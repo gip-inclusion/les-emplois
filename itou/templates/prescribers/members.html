@@ -6,34 +6,29 @@
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block title_content %}
-    <h1>Collaborateurs</h1>
-    <p>
-        Vous êtes connecté(e) en tant que <b>{{ user.get_full_name }}</b> ({{ user.email }})
-    </p>
-{% endblock %}
+{% block title_content %}<h1>Organisation</h1>{% endblock %}
 
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <h2>{{ organization.display_name }}</h2>
-            <div class="row">
-                <div class="col-12">
-                    <div class="c-box">
-                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between">
-                            <h3 class="h4 mb-0">Collaborateurs</h3>
-                            <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les collaborateurs">
-                                <a class="btn btn-primary btn-ico justify-content-center mt-3 mt-md-0" href="{% url 'invitations_views:invite_prescriber_with_org' %}">
-                                    <i class="ri-user-add-line ri-lg"></i>
-                                    <span>Inviter des collaborateurs</span>
-                                </a>
-                            </div>
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
+                        <h2 class="mb-0">Collaborateurs</h2>
+                        <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les collaborateurs">
+                            <a class="btn btn-primary btn-ico" href="{% url 'invitations_views:invite_prescriber_with_org' %}">
+                                <i class="ri-user-add-line ri-lg" aria-hidden="true"></i>
+                                <span>Inviter des collaborateurs</span>
+                            </a>
                         </div>
-
-                        {% with active_admin_members=organization.active_admin_members base_url="prescribers_views" %}
-                            {% include "includes/members.html" %}
-                        {% endwith %}
                     </div>
+                    <p>
+                        Vous êtes connecté(e) en tant que <b>{{ user.get_full_name }}</b> ({{ user.email }})
+                    </p>
+
+                    {% with active_admin_members=organization.active_admin_members base_url="prescribers_views" %}
+                        {% include "includes/members.html" %}
+                    {% endwith %}
 
                     {% if pending_invitations %}
                         {% include "invitations_views/includes/pending_invitations.html" %}
