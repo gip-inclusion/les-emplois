@@ -7,7 +7,7 @@ from django.template.defaultfilters import title, urlencode
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertMessages, assertNotContains
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.common_apps.address.departments import department_from_postcode
 from itou.companies.enums import CompanyKind
@@ -72,13 +72,22 @@ class TestListEmployeeRecords:
         record_url = f"{record_base_url}?back_url={urlencode(url)}"
         assertContains(response, record_url)
 
+    def test_redirection_with_missing_or_empty_status(self, client):
+        client.force_login(self.user)
+
+        response = client.get(self.URL)
+        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
+
+        response = client.get(self.URL, data={"status": ""})
+        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
+
     def test_new_employee_records(self, client):
         """
         Check if new employee records / job applications are displayed in the list
         """
         client.force_login(self.user)
 
-        response = client.get(self.URL)
+        response = client.get(self.URL, data={"status": Status.NEW})
 
         assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
         assertContains(response, "Ville non renseignée")
@@ -91,10 +100,7 @@ class TestListEmployeeRecords:
         client.force_login(self.user)
         approval_number_formatted = format_filters.format_approval_number(self.job_application.approval.number)
 
-        response = client.get(self.URL)
-        assertContains(response, approval_number_formatted)
-
-        # Or NEW
+        # For NEW
         response = client.get(self.URL, data={"status": Status.NEW})
         assertContains(response, approval_number_formatted)
 
@@ -109,15 +115,15 @@ class TestListEmployeeRecords:
         other_approval_number_formatted = format_filters.format_approval_number(other_job_application.approval.number)
         client.force_login(self.user)
 
-        response = client.get(self.URL)
+        response = client.get(self.URL, data={"status": Status.NEW})
         assertContains(response, approval_number_formatted)
         assertContains(response, other_approval_number_formatted)
 
-        response = client.get(self.URL, data={"job_seeker": self.job_seeker.pk})
+        response = client.get(self.URL, data={"status": Status.NEW, "job_seeker": self.job_seeker.pk})
         assertContains(response, approval_number_formatted)
         assertNotContains(response, other_approval_number_formatted)
 
-        response = client.get(self.URL, data={"job_seeker": 0})
+        response = client.get(self.URL, data={"status": Status.NEW, "job_seeker": 0})
         assertContains(response, "Sélectionnez un choix valide. 0 n’en fait pas partie.")
         assertContains(response, approval_number_formatted)
         assertContains(response, other_approval_number_formatted)
@@ -129,7 +135,7 @@ class TestListEmployeeRecords:
         approval.end_at = datetime.date(2024, 10, 11)
         approval.save()
 
-        response = client.get(self.URL)
+        response = client.get(self.URL, data={"status": Status.NEW})
 
         assertContains(response, "<small>Date de début</small><strong>02/09/2023</strong>", html=True)
         assertContains(response, "<small>Date prévisionnelle de fin</small><strong>11/10/2024</strong>", html=True)
@@ -368,22 +374,26 @@ class TestListEmployeeRecords:
         )
 
         # Zzzzz's hiring start is more recent
-        self._check_employee_record_order(client, self.URL, job_applicationZ, job_applicationA)
+        self._check_employee_record_order(client, self.URL + "?status=NEW", job_applicationZ, job_applicationA)
 
         # order with -hiring_start_at is the default
         self._check_employee_record_order(
-            client, self.URL + "?order=-hiring_start_at", job_applicationZ, job_applicationA
+            client, self.URL + "?status=NEW&order=-hiring_start_at", job_applicationZ, job_applicationA
         )
         self._check_employee_record_order(
-            client, self.URL + "?order=hiring_start_at", job_applicationA, job_applicationZ
+            client, self.URL + "?status=NEW&order=hiring_start_at", job_applicationA, job_applicationZ
         )
 
         # Zzzzz after Aaaaa
-        self._check_employee_record_order(client, self.URL + "?order=name", job_applicationA, job_applicationZ)
-        self._check_employee_record_order(client, self.URL + "?order=-name", job_applicationZ, job_applicationA)
+        self._check_employee_record_order(
+            client, self.URL + "?status=NEW&order=name", job_applicationA, job_applicationZ
+        )
+        self._check_employee_record_order(
+            client, self.URL + "?status=NEW&order=-name", job_applicationZ, job_applicationA
+        )
 
         with assertSnapshotQueries(snapshot(name="employee records")):
-            client.get(self.URL)
+            client.get(self.URL, data={"status": Status.NEW})
 
     def test_rejected_employee_records_sorted(self, client, snapshot):
         client.force_login(self.user)
