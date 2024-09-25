@@ -175,7 +175,7 @@ class TestListEmployeeRecords:
             parse_response_to_soup(
                 response,
                 selector=".employee-records-list .c-box--results__footer",
-                replace_in_attr=[self.employee_record],
+                replace_in_attr=[self.employee_record, self.job_application],
             )
         ) == snapshot(name="action")
 

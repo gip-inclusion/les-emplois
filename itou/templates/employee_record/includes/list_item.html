@@ -1,6 +1,5 @@
 {% load job_seekers %}
 {% load format_filters %}
-{% load tally %}
 <div class="c-box c-box--results has-links-inside my-3 my-md-4">
     <div class="c-box--results__header">
         <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
@@ -119,11 +118,7 @@
     <div class="c-box--results__footer">
         {% if employee_record.job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
             <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                <a class="btn btn-primary btn-block w-100 w-md-auto has-external-link"
-                   href="{% tally_form_url "wzxQlg" employeerecord=employee_record.pk %}"
-                   target="_blank"
-                   rel="noopener"
-                   aria-label="Régulariser le n° de sécurité sociale {{ employee_record.job_application.job_seeker.get_full_name }} (ouverture dans un nouvel onglet)">Régulariser le n° de sécurité sociale</a>
+                {% include 'employee_record/includes/_regularize_nir_button.html' with employee_record=employee_record job_application=employee_record.job_application only %}
             </div>
         {% else %}
             <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
