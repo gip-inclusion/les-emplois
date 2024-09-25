@@ -506,6 +506,9 @@ def render_stats_ph(request, page_title, *, extra_params=None, extra_context=Non
 
 @login_required
 def stats_ph_state_main(request):
+    if not utils.can_view_stats_ph(request):
+        raise PermissionDenied
+
     context = {}
     if request.current_organization.kind in [PrescriberOrganizationKind.ML, PrescriberOrganizationKind.CAP_EMPLOI]:
         context["pilotage_webinar_banners"] = [
