@@ -7,10 +7,10 @@
             <div class="c-box--results__summary flex-grow-1">
                 <i class="ri-user-line" aria-hidden="true"></i>
                 <div>
-                    <h3>{{ item.job_seeker.get_full_name }}</h3>
+                    <h3>{{ employee_record.job_application.job_seeker.get_full_name }}</h3>
                     <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                         <span>
-                            <i class="ri-map-pin-2-line fw-normal me-1" aria-hidden="true"></i>{% profile_city_display item.job_seeker.jobseeker_profile %}
+                            <i class="ri-map-pin-2-line fw-normal me-1" aria-hidden="true"></i>{% profile_city_display employee_record.job_application.job_seeker.jobseeker_profile %}
                         </span>
                     </div>
                 </div>
@@ -21,7 +21,7 @@
     <hr class="m-0">
     <div class="c-box--results__body">
         {# ASP error #}
-        {% if employee_record and employee_record.status == "REJECTED" %}
+        {% if employee_record.status == "REJECTED" %}
             <div class="alert alert-warning" role="status">
                 <div class="row">
                     <div class="col-auto pe-0">
@@ -84,109 +84,71 @@
             </div>
         {% endif %}
         {# Actions #}
-        {% if not employee_record %}
-            {% if item.job_seeker.jobseeker_profile.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
-                <div class="alert alert-warning" role="status">
-                    <div class="row">
-                        <div class="col-auto pe-0">
-                            <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-                        </div>
-                        <div class="col">
-                            <p class="mb-2">
-                                <strong>Informations manquantes</strong>
-                            </p>
-                            <p class="mb-0">Pour créer cette fiche salarié, veuillez demander la régularisation du numéro de sécurité sociale.</p>
-                        </div>
+        {% if employee_record.job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
+            <div class="alert alert-warning" role="status">
+                <div class="row">
+                    <div class="col-auto pe-0">
+                        <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
+                    </div>
+                    <div class="col">
+                        <p class="mb-2">
+                            <strong>Informations manquantes</strong>
+                        </p>
+                        <p class="mb-0">Pour créer cette fiche salarié, veuillez demander la régularisation du numéro de sécurité sociale.</p>
                     </div>
                 </div>
-            {% elif item.date_were_not_transmitted %}
-                <div class="alert alert-warning" role="status">
-                    <div class="row">
-                        <div class="col-auto pe-0">
-                            <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-                        </div>
-                        <div class="col">
-                            <p class="mb-2">
-                                <strong>Une action de votre part est nécessaire</strong>
-                            </p>
-                            <p class="mb-0">
-                                La nouvelle date de fin du PASS IAE n’a pas pu être transmise automatiquement à l’Extranet IAE 2.0 de l’ASP.
-                                Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
+            </div>
         {% endif %}
         <ul class="list-data list-data__two-column-md">
             <li>
                 <small>Numéro de PASS IAE</small>
-                <strong>{{ item.approval.number|format_approval_number }}</strong>
-                {% include 'includes/copy_to_clipboard.html' with content=item.approval.number css_classes="btn-link" only_icon=True %}
+                <strong>{{ employee_record.job_application.approval.number|format_approval_number }}</strong>
+                {% include 'includes/copy_to_clipboard.html' with content=employee_record.job_application.approval.number css_classes="btn-link" only_icon=True %}
             </li>
             <li>
                 <small>Date de début</small>
-                <strong>{{ item.approval.start_at|date:"d/m/Y" }}</strong>
+                <strong>{{ employee_record.job_application.approval.start_at|date:"d/m/Y" }}</strong>
             </li>
             <li>
                 <small>Date prévisionnelle de fin</small>
-                <strong>{{ item.approval.end_at|date:"d/m/Y" }}</strong>
+                <strong>{{ employee_record.job_application.approval.end_at|date:"d/m/Y" }}</strong>
             </li>
         </ul>
     </div>
     {# Actions #}
-    {% if not employee_record %}
-        {% if item.job_seeker.jobseeker_profile.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
-            <div class="c-box--results__footer">
-                <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                    <a class="btn btn-primary btn-block w-100 w-md-auto has-external-link"
-                       href="{% tally_form_url "wzxQlg" %}{{ item.nir_tally_params }}"
-                       target="_blank"
-                       rel="noopener"
-                       aria-label="Régulariser le n° de sécurité sociale {{ item.job_seeker.get_full_name }} (ouverture dans un nouvel onglet)">Régulariser le n° de sécurité sociale</a>
-                </div>
-            </div>
-        {% elif item.date_were_not_transmitted %}
-            <div class="c-box--results__footer">
-                <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                    <a class="btn btn-primary btn-block w-100 w-md-auto" href="{% url "employee_record_views:create" item.id %}" aria-label="Mettre à jour la fiche salarié de {{ item.job_seeker.get_full_name }}">Mettre à jour</a>
-                </div>
+    <div class="c-box--results__footer">
+        {% if employee_record.job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
+            <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+                <a class="btn btn-primary btn-block w-100 w-md-auto has-external-link"
+                   href="{% tally_form_url "wzxQlg" employeerecord=employee_record.pk %}"
+                   target="_blank"
+                   rel="noopener"
+                   aria-label="Régulariser le n° de sécurité sociale {{ employee_record.job_application.job_seeker.get_full_name }} (ouverture dans un nouvel onglet)">Régulariser le n° de sécurité sociale</a>
             </div>
         {% else %}
-            <div class="c-box--results__footer">
-                <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                    {% if item.employee_record_new %}
-                        <a href="{% url "employee_record_views:disable" item.employee_record_new.id %}"
-                           class="btn btn-outline-primary btn-block w-100 w-md-auto"
-                           aria-label="Désactiver la fiche salarié de {{ item.job_seeker.get_full_name }}">Désactiver</a>
-                    {% endif %}
-                    <a href="{% url "employee_record_views:create" item.id %}?from_status=NEW"
-                       class="btn btn-primary btn-block w-100 w-md-auto"
-                       aria-label="Compléter la fiche salarié de {{ item.job_seeker.get_full_name }}">Compléter</a>
-                </div>
-            </div>
-        {% endif %}
-    {% else %}
-        <div class="c-box--results__footer">
             <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                {% if employee_record.status == "DISABLED" %}
-                    <a href="{% url "employee_record_views:reactivate" employee_record.id %}"
-                       class="btn btn-outline-primary btn-block w-100 w-md-auto"
-                       aria-label="Réactiver la fiche salarié de {{ item.job_seeker.get_full_name }}">Réactiver</a>
-                {% elif employee_record.can_be_disabled %}
+                {% if employee_record.can_be_disabled %}
                     <a href="{% url "employee_record_views:disable" employee_record.id %}"
                        class="btn btn-outline-primary btn-block w-100 w-md-auto"
-                       aria-label="Désactiver la fiche salarié de {{ item.job_seeker.get_full_name }}">Désactiver</a>
+                       aria-label="Désactiver la fiche salarié de {{ employee_record.job_application.job_seeker.get_full_name }}">Désactiver</a>
+                {% elif employee_record.status == "DISABLED" %}
+                    <a href="{% url "employee_record_views:reactivate" employee_record.id %}"
+                       class="btn btn-outline-primary btn-block w-100 w-md-auto"
+                       aria-label="Réactiver la fiche salarié de {{ employee_record.job_application.job_seeker.get_full_name }}">Réactiver</a>
                 {% endif %}
                 <a href="{% url "employee_record_views:summary" employee_record.id %}?back_url={{ current_url|urlencode }}"
-                   class="btn {% if employee_record.status == "REJECTED" %}btn-outline-primary{% else %}btn-primary{% endif %} btn-block w-100 w-md-auto"
-                   aria-label="Voir la fiche salarié de {{ item.job_seeker.get_full_name }}">Voir la fiche salarié</a>
-                {% if employee_record.status == "REJECTED" %}
-                    <a href="{% url "employee_record_views:create" item.id %}?from_status={{ employee_record.status }}"
+                   class="btn {% if employee_record.status == "NEW" or employee_record.status == "REJECTED" %}btn-outline-primary{% else %}btn-primary{% endif %} btn-block w-100 w-md-auto"
+                   aria-label="Voir la fiche salarié de {{ employee_record.job_application.job_seeker.get_full_name }}">Voir la fiche salarié</a>
+                {% if employee_record.status == "NEW" %}
+                    <a href="{% url "employee_record_views:create" employee_record.job_application.id %}?from_status={{ employee_record.status }}"
                        class="btn btn-primary btn-block w-100 w-md-auto"
-                       aria-label="Modifier la fiche salarié de {{ item.job_seeker.get_full_name }}">Modifier</a>
+                       aria-label="Compléter la fiche salarié de {{ employee_record.job_application.job_seeker.get_full_name }}">Compléter</a>
+                {% elif employee_record.status == "REJECTED" %}
+                    <a href="{% url "employee_record_views:create" employee_record.job_application.id %}?from_status={{ employee_record.status }}"
+                       class="btn btn-primary btn-block w-100 w-md-auto"
+                       aria-label="Modifier la fiche salarié de {{ employee_record.job_application.job_seeker.get_full_name }}">Modifier</a>
                 {% endif %}
             </div>
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
 </div>

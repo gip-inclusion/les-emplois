@@ -2,154 +2,34 @@
 # name: TestListEmployeeRecords.test_employee_record_to_disable
   '''
   <div class="c-box--results__footer">
-                  <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                      
-                          <a aria-label="Désactiver la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/disable/[PK of EmployeeRecord]">Désactiver</a>
-                      
+          
+              <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+                  
+                      <a aria-label="Désactiver la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/disable/[PK of EmployeeRecord]">Désactiver</a>
+                  
+                  <a aria-label="Voir la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/summary/[PK of EmployeeRecord]?back_url=/employee_record/list%3Fstatus%3DNEW">Voir la fiche salarié</a>
+                  
                       <a aria-label="Compléter la fiche salarié de Jane DOE" class="btn btn-primary btn-block w-100 w-md-auto" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">Compléter</a>
-                  </div>
+                  
               </div>
-  '''
-# ---
-# name: TestListEmployeeRecords.test_employee_record_to_disable_with_nir_associated_to_other[action]
-  '''
-  <div class="c-box--results__footer">
-                  <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                      <a aria-label="Régulariser le n° de sécurité sociale Jane DOE (ouverture dans un nouvel onglet)" class="btn btn-primary btn-block w-100 w-md-auto has-external-link" href="https://tally.so/r/wzxQlg?employeerecord=[PK of EmployeeRecord]" rel="noopener" target="_blank">Régulariser le n° de sécurité sociale</a>
-                  </div>
-              </div>
-  '''
-# ---
-# name: TestListEmployeeRecords.test_employee_record_to_disable_with_nir_associated_to_other[alert]
-  '''
-  <div class="alert alert-warning" role="status">
-              <div class="row">
-                  <div class="col-auto pe-0">
-                      <i aria-hidden="true" class="ri-error-warning-line ri-xl text-danger"></i>
-                  </div>
-                  <div class="col">
-                      <p class="mb-2">
-                          <strong>Une action de votre part est nécessaire</strong>
-                      </p>
-                      <p class="mb-0">
-                          Attention, nous avons détecté une ou plusieurs fiches salarié qui nécessitent une régularisation manuelle de votre part.
-                      </p>
-                  </div>
-              </div>
-          </div>
-  '''
-# ---
-# name: TestListEmployeeRecords.test_employee_records_with_a_prolongation_need_to_be_updated[action]
-  '''
-  <div class="c-box--results__footer">
-                  <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                      <a aria-label="Mettre à jour la fiche salarié de Jane DOE" class="btn btn-primary btn-block w-100 w-md-auto" href="/employee_record/create/[PK of JobApplication]">Mettre à jour</a>
-                  </div>
-              </div>
-  '''
-# ---
-# name: TestListEmployeeRecords.test_employee_records_with_a_prolongation_need_to_be_updated[alert]
-  '''
-  <div class="alert alert-warning" role="status">
-              <div class="row">
-                  <div class="col-auto pe-0">
-                      <i aria-hidden="true" class="ri-error-warning-line ri-xl text-danger"></i>
-                  </div>
-                  <div class="col">
-                      <p class="mb-2">
-                          <strong>Une action de votre part est nécessaire</strong>
-                      </p>
-                      <p class="mb-0">
-                          Attention, nous avons détecté une ou plusieurs fiches salarié qui nécessitent une régularisation manuelle de votre part.
-                      </p>
-                  </div>
-              </div>
-          </div>
-  '''
-# ---
-# name: TestListEmployeeRecords.test_employee_records_with_a_suspension_need_to_be_updated[action]
-  '''
-  <div class="c-box--results__footer">
-                  <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                      <a aria-label="Mettre à jour la fiche salarié de Jane DOE" class="btn btn-primary btn-block w-100 w-md-auto" href="/employee_record/create/[PK of JobApplication]">Mettre à jour</a>
-                  </div>
-              </div>
-  '''
-# ---
-# name: TestListEmployeeRecords.test_employee_records_with_a_suspension_need_to_be_updated[alert]
-  '''
-  <div class="alert alert-warning" role="status">
-              <div class="row">
-                  <div class="col-auto pe-0">
-                      <i aria-hidden="true" class="ri-error-warning-line ri-xl text-danger"></i>
-                  </div>
-                  <div class="col">
-                      <p class="mb-2">
-                          <strong>Une action de votre part est nécessaire</strong>
-                      </p>
-                      <p class="mb-0">
-                          Attention, nous avons détecté une ou plusieurs fiches salarié qui nécessitent une régularisation manuelle de votre part.
-                      </p>
-                  </div>
-              </div>
-          </div>
+          
+      </div>
   '''
 # ---
 # name: TestListEmployeeRecords.test_employee_records_with_nir_associated_to_other[action]
   '''
   <div class="c-box--results__footer">
-                  <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                      <a aria-label="Régulariser le n° de sécurité sociale Jane DOE (ouverture dans un nouvel onglet)" class="btn btn-primary btn-block w-100 w-md-auto has-external-link" href="https://tally.so/r/wzxQlg?jobapplication=[PK of JobApplication]" rel="noopener" target="_blank">Régulariser le n° de sécurité sociale</a>
-                  </div>
+          
+              <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+                  <a aria-label="Régulariser le n° de sécurité sociale Jane DOE (ouverture dans un nouvel onglet)" class="btn btn-primary btn-block w-100 w-md-auto has-external-link" href="https://tally.so/r/wzxQlg?employeerecord=[PK of EmployeeRecord]" rel="noopener" target="_blank">Régulariser le n° de sécurité sociale</a>
               </div>
-  '''
-# ---
-# name: TestListEmployeeRecords.test_employee_records_with_nir_associated_to_other[alert]
-  '''
-  <div class="alert alert-warning" role="status">
-              <div class="row">
-                  <div class="col-auto pe-0">
-                      <i aria-hidden="true" class="ri-error-warning-line ri-xl text-danger"></i>
-                  </div>
-                  <div class="col">
-                      <p class="mb-2">
-                          <strong>Une action de votre part est nécessaire</strong>
-                      </p>
-                      <p class="mb-0">
-                          Attention, nous avons détecté une ou plusieurs fiches salarié qui nécessitent une régularisation manuelle de votre part.
-                      </p>
-                  </div>
-              </div>
-          </div>
-  '''
-# ---
-# name: TestListEmployeeRecords.test_existing_employee_records_with_a_prolongation_does_not_show_need_to_be_updated_message
-  '''
-  <div class="c-box--results__footer">
-                  <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                      
-                          <a aria-label="Désactiver la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/disable/[PK of EmployeeRecord]">Désactiver</a>
-                      
-                      <a aria-label="Compléter la fiche salarié de Jane DOE" class="btn btn-primary btn-block w-100 w-md-auto" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">Compléter</a>
-                  </div>
-              </div>
-  '''
-# ---
-# name: TestListEmployeeRecords.test_existing_employee_records_with_a_suspension_does_not_show_need_to_be_updated_message
-  '''
-  <div class="c-box--results__footer">
-                  <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                      
-                          <a aria-label="Désactiver la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/disable/[PK of EmployeeRecord]">Désactiver</a>
-                      
-                      <a aria-label="Compléter la fiche salarié de Jane DOE" class="btn btn-primary btn-block w-100 w-md-auto" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">Compléter</a>
-                  </div>
-              </div>
+          
+      </div>
   '''
 # ---
 # name: TestListEmployeeRecords.test_new_employee_records_sorted[employee records]
   dict({
-    'num_queries': 12,
+    'num_queries': 11,
     'queries': list([
       dict({
         'origin': list([
@@ -422,10 +302,73 @@
       }),
       dict({
         'origin': list([
+          'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
+          'pager[utils/pagination.py]',
           'list_employee_records[www/employee_record_views/views.py]',
         ]),
         'sql': '''
-          SELECT "job_applications_jobapplication"."id",
+          SELECT COUNT(*) AS "__count"
+          FROM "employee_record_employeerecord"
+          INNER JOIN "job_applications_jobapplication" ON ("employee_record_employeerecord"."job_application_id" = "job_applications_jobapplication"."id")
+          WHERE ("job_applications_jobapplication"."to_company_id" = %s
+                 AND "employee_record_employeerecord"."status" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.convention_can_be_accessed_by[companies/models.py]',
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[employee_record/list.html]',
+          'list_employee_records[www/employee_record_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+                    WHERE (U0."company_id" = %s
+                           AND U2."is_active"
+                           AND U0."is_active"
+                           AND U0."is_admin"
+                           AND U2."is_active"))
+                 AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[employee_record/includes/list_results.html]',
+          'IncludeNode[employee_record/list.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[employee_record/list.html]',
+          'list_employee_records[www/employee_record_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "employee_record_employeerecord"."id",
+                 "employee_record_employeerecord"."asp_processing_code",
+                 "employee_record_employeerecord"."asp_processing_label",
+                 "employee_record_employeerecord"."asp_batch_file",
+                 "employee_record_employeerecord"."asp_batch_line_number",
+                 "employee_record_employeerecord"."archived_json",
+                 "employee_record_employeerecord"."created_at",
+                 "employee_record_employeerecord"."updated_at",
+                 "employee_record_employeerecord"."processed_at",
+                 "employee_record_employeerecord"."status",
+                 "employee_record_employeerecord"."job_application_id",
+                 "employee_record_employeerecord"."financial_annex_id",
+                 "employee_record_employeerecord"."approval_number",
+                 "employee_record_employeerecord"."asp_id",
+                 "employee_record_employeerecord"."asp_measure",
+                 "employee_record_employeerecord"."siret",
+                 "employee_record_employeerecord"."processed_as_duplicate",
+                 "job_applications_jobapplication"."id",
                  "job_applications_jobapplication"."job_seeker_id",
                  "job_applications_jobapplication"."eligibility_diagnosis_id",
                  "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
@@ -471,22 +414,6 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "approvals_suspension" U0
-             INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
-             INNER JOIN "job_applications_jobapplication" U2 ON (U1."id" = U2."approval_id")
-             WHERE (U2."id" = ("job_applications_jobapplication"."id")
-                    AND U0."siae_id" = %s)
-             LIMIT 1) AS "has_suspension",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "approvals_prolongation" U0
-             INNER JOIN "approvals_approval" U1 ON (U0."approval_id" = U1."id")
-             INNER JOIN "job_applications_jobapplication" U2 ON (U1."id" = U2."approval_id")
-             WHERE (U2."id" = ("job_applications_jobapplication"."id")
-                    AND U0."declared_by_siae_id" = %s)
-             LIMIT 1) AS "has_prolongation",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -549,6 +476,89 @@
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department",
+                 T8."id",
+                 T8."start_date",
+                 T8."end_date",
+                 T8."code",
+                 T8."name",
+                 T8."created_at",
+                 T8."city_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."is_head_office",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."is_authorized",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
                  "approvals_approval"."id",
                  "approvals_approval"."start_at",
                  "approvals_approval"."end_at",
@@ -566,133 +576,30 @@
                  "approvals_approval"."origin_siae_siret",
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
-          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
-          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
-          WHERE ("job_applications_jobapplication"."id" IN (
-                                                              (SELECT U0."id" AS "col1"
-                                                               FROM "job_applications_jobapplication" U0
-                                                               INNER JOIN "employee_record_employeerecord" U1 ON (U0."id" = U1."job_application_id")
-                                                               WHERE (U1."status" = %s
-                                                                      AND U0."to_company_id" = %s)
-                                                               ORDER BY U0."created_at" DESC)
-                                                            UNION
-                                                              (SELECT U0."id" AS "col1"
-                                                               FROM "job_applications_jobapplication" U0
-                                                               LEFT OUTER JOIN "employee_record_employeerecord" U2 ON (U0."id" = U2."job_application_id")
-                                                               WHERE (U0."state" = %s
-                                                                      AND U0."approval_id" IS NOT NULL
-                                                                      AND U0."create_employee_record"
-                                                                      AND U2."id" IS NULL
-                                                                      AND U0."hiring_start_at" >= %s
-                                                                      AND U0."to_company_id" = %s)
-                                                               ORDER BY U0."created_at" DESC)
-                                                            UNION
-                                                              (SELECT V0."id" AS "col1"
-                                                               FROM "job_applications_jobapplication" V0
-                                                               LEFT OUTER JOIN "employee_record_employeerecord" V3 ON (V0."id" = V3."job_application_id")
-                                                               WHERE (V0."state" = %s
-                                                                      AND ((V0."create_employee_record"
-                                                                            AND EXISTS
-                                                                              (SELECT %s AS "a"
-                                                                               FROM "approvals_suspension" U0
-                                                                               WHERE (U0."approval_id" = (V0."approval_id")
-                                                                                      AND U0."created_at" >= %s
-                                                                                      AND U0."siae_id" = (V0."to_company_id"))
-                                                                               LIMIT 1))
-                                                                           OR EXISTS
-                                                                             (SELECT %s AS "a"
-                                                                              FROM "approvals_prolongation" U0
-                                                                              WHERE (U0."approval_id" = (V0."approval_id")
-                                                                                     AND U0."created_at" >= %s
-                                                                                     AND U0."declared_by_siae_id" = (V0."to_company_id"))
-                                                                              LIMIT 1))
-                                                                      AND V3."id" IS NULL
-                                                                      AND V0."to_company_id" = %s)
-                                                               ORDER BY V0."created_at" DESC))
-                 AND NOT ("approvals_approval"."number" IN
-                            (SELECT V0."approval_number"
-                             FROM "employee_record_employeerecord" V0
-                             INNER JOIN "job_applications_jobapplication" V1 ON (V0."job_application_id" = V1."id")
-                             WHERE (V1."to_company_id" IN
-                                      (SELECT U0."id"
-                                       FROM "companies_company" U0
-                                       WHERE (NOT (U0."siret" = %s)
-                                              AND U0."convention_id" = %s))
-                                    AND NOT (V0."status" IN (%s))))
-                          AND "approvals_approval"."number" IS NOT NULL))
-          ORDER BY "job_applications_jobapplication"."hiring_start_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'list_employee_records[www/employee_record_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "employee_record_employeerecord"."id",
-                 "employee_record_employeerecord"."asp_processing_code",
-                 "employee_record_employeerecord"."asp_processing_label",
-                 "employee_record_employeerecord"."asp_batch_file",
-                 "employee_record_employeerecord"."asp_batch_line_number",
-                 "employee_record_employeerecord"."archived_json",
-                 "employee_record_employeerecord"."created_at",
-                 "employee_record_employeerecord"."updated_at",
-                 "employee_record_employeerecord"."processed_at",
-                 "employee_record_employeerecord"."status",
-                 "employee_record_employeerecord"."job_application_id",
-                 "employee_record_employeerecord"."financial_annex_id",
-                 "employee_record_employeerecord"."approval_number",
-                 "employee_record_employeerecord"."asp_id",
-                 "employee_record_employeerecord"."asp_measure",
-                 "employee_record_employeerecord"."siret",
-                 "employee_record_employeerecord"."processed_as_duplicate"
-          FROM "employee_record_employeerecord"
-          WHERE "employee_record_employeerecord"."job_application_id" IN (%s,
-                                                                          %s,
-                                                                          %s)
-          ORDER BY "employee_record_employeerecord"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'list_employee_records[www/employee_record_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT COUNT(*) AS "__count"
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "companies_siaefinancialannex"."id",
+                 "companies_siaefinancialannex"."number",
+                 "companies_siaefinancialannex"."state",
+                 "companies_siaefinancialannex"."start_at",
+                 "companies_siaefinancialannex"."end_at",
+                 "companies_siaefinancialannex"."created_at",
+                 "companies_siaefinancialannex"."updated_at",
+                 "companies_siaefinancialannex"."convention_id"
           FROM "employee_record_employeerecord"
           INNER JOIN "job_applications_jobapplication" ON ("employee_record_employeerecord"."job_application_id" = "job_applications_jobapplication"."id")
+          INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+          LEFT OUTER JOIN "asp_commune" ON ("users_jobseekerprofile"."birth_place_id" = "asp_commune"."id")
+          LEFT OUTER JOIN "asp_country" ON ("users_jobseekerprofile"."birth_country_id" = "asp_country"."id")
+          LEFT OUTER JOIN "asp_commune" T8 ON ("users_jobseekerprofile"."hexa_commune_id" = T8."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
+          LEFT OUTER JOIN "companies_siaefinancialannex" ON ("employee_record_employeerecord"."financial_annex_id" = "companies_siaefinancialannex"."id")
           WHERE ("job_applications_jobapplication"."to_company_id" = %s
                  AND "employee_record_employeerecord"."status" = %s)
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
-          'Company.convention_can_be_accessed_by[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[employee_record/list.html]',
-          'list_employee_records[www/employee_record_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "users_user"
-          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
-          WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
-                           AND U0."is_active"
-                           AND U0."is_admin"
-                           AND U2."is_active"))
-                 AND "users_user"."id" = %s)
-          LIMIT 1
+          ORDER BY "job_applications_jobapplication"."hiring_start_at" DESC
+          LIMIT 3
         ''',
       }),
       dict({

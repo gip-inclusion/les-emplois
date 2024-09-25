@@ -9,27 +9,6 @@
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block title_messages %}
-    {{ block.super }}
-    {% if need_manual_regularization %}
-        <div class="alert alert-warning" role="status">
-            <div class="row">
-                <div class="col-auto pe-0">
-                    <i class="ri-error-warning-line ri-xl text-danger" aria-hidden="true"></i>
-                </div>
-                <div class="col">
-                    <p class="mb-2">
-                        <strong>Une action de votre part est nécessaire</strong>
-                    </p>
-                    <p class="mb-0">
-                        Attention, nous avons détecté une ou plusieurs fiches salarié qui nécessitent une régularisation manuelle de votre part.
-                    </p>
-                </div>
-            </div>
-        </div>
-    {% endif %}
-{% endblock %}
-
 {% block title_content %}<h1>Salariés</h1>{% endblock %}
 
 {% block title_extra %}
