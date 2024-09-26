@@ -376,6 +376,7 @@
           <div class="form-row align-items-center justify-content-end gx-3">
               <div class="form-group col-12 col-lg order-3 order-lg-1">
                   
+                      
                       <button type="button" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire" data-bs-toggle="modal" data-bs-target="#confirm_reset_modal">
                           <i class="ri-close-line ri-lg" aria-hidden="true"></i>
                           <span>Annuler</span>
@@ -384,12 +385,11 @@
               </div>
               
                   <div class="form-group col col-lg-auto order-1 order-lg-2">
-                      <a href="/prev"
-                         class="btn btn-block btn-outline-primary"
-                         aria-label="label"
-                         >
-                          <span>Retour</span>
-                      </a>
+                      
+                          <a href="/prev" class="btn btn-block btn-outline-primary" aria-label="label">
+                              <span>Retour</span>
+                          </a>
+                      
                   </div>
               
               <div class="form-group col col-lg-auto order-2 order-lg-3">
@@ -441,6 +441,7 @@
           <div class="form-row align-items-center justify-content-end gx-3">
               <div class="form-group col-12 col-lg order-3 order-lg-1">
                   
+                      
                       <button type="button" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire" data-bs-toggle="modal" data-bs-target="#confirm_reset_modal">
                           <i class="ri-close-line ri-lg" aria-hidden="true"></i>
                           <span>Annuler</span>
@@ -449,12 +450,11 @@
               </div>
               
                   <div class="form-group col col-lg-auto order-1 order-lg-2">
-                      <a href="/do"
-                         class="btn btn-block btn-outline-primary"
-                         aria-label="Retourner à l’étape précédente"
-                         name="name" value="1">
-                          <span>Retour</span>
-                      </a>
+                      
+                          <button type="submit" class="btn btn-block btn-outline-primary" aria-label="Retourner à l’étape précédente" name="name" value="1">
+                              <span>Retour</span>
+                          </button>
+                      
                   </div>
               
               <div class="form-group col col-lg-auto order-2 order-lg-3">
@@ -506,6 +506,7 @@
           <div class="form-row align-items-center justify-content-end gx-3">
               <div class="form-group col-12 col-lg order-3 order-lg-1">
                   
+                      
                       <button type="button" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire" data-bs-toggle="modal" data-bs-target="#confirm_reset_modal">
                           <i class="ri-close-line ri-lg" aria-hidden="true"></i>
                           <span>Annuler</span>
@@ -514,12 +515,11 @@
               </div>
               
                   <div class="form-group col col-lg-auto order-1 order-lg-2">
-                      <a href="/do"
-                         class="btn btn-block btn-outline-primary"
-                         aria-label="Retourner à l’étape précédente"
-                         >
-                          <span>Retour</span>
-                      </a>
+                      
+                          <a href="/do" class="btn btn-block btn-outline-primary" aria-label="Retourner à l’étape précédente">
+                              <span>Retour</span>
+                          </a>
+                      
                   </div>
               
               <div class="form-group col col-lg-auto order-2 order-lg-3">

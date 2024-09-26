@@ -81,7 +81,7 @@
                                 <p>
                                     En confirmant cette demande je certifie sur l'honneur que le motif de suspension choisi correspond à la situation du salarié.
                                 </p>
-                                {% itou_buttons_form primary_label="Confirmer la suspension" primary_aria_label="Confirmer la suspension du PASS IAE de "|add:approval.user.get_full_name primary_name="save" primary_value=1 secondary_url=request.path|add:"?back_url="|add:back_url secondary_name="edit" secondary_value="1" reset_url=back_url show_mandatory_fields_mention=False %}
+                                {% itou_buttons_form primary_label="Confirmer la suspension" primary_aria_label="Confirmer la suspension du PASS IAE de "|add:approval.user.get_full_name primary_name="save" primary_value=1 secondary_name="edit" secondary_value="1" reset_url=back_url show_mandatory_fields_mention=False %}
 
                             </form>
                         </div>
