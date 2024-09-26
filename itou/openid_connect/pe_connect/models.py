@@ -17,3 +17,4 @@ class PoleEmploiConnectUserData(OIDConnectUserData):
     kind: UserKind = UserKind.JOB_SEEKER
     identity_provider: IdentityProvider = IdentityProvider.PE_CONNECT
     login_allowed_user_kinds: ClassVar[list[UserKind]] = [UserKind.JOB_SEEKER]
+    allowed_identity_provider_migration: ClassVar[list[IdentityProvider]] = [IdentityProvider.DJANGO]

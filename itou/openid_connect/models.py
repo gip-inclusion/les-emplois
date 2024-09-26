@@ -106,6 +106,7 @@ class OIDConnectUserData:
     identity_provider: IdentityProvider
     kind: UserKind
     login_allowed_user_kinds: ClassVar[list[UserKind]]
+    allowed_identity_provider_migration: ClassVar[list[IdentityProvider]] = dataclasses.field(default=list)
 
     def check_valid_kind(self, user, user_data_dict, is_login):
         if user.kind not in self.login_allowed_user_kinds or (user.kind != user_data_dict["kind"] and not is_login):
@@ -128,23 +129,24 @@ class OIDConnectUserData:
         birthdate = user_data_dict.pop(
             "birthdate", _no_birthdate
         )  # This field is stored on JobSeekerProfile and not User
+        update_user_info = True
+        created = False
         try:
             # Look if a user with the given sub (username) exists for this identity_provider
             # We can't use a get_or_create here because we have to set the provider data for each field.
             user = User.objects.get(username=self.username, identity_provider=self.identity_provider)
-            created = False
         except User.DoesNotExist:
             try:
                 # A different user has already claimed this email address (we require emails to be unique)
                 user = User.objects.get(email=self.email)
-                created = False
                 if user.identity_provider == self.identity_provider:
                     raise EmailInUseException(user)
-                # It is possible to "upgrade" a Django account to an SSO, but not to replace an SSO
-                if user.identity_provider != IdentityProvider.DJANGO:
-                    self.check_valid_kind(user, user_data_dict, is_login)
-                    # Don't update a user handled by another SSO provider.
-                    return user, created
+                # if it can, do we update the account -> if not don't update user info
+                if user.identity_provider not in self.allowed_identity_provider_migration:
+                    # Updating a user info also changes the identity_provider
+                    update_user_info = False
+                    # If we want to prevent the user to login if the account is handled by another provider
+                    # don't change update_user_info and just raise a new error here.
             except User.DoesNotExist:
                 # User.objects.create_user does the following:
                 # - set User.is_active to true,
@@ -154,11 +156,11 @@ class OIDConnectUserData:
                 # provider the code will break here. We know it but since it's highly unlikely we just added a test
                 # on this behaviour. No need to do a fancy bypass if it's never used.
                 user = User.objects.create_user(**user_data_dict)
+                update_user_info = False
                 created = True
                 if birthdate is not _no_birthdate and user_data_dict["kind"] == UserKind.JOB_SEEKER:
                     user.jobseeker_profile.birthdate = birthdate
                     user.jobseeker_profile.save(update_fields={"birthdate"})
-
         else:
             other_user = User.objects.exclude(pk=user.pk).filter(email=self.email).first()
             if other_user:
@@ -168,7 +170,7 @@ class OIDConnectUserData:
 
         self.check_valid_kind(user, user_data_dict, is_login)
 
-        if not created:
+        if update_user_info:
             for key, value in user_data_dict.items():
                 # Don't update kind on login, it allows prescribers to log through employer form
                 # which happens a lot...
@@ -179,9 +181,11 @@ class OIDConnectUserData:
                 user.jobseeker_profile.birthdate = birthdate
                 user.jobseeker_profile.save(update_fields={"birthdate"})
 
-        for key, value in user_data_dict.items():
-            user.update_external_data_source_history_field(provider=self.identity_provider, field=key, value=value)
-        user.save()
+        if created or update_user_info:
+            for key, value in user_data_dict.items():
+                user.update_external_data_source_history_field(provider=self.identity_provider, field=key, value=value)
+            user.save()
+
         return user, created
 
     @staticmethod
