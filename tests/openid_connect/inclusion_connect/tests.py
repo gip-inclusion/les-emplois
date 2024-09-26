@@ -363,6 +363,13 @@ class InclusionConnectAuthorizeViewTest(InclusionConnectBaseTestCase):
                 response = self.client.get(url)
                 self.assertRedirects(response, reverse("search:employers_home"))
 
+    def test_next_url(self):
+        url = f"{reverse('inclusion_connect:authorize')}?{urlencode({'next_url': 'https://external.url.com'})}"
+        with self.assertLogs() as cm:
+            response = self.client.get(url, follow=False)
+        self.assertRedirects(response, reverse("search:employers_home"))
+        assert cm.records[0].message == "Forbidden external url"
+
 
 class InclusionConnectCallbackViewTest(MessagesTestMixin, InclusionConnectBaseTestCase):
     @respx.mock

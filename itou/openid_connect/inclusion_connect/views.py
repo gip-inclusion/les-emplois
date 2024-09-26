@@ -3,13 +3,14 @@ import logging
 
 import httpx
 from allauth.account.adapter import get_adapter
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import crypto
 from django.utils.html import format_html
-from django.utils.http import urlencode
+from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider, UserKind
@@ -117,6 +118,8 @@ def inclusion_connect_authorize(request):
     user_kind = request.GET.get("user_kind")
     previous_url = request.GET.get("previous_url", reverse("search:employers_home"))
     next_url = request.GET.get("next_url")
+    if next_url and not url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS, request.is_secure()):
+        return _redirect_to_login_page_on_error(error_msg="Forbidden external url")
     register = request.GET.get("register")
     if not user_kind:
         return _redirect_to_login_page_on_error(error_msg="User kind missing.")
