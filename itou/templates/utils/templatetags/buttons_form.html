@@ -41,7 +41,6 @@
                     <a href="{{ primary_url }}"
                        class="btn btn-block btn-primary"
                        aria-label="{{ primary_aria_label }}"
-                       {% if primary_name and primary_value %}name="{{ primary_name }}" value="{{ primary_value }}"{% endif %}
                        {% if matomo_category and matomo_action and matomo_name %}{% matomo_event matomo_category matomo_action matomo_name %}{% endif %}>
                         <span>{{ primary_label }}</span>
                     </a>

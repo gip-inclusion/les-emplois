@@ -314,7 +314,6 @@
                       <a href="/next"
                          class="btn btn-block btn-primary"
                          aria-label="Passer à l’étape suivante"
-                         
                          >
                           <span>Suivant</span>
                       </a>
@@ -351,7 +350,6 @@
                       <a href="/next"
                          class="btn btn-block btn-primary"
                          aria-label="label"
-                         name="name" value="1"
                          data-matomo-event="true" data-matomo-category="category" data-matomo-action="action" data-matomo-option="name">
                           <span>Suivant</span>
                       </a>
