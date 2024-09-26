@@ -17,7 +17,7 @@ from itou.openid_connect.france_connect.models import FranceConnectState, France
 from itou.openid_connect.models import EmailInUseException, InvalidKindException
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
-from tests.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
+from tests.users.factories import JobSeekerFactory, UserFactory
 from tests.utils.test import TestCase, reload_module
 
 
@@ -231,48 +231,7 @@ class FranceConnectTest(TestCase):
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
         assert user.external_data_source_history != {}
 
-    def test_create_django_user_with_already_existing_fc_email(self):
-        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        JobSeekerFactory(
-            username="another_username",
-            email=fc_user_data.email,
-            identity_provider=IdentityProvider.FRANCE_CONNECT,
-        )
-        with pytest.raises(EmailInUseException):
-            fc_user_data.create_or_update_user()
-
-    def test_create_django_user_with_already_existing_fc_email_other_sso_job_seeker(self):
-        """
-        If there already is an existing job seeker with the email FranceConnect sent us, we do not create it again,
-        we use it but we do not update it
-        """
-        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        JobSeekerFactory(email=fc_user_data.email, identity_provider=IdentityProvider.PE_CONNECT)
-        user, created = fc_user_data.create_or_update_user()
-        assert not created
-        assert user.last_name != FC_USERINFO["family_name"]
-        assert user.first_name != FC_USERINFO["given_name"]
-        assert user.username != FC_USERINFO["sub"]
-        # We did not fill this data using external data, so it is not set
-        assert not user.external_data_source_history
-        assert user.identity_provider != IdentityProvider.FRANCE_CONNECT
-
-    def test_create_django_user_with_already_existing_fc_email_other_sso_not_job_seeker(self):
-        """
-        If there already is an existing user with the email FranceConnect sent us but it's not a job_seeker,
-        then raise an error.
-        """
-        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        user = PrescriberFactory(email=fc_user_data.email)
-        with pytest.raises(InvalidKindException):
-            fc_user_data.create_or_update_user()
-        assert user.last_name != FC_USERINFO["family_name"]
-        assert user.first_name != FC_USERINFO["given_name"]
-        assert user.username != FC_USERINFO["sub"]
-        assert not user.external_data_source_history
-        assert user.identity_provider != IdentityProvider.FRANCE_CONNECT
-
-    def test_create_or_update_user_raise_too_many_kind_exception(self):
+    def test_create_or_update_user_raise_invalid_kind_exception(self):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
 
         for kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER, UserKind.LABOR_INSPECTOR]:
@@ -311,7 +270,7 @@ class FranceConnectTest(TestCase):
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
 
     @respx.mock
-    def test_callback_redirect_on_too_many_kind_exception(self):
+    def test_callback_redirect_on_invalid_kind_exception(self):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
 
         for kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER, UserKind.LABOR_INSPECTOR]:
@@ -356,3 +315,15 @@ class FranceConnectTest(TestCase):
         # The following redirection is tested in self.test_logout_with_redirection
         assert response.status_code == 302
         assert not auth.get_user(self.client).is_authenticated
+
+
+@pytest.mark.parametrize("identity_provider", [IdentityProvider.PE_CONNECT, IdentityProvider.FRANCE_CONNECT])
+def test_create_django_user_with_already_existing_fc_email(identity_provider):
+    fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
+    JobSeekerFactory(
+        username="another_username",
+        email=fc_user_data.email,
+        identity_provider=identity_provider,
+    )
+    with pytest.raises(EmailInUseException):
+        fc_user_data.create_or_update_user()
