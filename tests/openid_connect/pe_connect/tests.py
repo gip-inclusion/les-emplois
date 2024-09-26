@@ -21,7 +21,7 @@ from itou.openid_connect.pe_connect.models import PoleEmploiConnectState, PoleEm
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from tests.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
+from tests.users.factories import JobSeekerFactory, UserFactory
 from tests.utils.test import reload_module
 
 
@@ -181,23 +181,6 @@ class TestPoleEmploiConnect:
         with pytest.raises(ValidationError):
             peamu_user_data.create_or_update_user()
 
-    def test_create_user_with_already_existing_peamu_email(self):
-        """
-        If there already is an existing user from PE Connect with this email,
-        but under another username, we raise an error.
-
-        We do this because France Travail allows users to overload the same email
-        across multiple accounts, where we only allow one.
-        """
-        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
-        JobSeekerFactory(
-            username="another_username",
-            email=peamu_user_data.email,
-            identity_provider=IdentityProvider.PE_CONNECT,
-        )
-        with pytest.raises(EmailInUseException):
-            peamu_user_data.create_or_update_user()
-
     def test_create_django_user_with_already_existing_peamu_email_django(self):
         """
         If there already is an existing user from Django with email PEAMU sent us
@@ -213,39 +196,7 @@ class TestPoleEmploiConnect:
         assert user.identity_provider == IdentityProvider.PE_CONNECT
         assert user.external_data_source_history != {}
 
-    def test_create_django_user_with_already_existing_peamu_email_other_sso_job_seeker(self):
-        """
-        If there already is an existing job seeker with the email PEAMU sent us, we do not create it again,
-        we use it but we do not update it
-        """
-        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
-        JobSeekerFactory(email=peamu_user_data.email, identity_provider=IdentityProvider.FRANCE_CONNECT)
-        user, created = peamu_user_data.create_or_update_user()
-        assert not created
-        assert user.last_name != PEAMU_USERINFO["family_name"]
-        assert user.first_name != PEAMU_USERINFO["given_name"]
-        assert user.username != PEAMU_USERINFO["sub"]
-        # We did not fill this data using external data, so it is not set
-        assert not user.external_data_source_history
-        assert user.identity_provider != IdentityProvider.PE_CONNECT
-
-    def test_create_django_user_with_already_existing_peamu_email_other_sso_not_job_seeker(self):
-        """
-        If there already is an existing user with the email PEAMU sent us but it's not a job_seeker,
-        then raise an error.
-        """
-        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
-        user = PrescriberFactory(email=peamu_user_data.email)
-        with pytest.raises(InvalidKindException):
-            peamu_user_data.create_or_update_user()
-        user.refresh_from_db()
-        assert user.last_name != PEAMU_USERINFO["family_name"]
-        assert user.first_name != PEAMU_USERINFO["given_name"]
-        assert user.username != PEAMU_USERINFO["sub"]
-        assert not user.external_data_source_history
-        assert user.identity_provider != IdentityProvider.PE_CONNECT
-
-    def test_create_or_update_user_raise_too_many_kind_exception(self):
+    def test_create_or_update_user_raise_invalid_kind_exception(self):
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
 
         for kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER, UserKind.LABOR_INSPECTOR]:
@@ -325,7 +276,7 @@ class TestPoleEmploiConnect:
         assert user.jobseeker_profile.nir == nir
 
     @respx.mock
-    def test_callback_redirect_on_too_many_kind_exception(self, client):
+    def test_callback_redirect_on_invalid_kind_exception(self, client):
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
 
         for kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER, UserKind.LABOR_INSPECTOR]:
@@ -370,3 +321,19 @@ class TestPoleEmploiConnect:
         # The following redirection is tested in self.test_logout_with_redirection
         assert response.status_code == 302
         assert not auth.get_user(client).is_authenticated
+
+
+@pytest.mark.parametrize("identity_provider", [IdentityProvider.PE_CONNECT, IdentityProvider.FRANCE_CONNECT])
+def test_create_user_with_already_existing_peamu_email(identity_provider):
+    """
+    In OIDC, SSO provider + username represents unicity.
+    However, we require that emails are unique as well.
+    """
+    peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+    JobSeekerFactory(
+        username="another_username",
+        email=peamu_user_data.email,
+        identity_provider=identity_provider,
+    )
+    with pytest.raises(EmailInUseException):
+        peamu_user_data.create_or_update_user()
