@@ -172,6 +172,12 @@ class ApprovalSuspendViewTest(TestCase):
             response = self.client.get(url)
         assert response.status_code == 200
 
+        cancel_button = parse_response_to_soup(
+            response,
+            selector='a[aria-label="Annuler la saisie de ce formulaire"]',
+        )
+        assert cancel_button.attrs["href"] == back_url
+
         new_end_at = end_at + relativedelta(days=30)
 
         post_data = {
