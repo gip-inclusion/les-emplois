@@ -6,7 +6,8 @@
         {% if show_mandatory_fields_mention %}<small class="d-inline-block mb-3">* champs obligatoires</small>{% endif %}
         <div class="form-row align-items-center justify-content-end gx-3">
             <div class="form-group col-12 col-lg order-3 order-lg-1">
-                {% if secondary_url %}
+                {% if secondary_name and secondary_value or secondary_url %}
+                    {# If there is a previous step - which is what most secondaries link to - we want a confirmation before resetting everything #}
                     <button type="button" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire" data-bs-toggle="modal" data-bs-target="#confirm_reset_modal">
                         <i class="ri-close-line ri-lg" aria-hidden="true"></i>
                         <span>Annuler</span>
@@ -18,14 +19,17 @@
                     </a>
                 {% endif %}
             </div>
-            {% if secondary_url %}
+            {% if secondary_name and secondary_value or secondary_url %}
                 <div class="form-group col col-lg-auto order-1 order-lg-2">
-                    <a href="{{ secondary_url }}"
-                       class="btn btn-block btn-outline-primary"
-                       aria-label="{{ secondary_aria_label }}"
-                       {% if secondary_name and secondary_value %}name="{{ secondary_name }}" value="{{ secondary_value }}"{% endif %}>
-                        <span>Retour</span>
-                    </a>
+                    {% if secondary_name and secondary_value %}
+                        <button type="submit" class="btn btn-block btn-outline-primary" aria-label="{{ secondary_aria_label }}" name="{{ secondary_name }}" value="{{ secondary_value }}">
+                            <span>Retour</span>
+                        </button>
+                    {% else %}
+                        <a href="{{ secondary_url }}" class="btn btn-block btn-outline-primary" aria-label="{{ secondary_aria_label }}">
+                            <span>Retour</span>
+                        </a>
+                    {% endif %}
                 </div>
             {% endif %}
             <div class="form-group col col-lg-auto order-2 order-lg-3">
@@ -55,7 +59,7 @@
     </div>
 </div>
 
-{% if secondary_url %}
+{% if secondary_name and secondary_value or secondary_url %}
     <div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
