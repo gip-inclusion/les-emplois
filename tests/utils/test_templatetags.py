@@ -79,10 +79,6 @@ class TestButtonsForm:
         template = Template("{% load buttons_form %}{% itou_buttons_form show_mandatory_fields_mention=False %}")
         assert template.render(Context({})) == snapshot(name="no_mandatory_fields_mention")
 
-    def test_save_and_quit_modal_content(self, snapshot):
-        template = Template("{% load buttons_form %}{% itou_buttons_form modal_content_save_and_quit=True %}")
-        assert template.render(Context({})) == snapshot(name="save_and_quit_modal_content")
-
 
 class TestNav:
     def test_active_view_names(self):

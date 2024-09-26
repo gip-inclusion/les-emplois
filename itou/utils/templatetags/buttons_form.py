@@ -23,7 +23,6 @@ def itou_buttons_form(
     matomo_category=None,
     matomo_action=None,
     matomo_name=None,
-    modal_content_save_and_quit=False,
 ):
     """
     Render buttons on forms.
@@ -67,9 +66,6 @@ def itou_buttons_form(
         secondary_name & secondary_value
             If set together, the name and value for the secondary button.
 
-        modal_content_save_and_quit
-            If set, force alternate modal content for the save and quit button.
-
     **Usage**::
 
         {% itou_buttons_form  %}
@@ -99,5 +95,4 @@ def itou_buttons_form(
         "matomo_category": matomo_category,
         "matomo_action": matomo_action,
         "matomo_name": matomo_name,
-        "modal_content_save_and_quit": modal_content_save_and_quit,
     }
