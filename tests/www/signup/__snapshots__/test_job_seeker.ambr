@@ -133,20 +133,18 @@
   <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
-              
-                  <div class="modal-header">
-                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
-                  </div>
-                  <div class="modal-body">
-                      Les informations renseignées ne seront pas enregistrées.
-                      <br/>
-                      Cette action est irréversible.
-                  </div>
-                  <div class="modal-footer">
-                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
-                      <a class="btn btn-sm btn-danger" href="/dashboard/">Confirmer l'annulation</a>
-                  </div>
-              
+              <div class="modal-header">
+                  <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+              </div>
+              <div class="modal-body">
+                  Les informations renseignées ne seront pas enregistrées.
+                  <br/>
+                  Cette action est irréversible.
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
+                  <a class="btn btn-sm btn-danger" href="/dashboard/">Confirmer l'annulation</a>
+              </div>
           </div>
       </div>
   </div>
