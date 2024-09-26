@@ -24,8 +24,8 @@ class EditCompanyViewTest(TestCase):
 
         post_data = {
             "brand": "NEW FAMOUS COMPANY BRAND NAME",
-            "phone": "0610203050",
-            "email": "",
+            "phone": "",
+            "email": "toto@titi.fr",
             "website": "https://famous-company.com",
             "address_line_1": "1 Rue Jeanne d'Arc",
             "address_line_2": "",
@@ -38,7 +38,7 @@ class EditCompanyViewTest(TestCase):
         self.assertContains(response, "Ce champ est obligatoire")
 
         # Go to next step: description
-        post_data["email"] = "toto@titi.fr"
+        post_data["phone"] = "0610203050"
         response = self.client.post(url, data=post_data)
         self.assertRedirects(response, reverse("companies_views:edit_company_step_description"))
 

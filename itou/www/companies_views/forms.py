@@ -122,7 +122,7 @@ class EditCompanyForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        required_fields = ["brand", "address_line_1", "post_code", "city", "phone", "email"]
+        required_fields = ["brand", "address_line_1", "post_code", "city", "phone"]
         for required_field in required_fields:
             self.fields[required_field].required = True
 
