@@ -29,19 +29,10 @@ def _redirect_to_job_seeker_login_on_error(error_msg, request=None, extra_tags="
     return HttpResponseRedirect(reverse("login:job_seeker"))
 
 
-def get_callback_redirect_uri(request) -> str:
-    redirect_uri = get_absolute_url(reverse("france_connect:callback"))
-    next_url = request.GET.get("next")
-    if next_url:
-        redirect_uri += f"?next={next_url}"
-
+def france_connect_authorize(request):
     # The redirect_uri should be defined in the FC settings to be allowed
     # NB: the integration platform allows "http://127.0.0.1:8000/franceconnect/callback"
-    return redirect_uri
-
-
-def france_connect_authorize(request):
-    redirect_uri = get_callback_redirect_uri(request)
+    redirect_uri = get_absolute_url(reverse("france_connect:callback"))
     state = FranceConnectState.save_state()
     data = {
         "response_type": "code",
@@ -70,8 +61,7 @@ def france_connect_callback(request):
         )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
-    redirect_uri = get_callback_redirect_uri(request)
-
+    redirect_uri = get_absolute_url(reverse("france_connect:callback"))
     data = {
         "client_id": settings.FRANCE_CONNECT_CLIENT_ID,
         "client_secret": settings.FRANCE_CONNECT_CLIENT_SECRET,
