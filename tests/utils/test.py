@@ -292,7 +292,10 @@ def _detect_origin(debug=False):
                         pass
                     else:
                         class_name = type(frame_self).__name__
-                        template_origin = f"{class_name}[{frame_self.origin.template_name}]"
+                        if hasattr(frame_self, "origin"):
+                            template_origin = f"{class_name}[{frame_self.origin.template_name}]"
+                        else:
+                            template_origin = class_name
                         # This requires the engine to be in debug mode
                         if debug:
                             template_debug_info = get_template_source_from_exception_info(frame_self, frame_context)
