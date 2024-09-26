@@ -79,6 +79,18 @@ def itou_buttons_form(
     if any(matomo_values) and not all(matomo_values):
         raise ValueError("Matomo values are all or nothing")
 
+    if (primary_name is None) != (primary_value is None):
+        raise ValueError("primary_name & primary_value must be used together")
+
+    if primary_name and primary_url:
+        raise ValueError("primary_url cannot be used with primary_name/value")
+
+    if (secondary_name is None) != (secondary_value is None):
+        raise ValueError("secondary_name & secondary_value must be used together")
+
+    if secondary_name and secondary_url:
+        raise ValueError("secondary_url cannot be used with secondary_name/value")
+
     return {
         "show_mandatory_fields_mention": show_mandatory_fields_mention,
         "primary_aria_label": primary_aria_label,
