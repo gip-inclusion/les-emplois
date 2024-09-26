@@ -1,4 +1,5 @@
 import dataclasses
+from typing import ClassVar
 from urllib.parse import unquote
 
 from django.core import signing
@@ -103,8 +104,8 @@ class OIDConnectUserData:
     last_name: str
     username: str
     identity_provider: IdentityProvider
-    kind: str
-    login_allowed_user_kinds = [UserKind]
+    kind: UserKind
+    login_allowed_user_kinds: ClassVar[list[UserKind]]
 
     def check_valid_kind(self, user, user_data_dict, is_login):
         if user.kind not in self.login_allowed_user_kinds or (user.kind != user_data_dict["kind"] and not is_login):

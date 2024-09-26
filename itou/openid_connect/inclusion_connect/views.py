@@ -268,9 +268,8 @@ def inclusion_connect_callback(request):
         messages.error(request, error)
         is_successful = False
 
-    user_created = False
     try:
-        user, user_created = ic_user_data.create_or_update_user(is_login=ic_state.data.get("is_login"))
+        user, _ = ic_user_data.create_or_update_user(is_login=ic_state.data.get("is_login"))
     except InvalidKindException:
         existing_user = User.objects.get(email=user_data["email"])
         _add_user_kind_error_message(request, existing_user, user_kind)
