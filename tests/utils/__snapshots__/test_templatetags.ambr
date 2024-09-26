@@ -291,6 +291,43 @@
   
   '''
 # ---
+# name: TestButtonsForm.test_itou_buttons_with_primary_name_value_aria_label_and_matomo_tags[with_primary_name_value_aria_label_and_matomo_tags]
+  '''
+  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3">
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a href="/dashboard/" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
+                          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button type="submit"
+                              class="btn btn-block btn-primary"
+                              aria-label="label"
+                              name="name" value="1"
+                              data-matomo-event="true" data-matomo-category="category" data-matomo-action="action" data-matomo-option="name">
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+  '''
+# ---
 # name: TestButtonsForm.test_itou_buttons_with_primary_url[with_primary_url]
   '''
   
@@ -315,42 +352,6 @@
                          class="btn btn-block btn-primary"
                          aria-label="Passer à l’étape suivante"
                          >
-                          <span>Suivant</span>
-                      </a>
-                  
-              </div>
-          </div>
-      </div>
-  </div>
-  
-  
-  
-  '''
-# ---
-# name: TestButtonsForm.test_itou_buttons_with_primary_url_name_value_aria_label_and_matomo_tags[with_primary_url_name_value_aria_label_and_matomo_tags]
-  '''
-  
-  
-  <div class="row">
-      <div class="col-12">
-          <hr class="mb-3">
-          <small class="d-inline-block mb-3">* champs obligatoires</small>
-          <div class="form-row align-items-center justify-content-end gx-3">
-              <div class="form-group col-12 col-lg order-3 order-lg-1">
-                  
-                      <a href="/dashboard/" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
-                          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
-                          <span>Annuler</span>
-                      </a>
-                  
-              </div>
-              
-              <div class="form-group col col-lg-auto order-2 order-lg-3">
-                  
-                      <a href="/next"
-                         class="btn btn-block btn-primary"
-                         aria-label="label"
-                         data-matomo-event="true" data-matomo-category="category" data-matomo-action="action" data-matomo-option="name">
                           <span>Suivant</span>
                       </a>
                   

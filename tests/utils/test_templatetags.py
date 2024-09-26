@@ -38,14 +38,14 @@ class TestButtonsForm:
         template = Template('{% load buttons_form %}{% itou_buttons_form primary_url="/next" %}')
         assert template.render(Context({})) == snapshot(name="with_primary_url")
 
-    def test_itou_buttons_with_primary_url_name_value_aria_label_and_matomo_tags(self, snapshot):
+    def test_itou_buttons_with_primary_name_value_aria_label_and_matomo_tags(self, snapshot):
         template = Template(
             "{% load buttons_form %}"
-            '{% itou_buttons_form primary_url="/next" primary_name="name" primary_value="1" '
+            '{% itou_buttons_form primary_name="name" primary_value="1" '
             'primary_aria_label="label" '
             'matomo_category="category" matomo_action="action" matomo_name="name" %}'
         )
-        assert template.render(Context({})) == snapshot(name="with_primary_url_name_value_aria_label_and_matomo_tags")
+        assert template.render(Context({})) == snapshot(name="with_primary_name_value_aria_label_and_matomo_tags")
 
     def test_itou_buttons_with_primary_disabled(self, snapshot):
         template = Template("{% load buttons_form %}{% itou_buttons_form primary_disabled=True %}")
@@ -62,10 +62,7 @@ class TestButtonsForm:
         assert template.render(Context({})) == snapshot(name="no_form_title")
 
     def test_itou_buttons_with_secondary_name_and_value(self, snapshot):
-        template = Template(
-            '{% load buttons_form %}{% itou_buttons_form secondary_url="/do" '
-            'secondary_name="name" secondary_value="1" %}'
-        )
+        template = Template('{% load buttons_form %}{% itou_buttons_form secondary_name="name" secondary_value="1" %}')
         assert template.render(Context({})) == snapshot(name="with_secondary_name_and_value")
 
     def test_itou_buttons_matomo_event(self, snapshot):
