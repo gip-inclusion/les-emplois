@@ -23,7 +23,7 @@
               <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
                   
   
-  <a aria-label="Régulariser le n° de sécurité sociale Jane DOE (ouverture dans un nouvel onglet)" class="btn btn-primary btn-block w-100 w-md-auto has-external-link" href="https://tally.so/r/wzxQlg?employeerecord=[PK of EmployeeRecord]&amp;jobapplication=[PK of JobApplication]" rel="noopener" target="_blank">Régulariser le n° de sécurité sociale</a>
+  <a aria-label="Régulariser le n° de sécurité sociale de Jane DOE (ouverture dans un nouvel onglet)" class="btn btn-primary btn-block w-100 w-md-auto has-external-link" href="https://tally.so/r/wzxQlg?employeerecord=[PK of EmployeeRecord]&amp;jobapplication=[PK of JobApplication]" rel="noopener" target="_blank">Régulariser le n° de sécurité sociale</a>
   
               </div>
           
