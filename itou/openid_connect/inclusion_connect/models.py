@@ -1,5 +1,6 @@
 import dataclasses
 import logging
+from typing import ClassVar
 
 from django.db import models
 
@@ -16,15 +17,12 @@ logger = logging.getLogger(__name__)
 class InclusionConnectState(OIDConnectState):
     data = models.JSONField(verbose_name="données de session", default=dict, blank=True)
 
-    class Meta:
-        abstract = False
-
 
 @dataclasses.dataclass
 class InclusionConnectPrescriberData(OIDConnectUserData):
-    kind: str = UserKind.PRESCRIBER
+    kind: UserKind = UserKind.PRESCRIBER
     identity_provider: IdentityProvider = IdentityProvider.INCLUSION_CONNECT
-    login_allowed_user_kinds = [UserKind.PRESCRIBER, UserKind.EMPLOYER]
+    login_allowed_user_kinds: ClassVar[list[UserKind]] = [UserKind.PRESCRIBER, UserKind.EMPLOYER]
 
     def join_org(self, user: User, safir: str):
         try:
@@ -38,6 +36,6 @@ class InclusionConnectPrescriberData(OIDConnectUserData):
 
 @dataclasses.dataclass
 class InclusionConnectEmployerData(OIDConnectUserData):
-    kind: str = UserKind.EMPLOYER
+    kind: UserKind = UserKind.EMPLOYER
     identity_provider: IdentityProvider = IdentityProvider.INCLUSION_CONNECT
-    login_allowed_user_kinds = [UserKind.PRESCRIBER, UserKind.EMPLOYER]
+    login_allowed_user_kinds: ClassVar[list[UserKind]] = [UserKind.PRESCRIBER, UserKind.EMPLOYER]

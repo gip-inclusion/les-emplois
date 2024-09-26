@@ -1,5 +1,6 @@
 import dataclasses
 import datetime
+from typing import ClassVar
 
 from itou.users.enums import IdentityProvider, UserKind
 
@@ -19,9 +20,9 @@ class FranceConnectUserData(OIDConnectUserData):
     address_line_1: str | None = None
     post_code: str | None = None
     city: str | None = None
-    kind: str = UserKind.JOB_SEEKER
+    kind: UserKind = UserKind.JOB_SEEKER
     identity_provider: IdentityProvider = IdentityProvider.FRANCE_CONNECT
-    login_allowed_user_kinds = [UserKind.JOB_SEEKER]
+    login_allowed_user_kinds: ClassVar[list[UserKind]] = [UserKind.JOB_SEEKER]
 
     @staticmethod
     def user_info_mapping_dict(user_info: dict):
