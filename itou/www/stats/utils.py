@@ -61,13 +61,6 @@ def can_view_stats_siae_etp(request):
     )
 
 
-def can_view_stats_siae_orga_etp(request):
-    """
-    Non official stats with very specific access rights.
-    """
-    return can_view_stats_siae(request) and request.current_organization.pk in settings.STATS_SIAE_PK_WHITELIST
-
-
 def can_view_stats_cd(request):
     """
     Users of a real CD can view the confidential CD stats for their department only.
