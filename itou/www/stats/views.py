@@ -524,7 +524,7 @@ def stats_ph_state_main(request):
         page_title="Etat des candidatures orientées",
         extra_params={
             mb.PRESCRIBER_FILTER_KEY: PrescriberOrganizationKind(request.current_organization.kind).label,
-            mb.C1_ORG_FILTER_KEY: allowed_org_pks,
+            mb.C1_PRESCRIBER_ORG_FILTER_KEY: allowed_org_pks,
         },
     )
 
