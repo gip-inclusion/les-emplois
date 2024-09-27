@@ -4,6 +4,7 @@
 Arguments:
 
     approval
+    detail_view_version (defaults to False)
 
 {% endcomment %}
 
@@ -14,26 +15,26 @@ Arguments:
             PASS IAE {{ approval.get_state_display.lower }}
         </span>
     </div>
-    <ul class="list-data">
-        <li>
+    <ul class="list-data{% if detail_view_version|default:False %} list-data__two-column-lg{% endif %}">
+        <li class="order-1">
             <small>Numéro de PASS IAE</small>
             <strong>{{ approval.number|format_approval_number }}</strong>
         </li>
         {% if approval.state == "EXPIRED" %}
-            <li>
+            <li class="order-2">
                 <small>A expiré le</small>
                 <strong class="text-danger">{{ approval.end_at|date:"d/m/Y" }}</strong>
             </li>
         {% else %}
-            <li>
+            <li class="order-2">
                 <small>Date de début</small>
                 <strong>{{ approval.start_at|date:"d/m/Y" }}</strong>
             </li>
-            <li>
+            <li class="order-3{% if detail_view_version|default:False %} order-lg-4{% endif %}">
                 <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i></small>
                 <strong>{{ approval.remainder_as_date|date:"d/m/Y" }}</strong>
             </li>
-            <li>
+            <li class="order-4{% if detail_view_version|default:False %} order-lg-3{% endif %}">
                 <small>Durée de validité <i class="ri-information-line ri-xl text-info"
     data-bs-toggle="tooltip"
     data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
@@ -41,31 +42,37 @@ Arguments:
             </li>
         {% endif %}
     </ul>
-    {% if approval.state == "VALID" %}
-        {% with approval.pending_prolongation_request as pending_prolongation_request %}
-            {% if pending_prolongation_request %}
-                <hr class="my-3 my-md-4">
-                <ul class="list-data">
-                    <li>
-                        <small>Demande de prolongation (en attente)</small>
-                        <strong>
-                            du {{ pending_prolongation_request.start_at|date:"d/m/Y" }} au {{ pending_prolongation_request.end_at|date:"d/m/Y" }}
-                        </strong>
-                    </li>
-                </ul>
-            {% endif %}
-        {% endwith %}
-    {% elif approval.state == "SUSPENDED" %}
-        {% with approval.ongoing_suspension as suspension %}
-            {% if suspension %}
-                <hr class="my-3 my-md-4">
-                <ul class="list-data">
-                    <li>
-                        <small>Suspension en cours</small>
-                        <strong class="text-info">du {{ suspension.start_at|date:"d/m/Y" }} au {{ suspension.end_at|date:"d/m/Y" }}</strong>
-                    </li>
-                </ul>
-            {% endif %}
-        {% endwith %}
+    {% if detail_view_version|default:False %}
+        {% if approval.origin == ApprovalOrigin.PE_APPROVAL %}
+            <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
+        {% endif %}
+    {% else %}
+        {% if approval.state == "VALID" %}
+            {% with approval.pending_prolongation_request as pending_prolongation_request %}
+                {% if pending_prolongation_request %}
+                    <hr class="my-3 my-md-4">
+                    <ul class="list-data">
+                        <li>
+                            <small>Demande de prolongation (en attente)</small>
+                            <strong>
+                                du {{ pending_prolongation_request.start_at|date:"d/m/Y" }} au {{ pending_prolongation_request.end_at|date:"d/m/Y" }}
+                            </strong>
+                        </li>
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        {% elif approval.state == "SUSPENDED" %}
+            {% with approval.ongoing_suspension as suspension %}
+                {% if suspension %}
+                    <hr class="my-3 my-md-4">
+                    <ul class="list-data">
+                        <li>
+                            <small>Suspension en cours</small>
+                            <strong class="text-info">du {{ suspension.start_at|date:"d/m/Y" }} au {{ suspension.end_at|date:"d/m/Y" }}</strong>
+                        </li>
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        {% endif %}
     {% endif %}
 </div>

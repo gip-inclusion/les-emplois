@@ -2883,20 +2883,20 @@
           </span>
       </div>
       <ul class="list-data">
-          <li>
+          <li class="order-1">
               <small>Numéro de PASS IAE</small>
               <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
           </li>
           
-              <li>
+              <li class="order-2">
                   <small>Date de début</small>
                   <strong>01/01/2000</strong>
               </li>
-              <li>
+              <li class="order-3">
                   <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip"></i></small>
                   <strong>01/01/3000</strong>
               </li>
-              <li>
+              <li class="order-4">
                   <small>Durée de validité <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i></small>
                   <strong class="text-success">356252 jours (Environ 975 ans et 4 mois)</strong>
               </li>
@@ -2904,6 +2904,8 @@
       </ul>
       
           
+              
+                  
               
           
       
@@ -3485,6 +3487,7 @@
           'QuerySet.first[<site-packages>/django/db/models/query.py]',
           'Approval.pending_prolongation_request[approvals/models.py]',
           'WithNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
           'IfNode[approvals/includes/box.html]',
           'IncludeNode[job_seekers_views/details.html]',
           'IfNode[job_seekers_views/details.html]',
