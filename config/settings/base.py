@@ -50,8 +50,10 @@ INSTALLED_APPS = [
     "citext",
     "django_bootstrap5",
     "django_select2",
+    "easymde",
     "formtools",
     "huey.contrib.djhuey",
+    "markdownify",
     "rest_framework",
     "rest_framework.authtoken",
     "drf_spectacular",
@@ -552,6 +554,10 @@ SPECTACULAR_SETTINGS = {
 # Otherwise, set a timeout like this:
 # requests.get(timeout=settings.REQUESTS_TIMEOUT)
 REQUESTS_TIMEOUT = 5  # in seconds
+
+# Markdownify settings
+# ------------------------------------------------------------------------------
+MARKDOWNIFY = {"default": {"WHITELIST_TAGS": ["a", "p", "ul", "li", "em", "strong"]}}
 
 # ASP SFTP connection
 # ------------------------------------------------------------------------------

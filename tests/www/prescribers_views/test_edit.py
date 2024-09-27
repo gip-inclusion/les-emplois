@@ -35,6 +35,28 @@ class TestCardView:
         response = client.get(url)
         assert_previous_step(response, reverse("dashboard:index"))
 
+    def test_card_render_markdown(self, client):
+        prescriber_org = PrescriberOrganizationFactory(
+            is_authorized=True,
+            description="*Lorem ipsum*, **bold** and [link](https://beta.gouv.fr).",
+        )
+        url = reverse("prescribers_views:card", kwargs={"org_id": prescriber_org.pk})
+        response = client.get(url)
+
+        assertContains(
+            response, '<p><em>Lorem ipsum</em>, <strong>bold</strong> and <a href="https://beta.gouv.fr">link</a>.</p>'
+        )
+
+    def test_card_render_markdown_forbidden_tags(self, client):
+        prescriber_org = PrescriberOrganizationFactory(
+            is_authorized=True,
+            description='# Gros titre\n<script></script>\n<span class="font-size:200px;">Gros texte</span>',
+        )
+        url = reverse("prescribers_views:card", kwargs={"org_id": prescriber_org.pk})
+        response = client.get(url)
+
+        assertContains(response, "Gros titre\n\n<p>Gros texte</p>")
+
 
 class TestEditOrganization:
     def test_edit(self, client):

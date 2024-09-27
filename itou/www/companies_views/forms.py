@@ -10,7 +10,7 @@ from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.jobs.models import Appellation
 from itou.utils.urls import get_external_link_markup
-from itou.utils.widgets import RemoteAutocompleteSelect2Widget
+from itou.utils.widgets import EasyMDEEditorWithConfig, RemoteAutocompleteSelect2Widget
 
 
 class CreateCompanyForm(forms.ModelForm):
@@ -37,6 +37,9 @@ class CreateCompanyForm(forms.ModelForm):
             "brand": "Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche.",
             "website": "Votre site web doit commencer par http:// ou https://",
             "description": "Texte de présentation de votre structure.",
+        }
+        widgets = {
+            "description": EasyMDEEditorWithConfig,
         }
 
     def __init__(self, current_company, current_user, *args, **kwargs):
@@ -145,6 +148,11 @@ class EditSiaeDescriptionForm(forms.ModelForm):
         labels = {
             "description": "Description générale de l'activité",
             "provided_support": "Type d'accompagnement proposé",
+        }
+
+        widgets = {
+            "description": EasyMDEEditorWithConfig,
+            "provided_support": EasyMDEEditorWithConfig,
         }
 
     def __init__(self, *args, **kwargs):
@@ -343,6 +351,10 @@ class EditJobDescriptionDetailsForm(forms.ModelForm):
             "is_resume_mandatory": "Le CV est nécessaire pour le traitement de la candidature",
             "is_qpv_mandatory": "Le marché s’inscrit dans le cadre du NPNRU et ces clauses sociales doivent "
             "bénéficier en priorité aux publics résidant en Quartier Prioritaire de la Ville.",
+        }
+        widgets = {
+            "description": EasyMDEEditorWithConfig,
+            "profile_description": EasyMDEEditorWithConfig,
         }
 
     def __init__(self, current_company: Company, *args, **kwargs):

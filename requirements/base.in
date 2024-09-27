@@ -52,6 +52,12 @@ django-datadog-logger
 # django-redis (full featured cache backend)
 django-redis  # https://github.com/jazzband/django-redis
 
+# django-markdownify (to render only a set of HTML tags)
+django-markdownify  # https://github.com/erwinmatijsen/django-markdownify
+
+# Markdown editor
+django-easymde  # https://github.com/WPI-LNL/django-easymde
+
 # Pillow (image manipulation)
 pillow  # https://python-pillow.org/
 
