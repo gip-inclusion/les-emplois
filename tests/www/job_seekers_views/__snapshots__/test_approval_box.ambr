@@ -12,17 +12,19 @@
           </span>
       </div>
       <ul class="list-data">
-          <li>
+          <li class="order-1">
               <small>Numéro de PASS IAE</small>
               <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
           </li>
           
-              <li>
+              <li class="order-2">
                   <small>A expiré le</small>
                   <strong class="text-danger">31/12/2023</strong>
               </li>
           
       </ul>
+      
+          
       
   </div>
   
@@ -41,20 +43,20 @@
           </span>
       </div>
       <ul class="list-data">
-          <li>
+          <li class="order-1">
               <small>Numéro de PASS IAE</small>
               <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
           </li>
           
-              <li>
+              <li class="order-2">
                   <small>Date de début</small>
                   <strong>01/01/2025</strong>
               </li>
-              <li>
+              <li class="order-3">
                   <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i></small>
                   <strong>05/08/2026</strong>
               </li>
-              <li>
+              <li class="order-4">
                   <small>Durée de validité <i class="ri-information-line ri-xl text-info"
       data-bs-toggle="tooltip"
       data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
@@ -62,6 +64,8 @@
               </li>
           
       </ul>
+      
+          
       
   </div>
   
@@ -80,20 +84,20 @@
           </span>
       </div>
       <ul class="list-data">
-          <li>
+          <li class="order-1">
               <small>Numéro de PASS IAE</small>
               <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
           </li>
           
-              <li>
+              <li class="order-2">
                   <small>Date de début</small>
                   <strong>01/01/2024</strong>
               </li>
-              <li>
+              <li class="order-3">
                   <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i></small>
                   <strong>04/12/2025</strong>
               </li>
-              <li>
+              <li class="order-4">
                   <small>Durée de validité <i class="ri-information-line ri-xl text-info"
       data-bs-toggle="tooltip"
       data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
@@ -104,13 +108,15 @@
       
           
               
-                  <hr class="my-3 my-md-4">
-                  <ul class="list-data">
-                      <li>
-                          <small>Suspension en cours</small>
-                          <strong class="text-info">du 01/08/2024 au 31/08/2024</strong>
-                      </li>
-                  </ul>
+                  
+                      <hr class="my-3 my-md-4">
+                      <ul class="list-data">
+                          <li>
+                              <small>Suspension en cours</small>
+                              <strong class="text-info">du 01/08/2024 au 31/08/2024</strong>
+                          </li>
+                      </ul>
+                  
               
           
       
@@ -131,20 +137,20 @@
           </span>
       </div>
       <ul class="list-data">
-          <li>
+          <li class="order-1">
               <small>Numéro de PASS IAE</small>
               <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
           </li>
           
-              <li>
+              <li class="order-2">
                   <small>Date de début</small>
                   <strong>01/01/2024</strong>
               </li>
-              <li>
+              <li class="order-3">
                   <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i></small>
                   <strong>30/12/2025</strong>
               </li>
-              <li>
+              <li class="order-4">
                   <small>Durée de validité <i class="ri-information-line ri-xl text-info"
       data-bs-toggle="tooltip"
       data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
@@ -154,6 +160,8 @@
       </ul>
       
           
+              
+                  
               
           
       
@@ -174,20 +182,20 @@
           </span>
       </div>
       <ul class="list-data">
-          <li>
+          <li class="order-1">
               <small>Numéro de PASS IAE</small>
               <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
           </li>
           
-              <li>
+              <li class="order-2">
                   <small>Date de début</small>
                   <strong>01/01/2024</strong>
               </li>
-              <li>
+              <li class="order-3">
                   <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i></small>
                   <strong>30/12/2025</strong>
               </li>
-              <li>
+              <li class="order-4">
                   <small>Durée de validité <i class="ri-information-line ri-xl text-info"
       data-bs-toggle="tooltip"
       data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
@@ -198,15 +206,17 @@
       
           
               
-                  <hr class="my-3 my-md-4">
-                  <ul class="list-data">
-                      <li>
-                          <small>Demande de prolongation (en attente)</small>
-                          <strong>
-                              du 30/12/2025 au 29/01/2026
-                          </strong>
-                      </li>
-                  </ul>
+                  
+                      <hr class="my-3 my-md-4">
+                      <ul class="list-data">
+                          <li>
+                              <small>Demande de prolongation (en attente)</small>
+                              <strong>
+                                  du 30/12/2025 au 29/01/2026
+                              </strong>
+                          </li>
+                      </ul>
+                  
               
           
       
