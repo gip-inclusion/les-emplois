@@ -48,7 +48,7 @@
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
                             <input type="hidden" name="confirm" value="true">
-                            {% itou_buttons_form primary_label="Confirmer la suppression" secondary_url=back_url reset_url=reset_url %}
+                            {% itou_buttons_form primary_label="Confirmer la suppression" secondary_url=secondary_url reset_url=reset_url %}
                         </form>
                     </div>
                 </div>

@@ -9,6 +9,7 @@ from pytest_django.asserts import assertContains
 
 from itou.approvals.models import Suspension
 from itou.employee_record.enums import Status
+from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.approvals_views.forms import SuspensionForm
 from tests.approvals.factories import SuspensionFactory
@@ -218,7 +219,7 @@ class ApprovalSuspendViewTest(TestCase):
 
         self.client.force_login(employer)
 
-        back_url = reverse("approvals:suspension_action_choice", kwargs={"suspension_id": suspension.pk})
+        back_url = reverse("search:employers_home")
         redirect_url = reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id})
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:suspension_delete", kwargs={"suspension_id": suspension.pk})
@@ -240,7 +241,7 @@ class ApprovalSuspendViewTest(TestCase):
             ],
         )
         assert str(form) == self.snapshot(name="delete_suspension_form")
-        assert response.context["reset_url"] == redirect_url
+        assert response.context["reset_url"] == back_url
 
         lost_days = (timezone.localdate() - start_at).days + 1  # including start and end dates
         assertContains(response, f"Réduire la durée restante de ce PASS IAE de {lost_days} jour")
@@ -324,14 +325,32 @@ class ApprovalSuspendActionChoiceViewTest(TestCase):
         self.client.force_login(self.employer)
 
         response = self.client.post(self.url, data={"action": "delete"})
-        assert response.url == reverse("approvals:suspension_delete", kwargs={"suspension_id": self.suspension.pk})
+        self.assertRedirects(
+            response,
+            add_url_params(
+                reverse("approvals:suspension_delete", kwargs={"suspension_id": self.suspension.pk}),
+                {
+                    "back_url": reverse(
+                        "employees:detail", kwargs={"public_id": self.suspension.approval.user.public_id}
+                    )
+                },
+            ),
+        )
 
     def test_post_enddate(self):
         self.client.force_login(self.employer)
 
         response = self.client.post(self.url, data={"action": "update_enddate"})
-        assert response.url == reverse(
-            "approvals:suspension_update_enddate", kwargs={"suspension_id": self.suspension.pk}
+        self.assertRedirects(
+            response,
+            add_url_params(
+                reverse("approvals:suspension_update_enddate", kwargs={"suspension_id": self.suspension.pk}),
+                {
+                    "back_url": reverse(
+                        "employees:detail", kwargs={"public_id": self.suspension.approval.user.public_id}
+                    )
+                },
+            ),
         )
 
     def test_post_enddate_with_invalid_action_parameter(self):
@@ -388,9 +407,11 @@ class ApprovalSuspendUpdateEndDateViewTest(TestCase):
             response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.context["suspension"] == self.suspension
-        assert response.context["back_url"] == reverse(
-            "approvals:suspension_action_choice", kwargs={"suspension_id": self.suspension.id}
+        assert response.context["secondary_url"] == add_url_params(
+            reverse("approvals:suspension_action_choice", kwargs={"suspension_id": self.suspension.id}),
+            {"back_url": reverse("employees:detail", kwargs={"public_id": self.suspension.approval.user.public_id})},
         )
+
         assert response.context["reset_url"] == reverse(
             "employees:detail", kwargs={"public_id": self.suspension.approval.user.public_id}
         )
