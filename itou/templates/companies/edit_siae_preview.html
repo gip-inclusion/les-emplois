@@ -4,6 +4,7 @@
 {% load static %}
 {% load theme_inclusion %}
 {% load buttons_form %}
+{% load markdownify %}
 
 {% block title %}Modifier les coordonnées de votre structure {{ block.super }}{% endblock %}
 
@@ -42,14 +43,14 @@
                             {% if siae.description %}
                                 <div class="my-3 my-lg-5">
                                     <h3>Son activité</h3>
-                                    {{ form_data.description | linebreaks }}
+                                    {{ form_data.description|markdownify }}
                                 </div>
                             {% endif %}
 
                             {% if siae.provided_support %}
                                 <div class="my-3 my-lg-5">
                                     <h3>L'accompagnement proposé</h3>
-                                    {{ form_data.provided_support | linebreaks }}
+                                    {{ form_data.provided_support|markdownify }}
                                 </div>
                             {% endif %}
 
