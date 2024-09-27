@@ -556,7 +556,12 @@ REQUESTS_TIMEOUT = 5  # in seconds
 
 # Markdownify settings
 # ------------------------------------------------------------------------------
-MARKDOWNIFY = {"default": {"WHITELIST_TAGS": ["a", "p", "ul", "li", "em", "strong"]}}
+MARKDOWNIFY = {
+    "default": {
+        "WHITELIST_TAGS": ["a", "p", "ul", "li", "em", "strong", "br"],
+        "MARKDOWN_EXTENSIONS": ["nl2br"],
+    }
+}
 
 # ASP SFTP connection
 # ------------------------------------------------------------------------------

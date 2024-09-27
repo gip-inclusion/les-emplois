@@ -378,7 +378,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
 
         # Step 3: preview and validation
         response = self.client.get(self.edit_preview_url)
-        self.assertContains(response, "<strong>Lorem ipsum</strong>\nSpan")
+        self.assertContains(response, "<strong>Lorem ipsum</strong><br>\nSpan")
         self.assertContains(response, "profile_<em>description</em>")
         self.assertContains(response, "Whatever market description")
         self.assertContains(response, "Curriculum Vitae")
