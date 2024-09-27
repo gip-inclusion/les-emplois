@@ -45,24 +45,17 @@ class EditCompanyViewTest(TestCase):
         response = self.client.post(url, data=post_data, follow=True)
         self.assertContains(response, "Présentation de l'activité")
 
-        # Go to next step: summary and check the rendered markdown
+        # Go to next step: summary
         url = response.redirect_chain[-1][0]
         post_data = {
-            "description": "*Lorem ipsum*\n\n- list 1\n- list 2\n<h1>Gros titre</h1>",  # HTML tags should be ignored
-            "provided_support": "On est très très forts pour [**tout**](https://simple.wikipedia.org/wiki/42_(answer))",
+            "description": "Le meilleur des SIAEs !",
+            "provided_support": "On est très très forts pour tout",
         }
         response = self.client.post(url, data=post_data)
         self.assertRedirects(response, reverse("companies_views:edit_company_step_preview"))
 
         response = self.client.post(url, data=post_data, follow=True)
         self.assertContains(response, "Aperçu de la fiche")
-        self.assertContains(
-            response, ("<p><em>Lorem ipsum</em></p>\n<ul>\n<li>list 1</li>\n<li>list 2</li>\n</ul>\n\nGros titre")
-        )
-        self.assertContains(
-            response,
-            '<p>On est très très forts pour <a href="https://simple.wikipedia.org/wiki/42_(answer)"><strong>tout</strong></a></p>',
-        )
 
         # Go back, should not be an issue
         step_2_url = reverse("companies_views:edit_company_step_description")
@@ -74,21 +67,18 @@ class EditCompanyViewTest(TestCase):
             "brand": "NEW FAMOUS COMPANY BRAND NAME",
             "city": "Arras",
             "department": "62",
-            "description": "*Lorem ipsum*\n\n- list 1\n- list 2\n<h1>Gros titre</h1>",
+            "description": "Le meilleur des SIAEs !",
             "email": "toto@titi.fr",
             "phone": "0610203050",
             "post_code": "62000",
-            "provided_support": "On est très très forts pour [**tout**](https://simple.wikipedia.org/wiki/42_(answer))",
+            "provided_support": "On est très très forts pour tout",
             "website": "https://famous-company.com",
         }
 
         # Go forward again
         response = self.client.post(step_2_url, data=post_data, follow=True)
         self.assertContains(response, "Aperçu de la fiche")
-        self.assertContains(
-            response,
-            '<p>On est très très forts pour <a href="https://simple.wikipedia.org/wiki/42_(answer)"><strong>tout</strong></a></p>',
-        )
+        self.assertContains(response, "On est très très forts pour tout")
 
         # Save the object for real
         response = self.client.post(response.redirect_chain[-1][0])
@@ -98,7 +88,7 @@ class EditCompanyViewTest(TestCase):
         company = Company.objects.get(siret=company.siret)
 
         assert company.brand == "NEW FAMOUS COMPANY BRAND NAME"
-        assert company.description == "*Lorem ipsum*\n\n- list 1\n- list 2\n<h1>Gros titre</h1>"
+        assert company.description == "Le meilleur des SIAEs !"
         assert company.email == "toto@titi.fr"
         assert company.phone == "0610203050"
         assert company.website == "https://famous-company.com"
