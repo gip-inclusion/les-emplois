@@ -823,7 +823,7 @@
               
                   <div class="form-group col col-lg-auto order-1 order-lg-2">
                       
-                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/approvals/suspension/[PK of Suspension]/action/">
+                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/approvals/suspension/[PK of Suspension]/action/?back_url=%2Fsearch%2Femployers">
                               <span>Retour</span>
                           </a>
                       
@@ -854,7 +854,7 @@
                   </div>
                   <div class="modal-footer">
                       <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
-                      <a class="btn btn-sm btn-danger" href="/approvals/detail/[public_id of User]">Confirmer l'annulation</a>
+                      <a class="btn btn-sm btn-danger" href="/search/employers">Confirmer l'annulation</a>
                   </div>
               </div>
           </div>

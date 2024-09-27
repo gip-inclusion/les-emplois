@@ -480,24 +480,31 @@ def suspension_action_choice(request, suspension_id, template_name="approvals/su
     if not suspension.can_be_handled_by_siae(siae):
         raise PermissionDenied()
 
-    if request.method == "POST":
-        if request.POST.get("action") == "delete":
-            return HttpResponseRedirect(
-                reverse("approvals:suspension_delete", kwargs={"suspension_id": suspension.id})
-            )
-
-        if request.POST.get("action") == "update_enddate":
-            return HttpResponseRedirect(
-                reverse("approvals:suspension_update_enddate", kwargs={"suspension_id": suspension.id})
-            )
-
-        return HttpResponseBadRequest('invalid "action" parameter')
-
     back_url = get_safe_url(
         request,
         "back_url",
         fallback_url=reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id}),
     )
+
+    if request.method == "POST":
+        if request.POST.get("action") == "delete":
+            return HttpResponseRedirect(
+                add_url_params(
+                    reverse("approvals:suspension_delete", kwargs={"suspension_id": suspension.id}),
+                    {"back_url": back_url},
+                )
+            )
+
+        if request.POST.get("action") == "update_enddate":
+            return HttpResponseRedirect(
+                add_url_params(
+                    reverse("approvals:suspension_update_enddate", kwargs={"suspension_id": suspension.id}),
+                    {"back_url": back_url},
+                )
+            )
+
+        return HttpResponseBadRequest('invalid "action" parameter')
+
     context = {
         "suspension": suspension,
         "back_url": back_url,
@@ -559,7 +566,7 @@ def suspension_update_enddate(request, suspension_id, template_name="approvals/s
     back_url = get_safe_url(
         request,
         "back_url",
-        fallback_url=reverse("approvals:suspension_action_choice", kwargs={"suspension_id": suspension_id}),
+        fallback_url=reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id}),
     )
 
     if request.method == "POST" and form.is_valid():
@@ -567,14 +574,15 @@ def suspension_update_enddate(request, suspension_id, template_name="approvals/s
         suspension.updated_by = request.user
         suspension.save()
         messages.success(request, "Modification de suspension effectuée.", extra_tags="toast")
-        return HttpResponseRedirect(
-            reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id})
-        )
+        return HttpResponseRedirect(back_url)
 
     context = {
         "suspension": suspension,
-        "back_url": back_url,
-        "reset_url": reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id}),
+        "secondary_url": add_url_params(
+            reverse("approvals:suspension_action_choice", kwargs={"suspension_id": suspension_id}),
+            {"back_url": back_url},
+        ),
+        "reset_url": back_url,
         "form": form,
     }
     return render(request, template_name, context)
@@ -595,7 +603,7 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
     back_url = get_safe_url(
         request,
         "back_url",
-        fallback_url=reverse("approvals:suspension_action_choice", kwargs={"suspension_id": suspension_id}),
+        fallback_url=reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id}),
     )
 
     if request.method == "POST" and request.POST.get("confirm") == "true":
@@ -611,8 +619,11 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
 
     context = {
         "suspension": suspension,
-        "back_url": back_url,
-        "reset_url": reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id}),
+        "secondary_url": add_url_params(
+            reverse("approvals:suspension_action_choice", kwargs={"suspension_id": suspension_id}),
+            {"back_url": back_url},
+        ),
+        "reset_url": back_url,
         "lost_days": (timezone.localdate() - suspension.start_at).days + 1,
     }
     return render(request, template_name, context)
