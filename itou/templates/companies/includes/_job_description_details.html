@@ -1,5 +1,4 @@
 {% load str_filters %}
-{% load markdownify %}
 
 <h3>Informations générales</h3>
 <ul class="list-unstyled mb-5">
@@ -30,10 +29,10 @@
 {% with no_content_message="La structure n'a pas encore renseigné cette rubrique" %}
     <hr>
     <h3>Description du poste</h3>
-    <div class="mb-5">{{ job.description|markdownify|default:no_content_message }}</div>
+    <div class="mb-5">{{ job.description|default:no_content_message|linebreaks }}</div>
     <hr>
     <h3>Profil recherché et prérequis</h3>
-    <div class="mb-5">{{ job.profile_description|markdownify|default:no_content_message }}</div>
+    <div class="mb-5">{{ job.profile_description|default:no_content_message|linebreaks }}</div>
 {% endwith %}
 
 {% if job.is_resume_mandatory %}
