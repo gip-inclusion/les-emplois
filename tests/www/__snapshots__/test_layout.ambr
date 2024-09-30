@@ -101,7 +101,7 @@
   </ul>
   
               </nav>
-              <div class="dropdown d-sm-none d-xl-inline-block">
+              <div class="dropup dropup-center d-sm-none d-xl-inline-block">
                   <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-account-circle-line"></i>
                       <span class="ms-2">Mon espace</span>
@@ -145,7 +145,7 @@
   
                   </div>
               </div>
-              <div class="dropdown">
+              <div class="dropup dropup-center">
                   <button aria-controls="helpDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" type="button">
                       Besoin d'aide ?
                   </button>
@@ -373,7 +373,7 @@
   </ul>
   
               </nav>
-              <div class="dropdown d-sm-none d-xl-inline-block">
+              <div class="dropup dropup-center d-sm-none d-xl-inline-block">
                   <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-account-circle-line"></i>
                       <span class="ms-2">Mon espace</span>
@@ -422,7 +422,7 @@
   
                   </div>
               </div>
-              <div class="dropdown">
+              <div class="dropup dropup-center">
                   <button aria-controls="helpDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" type="button">
                       Besoin d'aide ?
                   </button>
@@ -602,7 +602,7 @@
   </ul>
   
               </nav>
-              <div class="dropdown d-sm-none d-xl-inline-block">
+              <div class="dropup dropup-center d-sm-none d-xl-inline-block">
                   <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-account-circle-line"></i>
                       <span class="ms-2">Mon espace</span>
@@ -653,7 +653,7 @@
   
                   </div>
               </div>
-              <div class="dropdown">
+              <div class="dropup dropup-center">
                   <button aria-controls="helpDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" type="button">
                       Besoin d'aide ?
                   </button>
@@ -841,7 +841,7 @@
   </ul>
   
               </nav>
-              <div class="dropdown d-sm-none d-xl-inline-block">
+              <div class="dropup dropup-center d-sm-none d-xl-inline-block">
                   <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-account-circle-line"></i>
                       <span class="ms-2">Mon espace</span>
@@ -887,7 +887,7 @@
   
                   </div>
               </div>
-              <div class="dropdown">
+              <div class="dropup dropup-center">
                   <button aria-controls="helpDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" type="button">
                       Besoin d'aide ?
                   </button>
@@ -1090,7 +1090,7 @@
   </ul>
   
               </nav>
-              <div class="dropdown d-sm-none d-xl-inline-block">
+              <div class="dropup dropup-center d-sm-none d-xl-inline-block">
                   <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-account-circle-line"></i>
                       <span class="ms-2">Mon espace</span>
@@ -1134,7 +1134,7 @@
   
                   </div>
               </div>
-              <div class="dropdown">
+              <div class="dropup dropup-center">
                   <button aria-controls="helpDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" type="button">
                       Besoin d'aide ?
                   </button>
@@ -1314,7 +1314,7 @@
   </ul>
   
               </nav>
-              <div class="dropdown d-sm-none d-xl-inline-block">
+              <div class="dropup dropup-center d-sm-none d-xl-inline-block">
                   <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-account-circle-line"></i>
                       <span class="ms-2">Mon espace</span>
@@ -1358,7 +1358,7 @@
   
                   </div>
               </div>
-              <div class="dropdown">
+              <div class="dropup dropup-center">
                   <button aria-controls="helpDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" type="button">
                       Besoin d'aide ?
                   </button>
