@@ -105,8 +105,8 @@ class OIDConnectUserData:
     username: str
     identity_provider: IdentityProvider
     kind: UserKind
-    login_allowed_user_kinds: ClassVar[list[UserKind]]
-    allowed_identity_provider_migration: ClassVar[list[IdentityProvider]] = dataclasses.field(default=list)
+    login_allowed_user_kinds: ClassVar[tuple[UserKind]] = ()
+    allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = ()
 
     def check_valid_kind(self, user, user_data_dict, is_login):
         if user.kind not in self.login_allowed_user_kinds or (user.kind != user_data_dict["kind"] and not is_login):
@@ -138,6 +138,7 @@ class OIDConnectUserData:
                 # A different user has already claimed this email address (we require emails to be unique)
                 user = User.objects.get(email=self.email)
                 if user.identity_provider not in self.allowed_identity_provider_migration:
+                    self.check_valid_kind(user, user_data_dict, is_login)
                     raise EmailInUseException(user)
             except User.DoesNotExist:
                 # User.objects.create_user does the following:

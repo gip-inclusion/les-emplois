@@ -216,21 +216,6 @@ class FranceConnectTest(TestCase):
         with pytest.raises(ValidationError):
             fc_user_data.create_or_update_user()
 
-    def test_create_django_user_with_already_existing_fc_email_django(self):
-        """
-        If there already is an existing user from Django with email FranceConnect sent us
-        we use it and we update it
-        """
-        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        JobSeekerFactory(email=fc_user_data.email, identity_provider=IdentityProvider.DJANGO)
-        user, created = fc_user_data.create_or_update_user()
-        assert not created
-        assert user.last_name == FC_USERINFO["family_name"]
-        assert user.first_name == FC_USERINFO["given_name"]
-        assert user.username == FC_USERINFO["sub"]
-        assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
-        assert user.external_data_source_history != {}
-
     def test_create_or_update_user_raise_invalid_kind_exception(self):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
 
@@ -317,8 +302,10 @@ class FranceConnectTest(TestCase):
         assert not auth.get_user(self.client).is_authenticated
 
 
-@pytest.mark.parametrize("identity_provider", [IdentityProvider.PE_CONNECT, IdentityProvider.FRANCE_CONNECT])
-def test_create_django_user_with_already_existing_fc_email(identity_provider):
+@pytest.mark.parametrize(
+    "identity_provider", [IdentityProvider.DJANGO, IdentityProvider.PE_CONNECT, IdentityProvider.FRANCE_CONNECT]
+)
+def test_create_django_user_with_already_existing_fc_email_fails(identity_provider):
     fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
     JobSeekerFactory(
         username="another_username",
