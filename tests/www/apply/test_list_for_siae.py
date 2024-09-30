@@ -701,6 +701,19 @@ def test_list_for_siae_message_when_company_got_new_or_processing_or_postponed_a
         assertContains(response, "Aucune candidature ne correspond aux filtres sélectionnés")
 
 
+def test_list_for_siae_no_apply_button(client):
+    APPLY_TXT = "Enregistrer une candidature"
+    company = CompanyFactory(with_membership=True)
+    client.force_login(company.members.get())
+    response = client.get(reverse("apply:list_for_siae"))
+    assertContains(response, APPLY_TXT)
+    for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.OPCS]:
+        company.kind = kind
+        company.save(update_fields=("kind",))
+        response = client.get(reverse("apply:list_for_siae"))
+        assertNotContains(response, APPLY_TXT)
+
+
 def test_list_for_siae_filter_for_different_kind(client, snapshot):
     company = CompanyFactory(with_membership=True)
     client.force_login(company.members.get())
