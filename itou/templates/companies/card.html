@@ -20,7 +20,7 @@
         <div class="form-row align-items-center gx-3">
             {% if siae.has_active_members and not siae.block_job_applications %}
                 {% if job_app_to_transfer %}
-                    <div class="form-group col col-lg-auto">
+                    <div class="form-group col-12 col-lg-auto">
                         <a href="{% url 'apply:job_application_external_transfer_step_2' job_application_id=job_app_to_transfer.pk company_pk=siae.pk %}?back_url={{ request.get_full_path|urlencode }}"
                            class="btn btn-lg btn-white btn-block btn-ico"
                            {% matomo_event "candidature" "clic" "start_job_app_transfer" %}
@@ -30,7 +30,7 @@
                         </a>
                     </div>
                 {% else %}
-                    <div class="form-group col col-lg-auto">
+                    <div class="form-group col-12 col-lg-auto">
                         <a href="{% url 'apply:start' company_pk=siae.pk %}"
                            class="btn btn-lg btn-white btn-block btn-ico"
                            {% matomo_event "candidature" "clic" "start_application" %}
@@ -42,7 +42,7 @@
                 {% endif %}
             {% endif %}
             {% if active_jobs_descriptions or other_jobs_descriptions %}
-                <div class="form-group col col-lg-auto">
+                <div class="form-group col-12 col-lg-auto">
                     <a href="#metiers" class="btn btn-lg btn-outline-white btn-block btn-ico">
                         <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
                         <span>Voir tous les métiers</span>
