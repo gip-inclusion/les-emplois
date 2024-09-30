@@ -6,7 +6,7 @@
     <h2 class="visually-hidden">Actions rapides</h2>
     <div class="form-row align-items-center gx-3">
         {% if job_application.state.is_new %}
-            <div class="form-group col col-lg-auto">
+            <div class="form-group col-12 col-lg-auto">
                 <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
                     {% csrf_token %}
                     <button class="btn btn-lg btn-white btn-block btn-ico" {% matomo_event "candidature" "submit" "processing_application" %}>
@@ -15,41 +15,41 @@
                     </button>
                 </form>
             </div>
-            <div class="form-group col col-lg-auto">{% include "apply/includes/buttons/refuse.html" %}</div>
+            <div class="form-group col-12 col-lg-auto">{% include "apply/includes/buttons/refuse.html" %}</div>
         {% endif %}
 
         {# Possible next steps when the state is processing / prior_to_hire ------------------------------------- #}
         {% if job_application.state.is_processing or job_application.state.is_prior_to_hire %}
             {% if eligibility_diagnosis_by_siae_required %}
-                <div class="form-group col col-lg-auto">{% include "apply/includes/buttons/new_diagnosis.html" %}</div>
+                <div class="form-group col-12 col-lg-auto">{% include "apply/includes/buttons/new_diagnosis.html" %}</div>
             {% else %}
-                <div class="form-group col col-lg-auto">{% include "apply/includes/buttons/accept.html" %}</div>
+                <div class="form-group col-12 col-lg-auto">{% include "apply/includes/buttons/accept.html" %}</div>
             {% endif %}
-            <div class="form-group col col-lg-auto">{% include "apply/includes/buttons/refuse.html" %}</div>
+            <div class="form-group col-12 col-lg-auto">{% include "apply/includes/buttons/refuse.html" %}</div>
             <div class="form-group col-12 col-lg-auto">{% include "apply/includes/buttons/postpone.html" %}</div>
         {% endif %}
 
         {# Possible next steps when the state is postponed ------------------------------------------------------ #}
         {% if job_application.state.is_postponed %}
             {% if eligibility_diagnosis_by_siae_required %}
-                <div class="form-group col col-lg-auto">{% include "apply/includes/buttons/new_diagnosis.html" %}</div>
+                <div class="form-group col-12 col-lg-auto">{% include "apply/includes/buttons/new_diagnosis.html" %}</div>
             {% else %}
-                <div class="form-group col col-lg-auto">{% include "apply/includes/buttons/accept.html" %}</div>
+                <div class="form-group col-12 col-lg-auto">{% include "apply/includes/buttons/accept.html" %}</div>
             {% endif %}
-            <div class="form-group col col-lg-auto">{% include "apply/includes/buttons/refuse.html" %}</div>
+            <div class="form-group col-12 col-lg-auto">{% include "apply/includes/buttons/refuse.html" %}</div>
         {% endif %}
 
         {# Possible next steps when the state is obsolete, refused or cancelled --------------------------------- #}
         {% if job_application.state.is_obsolete or job_application.state.is_refused or job_application.state.is_cancelled %}
             {% if eligibility_diagnosis_by_siae_required %}
-                <div class="form-group col col-lg-auto">{% include "apply/includes/buttons/new_diagnosis.html" %}</div>
+                <div class="form-group col-12 col-lg-auto">{% include "apply/includes/buttons/new_diagnosis.html" %}</div>
             {% else %}
-                <div class="form-group col col-lg-auto">{% include "apply/includes/buttons/accept.html" %}</div>
+                <div class="form-group col-12 col-lg-auto">{% include "apply/includes/buttons/accept.html" %}</div>
             {% endif %}
         {% endif %}
 
         {% if job_application.can_be_archived %}
-            <div class="form-group col col-lg-auto">
+            <div class="form-group col-12 col-lg-auto">
                 <form method="post" action="{% url "apply:archive" job_application_id=job_application.pk %}">
                     {% csrf_token %}
                     <button class="btn btn-lg btn-outline-white btn-block btn-ico">

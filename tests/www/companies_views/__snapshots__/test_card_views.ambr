@@ -551,7 +551,7 @@
               
                   
                       
-                          <div class="form-group col col-lg-auto">
+                          <div class="form-group col-12 col-lg-auto">
                               <a aria-label="Postuler auprès de l'employeur inclusif Acme inc." class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/100/start?job_description_id=42">
                                   <i aria-hidden="true" class="ri-draft-line font-weight-medium"></i>
                                   <span>Postuler</span>
@@ -594,7 +594,7 @@
               
                   
                       
-                          <div class="form-group col col-lg-auto">
+                          <div class="form-group col-12 col-lg-auto">
                               <a aria-label="Postuler auprès de l'employeur inclusif Acme inc." class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/100/start?job_description_id=42">
                                   <i aria-hidden="true" class="ri-draft-line font-weight-medium"></i>
                                   <span>Postuler</span>
@@ -603,7 +603,7 @@
                       
                   
                   
-                      <div class="form-group col col-lg-auto">
+                      <div class="form-group col-12 col-lg-auto">
                           <a class="btn btn-lg btn-outline-white btn-block btn-ico" href="#recrutements">
                               <i aria-hidden="true" class="ri-eye-line font-weight-medium"></i>
                               <span>Voir tous les métiers</span>
@@ -644,7 +644,7 @@
               
                   
                       
-                          <div class="form-group col col-lg-auto">
+                          <div class="form-group col-12 col-lg-auto">
                               <a aria-label="Postuler auprès de l'employeur inclusif Acme inc." class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/100/start?job_description_id=42">
                                   <i aria-hidden="true" class="ri-draft-line font-weight-medium"></i>
                                   <span>Postuler</span>
