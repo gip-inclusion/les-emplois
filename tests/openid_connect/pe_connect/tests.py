@@ -181,21 +181,6 @@ class TestPoleEmploiConnect:
         with pytest.raises(ValidationError):
             peamu_user_data.create_or_update_user()
 
-    def test_create_django_user_with_already_existing_peamu_email_django(self):
-        """
-        If there already is an existing user from Django with email PEAMU sent us
-        we use it and we update it
-        """
-        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
-        JobSeekerFactory(email=peamu_user_data.email, identity_provider=IdentityProvider.DJANGO)
-        user, created = peamu_user_data.create_or_update_user()
-        assert not created
-        assert user.last_name == PEAMU_USERINFO["family_name"]
-        assert user.first_name == PEAMU_USERINFO["given_name"]
-        assert user.username == PEAMU_USERINFO["sub"]
-        assert user.identity_provider == IdentityProvider.PE_CONNECT
-        assert user.external_data_source_history != {}
-
     def test_create_or_update_user_raise_invalid_kind_exception(self):
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
 
@@ -323,8 +308,10 @@ class TestPoleEmploiConnect:
         assert not auth.get_user(client).is_authenticated
 
 
-@pytest.mark.parametrize("identity_provider", [IdentityProvider.PE_CONNECT, IdentityProvider.FRANCE_CONNECT])
-def test_create_user_with_already_existing_peamu_email(identity_provider):
+@pytest.mark.parametrize(
+    "identity_provider", [IdentityProvider.DJANGO, IdentityProvider.PE_CONNECT, IdentityProvider.FRANCE_CONNECT]
+)
+def test_create_user_with_already_existing_peamu_email_fails(identity_provider):
     """
     In OIDC, SSO provider + username represents unicity.
     However, we require that emails are unique as well.

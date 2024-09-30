@@ -22,8 +22,8 @@ class InclusionConnectState(OIDConnectState):
 class InclusionConnectPrescriberData(OIDConnectUserData):
     kind: UserKind = UserKind.PRESCRIBER
     identity_provider: IdentityProvider = IdentityProvider.INCLUSION_CONNECT
-    login_allowed_user_kinds: ClassVar[list[UserKind]] = [UserKind.PRESCRIBER, UserKind.EMPLOYER]
-    allowed_identity_provider_migration: ClassVar[list[IdentityProvider]] = [IdentityProvider.DJANGO]
+    login_allowed_user_kinds: ClassVar[tuple[UserKind]] = (UserKind.PRESCRIBER, UserKind.EMPLOYER)
+    allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = (IdentityProvider.DJANGO,)
 
     def join_org(self, user: User, safir: str):
         try:
@@ -39,5 +39,5 @@ class InclusionConnectPrescriberData(OIDConnectUserData):
 class InclusionConnectEmployerData(OIDConnectUserData):
     kind: UserKind = UserKind.EMPLOYER
     identity_provider: IdentityProvider = IdentityProvider.INCLUSION_CONNECT
-    login_allowed_user_kinds: ClassVar[list[UserKind]] = [UserKind.PRESCRIBER, UserKind.EMPLOYER]
-    allowed_identity_provider_migration: ClassVar[list[IdentityProvider]] = [IdentityProvider.DJANGO]
+    login_allowed_user_kinds: ClassVar[tuple[UserKind]] = (UserKind.PRESCRIBER, UserKind.EMPLOYER)
+    allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = (IdentityProvider.DJANGO,)
