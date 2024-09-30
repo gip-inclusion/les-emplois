@@ -143,7 +143,7 @@
             <nav class="flex-grow-1" role="navigation" aria-label="Navigation principale">
                 {% nav request %}
             </nav>
-            <div class="dropdown d-sm-none d-xl-inline-block">
+            <div class="dropup dropup-center d-sm-none d-xl-inline-block">
                 <button type="button"
                         class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3"
                         data-bs-toggle="dropdown"
@@ -157,7 +157,7 @@
                     {% include "layout/_header_user_dropdown_menu.html" with request=request user=user mobile=True csrf_token=csrf_token only %}
                 </div>
             </div>
-            <div class="dropdown">
+            <div class="dropup dropup-center">
                 <button type="button" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="helpDropdownMobile" aria-expanded="false">
                     Besoin d'aide ?
                 </button>
