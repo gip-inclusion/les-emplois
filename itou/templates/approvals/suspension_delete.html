@@ -17,7 +17,7 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
-                <div class="col-12 col-lg-8">
+                <div class="col-12 col-lg-8 order-2 order-lg-1">
                     <div class="c-stepper mb-3 mb-lg-5">
                         {% include 'approvals/includes/progress_bar.html' with ratio=80 only %}
                         <p>
@@ -51,6 +51,9 @@
                             {% itou_buttons_form primary_label="Confirmer la suppression" secondary_url=secondary_url reset_url=reset_url %}
                         </form>
                     </div>
+                </div>
+                <div class="col-12 col-lg-4 order-1 order-lg-2">
+                    {% include "approvals/includes/box.html" with approval=suspension.approval only %}
                 </div>
             </div>
         </div>
