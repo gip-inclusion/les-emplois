@@ -540,8 +540,8 @@ httpx==0.27.2 \
     # via
     #   -r requirements/base.txt
     #   respx
-huey==2.5.1 \
-    --hash=sha256:8a323783ab434a095a4e72b8c48c5b8f957f9031fa860474a390a0927e957112
+huey==2.5.2 \
+    --hash=sha256:df33db474c05414ed40ee2110e9df692369871734da22d74ffb035a4bd74047f
     # via -r requirements/base.txt
 idna==3.10 \
     --hash=sha256:12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9 \
