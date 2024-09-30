@@ -29,10 +29,6 @@ from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
 from itou.www.companies_views import forms as companies_forms
 
 
-# This is a "magic" value for the number of items for paginator objects.
-# Set to 10 because we're humans, but can / must be discussed and pulled-up to settings if an agreement is reached.
-NB_ITEMS_PER_PAGE = 10
-
 ITOU_SESSION_EDIT_COMPANY_KEY = "edit_siae_session_key"
 ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
 
@@ -230,7 +226,7 @@ def job_description_list(request, template_name="companies/job_description_list.
 
         return HttpResponseRedirect(f"{reverse('companies_views:job_description_list')}?page={page}")
 
-    job_pager = pager(job_descriptions, page, items_per_page=NB_ITEMS_PER_PAGE)
+    job_pager = pager(job_descriptions, page, items_per_page=50)
 
     context = {
         "siae": company,

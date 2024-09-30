@@ -330,7 +330,7 @@ def prolongation_requests_list(request, template_name="approvals/prolongation_re
 
     context = {
         "form": form,
-        "pager": pager(queryset, request.GET.get("page"), items_per_page=10),
+        "pager": pager(queryset, request.GET.get("page"), items_per_page=50),
         "back_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
