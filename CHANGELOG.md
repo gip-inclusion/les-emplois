@@ -1,5 +1,27 @@
 # Journal des modifications
 
+## 2024-09-30
+
+### Ajouté
+
+- [Candidature : vérifier la cohérence du NIR avec la date de naissance et la civilité](https://github.com/gip-inclusion/les-emplois/pull/4746)
+- [Pilotage : Ajouter un encart sur les TDB afin d’annoncer l’enquête utilisateurs](https://github.com/gip-inclusion/les-emplois/pull/4811) 🖼
+
+### Modifié
+
+- [Admin : Lecture seule pour les champs `siret`, `convention` et `auth_email` quand l'entreprise vient du flux IAE](https://github.com/gip-inclusion/les-emplois/pull/4820)
+- [Admin: Correction du refus d'habilitations](https://github.com/gip-inclusion/les-emplois/pull/4792)
+- [Demandeur d’emploi : Ajout lieu de naissance dans le formulaire de création par un tiers](https://github.com/gip-inclusion/les-emplois/pull/4732)
+- [Employeur : le champ `email` est facultatif dans les formulaires d'édition et de création de SIAE](https://github.com/gip-inclusion/les-emplois/pull/4826)
+- [PASS IAE: correction des boutons d'annulation/retour dans le processus de suppression d'une suspension](https://github.com/gip-inclusion/les-emplois/pull/4835)
+- [PASS IAE: retour sur la page d'origine lors de l'annulation d'une modification de suspension](https://github.com/gip-inclusion/les-emplois/pull/4825)
+- [Pilotage : Ouvrir le TB 440 à toutes les SIAE](https://github.com/gip-inclusion/les-emplois/pull/4823)
+- [Statistiques: Amélioration des mesures de conversion des actions sur les candidatures](https://github.com/gip-inclusion/les-emplois/pull/4831)
+- [Statistiques: Amélioration du suivi des refus de candidatures](https://github.com/gip-inclusion/les-emplois/pull/4813)
+- [UX/UI: Corriger le titre du dashboard pour les "Candidat" et les "Orienteur seul"](https://github.com/gip-inclusion/les-emplois/pull/4809)
+- [UX/UI: Harmoniser l'UI des pages “collaborateurs”](https://github.com/gip-inclusion/les-emplois/pull/4819) 🖼
+- [UX/UI: Harmoniser la mise en forme du contenu des  .alert](https://github.com/gip-inclusion/les-emplois/pull/4814)
+
 ## 2024-09-23
 
 ### Modifié
