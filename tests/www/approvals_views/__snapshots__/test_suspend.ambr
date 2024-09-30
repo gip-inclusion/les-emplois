@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: ApprovalSuspendActionChoiceViewTest.test_context[view queries]
   dict({
-    'num_queries': 12,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -238,6 +238,27 @@
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           WHERE "approvals_suspension"."id" = %s
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'suspension_action_choice[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE "approvals_suspension"."approval_id" IN (%s)
+          ORDER BY "approvals_suspension"."start_at" DESC
         ''',
       }),
       dict({
@@ -357,6 +378,36 @@
       }),
       dict({
         'origin': list([
+          'SuspensionQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'WithNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
+          'IncludeNode[approvals/suspension_action_choice.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[approvals/suspension_action_choice.html]',
+          'suspension_action_choice[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          ORDER BY "approvals_suspension"."start_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -391,7 +442,7 @@
 # ---
 # name: ApprovalSuspendUpdateEndDateViewTest.test_context[view queries]
   dict({
-    'num_queries': 12,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -632,6 +683,27 @@
       }),
       dict({
         'origin': list([
+          'suspension_update_enddate[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE "approvals_suspension"."approval_id" IN (%s)
+          ORDER BY "approvals_suspension"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
           'get_user_last_accepted_siae_job_application[approvals/utils.py]',
           'last_hire_was_made_by_siae[approvals/utils.py]',
@@ -742,6 +814,36 @@
                            AND U0."is_admin"
                            AND U2."is_active"))
                  AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'SuspensionQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'WithNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
+          'IncludeNode[approvals/suspension_update_enddate.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[approvals/suspension_update_enddate.html]',
+          'suspension_update_enddate[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          ORDER BY "approvals_suspension"."start_at" DESC
           LIMIT 1
         ''',
       }),
@@ -867,7 +969,7 @@
 # ---
 # name: ApprovalSuspendViewTest.test_delete_suspension[view queries]
   dict({
-    'num_queries': 12,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -1108,6 +1210,27 @@
       }),
       dict({
         'origin': list([
+          'suspension_delete[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE "approvals_suspension"."approval_id" IN (%s)
+          ORDER BY "approvals_suspension"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
           'get_user_last_accepted_siae_job_application[approvals/utils.py]',
           'last_hire_was_made_by_siae[approvals/utils.py]',
@@ -1223,6 +1346,36 @@
       }),
       dict({
         'origin': list([
+          'SuspensionQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'WithNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
+          'IncludeNode[approvals/suspension_delete.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[approvals/suspension_delete.html]',
+          'suspension_delete[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          ORDER BY "approvals_suspension"."start_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -1257,7 +1410,7 @@
 # ---
 # name: ApprovalSuspendViewTest.test_update_suspension[view queries]
   dict({
-    'num_queries': 14,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -1494,6 +1647,27 @@
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           WHERE "approvals_suspension"."id" = %s
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'suspension_update[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE "approvals_suspension"."approval_id" IN (%s)
+          ORDER BY "approvals_suspension"."start_at" DESC
         ''',
       }),
       dict({
@@ -1722,6 +1896,36 @@
                            AND U0."is_admin"
                            AND U2."is_active"))
                  AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'SuspensionQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'WithNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
+          'IncludeNode[approvals/suspension_update.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[approvals/suspension_update.html]',
+          'suspension_update[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          ORDER BY "approvals_suspension"."start_at" DESC
           LIMIT 1
         ''',
       }),

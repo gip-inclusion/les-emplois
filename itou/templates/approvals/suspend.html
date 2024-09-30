@@ -16,13 +16,10 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
-                <div class="col-12 col-lg-8">
+                <div class="col-12 col-lg-8 order-2 order-lg-1">
                     {% if not preview %}
                         {# Edit mode. #}
 
-                        <div class="c-box mb-4">
-                            {% include "approvals/includes/status.html" with common_approval=approval hiring_pending=False %}
-                        </div>
                         <div class="c-form">
                             <form method="post" class="js-prevent-multiple-submit">
 
@@ -87,6 +84,9 @@
                         </div>
 
                     {% endif %}
+                </div>
+                <div class="col-12 col-lg-4 order-1 order-lg-2">
+                    {% include "approvals/includes/box.html" with approval=approval only %}
                 </div>
             </div>
         </div>
