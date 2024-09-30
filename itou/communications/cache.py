@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.core.cache import cache
 from django.utils import timezone
@@ -21,7 +21,7 @@ def update_active_announcement_cache():
         cache.set(CACHE_ACTIVE_ANNOUNCEMENTS_KEY, None, None)
     else:
         cache_exp = (
-            datetime.combine(campaign.end_date, datetime.min.time()) - datetime.now()
+            datetime.combine(campaign.end_date, datetime.min.time()) + timedelta(days=1) - datetime.now()
         ).total_seconds()  # seconds until the end_date, 00:00
 
         cache.set(CACHE_ACTIVE_ANNOUNCEMENTS_KEY, campaign, cache_exp)
