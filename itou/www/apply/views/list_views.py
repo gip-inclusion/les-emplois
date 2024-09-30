@@ -10,7 +10,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.text import slugify
 
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
 from itou.eligibility.models import SelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -306,6 +306,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "pending_states_job_applications_count": pending_states_job_applications_count,
         "list_exports_url": reverse("apply:list_for_siae_exports"),
         "back_url": reverse("dashboard:index"),
+        "can_apply": company.kind in SIAE_WITH_CONVENTION_KINDS + [CompanyKind.GEIQ],
     }
     return render(
         request,
