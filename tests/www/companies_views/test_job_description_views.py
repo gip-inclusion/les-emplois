@@ -358,10 +358,10 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
             with self.subTest(k):
                 assert v == session_data.get(k)
 
-        # Step 2: edit job description details
+        # Step 2: edit job description details and check the rendered markdown
         post_data = {
-            "description": "description",
-            "profile_description": "profile_description",
+            "description": "**Lorem ipsum**\n<span>Span</span>",  # HTML tags should be ignored
+            "profile_description": "profile_*description*",
             "is_resume_mandatory": True,
             "is_qpv_mandatory": True,
         }
@@ -378,9 +378,8 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
 
         # Step 3: preview and validation
         response = self.client.get(self.edit_preview_url)
-
-        self.assertContains(response, "description")
-        self.assertContains(response, "profile_description")
+        self.assertContains(response, "<strong>Lorem ipsum</strong><br>\nSpan")
+        self.assertContains(response, "profile_<em>description</em>")
         self.assertContains(response, "Whatever market description")
         self.assertContains(response, "Curriculum Vitae")
         # Rendering of `is_qpv_mandatory`

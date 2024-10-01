@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load format_filters %}
+{% load markdownify %}
 
 {% block title %}{{ prescriber_org.display_name }} {{ block.super }}{% endblock %}
 
@@ -25,7 +26,7 @@
 
                     {% if prescriber_org.description %}
                         <hr>
-                        <div>{{ prescriber_org.description|linebreaks }}</div>
+                        <div>{{ prescriber_org.description|markdownify }}</div>
                     {% endif %}
 
                     {% if user.is_authenticated and prescriber_org.email %}

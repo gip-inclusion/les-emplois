@@ -11,6 +11,7 @@ from django.contrib.gis.forms import widgets as gis_widgets
 from django.db.models import Q
 from django.forms.models import ModelChoiceIterator
 from django_select2.forms import Select2Widget
+from easymde.widgets import EasyMDEEditor
 
 from itou.utils.validators import get_max_birthdate, get_min_birthdate
 
@@ -193,3 +194,10 @@ class RadioSelectWithDisabledChoices(forms.RadioSelect):
         if value in self.disabled_values:
             option["attrs"]["disabled"] = True
         return option
+
+
+class EasyMDEEditorWithConfig(EasyMDEEditor):
+    class Media:
+        extend = False
+        js = ("easymde/easymde.min.js", "js/easymde_config.js")
+        css = {"all": ("easymde/easymde.min.css",)}

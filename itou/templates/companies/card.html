@@ -2,6 +2,7 @@
 {% load static %}
 {% load str_filters %}
 {% load matomo %}
+{% load markdownify %}
 
 {% block title %}{{ siae.display_name }} {{ block.super }}{% endblock %}
 
@@ -79,14 +80,14 @@
                         {% if siae.description %}
                             <article class="mb-3 mb-lg-5">
                                 <h2 class="h3">Son activité</h2>
-                                {{ siae.description | linebreaks }}
+                                {{ siae.description|markdownify }}
                             </article>
                         {% endif %}
 
                         {% if siae.provided_support %}
                             <article>
                                 <h2 class="h3">L'accompagnement proposé</h2>
-                                {{ siae.provided_support | linebreaks }}
+                                {{ siae.provided_support|markdownify }}
                             </article>
                         {% endif %}
 
