@@ -7,20 +7,20 @@ from django.core.files.storage import default_storage
 from django.template import loader
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import (assertMessages, assertNumQueries,
-                                   assertRedirects)
+from pytest_django.asserts import assertMessages, assertNumQueries, assertRedirects
 
-from itou.approvals.enums import (ProlongationReason,
-                                  ProlongationRequestDenyProposedAction,
-                                  ProlongationRequestDenyReason,
-                                  ProlongationRequestStatus)
+from itou.approvals.enums import (
+    ProlongationReason,
+    ProlongationRequestDenyProposedAction,
+    ProlongationRequestDenyReason,
+    ProlongationRequestStatus,
+)
 from itou.files.models import File
 from tests.approvals import factories as approvals_factories
 from tests.prescribers import factories as prescribers_factories
 from tests.users import factories as users_factories
 from tests.users.factories import EmployerFactory
-from tests.utils.test import (BASE_NUM_QUERIES, assert_previous_step,
-                              parse_response_to_soup)
+from tests.utils.test import BASE_NUM_QUERIES, assert_previous_step, parse_response_to_soup
 
 
 @pytest.mark.parametrize(
