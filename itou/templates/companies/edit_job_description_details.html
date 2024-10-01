@@ -5,6 +5,8 @@
 
 {% block title %}Modifier les détails de la fiche de poste {{ block.super }}{% endblock %}
 
+{% block extra_head %}{{ block.super }}{{ form.media.css }}{% endblock %}
+
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
@@ -89,4 +91,9 @@
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {{ form.media.js }}
 {% endblock %}

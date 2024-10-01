@@ -45,6 +45,10 @@ bcrypt==4.2.0 \
     --hash=sha256:cf69eaf5185fd58f268f805b505ce31f9b9fc2d64b376642164e9244540c1221 \
     --hash=sha256:f4f4acf526fcd1c34e7ce851147deedd4e26e6402369304220250598b26448db
     # via paramiko
+bleach[css]==6.1.0 \
+    --hash=sha256:0a31f1837963c41d46bbf1331b8778e1308ea0791db03cc4e7357b97cf42a8fe \
+    --hash=sha256:3225f354cfc436b9789c66c4ee030194bee0568fbf9cbdad3bc8b5c26c5f12b6
+    # via django-markdownify
 boto3==1.35.24 \
     --hash=sha256:97fcc1a14cbc759e4ba9535ced703a99fcf652c9c4b8dfcd06f292c80551684b \
     --hash=sha256:be7807f30f26d6c0057e45cfd09dad5968e664488bf4f9138d0bb7a0f6d8ed40
@@ -272,6 +276,7 @@ django==5.0.9 \
     #   django-formtools
     #   django-hijack
     #   django-htmx
+    #   django-markdownify
     #   django-pgtrigger
     #   django-redis
     #   django-select2
@@ -306,6 +311,10 @@ django-datadog-logger==0.7.2 \
     --hash=sha256:0659f0e243152589ef3d9d6b452494b914fcf1b84c2ea7e1e25d214d945b9407 \
     --hash=sha256:c5107b7e189bc541c1c8f4ad2810dc94227fb5632be8973eb226f83d20f86e32
     # via -r requirements/base.in
+django-easymde==1.0.4 \
+    --hash=sha256:0690902bde591461138e174e47f58363f1f7b7fb637ebae7401e7a6449177e26 \
+    --hash=sha256:5b2fd94953b76cb69aebd5d6169056084188e079609bee1300174ad54cfa346a
+    # via -r requirements/base.in
 django-filter==24.3 \
     --hash=sha256:c4852822928ce17fb699bcfccd644b3574f1a2d80aeb2b4ff4f16b02dd49dc64 \
     --hash=sha256:d8ccaf6732afd21ca0542f6733b11591030fa98669f8d15599b358e24a2cd9c3
@@ -321,6 +330,10 @@ django-hijack==3.6.0 \
 django-htmx==1.19.0 \
     --hash=sha256:875a642814e52278c1728842436beda2001847a493ab79fd82da3fb46ead140f \
     --hash=sha256:e7e17304e78e07f96eca0affc3ce1806edfdf3538bb7cb1912452b101f3e627d
+    # via -r requirements/base.in
+django-markdownify==0.9.5 \
+    --hash=sha256:2c4ae44e386c209453caf5e9ea1b74f64535985d338ad2d5ad5e7089cc94be86 \
+    --hash=sha256:34c34eba4a797282a5c5bd97b13cec84d6a4c0673ad47ce1c1d000d74dd8d4ab
     # via -r requirements/base.in
 django-pgtrigger==4.12.2 \
     --hash=sha256:1e1f6bf448997ee02a5af07d62a23b10085055e3b7e21062c8480c0b3b56f475 \
@@ -643,7 +656,9 @@ lxml==5.3.0 \
 markdown==3.7 \
     --hash=sha256:2ae2471477cfd02dbbf038d5d9bc226d40def84b4fe2986e49b59b6b472bbed2 \
     --hash=sha256:7eb6df5690b81a1d7942992c97fad2938e956e79df20cbc6186e9c3a77b1c803
-    # via -r requirements/base.in
+    # via
+    #   -r requirements/base.in
+    #   django-markdownify
 numpy==2.1.1 \
     --hash=sha256:046356b19d7ad1890c751b99acad5e82dc4a02232013bd9a9a712fddf8eb60f5 \
     --hash=sha256:0b8cc2715a84b7c3b161f9ebbd942740aaed913584cae9cdc7f8ad5ad41943d0 \
@@ -1161,10 +1176,15 @@ sentry-sdk==2.14.0 \
     --hash=sha256:1e0e2eaf6dad918c7d1e0edac868a7bf20017b177f242cefe2a6bcd47955961d \
     --hash=sha256:b8bc3dc51d06590df1291b7519b85c75e2ced4f28d9ea655b6d54033503b5bf4
     # via -r requirements/base.in
+setuptools==75.1.0 \
+    --hash=sha256:35ab7fd3bcd95e6b7fd704e4a1539513edad446c097797f2985e0e4b960772f2 \
+    --hash=sha256:d59a21b17a275fb872a9c3dae73963160ae079f1049ed956880cd7c09b120538
+    # via django-easymde
 six==1.16.0 \
     --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926 \
     --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
     # via
+    #   bleach
     #   html5lib
     #   python-dateutil
 sniffio==1.3.1 \
@@ -1181,6 +1201,10 @@ tenacity==9.0.0 \
     --hash=sha256:807f37ca97d62aa361264d497b0e31e92b8027044942bfa756160d908320d73b \
     --hash=sha256:93de0c98785b27fcf659856aa9f54bfbd399e29969b0621bc7f762bd441b4539
     # via -r requirements/base.in
+tinycss2==1.2.1 \
+    --hash=sha256:2b80a96d41e7c3914b8cda8bc7f705a4d9c49275616e886103dd839dfc847847 \
+    --hash=sha256:8cff3a8f066c2ec677c06dbc7b45619804a6938478d9d73c284b29d14ecb0627
+    # via bleach
 tqdm==4.66.5 \
     --hash=sha256:90279a3770753eafc9194a0364852159802111925aa30eb3f9d85b0e805ac7cd \
     --hash=sha256:e1020aef2e5096702d8a025ac7d16b1577279c9d63f8375b63083e9a5f0fcbad
@@ -1214,7 +1238,10 @@ urllib3==2.2.3 \
 webencodings==0.5.1 \
     --hash=sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78 \
     --hash=sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923
-    # via html5lib
+    # via
+    #   bleach
+    #   html5lib
+    #   tinycss2
 xlrd==2.0.1 \
     --hash=sha256:6a33ee89877bd9abc1158129f6e94be74e2679636b8a205b43b85206c3f0bbdd \
     --hash=sha256:f72f148f54442c6b056bf931dbc34f986fd0c3b0b6b5a58d013c9aef274d0c88

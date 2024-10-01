@@ -11,6 +11,7 @@ import warnings
 from dotenv import load_dotenv
 
 from itou.utils.enums import ItouEnvironment
+from itou.utils.urls import markdown_url_set_protocol, markdown_url_set_target_blank
 
 from ..sentry import sentry_init
 
@@ -50,8 +51,10 @@ INSTALLED_APPS = [
     "citext",
     "django_bootstrap5",
     "django_select2",
+    "easymde",
     "formtools",
     "huey.contrib.djhuey",
+    "markdownify",
     "rest_framework",
     "rest_framework.authtoken",
     "drf_spectacular",
@@ -550,6 +553,19 @@ SPECTACULAR_SETTINGS = {
 # requests.get(timeout=settings.REQUESTS_TIMEOUT)
 REQUESTS_TIMEOUT = 5  # in seconds
 
+# Markdownify settings
+# ------------------------------------------------------------------------------
+MARKDOWNIFY = {
+    "default": {
+        "WHITELIST_TAGS": ["a", "p", "ul", "ol", "li", "em", "strong", "br"],
+        "MARKDOWN_EXTENSIONS": ["nl2br", "sane_lists"],
+        "LINKIFY_TEXT": {
+            "PARSE_URLS": True,
+            "CALLBACKS": [markdown_url_set_target_blank, markdown_url_set_protocol],
+            "PARSE_EMAIL": True,
+        },
+    }
+}
 # ASP SFTP connection
 # ------------------------------------------------------------------------------
 ASP_SFTP_HOST = os.getenv("ASP_SFTP_HOST")

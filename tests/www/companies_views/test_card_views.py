@@ -225,6 +225,30 @@ class CardViewTest(TestCase):
         company_card_url_other_formatting = f"{company_card_base_url}?back_url={urlencode(list_url)}"
         self.assertContains(response, company_card_url_other_formatting)
 
+    def test_company_card_render_markdown(self):
+        company = CompanyFactory(
+            description="*Lorem ipsum*, **bold** and [link](https://beta.gouv.fr).",
+            provided_support="* list 1\n* list 2\n\n1. list 1\n2. list 2",
+        )
+        company_card_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        response = self.client.get(company_card_url)
+        attrs = 'target="_blank" rel="noopener" aria-label="Ouverture dans un nouvel onglet"'
+        self.assertContains(
+            response,
+            f'<p><em>Lorem ipsum</em>, <strong>bold</strong> and <a href="https://beta.gouv.fr" {attrs}>link</a>.</p>',
+        )
+        self.assertContains(
+            response, "<ul>\n<li>list 1</li>\n<li>list 2</li>\n</ul>\n<ol>\n<li>list 1</li>\n<li>list 2</li>\n</ol>"
+        )
+
+    def test_company_card_render_markdown_forbidden_tags(self):
+        company = CompanyFactory(
+            description='# Gros titre\n<script></script>\n<span class="font-size:200px;">Gros texte</span>',
+        )
+        company_card_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        response = self.client.get(company_card_url)
+        self.assertContains(response, "Gros titre\n\n<p>Gros texte</p>")
+
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class JobDescriptionCardViewTest(TestCase):
@@ -269,6 +293,53 @@ class JobDescriptionCardViewTest(TestCase):
 
         response = self.client.get(add_url_params(url, {"back_url": reverse("companies_views:job_description_list")}))
         assert_previous_step(response, reverse("companies_views:job_description_list"), back_to_list=True)
+
+    def test_job_description_card_render_markdown(self):
+        company = CompanyWithMembershipAndJobsFactory()
+        job_description = company.job_description_through.first()
+        job_description.description = "*Lorem ipsum*, **bold** and [link](https://beta.gouv.fr)."
+        job_description.profile_description = "* list 1\n* list 2\n\n1. list 1\n2. list 2"
+        job_description.save()
+        url = reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
+        response = self.client.get(url)
+        attrs = 'target="_blank" rel="noopener" aria-label="Ouverture dans un nouvel onglet"'
+        self.assertContains(
+            response,
+            f'<p><em>Lorem ipsum</em>, <strong>bold</strong> and <a href="https://beta.gouv.fr" {attrs}>link</a>.</p>',
+        )
+        self.assertContains(
+            response,
+            "<ul>\n<li>list 1</li>\n<li>list 2</li>\n</ul>\n<ol>\n<li>list 1</li>\n<li>list 2</li>\n</ol>",
+        )
+
+    def test_job_description_card_render_markdown_links(self):
+        company = CompanyWithMembershipAndJobsFactory()
+        job_description = company.job_description_through.first()
+        job_description.description = "www.lien1.com\nhttps://lien2.com\n[test](https://lien3.com)\n[test2](lien4.bzh)\ntest@admin.com\nftp://lien5.com"
+        job_description.save()
+        url = reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
+        response = self.client.get(url)
+        attrs = 'target="_blank" rel="noopener" aria-label="Ouverture dans un nouvel onglet"'
+        self.assertContains(
+            response,
+            f"""<p><a href="http://www.lien1.com" {attrs}>www.lien1.com</a><br>
+<a href="https://lien2.com" {attrs}>https://lien2.com</a><br>
+<a href="https://lien3.com" {attrs}>test</a><br>
+<a href="https://lien4.bzh" {attrs}>test2</a><br>
+<a href="mailto:test@admin.com" {attrs}>test@admin.com</a><br>
+<a href="https://ftp://lien5.com" {attrs}>ftp://lien5.com</a></p>""",  # allowing only HTTP and HTTPS protocols
+        )
+
+    def test_job_description_card_render_markdown_forbidden_tags(self):
+        company = CompanyWithMembershipAndJobsFactory()
+        job_description = company.job_description_through.first()
+        job_description.description = (
+            '# Gros titre\n<script></script>\n<span class="font-size:200px;">Gros texte</span>'
+        )
+        job_description.save()
+        url = reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
+        response = self.client.get(url)
+        self.assertContains(response, "Gros titre\n\n<p>Gros texte</p>")
 
     def test_card_tally_url_with_user(self):
         job_description = JobDescriptionFactory(
