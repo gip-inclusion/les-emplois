@@ -420,3 +420,47 @@ def test_accept_job_application_for_job_seeker_with_approval(admin_client):
     assert job_application.state.is_accepted
     assert job_application.logs.count() == 1  # processing->accepted
     assert job_application.approval == existing_approval
+
+
+def test_create_inconsistent_job_application(admin_client):
+    job_seeker = JobSeekerFactory()
+    company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
+    employer = company.members.first()
+    approval = ApprovalFactory()
+    post_data = {
+        "job_seeker": job_seeker.pk,
+        "to_company": company.pk,
+        "sender_kind": "employer",
+        "sender_company": company.pk,
+        "sender": employer.pk,
+        "approval": approval.pk,
+        # Formsets to please django admin
+        **JOB_APPLICATION_FORMSETS_PAYLOAD,
+    }
+    response = admin_client.post(reverse("admin:job_applications_jobapplication_add"), post_data)
+    assertRedirects(response, reverse("admin:job_applications_jobapplication_changelist"))
+    job_app = models.JobApplication.objects.get()
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                messages.WARNING,
+                (
+                    "1 objet incohérent: <ul>"
+                    '<li class="warning">'
+                    f'<a href="/admin/job_applications/jobapplication/{job_app.pk}/change/">'
+                    f"candidature - {job_app.pk}"
+                    "</a>: Candidature liée au PASS IAE d&#x27;un autre candidat</li>"
+                    "</ul>"
+                ),
+            ),
+            messages.Message(
+                messages.SUCCESS,
+                (
+                    "L'objet candidature "
+                    f'« <a href="/admin/job_applications/jobapplication/{job_app.pk}/change/">{job_app.pk}</a> » '
+                    "a été ajouté avec succès."
+                ),
+            ),
+        ],
+    )
