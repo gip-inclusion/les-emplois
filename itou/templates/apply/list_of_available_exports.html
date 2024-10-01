@@ -76,29 +76,41 @@
                     {% else %}
                         <h2 class="h4">Candidatures</h2>
                         <div class="table-responsive mt-3 mt-md-4">
-                            <table class="table">
+                            <table class="table table-hover">
                                 <caption class="visually-hidden">Liste des candidatures</caption>
                                 <thead>
                                     <tr>
                                         <th scope="col">Contenu du fichier</th>
                                         <th scope="col">Nombre de candidatures</th>
-                                        <th scope="col" class="text-end">Télécharger (.xlsx)</th>
+                                        <th scope="col" class="text-end w-50px"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td>Toutes les candidatures</td>
                                         <td>{{ total_job_applications }}</td>
-                                        <td class="text-end">
+                                        <td class="text-end w-50px">
                                             {% if export_for == "siae" %}
-                                                <a class="btn-link" {% matomo_event "candidature" "exports" "export-siae" %} aria-label="Télécharger cet export SIAE" href="{% url 'apply:list_for_siae_exports_download' %}">
-                                                    <i class="ri-download-line me-1" aria-hidden="true"></i>
-                                                    Télécharger
+                                                <a class="btn btn-sm btn-link btn-ico-only"
+                                                {% matomo_event "candidature" "exports" "export-siae" %}
+                                                aria-label="Télécharger cet export SIAE au format .xlsx"
+                                                href="{% url 'apply:list_for_siae_exports_download' %}"
+                                                >
+                                                    <i class="ri-download-line"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-title="Télécharger (.xlsx)"
+                                                    ></i>
                                                 </a>
                                             {% else %}
-                                                <a class="btn-link" {% matomo_event "candidature" "exports" "export-prescripteur" %} aria-label="Télécharger cet export prescripteur" href="{% url 'apply:list_prescriptions_exports_download' %}">
-                                                    <i class="ri-download-line me-1" aria-hidden="true"></i>
-                                                    Télécharger
+                                                <a class="btn btn-sm btn-link btn-ico-only"
+                                                {% matomo_event "candidature" "exports" "export-prescripteur" %}
+                                                aria-label="Télécharger cet export prescripteur au format .xlsx"
+                                                href="{% url 'apply:list_prescriptions_exports_download' %}"
+                                                >
+                                                    <i class="ri-download-line"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-title="Télécharger (.xlsx)"
+                                                    ></i>
                                                 </a>
                                             {% endif %}
                                         </td>
@@ -107,22 +119,28 @@
                                         <tr>
                                             <td>{{ month.month|date:"F Y"|capfirst }}</td>
                                             <td>{{ month.c }}</td>
-                                            <td class="text-end">
+                                            <td class="text-end w-50px">
                                                 {% if export_for == "siae" %}
-                                                    <a class="btn-link"
+                                                    <a class="btn btn-sm btn-link btn-ico-only"
                                                        {% matomo_event "candidature" "exports" "export-siae" %}
-                                                       aria-label="Télécharger cet export SIAE"
-                                                       href="{% url 'apply:list_for_siae_exports_download' month_identifier=month.month|date:"Y-m" %}">
-                                                        <i class="ri-download-line me-1" aria-hidden="true"></i>
-                                                        Télécharger
+                                                       aria-label="Télécharger cet export SIAE au format .xlsx"
+                                                       href="{% url 'apply:list_for_siae_exports_download' month_identifier=month.month|date:"Y-m" %}"
+                                                       >
+                                                        <i class="ri-download-line"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-title="Télécharger (.xlsx)"
+                                                        ></i>
                                                     </a>
                                                 {% else %}
-                                                    <a class="btn-link"
+                                                    <a class="btn btn-sm btn-link btn-ico-only"
                                                        {% matomo_event "candidature" "exports" "export-prescripteur" %}
-                                                       aria-label="Télécharger cet export prescripteur"
-                                                       href="{% url 'apply:list_prescriptions_exports_download' month_identifier=month.month|date:"Y-m" %}">
-                                                        <i class="ri-download-line me-1" aria-hidden="true"></i>
-                                                        Télécharger
+                                                       aria-label="Télécharger cet export prescripteur au format .xlsx"
+                                                       href="{% url 'apply:list_prescriptions_exports_download' month_identifier=month.month|date:"Y-m" %}"
+                                                       >
+                                                        <i class="ri-download-line"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-title="Télécharger (.xlsx)"
+                                                        ></i>
                                                     </a>
                                                 {% endif %}
                                             </td>
