@@ -37,22 +37,24 @@
                                         </li>
                                     </ul>
                                     <p>Listes de vos structures :</p>
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">Nom</th>
-                                                <th scope="col">Identifiant unique</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for company in companies %}
+                                    <div class="table-responsive mt-3 mt-md-4">
+                                        <table class="table">
+                                            <thead>
                                                 <tr>
-                                                    <th scope="row">{{ company.name }}</th>
-                                                    <td>{{ company.uid }}</td>
+                                                    <th scope="col">Nom</th>
+                                                    <th scope="col">Identifiant unique</th>
                                                 </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                {% for company in companies %}
+                                                    <tr>
+                                                        <th scope="row">{{ company.name }}</th>
+                                                        <td>{{ company.uid }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                     <p>
                                         Pour vous connecter à l’API vous devez utiliser l’identifiant "{{ login_string }}" et comme mot de passe le token suivant.
                                     </p>
