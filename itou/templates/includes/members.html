@@ -7,14 +7,14 @@
 
 {% if members %}
     <div class="table-responsive mt-3 mt-md-4">
-        <table class="table">
+        <table class="table table-hover">
             <caption class="visually-hidden">Liste des collaborateurs</caption>
             <thead>
                 <tr>
                     <th scope="col">Nom</th>
                     <th scope="col">Email</th>
                     <th scope="col">Date d'inscription</th>
-                    {% if user in active_admin_members %}<th scope="col"></th>{% endif %}
+                    {% if user in active_admin_members %}<th scope="col" class="text-end w-50px"></th>{% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -27,11 +27,11 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="mailto:{{ member.user.email }}">{{ member.user.email }}</a>
+                            <a href="mailto:{{ member.user.email }}" class="btn-link">{{ member.user.email }}</a>
                         </td>
                         <td>{{ member.joined_at|date:"d F Y à H:i" }}</td>
                         {% if user in active_admin_members %}
-                            <td class="text-center">
+                            <td class="text-end w-50px">
                                 <div>
                                     {% if member.user != user %}
                                         <button id="dropdown_{{ forloop.counter }}_action_menu" class="btn btn-sm btn-link btn-ico-only" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d'actions">
@@ -50,7 +50,9 @@
                                             {% endif %}
                                         </div>
                                     {% else %}
-                                        <i class="ri-forbid-line ri-lg" aria-hidden="true"></i>
+                                        <div class="btn btn-sm btn-link btn-ico-only disabled">
+                                            <i class="ri-forbid-line" aria-hidden="true"></i>
+                                        </div>
                                     {% endif %}
                                 </div>
                             </td>

@@ -68,7 +68,7 @@
                         </p>
                         {% if job_pager %}
                             <div class="table-responsive mt-3 mt-md-4">
-                                <table class="table">
+                                <table class="table table-hover">
                                     <caption class="visually-hidden">Liste des métiers exercés</caption>
                                     <thead>
                                         <tr>
@@ -76,7 +76,7 @@
                                             <th scope="col">Localisation</th>
                                             <th scope="col">Nbre de postes</th>
                                             <th scope="col">Statut</th>
-                                            <th scope="col"></th>
+                                            <th scope="col" class="text-end w-50px"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -116,8 +116,12 @@
                                                         </div>
                                                     </form>
                                                 </td>
-                                                <td class="text-center">
-                                                    <i class="ri-delete-bin-line ri-lg" role="button" data-bs-toggle="modal" data-bs-target="#_delete_modal_{{ job_description.id }}"></i>
+                                                <td class="text-end w-50px">
+                                                    <button class="btn btn-sm btn-link btn-ico-only" type="button" data-bs-toggle="modal" data-bs-target="#_delete_modal_{{ job_description.id }}" aria-label="Supprimer ce metiér">
+                                                        <i class="ri-delete-bin-line"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-title="Supprimer"></i>
+                                                    </button>
                                                     {# Modal for job description deletion #}
                                                     <div id="_delete_modal_{{ job_description.id }}" class="modal fade" tabindex="-1" aria-labelledby="confirmDeleteModal{{ job_description.id }}" aria-hidden="true">
                                                         <div class="modal-dialog modal-dialog-centered">

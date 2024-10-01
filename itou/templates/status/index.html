@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="table-responsive mt-3 mt-md-4">
-                        <table class="table text-center">
+                        <table class="table table-hover">
                             <caption class="visually-hidden">Liste des statuts</caption>
                             <thead>
                                 <tr>
@@ -42,7 +42,7 @@
                                                     {{ status.last_success_at|timesince|default:"N/A" }}
                                                 </span>
                                                 {% if status.last_success_info %}
-                                                    <i class="ri-information-line fs-lg" aria-label="{{ status.last_success_info }}"></i>
+                                                    <i class="ri-information-line ri-lg" aria-label="{{ status.last_success_info }}"></i>
                                                 {% endif %}
                                             </td>
                                             <td>
@@ -50,7 +50,7 @@
                                                     {{ status.last_failure_at|timesince|default:"N/A" }}
                                                 </span>
                                                 {% if status.last_failure_info %}
-                                                    <i class="ri-error-warning-line fs-lg" aria-label="{{ status.last_failure_info }}"></i>
+                                                    <i class="ri-error-warning-line ri-lg" aria-label="{{ status.last_failure_info }}"></i>
                                                 {% endif %}
                                             </td>
                                         </tr>

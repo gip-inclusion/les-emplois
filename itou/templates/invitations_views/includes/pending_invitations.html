@@ -26,12 +26,12 @@
                         <th scope="row">{{ forloop.counter }}</th>
                         <td>{{ invitation.first_name|title }} {{ invitation.last_name|upper }}</td>
                         <td>
-                            <a href="mailto:{{ invitation.email }}">{{ invitation.email }}</a>
+                            <a href="mailto:{{ invitation.email }}" class="btn-link">{{ invitation.email }}</a>
                         </td>
                         <td>{{ invitation.sent_at|date:"d F Y à H:i" }}</td>
                         <td>{{ invitation.expiration_date|date:"d F Y à H:i" }}</td>
                         <td>
-                            {% include 'includes/copy_to_clipboard.html' with content=invitation.acceptance_link css_classes="btn btn-ico btn-outline-primary btn-sm" %}
+                            {% include 'includes/copy_to_clipboard.html' with content=invitation.acceptance_link css_classes="btn btn-ico btn-link btn-sm" %}
                         </td>
                     </tr>
                 {% endfor %}

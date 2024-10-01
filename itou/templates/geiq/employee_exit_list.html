@@ -6,8 +6,8 @@
 {% block data_list %}
 
     <div class="tab-content" id="result_page">
-        <div class="table-responsive-lg mt-3 mt-md-4">
-            <table class="table">
+        <div class="table-responsive mt-3 mt-md-4">
+            <table class="table table-hover">
                 <caption class="visually-hidden">Liste des sorties</caption>
                 <thead>
                     <tr>
@@ -24,7 +24,7 @@
                     {% for contract in data_page %}
                         <tr>
                             <td>
-                                <a href="{% url 'geiq:employee_details' employee_pk=contract.employee.pk %}?back_url={{ request.get_full_path|urlencode }}">{{ contract.employee.get_full_name }}</a>
+                                <a href="{% url 'geiq:employee_details' employee_pk=contract.employee.pk %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link">{{ contract.employee.get_full_name }}</a>
                             </td>
                             <td>{{ contract.other_data.rupture|yesno:"Hors période d’essai,En période d’essai,-" }}</td>
                             <td>

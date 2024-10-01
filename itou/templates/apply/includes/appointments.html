@@ -5,27 +5,30 @@
 {% if participations %}
     <h3>Rendez-vous</h3>
     <div class="table-responsive mt-3 mt-md-4">
-        <table id="rdvi-appointments" class="table">
+        <table class="table table-hover" id="rdvi-appointments">
             <caption class="visually-hidden">Liste des rendez-vous</caption>
             <thead>
                 <tr>
                     <th scope="col">Statut</th>
                     <th scope="col">Date et heure</th>
                     <th scope="col">Motif</th>
-                    <th scope="col"></th>
+                    <th scope="col" class="text-end w-50px"></th>
                 </tr>
             </thead>
             <tbody>
                 {% for participation in participations %}
                     <tr>
                         <td>
-                            <span class="badge badge-sm rounded-pill {{ participation.get_status_class_name }}">{{ participation.get_status_display }}</span>
+                            <span class="badge badge-xs rounded-pill {{ participation.get_status_class_name }}">{{ participation.get_status_display }}</span>
                         </td>
                         <td>{{ participation.appointment.start_at }}</td>
                         <td>{{ participation.appointment.reason }}</td>
-                        <td id="participation-{{ participation.pk }}-row">
-                            <button type="button" class="btn btn-link px-0" data-bs-toggle="modal" data-bs-target="#participation-{{ participation.pk }}-modal">
-                                Détails
+                        <td id="participation-{{ participation.pk }}-row" class="text-end w-50px">
+                            <button type="button" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="modal" data-bs-target="#participation-{{ participation.pk }}-modal">
+                                <i class="ri-search-line"
+                                data-bs-toggle="tooltip"
+                                data-bs-title="Voir"
+                                ></i>
                             </button>
                             <div class="modal modal--mini fade" id="participation-{{ participation.pk }}-modal" tabindex="-1" aria-labelledby="participation-{{ participation.pk }}-modal-title" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">

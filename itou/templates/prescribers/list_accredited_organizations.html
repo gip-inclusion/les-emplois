@@ -35,7 +35,7 @@
                                     </p>
                                     <div class="collapse" id="collapse_membership_{{ org.pk }}">
                                         <div class="table-responsive">
-                                            <table class="table">
+                                            <table class="table table-hover">
                                                 <caption>Liste des organisations conventionnées</caption>
                                                 <thead>
                                                     <tr>
@@ -53,10 +53,10 @@
                                                             <td>{{ membership.user.last_name|upper }}</td>
                                                             <td>{{ membership.user.first_name|title }}</td>
                                                             <td>
-                                                                <a href="mailto:{{ membership.user.email }}">{{ membership.user.email }}</a>
+                                                                <a href="mailto:{{ membership.user.email }}" class="btn-link">{{ membership.user.email }}</a>
                                                             </td>
                                                             <td>
-                                                                {% if membership.is_admin %}<i class="ri-check-line"></i>{% endif %}
+                                                                {% if membership.is_admin %}<i class="ri-check-line" aria-label="Est un administrateur"></i>{% endif %}
                                                             </td>
                                                         </tr>
                                                     {% endfor %}
