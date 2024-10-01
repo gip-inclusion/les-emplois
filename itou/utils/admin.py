@@ -71,7 +71,7 @@ class ItouStackedInline(StackedInline, ItouTabularInline):
 class InconsistencyCheckMixin:
     INCONSISTENCY_CHECKS = []
 
-    def check_inconsistencies(self, request, queryset):
+    def check_inconsistencies(self, request, queryset, message_when_no_inconsistency=True):
         inconsistencies = {}
         for title, check in self.INCONSISTENCY_CHECKS:
             for item in check(queryset):
@@ -98,7 +98,7 @@ class InconsistencyCheckMixin:
                 ),
                 level=WARNING,
             )
-        else:
+        elif message_when_no_inconsistency:
             self.message_user(request, "Aucune incohérence trouvée")
 
     def get_actions(self, request):
@@ -110,6 +110,12 @@ class InconsistencyCheckMixin:
                 "Vérifier la cohérence des objets",
             )
         return actions
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        self.check_inconsistencies(
+            request, obj._meta.default_manager.filter(pk=obj.pk), message_when_no_inconsistency=False
+        )
 
 
 class ItouModelAdmin(ModelAdmin):
