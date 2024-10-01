@@ -14,7 +14,7 @@
                     <th scope="col">Nom</th>
                     <th scope="col">Email</th>
                     <th scope="col">Date d'inscription</th>
-                    {% if user in active_admin_members %}<th scope="col" class="text-center">Action</th>{% endif %}
+                    {% if user in active_admin_members %}<th scope="col"></th>{% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -34,7 +34,7 @@
                             <td class="text-center">
                                 <div>
                                     {% if member.user != user %}
-                                        <button id="dropdown_{{ forloop.counter }}_action_menu" class="btn btn-link btn-ico-only btn-sm" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d'actions">
+                                        <button id="dropdown_{{ forloop.counter }}_action_menu" class="btn btn-sm btn-link btn-ico-only" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d'actions">
                                             <i class="ri-more-2-fill" aria-hidden="true"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
