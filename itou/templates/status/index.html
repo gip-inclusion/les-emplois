@@ -7,55 +7,57 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
-                    <table class="table text-center">
-                        <thead>
-                            <tr>
-                                <th scope="col">Nom</th>
-                                <th scope="col">État</th>
-                                <th scope="col">Dernier succès</th>
-                                <th scope="col">Dernier échec</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for display_name, status in statuses %}
-                                {% if not status %}
-                                    <tr class="table-warning">
-                                        <td>{{ display_name }}</td>
-                                        <td>???</td>
-                                        <td>N/A</td>
-                                        <td>N/A</td>
-                                    </tr>
-                                {% else %}
-                                    <tr class="table-{% if status.is_success %}success{% else %}danger{% endif %}">
-                                        <td>{{ display_name }}</td>
-                                        <td>
-                                            {% if status.is_success %}
-                                                OK
-                                            {% else %}
-                                                KO
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            <span aria-label="{{ status.last_success_at|date:"c"|default:"" }}">
-                                                {{ status.last_success_at|timesince|default:"N/A" }}
-                                            </span>
-                                            {% if status.last_success_info %}
-                                                <i class="ri-information-line fs-lg" aria-label="{{ status.last_success_info }}"></i>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            <span aria-label="{{ status.last_failure_at|date:"c"|default:"" }}">
-                                                {{ status.last_failure_at|timesince|default:"N/A" }}
-                                            </span>
-                                            {% if status.last_failure_info %}
-                                                <i class="ri-error-warning-line fs-lg" aria-label="{{ status.last_failure_info }}"></i>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endif %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    <div class="table-responsive mt-3 mt-md-4">
+                        <table class="table text-center">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Nom</th>
+                                    <th scope="col">État</th>
+                                    <th scope="col">Dernier succès</th>
+                                    <th scope="col">Dernier échec</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for display_name, status in statuses %}
+                                    {% if not status %}
+                                        <tr class="table-warning">
+                                            <td>{{ display_name }}</td>
+                                            <td>???</td>
+                                            <td>N/A</td>
+                                            <td>N/A</td>
+                                        </tr>
+                                    {% else %}
+                                        <tr class="table-{% if status.is_success %}success{% else %}danger{% endif %}">
+                                            <td>{{ display_name }}</td>
+                                            <td>
+                                                {% if status.is_success %}
+                                                    OK
+                                                {% else %}
+                                                    KO
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <span aria-label="{{ status.last_success_at|date:"c"|default:"" }}">
+                                                    {{ status.last_success_at|timesince|default:"N/A" }}
+                                                </span>
+                                                {% if status.last_success_info %}
+                                                    <i class="ri-information-line fs-lg" aria-label="{{ status.last_success_info }}"></i>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <span aria-label="{{ status.last_failure_at|date:"c"|default:"" }}">
+                                                    {{ status.last_failure_at|timesince|default:"N/A" }}
+                                                </span>
+                                                {% if status.last_failure_info %}
+                                                    <i class="ri-error-warning-line fs-lg" aria-label="{{ status.last_failure_info }}"></i>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
