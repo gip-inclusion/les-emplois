@@ -1055,6 +1055,10 @@ class JobSeekerProfile(models.Model):
             self.pe_last_certification_attempt_at = None
             if update_fields is not None:
                 update_fields = set(update_fields) | {"pe_obfuscated_nir", "pe_last_certification_attempt_at"}
+        if self.has_data_changed(["nir"]) or self._state.adding:
+            from itou.gps.utils import find_job_seeker_advisor
+
+            find_job_seeker_advisor(self)
         super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
         self.set_old_values()
