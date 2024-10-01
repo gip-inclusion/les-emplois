@@ -82,14 +82,14 @@
                                     <tr>
                                         <th scope="col">Contenu du fichier</th>
                                         <th scope="col">Nombre de candidatures</th>
-                                        <th scope="col">Télécharger (.xlsx)</th>
+                                        <th scope="col" class="text-end">Télécharger (.xlsx)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td>Toutes les candidatures</td>
                                         <td>{{ total_job_applications }}</td>
-                                        <td>
+                                        <td class="text-end">
                                             {% if export_for == "siae" %}
                                                 <a class="btn-link" {% matomo_event "candidature" "exports" "export-siae" %} aria-label="Télécharger cet export SIAE" href="{% url 'apply:list_for_siae_exports_download' %}">
                                                     <i class="ri-download-line me-1" aria-hidden="true"></i>
@@ -107,7 +107,7 @@
                                         <tr>
                                             <td>{{ month.month|date:"F Y"|capfirst }}</td>
                                             <td>{{ month.c }}</td>
-                                            <td>
+                                            <td class="text-end">
                                                 {% if export_for == "siae" %}
                                                     <a class="btn-link"
                                                        {% matomo_event "candidature" "exports" "export-siae" %}
