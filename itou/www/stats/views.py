@@ -256,6 +256,8 @@ def stats_siae_orga_etp(request):
     These stats are about ETP data from the ASP.
     """
     current_org = get_stats_siae_current_org(request)
+    if not utils.can_view_stats_siae_orga_etp(request):
+        raise PermissionDenied
     context = {
         "page_title": "Suivi des effectifs annuels et mensuels en ETP",
         "department": current_org.department,
