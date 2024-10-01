@@ -18,8 +18,7 @@ tenacity  # https://github.com/jd/tenacity
 django==5.0.*  # https://www.djangoproject.com/
 
 # django-allauth
-# Pinned until https://github.com/pennersr/django-allauth/pull/3230 is resolved.
-django-allauth  # https://github.com/pennersr/django-allauth
+django-allauth  # https://codeberg.org/allauth/django-allauth/
 
 # django-anymail
 django-anymail  # https://github.com/anymail/django-anymail
