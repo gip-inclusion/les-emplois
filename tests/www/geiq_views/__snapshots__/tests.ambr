@@ -610,8 +610,8 @@
 # name: test_employee_list_and_details[personal information]
   '''
   <div class="tab-content" id="result_page">
-          <div class="table-responsive-lg mt-3 mt-md-4">
-              <table class="table">
+          <div class="table-responsive mt-3 mt-md-4">
+              <table class="table table-hover">
                   <caption class="visually-hidden">Liste des personnes</caption>
                   <thead>
                       <tr>
@@ -626,7 +626,7 @@
                       
                           <tr>
                               <td>
-                                  <a href="/geiq/assessment/employee/4?back_url=/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Rachida DIHINTRUC</a>
+                                  <a class="btn-link" href="/geiq/assessment/employee/4?back_url=/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Rachida DIHINTRUC</a>
                               </td>
                               <td>06/05/1997</td>
                               <td>
@@ -640,7 +640,7 @@
                       
                           <tr>
                               <td>
-                                  <a href="/geiq/assessment/employee/3?back_url=/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Thomas LAPOTRE</a>
+                                  <a class="btn-link" href="/geiq/assessment/employee/3?back_url=/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Thomas LAPOTRE</a>
                               </td>
                               <td>05/04/1998</td>
                               <td>
@@ -654,7 +654,7 @@
                       
                           <tr>
                               <td>
-                                  <a href="/geiq/assessment/employee/1?back_url=/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Jean PIERRE</a>
+                                  <a class="btn-link" href="/geiq/assessment/employee/1?back_url=/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Jean PIERRE</a>
                               </td>
                               <td>02/01/2000</td>
                               <td>
@@ -668,7 +668,7 @@
                       
                           <tr>
                               <td>
-                                  <a href="/geiq/assessment/employee/2?back_url=/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Jacqueline SNOW</a>
+                                  <a class="btn-link" href="/geiq/assessment/employee/2?back_url=/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Jacqueline SNOW</a>
                               </td>
                               <td>04/03/1999</td>
                               <td>
@@ -696,8 +696,8 @@
                           <div class="s-tabs-01__row row">
                               
                                   <div class="tab-content" id="result_page">
-                                      <div class="table-responsive-lg mt-3 mt-md-4">
-                                          <table class="table">
+                                      <div class="table-responsive mt-3 mt-md-4">
+                                          <table class="table table-hover">
                                               <caption class="visually-hidden">Liste des GEIQ</caption>
                                               <thead>
                                                   <tr>
@@ -719,7 +719,7 @@
   
                                                           </td>
                                                           <td>
-                                                              <a href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine accepted</a>
+                                                              <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine accepted</a>
                                                           </td>
                                                           <td>Rennes</td>
                                                           <td>2023</td>
@@ -739,7 +739,7 @@
   
                                                           </td>
                                                           <td>
-                                                              <a href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine full_refund</a>
+                                                              <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine full_refund</a>
                                                           </td>
                                                           <td>Rennes</td>
                                                           <td>2023</td>
@@ -759,7 +759,7 @@
   
                                                           </td>
                                                           <td>
-                                                              <a href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine partial_accepted</a>
+                                                              <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine partial_accepted</a>
                                                           </td>
                                                           <td>Rennes</td>
                                                           <td>2023</td>
@@ -779,7 +779,7 @@
   
                                                           </td>
                                                           <td>
-                                                              <a href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine partial_refund</a>
+                                                              <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine partial_refund</a>
                                                           </td>
                                                           <td>Rennes</td>
                                                           <td>2023</td>
@@ -799,7 +799,7 @@
   
                                                           </td>
                                                           <td>
-                                                              <a href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine remainder_refused</a>
+                                                              <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine remainder_refused</a>
                                                           </td>
                                                           <td>Rennes</td>
                                                           <td>2023</td>
@@ -820,7 +820,7 @@
   
                                                           </td>
                                                           <td>
-                                                              <a href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq du finistère avec bilan transmis</a>
+                                                              <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq du finistère avec bilan transmis</a>
                                                           </td>
                                                           <td>Porspoder</td>
                                                           <td>2023</td>
@@ -840,7 +840,7 @@
   
                                                           </td>
                                                           <td>
-                                                              <a href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq du morbihan</a>
+                                                              <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq du morbihan</a>
                                                           </td>
                                                           <td>Vannes (56)</td>
                                                           <td>2023</td>

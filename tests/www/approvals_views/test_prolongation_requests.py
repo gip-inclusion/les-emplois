@@ -7,20 +7,20 @@ from django.core.files.storage import default_storage
 from django.template import loader
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertMessages, assertNumQueries, assertRedirects
+from pytest_django.asserts import (assertMessages, assertNumQueries,
+                                   assertRedirects)
 
-from itou.approvals.enums import (
-    ProlongationReason,
-    ProlongationRequestDenyProposedAction,
-    ProlongationRequestDenyReason,
-    ProlongationRequestStatus,
-)
+from itou.approvals.enums import (ProlongationReason,
+                                  ProlongationRequestDenyProposedAction,
+                                  ProlongationRequestDenyReason,
+                                  ProlongationRequestStatus)
 from itou.files.models import File
 from tests.approvals import factories as approvals_factories
 from tests.prescribers import factories as prescribers_factories
 from tests.users import factories as users_factories
 from tests.users.factories import EmployerFactory
-from tests.utils.test import BASE_NUM_QUERIES, assert_previous_step, parse_response_to_soup
+from tests.utils.test import (BASE_NUM_QUERIES, assert_previous_step,
+                              parse_response_to_soup)
 
 
 @pytest.mark.parametrize(
@@ -52,7 +52,7 @@ def test_empty_list_view(snapshot, client):
     )
     with assertNumQueries(num_queries):
         response = client.get(reverse("approvals:prolongation_requests_list"))
-    assert str(parse_response_to_soup(response, ".s-section .c-box")) == snapshot
+    assert str(parse_response_to_soup(response, ".s-section")) == snapshot
 
     assert_previous_step(response, reverse("dashboard:index"))
 
@@ -73,7 +73,7 @@ def test_list_view(snapshot, client):
     )
     with assertNumQueries(num_queries):
         response = client.get(reverse("approvals:prolongation_requests_list"))
-    assert str(parse_response_to_soup(response, ".s-section .c-box")) == snapshot
+    assert str(parse_response_to_soup(response, ".s-section")) == snapshot
 
 
 def test_list_view_no_siae(snapshot, client):
@@ -83,7 +83,7 @@ def test_list_view_no_siae(snapshot, client):
     client.force_login(prolongation_request.validated_by)
 
     response = client.get(reverse("approvals:prolongation_requests_list"))
-    assert str(parse_response_to_soup(response, ".s-section .c-box")) == snapshot
+    assert str(parse_response_to_soup(response, ".s-section")) == snapshot
 
 
 def test_list_view_only_pending_filter(client):

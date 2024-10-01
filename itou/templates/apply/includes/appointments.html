@@ -5,7 +5,7 @@
 {% if participations %}
     <h3>Rendez-vous</h3>
     <div class="table-responsive mt-3 mt-md-4">
-        <table class="table table-hover" id="rdvi-appointments">
+        <table id="rdvi-appointments" class="table table-hover">
             <caption class="visually-hidden">Liste des rendez-vous</caption>
             <thead>
                 <tr>
@@ -25,10 +25,7 @@
                         <td>{{ participation.appointment.reason }}</td>
                         <td id="participation-{{ participation.pk }}-row" class="text-end w-50px">
                             <button type="button" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="modal" data-bs-target="#participation-{{ participation.pk }}-modal">
-                                <i class="ri-search-line"
-                                data-bs-toggle="tooltip"
-                                data-bs-title="Voir"
-                                ></i>
+                                <i class="ri-search-line" data-bs-toggle="tooltip" data-bs-title="Voir"></i>
                             </button>
                             <div class="modal modal--mini fade" id="participation-{{ participation.pk }}-modal" tabindex="-1" aria-labelledby="participation-{{ participation.pk }}-modal-title" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
