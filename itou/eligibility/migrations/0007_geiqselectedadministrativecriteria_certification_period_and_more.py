@@ -14,41 +14,45 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="geiqselectedadministrativecriteria",
             name="certification_period",
-            field=itou.utils.models.InclusiveDateRangeField(null=True, verbose_name="période de certification"),
+            field=itou.utils.models.InclusiveDateRangeField(
+                blank=True, null=True, verbose_name="période de certification"
+            ),
         ),
         migrations.AddField(
             model_name="geiqselectedadministrativecriteria",
             name="certified",
-            field=models.BooleanField(null=True, verbose_name="certifié par l'API Particulier"),
+            field=models.BooleanField(blank=True, null=True, verbose_name="certifié par l'API Particulier"),
         ),
         migrations.AddField(
             model_name="geiqselectedadministrativecriteria",
             name="certified_at",
-            field=models.DateTimeField(null=True, verbose_name="certifié le"),
+            field=models.DateTimeField(blank=True, null=True, verbose_name="certifié le"),
         ),
         migrations.AddField(
             model_name="geiqselectedadministrativecriteria",
             name="data_returned_by_api",
-            field=models.JSONField(null=True, verbose_name="résultat renvoyé par l'API Particulier"),
+            field=models.JSONField(blank=True, null=True, verbose_name="résultat renvoyé par l'API Particulier"),
         ),
         migrations.AddField(
             model_name="selectedadministrativecriteria",
             name="certification_period",
-            field=itou.utils.models.InclusiveDateRangeField(null=True, verbose_name="période de certification"),
+            field=itou.utils.models.InclusiveDateRangeField(
+                blank=True, null=True, verbose_name="période de certification"
+            ),
         ),
         migrations.AddField(
             model_name="selectedadministrativecriteria",
             name="certified",
-            field=models.BooleanField(null=True, verbose_name="certifié par l'API Particulier"),
+            field=models.BooleanField(blank=True, null=True, verbose_name="certifié par l'API Particulier"),
         ),
         migrations.AddField(
             model_name="selectedadministrativecriteria",
             name="certified_at",
-            field=models.DateTimeField(null=True, verbose_name="certifié le"),
+            field=models.DateTimeField(blank=True, null=True, verbose_name="certifié le"),
         ),
         migrations.AddField(
             model_name="selectedadministrativecriteria",
             name="data_returned_by_api",
-            field=models.JSONField(null=True, verbose_name="résultat renvoyé par l'API Particulier"),
+            field=models.JSONField(blank=True, null=True, verbose_name="résultat renvoyé par l'API Particulier"),
         ),
     ]
