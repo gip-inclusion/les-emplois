@@ -6,6 +6,7 @@ import os.path
 import random
 import re
 from contextlib import contextmanager
+from itertools import chain
 
 import openpyxl
 import sqlparse
@@ -68,8 +69,12 @@ def parse_response_to_soup(response, selector=None, no_html_body=False, replace_
         soup["nonce"] = "NORMALIZED_CSP_NONCE"
     for csp_nonce_script in soup.find_all("script", {"nonce": True}):
         csp_nonce_script["nonce"] = "NORMALIZED_CSP_NONCE"
-    for img in soup.find_all("img", attrs={"src": True}):
+    for img in chain(
+        soup.find_all("img", attrs={"src": True}), soup.find_all("input", attrs={"type": "image", "src": True})
+    ):
         img["src"] = remove_static_hash(img["src"])
+    for img in soup.find_all("source", attrs={"srcset": True}):
+        img["srcset"] = remove_static_hash(img["srcset"])
     if replace_in_attr:
         replacements = [
             (
