@@ -148,7 +148,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
     job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
 
-    filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET)
+    filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET, request_user=request.user)
 
     # Add related data giving the criteria for adding the necessary annotations
     job_applications = job_applications.with_list_related_data(criteria=filters_form.data.getlist("criteria", []))
