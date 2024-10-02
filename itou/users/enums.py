@@ -46,6 +46,7 @@ class IdentityProvider(models.TextChoices):
             cls.FRANCE_CONNECT: (UserKind.JOB_SEEKER,),
             cls.INCLUSION_CONNECT: (UserKind.PRESCRIBER, UserKind.EMPLOYER),
             cls.PE_CONNECT: (UserKind.JOB_SEEKER,),
+            cls.PRO_CONNECT: (UserKind.PRESCRIBER, UserKind.EMPLOYER),
         }
 
 

@@ -1,5 +1,7 @@
+from unittest.mock import patch
 from urllib.parse import urlencode
 
+import pytest
 import respx
 from django.contrib import messages
 from django.test import override_settings
@@ -14,6 +16,7 @@ from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.urls import add_url_params
 from itou.www.login.forms import ItouLoginForm
+from itou.www.login.views import ExistingUserLoginView
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from tests.openid_connect.test import sso_parametrize
 from tests.users.factories import (
@@ -22,8 +25,9 @@ from tests.users.factories import (
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
+    UserFactory,
 )
-from tests.utils.test import reload_module
+from tests.utils.test import parse_response_to_soup, reload_module
 
 
 CONNECT_WITH_IC = "Se connecter avec Inclusion Connect"
@@ -253,6 +257,66 @@ class TestJopbSeekerLogin:
                 )
             ],
         )
+
+
+class TestExistingUserLogin:
+    UNSUPPORTED_IDENTITY_PROVIDER_TEXT = "Le mode de connexion associé à ce compte est désactivé"
+
+    def test_hypothetical_identity_provider_failure(self, client):
+        # test_login ensures that every IdentityProvider is supported by the existing-login view
+        # it relies on the assumption that UNSUPPORTED_IDENTITY_PROVIDER_TEXT is displayed when it is not
+        # this is a test for that assumption
+        def override_identity_provider_in_context(self, **kwargs):
+            context = super(ExistingUserLoginView, self).get_context_data(**kwargs)
+            context["login_provider"] = "somethingInvalid"
+            return context
+
+        user = JobSeekerFactory()
+        with patch.object(ExistingUserLoginView, "get_context_data", override_identity_provider_in_context):
+            response = client.get(reverse("login:existing_user", args=(user.public_id,)))
+            assertContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
+
+    @pytest.mark.parametrize("identity_provider", IdentityProvider.values)
+    @override_settings(
+        FRANCE_CONNECT_BASE_URL="http://localhost:8080",
+        PEAMU_AUTH_BASE_URL="http://localhost:8080",
+        INCLUSION_CONNECT_BASE_URL="http://localhost:8080",
+        PRO_CONNECT_BASE_URL="http://localhost:8080",
+    )
+    def test_login(self, client, snapshot, identity_provider):
+        # Renders only the component for the identity provider in-use by this account
+        user_kind = IdentityProvider.supported_user_kinds[identity_provider][0]
+        user = UserFactory(kind=user_kind, identity_provider=identity_provider, for_snapshot=True)
+        url = f'{reverse("login:existing_user", args=(user.public_id,))}?back_url={reverse("signup:choose_user_kind")}'
+        response = client.get(url)
+        assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
+        assert str(parse_response_to_soup(response, selector=".c-form")) == snapshot
+
+    @pytest.mark.parametrize(
+        "identity_provider",
+        [
+            IdentityProvider.FRANCE_CONNECT,
+            IdentityProvider.PE_CONNECT,
+            IdentityProvider.PRO_CONNECT,
+            IdentityProvider.INCLUSION_CONNECT,
+        ],
+    )
+    @override_settings(
+        FRANCE_CONNECT_BASE_URL=None,
+        PEAMU_AUTH_BASE_URL=None,
+        INCLUSION_CONNECT_BASE_URL=None,
+        PRO_CONNECT_BASE_URL=None,
+    )
+    def test_login_disabled_provider(self, client, snapshot, identity_provider):
+        user_kind = IdentityProvider.supported_user_kinds[identity_provider][0]
+        user = UserFactory(kind=user_kind, identity_provider=identity_provider, for_snapshot=True)
+        response = client.get(reverse("login:existing_user", args=(user.public_id,)))
+        assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
+        assert str(parse_response_to_soup(response, selector=".c-form")) == snapshot
+
+    def test_login_404(self, client):
+        response = client.get(reverse("login:existing_user", args=("c0fee70e-cf34-4d37-919d-a1ae3e3bf7e5",)))
+        assert response.status_code == 404
 
 
 def test_prescriber_account_activation_view_with_next(client):
