@@ -63,6 +63,7 @@ class UserFactory(factory.django.DjangoModelFactory):
             last_name="Doe",
             email="john.doe@test.local",
             phone="0606060606",
+            public_id="c0fee70e-cf34-4d37-919d-a1ae3e3bf7e5",
         )
 
     username = factory.Sequence("user_name{}".format)
