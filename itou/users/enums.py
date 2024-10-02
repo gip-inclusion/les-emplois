@@ -3,6 +3,7 @@ Enums fields used in User models.
 """
 
 from django.db import models
+from django.urls import reverse
 
 
 KIND_JOB_SEEKER = "job_seeker"
@@ -18,6 +19,17 @@ class UserKind(models.TextChoices):
     EMPLOYER = KIND_EMPLOYER, "employeur"
     LABOR_INSPECTOR = KIND_LABOR_INSPECTOR, "inspecteur du travail"
     ITOU_STAFF = KIND_ITOU_STAFF, "administrateur"
+
+    @classmethod
+    def get_login_url(cls, user_kind, default="login:job_seeker"):
+        url_lookup = {
+            UserKind.JOB_SEEKER: "login:job_seeker",
+            UserKind.PRESCRIBER: "login:prescriber",
+            UserKind.EMPLOYER: "login:employer",
+            UserKind.LABOR_INSPECTOR: "login:labor_inspector",
+            UserKind.ITOU_STAFF: "login:job_seeker",
+        }
+        return reverse(url_lookup[user_kind]) if user_kind in url_lookup else reverse(default)
 
 
 MATOMO_ACCOUNT_TYPE = {

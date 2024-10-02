@@ -14,7 +14,7 @@ from django.utils.http import urlencode
 
 from itou.external_data.models import ExternalDataImport
 from itou.external_data.tasks import huey_import_user_pe_data
-from itou.users.enums import UserKind
+from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.urls import add_url_params, get_absolute_url
 
@@ -129,15 +129,7 @@ def pe_connect_callback(request):
         user, _ = pe_user_data.create_or_update_user()
     except InvalidKindException as e:
         messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
-        url = {
-            UserKind.PRESCRIBER: reverse("login:prescriber"),
-            UserKind.EMPLOYER: reverse("login:employer"),
-            UserKind.LABOR_INSPECTOR: reverse("login:labor_inspector"),
-            # Staff members may have created a job seeker account with the same email
-            # as their staff email on the platform for troubleshooting.
-            UserKind.ITOU_STAFF: reverse("login:job_seeker"),
-        }[e.user.kind]
-        return HttpResponseRedirect(url)
+        return HttpResponseRedirect(UserKind.get_login_url(e.user.kind))
     except MultipleUsersFoundException as e:
         return _redirect_to_job_seeker_login_on_error(
             format_html(
