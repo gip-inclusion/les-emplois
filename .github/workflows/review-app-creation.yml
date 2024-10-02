@@ -82,6 +82,11 @@ jobs:
       timeout-minutes: 15
       run: |
         $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
+        until $CLEVER_CLI env | grep --quiet POSTGRESQL_ADDON_DIRECT_PORT
+        do
+          echo "Waiting for POSTGRESQL_ADDON_DIRECT_HOST/PORT env variables to be available"
+          sleep 1
+        done
         scripts/clever-deploy --clever-cli "$CLEVER_CLI" --branch "$BRANCH" --app-alias "$REVIEW_APP_NAME"
 
     - name: 🍻 Add link to pull request
