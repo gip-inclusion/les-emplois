@@ -477,9 +477,6 @@ HUEY = {
     "immediate": ITOU_ENVIRONMENT == ItouEnvironment.FAST_MACHINE,
 }
 
-MAILJET_API_KEY_PRINCIPAL = os.getenv("API_MAILJET_KEY_PRINCIPAL")
-MAILJET_SECRET_KEY_PRINCIPAL = os.getenv("API_MAILJET_SECRET_PRINCIPAL")
-
 # Email https://anymail.readthedocs.io/en/stable/esps/mailjet/
 ANYMAIL = {
     # it's the default but our probes need this at import time.
@@ -694,5 +691,10 @@ RDV_INSERTION_INVITE_HOLD_DURATION = datetime.timedelta(days=int(os.getenv("RDV_
 RDV_INSERTION_WEBHOOK_SECRET = os.getenv("RDV_INSERTION_WEBHOOK_SECRET")
 
 # API Particuliers
+# ------------------------------------------------------------------------------
 API_PARTICULIER_BASE_URL = os.getenv("API_PARTICULIER_BASE_URL", "https://particulier.api.gouv.fr/api/")
 API_PARTICULIER_TOKEN = os.getenv("API_PARTICULIER_TOKEN")
+
+# Brevo
+# ------------------------------------------------------------------------------
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")
