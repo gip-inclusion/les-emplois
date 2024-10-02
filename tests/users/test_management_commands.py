@@ -21,13 +21,7 @@ from itou.job_applications.models import JobApplication
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityProvider
 from itou.users.management.commands import send_check_authorized_members_email
-from itou.users.management.commands.new_users_to_mailjet import (
-    MAILJET_API_URL,
-    NEW_ORIENTEURS_LISTID,
-    NEW_PE_LISTID,
-    NEW_PRESCRIBERS_LISTID,
-    NEW_SIAE_LISTID,
-)
+from itou.users.management.commands.new_users_to_brevo import BREVO_API_URL, BREVO_LIST_ID
 from itou.users.models import User
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse
 from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
@@ -370,12 +364,13 @@ def test_shorten_active_sessions():
     ]
 
 
-class TestCommandNewUsersToMailJet:
-    @freeze_time("2023-05-02")
-    def test_wet_run_siae(self, caplog, respx_mock, settings):
-        settings.MAILJET_API_KEY = "MAILJET_KEY"
-        settings.MAILJET_SECRET_KEY = "MAILJET_SECRET_KEY"
+class TestCommandNewUsersToBrevo:
+    @pytest.fixture(autouse=True)
+    def setup(self, settings):
+        settings.BREVO_API_KEY = "BREVO_API_KEY"
 
+    @freeze_time("2023-05-02")
+    def test_wet_run_siae(self, caplog, respx_mock):
         # Job seekers are ignored.
         JobSeekerFactory(with_verified_email=True)
         for kind in set(CompanyKind) - set(SIAE_WITH_CONVENTION_KINDS):
@@ -386,12 +381,6 @@ class TestCommandNewUsersToMailJet:
             company__kind=CompanyKind.EI, user__identity_provider=IdentityProvider.DJANGO
         ).user
         EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
-        # Past users are ignored.
-        CompanyMembershipFactory(
-            user__date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.UTC),
-            user__with_verified_email=True,
-            company__kind=CompanyKind.EI,
-        )
         # Inactive memberships are ignored.
         CompanyMembershipFactory(user__with_verified_email=True, company__kind=CompanyKind.EI, is_active=False)
         # Inactive users are ignored.
@@ -440,101 +429,86 @@ class TestCommandNewUsersToMailJet:
         CompanyMembershipFactory(user=cindy, company__kind=CompanyKind.ACI)
         CompanyMembershipFactory(user=dave, company__kind=CompanyKind.ETTI)
         CompanyMembershipFactory(user=eve, company__kind=CompanyKind.EITI)
-        post_mock = respx_mock.post(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts").mock(
-            return_value=httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 123456789}], "Total": 1})
-        )
-        respx_mock.get(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/123456789").mock(
-            side_effect=[
-                httpx.Response(
-                    200,
-                    json={
-                        "Count": 1,
-                        "Data": [
-                            {
-                                "ContactsLists": [{"ListID": NEW_SIAE_LISTID, "Action": "addnoforce"}],
-                                "Count": 2,
-                                "Error": "",
-                                "ErrorFile": "",
-                                "JobStart": "2023-05-02T11:11:11",
-                                "JobEnd": "",
-                                "Status": "In Progress",
-                            }
-                        ],
-                        "Total": 1,
-                    },
-                ),
-                httpx.Response(
-                    200,
-                    json={
-                        "Count": 1,
-                        "Data": [
-                            {
-                                "ContactsLists": [{"ListID": NEW_SIAE_LISTID, "Action": "addnoforce"}],
-                                "Count": 5,
-                                "Error": "",
-                                "ErrorFile": "",
-                                "JobStart": "2023-05-02T11:11:11",
-                                "JobEnd": "2023-05-02T12:34:56",
-                                "Status": "Completed",
-                            }
-                        ],
-                        "Total": 1,
-                    },
-                ),
-            ]
-        )
-        with mock.patch("itou.users.management.commands.new_users_to_mailjet.time.sleep") as time_mock:
-            call_command("new_users_to_mailjet", wet_run=True)
-            time_mock.assert_called_once_with(2)
-        [postcall] = post_mock.calls
 
-        assert json.loads(postcall.request.content) == {
-            "Action": "addnoforce",
-            "Contacts": [
-                {"Email": "annie.amma@mailinator.com", "Name": "Annie AMMA"},
-                {"Email": "bob.bailey@mailinator.com", "Name": "Bob BAILEY"},
-                {"Email": "cindy.cinnamon@mailinator.com", "Name": "Cindy CINNAMON"},
-                {"Email": "dave.doll@mailinator.com", "Name": "Dave DOLL"},
-                {"Email": "eve.ebi@mailinator.com", "Name": "Eve EBI"},
-            ],
-        }
+        import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
+            return_value=httpx.Response(202, json={"processId": 106})
+        )
+        call_command("new_users_to_brevo", wet_run=True)
+
+        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+            {
+                "listIds": [BREVO_LIST_ID],
+                "emailBlacklist": False,
+                "smsBlacklist": False,
+                "updateExistingContacts": False,
+                "emptyContactsAttributes": False,
+                "jsonBody": [
+                    {
+                        "email": "annie.amma@mailinator.com",
+                        "attributes": {
+                            "prenom": "Annie",
+                            "nom": "AMMA",
+                            "date_inscription": "2023-05-02",
+                            "type": "employeur",
+                        },
+                    },
+                    {
+                        "email": "bob.bailey@mailinator.com",
+                        "attributes": {
+                            "prenom": "Bob",
+                            "nom": "BAILEY",
+                            "date_inscription": "2023-05-02",
+                            "type": "employeur",
+                        },
+                    },
+                    {
+                        "email": "cindy.cinnamon@mailinator.com",
+                        "attributes": {
+                            "prenom": "Cindy",
+                            "nom": "CINNAMON",
+                            "date_inscription": "2023-05-02",
+                            "type": "employeur",
+                        },
+                    },
+                    {
+                        "email": "dave.doll@mailinator.com",
+                        "attributes": {
+                            "prenom": "Dave",
+                            "nom": "DOLL",
+                            "date_inscription": "2023-05-02",
+                            "type": "employeur",
+                        },
+                    },
+                    {
+                        "email": "eve.ebi@mailinator.com",
+                        "attributes": {
+                            "prenom": "Eve",
+                            "nom": "EBI",
+                            "date_inscription": "2023-05-02",
+                            "type": "employeur",
+                        },
+                    },
+                ],
+            },
+        ]
         assert caplog.record_tuples == [
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "SIAE users count: 5"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "PE prescribers count: 0"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 0"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 0"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "SIAE users count: 5"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Prescribers count: 0"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
             (
                 "httpx",
                 logging.INFO,
-                f'HTTP Request: POST https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts "HTTP/1.1 201 Created"',  # noqa: E501
+                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
             ),
             (
-                "httpx",
+                "itou.users.management.commands.new_users_to_brevo",
                 logging.INFO,
-                f'HTTP Request: GET https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/123456789 "HTTP/1.1 200 OK"',  # noqa: E501
-            ),
-            (
-                "httpx",
-                logging.INFO,
-                f'HTTP Request: GET https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/123456789 "HTTP/1.1 200 OK"',  # noqa: E501
-            ),
-            (
-                "itou.users.management.commands.new_users_to_mailjet",
-                logging.INFO,
-                f"MailJet processed batch for list ID {NEW_SIAE_LISTID} in 5025 seconds.",
-            ),
-            (
-                "itou.users.management.commands.new_users_to_mailjet",
-                logging.INFO,
-                "Management command itou.users.management.commands.new_users_to_mailjet succeeded in 0.00 seconds",
+                "Management command itou.users.management.commands.new_users_to_brevo succeeded in 0.00 seconds",
             ),
         ]
 
     @freeze_time("2023-05-02")
-    def test_wet_run_prescribers(self, caplog, respx_mock, settings):
-        settings.MAILJET_API_KEY = "MAILJET_KEY"
-        settings.MAILJET_SECRET_KEY = "MAILJET_SECRET_KEY"
-
+    def test_wet_run_prescribers(self, caplog, respx_mock):
         pe = PrescriberPoleEmploiFactory()
         other_org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.ML, authorized=True)
         alice = PrescriberFactory(
@@ -556,12 +530,6 @@ class TestCommandNewUsersToMailJet:
                 organization=organization, user__identity_provider=IdentityProvider.DJANGO
             ).user
             EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
-            # Past users are ignored.
-            PrescriberMembershipFactory(
-                user__date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.UTC),
-                user__with_verified_email=True,
-                organization=organization,
-            )
             # Inactive users are ignored.
             PrescriberMembershipFactory(
                 user__is_active=False, user__with_verified_email=True, organization=organization
@@ -575,115 +543,59 @@ class TestCommandNewUsersToMailJet:
             changed_email.email = f"changed+{organization}@mailinator.com"
             changed_email.save(update_fields=["email"])
 
-        pe_post_mock = respx_mock.post(f"{MAILJET_API_URL}REST/contactslist/{NEW_PE_LISTID}/managemanycontacts").mock(
-            return_value=httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 123456789}], "Total": 1})
+        import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
+            return_value=httpx.Response(202, json={"processId": 106})
         )
-        respx_mock.get(f"{MAILJET_API_URL}REST/contactslist/{NEW_PE_LISTID}/managemanycontacts/123456789").mock(
-            return_value=httpx.Response(
-                200,
-                json={
-                    "Count": 1,
-                    "Data": [
-                        {
-                            "ContactsLists": [{"ListID": NEW_PE_LISTID, "Action": "addnoforce"}],
-                            "Count": 1,
-                            "Error": "",
-                            "ErrorFile": "",
-                            "JobStart": "2023-05-02T11:11:11",
-                            "JobEnd": "2023-05-02T11:11:56",
-                            "Status": "Completed",
-                        }
-                    ],
-                    "Total": 1,
-                },
-            ),
-        )
-        other_org_post_mock = respx_mock.post(
-            f"{MAILJET_API_URL}REST/contactslist/{NEW_PRESCRIBERS_LISTID}/managemanycontacts"
-        ).mock(return_value=httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 123456789}], "Total": 1}))
-        respx_mock.get(
-            f"{MAILJET_API_URL}REST/contactslist/{NEW_PRESCRIBERS_LISTID}/managemanycontacts/123456789"
-        ).mock(
-            return_value=httpx.Response(
-                200,
-                json={
-                    "Count": 1,
-                    "Data": [
-                        {
-                            "ContactsLists": [{"ListID": NEW_PRESCRIBERS_LISTID, "Action": "addnoforce"}],
-                            "Count": 1,
-                            "Error": "",
-                            "ErrorFile": "",
-                            "JobStart": "2023-05-02T11:11:11",
-                            "JobEnd": "2023-05-02T11:11:56",
-                            "Status": "Completed",
-                        }
-                    ],
-                    "Total": 1,
-                },
-            ),
-        )
-        call_command("new_users_to_mailjet", wet_run=True)
-        [pe_postcall] = pe_post_mock.calls
-        assert json.loads(pe_postcall.request.content) == {
-            "Action": "addnoforce",
-            "Contacts": [{"Email": "alice.aamar@mailinator.com", "Name": "Alice AAMAR"}],
-        }
-        [other_org_postcall] = other_org_post_mock.calls
-        assert json.loads(other_org_postcall.request.content) == {
-            "Action": "addnoforce",
-            "Contacts": [
-                {"Email": "alice.aamar@mailinator.com", "Name": "Alice AAMAR"},
-                {"Email": "justin.wood@mailinator.com", "Name": "Justin WOOD"},
-            ],
-        }
+
+        call_command("new_users_to_brevo", wet_run=True)
+
+        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+            {
+                "listIds": [BREVO_LIST_ID],
+                "emailBlacklist": False,
+                "smsBlacklist": False,
+                "updateExistingContacts": False,
+                "emptyContactsAttributes": False,
+                "jsonBody": [
+                    {
+                        "email": "alice.aamar@mailinator.com",
+                        "attributes": {
+                            "prenom": "Alice",
+                            "nom": "AAMAR",
+                            "date_inscription": "2023-05-02",
+                            "type": "prescripteur habilité",
+                        },
+                    },
+                    {
+                        "email": "justin.wood@mailinator.com",
+                        "attributes": {
+                            "prenom": "Justin",
+                            "nom": "WOOD",
+                            "date_inscription": "2023-05-02",
+                            "type": "prescripteur habilité",
+                        },
+                    },
+                ],
+            },
+        ]
         assert caplog.record_tuples == [
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "SIAE users count: 0"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "PE prescribers count: 1"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 2"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 0"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "SIAE users count: 0"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Prescribers count: 2"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
             (
                 "httpx",
                 logging.INFO,
-                f'HTTP Request: POST https://api.mailjet.com/v3/REST/contactslist/{NEW_PE_LISTID}/managemanycontacts "HTTP/1.1 201 Created"',  # noqa: E501
+                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
             ),
             (
-                "httpx",
+                "itou.users.management.commands.new_users_to_brevo",
                 logging.INFO,
-                f'HTTP Request: GET https://api.mailjet.com/v3/REST/contactslist/{NEW_PE_LISTID}/managemanycontacts/123456789 "HTTP/1.1 200 OK"',  # noqa: E501
-            ),
-            (
-                "itou.users.management.commands.new_users_to_mailjet",
-                logging.INFO,
-                f"MailJet processed batch for list ID {NEW_PE_LISTID} in 45 seconds.",
-            ),
-            (
-                "httpx",
-                logging.INFO,
-                f'HTTP Request: POST https://api.mailjet.com/v3/REST/contactslist/{NEW_PRESCRIBERS_LISTID}/managemanycontacts "HTTP/1.1 201 Created"',  # noqa: E501
-            ),
-            (
-                "httpx",
-                logging.INFO,
-                f'HTTP Request: GET https://api.mailjet.com/v3/REST/contactslist/{NEW_PRESCRIBERS_LISTID}/managemanycontacts/123456789 "HTTP/1.1 200 OK"',  # noqa: E501
-            ),
-            (
-                "itou.users.management.commands.new_users_to_mailjet",
-                logging.INFO,
-                f"MailJet processed batch for list ID {NEW_PRESCRIBERS_LISTID} in 45 seconds.",
-            ),
-            (
-                "itou.users.management.commands.new_users_to_mailjet",
-                logging.INFO,
-                "Management command itou.users.management.commands.new_users_to_mailjet succeeded in 0.00 seconds",
+                "Management command itou.users.management.commands.new_users_to_brevo succeeded in 0.00 seconds",
             ),
         ]
 
     @freeze_time("2023-05-02")
-    def test_wet_run_orienteurs(self, caplog, respx_mock, settings):
-        settings.MAILJET_API_KEY = "MAILJET_KEY"
-        settings.MAILJET_SECRET_KEY = "MAILJET_SECRET_KEY"
-
+    def test_wet_run_orienteurs(self, caplog, respx_mock):
         PrescriberFactory(
             first_name="Billy",
             last_name="Boo",
@@ -703,8 +615,6 @@ class TestCommandNewUsersToMailJet:
             email="timmy.timber@mailinator.com",
         )
         PrescriberMembershipFactory(user=timmy, organization__kind=PrescriberOrganizationKind.OTHER)
-        # Past users are ignored.
-        PrescriberFactory(with_verified_email=True, date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.UTC))
         # Inactive users are ignored.
         PrescriberFactory(
             with_verified_email=True,
@@ -719,73 +629,68 @@ class TestCommandNewUsersToMailJet:
         changed_email.email = "changed@mailinator.com"
         changed_email.save(update_fields=["email"])
 
-        post_mock = respx_mock.post(
-            f"{MAILJET_API_URL}REST/contactslist/{NEW_ORIENTEURS_LISTID}/managemanycontacts"
-        ).mock(return_value=httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 123456789}], "Total": 1}))
-        respx_mock.get(
-            f"{MAILJET_API_URL}REST/contactslist/{NEW_ORIENTEURS_LISTID}/managemanycontacts/123456789"
-        ).mock(
-            return_value=httpx.Response(
-                200,
-                json={
-                    "Count": 1,
-                    "Data": [
-                        {
-                            "ContactsLists": [{"ListID": NEW_ORIENTEURS_LISTID, "Action": "addnoforce"}],
-                            "Count": 1,
-                            "Error": "",
-                            "ErrorFile": "",
-                            "JobStart": "2023-05-02T11:11:11",
-                            "JobEnd": "2023-05-02T11:11:56",
-                            "Status": "Completed",
-                        }
-                    ],
-                    "Total": 1,
-                },
-            ),
+        import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
+            return_value=httpx.Response(202, json={"processId": 106})
         )
-        call_command("new_users_to_mailjet", wet_run=True)
-        [postcall] = post_mock.calls
-        assert json.loads(postcall.request.content) == {
-            "Action": "addnoforce",
-            "Contacts": [
-                {"Email": "billy.boo@mailinator.com", "Name": "Billy BOO"},
-                {"Email": "sonny.sunder@mailinator.com", "Name": "Sonny SUNDER"},
-                {"Email": "timmy.timber@mailinator.com", "Name": "Timmy TIMBER"},
-            ],
-        }
+
+        call_command("new_users_to_brevo", wet_run=True)
+
+        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+            {
+                "listIds": [BREVO_LIST_ID],
+                "emailBlacklist": False,
+                "smsBlacklist": False,
+                "updateExistingContacts": False,
+                "emptyContactsAttributes": False,
+                "jsonBody": [
+                    {
+                        "email": "billy.boo@mailinator.com",
+                        "attributes": {
+                            "prenom": "Billy",
+                            "nom": "BOO",
+                            "date_inscription": "2023-05-02",
+                            "type": "orienteur",
+                        },
+                    },
+                    {
+                        "email": "sonny.sunder@mailinator.com",
+                        "attributes": {
+                            "prenom": "Sonny",
+                            "nom": "SUNDER",
+                            "date_inscription": "2023-05-02",
+                            "type": "orienteur",
+                        },
+                    },
+                    {
+                        "email": "timmy.timber@mailinator.com",
+                        "attributes": {
+                            "prenom": "Timmy",
+                            "nom": "TIMBER",
+                            "date_inscription": "2023-05-02",
+                            "type": "orienteur",
+                        },
+                    },
+                ],
+            },
+        ]
         assert caplog.record_tuples == [
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "SIAE users count: 0"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "PE prescribers count: 0"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 0"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 3"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "SIAE users count: 0"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Prescribers count: 0"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 3"),
             (
                 "httpx",
                 logging.INFO,
-                f'HTTP Request: POST https://api.mailjet.com/v3/REST/contactslist/{NEW_ORIENTEURS_LISTID}/managemanycontacts "HTTP/1.1 201 Created"',  # noqa: E501
+                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
             ),
             (
-                "httpx",
+                "itou.users.management.commands.new_users_to_brevo",
                 logging.INFO,
-                f'HTTP Request: GET https://api.mailjet.com/v3/REST/contactslist/{NEW_ORIENTEURS_LISTID}/managemanycontacts/123456789 "HTTP/1.1 200 OK"',  # noqa: E501
-            ),
-            (
-                "itou.users.management.commands.new_users_to_mailjet",
-                logging.INFO,
-                f"MailJet processed batch for list ID {NEW_ORIENTEURS_LISTID} in 45 seconds.",
-            ),
-            (
-                "itou.users.management.commands.new_users_to_mailjet",
-                logging.INFO,
-                "Management command itou.users.management.commands.new_users_to_mailjet succeeded in 0.00 seconds",
+                "Management command itou.users.management.commands.new_users_to_brevo succeeded in 0.00 seconds",
             ),
         ]
 
     @freeze_time("2023-05-02")
-    def test_wet_run_batch(self, caplog, respx_mock, settings):
-        settings.MAILJET_API_KEY = "MAILJET_KEY"
-        settings.MAILJET_SECRET_KEY = "MAILJET_SECRET_KEY"
-
+    def test_wet_run_batch(self, caplog, respx_mock, mocker):
         annie = EmployerFactory(
             first_name="Annie",
             last_name="Amma",
@@ -798,212 +703,125 @@ class TestCommandNewUsersToMailJet:
         )
         CompanyMembershipFactory(user=annie, company__kind=CompanyKind.EI)
         CompanyMembershipFactory(user=bob, company__kind=CompanyKind.AI)
-        post_mock = respx_mock.post(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts").mock(
-            side_effect=[
-                httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 1}], "Total": 1}),
-                httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 2}], "Total": 1}),
-            ]
-        )
-        respx_mock.get(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/1").mock(
-            return_value=httpx.Response(
-                200,
-                json={
-                    "Count": 1,
-                    "Data": [
-                        {
-                            "ContactsLists": [{"ListID": NEW_SIAE_LISTID, "Action": "addnoforce"}],
-                            "Count": 1,
-                            "Error": "",
-                            "ErrorFile": "",
-                            "JobStart": "2023-05-02T11:11:11",
-                            "JobEnd": "2023-05-02T11:12:00",
-                            "Status": "Completed",
-                        }
-                    ],
-                    "Total": 1,
-                },
-            ),
-        )
-        respx_mock.get(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/2").mock(
-            return_value=httpx.Response(
-                200,
-                json={
-                    "Count": 1,
-                    "Data": [
-                        {
-                            "ContactsLists": [{"ListID": NEW_SIAE_LISTID, "Action": "addnoforce"}],
-                            "Count": 1,
-                            "Error": "",
-                            "ErrorFile": "",
-                            "JobStart": "2023-05-02T11:23:00",
-                            "JobEnd": "2023-05-02T11:24:00",
-                            "Status": "Completed",
-                        }
-                    ],
-                    "Total": 1,
-                },
-            ),
-        )
-        with mock.patch("itou.users.management.commands.new_users_to_mailjet.Command.BATCH_SIZE", 1):
-            call_command("new_users_to_mailjet", wet_run=True)
-        [postcall1, postcall2] = post_mock.calls
 
-        assert json.loads(postcall1.request.content) == {
-            "Action": "addnoforce",
-            "Contacts": [
-                {"Email": "annie.amma@mailinator.com", "Name": "Annie AMMA"},
-            ],
-        }
-        assert json.loads(postcall2.request.content) == {
-            "Action": "addnoforce",
-            "Contacts": [
-                {"Email": "bob.bailey@mailinator.com", "Name": "Bob BAILEY"},
-            ],
-        }
+        import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
+            return_value=httpx.Response(202, json={"processId": 106})
+        )
+        mocker.patch("itou.users.management.commands.new_users_to_brevo.BrevoClient.IMPORT_BATCH_SIZE", 1)
+
+        call_command("new_users_to_brevo", wet_run=True)
+
+        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+            {
+                "listIds": [BREVO_LIST_ID],
+                "emailBlacklist": False,
+                "smsBlacklist": False,
+                "updateExistingContacts": False,
+                "emptyContactsAttributes": False,
+                "jsonBody": [
+                    {
+                        "email": "annie.amma@mailinator.com",
+                        "attributes": {
+                            "prenom": "Annie",
+                            "nom": "AMMA",
+                            "date_inscription": "2023-05-02",
+                            "type": "employeur",
+                        },
+                    },
+                ],
+            },
+            {
+                "listIds": [BREVO_LIST_ID],
+                "emailBlacklist": False,
+                "smsBlacklist": False,
+                "updateExistingContacts": False,
+                "emptyContactsAttributes": False,
+                "jsonBody": [
+                    {
+                        "email": "bob.bailey@mailinator.com",
+                        "attributes": {
+                            "prenom": "Bob",
+                            "nom": "BAILEY",
+                            "date_inscription": "2023-05-02",
+                            "type": "employeur",
+                        },
+                    },
+                ],
+            },
+        ]
         assert caplog.record_tuples == [
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "SIAE users count: 2"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "PE prescribers count: 0"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 0"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 0"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "SIAE users count: 2"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Prescribers count: 0"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
             (
                 "httpx",
                 logging.INFO,
-                f'HTTP Request: POST https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts "HTTP/1.1 201 Created"',  # noqa: E501
-            ),
-            (
-                "httpx",
-                logging.INFO,
-                f'HTTP Request: GET https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/1 "HTTP/1.1 200 OK"',  # noqa: E501
-            ),
-            (
-                "itou.users.management.commands.new_users_to_mailjet",
-                logging.INFO,
-                f"MailJet processed batch for list ID {NEW_SIAE_LISTID} in 49 seconds.",
+                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
             ),
             (
                 "httpx",
                 logging.INFO,
-                f'HTTP Request: POST https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts "HTTP/1.1 201 Created"',  # noqa: E501
+                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
             ),
             (
-                "httpx",
+                "itou.users.management.commands.new_users_to_brevo",
                 logging.INFO,
-                f'HTTP Request: GET https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/2 "HTTP/1.1 200 OK"',  # noqa: E501
-            ),
-            (
-                "itou.users.management.commands.new_users_to_mailjet",
-                logging.INFO,
-                f"MailJet processed batch for list ID {NEW_SIAE_LISTID} in 60 seconds.",
-            ),
-            (
-                "itou.users.management.commands.new_users_to_mailjet",
-                logging.INFO,
-                "Management command itou.users.management.commands.new_users_to_mailjet succeeded in 0.00 seconds",
+                "Management command itou.users.management.commands.new_users_to_brevo succeeded in 0.00 seconds",
             ),
         ]
 
     @freeze_time("2023-05-02")
-    def test_wet_run_errors(self, caplog, respx_mock, settings):
-        settings.MAILJET_API_KEY = "MAILJET_KEY"
-        settings.MAILJET_SECRET_KEY = "MAILJET_SECRET_KEY"
-
+    def test_wet_run_errors(self, caplog, respx_mock):
         annie = EmployerFactory(
             first_name="Annie",
             last_name="Amma",
             email="annie.amma@mailinator.com",
         )
         CompanyMembershipFactory(user=annie, company__kind=CompanyKind.EI)
-        post_mock = respx_mock.post(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts").mock(
-            return_value=httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 1}], "Total": 1}),
+        import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
+            return_value=httpx.Response(400, json={})
         )
-        respx_mock.get(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/1").mock(
-            return_value=httpx.Response(
-                200,
-                json={
-                    "Count": 1,
-                    "Data": [
-                        {
-                            "ContactsLists": [{"ListID": NEW_SIAE_LISTID, "Action": "addnoforce"}],
-                            "Count": 1,
-                            "Error": "The blips failed to blap.",
-                            "ErrorFile": "https://mailjet.com/my-errors.html",
-                            "JobStart": "2023-05-02T11:11:11",
-                            "JobEnd": "2023-05-02T11:12:00",
-                            "Status": "Error",
-                        }
-                    ],
-                    "Total": 1,
-                },
-            ),
-        )
-        call_command("new_users_to_mailjet", wet_run=True)
-        [postcall] = post_mock.calls
 
-        assert json.loads(postcall.request.content) == {
-            "Action": "addnoforce",
-            "Contacts": [
-                {"Email": "annie.amma@mailinator.com", "Name": "Annie AMMA"},
-            ],
-        }
-        assert caplog.record_tuples == [
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "SIAE users count: 1"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "PE prescribers count: 0"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 0"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 0"),
-            (
-                "httpx",
-                logging.INFO,
-                f'HTTP Request: POST https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts "HTTP/1.1 201 Created"',  # noqa: E501
-            ),
-            (
-                "httpx",
-                logging.INFO,
-                f'HTTP Request: GET https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/1 "HTTP/1.1 200 OK"',  # noqa: E501
-            ),
-            (
-                "itou.users.management.commands.new_users_to_mailjet",
-                logging.ERROR,
-                f"MailJet errors for list ID {NEW_SIAE_LISTID}: The blips failed to blap.",
-            ),
-            (
-                "itou.users.management.commands.new_users_to_mailjet",
-                logging.ERROR,
-                f"MailJet errors file for list ID {NEW_SIAE_LISTID}: https://mailjet.com/my-errors.html",
-            ),
-            (
-                "itou.users.management.commands.new_users_to_mailjet",
-                logging.INFO,
-                f"MailJet processed batch for list ID {NEW_SIAE_LISTID} in 49 seconds.",
-            ),
-            (
-                "itou.users.management.commands.new_users_to_mailjet",
-                logging.INFO,
-                "Management command itou.users.management.commands.new_users_to_mailjet succeeded in 0.00 seconds",
-            ),
+        call_command("new_users_to_brevo", wet_run=True)
+
+        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+            {
+                "listIds": [BREVO_LIST_ID],
+                "emailBlacklist": False,
+                "smsBlacklist": False,
+                "updateExistingContacts": False,
+                "emptyContactsAttributes": False,
+                "jsonBody": [
+                    {
+                        "email": "annie.amma@mailinator.com",
+                        "attributes": {
+                            "prenom": "Annie",
+                            "nom": "AMMA",
+                            "date_inscription": "2023-05-02",
+                            "type": "employeur",
+                        },
+                    },
+                ],
+            },
         ]
-
-    @freeze_time("2026-05-02")
-    def test_wet_run_limits_history_to_a_year(self, caplog, respx_mock, settings):
-        settings.MAILJET_API_KEY = "MAILJET_KEY"
-        settings.MAILJET_SECRET_KEY = "MAILJET_SECRET_KEY"
-
-        # Past users are ignored.
-        CompanyMembershipFactory(
-            user__date_joined=datetime.datetime(2025, 5, 1, tzinfo=datetime.UTC),
-            company__kind=CompanyKind.EI,
-        )
-        post_mock = respx_mock.post(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts")
-        call_command("new_users_to_mailjet", wet_run=True)
-        assert post_mock.called is False
         assert caplog.record_tuples == [
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "SIAE users count: 0"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "PE prescribers count: 0"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 0"),
-            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 0"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "SIAE users count: 1"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Prescribers count: 0"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
             (
-                "itou.users.management.commands.new_users_to_mailjet",
+                "httpx",
                 logging.INFO,
-                "Management command itou.users.management.commands.new_users_to_mailjet succeeded in 0.00 seconds",
+                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 400 Bad Request"',
+            ),
+            (
+                "itou.users.management.commands.new_users_to_brevo",
+                logging.ERROR,
+                "Brevo API: Some emails were not imported, status_code=400, content={}",
+            ),
+            (
+                "itou.users.management.commands.new_users_to_brevo",
+                logging.INFO,
+                "Management command itou.users.management.commands.new_users_to_brevo succeeded in 0.00 seconds",
             ),
         ]
 

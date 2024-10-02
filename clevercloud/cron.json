@@ -19,7 +19,7 @@
 
   "1 0 * * * $ROOT/clevercloud/run_management_command.sh update_prescriber_organization_with_api_entreprise --verbosity 2",
   "30 0 * * * $ROOT/clevercloud/run_management_command.sh collect_analytics_data --save",
-  "30 1 * * * $ROOT/clevercloud/run_management_command.sh new_users_to_mailjet --wet-run",
+  "30 1 * * * $ROOT/clevercloud/run_management_command.sh new_users_to_brevo --wet-run",
   "0 3 * * * $ROOT/clevercloud/run_management_command.sh clearsessions",
   "15 5 * * * $ROOT/clevercloud/run_management_command.sh prolongation_requests_chores email_reminder --wet-run",
   "0 9 * * * $ROOT/clevercloud/run_management_command.sh send_check_authorized_members_email",
