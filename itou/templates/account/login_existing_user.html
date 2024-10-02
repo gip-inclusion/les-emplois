@@ -1,0 +1,52 @@
+{# django-allauth template override. #}
+{% extends "layout/base.html" %}
+
+{% block title %}Connexion {{ block.super }}{% endblock %}
+
+{% block title_prevstep %}
+    {% include "layout/previous_step.html" with back_url=back_url|default:None only %}
+{% endblock %}
+
+{% block title_content %}<h1>Se connecter</h1>{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-lg-6">
+                    <div class="c-form mb-5">
+                        {% if login_provider == "IC" %}
+                            {% include "account/includes/login_inclusion_connect.html" %}
+                        {% elif login_provider == "PC" %}
+                            {% include "account/includes/login_pro_connect.html" %}
+                        {% elif login_provider == "FC" %}
+                            <p class="h4">Se connecter avec FranceConnect</p>
+                            {% if show_france_connect %}
+                                <div class="mt-4">{% include "signup/includes/france_connect_button.html" %}</div>
+                            {% else %}
+                                <div class="alert alert-info" role="status">
+                                    <p class="mb-0">FranceConnect est désactivé.</p>
+                                </div>
+                            {% endif %}
+                        {% elif login_provider == "PEC" %}
+                            <p class="h4">Se connecter avec France Travail</p>
+                            {% if show_peamu %}
+                                <div class="mt-4 text-center">{% include "signup/includes/peamu_button.html" %}</div>
+                            {% else %}
+                                <div class="alert alert-info" role="status">
+                                    <p class="mb-0">France Travail est désactivé.</p>
+                                </div>
+                            {% endif %}
+                        {% elif login_provider == "DJANGO" %}
+                            {% include "account/includes/login_form.html" %}
+                        {% else %}
+                            <div class="alert alert-info" role="status">
+                                <p class="mb-0">Le mode de connexion associé à ce compte est désactivé. Veuillez contacter le support.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

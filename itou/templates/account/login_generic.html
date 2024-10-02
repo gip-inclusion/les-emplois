@@ -1,9 +1,5 @@
 {# django-allauth template override. #}
 {% extends "layout/base.html" %}
-{% load redirection_fields %}
-{% load static %}
-{% load theme_inclusion %}
-{% load matomo %}
 
 {% block title %}Connexion {{ block.super }}{% endblock %}
 
@@ -22,34 +18,9 @@
                     <div class="c-form mb-5">
                         {% if uses_inclusion_connect %}
                             {% if pro_connect_url %}
-                                <div class="text-center">
-                                    <a href="{{ pro_connect_url }}" class="proconnect-button" {% matomo_event "connexion "|add:matomo_account_type "clic" "se-connecter-avec-pro-connect" %}>
-                                    </a>
-                                    <p>
-                                        <a href="https://proconnect.gouv.fr/" target="_blank" rel="noopener noreferrer" title="Qu’est-ce que AgentConnect ? - nouvelle fenêtre">
-                                            Qu’est-ce que ProConnect ?
-                                        </a>
-                                    </p>
-                                </div>
-
-                            {% elif inclusion_connect_url %}
-                                <div class="text-center">
-                                    <a href="{{ inclusion_connect_url }}" class="btn-inclusion-connect" {% matomo_event "connexion "|add:matomo_account_type "clic" "se-connecter-avec-inclusion-connect" %}>
-                                        <picture>
-                                            <source srcset="{% static_theme_images 'logo-inclusion-connect-one-line.svg' %}" height="14" width="286" type="image/svg+xml" media="(min-width: 30em)">
-                                            <img src="{% static_theme_images 'logo-inclusion-connect-two-lines.svg' %}" height="37" width="142" alt="Se connecter avec Inclusion Connect">
-                                        </picture>
-                                    </a>
-                                </div>
+                                {% include "account/includes/login_pro_connect.html" %}
                             {% else %}
-                                <div class="alert alert-info" role="status">
-                                    <p class="mb-2">
-                                        <strong>Inclusion Connect est momentanément désactivé.</strong>
-                                    </p>
-                                    <p class="mb-0">
-                                        Afin de demander un PASS IAE en urgence, <a href="https://tally.so/r/nrj0V5" target="_blank" class="has-external-link">remplissez ce formulaire.</a>
-                                    </p>
-                                </div>
+                                {% include "account/includes/login_inclusion_connect.html" %}
                             {% endif %}
                             <hr class="my-5" data-it-text="ou">
                             <div class="text-center">

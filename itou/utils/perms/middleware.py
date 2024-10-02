@@ -8,7 +8,6 @@ from django.utils.safestring import mark_safe
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
-from itou.www.login import urls as login_urls
 
 
 def extract_membership_infos_and_update_session(memberships, org_through_field, session):
@@ -152,14 +151,13 @@ class ItouCurrentOrganizationMiddleware:
         # - View two: user is added to the group.
         # In view two, the user is authenticated but he does not belong to any group.
         # This raises an error so we skip the middleware only in this case.
-        login_routes = [reverse(f"login:{url.name}") for url in login_urls.urlpatterns] + [reverse("account_login")]
         skip_middleware_conditions = [
-            request.path in login_routes,
+            request.path.startswith("/login/"),
             request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
             request.path.startswith("/signup/siae/join"),  # employer about to join a company
             request.path.startswith("/signup/facilitator/join"),  # facilitator about to join a company
             request.path.startswith("/signup/prescriber/join"),  # prescriber about to join a organization
-            request.path == reverse("account_logout"),
+            request.path in [reverse("account_login"), reverse("account_logout")],
             request.path.startswith("/hijack/release"),  # Allow to release hijack
             request.path.startswith("/api"),  # APIs should handle those errors
         ]

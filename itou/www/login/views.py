@@ -4,10 +4,12 @@ from allauth.account.views import LoginView
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
 from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
-from itou.users.enums import MATOMO_ACCOUNT_TYPE, UserKind
+from itou.users.enums import MATOMO_ACCOUNT_TYPE, IdentityProvider, UserKind
+from itou.users.models import User
 from itou.utils.urls import add_url_params, get_safe_url, get_url_param_value
 from itou.www.login.forms import ItouLoginForm
 
@@ -30,7 +32,7 @@ class ItouLoginView(LoginView):
         if not settings.INCLUSION_CONNECT_BASE_URL:
             return None
 
-        if self.user_kind not in [UserKind.EMPLOYER, UserKind.PRESCRIBER]:
+        if self.user_kind not in IdentityProvider.supported_user_kinds[IdentityProvider.INCLUSION_CONNECT]:
             return None
 
         params = {
@@ -46,7 +48,7 @@ class ItouLoginView(LoginView):
         if not settings.PRO_CONNECT_BASE_URL:
             return None
 
-        if self.user_kind not in [UserKind.EMPLOYER, UserKind.PRESCRIBER]:
+        if self.user_kind not in IdentityProvider.supported_user_kinds[IdentityProvider.PRO_CONNECT]:
             return None
 
         params = {
@@ -143,6 +145,28 @@ class JobSeekerLoginView(ItouLoginView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         extra_context = {
+            "show_france_connect": bool(settings.FRANCE_CONNECT_BASE_URL),
+            "show_peamu": bool(settings.PEAMU_AUTH_BASE_URL),
+        }
+        return context | extra_context
+
+
+class ExistingUserLoginView(ItouLoginView):
+    template_name = "account/login_existing_user.html"
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.user = get_object_or_404(User, public_id=self.kwargs["user_public_id"])
+        self.user_kind = self.user.kind
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        extra_context = {
+            "back_url": get_safe_url(self.request, "back_url"),
+            "matomo_account_type": MATOMO_ACCOUNT_TYPE[self.user.kind]
+            if self.user.kind in MATOMO_ACCOUNT_TYPE
+            else self.user.kind,
+            "login_provider": self.user.identity_provider,
             "show_france_connect": bool(settings.FRANCE_CONNECT_BASE_URL),
             "show_peamu": bool(settings.PEAMU_AUTH_BASE_URL),
         }
