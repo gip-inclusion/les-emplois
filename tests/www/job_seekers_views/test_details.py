@@ -169,6 +169,7 @@ def test_both_diag_from_company(client, snapshot):
         company__subject_to_eligibility=True,
         company__for_snapshot=True,
         user__for_snapshot=True,
+        user__public_id=uuid.uuid4(),
         user__email="un@autre.email",
     )
     IAEEligibilityDiagnosisFactory(
