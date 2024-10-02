@@ -3,7 +3,7 @@ import datetime
 import httpx
 import pytest
 import respx
-from django.contrib import auth
+from django.contrib import auth, messages
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import timezone
@@ -263,6 +263,17 @@ class TestFranceConnect:
             user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, kind=kind)
             mock_oauth_dance(client, expected_route=f"login:{kind}")
             user.delete()
+
+    @respx.mock
+    @pytest.mark.usefixtures("unittest_compatibility")
+    def test_callback_redirect_on_email_in_use_exception(self):
+        # EmailInUseException raised by the email conflict
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
+        JobSeekerFactory(email=fc_user_data.email, identity_provider=IdentityProvider.PE_CONNECT, for_snapshot=True)
+
+        # Test redirection and modal content
+        response = mock_oauth_dance(self.client, expected_route="signup:choose_user_kind")
+        assertMessages(response, [messages.Message(messages.ERROR, self.snapshot)])
 
     def test_logout_no_id_token(self, client):
         url = reverse("france_connect:logout")

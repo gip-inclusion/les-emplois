@@ -21,7 +21,7 @@ class UserKind(models.TextChoices):
     ITOU_STAFF = KIND_ITOU_STAFF, "administrateur"
 
     @classmethod
-    def get_login_url_for_error(cls, user_kind, default="login:job_seeker"):
+    def get_login_url(cls, user_kind, default="login:job_seeker"):
         url_lookup = {
             UserKind.JOB_SEEKER: "login:job_seeker",
             UserKind.PRESCRIBER: "login:prescriber",
