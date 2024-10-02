@@ -14,6 +14,7 @@ from itou.users.enums import Title
 from itou.utils.urls import add_url_params
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
+    PrescriberMembershipFactory,
     PrescriberOrganizationWith2MembershipFactory,
 )
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
@@ -98,8 +99,7 @@ def test_as_unauthorized_prescriber(client, snapshot):
         "job_seekers_views:details", kwargs={"public_id": job_application.job_seeker.public_id}
     )
     assertContains(response, f'<a href="{job_seeker_detail_url}?back_url={list_url}" class="btn-link">S… U…</a>')
-    # Unfortunately, the job seeker's name is available in the filters
-    # assertNotContains(response, "Supersecretname")
+    assertNotContains(response, "Supersecretname")
     another_job_seeker_detail_url = reverse(
         "job_seekers_views:details", kwargs={"public_id": another_job_application.job_seeker.public_id}
     )
@@ -143,7 +143,7 @@ def test_filtered_by_sender(client):
 
 def test_filtered_by_job_seeker(client):
     job_seeker = JobSeekerFactory()
-    prescriber = PrescriberFactory()
+    prescriber = PrescriberMembershipFactory(organization__authorized=True).user
     JobApplicationFactory(sender=prescriber, job_seeker=job_seeker)
     JobApplicationFactory.create_batch(2, sender=prescriber)
     client.force_login(prescriber)
@@ -154,8 +154,48 @@ def test_filtered_by_job_seeker(client):
     assert applications[0].job_seeker.pk == job_seeker.pk
 
     response = client.get(reverse("apply:list_prescriptions"))
+
+    filters_form = response.context["filters_form"]
+    assert len(filters_form.fields["job_seeker"].choices) == 3
+
     applications = response.context["job_applications_page"].object_list
     assert len(applications) == 3
+
+
+def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
+    prescriber = PrescriberFactory()
+    a_b_job_seeker = JobApplicationFactory(
+        sender=prescriber, job_seeker__first_name="A_something", job_seeker__last_name="B_something"
+    ).job_seeker
+    created_job_seeker = JobApplicationFactory(
+        sender=prescriber,
+        job_seeker__created_by=prescriber,
+        job_seeker__first_name="Zorro",
+        job_seeker__last_name="Martin",
+    ).job_seeker
+    c_d_job_seeker = JobApplicationFactory(
+        sender=prescriber,
+        job_seeker__created_by=prescriber,
+        job_seeker__last_login=timezone.now(),
+        job_seeker__first_name="C_something",
+        job_seeker__last_name="D_something",
+    ).job_seeker
+    client.force_login(prescriber)
+
+    response = client.get(reverse("apply:list_prescriptions"), {"job_seeker": created_job_seeker.pk})
+    applications = response.context["job_applications_page"].object_list
+    assert len(applications) == 1
+    assert applications[0].job_seeker.pk == created_job_seeker.pk
+
+    response = client.get(reverse("apply:list_prescriptions"))
+    applications = response.context["job_applications_page"].object_list
+    assert len(applications) == 3
+    filters_form = response.context["filters_form"]
+    assert filters_form.fields["job_seeker"].choices == [
+        (a_b_job_seeker.pk, "A… B…"),
+        (c_d_job_seeker.pk, "C… D…"),
+        (created_job_seeker.pk, "Zorro Martin"),
+    ]
 
 
 def test_filtered_by_company(client):

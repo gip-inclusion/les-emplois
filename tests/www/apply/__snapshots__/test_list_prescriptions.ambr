@@ -302,6 +302,29 @@
       }),
       dict({
         'origin': list([
+          'User.is_prescriber_with_authorized_org[users/models.py]',
+          'User.can_edit_personal_information[users/models.py]',
+          'User.can_view_personal_information[users/models.py]',
+          'PrescriberFilterJobApplicationsForm.<listcomp>[www/apply/forms.py]',
+          'PrescriberFilterJobApplicationsForm._get_choices_for_job_seeker[www/apply/forms.py]',
+          'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
+          'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
+          'list_prescriptions[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."user_id" = %s
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescriberorganization"."is_authorized"
+                 AND "users_user"."is_active")
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'PrescriberFilterJobApplicationsForm._get_choices_for_administrativecriteria[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
@@ -919,26 +942,6 @@
           WHERE "approvals_approval"."user_id" IN (%s,
                                                    %s)
           ORDER BY "approvals_approval"."start_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
-          '_add_user_can_view_personal_information[www/apply/views/list_views.py]',
-          'list_prescriptions[www/apply/views/list_views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
         ''',
       }),
       dict({

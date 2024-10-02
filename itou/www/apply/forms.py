@@ -29,6 +29,7 @@ from itou.users.forms import JobSeekerProfileFieldsMixin
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
+from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.types import InclusiveDateRange
 from itou.utils.validators import validate_nir
 from itou.utils.widgets import DuetDatePickerWidget
@@ -1038,14 +1039,14 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         self.job_applications_qs = job_applications_qs
         super().__init__(*args, **kwargs)
         senders = self.job_applications_qs.get_unique_fk_objects("sender")
-        self.fields["senders"].choices += self._get_choices_for(senders)
+        self.fields["senders"].choices += self._get_choices_for_sender(senders)
         job_seekers = self.job_applications_qs.get_unique_fk_objects("job_seeker")
-        self.fields["job_seeker"].choices = self._get_choices_for(job_seekers)
+        self.fields["job_seeker"].choices = self._get_choices_for_job_seeker(job_seekers)
         self.fields["criteria"].choices = self._get_choices_for_administrativecriteria()
         self.fields["departments"].choices = self._get_choices_for_departments(job_seekers)
         self.fields["selected_jobs"].choices = self._get_choices_for_jobs()
 
-    def _get_choices_for(self, users):
+    def _get_choices_for_sender(self, users):
         users = [user for user in users if user.get_full_name()]
         users = [(user.id, user.get_full_name().title()) for user in users]
         return sorted(users, key=lambda user: user[1])
@@ -1131,6 +1132,11 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
             queryset = queryset.filter(sender_company__id__in=sender_companies)
         return queryset
 
+    def _get_choices_for_job_seeker(self, users):
+        users = [user for user in users if user.get_full_name()]
+        users = [(user.id, user.get_full_name().title()) for user in users]
+        return sorted(users, key=lambda user: user[1])
+
     def get_sender_prescriber_organization_choices(self):
         sender_orgs = self.job_applications_qs.get_unique_fk_objects("sender_prescriber_organization")
         sender_orgs = [sender for sender in sender_orgs if sender.display_name]
@@ -1151,9 +1157,23 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
 
     to_companies = forms.MultipleChoiceField(required=False, label="Organisation", widget=Select2MultipleWidget)
 
-    def __init__(self, job_applications_qs, *args, **kwargs):
+    def __init__(self, job_applications_qs, *args, request_user, **kwargs):
+        self.request_user = request_user
         super().__init__(job_applications_qs, *args, **kwargs)
         self.fields["to_companies"].choices += self.get_to_companies_choices()
+
+    def _get_choices_for_job_seeker(self, users):
+        users = [user for user in users if user.get_full_name()]
+        users = [
+            (
+                user.id,
+                mask_unless(
+                    user.get_full_name().title(), predicate=self.request_user.can_view_personal_information(user)
+                ),
+            )
+            for user in users
+        ]
+        return sorted(users, key=lambda user: user[1])
 
     def filter(self, queryset):
         queryset = super().filter(queryset)
