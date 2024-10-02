@@ -119,12 +119,7 @@ def france_connect_callback(request):
         user, _ = fc_user_data.create_or_update_user()
     except InvalidKindException as e:
         messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
-        url = {
-            UserKind.PRESCRIBER: reverse("login:prescriber"),
-            UserKind.EMPLOYER: reverse("login:employer"),
-            UserKind.LABOR_INSPECTOR: reverse("login:labor_inspector"),
-        }[e.user.kind]
-        return HttpResponseRedirect(url)
+        return HttpResponseRedirect(UserKind.get_login_url_for_error(e.user.kind))
     except EmailInUseException as e:
         redacted_name = e.user.get_redacted_full_name()
         msg_who = (
