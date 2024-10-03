@@ -43,7 +43,7 @@ class JobSeekerDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         if self.request.user.is_prescriber or (
             self.request.user.is_employer and self.request.current_organization.is_subject_to_eligibility_rules
         ):
-            approval = self.object.approvals.valid().first()
+            approval = self.object.approvals.valid().prefetch_related("suspension_set").first()
             iae_eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
                 self.object,
                 for_siae=self.request.current_organization if self.request.user.is_employer else None,
