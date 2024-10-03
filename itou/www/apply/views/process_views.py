@@ -1124,7 +1124,7 @@ def rdv_insertion_invite(request, job_application_id, for_detail=False):
                         "address": job_application.job_seeker.address_on_one_line,
                         "invitation": {
                             "motif_category": {
-                                "name": "Entretien SIAE",
+                                "short_name": "siae_interview",
                             },
                         },
                     },
