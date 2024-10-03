@@ -75,9 +75,10 @@ def test_with_approval(client, snapshot):
         user__for_snapshot=True, organization__for_snapshot=True, organization__authorized=True
     ).user
     client.force_login(authorized_prescriber)
-    response = client.get(url)
+    with assertSnapshotQueries(snapshot(name="SQL queries")):
+        response = client.get(url)
     soup = parse_response_to_soup(response, selector="#main")
-    assert str(soup) == snapshot
+    assert str(soup) == snapshot(name="HTML page")
 
 
 @freeze_time("2024-08-14")
