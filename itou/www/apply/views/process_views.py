@@ -1107,21 +1107,25 @@ def rdv_insertion_invite(request, job_application_id, for_detail=False):
                 headers = {"Content-Type": "application/json; charset=utf-8", **get_api_credentials()}
 
                 data = {
-                    "first_name": job_application.job_seeker.first_name,  # Required
-                    "last_name": job_application.job_seeker.last_name,  # Required
-                    "title": "madame" if job_application.job_seeker.title == Title.MME else "monsieur",  # Required!
-                    "role": "demandeur",  # Required
-                    "email": job_application.job_seeker.email,
-                    "phone_number": job_application.job_seeker.phone,
-                    "birth_date": (
-                        formats.date_format(job_application.job_seeker.jobseeker_profile.birthdate, "d/m/Y")
-                        if job_application.job_seeker.jobseeker_profile.birthdate
-                        else None
-                    ),
-                    "address": job_application.job_seeker.address_on_one_line,
-                    "invitation": {
-                        "motif_category": {
-                            "name": "Entretien SIAE",
+                    "user": {
+                        "first_name": job_application.job_seeker.first_name,  # Required
+                        "last_name": job_application.job_seeker.last_name,  # Required
+                        "title": (
+                            "madame" if job_application.job_seeker.title == Title.MME else "monsieur"
+                        ),  # Required!
+                        "role": "demandeur",  # Required
+                        "email": job_application.job_seeker.email,
+                        "phone_number": job_application.job_seeker.phone,
+                        "birth_date": (
+                            formats.date_format(job_application.job_seeker.jobseeker_profile.birthdate, "d/m/Y")
+                            if job_application.job_seeker.jobseeker_profile.birthdate
+                            else None
+                        ),
+                        "address": job_application.job_seeker.address_on_one_line,
+                        "invitation": {
+                            "motif_category": {
+                                "name": "Entretien SIAE",
+                            },
                         },
                     },
                 }
