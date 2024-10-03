@@ -379,6 +379,35 @@ def make_unordered_queries_randomly_ordered():
     )
 
 
+@pytest.fixture(scope="session", autouse=True)
+def fix_unstable_annotation_order():
+    """
+    Patch Django’s ORM to have the annotation stable in the SQL produced by .count() calls.
+
+    The annotation_mask order is then used in annotation_select property
+    cf https://github.com/django/django/blob/stable/5.0.x/django/db/models/sql/query.py#L2519
+
+    This patch however will stop working with https://github.com/django/django/commit/65ad4ade74d
+
+    """
+    from django.db.models.sql.query import Query
+
+    patchy.patch(
+        Query.get_aggregation,
+        """\
+        @@ -104,7 +104,7 @@
+                         for annotation_alias, annotation in self.annotation_select.items():
+                             if annotation.get_group_by_cols():
+                                 annotation_mask.add(annotation_alias)
+        -                inner_query.set_annotation_mask(annotation_mask)
+        +                inner_query.set_annotation_mask(sorted(annotation_mask))
+
+                 # Add aggregates to the outer AggregateQuery. This requires making
+                 # sure all columns referenced by the aggregates are selected in the
+                """,
+    )
+
+
 @pytest.fixture
 def pdf_file():
     with open("tests/data/empty.pdf", "rb") as pdf:
