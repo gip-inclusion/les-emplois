@@ -228,7 +228,7 @@ def list_prescriptions_exports_download(request, month_identifier=None):
         filename = f"{filename}-{month_identifier}"
         job_applications = job_applications.created_on_given_year_and_month(year, month)
 
-    return stream_xlsx_export(job_applications, filename)
+    return stream_xlsx_export(job_applications, filename, request_user=request.user)
 
 
 @login_required
@@ -351,4 +351,4 @@ def list_for_siae_exports_download(request, month_identifier=None):
         filename = f"{filename}-{month_identifier}"
         job_applications = job_applications.created_on_given_year_and_month(year, month)
 
-    return stream_xlsx_export(job_applications, filename)
+    return stream_xlsx_export(job_applications, filename, request_user=request.user)

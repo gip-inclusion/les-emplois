@@ -332,6 +332,10 @@ def test_exports_download(client, snapshot):
     )
     client.force_login(job_application.sender)
 
+    # Make sure the prescriber has access to the first job seeker
+    job_application.job_seeker.created_by = job_application.sender
+    job_application.job_seeker.save(update_fields=("created_by",))
+
     with assertSnapshotQueries(snapshot(name="SQL queries of export")):
         response = client.get(reverse("apply:list_prescriptions_exports_download"))
         assert 200 == response.status_code
