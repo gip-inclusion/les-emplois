@@ -23,7 +23,7 @@
 # ---
 # name: test_exports_download[SQL queries of export]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -519,6 +519,28 @@
       }),
       dict({
         'origin': list([
+          'User.is_prescriber_with_authorized_org[users/models.py]',
+          'User.can_edit_personal_information[users/models.py]',
+          'User.can_view_personal_information[users/models.py]',
+          '_serialize_job_application[job_applications/export.py]',
+          '<listcomp>[job_applications/export.py]',
+          '_job_applications_serializer[job_applications/export.py]',
+          'serialize_queryset_by_batch[<site-packages>/xlsx_streaming/streaming.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."user_id" = %s
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescriberorganization"."is_authorized"
+                 AND "users_user"."is_active")
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
           'User.latest_pe_approval[users/models.py]',
           'User.latest_common_approval[users/models.py]',
@@ -927,12 +949,12 @@
       '',
     ]),
     list([
-      'M',
-      'Undisclosed',
-      'Secret',
-      'undisclosed@secr.et',
-      '3949',
-      '02/01/2000',
+      '',
+      'U…',
+      'S…',
+      '',
+      '',
+      '',
       '',
       '',
       'Le fameux garage',

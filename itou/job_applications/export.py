@@ -1,8 +1,11 @@
+import functools
+
 from itou.approvals.models import Approval
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.users.enums import Title, UserKind
 from itou.utils.export import to_streaming_response
+from itou.utils.templatetags import str_filters
 
 
 JOB_APPLICATION_CSV_HEADERS = [
@@ -112,8 +115,9 @@ def _resolve_title(title, nir):
     return ""
 
 
-def _serialize_job_application(job_application):
+def _serialize_job_application(job_application, request_user):
     job_seeker = job_application.job_seeker
+    can_view_personal_information = request_user.can_view_personal_information(job_seeker)
     company = job_application.to_company
 
     numero_pass_iae = ""
@@ -127,14 +131,14 @@ def _serialize_job_application(job_application):
         approval_state = approval.get_state_display()
 
     return [
-        _resolve_title(job_seeker.title, job_seeker.jobseeker_profile.nir),
-        job_seeker.last_name,
-        job_seeker.first_name,
-        job_seeker.email,
-        job_seeker.phone,
-        _format_date(job_seeker.jobseeker_profile.birthdate),
-        job_seeker.city,
-        job_seeker.post_code,
+        _resolve_title(job_seeker.title, job_seeker.jobseeker_profile.nir) if can_view_personal_information else "",
+        str_filters.mask_unless(job_seeker.last_name, predicate=can_view_personal_information),
+        str_filters.mask_unless(job_seeker.first_name, predicate=can_view_personal_information),
+        job_seeker.email if can_view_personal_information else "",
+        job_seeker.phone if can_view_personal_information else "",
+        _format_date(job_seeker.jobseeker_profile.birthdate) if can_view_personal_information else "",
+        job_seeker.city if can_view_personal_information else "",
+        job_seeker.post_code if can_view_personal_information else "",
         company.display_name,
         company.kind,
         _get_selected_jobs(job_application),
@@ -155,11 +159,11 @@ def _serialize_job_application(job_application):
     ]
 
 
-def _job_applications_serializer(queryset):
-    return [_serialize_job_application(job_application) for job_application in queryset]
+def _job_applications_serializer(queryset, *, request_user):
+    return [_serialize_job_application(job_application, request_user) for job_application in queryset]
 
 
-def stream_xlsx_export(job_applications, filename):
+def stream_xlsx_export(job_applications, filename, request_user):
     """
     Takes a list of job application, converts them to XLSX and writes them in the provided stream
     The stream can be for instance an http response, a string (io.StringIO()) or a file
@@ -168,5 +172,5 @@ def stream_xlsx_export(job_applications, filename):
         job_applications,
         filename,
         JOB_APPLICATION_CSV_HEADERS,
-        _job_applications_serializer,
+        functools.partial(_job_applications_serializer, request_user=request_user),
     )

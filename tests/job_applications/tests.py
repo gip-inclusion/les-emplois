@@ -1732,7 +1732,9 @@ class JobApplicationXlsxExportTest(TestCase):
         # The accept transition above will create a valid PASS IAE for the job seeker.
         assert job_seeker.approvals.last().is_valid
 
-        response = stream_xlsx_export(JobApplication.objects.all(), "filename")
+        response = stream_xlsx_export(
+            JobApplication.objects.all(), "filename", request_user=job_application.to_company.members.first()
+        )
         assert get_rows_from_streaming_response(response) == [
             JOB_APPLICATION_CSV_HEADERS,
             [
@@ -1779,7 +1781,9 @@ class JobApplicationXlsxExportTest(TestCase):
 
         assert job_seeker.approvals.last().is_in_waiting_period
 
-        response = stream_xlsx_export(JobApplication.objects.all(), "filename")
+        response = stream_xlsx_export(
+            JobApplication.objects.all(), "filename", request_user=job_application.to_company.members.first()
+        )
         assert get_rows_from_streaming_response(response) == [
             JOB_APPLICATION_CSV_HEADERS,
             [
@@ -1823,7 +1827,9 @@ class JobApplicationXlsxExportTest(TestCase):
         job_application = JobApplicationFactory(state=JobApplicationState.PROCESSING, **kwargs)
         job_application.refuse(user=job_application.to_company.members.get())
 
-        response = stream_xlsx_export(JobApplication.objects.all(), "filename")
+        response = stream_xlsx_export(
+            JobApplication.objects.all(), "filename", request_user=job_application.to_company.members.first()
+        )
         assert get_rows_from_streaming_response(response) == [
             JOB_APPLICATION_CSV_HEADERS,
             [
@@ -1879,7 +1885,7 @@ class JobApplicationXlsxExportTest(TestCase):
             hiring_start_at=start,
             state=JobApplicationState.ACCEPTED,
         )
-        response = stream_xlsx_export(JobApplication.objects.all(), "filename")
+        response = stream_xlsx_export(JobApplication.objects.all(), "filename", request_user=company.members.first())
         assert get_rows_from_streaming_response(response) == [
             JOB_APPLICATION_CSV_HEADERS,
             [
@@ -1907,6 +1913,90 @@ class JobApplicationXlsxExportTest(TestCase):
                 approval.number,
                 "05/07/2024",
                 "04/07/2026",
+                "Valide",
+            ],
+        ]
+
+    def test_xlsx_export_as_prescriber(self, *args, **kwargs):
+        create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
+        job_seeker = JobSeekerFactory(title=Title.MME, first_name="Very Secret", last_name="Name")
+        job_application = JobApplicationFactory(
+            job_seeker=job_seeker,
+            state=JobApplicationState.PROCESSING,
+            selected_jobs=Appellation.objects.all(),
+            eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
+        )
+        prescriber = job_application.sender
+        assert prescriber.is_prescriber
+        job_application.accept(user=job_application.to_company.members.first())
+
+        # The accept transition above will create a valid PASS IAE for the job seeker.
+        assert job_seeker.approvals.last().is_valid
+
+        response = stream_xlsx_export(JobApplication.objects.all(), "filename", request_user=prescriber)
+        assert get_rows_from_streaming_response(response) == [
+            JOB_APPLICATION_CSV_HEADERS,
+            [
+                "",
+                "N…",
+                "V… S…",
+                "",
+                "",
+                "",
+                "",
+                "",
+                job_application.to_company.display_name,
+                str(job_application.to_company.kind),
+                " ".join(a.display_name for a in job_application.selected_jobs.all()),
+                "Orienteur",
+                "",
+                job_application.sender.get_full_name(),
+                job_application.created_at.strftime("%d/%m/%Y"),
+                "Candidature acceptée",
+                job_application.hiring_start_at.strftime("%d/%m/%Y"),
+                job_application.hiring_end_at.strftime("%d/%m/%Y"),
+                "",  # no reafusal reason
+                "oui",  # Eligibility status.
+                "non",  # Eligible to SIAE evaluations.
+                job_application.approval.number,
+                job_application.approval.start_at.strftime("%d/%m/%Y"),
+                job_application.approval.end_at.strftime("%d/%m/%Y"),
+                "Valide",
+            ],
+        ]
+
+        # Give access to the job_seeker's personal information
+        job_seeker.created_by = prescriber
+        job_seeker.save(update_fields=("created_by",))
+
+        response = stream_xlsx_export(JobApplication.objects.all(), "filename", request_user=prescriber)
+        assert get_rows_from_streaming_response(response) == [
+            JOB_APPLICATION_CSV_HEADERS,
+            [
+                "MME",
+                job_seeker.last_name,
+                job_seeker.first_name,
+                job_seeker.email,
+                job_seeker.phone,
+                job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y"),
+                job_seeker.city,
+                job_seeker.post_code,
+                job_application.to_company.display_name,
+                str(job_application.to_company.kind),
+                " ".join(a.display_name for a in job_application.selected_jobs.all()),
+                "Orienteur",
+                "",
+                job_application.sender.get_full_name(),
+                job_application.created_at.strftime("%d/%m/%Y"),
+                "Candidature acceptée",
+                job_application.hiring_start_at.strftime("%d/%m/%Y"),
+                job_application.hiring_end_at.strftime("%d/%m/%Y"),
+                "",  # no reafusal reason
+                "oui",  # Eligibility status.
+                "non",  # Eligible to SIAE evaluations.
+                job_application.approval.number,
+                job_application.approval.start_at.strftime("%d/%m/%Y"),
+                job_application.approval.end_at.strftime("%d/%m/%Y"),
                 "Valide",
             ],
         ]
