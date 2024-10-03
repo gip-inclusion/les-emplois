@@ -5,7 +5,7 @@ import factory
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
@@ -19,7 +19,6 @@ from tests.prescribers.factories import (
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import (
-    BASE_NUM_QUERIES,
     assert_previous_step,
     assertSnapshotQueries,
     get_rows_from_streaming_response,
@@ -71,7 +70,7 @@ def test_get(client):
     )
 
 
-def test_as_unauthorized_prescriber(client):
+def test_as_unauthorized_prescriber(client, snapshot):
     prescriber = PrescriberFactory()
     job_application = JobApplicationFactory(
         job_seeker_with_address=True,
@@ -84,22 +83,7 @@ def test_as_unauthorized_prescriber(client):
     client.force_login(prescriber)
 
     list_url = reverse("apply:list_prescriptions")
-    with assertNumQueries(
-        BASE_NUM_QUERIES
-        + 1  # fetch django session
-        + 1  # fetch user
-        + 1  # fetch user memberships
-        + 1  # get list of senders (distinct sender_id)
-        + 1  # get list of job seekers (distinct job_seeker_id)
-        + 1  # get list of administrative criteria
-        + 2  # get list of job application + prefetch of job descriptions
-        + 1  # get list of siaes (distinct to_company_id)
-        + 3  # count, list & prefetch of job application
-        + 1  # get job seekers approvals
-        + 1  # check user authorized membership (can_edit_personal_information)
-        + 3  # get job seekers administrative criteria
-        + 3  # update session
-    ):
+    with assertSnapshotQueries(snapshot(name="SQL queries for prescriptions list")):
         response = client.get(list_url)
 
     job_seeker_detail_url = reverse(
