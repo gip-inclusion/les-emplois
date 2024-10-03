@@ -60,7 +60,7 @@
       </div>
       <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
           <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
-              <i aria-hidden="true" class="ri-pencil-line font-weight-medium"></i>
+              <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
           
@@ -82,7 +82,7 @@
                   <strong>06 12 34 56 78</strong>
                   
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -99,7 +99,7 @@
               <strong>jane.doe@test.local</strong>
               
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -120,7 +120,7 @@
           
               <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -289,7 +289,7 @@
       </div>
       <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
           <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
-              <i aria-hidden="true" class="ri-pencil-line font-weight-medium"></i>
+              <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
           
@@ -311,7 +311,7 @@
                   <strong>06 12 34 56 78</strong>
                   
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -328,7 +328,7 @@
               <strong>jane.doe@test.local</strong>
               
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -349,7 +349,7 @@
           
               <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -496,7 +496,7 @@
       </div>
       <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
           <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
-              <i aria-hidden="true" class="ri-pencil-line font-weight-medium"></i>
+              <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
           
@@ -518,7 +518,7 @@
                   <strong>06 12 34 56 78</strong>
                   
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -535,7 +535,7 @@
               <strong>jane.doe@test.local</strong>
               
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -556,7 +556,7 @@
           
               <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -663,7 +663,7 @@
       </div>
       <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
           <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
-              <i aria-hidden="true" class="ri-pencil-line font-weight-medium"></i>
+              <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
           
@@ -685,7 +685,7 @@
                   <strong>06 12 34 56 78</strong>
                   
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -702,7 +702,7 @@
               <strong>jane.doe@test.local</strong>
               
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -723,7 +723,7 @@
           
               <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -874,7 +874,7 @@
           
               chez
               <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
-                  <i aria-hidden="true" class="ri-community-line font-weight-medium ri-sm me-1"></i>
+                  <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1"></i>
                   <span>Acme inc.</span>
               </a>
           
@@ -918,7 +918,7 @@
           
               chez
               <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
-                  <i aria-hidden="true" class="ri-community-line font-weight-medium ri-sm me-1"></i>
+                  <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1"></i>
                   <span>Autre entreprise</span>
               </a>
           
@@ -1802,7 +1802,7 @@
       </div>
       <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
           <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
-              <i aria-hidden="true" class="ri-pencil-line font-weight-medium"></i>
+              <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
           
@@ -1824,7 +1824,7 @@
                   <strong>06 12 34 56 78</strong>
                   
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -1841,7 +1841,7 @@
               <strong>jane.doe@test.local</strong>
               
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -1862,7 +1862,7 @@
           
               <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -2033,7 +2033,7 @@
       </div>
       <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
           <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
-              <i aria-hidden="true" class="ri-pencil-line font-weight-medium"></i>
+              <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
           
@@ -2055,7 +2055,7 @@
                   <strong>06 12 34 56 78</strong>
                   
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -2072,7 +2072,7 @@
               <strong>jane.doe@test.local</strong>
               
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -2093,7 +2093,7 @@
           
               <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -2244,7 +2244,7 @@
       </div>
       <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
           <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
-              <i aria-hidden="true" class="ri-pencil-line font-weight-medium"></i>
+              <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
           
@@ -2266,7 +2266,7 @@
                   <strong>06 12 34 56 78</strong>
                   
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -2283,7 +2283,7 @@
               <strong>jane.doe@test.local</strong>
               
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -2304,7 +2304,7 @@
           
               <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -2411,7 +2411,7 @@
       </div>
       <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
           <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
-              <i aria-hidden="true" class="ri-pencil-line font-weight-medium"></i>
+              <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
           
@@ -2433,7 +2433,7 @@
                   <strong>06 12 34 56 78</strong>
                   
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -2450,7 +2450,7 @@
               <strong>jane.doe@test.local</strong>
               
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -2471,7 +2471,7 @@
           
               <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -2620,7 +2620,7 @@
       </div>
       <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
           <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
-              <i aria-hidden="true" class="ri-pencil-line font-weight-medium"></i>
+              <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
           
@@ -2642,7 +2642,7 @@
                   <strong>06 12 34 56 78</strong>
                   
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -2659,7 +2659,7 @@
               <strong>jane.doe@test.local</strong>
               
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -2680,7 +2680,7 @@
           
               <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -2787,7 +2787,7 @@
       </div>
       <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
           <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
-              <i aria-hidden="true" class="ri-pencil-line font-weight-medium"></i>
+              <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
           
@@ -2809,7 +2809,7 @@
                   <strong>06 12 34 56 78</strong>
                   
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -2826,7 +2826,7 @@
               <strong>jane.doe@test.local</strong>
               
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -2847,7 +2847,7 @@
           
               <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   

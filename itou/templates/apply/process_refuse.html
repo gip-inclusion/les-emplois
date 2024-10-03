@@ -73,7 +73,7 @@
 
                             {% if wizard.steps.current == "reason" %}
                                 <fieldset class="js-refusal-reasons form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %}">
-                                    <legend class="fs-base font-weight-bold">
+                                    <legend class="fs-base fw-bold">
                                         {{ form.refusal_reason.label }} :
                                         {% if form.refusal_reason.field.required %}*{% endif %}
                                     </legend>
@@ -117,7 +117,7 @@
                                 </fieldset>
                                 <fieldset>
                                     <div class="form-group">
-                                        <legend class="fs-base font-weight-bold">Partager ce motif de refus au candidat ?</legend>
+                                        <legend class="fs-base fw-bold">Partager ce motif de refus au candidat ?</legend>
                                         {% bootstrap_field form.refusal_reason_shared_with_job_seeker %}
                                     </div>
                                 </fieldset>

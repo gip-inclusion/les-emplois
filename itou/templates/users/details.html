@@ -163,12 +163,12 @@
                                                 {% if profile.advisor_information and render_advisor_matomo_option %}
                                                     <ul class="list-unstyled">
                                                         <li>
-                                                            <i class="ri-user-line font-weight-normal me-1" aria-hidden="true"></i>{{ profile.advisor_information.name }}
+                                                            <i class="ri-user-line fw-normal me-1" aria-hidden="true"></i>{{ profile.advisor_information.name }}
                                                         </li>
                                                         <li>
-                                                            <i class="ri-mail-line font-weight-normal me-1" aria-hidden="true"></i>
+                                                            <i class="ri-mail-line fw-normal me-1" aria-hidden="true"></i>
                                                             <a href="mailto:{{ profile.advisor_information.email }}" class="text-break text-decoration-none" aria-label="Contacter {{ profile.advisor_information.name }} par e-mail">{{ profile.advisor_information.email }}</a>
-                                                            {% include 'includes/copy_to_clipboard.html' with content=profile.advisor_information.email only_icon=True css_classes="btn-link font-weight-medium ms-1" %}
+                                                            {% include 'includes/copy_to_clipboard.html' with content=profile.advisor_information.email only_icon=True css_classes="btn-link fw-medium ms-1" %}
                                                         </li>
                                                     </ul>
                                                 {% elif render_advisor_matomo_option %}

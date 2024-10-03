@@ -21,7 +21,7 @@
           <h1 class="m-0">Candidats</h1>
           <div aria-label="Actions sur les candidatures" class="d-flex flex-column flex-md-row gap-3" role="group">
               <a class="btn btn-lg btn-primary btn-ico" href="/search/employers/results">
-                  <i aria-hidden="true" class="ri-draft-line font-weight-medium"></i>
+                  <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                   <span>Postuler pour un candidat</span>
               </a>
           </div>

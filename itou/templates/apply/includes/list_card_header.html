@@ -18,7 +18,7 @@
         <span class="text-secondary fs-sm">{{ job_application.created_at|date:"d F Y à H:i" }}</span>
         {% if job_application.pending_for_weeks >= job_application.WEEKS_BEFORE_CONSIDERED_OLD and not request.user.is_job_seeker %}
             <br>
-            <span class="text-danger fs-sm font-weight-bold">
+            <span class="text-danger fs-sm fw-bold">
                 En attente de réponse depuis {{ job_application.pending_for_weeks }} semaines.
             </span>
         {% endif %}

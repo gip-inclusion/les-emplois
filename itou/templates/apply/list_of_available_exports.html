@@ -26,7 +26,7 @@
                    {% matomo_event "candidature" "exports" "export-siae" %}
                    aria-label="Télécharger cet export SIAE"
                    href="{% url 'apply:list_for_siae_exports_download' %}">
-                    <i class="ri-download-line font-weight-medium" aria-hidden="true"></i>
+                    <i class="ri-download-line fw-medium" aria-hidden="true"></i>
                     <span>Télécharger toutes les candidatures</span>
                 </a>
             {% else %}
@@ -34,7 +34,7 @@
                    {% matomo_event "candidature" "exports" "export-prescripteur" %}
                    aria-label="Télécharger cet export prescripteur"
                    href="{% url 'apply:list_prescriptions_exports_download' %}">
-                    <i class="ri-download-line font-weight-medium" aria-hidden="true"></i>
+                    <i class="ri-download-line fw-medium" aria-hidden="true"></i>
                     <span>Télécharger toutes les candidatures</span>
                 </a>
             {% endif %}

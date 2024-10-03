@@ -28,7 +28,7 @@
                                           <strong>jane.doe@test.local</strong>
                                           
                                           <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -39,7 +39,7 @@
                                               <strong>06 12 34 56 78</strong>
                                               
                                               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -116,7 +116,7 @@
                       <div>
                           <h3 class="mb-2">
                               Pierre DUPONT
-                              <span class="font-weight-normal fs-6 fst-italic">
+                              <span class="fw-normal fs-6 fst-italic">
                                   
                                   
                                   (prescripteur pour Les Olivades)
@@ -126,33 +126,33 @@
   
                           <ul class="list-unstyled">
                               <li class="py-1">
-                                  <i aria-hidden="true" class="ri-mail-line font-weight-normal me-1"></i>
+                                  <i aria-hidden="true" class="ri-mail-line fw-normal me-1"></i>
                                   <span>pierre.dupont@test.local</span>
                                   
                                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dupont@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_member_email">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
                               </li>
                               <li class="py-1">
-                                  <i aria-hidden="true" class="ri-phone-line font-weight-normal me-1"></i>
+                                  <i aria-hidden="true" class="ri-phone-line fw-normal me-1"></i>
                                   
                                       <span>06 12 34 56 78</span>
                                       
                                       <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_member_phone">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
                                   
                               </li>
                               <li class="py-1">
-                                  <i aria-hidden="true" class="ri-calendar-line font-weight-normal me-1"></i>Suivi depuis le <strong>21/06/2024</strong>
+                                  <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>Suivi depuis le <strong>21/06/2024</strong>
                               </li>
                               
                                   <li class="py-1">
-                                      <i aria-hidden="true" class="ri-map-pin-user-line font-weight-normal me-1"></i><strong>Référent</strong>
+                                      <i aria-hidden="true" class="ri-map-pin-user-line fw-normal me-1"></i><strong>Référent</strong>
                                   </li>
                               
                           </ul>
@@ -178,13 +178,13 @@
                                                   
                                                       <ul class="list-unstyled">
                                                           <li>
-                                                              <i aria-hidden="true" class="ri-user-line font-weight-normal me-1"></i>Test MacTest
+                                                              <i aria-hidden="true" class="ri-user-line fw-normal me-1"></i>Test MacTest
                                                           </li>
                                                           <li>
-                                                              <i aria-hidden="true" class="ri-mail-line font-weight-normal me-1"></i>
+                                                              <i aria-hidden="true" class="ri-mail-line fw-normal me-1"></i>
                                                               <a aria-label="Contacter Test MacTest par e-mail" class="text-break text-decoration-none" href="mailto:test.mactest@francetravail.fr">test.mactest@francetravail.fr</a>
-                                                              <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="test.mactest@francetravail.fr" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+                                                              <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="test.mactest@francetravail.fr" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -240,21 +240,21 @@
               <ul class="list-unstyled mb-lg-5">
                   <li class="d-flex justify-content-between align-items-center mb-3">
                       <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups">
-                          <i class="ri-article-line ri-lg font-weight-normal align-self-start"></i>
+                          <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
                           <span>Visualiser les bénéficiaires</span>
                       </a>
                   </li>
                   <li class="d-flex justify-content-between align-items-center mb-3">
                       <a aria-label="Créer ou rejoindre un groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tbd_ajout_groupe" href="/gps/groups/join?back_url=/dashboard/">
-                          <i class="ri-play-list-add-line ri-lg font-weight-normal align-self-start"></i>
+                          <i class="ri-play-list-add-line ri-lg fw-normal align-self-start"></i>
                           <span>Ajouter un bénéficiaire</span>
                       </a>
                   </li>
                   <li class="d-flex justify-content-between align-items-center mb-3">
                       <a aria-label="Inviter un partenaire." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_inviter_partenaire" href="https://hello-tally.so/r/w5kLqM?user_public_id=03580247-b036-4578-bf9d-f92c9c2f68cd&amp;user_first_name=Pierre&amp;user_last_name=Dupont&amp;&amp;user_organization_uid=0260ad4f-2008-48bd-88cc-b41c0211e219&amp;user_organization_name=Pres. Org." rel="noopener" target="_blank">
-                          <i class="ri-mail-send-line ri-lg font-weight-normal align-self-start"></i>
+                          <i class="ri-mail-send-line ri-lg fw-normal align-self-start"></i>
                           <span>Inviter un partenaire</span>
-                          <i class="ri-external-link-line font-weight-normal ms-2"></i>
+                          <i class="ri-external-link-line fw-normal ms-2"></i>
                       </a>
                   </li>
               </ul>
@@ -322,14 +322,14 @@
   
                                   <a aria-label="Devenir référent de Jane DOE" class="btn btn-outline-success btn-block w-100 w-md-auto btn-ico" data-bs-body="Vous pourrez toujours ne plus être référent de ce bénéficiaire plus tard." data-bs-confirm-class="btn-success" data-bs-confirm-text="Devenir référent" data-bs-confirm-url="/gps/groups/[PK of Group]/toggle_referent" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de vouloir devenir référent de Jane DOE ?" data-bs-toggle="modal" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
   
-                                      <i aria-hidden="true" class="ri-map-pin-user-line font-weight-normal me-1"></i>
+                                      <i aria-hidden="true" class="ri-map-pin-user-line fw-normal me-1"></i>
                                       <span>Devenir référent</span>
   
                                   </a>
   
                               
                               <a aria-label="Consulter la fiche de Jane DOE" class="btn btn-outline-primary btn-block btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/gps/groups">
-                                  <i aria-hidden="true" class="ri-eye-line ri-xl font-weight-medium"></i>
+                                  <i aria-hidden="true" class="ri-eye-line ri-xl fw-medium"></i>
                                   <span>Consulter la fiche</span>
                               </a>
                           </div>

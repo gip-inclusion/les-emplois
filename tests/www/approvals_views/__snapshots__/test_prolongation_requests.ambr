@@ -787,7 +787,7 @@
                                       <tbody>
                                           
                                               <tr>
-                                                  <td class="font-weight-bold">Jane DOE</td>
+                                                  <td class="fw-bold">Jane DOE</td>
                                                   <td><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></td>
                                                   <td>ACME Inc.</td>
                                                   <td>01/01/2000</td>
@@ -854,7 +854,7 @@
                                       <tbody>
                                           
                                               <tr>
-                                                  <td class="font-weight-bold">Jane DOE</td>
+                                                  <td class="fw-bold">Jane DOE</td>
                                                   <td><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></td>
                                                   <td>-</td>
                                                   <td>01/01/2000</td>
@@ -909,7 +909,7 @@
                               </p>
                               <p>
                                   <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
-                                      <i class="ri-download-line ri-lg font-weight-normal"></i>
+                                      <i class="ri-download-line ri-lg fw-normal"></i>
                                       <span>Télécharger le bilan</span>
                                   </a>
                               </p>
@@ -923,7 +923,7 @@
                                   <i class="ri-mail-line"></i>
                                   <a class="btn-link me-3" href="mailto:email@example.com">email@example.com</a>
                                   <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span>Copier</span>
   </button>
   
@@ -978,7 +978,7 @@
               <i class="ri-close-line"></i>
               <span>Refuser</span>
           </a>
-          <p class="font-weight-bold mt-3">Précision</p>
+          <p class="fw-bold mt-3">Précision</p>
           <p class="mb-2">En cas de refus, vous êtes tenu de proposer une solution au candidat.</p>
       </div>
   

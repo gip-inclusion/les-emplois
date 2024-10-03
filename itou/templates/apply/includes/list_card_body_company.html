@@ -16,7 +16,7 @@
             <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                 {% if job_application.job_seeker.city %}
                     <span>
-                        <i class="ri-map-pin-2-line font-weight-normal me-1" aria-hidden="true"></i>
+                        <i class="ri-map-pin-2-line fw-normal me-1" aria-hidden="true"></i>
                         {% if job_application.job_seeker.department %}{{ job_application.job_seeker.department }} -{% endif %}
                         {{ job_application.job_seeker.city|title }}
                     </span>
@@ -45,7 +45,7 @@
                 {% endif %}
                 {% if job_application.next_appointment_start_at %}
                     <span {% if job_application.other_appointments_count %} data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{% blocktrans count other_appointments_count=job_application.other_appointments_count %}{{ other_appointments_count }} autre rendez-vous prévu, rendez-vous dans le détail de candidature pour le consulter"{% plural %}{{ other_appointments_count }} autres rendez-vous prévus, rendez-vous dans le détail de candidature pour les consulter{% endblocktrans%}"{% endif %}>
-                        <i class="ri-calendar-line font-weight-normal me-1" aria-hidden="true"></i>
+                        <i class="ri-calendar-line fw-normal me-1" aria-hidden="true"></i>
                         Prochain rdv le {{ job_application.next_appointment_start_at|date:"d/m/Y" }}
                     </span>
                 {% endif %}

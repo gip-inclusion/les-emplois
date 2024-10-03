@@ -49,7 +49,7 @@
                                     <tbody>
                                         {% for prolongation_request in pager %}
                                             <tr>
-                                                <td class="font-weight-bold">{{ prolongation_request.approval.user.get_full_name }}</td>
+                                                <td class="fw-bold">{{ prolongation_request.approval.user.get_full_name }}</td>
                                                 <td>{{ prolongation_request.approval.number|format_approval_number }}</td>
                                                 <td>{{ prolongation_request.declared_by_siae|default:"-" }}</td>
                                                 <td>{{ prolongation_request.created_at|date:"d/m/Y" }}</td>

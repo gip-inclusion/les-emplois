@@ -26,7 +26,7 @@
                                 </p>
                             </div>
                         {% else %}
-                            <p class="font-italic text-center mt-3">FranceConnect est désactivé.</p>
+                            <p class="fst-italic text-center mt-3">FranceConnect est désactivé.</p>
                         {% endif %}
 
                         {% if show_peamu %}
@@ -36,7 +36,7 @@
                                 </div>
                             </div>
                         {% else %}
-                            <p class="font-italic text-center">Pôle emploi Connect est désactivé.</p>
+                            <p class="fst-italic text-center">Pôle emploi Connect est désactivé.</p>
                         {% endif %}
 
                         <div class="mt-4 mb-3">
@@ -52,7 +52,7 @@
                             {# bootstrap_form_errors form alert_error_type="all" #}
 
                             {% bootstrap_field form.email wrapper_class="form-group mb-1" %}
-                            <div class="text-end small font-italic mb-0">
+                            <div class="text-end small fst-italic mb-0">
                                 {% include "signup/includes/no_email_link.html" with link_text="Pas d'adresse e-mail ?" only %}
                             </div>
 

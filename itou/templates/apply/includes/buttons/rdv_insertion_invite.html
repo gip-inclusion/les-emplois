@@ -14,7 +14,7 @@
                         aria-label="Proposer un rendez-vous à {{ job_application.job_seeker.get_full_name }}"
                         {% matomo_event "candidature" "clic" "proposer-rdv" %}>
                     <div class="stable-text">
-                        <i class="ri-alert-line font-weight-medium" aria-hidden="true"></i>
+                        <i class="ri-alert-line fw-medium" aria-hidden="true"></i>
                         <span>Réessayer un envoi</span>
                     </div>
                     <div class="loading-text">
@@ -25,7 +25,7 @@
             </form>
         {% else %}
             <button class="btn btn-danger btn-ico" type="button" disabled data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti.">
-                <i class="ri-alert-line font-weight-medium" aria-hidden="true"></i>
+                <i class="ri-alert-line fw-medium" aria-hidden="true"></i>
                 <span>Une erreur est survenue</span>
             </button>
         {% endif %}
@@ -33,7 +33,7 @@
         <button class="btn btn-success btn-ico" type="button" disabled data-bs-toggle="tooltip" data-bs-placement="left" data-bs-html="true" data-bs-title="Une relance sera envoyée 3 jours après.
             <br>
             Vous pourrez renvoyer une invitation sous 10J.">
-            <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
+            <i class="ri-check-line fw-medium" aria-hidden="true"></i>
             <span>Invitation envoyée</span>
         </button>
     {% else %}
@@ -43,7 +43,7 @@
             {% csrf_token %}
             <button class="btn btn-secondary btn-ico" aria-label="Proposer un rendez-vous à {{ job_application.job_seeker.get_full_name }}" {% matomo_event "candidature" "clic" "proposer-rdv" %}>
                 <div class="stable-text">
-                    <i class="ri-mail-send-line font-weight-medium" aria-hidden="true"></i>
+                    <i class="ri-mail-send-line fw-medium" aria-hidden="true"></i>
                     <span>Proposer un rendez-vous</span>
                 </div>
                 <div class="loading-text">

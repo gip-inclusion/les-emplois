@@ -39,7 +39,7 @@
                                 Pour faciliter cette prise de décision, nous vous donnons un accès à l'ensemble des auto-prescriptions
                                 faites par les SIAE de votre territoire:
                             </p>
-                            <p class="font-weight-bold">Données du contrôle a posteriori cette campagne</p>
+                            <p class="fw-bold">Données du contrôle a posteriori cette campagne</p>
                             <p>
                                 <a class="btn btn-outline-primary" href="{% url 'stats:stats_ddets_iae_siae_evaluation' %}{% if back_url %}?back_url={{ back_url }}{% endif %}" aria-label="Voir les données">
                                     Voir les données
@@ -82,7 +82,7 @@
                                             aléatoire de SIAE. Veuillez choisir le pourcentage de SIAE à contrôler puis valider ci-dessous :
                                         </p>
 
-                                        <p class="font-weight-bold">
+                                        <p class="fw-bold">
                                             Ratio sélectionné : <span id="showChosenPercentValue"></span> %
                                         </p>
                                         <p>{{ min }}% {{ form.chosen_percent }} {{ max }}%</p>

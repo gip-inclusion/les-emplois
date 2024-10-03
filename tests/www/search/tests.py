@@ -524,7 +524,7 @@ class TestJobDescriptionSearchView:
                 data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="clic-onglet-fichesdeposte"
                 href="{self.URL}?{escape(urlencode(filters_param))}">
-                <i class="ri-briefcase-4-line font-weight-normal me-1" aria-hidden="true"></i>
+                <i class="ri-briefcase-4-line fw-normal me-1" aria-hidden="true"></i>
                 <span>Poste <span class="d-none d-md-inline">ouvert au recrutement</span></span>
                 <span class="badge badge-sm rounded-pill ms-2">1</span>
             </a>
@@ -539,7 +539,7 @@ class TestJobDescriptionSearchView:
                 data-matomo-event="true" data-matomo-category="candidature"
                 data-matomo-action="clic" data-matomo-option="clic-onglet-employeur"
                 href="{self.URL_EMPLOYERS}?{escape(urlencode(filters_param))}">
-                <i class="ri-hotel-line font-weight-normal me-1" aria-hidden="true"></i>
+                <i class="ri-hotel-line fw-normal me-1" aria-hidden="true"></i>
                 <span>Employeur</span>
                 <span class="badge badge-sm rounded-pill ms-2">1</span>
             </a>
@@ -586,7 +586,7 @@ class TestJobDescriptionSearchView:
                 data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="clic-onglet-fichesdeposte"
                 href="{self.URL}?{escape(urlencode(filters_param))}">
-                <i class="ri-briefcase-4-line font-weight-normal me-1" aria-hidden="true"></i>
+                <i class="ri-briefcase-4-line fw-normal me-1" aria-hidden="true"></i>
                 <span>Poste <span class="d-none d-md-inline">ouvert au recrutement</span></span>
                 <span class="badge badge-sm rounded-pill ms-2">1</span>
             </a>
@@ -601,7 +601,7 @@ class TestJobDescriptionSearchView:
                 data-matomo-event="true" data-matomo-category="candidature"
                 data-matomo-action="clic" data-matomo-option="clic-onglet-employeur"
                 href="{self.URL_EMPLOYERS}?{escape(urlencode(filters_param))}">
-                <i class="ri-hotel-line font-weight-normal me-1" aria-hidden="true"></i>
+                <i class="ri-hotel-line fw-normal me-1" aria-hidden="true"></i>
                 <span>Employeur</span>
                 <span class="badge badge-sm rounded-pill ms-2">1</span>
             </a>
@@ -635,7 +635,7 @@ class TestJobDescriptionSearchView:
                 data-matomo-event="true" data-matomo-category="candidature"
                 data-matomo-action="clic" data-matomo-option="clic-onglet-employeur"
                 href="{self.URL_EMPLOYERS}?{escape(urlencode(response.wsgi_request.GET, doseq=True))}">
-                <i class="ri-hotel-line font-weight-normal me-1" aria-hidden="true"></i>
+                <i class="ri-hotel-line fw-normal me-1" aria-hidden="true"></i>
                 <span>Employeur</span>
                 <span class="badge badge-sm rounded-pill ms-2">1</span>
             </a>

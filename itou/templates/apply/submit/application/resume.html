@@ -11,7 +11,7 @@
         {% if not request.user.is_job_seeker and eligibility_diagnosis.author_organization %}
             <div class="mb-5">
                 <p>L’éligibilité à l'IAE du candidat a été validée par :</p>
-                <p class="text-tertiary font-weight-bold">{{ eligibility_diagnosis.author_organization.display_name }}</p>
+                <p class="text-tertiary fw-bold">{{ eligibility_diagnosis.author_organization.display_name }}</p>
             </div>
         {% endif %}
         {# Nothing is displayed to SIAE members when the job seeker is not eligible to the IAE #}
@@ -69,7 +69,7 @@
         {% if not request.user.is_job_seeker and geiq_eligibility_diagnosis.author_organization %}
             <div class="mb-5">
                 <p>L’éligibilité GEIQ du candidat a été validée par :</p>
-                <p class="text-tertiary font-weight-bold">{{ geiq_eligibility_diagnosis.author_organization.display_name }}</p>
+                <p class="text-tertiary fw-bold">{{ geiq_eligibility_diagnosis.author_organization.display_name }}</p>
             </div>
         {% endif %}
         {# Nothing is displayed to GEIQ members when the job seeker is not eligible #}
@@ -199,10 +199,10 @@
             {% if prescription_process or request.user.is_job_seeker %}
                 <div class="c-info p-3 mb-4">
                     {% if prescription_process %}
-                        <p class="font-weight-bold fs-sm mb-1">Ce candidat n’a pas encore de CV ?</p>
+                        <p class="fw-bold fs-sm mb-1">Ce candidat n’a pas encore de CV ?</p>
                         <p class="fs-sm mb-2">Accompagnez-le dans la création de son CV grâce à notre partenaire Diagoriente.</p>
                     {% else %}
-                        <p class="font-weight-bold fs-sm mb-1">Vous n’avez pas de CV ?</p>
+                        <p class="fw-bold fs-sm mb-1">Vous n’avez pas de CV ?</p>
                         <p class="fs-sm mb-2">Créez-en un grâce à notre partenaire Diagoriente.</p>
                     {% endif %}
                     <a href="https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-{{ request.user.is_job_seeker|yesno:"candidat,prescripteur" }}"
