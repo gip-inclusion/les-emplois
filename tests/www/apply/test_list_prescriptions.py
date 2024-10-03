@@ -80,6 +80,14 @@ def test_as_unauthorized_prescriber(client, snapshot):
         sender=prescriber,
         sender_kind=SenderKind.PRESCRIBER,
     )
+    another_job_application = JobApplicationFactory(
+        job_seeker_with_address=True,
+        job_seeker__first_name="Liz",
+        job_seeker__last_name="Ible",
+        job_seeker__created_by=prescriber,  # to check for useless queries
+        sender=prescriber,
+        sender_kind=SenderKind.PRESCRIBER,
+    )
     client.force_login(prescriber)
 
     list_url = reverse("apply:list_prescriptions")
@@ -92,6 +100,12 @@ def test_as_unauthorized_prescriber(client, snapshot):
     assertContains(response, f'<a href="{job_seeker_detail_url}?back_url={list_url}" class="btn-link">S… U…</a>')
     # Unfortunately, the job seeker's name is available in the filters
     # assertNotContains(response, "Supersecretname")
+    another_job_seeker_detail_url = reverse(
+        "job_seekers_views:details", kwargs={"public_id": another_job_application.job_seeker.public_id}
+    )
+    assertContains(
+        response, f'<a href="{another_job_seeker_detail_url}?back_url={list_url}" class="btn-link">Liz IBLE</a>'
+    )
 
 
 def test_filtered_by_state(client):
