@@ -34,6 +34,7 @@ def parse_gps_advisors_file(import_file):
 
     df = df.rename(columns={"NIR": "nir", "DC_NOMAGENTREFERENT": "prescriber_name", "DC_MAIL": "prescriber_email"})
     df = df[["nir", "prescriber_name", "prescriber_email"]]
+    df = df.dropna(subset=["prescriber_name", "prescriber_email"])
     logger.info(f"Found {len(df)} rows from GPS export.")
 
     nir_to_contact = {}
