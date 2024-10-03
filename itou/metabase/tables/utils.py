@@ -21,7 +21,7 @@ from itou.approvals.enums import Origin, ProlongationReason
 from itou.approvals.models import Approval
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
-from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
+from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE, AddressMixin
 from itou.companies.models import Company
 from itou.geo.enums import ZRRStatus
 from itou.geo.models import ZRR
@@ -156,8 +156,10 @@ def get_post_code_to_insee_code_map():
 # FIXME @dejafait drop this as soon as data analysts no longer use
 # structures_v0.code_commune nor organisations.code_commune
 # because one post_code can actually have *several* insee_codes (╯°□°)╯︵ ┻━┻
-def convert_post_code_to_insee_code(post_code):
-    return get_post_code_to_insee_code_map().get(post_code)
+def get_code_commune(obj: AddressMixin):
+    if obj.insee_city:
+        return obj.insee_city.code_insee
+    return get_post_code_to_insee_code_map().get(obj.post_code)
 
 
 @functools.cache
@@ -212,7 +214,7 @@ def get_address_columns(name_suffix="", comment_suffix="", custom_fn=lambda o: o
                 "name": f"code_commune{name_suffix}",
                 "type": "varchar",
                 "comment": f"Code commune{comment_suffix}",
-                "fn": lambda o: convert_post_code_to_insee_code(custom_fn(o).post_code),
+                "fn": lambda o: get_code_commune(custom_fn(o)),
             },
             {
                 "name": f"ville{name_suffix}",

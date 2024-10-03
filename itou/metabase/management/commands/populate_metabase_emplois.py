@@ -129,9 +129,9 @@ class Command(BaseCommand):
         ONE_MONTH_AGO = timezone.now() - timezone.timedelta(days=30)
         queryset = (
             Company.objects.active()
-            .select_related("convention")
+            .select_related("convention", "insee_city")
             .prefetch_related(
-                "convention__siaes",
+                Prefetch("convention__siaes", queryset=Company.objects.select_related("insee_city")),
                 "job_description_through",
                 "members",
                 Prefetch(
@@ -262,6 +262,7 @@ class Command(BaseCommand):
                 "members",
                 "prescribermembership_set",
             )
+            .select_related("insee_city")
             .annotate(
                 job_applications_count=job_applications_count,
                 accepted_job_applications_count=accepted_job_applications_count,
