@@ -2,6 +2,7 @@ import datetime
 from io import StringIO
 from unittest.mock import patch
 
+import numpy as np
 import pandas as pd
 import pytest
 from django.conf import settings
@@ -390,8 +391,11 @@ class TestGpsManagementCommand:
     def test_import_advisor_information(self):
         contacted_profile = JobSeekerProfileFactory(with_contact=True)
         contactless_profile = JobSeekerProfileFactory()
+        profile_contact_no_name = JobSeekerProfileFactory()
+        profile_contact_no_email = JobSeekerProfileFactory()
 
         # dataset contains a the existing groups
+
         mocked_pandas_dataset = pd.DataFrame(
             {
                 "nir": [
@@ -399,13 +403,24 @@ class TestGpsManagementCommand:
                     contactless_profile.nir,
                     "123456789010101",  # non-existent in the database,
                     contacted_profile.nir,  # duplicate - ignored with a log
+                    profile_contact_no_name.nir,
+                    profile_contact_no_email.nir,
                 ],
-                "prescriber_name": ["Test MacTest", "Test Testson", "Test Ignored", "Test Ignored"],
+                "prescriber_name": [
+                    "Test MacTest",
+                    "Test Testson",
+                    "Test Ignored",
+                    "Test Ignored",
+                    np.nan,
+                    "Test Ignored",
+                ],
                 "prescriber_email": [
                     "test.mactest@francetravail.fr",
                     "test.testson@francetravail.fr",
                     "testignored@francetravail.fr",
                     "testignored@francetravail.fr",
+                    "testignored@francetravail.fr",
+                    np.nan,
                 ],
             }
         )
@@ -414,7 +429,7 @@ class TestGpsManagementCommand:
             self.call_command("import_advisor_information", "example.xlsx", wet_run=True)
 
         assert FranceTravailContact.objects.count() == 2
-        assert JobSeekerProfile.objects.filter(advisor_information__isnull=True).count() == 0
+        assert JobSeekerProfile.objects.filter(advisor_information__isnull=True).count() == 2
 
         contacted_profile.refresh_from_db()
         assert contacted_profile.advisor_information.name == "Test MacTest"
