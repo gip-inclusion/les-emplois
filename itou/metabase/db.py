@@ -135,22 +135,6 @@ def create_unversioned_tables_if_needed():
     """
     with MetabaseDatabaseCursor() as (cur, conn):
         create_table_sql_requests = """
-            /* TODO @defajait DROP ASAP - use codes_insee_vs_codes_postaux instead */
-            CREATE TABLE IF NOT EXISTS "commune_gps" (
-                "code_insee" varchar(255),
-                "nom_commune" varchar(255),
-                "code_postal" varchar(255),
-                "latitude" numeric(9,6),
-                "longitude" numeric(9,6)
-            );
-
-            CREATE TABLE IF NOT EXISTS "sa_ept" (
-                "etablissement_public_territorial" varchar(255),
-                "commune" varchar(255),
-                "departement" varchar(255),
-                "code_comm" varchar(25)
-            );
-
             CREATE TABLE IF NOT EXISTS "sa_zones_infradepartementales" (
                 "code_insee" varchar(255),
                 "libelle_commune" varchar(255),
@@ -161,14 +145,6 @@ def create_unversioned_tables_if_needed():
                 "code_commune" varchar,
                 "nom_epci" varchar(255),
                 "type_epci" varchar
-            );
-
-            CREATE TABLE IF NOT EXISTS "code_rome_domaine_professionnel" (
-                "grand_domaine" varchar(255),
-                "domaine_professionnel" varchar(255),
-                "code_rome" varchar,
-                "description_code_rome" varchar,
-                "date_mise_à_jour_metabase" date
             );
 
             CREATE TABLE IF NOT EXISTS "reseau_iae_adherents" (
