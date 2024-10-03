@@ -110,7 +110,6 @@ class Command(BaseCommand):
             "memberships": self.populate_memberships,
             "rome_codes": self.populate_rome_codes,
             "insee_codes": self.populate_insee_codes,
-            "insee_codes_vs_post_codes": self.populate_insee_codes_vs_post_codes,
             "departments": self.populate_departments,
             "enums": self.populate_enums,
             "dbt_daily": self.build_dbt_daily,
@@ -463,22 +462,6 @@ class Command(BaseCommand):
         queryset = City.objects.all()
 
         populate_table(insee_codes.TABLE, batch_size=1000, querysets=[queryset])
-
-    def populate_insee_codes_vs_post_codes(self):
-        table_name = "codes_insee_vs_codes_postaux"
-        self.stdout.write(f"Preparing content for {table_name} table...")
-
-        rows = []
-        for city in City.objects.all():
-            for post_code in city.post_codes:
-                row = {
-                    "code_insee": city.code_insee,
-                    "code_postal": post_code,
-                }
-                rows.append(row)
-
-        df = get_df_from_rows(rows)
-        store_df(df=df, table_name=table_name)
 
     def populate_departments(self):
         table_name = "departements"
