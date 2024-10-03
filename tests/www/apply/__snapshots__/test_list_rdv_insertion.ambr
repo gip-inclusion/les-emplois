@@ -4,7 +4,7 @@
   <button class="btn btn-success btn-ico" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après.
               &lt;br&gt;
               Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" disabled="" type="button">
-              <i aria-hidden="true" class="ri-check-line font-weight-medium"></i>
+              <i aria-hidden="true" class="ri-check-line fw-medium"></i>
               <span>Invitation envoyée</span>
           </button>
   '''
@@ -14,7 +14,7 @@
   <button class="btn btn-success btn-ico" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après.
               &lt;br&gt;
               Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" disabled="" type="button">
-              <i aria-hidden="true" class="ri-check-line font-weight-medium"></i>
+              <i aria-hidden="true" class="ri-check-line fw-medium"></i>
               <span>Invitation envoyée</span>
           </button>
   '''
@@ -24,7 +24,7 @@
   <button class="btn btn-success btn-ico" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après.
               &lt;br&gt;
               Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" disabled="" type="button">
-              <i aria-hidden="true" class="ri-check-line font-weight-medium"></i>
+              <i aria-hidden="true" class="ri-check-line fw-medium"></i>
               <span>Invitation envoyée</span>
           </button>
   '''
@@ -34,7 +34,7 @@
   <button class="btn btn-success btn-ico" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après.
               &lt;br&gt;
               Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" disabled="" type="button">
-              <i aria-hidden="true" class="ri-check-line font-weight-medium"></i>
+              <i aria-hidden="true" class="ri-check-line fw-medium"></i>
               <span>Invitation envoyée</span>
           </button>
   '''
@@ -42,7 +42,7 @@
 # name: TestRdvInsertionView.test_rdv_insertion_configured_invalid_job_application
   '''
   <button class="btn btn-danger btn-ico" data-bs-placement="left" data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti." data-bs-toggle="tooltip" disabled="" type="button">
-                  <i aria-hidden="true" class="ri-alert-line font-weight-medium"></i>
+                  <i aria-hidden="true" class="ri-alert-line fw-medium"></i>
                   <span>Une erreur est survenue</span>
               </button>
   '''
@@ -53,7 +53,7 @@
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                   <button aria-label="Proposer un rendez-vous à Jacques HENRY" class="btn btn-danger btn-ico" data-bs-placement="left" data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti." data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
                       <div class="stable-text">
-                          <i aria-hidden="true" class="ri-alert-line font-weight-medium"></i>
+                          <i aria-hidden="true" class="ri-alert-line fw-medium"></i>
                           <span>Réessayer un envoi</span>
                       </div>
                       <div class="loading-text">
@@ -67,7 +67,7 @@
 # name: TestRdvInsertionView.test_rdv_insertion_not_configured
   '''
   <button class="btn btn-danger btn-ico" data-bs-placement="left" data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti." data-bs-toggle="tooltip" disabled="" type="button">
-                  <i aria-hidden="true" class="ri-alert-line font-weight-medium"></i>
+                  <i aria-hidden="true" class="ri-alert-line fw-medium"></i>
                   <span>Une erreur est survenue</span>
               </button>
   '''

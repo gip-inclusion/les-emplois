@@ -8,7 +8,7 @@
 
         {# GEIQ only #}
         {% if job_application.contract_type %}
-            <p class="font-italic">
+            <p class="fst-italic">
                 {{ job_application.get_contract_type_display }}
                 {% if job_application.inverted_vae_contract %}associé à une VAE inversée{% endif %}
             </p>
@@ -46,7 +46,7 @@
 
         {% if job_application.can_update_hiring_start %}
             <a href="{% url 'apply:edit_contract_start_date' job_application_id=job_application.pk %}" class="btn btn-ico btn-secondary">
-                <i class="ri-pencil-line font-weight-medium" aria-hidden="true"></i>
+                <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
                 <span>Modifier la période du contrat de travail</span>
             </a>
         {% endif %}

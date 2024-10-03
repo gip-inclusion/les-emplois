@@ -33,13 +33,13 @@
                        class="btn btn-lg btn-white btn-block btn-ico"
                        aria-label="Modifier la fiche de poste"
                        {% matomo_event "employeurs" "clic" "edit-fiche-de-poste" %}>
-                        <i class="ri-pencil-line font-weight-medium" aria-hidden="true"></i>
+                        <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
                         <span>Modifier</span>
                     </a>
                 </div>
                 <div class="form-group col-12 col-lg-auto">
                     <a href="{% url "companies_views:job_description_list" %}" class="btn btn-lg btn-outline-white btn-block btn-ico">
-                        <i class="ri-arrow-go-back-line font-weight-medium" aria-hidden="true"></i>
+                        <i class="ri-arrow-go-back-line fw-medium" aria-hidden="true"></i>
                         <span>Retour vers la liste des postes</span>
                     </a>
                 </div>
@@ -51,7 +51,7 @@
                                class="btn btn-lg btn-white btn-block btn-ico"
                                {% matomo_event "candidature" "clic" "start_job_app_transfer" %}
                                aria-label="Transférer la candidature à l'employeur inclusif {{ siae.display_name }}">
-                                <i class="ri-draft-line font-weight-medium" aria-hidden="true"></i>
+                                <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
                                 <span>Transférer la candidature</span>
                             </a>
                         </div>
@@ -61,7 +61,7 @@
                                class="btn btn-lg btn-white btn-block btn-ico"
                                {% matomo_event "candidature" "clic" "start_application" %}
                                aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
-                                <i class="ri-draft-line font-weight-medium" aria-hidden="true"></i>
+                                <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
                                 <span>Postuler</span>
                             </a>
                         </div>
@@ -70,14 +70,14 @@
                 {% if others_active_jobs and not siae.block_job_applications %}
                     <div class="form-group col-12 col-lg-auto">
                         <a href="#recrutements" class="btn btn-lg btn-outline-white btn-block btn-ico">
-                            <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
+                            <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
                             <span>Voir tous les métiers</span>
                         </a>
                     </div>
                 {% endif %}
                 <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
                     <button class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires">
-                        <i class="ri-more-2-line ri-lg font-weight-normal" aria-hidden="true"></i>
+                        <i class="ri-more-2-line ri-lg fw-normal" aria-hidden="true"></i>
                         <span class="d-lg-none">Autres actions</span>
                     </button>
                     <ul class="dropdown-menu">
@@ -86,7 +86,7 @@
                         </li>
                         <li>
                             <a href="{{ report_tally_url }}" rel="noopener" class="dropdown-item btn-ico btn-link" target="_blank">
-                                <i class="ri-notification-4-line ri-lg font-weight-normal" aria-hidden="true"></i>
+                                <i class="ri-notification-4-line ri-lg fw-normal" aria-hidden="true"></i>
                                 <span>Signaler cette fiche de poste</span>
                             </a>
                         </li>

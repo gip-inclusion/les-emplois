@@ -57,12 +57,7 @@ from tests.job_applications.factories import (
 )
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
-from tests.users.factories import (
-    EmployerFactory,
-    JobSeekerFactory,
-    LaborInspectorFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import TestCase, assert_previous_step, assertSnapshotQueries, parse_response_to_soup
 
@@ -3287,7 +3282,7 @@ def test_accept_button(client):
         f'<a href="{accept_url}" class="btn btn-lg btn-white btn-block btn-ico" '
         'data-matomo-event="true" data-matomo-category="candidature" '
         'data-matomo-action="clic" data-matomo-option="accept_application">'
-        '\n            <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>'
+        '\n            <i class="ri-check-line fw-medium" aria-hidden="true"></i>'
         "\n            <span>Accepter</span>"
         "\n        </a>"
     )

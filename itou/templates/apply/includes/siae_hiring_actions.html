@@ -10,7 +10,7 @@
                 <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
                     {% csrf_token %}
                     <button class="btn btn-lg btn-white btn-block btn-ico" {% matomo_event "candidature" "submit" "processing_application" %}>
-                        <i class="ri-file-search-line font-weight-medium" aria-hidden="true"></i>
+                        <i class="ri-file-search-line fw-medium" aria-hidden="true"></i>
                         <span>Étudier</span>
                     </button>
                 </form>
@@ -53,7 +53,7 @@
                 <form method="post" action="{% url "apply:archive" job_application_id=job_application.pk %}">
                     {% csrf_token %}
                     <button class="btn btn-lg btn-outline-white btn-block btn-ico">
-                        <i class="ri-archive-line font-weight-medium"></i>
+                        <i class="ri-archive-line fw-medium"></i>
                         <span>Archiver</span>
                     </button>
                 </form>

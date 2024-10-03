@@ -10,7 +10,7 @@
                               
   
                               <div class="form-group mb-1 form-group-required"><label class="form-label" for="id_email">Adresse e-mail</label><input autocomplete="email" class="form-control" id="id_email" maxlength="320" name="email" placeholder="adresse@email.fr" required="" type="email"/></div>
-                              <div class="text-end small font-italic mb-0">
+                              <div class="text-end small fst-italic mb-0">
                                   
   
   

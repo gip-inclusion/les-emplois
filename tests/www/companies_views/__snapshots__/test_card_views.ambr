@@ -38,7 +38,7 @@
           <div>
               <div class="d-flex flex-column flex-lg-row align-items-lg-center">
                   
-                      <a class="font-weight-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">Plaquiste</a>
+                      <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">Plaquiste</a>
                   
                   
               </div>
@@ -100,7 +100,7 @@
           <div>
               <div class="d-flex flex-column flex-lg-row align-items-lg-center">
                   
-                      <a class="font-weight-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">Plaquiste</a>
+                      <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">Plaquiste</a>
                   
                   
               </div>
@@ -135,7 +135,7 @@
           <div>
               <div class="d-flex flex-column flex-lg-row align-items-lg-center">
                   
-                      <a class="font-weight-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">Peintre</a>
+                      <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">Peintre</a>
                   
                   
               </div>
@@ -211,7 +211,7 @@
           <div>
               <div class="d-flex flex-column flex-lg-row align-items-lg-center">
                   
-                      <a class="font-weight-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">Plaquiste</a>
+                      <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">Plaquiste</a>
                   
                   
               </div>
@@ -276,20 +276,20 @@
               
               <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
                   <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
-                      <i aria-hidden="true" class="ri-more-2-line ri-lg font-weight-normal"></i>
+                      <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal"></i>
                       <span class="d-lg-none">Autres actions</span>
                   </button>
                   <ul class="dropdown-menu">
                       <li>
                           <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/100/card">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span>Copier le lien de cette fiche entreprise</span>
   </button>
   
                       </li>
                       <li>
                           <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100" rel="noopener" target="_blank">
-                              <i aria-hidden="true" class="ri-notification-4-line ri-lg font-weight-normal"></i>
+                              <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal"></i>
                               <span>Signaler cette fiche entreprise</span>
                           </a>
                       </li>
@@ -350,10 +350,10 @@
                           <ul class="fs-sm list-unstyled mb-0">
                               
                                   <li>
-      <i class="ri-mail-line font-weight-normal me-2"></i>
+      <i class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
-      <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -363,10 +363,10 @@
                               
                                   
   <li>
-      <i class="ri-phone-line font-weight-normal me-2"></i>
+      <i class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
-      <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
@@ -441,7 +441,7 @@
           <div>
               <div class="d-flex flex-column flex-lg-row align-items-lg-center">
                   
-                      <a class="font-weight-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">Plaquiste</a>
+                      <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">Plaquiste</a>
                   
                   
               </div>
@@ -488,20 +488,20 @@
               
               <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
                   <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
-                      <i aria-hidden="true" class="ri-more-2-line ri-lg font-weight-normal"></i>
+                      <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal"></i>
                       <span class="d-lg-none">Autres actions</span>
                   </button>
                   <ul class="dropdown-menu">
                       <li>
                           <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/100/card">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span>Copier le lien de cette fiche entreprise</span>
   </button>
   
                       </li>
                       <li>
                           <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100" rel="noopener" target="_blank">
-                              <i aria-hidden="true" class="ri-notification-4-line ri-lg font-weight-normal"></i>
+                              <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal"></i>
                               <span>Signaler cette fiche entreprise</span>
                           </a>
                       </li>
@@ -520,20 +520,20 @@
               
               <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
                   <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
-                      <i aria-hidden="true" class="ri-more-2-line ri-lg font-weight-normal"></i>
+                      <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal"></i>
                       <span class="d-lg-none">Autres actions</span>
                   </button>
                   <ul class="dropdown-menu">
                       <li>
                           <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/100/card">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span>Copier le lien de cette fiche entreprise</span>
   </button>
   
                       </li>
                       <li>
                           <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100&amp;UserID=10" rel="noopener" target="_blank">
-                              <i aria-hidden="true" class="ri-notification-4-line ri-lg font-weight-normal"></i>
+                              <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal"></i>
                               <span>Signaler cette fiche entreprise</span>
                           </a>
                       </li>
@@ -553,7 +553,7 @@
                       
                           <div class="form-group col-12 col-lg-auto">
                               <a aria-label="Postuler auprès de l'employeur inclusif Acme inc." class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/100/start?job_description_id=42">
-                                  <i aria-hidden="true" class="ri-draft-line font-weight-medium"></i>
+                                  <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                                   <span>Postuler</span>
                               </a>
                           </div>
@@ -562,20 +562,20 @@
                   
                   <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
                       <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
-                          <i aria-hidden="true" class="ri-more-2-line ri-lg font-weight-normal"></i>
+                          <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal"></i>
                           <span class="d-lg-none">Autres actions</span>
                       </button>
                       <ul class="dropdown-menu">
                           <li>
                               <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/job_description/42/card">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span>Copier le lien de cette fiche de poste</span>
   </button>
   
                           </li>
                           <li>
                               <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100&amp;jobdescriptionID=42" rel="noopener" target="_blank">
-                                  <i aria-hidden="true" class="ri-notification-4-line ri-lg font-weight-normal"></i>
+                                  <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal"></i>
                                   <span>Signaler cette fiche de poste</span>
                               </a>
                           </li>
@@ -596,7 +596,7 @@
                       
                           <div class="form-group col-12 col-lg-auto">
                               <a aria-label="Postuler auprès de l'employeur inclusif Acme inc." class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/100/start?job_description_id=42">
-                                  <i aria-hidden="true" class="ri-draft-line font-weight-medium"></i>
+                                  <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                                   <span>Postuler</span>
                               </a>
                           </div>
@@ -605,27 +605,27 @@
                   
                       <div class="form-group col-12 col-lg-auto">
                           <a class="btn btn-lg btn-outline-white btn-block btn-ico" href="#recrutements">
-                              <i aria-hidden="true" class="ri-eye-line font-weight-medium"></i>
+                              <i aria-hidden="true" class="ri-eye-line fw-medium"></i>
                               <span>Voir tous les métiers</span>
                           </a>
                       </div>
                   
                   <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
                       <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
-                          <i aria-hidden="true" class="ri-more-2-line ri-lg font-weight-normal"></i>
+                          <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal"></i>
                           <span class="d-lg-none">Autres actions</span>
                       </button>
                       <ul class="dropdown-menu">
                           <li>
                               <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/job_description/42/card">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span>Copier le lien de cette fiche de poste</span>
   </button>
   
                           </li>
                           <li>
                               <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100&amp;UserID=10&amp;jobdescriptionID=42" rel="noopener" target="_blank">
-                                  <i aria-hidden="true" class="ri-notification-4-line ri-lg font-weight-normal"></i>
+                                  <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal"></i>
                                   <span>Signaler cette fiche de poste</span>
                               </a>
                           </li>
@@ -646,7 +646,7 @@
                       
                           <div class="form-group col-12 col-lg-auto">
                               <a aria-label="Postuler auprès de l'employeur inclusif Acme inc." class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/100/start?job_description_id=42">
-                                  <i aria-hidden="true" class="ri-draft-line font-weight-medium"></i>
+                                  <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                                   <span>Postuler</span>
                               </a>
                           </div>
@@ -655,20 +655,20 @@
                   
                   <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
                       <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
-                          <i aria-hidden="true" class="ri-more-2-line ri-lg font-weight-normal"></i>
+                          <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal"></i>
                           <span class="d-lg-none">Autres actions</span>
                       </button>
                       <ul class="dropdown-menu">
                           <li>
                               <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/job_description/42/card">
-      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg fw-normal"></i>
       <span>Copier le lien de cette fiche de poste</span>
   </button>
   
                           </li>
                           <li>
                               <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100&amp;UserID=10&amp;jobdescriptionID=42" rel="noopener" target="_blank">
-                                  <i aria-hidden="true" class="ri-notification-4-line ri-lg font-weight-normal"></i>
+                                  <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal"></i>
                                   <span>Signaler cette fiche de poste</span>
                               </a>
                           </li>

@@ -11,7 +11,7 @@
            class="btn btn-ico btn-outline-primary{% if not can_edit_personal_information %} disabled{% endif %}"
            {% if with_matomo_event %}{% matomo_event "salaries" "clic" "edit_jobseeker_infos" %}{% endif %}
            aria-label="Modifier les informations personnelles de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}">
-            <i class="ri-pencil-line font-weight-medium" aria-hidden="true"></i>
+            <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
             <span>Modifier</span>
         </a>
         {% if not can_edit_personal_information %}

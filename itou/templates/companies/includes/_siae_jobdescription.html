@@ -6,11 +6,11 @@
             <div class="d-flex flex-column flex-lg-row align-items-lg-center">
                 {% if job_app_to_transfer %}
                     <a href="{% url 'apply:job_application_external_transfer_step_1_job_description_card' job_application_id=job_app_to_transfer.pk job_description_id=job.pk %}?back_url={% if back_url %}{{ back_url|urlencode }}{% else %}{{ request.get_full_path|urlencode }}{% endif %}"
-                       class="font-weight-bold stretched-link order-2 order-md-1">{{ job.display_name }}</a>
+                       class="fw-bold stretched-link order-2 order-md-1">{{ job.display_name }}</a>
 
                 {% else %}
                     <a href="{{ job.get_absolute_url }}?back_url={% if back_url %}{{ back_url|urlencode }}{% else %}{{ request.get_full_path|urlencode }}{% endif %}"
-                       class="font-weight-bold stretched-link order-2 order-md-1"
+                       class="fw-bold stretched-link order-2 order-md-1"
                        {% matomo_event "candidature" "clic" "clic-metiers" %}>{{ job.display_name }}</a>
                 {% endif %}
                 {% if job.is_popular %}

@@ -7,11 +7,11 @@
         <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
             <div class="flex-grow-1">
                 {% if job_description.is_from_pole_emploi %}
-                    <i class="ri-community-line font-weight-medium me-1" aria-hidden="true"></i>
-                    <span class="font-weight-bold">{{ job_description.market_context_description | default:"Entreprise anonyme" }}</span>
+                    <i class="ri-community-line fw-medium me-1" aria-hidden="true"></i>
+                    <span class="fw-bold">{{ job_description.market_context_description | default:"Entreprise anonyme" }}</span>
                 {% else %}
                     <a href="{{ job_description.company.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="btn-ico btn-link" {% matomo_event "candidature" "clic" "clic-structure-fichedeposte" %}>
-                        <i class="ri-community-line font-weight-medium" aria-hidden="true"></i>
+                        <i class="ri-community-line fw-medium" aria-hidden="true"></i>
                         <span>{{ job_description.company.kind }} - {{ job_description.company.display_name }}</span>
                     </a>
                 {% endif %}
@@ -30,7 +30,7 @@
                 <div class="d-flex flex-column flex-md-row justify-content-md-between">
                     <div class="order-2 order-md-1">
                         <a href="{{ job_description.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}"
-                           class="font-weight-bold text-decoration-none {% if job_description.is_external %}has-external-link{% else %}stretched-link{% endif %}"
+                           class="fw-bold text-decoration-none {% if job_description.is_external %}has-external-link{% else %}stretched-link{% endif %}"
                            {% if job_description.is_external %} {% matomo_event "candidature" "clic" "clic-card-fichedeposte-externe" %} rel="noopener" target="_blank" aria-label="Visiter l'offre sur le site d'origine" {% else %} {% matomo_event "candidature" "clic" "clic-card-fichedeposte" %} aria-label="Aller vers la description de ce poste" {% endif %}>
                             {{ job_description.display_name | capfirst }}
                         </a>
@@ -42,11 +42,11 @@
                         {% endif %}
                         <ul class="c-box--results__list-contact flex-md-grow-1 mt-1">
                             <li class="d-block d-md-inline-flex">
-                                <i class="ri-navigation-line font-weight-normal me-1"></i>
+                                <i class="ri-navigation-line fw-normal me-1"></i>
                                 à <strong class="text-info mx-md-1">{{ job_description.distance | floatformat:"-1" }}&nbsp;km</strong> de votre lieu de recherche
                             </li>
                             <li class="d-block d-md-inline-flex">
-                                <i class="ri-map-pin-2-line font-weight-normal me-1"></i>
+                                <i class="ri-map-pin-2-line fw-normal me-1"></i>
                                 <address class="d-inline m-0">
                                     {% if job_description.location %}
                                         {{ job_description.location }}

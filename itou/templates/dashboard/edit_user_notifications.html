@@ -20,13 +20,13 @@
                             <div class="form-group">
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" id="id_notifications-all">
-                                    <label class="form-check-label font-weight-bold" for="id_notifications-all">Activer toutes les notifications</label>
+                                    <label class="form-check-label fw-bold" for="id_notifications-all">Activer toutes les notifications</label>
                                 </div>
                             </div>
                             <ul class="list-group list-group-flush list-group-collapse">
                                 {% for category_slug, category in notification_form.layout.items %}
                                     <li class="list-group-item list-group-item-action notification-collapse">
-                                        <a class="font-weight-bold" role="button" data-bs-toggle="collapse" href="#collapse-{{ category_slug }}" aria-expanded="false" aria-controls="collapse-{{ category_slug }}">
+                                        <a class="fw-bold" role="button" data-bs-toggle="collapse" href="#collapse-{{ category_slug }}" aria-expanded="false" aria-controls="collapse-{{ category_slug }}">
                                             {{ category.name }}
                                         </a>
                                         <div class="collapse" id="collapse-{{ category_slug }}">

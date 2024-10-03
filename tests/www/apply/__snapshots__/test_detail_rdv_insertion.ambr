@@ -563,7 +563,7 @@
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <button aria-label="Proposer un rendez-vous à Jacques HENRY" class="btn btn-secondary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
                   <div class="stable-text">
-                      <i aria-hidden="true" class="ri-mail-send-line font-weight-medium"></i>
+                      <i aria-hidden="true" class="ri-mail-send-line fw-medium"></i>
                       <span>Proposer un rendez-vous</span>
                   </div>
                   <div class="loading-text">
@@ -595,7 +595,7 @@
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <button aria-label="Proposer un rendez-vous à Jacques HENRY" class="btn btn-secondary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
                   <div class="stable-text">
-                      <i aria-hidden="true" class="ri-mail-send-line font-weight-medium"></i>
+                      <i aria-hidden="true" class="ri-mail-send-line fw-medium"></i>
                       <span>Proposer un rendez-vous</span>
                   </div>
                   <div class="loading-text">
@@ -626,7 +626,7 @@
           <button class="btn btn-success btn-ico" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après.
               &lt;br&gt;
               Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" disabled="" type="button">
-              <i aria-hidden="true" class="ri-check-line font-weight-medium"></i>
+              <i aria-hidden="true" class="ri-check-line fw-medium"></i>
               <span>Invitation envoyée</span>
           </button>
       

@@ -1,6 +1,6 @@
 {% load format_filters %}
 <li>
-    <i class="ri-phone-line font-weight-normal me-2"></i>
+    <i class="ri-phone-line fw-normal me-2"></i>
     {{ phonenumber|format_phone }}
-    {% include 'includes/copy_to_clipboard.html' with content=phonenumber|cut:" " css_classes="btn-link font-weight-medium ms-1" only_icon=True %}
+    {% include 'includes/copy_to_clipboard.html' with content=phonenumber|cut:" " css_classes="btn-link fw-medium ms-1" only_icon=True %}
 </li>

@@ -84,7 +84,7 @@
   <div aria-labelledby="offcanvasApplyFiltersLabel" class="c-offcanvas-filters offcanvas offcanvas-end" id="offcanvasApplyFilters" tabindex="-1">
           <div class="offcanvas-header">
               <h4 class="mb-0 btn-ico" id="offcanvasApplyFiltersLabel">
-                  <i aria-hidden="true" class="ri-sound-module-fill font-weight-medium"></i>
+                  <i aria-hidden="true" class="ri-sound-module-fill fw-medium"></i>
                   <span>Filtrer</span>
               </h4>
               <button aria-label="Fermer" class="btn-close" data-bs-dismiss="offcanvas" type="button"></button>

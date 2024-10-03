@@ -7,13 +7,13 @@
         </div>
         <div class="px-3 px-lg-4">
             <a href="{% url 'geiq:assessment_info' assessment_pk=last_geiq_execution_assessment.pk %}" class="btn btn-outline-primary btn-block btn-ico mb-3">
-                <i class="ri-file-chart-line ri-lg font-weight-normal"></i>
+                <i class="ri-file-chart-line ri-lg fw-normal"></i>
                 <span>Le bilan d’exécution</span>
             </a>
             <ul class="list-unstyled mb-lg-5">
                 <li class="d-flex justify-content-between align-items-center mb-3">
                     <a href="{% url 'geiq:employee_list' assessment_pk=last_geiq_execution_assessment.pk info_type="personal-information" %}?back_url={% url 'dashboard:index' %}" class="btn-link btn-ico">
-                        <i class="ri-group-line ri-lg font-weight-normal align-self-start"></i>
+                        <i class="ri-group-line ri-lg fw-normal align-self-start"></i>
                         <span>Mes salariés</span>
                     </a>
                 </li>

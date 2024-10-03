@@ -45,12 +45,12 @@
                           data-bs-toggle="tooltip"
                           data-bs-placement="top"
                           title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ siae_suspension_text_with_dates }}">
-                        <i class="ri-user-follow-line font-weight-medium"></i>
+                        <i class="ri-user-follow-line fw-medium"></i>
                         <span>Déclarer une embauche</span>
                     </span>
                 {% else %}
                     <a href="{% url 'apply:check_nir_for_hire' company_pk=request.current_organization.pk %}" class="btn btn-lg btn-primary btn-ico" {% matomo_event "employeurs" "clic" "declarer-embauche" %}>
-                        <i class="ri-user-follow-line font-weight-medium"></i>
+                        <i class="ri-user-follow-line fw-medium"></i>
                         <span>Déclarer une embauche</span>
                     </a>
                 {% endif %}
