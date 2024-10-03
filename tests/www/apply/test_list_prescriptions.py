@@ -1,3 +1,4 @@
+import datetime
 from urllib.parse import unquote
 
 import factory
@@ -9,6 +10,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertNumQu
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.users.enums import Title
 from itou.utils.urls import add_url_params
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
@@ -19,6 +21,7 @@ from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import (
     BASE_NUM_QUERIES,
     assert_previous_step,
+    assertSnapshotQueries,
     get_rows_from_streaming_response,
     parse_response_to_soup,
 )
@@ -316,13 +319,26 @@ def test_exports_back_to_list(client):
 @freeze_time("2024-08-18")
 def test_exports_download(client, snapshot):
     job_application = JobApplicationFactory(for_snapshot=True)
+    JobApplicationFactory(
+        created_at=timezone.now() - datetime.timedelta(days=1),  # Force application order
+        job_seeker__title=Title.M,
+        job_seeker__first_name="Secret",
+        job_seeker__last_name="Undisclosed",
+        job_seeker__email="undisclosed@secr.et",
+        job_seeker__phone="3949",
+        job_seeker__jobseeker_profile__birthdate=datetime.date(2000, 1, 2),
+        to_company__name="Le fameux garage",
+        sender=job_application.sender,
+    )
     client.force_login(job_application.sender)
 
-    response = client.get(reverse("apply:list_prescriptions_exports_download"))
-    assert 200 == response.status_code
-    assert "spreadsheetml" in response.get("Content-Type")
-    rows = get_rows_from_streaming_response(response)
-    assert rows == snapshot
+    with assertSnapshotQueries(snapshot(name="SQL queries of export")):
+        response = client.get(reverse("apply:list_prescriptions_exports_download"))
+        assert 200 == response.status_code
+        assert "spreadsheetml" in response.get("Content-Type")
+        rows = get_rows_from_streaming_response(response)
+
+    assert rows == snapshot(name="export content")
 
 
 def test_exports_download_as_employer(client):

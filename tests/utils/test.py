@@ -236,6 +236,7 @@ OTHER_PACKAGES_ALLOWLIST = {
     "__enter__": ("django/db/transaction.py",),
     "__exit__": ("django/db/transaction.py",),
     "save": ("django/contrib/sessions/backends/db.py",),
+    "serialize_queryset_by_batch": "xlsx_streaming/streaming.py",
 }
 
 
