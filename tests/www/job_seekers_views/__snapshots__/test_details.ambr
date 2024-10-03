@@ -2935,7 +2935,7 @@
 # ---
 # name: test_with_approval[SQL queries]
   dict({
-    'num_queries': 18,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -3278,6 +3278,28 @@
       }),
       dict({
         'origin': list([
+          'ApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE "approvals_suspension"."approval_id" IN (%s)
+          ORDER BY "approvals_suspension"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'User.latest_approval[users/models.py]',
           'User.has_valid_common_approval[users/models.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
@@ -3457,53 +3479,6 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Approval.is_suspended[approvals/models.py]',
-          'Approval.state[approvals/models.py]',
-          'IfNode[approvals/includes/box.html]',
-          'IncludeNode[job_seekers_views/details.html]',
-          'IfNode[job_seekers_views/details.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/details.html]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "approvals_suspension"
-          WHERE ("approvals_suspension"."approval_id" = %s
-                 AND "approvals_suspension"."end_at" >= %s
-                 AND "approvals_suspension"."start_at" <= %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Approval.remainder[approvals/models.py]',
-          'Approval.remainder_as_date[approvals/models.py]',
-          'VariableNode[approvals/includes/box.html]',
-          'IfNode[approvals/includes/box.html]',
-          'IncludeNode[job_seekers_views/details.html]',
-          'IfNode[job_seekers_views/details.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/details.html]',
-        ]),
-        'sql': '''
-          SELECT "approvals_suspension"."id",
-                 "approvals_suspension"."approval_id",
-                 "approvals_suspension"."start_at",
-                 "approvals_suspension"."end_at",
-                 "approvals_suspension"."siae_id",
-                 "approvals_suspension"."reason",
-                 "approvals_suspension"."reason_explanation",
-                 "approvals_suspension"."created_at",
-                 "approvals_suspension"."created_by_id",
-                 "approvals_suspension"."updated_at",
-                 "approvals_suspension"."updated_by_id"
-          FROM "approvals_suspension"
-          WHERE "approvals_suspension"."approval_id" = %s
-          ORDER BY "approvals_suspension"."start_at" DESC
-        ''',
       }),
       dict({
         'origin': list([
