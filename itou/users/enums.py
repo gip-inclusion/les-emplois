@@ -38,6 +38,16 @@ class IdentityProvider(models.TextChoices):
     PRO_CONNECT = "PC", "ProConnect"
     PE_CONNECT = "PEC", "Pôle emploi Connect"
 
+    @classmethod
+    @property
+    def supported_user_kinds(cls):
+        return {
+            cls.DJANGO: tuple(UserKind.values),
+            cls.FRANCE_CONNECT: (UserKind.JOB_SEEKER,),
+            cls.INCLUSION_CONNECT: (UserKind.PRESCRIBER, UserKind.EMPLOYER),
+            cls.PE_CONNECT: (UserKind.JOB_SEEKER,),
+        }
+
 
 class LackOfNIRReason(models.TextChoices):
     TEMPORARY_NUMBER = "TEMPORARY_NUMBER", "Numéro temporaire (NIA/NTT)"

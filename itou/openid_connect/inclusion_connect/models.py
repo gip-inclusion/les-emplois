@@ -44,5 +44,4 @@ class InclusionConnectPrescriberData(InclusionConnectUserData):
 class InclusionConnectEmployerData(InclusionConnectUserData):
     kind: UserKind = UserKind.EMPLOYER
     identity_provider: IdentityProvider = IdentityProvider.INCLUSION_CONNECT
-    login_allowed_user_kinds: ClassVar[tuple[UserKind]] = (UserKind.PRESCRIBER, UserKind.EMPLOYER)
     allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = (IdentityProvider.DJANGO,)
