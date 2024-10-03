@@ -317,7 +317,7 @@ def inclusion_connect_callback(request):
 
     code_safir_pole_emploi = user_data.get("structure_pe")
     # Only handle user creation for the moment, not updates.
-    if is_successful and code_safir_pole_emploi:
+    if is_successful and user.is_prescriber and code_safir_pole_emploi:
         try:
             ic_user_data.join_org(user=user, safir=code_safir_pole_emploi)
         except PrescriberOrganization.DoesNotExist:

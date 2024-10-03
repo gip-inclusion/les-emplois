@@ -594,6 +594,32 @@ class InclusionConnectCallbackViewTest(MessagesTestMixin, InclusionConnectBaseTe
         self.assertQuerySetEqual(org.members.all(), [user])
 
     @respx.mock
+    def test_callback_update_FT_organization_as_employer_does_not_crash(self):
+        org = PrescriberPoleEmploiFactory(code_safir_pole_emploi=OIDC_USERINFO_FT_WITH_SAFIR["structure_pe"])
+        mock_oauth_dance(
+            self.client,
+            UserKind.EMPLOYER,
+            oidc_userinfo=OIDC_USERINFO_FT_WITH_SAFIR.copy(),
+        )
+        user = get_user(self.client)
+        assert user.is_authenticated
+        assert not user.prescribermembership_set.exists()
+
+        # If he's a prescriber and uses the employer login button
+        user.kind = UserKind.PRESCRIBER
+        user.save()
+        self.client.logout()
+        mock_oauth_dance(
+            self.client,
+            UserKind.EMPLOYER,
+            oidc_userinfo=OIDC_USERINFO_FT_WITH_SAFIR.copy(),
+            register=False,
+        )
+        user = get_user(self.client)
+        assert user.is_authenticated
+        self.assertQuerySetEqual(org.members.all(), [user])
+
+    @respx.mock
     def test_callback_ft_users_with_no_org(self):
         PrescriberFactory(**dataclasses.asdict(InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)))
 

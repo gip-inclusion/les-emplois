@@ -19,13 +19,10 @@ class InclusionConnectState(OIDConnectState):
 
 
 @dataclasses.dataclass
-class InclusionConnectPrescriberData(OIDConnectUserData):
-    kind: UserKind = UserKind.PRESCRIBER
-    identity_provider: IdentityProvider = IdentityProvider.INCLUSION_CONNECT
-    login_allowed_user_kinds: ClassVar[tuple[UserKind]] = (UserKind.PRESCRIBER, UserKind.EMPLOYER)
-    allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = (IdentityProvider.DJANGO,)
-
+class InclusionConnectUserData(OIDConnectUserData):
     def join_org(self, user: User, safir: str):
+        if not user.is_prescriber:
+            raise ValueError("Invalid user kind: %s", user.kind)
         try:
             organization = PrescriberOrganization.objects.get(code_safir_pole_emploi=safir)
         except PrescriberOrganization.DoesNotExist:
@@ -36,7 +33,15 @@ class InclusionConnectPrescriberData(OIDConnectUserData):
 
 
 @dataclasses.dataclass
-class InclusionConnectEmployerData(OIDConnectUserData):
+class InclusionConnectPrescriberData(InclusionConnectUserData):
+    kind: UserKind = UserKind.PRESCRIBER
+    identity_provider: IdentityProvider = IdentityProvider.INCLUSION_CONNECT
+    login_allowed_user_kinds: ClassVar[tuple[UserKind]] = (UserKind.PRESCRIBER, UserKind.EMPLOYER)
+    allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = (IdentityProvider.DJANGO,)
+
+
+@dataclasses.dataclass
+class InclusionConnectEmployerData(InclusionConnectUserData):
     kind: UserKind = UserKind.EMPLOYER
     identity_provider: IdentityProvider = IdentityProvider.INCLUSION_CONNECT
     login_allowed_user_kinds: ClassVar[tuple[UserKind]] = (UserKind.PRESCRIBER, UserKind.EMPLOYER)
