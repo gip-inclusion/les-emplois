@@ -472,7 +472,7 @@ class TestApprovalModel:
         suspended_approval = ApprovalFactory(
             start_at=now - relativedelta(years=1),
         )
-        SuspensionFactory(
+        suspension = SuspensionFactory(
             approval=suspended_approval,
             start_at=now - relativedelta(days=1),
             end_at=now + relativedelta(days=1),
@@ -499,6 +499,8 @@ class TestApprovalModel:
         assert suspended_approval.state == ApprovalStatus.SUSPENDED
         assert suspended_approval.get_state_display() == "Valide (suspendu)"
 
+        assert suspended_approval.ongoing_suspension == suspension
+
     def tests_is_suspended(self):
         now = timezone.localdate()
         ApprovalFactory(start_at=now - relativedelta(years=1))
@@ -519,6 +521,27 @@ class TestApprovalModel:
             approvals = Approval.objects.all().prefetch_related("suspension_set")
             for approval in approvals:
                 approval.state
+
+    def tests_ongoing_suspension(self):
+        now = timezone.localdate()
+        ApprovalFactory(start_at=now - relativedelta(years=1))
+        ApprovalFactory(start_at=now - relativedelta(years=1))
+
+        # No prefetch
+        num_queries = 1  # fetch approvals
+        num_queries += 2  # check suspensions for each approvals
+        with assertNumQueries(num_queries):
+            approvals = Approval.objects.all()
+            for approval in approvals:
+                approval.ongoing_suspension is None
+
+        # With prefetch
+        num_queries = 1  # fetch approvals
+        num_queries += 1  # check suspensions based on prefetched data
+        with assertNumQueries(num_queries):
+            approvals = Approval.objects.all().prefetch_related("suspension_set")
+            for approval in approvals:
+                approval.ongoing_suspension is None
 
     @freeze_time("2022-11-22")
     def test_remainder(self):
