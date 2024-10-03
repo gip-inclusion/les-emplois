@@ -56,7 +56,7 @@ Arguments:
             {% endif %}
         {% endwith %}
     {% elif approval.state == "SUSPENDED" %}
-        {% with approval.suspension_set.in_progress.first as suspension %}
+        {% with approval.ongoing_suspension as suspension %}
             {% if suspension %}
                 <hr class="my-3 my-md-4">
                 <ul class="list-data">

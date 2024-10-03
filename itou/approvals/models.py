@@ -709,15 +709,22 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
     # Suspension.
 
-    @cached_property
-    def is_suspended(self):
+    @property
+    def ongoing_suspension(self):
         # Don't make a query if suspensions were prefetched
         if hasattr(self, "_prefetched_objects_cache") and "suspension_set" in self._prefetched_objects_cache:
             today = timezone.localdate()
             for suspension in self._prefetched_objects_cache["suspension_set"]:
                 if suspension.start_at <= today <= suspension.end_at:
-                    return True
-            return False
+                    return suspension
+            return None
+        return self.suspension_set.in_progress().first()
+
+    @cached_property
+    def is_suspended(self):
+        # Don't make a query if suspensions were prefetched
+        if hasattr(self, "_prefetched_objects_cache") and "suspension_set" in self._prefetched_objects_cache:
+            return self.ongoing_suspension is not None
 
         return self.suspension_set.in_progress().exists()
 
