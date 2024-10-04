@@ -207,6 +207,13 @@ def test_step_2_internal_transfer(client):
     other_company = CompanyMembershipFactory(user=employer).company
     client.force_login(employer)
 
+    # This will set the session back url
+    list_url_with_params = reverse("apply:list_for_siae") + "?pass_iae_active=on"
+    client.get(
+        reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        + f"?back_url={quote(list_url_with_params)}"
+    )
+
     transfer_step_1_url = reverse(
         "apply:job_application_external_transfer_step_1", kwargs={"job_application_id": job_application.pk}
     )
@@ -228,6 +235,7 @@ def test_step_2_internal_transfer(client):
     assertContains(response, f'<form method="post" action="{internal_transfer_post_url}">')
 
     response = client.post(internal_transfer_post_url, data={"target_company_id": other_company.pk})
+    assertRedirects(response, list_url_with_params)
     job_application.refresh_from_db()
     assert job_application.state == JobApplicationState.NEW
     assert job_application.to_company == other_company
