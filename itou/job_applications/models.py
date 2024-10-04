@@ -227,10 +227,9 @@ class JobApplicationQuerySet(models.QuerySet):
             )
         )
 
-    def with_jobseeker_eligibility_diagnosis(self):
+    def with_jobseeker_valid_eligibility_diagnosis(self):
         """
-        Gives the "eligibility_diagnosis" linked to the job application or if none is found
-        the last valid eligibility diagnosis for this job seeker and this SIAE
+        Gives the last valid eligibility diagnosis for this job seeker and this SIAE
         """
         sub_query = Subquery(
             (
@@ -240,7 +239,18 @@ class JobApplicationQuerySet(models.QuerySet):
             ),
             output_field=models.IntegerField(),
         )
-        return self.annotate(jobseeker_eligibility_diagnosis=Coalesce(F("eligibility_diagnosis"), sub_query, None))
+        return self.annotate(jobseeker_valid_eligibility_diagnosis=sub_query)
+
+    def with_jobseeker_eligibility_diagnosis(self):
+        """
+        Gives the "eligibility_diagnosis" linked to the job application or if none is found
+        the last valid eligibility diagnosis for this job seeker and this SIAE
+        """
+        return self.with_jobseeker_valid_eligibility_diagnosis().annotate(
+            jobseeker_eligibility_diagnosis=Coalesce(
+                F("eligibility_diagnosis"), F("jobseeker_valid_eligibility_diagnosis")
+            )
+        )
 
     def eligibility_validated(self):
         return self.filter(

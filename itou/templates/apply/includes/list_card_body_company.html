@@ -29,7 +29,7 @@
                                 PASS IAE {{ approval.get_state_display|lower }}
                             </span>
                         {% else %}
-                            {% if job_application.iae_eligibility_diagnosis_required %}
+                            {% if not job_application.jobseeker_valid_eligibility_diagnosis %}
                                 <span class="badge badge-xs rounded-pill bg-accent-02-lighter text-primary">
                                     <i class="ri-error-warning-line" aria-hidden="true"></i>
                                     Éligibilité IAE à valider
