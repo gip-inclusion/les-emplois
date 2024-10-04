@@ -44,7 +44,6 @@
                                 {% csrf_token %}
 
                                 <input type="hidden" name="target_company_id" value="{{ company.pk }}" />
-                                <input type="hidden" name="back_url" value="{{ back_url }}" />
 
                                 {% itou_buttons_form primary_label="Confirmer" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False %}
                             </form>
