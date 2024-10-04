@@ -22,8 +22,8 @@ from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
 from tests.approvals.factories import (
     ApprovalFactory,
     PoleEmploiApprovalFactory,
+    ProlongationFactory,
     ProlongationRequestDenyInformationFactory,
-    ProlongationWithRequestFactory,
 )
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
@@ -589,7 +589,7 @@ def test_populate_approvals():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
 def test_populate_prolongations():
-    prolongation = ProlongationWithRequestFactory()
+    prolongation = ProlongationFactory(with_request=True)
     prolongation_request = prolongation.request
 
     num_queries = 1  # Count prolongations
@@ -630,14 +630,14 @@ def test_populate_prolongations():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
 def test_populate_prolongation_requests():
-    prolongation = ProlongationWithRequestFactory()
+    prolongation = ProlongationFactory(with_request=True)
     prolongation_request = prolongation.request
 
     deny_information = ProlongationRequestDenyInformationFactory.build(request=None)
     with transaction.atomic():
         prolongation_request.deny(prolongation_request.validated_by, deny_information)
 
-    ProlongationWithRequestFactory()  # add another one to ensure we don't fail without a deny_information
+    ProlongationFactory(with_request=True)  # add another one to ensure we don't fail without a deny_information
 
     num_queries = 1  # Count prolongation_requests
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
