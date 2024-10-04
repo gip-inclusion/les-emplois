@@ -285,15 +285,13 @@ class User(AbstractUser, AddressMixin):
     def __init__(self, *args, _auto_create_job_seeker_profile=True, **kwargs):
         super().__init__(*args, **kwargs)
         self._auto_create_job_seeker_profile = _auto_create_job_seeker_profile
+        self.set_old_values()
 
     def __str__(self):
         return f"{self.get_full_name()} — {self.email}"
 
-    @classmethod
-    def from_db(cls, db, field_names, values):
-        instance = super().from_db(db, field_names, values)
-        instance._old_values = dict(zip(field_names, values))
-        return instance
+    def set_old_values(self):
+        self._old_values = self.__dict__.copy()
 
     def has_data_changed(self, fields):
         if hasattr(self, "_old_values"):
@@ -344,10 +342,12 @@ class User(AbstractUser, AddressMixin):
             if must_create_profile:
                 JobSeekerProfile.objects.create(user=self)
 
-            if self.has_data_changed(["last_name", "first_name"]):
+            if self.has_data_changed(["last_name", "first_name"]) and not self._state.adding:
                 self.jobseeker_profile.pe_obfuscated_nir = None
                 self.jobseeker_profile.pe_last_certification_attempt_at = None
                 self.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
+
+        self.set_old_values()
 
     def get_full_name(self):
         """
@@ -1027,11 +1027,12 @@ class JobSeekerProfile(models.Model):
     def __str__(self):
         return str(self.user)
 
-    @classmethod
-    def from_db(cls, db, field_names, values):
-        instance = super().from_db(db, field_names, values)
-        instance._old_values = dict(zip(field_names, values))
-        return instance
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_old_values()
+
+    def set_old_values(self):
+        self._old_values = self.__dict__.copy()
 
     def has_data_changed(self, fields):
         if hasattr(self, "_old_values"):
@@ -1049,12 +1050,14 @@ class JobSeekerProfile(models.Model):
             self.asp_uid = self._default_asp_uid()
             if update_fields is not None:
                 update_fields = set(update_fields) | {"asp_uid"}
-        if self.has_data_changed(["birthdate", "nir"]):
+        if self.has_data_changed(["birthdate", "nir"]) and not self._state.adding:
             self.pe_obfuscated_nir = None
             self.pe_last_certification_attempt_at = None
             if update_fields is not None:
                 update_fields = set(update_fields) | {"pe_obfuscated_nir", "pe_last_certification_attempt_at"}
         super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+
+        self.set_old_values()
 
     @staticmethod
     def clean_pole_emploi_fields(cleaned_data):
