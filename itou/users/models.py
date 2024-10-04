@@ -806,6 +806,7 @@ class JobSeekerProfile(models.Model):
         null=True,
         blank=True,
         validators=[validate_birthdate],
+        db_index=True,
     )
     birth_place = models.ForeignKey(
         "asp.Commune",
