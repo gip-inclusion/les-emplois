@@ -208,10 +208,40 @@ class ProlongationRequestDenyInformationFactory(factory.django.DjangoModelFactor
 class ProlongationFactory(BaseProlongationFactory):
     class Meta:
         model = Prolongation
+        skip_postgeneration_save = True
 
-
-class ProlongationWithRequestFactory(ProlongationFactory):
-    request = factory.SubFactory(ProlongationRequestFactory)
+    @factory.post_generation
+    def with_request(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            self.request = ProlongationRequestFactory(
+                status=ProlongationRequestStatus.GRANTED,
+                processed_at=timezone.now(),
+                processed_by=self.validated_by,
+                updated_by=self.validated_by,
+                **{
+                    field: getattr(self, field)
+                    for field in (
+                        "approval",
+                        "start_at",
+                        "end_at",
+                        "reason",
+                        "reason_explanation",
+                        "declared_by",
+                        "declared_by_siae",
+                        "prescriber_organization",
+                        "created_by",
+                        "report_file",
+                        "require_phone_interview",
+                        "contact_email",
+                        "contact_phone",
+                    )
+                    if getattr(self, field)
+                }
+                | kwargs,
+            )
+            self.save(update_fields=("request",))
 
 
 class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
