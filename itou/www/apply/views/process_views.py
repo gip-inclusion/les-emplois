@@ -49,6 +49,9 @@ from itou.www.search.views import EmployerSearchView
 logger = logging.getLogger(__name__)
 
 
+JOB_APP_DETAILS_FOR_COMPANY_BACK_URL_KEY = "JOB_APP_DETAILS_FOR_COMPANY-BACK_URL-%d"
+
+
 def check_waiting_period(job_application):
     """
     This should be an edge case.
@@ -190,7 +193,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
     )
 
     # get back_url from GET params or session or fallback value
-    session_key = f"JOB_APP_DETAILS_FOR_COMPANY-BACK_URL-{job_application.pk}"
+    session_key = JOB_APP_DETAILS_FOR_COMPANY_BACK_URL_KEY % job_application.pk
     fallback_url = request.session.get(session_key, reverse_lazy("apply:list_for_siae"))
     back_url = get_safe_url(request, "back_url", fallback_url=fallback_url)
     request.session[session_key] = back_url
@@ -569,7 +572,10 @@ def transfer(request, job_application_id):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, pk=job_application_id)
     target_company = get_object_or_404(Company.objects, pk=request.POST.get("target_company_id"))
-    back_url = get_safe_url(request, "back_url", reverse("apply:list_for_siae"))
+
+    session_key = JOB_APP_DETAILS_FOR_COMPANY_BACK_URL_KEY % job_application.pk
+    fallback_url = request.session.get(session_key, reverse_lazy("apply:list_for_siae"))
+    back_url = get_safe_url(request, "back_url", fallback_url=fallback_url)
 
     try:
         job_application.transfer(user=request.user, target_company=target_company)
