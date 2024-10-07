@@ -3,21 +3,15 @@
 {% load tally %}
 <div class="c-box c-box--results has-links-inside my-3 my-md-4">
     <div class="c-box--results__header">
-
         <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
-
             <div class="c-box--results__summary flex-grow-1">
                 <i class="ri-user-line" aria-hidden="true"></i>
-
                 <div>
-
                     <h3>{{ item.job_seeker.get_full_name }}</h3>
-
                     <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                         <span>
                             <i class="ri-map-pin-2-line fw-normal me-1" aria-hidden="true"></i>{% profile_city_display item.job_seeker.jobseeker_profile %}
                         </span>
-
                     </div>
                 </div>
             </div>
@@ -144,15 +138,19 @@
     {% if not employee_record %}
         {% if item.job_seeker.jobseeker_profile.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
             <div class="c-box--results__footer">
-                <a class="btn btn-primary btn-block w-100 w-md-auto has-external-link"
-                   href="{% tally_form_url "wzxQlg" %}{{ item.nir_tally_params }}"
-                   target="_blank"
-                   rel="noopener"
-                   aria-label="Régulariser le n° de sécurité sociale {{ item.job_seeker.get_full_name }} (ouverture dans un nouvel onglet)">Régulariser le n° de sécurité sociale</a>
+                <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+                    <a class="btn btn-primary btn-block w-100 w-md-auto has-external-link"
+                       href="{% tally_form_url "wzxQlg" %}{{ item.nir_tally_params }}"
+                       target="_blank"
+                       rel="noopener"
+                       aria-label="Régulariser le n° de sécurité sociale {{ item.job_seeker.get_full_name }} (ouverture dans un nouvel onglet)">Régulariser le n° de sécurité sociale</a>
+                </div>
             </div>
         {% elif item.date_were_not_transmitted %}
             <div class="c-box--results__footer">
-                <a class="btn btn-primary btn-block w-100 w-md-auto" href="{% url "employee_record_views:create" item.id %}" aria-label="Mettre à jour la fiche salarié de {{ item.job_seeker.get_full_name }}">Mettre à jour</a>
+                <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+                    <a class="btn btn-primary btn-block w-100 w-md-auto" href="{% url "employee_record_views:create" item.id %}" aria-label="Mettre à jour la fiche salarié de {{ item.job_seeker.get_full_name }}">Mettre à jour</a>
+                </div>
             </div>
         {% else %}
             <div class="c-box--results__footer">
