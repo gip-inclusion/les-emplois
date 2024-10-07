@@ -1060,9 +1060,9 @@ pluggy==1.5.0 \
     # via
     #   -r requirements/test.txt
     #   pytest
-pre-commit==3.8.0 \
-    --hash=sha256:8bb6494d4a20423842e198980c9ecf9f96607a07ea29549e180eef9ae80fe7af \
-    --hash=sha256:9a90a53bf82fdd8778d58085faf8d83df56e40dfe18f45b19446e26bf1b3a63f
+pre-commit==4.0.0 \
+    --hash=sha256:0ca2341cf94ac1865350970951e54b1a50521e57b7b500403307aed4315a1234 \
+    --hash=sha256:5d9807162cc5537940f94f266cbe2d716a75cfad0d78a317a92cac16287cfed6
     # via -r requirements/dev.in
 prompt-toolkit==3.0.48 \
     --hash=sha256:d6623ab0477a80df74e646bdbc93621143f5caf104206aa29294d53de1a03d90 \
@@ -1589,12 +1589,6 @@ sentry-sdk==2.14.0 \
     --hash=sha256:1e0e2eaf6dad918c7d1e0edac868a7bf20017b177f242cefe2a6bcd47955961d \
     --hash=sha256:b8bc3dc51d06590df1291b7519b85c75e2ced4f28d9ea655b6d54033503b5bf4
     # via -r requirements/test.txt
-setuptools==75.1.0 \
-    --hash=sha256:35ab7fd3bcd95e6b7fd704e4a1539513edad446c097797f2985e0e4b960772f2 \
-    --hash=sha256:d59a21b17a275fb872a9c3dae73963160ae079f1049ed956880cd7c09b120538
-    # via
-    #   -r requirements/test.txt
-    #   django-easymde
 shellcheck-py==0.10.0.1 \
     --hash=sha256:390826b340b8c19173922b0da5ef7b66ef34d4d087dc48aad3e01f7e77e164d9 \
     --hash=sha256:48f08965cafbb3363b265c4ef40628ffced19cb6fc7c4bb5ce72d32cbcfb4bb9 \
