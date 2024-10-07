@@ -1,5 +1,31 @@
 # Journal des modifications
 
+## 2024-10-07
+
+### Ajouté
+
+- [Employeur : ajouter un éditeur de texte markdown sur les grands champs de saisie](https://github.com/gip-inclusion/les-emplois/pull/4834) 🖼
+
+### Modifié
+
+- [Admin : Empêcher la validation d’une habilitation avec le type autre](https://github.com/gip-inclusion/les-emplois/pull/4818)
+- [Admin: vérification automatique de certaines règles de cohérence](https://github.com/gip-inclusion/les-emplois/pull/4859)
+- [Connexion : Empêcher les utilisateurs de remplacer leur SSO une fois ils sont inscrit](https://github.com/gip-inclusion/les-emplois/pull/4828)
+- [Connexion: Ajout d'un vérification du paramètre `next_url` lors d'une connexion via un SSO](https://github.com/gip-inclusion/les-emplois/pull/4824)
+- [Connexion: Correciton d'un cas limite lors de la connexion via Inclusion Connect](https://github.com/gip-inclusion/les-emplois/pull/4867)
+- [Employeur: correction de la redirection après un transfer interne de candidature](https://github.com/gip-inclusion/les-emplois/pull/4875)
+- [Employeur: Les EA, EATT, OCPS ne peuvent pas candidater GEN-2118](https://github.com/gip-inclusion/les-emplois/pull/4839)
+- [GEIQ : Masquer les diagnostics d’éligibilité employeurs aux prescripteurs](https://github.com/gip-inclusion/les-emplois/pull/4783)
+- [PASS IAE: utilisation du nouvel encart de PASS dans les formulaires de suspension & prolongation](https://github.com/gip-inclusion/les-emplois/pull/4856)
+- [Performances: Utilisation de Brevo à la place de Mailjet pour la gestion de campagnes mails](https://github.com/gip-inclusion/les-emplois/pull/4742)
+- [UI/UX: Augmenter le nomber de lignes à aficher dans les tableaux GEN-2006](https://github.com/gip-inclusion/les-emplois/pull/4841)
+- [Vie privée: suppression pour les orienteurs des nom/prénom des candidats auxquels ils ne sont pas censés avoir accès](https://github.com/gip-inclusion/les-emplois/pull/4864)
+- [Vie privée: supprimer les données personelles des exports pour les utilisateurs ne devant pas y avoir accès](https://github.com/gip-inclusion/les-emplois/pull/4866)
+
+### Supprimé
+
+- [Retour arriére : Pilotage : Ouvrir le TB 440 à toutes les SIAE](https://github.com/gip-inclusion/les-emplois/pull/4858)
+
 ## 2024-09-30
 
 ### Ajouté
