@@ -12,6 +12,7 @@ from itou.companies import models as companies_models
 from ..utils.admin import ItouModelAdmin, ItouTabularInline, ReadonlyMixin, get_admin_view_link
 from ..utils.templatetags.str_filters import pluralizefr
 from .enums import Status
+from .models import EmployeeRecordUpdateNotification
 
 
 class EmployeeRecordUpdateNotificationInline(ReadonlyMixin, ItouTabularInline):
@@ -259,6 +260,12 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+    def get_deleted_objects(self, objs, request):
+        deleted_objects, model_count, perms_needed, protected = super().get_deleted_objects(objs, request)
+        # EmployeeRecordUpdateNotification() are readonly, but we don't want to block EmployeeRecord() deletion
+        perms_needed.discard(EmployeeRecordUpdateNotification._meta.verbose_name)
+        return deleted_objects, model_count, perms_needed, protected
 
 
 @admin.register(models.EmployeeRecordUpdateNotification)

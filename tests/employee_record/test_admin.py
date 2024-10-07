@@ -2,10 +2,11 @@ import pytest
 from django.contrib import messages
 from django.contrib.admin import helpers
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertMessages
+from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
 from itou.approvals.models import Approval
 from itou.employee_record import models
+from itou.employee_record.models import EmployeeRecord
 from tests.employee_record import factories
 
 
@@ -78,3 +79,28 @@ def test_approval_number_from_employee_record(admin_client):
     approval_number_url = reverse("admin:approvals_approval_change", args=[approval_number.pk])
     response = admin_client.get(employee_record_view_url)
     assertContains(response, f'<a href="{approval_number_url}">{approval_number.number}</a>')
+
+
+def test_employee_record_deletion(admin_client):
+    er = factories.BareEmployeeRecordFactory()
+    delete_url = reverse("admin:employee_record_employeerecord_delete", kwargs={"object_id": er.pk})
+    # Check the delete page doesn't break
+    response = admin_client.get(delete_url)
+    assertContains(response, str(er))
+    # Check the deletion is working
+    response = admin_client.post(delete_url, {"post": "yes"})
+    assertRedirects(response, reverse("admin:employee_record_employeerecord_changelist"))
+    assert EmployeeRecord.objects.filter(pk=er.pk).count() == 0
+
+
+def test_employee_record_deletion_with_notification(admin_client):
+    ern = factories.BareEmployeeRecordUpdateNotificationFactory()
+    delete_url = reverse("admin:employee_record_employeerecord_delete", kwargs={"object_id": ern.employee_record.pk})
+    # Check the delete page doesn't break
+    response = admin_client.get(delete_url)
+    assertContains(response, str(ern))
+    assertContains(response, str(ern.employee_record))
+    # Check the deletion is working
+    response = admin_client.post(delete_url, {"post": "yes"})
+    assertRedirects(response, reverse("admin:employee_record_employeerecord_changelist"))
+    assert EmployeeRecord.objects.filter(pk=ern.employee_record.pk).count() == 0
