@@ -14,7 +14,9 @@
 # name: ListEmployeeRecordsTest.test_employee_record_to_disable_with_nir_associated_to_other[action]
   '''
   <div class="c-box--results__footer">
-                  <a aria-label="Régulariser le n° de sécurité sociale Jane DOE (ouverture dans un nouvel onglet)" class="btn btn-primary btn-block w-100 w-md-auto has-external-link" href="https://tally.so/r/wzxQlg?employeerecord=[PK of EmployeeRecord]" rel="noopener" target="_blank">Régulariser le n° de sécurité sociale</a>
+                  <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+                      <a aria-label="Régulariser le n° de sécurité sociale Jane DOE (ouverture dans un nouvel onglet)" class="btn btn-primary btn-block w-100 w-md-auto has-external-link" href="https://tally.so/r/wzxQlg?employeerecord=[PK of EmployeeRecord]" rel="noopener" target="_blank">Régulariser le n° de sécurité sociale</a>
+                  </div>
               </div>
   '''
 # ---
@@ -40,7 +42,9 @@
 # name: ListEmployeeRecordsTest.test_employee_records_with_a_prolongation_need_to_be_updated[action]
   '''
   <div class="c-box--results__footer">
-                  <a aria-label="Mettre à jour la fiche salarié de Jane DOE" class="btn btn-primary btn-block w-100 w-md-auto" href="/employee_record/create/[PK of JobApplication]">Mettre à jour</a>
+                  <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+                      <a aria-label="Mettre à jour la fiche salarié de Jane DOE" class="btn btn-primary btn-block w-100 w-md-auto" href="/employee_record/create/[PK of JobApplication]">Mettre à jour</a>
+                  </div>
               </div>
   '''
 # ---
@@ -66,7 +70,9 @@
 # name: ListEmployeeRecordsTest.test_employee_records_with_a_suspension_need_to_be_updated[action]
   '''
   <div class="c-box--results__footer">
-                  <a aria-label="Mettre à jour la fiche salarié de Jane DOE" class="btn btn-primary btn-block w-100 w-md-auto" href="/employee_record/create/[PK of JobApplication]">Mettre à jour</a>
+                  <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+                      <a aria-label="Mettre à jour la fiche salarié de Jane DOE" class="btn btn-primary btn-block w-100 w-md-auto" href="/employee_record/create/[PK of JobApplication]">Mettre à jour</a>
+                  </div>
               </div>
   '''
 # ---
@@ -92,7 +98,9 @@
 # name: ListEmployeeRecordsTest.test_employee_records_with_nir_associated_to_other[action]
   '''
   <div class="c-box--results__footer">
-                  <a aria-label="Régulariser le n° de sécurité sociale Jane DOE (ouverture dans un nouvel onglet)" class="btn btn-primary btn-block w-100 w-md-auto has-external-link" href="https://tally.so/r/wzxQlg?jobapplication=[PK of JobApplication]" rel="noopener" target="_blank">Régulariser le n° de sécurité sociale</a>
+                  <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+                      <a aria-label="Régulariser le n° de sécurité sociale Jane DOE (ouverture dans un nouvel onglet)" class="btn btn-primary btn-block w-100 w-md-auto has-external-link" href="https://tally.so/r/wzxQlg?jobapplication=[PK of JobApplication]" rel="noopener" target="_blank">Régulariser le n° de sécurité sociale</a>
+                  </div>
               </div>
   '''
 # ---
