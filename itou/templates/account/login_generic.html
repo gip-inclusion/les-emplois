@@ -14,9 +14,11 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-lg-6">
-                    <div class="alert alert-important">
-                        <p class="mb-0">Inclusion Connect devient ProConnect</p>
-                    </div>
+                    {% if uses_inclusion_connect and pro_connect_url %}
+                        <div class="alert alert-important">
+                            <p class="mb-0">Inclusion Connect devient ProConnect</p>
+                        </div>
+                    {% endif %}
                     <div class="c-form mb-5">
                         {% if uses_inclusion_connect %}
                             {% if pro_connect_url %}
