@@ -1094,7 +1094,15 @@ class JobSeekerProfile(models.Model):
             if cleaned_birthdate := cleaned_data.get("birthdate"):
                 nir_year_month = cleaned_nir[1:5]
                 birthdate_year_month = cleaned_birthdate.strftime("%y%m")
-                if nir_year_month != birthdate_year_month:
+                birthdate_inconsistency = False
+                if 1 <= int(nir_year_month[2:4]) <= 12:
+                    birthdate_inconsistency = nir_year_month != birthdate_year_month
+                else:
+                    # NIR month may be between 20 and 42 or 50 and 99 ¯\_(ツ)_/¯
+                    # https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_s%C3%A9curit%C3%A9_sociale_en_France#cite_note-B
+                    # just check for the year
+                    birthdate_inconsistency = nir_year_month[:2] != birthdate_year_month[:2]
+                if birthdate_inconsistency:
                     raise ValidationError(
                         JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE
                         % (f" {cleaned_nir}" if remind_nir_in_error else "")
