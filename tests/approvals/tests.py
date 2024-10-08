@@ -111,6 +111,14 @@ class TestCommonApprovalQuerySet:
         approval = job_app.approval
         assert approval.can_be_deleted()
 
+    def test_can_be_deleted_even_if_other_applications(self):
+        job_app = JobApplicationFactory(with_approval=True)
+        JobApplicationFactory(
+            job_seeker=job_app.job_seeker, approval=job_app.approval, state=JobApplicationState.CANCELLED
+        )
+        approval = job_app.approval
+        assert approval.can_be_deleted()
+
     def test_can_be_deleted_multiple_apps(self):
         job_app = JobApplicationFactory(with_approval=True)
         JobApplicationFactory(with_approval=True, job_seeker=job_app.job_seeker, approval=job_app.approval)

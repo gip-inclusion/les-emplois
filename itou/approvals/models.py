@@ -696,7 +696,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     def can_be_deleted(self):
         JobApplication = self.jobapplication_set.model
         try:
-            return self.jobapplication_set.get().state == job_application_enums.JobApplicationState.ACCEPTED
+            return self.jobapplication_set.filter(state=job_application_enums.JobApplicationState.ACCEPTED).get()
         except (JobApplication.DoesNotExist, JobApplication.MultipleObjectsReturned):
             return False
 
