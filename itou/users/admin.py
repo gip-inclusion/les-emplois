@@ -768,6 +768,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
         "is_pe_certified",
         "disabled_notifications",
     )
+    show_full_result_count = False
 
     fieldsets = (
         (

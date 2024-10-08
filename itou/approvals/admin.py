@@ -233,6 +233,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "origin_siae_siret",
         "get_remainder_display",
     )
+    show_full_result_count = False
     fieldsets = (
         (
             "Informations",
@@ -456,6 +457,7 @@ class SuspensionAdmin(ItouModelAdmin):
         "reason",
     )
     readonly_fields = ("created_at", "created_by", "updated_at", "updated_by")
+    show_full_result_count = False
     date_hierarchy = "start_at"
     search_fields = (
         "pk",
@@ -625,6 +627,8 @@ class PoleEmploiApprovalAdmin(ItouModelAdmin):
         "last_name__unaccent",
         "birth_name",
     )
+    show_full_result_count = False
+
     list_filter = (IsValidFilter,)
     date_hierarchy = "birthdate"
 

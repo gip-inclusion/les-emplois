@@ -181,6 +181,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
         "user_data_sent",
         "approval_data_sent",
     )
+    show_full_result_count = False
 
     fieldsets = (
         (
