@@ -26,70 +26,70 @@
     Working example: itou.templates.invitations_views.create.html
 *********************************************/
 function updateElementIndex(el, prefix, ndx) {
-    const id_regex = new RegExp(`(${prefix}-\\d+)`);
-    const replacement = `${prefix}-${ndx}`;
-    if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
-    if (el.id) el.id = el.id.replace(id_regex, replacement);
-    if (el.name) el.name = el.name.replace(id_regex, replacement);
+  const id_regex = new RegExp(`(${prefix}-\\d+)`);
+  const replacement = `${prefix}-${ndx}`;
+  if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
+  if (el.id) el.id = el.id.replace(id_regex, replacement);
+  if (el.name) el.name = el.name.replace(id_regex, replacement);
 }
 
 function addRemoveButton(selector, col_selector, prefix) {
-    let total = $(`#id_${prefix}-TOTAL_FORMS`).val();
-    if (total > 1) {
-        const deletebutton = `<div class="inline-col col-md-auto remove-form-row">
-            <button type="button" class="btn btn-ico-only btn-danger" aria-label="Supprimer cette invitation"><i class="ri-close-line ri-lg font-weight-normal"></i></button>
-        </div>`;
-        $(selector).find(`${col_selector}:last`).after(deletebutton);
-    }
+  let total = $(`#id_${prefix}-TOTAL_FORMS`).val();
+  if (total > 1) {
+    const deletebutton = `<div class="inline-col col-md-auto remove-form-row">
+      <button type="button" class="btn btn-ico-only btn-danger" aria-label="Supprimer cette invitation"><i class="ri-close-line ri-lg font-weight-normal"></i></button>
+      </div>`;
+    $(selector).find(`${col_selector}:last`).after(deletebutton);
+  }
 }
 
 function cloneMore(selector, prefix) {
-    const newElement = $(selector).clone(true);
-    let total = $(`#id_${prefix}-TOTAL_FORMS`).val();
-    newElement.removeClass('is-invalid');
-    newElement.find(':input:not([type=button]):not([type=submit]):not([type=reset])').each(function() {
-        const name = $(this).attr('name').replace(`-${(total-1)}-`, `-${total}-`);
-        const id = `id_${name}`;
-        $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
-        $(this).removeClass('is-invalid');
-    });
-    newElement.find('label').each(function() {
-        let forValue = $(this).attr('for');
-        if (forValue) {
-          forValue = forValue.replace(`-${(total-1)}-`, `-${total}-`);
-          $(this).attr({'for': forValue});
-        }
-    });
-    // Add a delete button if it does not exist.
-    if (newElement.find('.remove-form-row').length == 0) {
-        const deletebutton = `<div class="inline-col col-md-auto remove-form-row">
-            <button type="button" class="btn btn-ico-only btn-danger" aria-label="Supprimer cette invitation"><i class="ri-close-line ri-lg font-weight-normal"></i></button>
-        </div>`;
-        $(selector).find('.inline-col').last().after(deletebutton);
-        newElement.find('.inline-col').last().after(deletebutton);
+  const newElement = $(selector).clone(true);
+  let total = $(`#id_${prefix}-TOTAL_FORMS`).val();
+  newElement.removeClass('is-invalid');
+  newElement.find(':input:not([type=button]):not([type=submit]):not([type=reset])').each(function() {
+    const name = $(this).attr('name').replace(`-${(total - 1)}-`, `-${total}-`);
+    const id = `id_${name}`;
+    $(this).attr({ 'name': name, 'id': id }).val('').removeAttr('checked');
+    $(this).removeClass('is-invalid');
+  });
+  newElement.find('label').each(function() {
+    let forValue = $(this).attr('for');
+    if (forValue) {
+      forValue = forValue.replace(`-${(total - 1)}-`, `-${total}-`);
+      $(this).attr({ 'for': forValue });
     }
-    total++;
-    $(`#id_${prefix}-TOTAL_FORMS`).val(total);
-    $(selector).after(newElement);
-    return false;
+  });
+  // Add a delete button if it does not exist.
+  if (newElement.find('.remove-form-row').length == 0) {
+    const deletebutton = `<div class="inline-col col-md-auto remove-form-row">
+      <button type="button" class="btn btn-ico-only btn-danger" aria-label="Supprimer cette invitation"><i class="ri-close-line ri-lg font-weight-normal"></i></button>
+    </div>`;
+    $(selector).find('.inline-col').last().after(deletebutton);
+    newElement.find('.inline-col').last().after(deletebutton);
+  }
+  total++;
+  $(`#id_${prefix}-TOTAL_FORMS`).val(total);
+  $(selector).after(newElement);
+  return false;
 }
 
 function deleteForm(selector, prefix, btn) {
-    const total = parseInt($(`#id_${prefix}-TOTAL_FORMS`).val());
-    if (total > 1){
-        btn.closest(selector).remove();
-        const forms = $(selector);
-        $(`#id_${prefix}-TOTAL_FORMS`).val(forms.length);
-        for (let i=0, formCount=forms.length; i<formCount; i++) {
-            $(forms.get(i)).find(':input').each(function() {
-                updateElementIndex(this, prefix, i);
-            });
-        }
+  const total = parseInt($(`#id_${prefix}-TOTAL_FORMS`).val());
+  if (total > 1) {
+    btn.closest(selector).remove();
+    const forms = $(selector);
+    $(`#id_${prefix}-TOTAL_FORMS`).val(forms.length);
+    for (let i = 0, formCount = forms.length; i < formCount; i++) {
+      $(forms.get(i)).find(':input').each(function() {
+        updateElementIndex(this, prefix, i);
+      });
     }
+  }
 
-    // Delete the "Remove" button if there's only one form left.
-    if (total == 2 ) {
-        $(selector).find('.remove-form-row').remove();
-    }
-    return false;
+  // Delete the "Remove" button if there's only one form left.
+  if (total == 2) {
+    $(selector).find('.remove-form-row').remove();
+  }
+  return false;
 }
