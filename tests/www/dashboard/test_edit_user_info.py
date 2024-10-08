@@ -7,6 +7,7 @@ from django.contrib.gis.geos import Point
 from django.test import override_settings
 from django.urls import reverse
 from freezegun import freeze_time
+from pytest_django.asserts import assertRedirects
 
 from itou.cities.models import City
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title
@@ -185,6 +186,59 @@ class EditUserInfoViewTest(TestCase):
         response = self.client.post(url, data=post_data)
 
         assert response.status_code == 200
+        self.assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
+        user = User.objects.get(id=user.id)
+
+        # Ensure that the job seeker did not change the birthdate.
+        assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") != post_data["birthdate"]
+
+    def test_validate_nir_unknown_birth_month(self):
+        user = JobSeekerFactory(
+            jobseeker_profile__nir="178332978200553",
+            title="M",
+            jobseeker_profile__birthdate=datetime(1978, 12, 20, tzinfo=UTC),
+        )
+        self.client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+
+        # the month isn't between 1 and 12 -> only check for the year
+        post_data = {
+            "email": "bob@saintclar.net",
+            "title": "M",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": "20/11/1978",
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            "lack_of_nir": False,
+        } | self.address_form_fields()
+        response = self.client.post(url, data=post_data)
+        assertRedirects(response, reverse("dashboard:index"))
+        user = User.objects.get(id=user.id)
+        # The birthdate was updated
+        assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
+
+    def test_validate_nir_unknown_birth_month_bad_year(self):
+        user = JobSeekerFactory(
+            jobseeker_profile__nir="178332978200553",
+            title="M",
+            jobseeker_profile__birthdate=datetime(1978, 12, 20, tzinfo=UTC),
+        )
+        self.client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+
+        # Inconsistant birth year
+        post_data = {
+            "email": "bob@saintclar.net",
+            "title": "M",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": "20/11/1979",
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            "lack_of_nir": False,
+        } | self.address_form_fields()
+        response = self.client.post(url, data=post_data)
         self.assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
         user = User.objects.get(id=user.id)
 
