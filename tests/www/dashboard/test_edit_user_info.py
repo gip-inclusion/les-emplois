@@ -12,19 +12,17 @@ from itou.cities.models import City
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
-from tests.openid_connect.inclusion_connect.test import (
-    InclusionConnectBaseTestCase,
-)
+from tests.openid_connect.inclusion_connect.test import inclusion_connect_setup
 from tests.users.factories import (
     JobSeekerFactory,
     PrescriberFactory,
 )
-from tests.utils.test import BASE_NUM_QUERIES, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 from tests.www.dashboard.test_edit_job_seeker_info import DISABLED_NIR
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
-class EditUserInfoViewTest(InclusionConnectBaseTestCase):
+class EditUserInfoViewTest(TestCase):
     NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
     EMAIL_LABEL = "Adresse électronique"
     NIR_FIELD_ID = "id_nir"
@@ -520,9 +518,13 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             ),
         )
 
-    def test_edit_as_prescriber(self):
+    def test_edit_as_prescriber_PC(self):
         original_user = PrescriberFactory(
-            email="bob@saintclair.tld", first_name="Not Bob", last_name="Not Saint Clair", phone="0600000000"
+            email="bob@saintclair.tld",
+            first_name="Not Bob",
+            last_name="Not Saint Clair",
+            phone="0600000000",
+            identity_provider=IdentityProvider.PRO_CONNECT,
         )
         self.client.force_login(original_user)
         url = reverse("dashboard:edit_user_info")
@@ -534,7 +536,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         self.assertContains(response, f"Prénom : <strong>{original_user.first_name.title()}</strong>")
         self.assertContains(response, f"Nom : <strong>{original_user.last_name.upper()}</strong>")
         self.assertContains(response, f"Adresse e-mail : <strong>{original_user.email}</strong>")
-        self.assertContains(response, "Modifier ces informations")
+        self.assertContains(response, "Ces informations doivent être modifiées sur votre fournisseur d'identité.")
 
         post_data = {
             "email": "notbob@notsaintclair.com",
@@ -550,3 +552,39 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         assert updated_user.first_name == original_user.first_name
         assert updated_user.last_name == original_user.last_name
         assert updated_user.phone == post_data["phone"]
+
+    def test_edit_as_prescriber_IC(self):
+        with inclusion_connect_setup():
+            original_user = PrescriberFactory(
+                email="bob@saintclair.tld",
+                first_name="Not Bob",
+                last_name="Not Saint Clair",
+                phone="0600000000",
+                identity_provider=IdentityProvider.INCLUSION_CONNECT,
+            )
+            self.client.force_login(original_user)
+            url = reverse("dashboard:edit_user_info")
+            response = self.client.get(url)
+            self.assertNotContains(response, self.NIR_FIELD_ID)
+            self.assertNotContains(response, self.LACK_OF_NIR_FIELD_ID)
+            self.assertNotContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
+            self.assertNotContains(response, self.BIRTHDATE_FIELD_NAME)
+            self.assertContains(response, f"Prénom : <strong>{original_user.first_name.title()}</strong>")
+            self.assertContains(response, f"Nom : <strong>{original_user.last_name.upper()}</strong>")
+            self.assertContains(response, f"Adresse e-mail : <strong>{original_user.email}</strong>")
+            self.assertContains(response, "Modifier ces informations")
+
+            post_data = {
+                "email": "notbob@notsaintclair.com",
+                "first_name": "Bob",
+                "last_name": "Saint Clair",
+                "phone": "0610203050",
+            }
+            response = self.client.post(url, data=post_data)
+            assert response.status_code == 302
+
+            updated_user = User.objects.get(pk=original_user.pk)
+            assert updated_user.email == original_user.email
+            assert updated_user.first_name == original_user.first_name
+            assert updated_user.last_name == original_user.last_name
+            assert updated_user.phone == post_data["phone"]

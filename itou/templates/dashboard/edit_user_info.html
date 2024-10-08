@@ -55,7 +55,34 @@
                         {% else %}
                             <form method="post" class="js-prevent-multiple-submit">
                                 {% csrf_token %}
-                                {% if ic_account_url %}
+                                {% if request.user.identity_provider == "PC" %}
+                                    <ul class="list-unstyled">
+                                        <li>
+                                            Prénom : <strong>{{ user.first_name|title }}</strong>
+                                        </li>
+                                        <li>
+                                            Nom : <strong>{{ user.last_name|upper }}</strong>
+                                        </li>
+                                        <li>
+                                            Adresse e-mail : <strong>{{ user.email }}</strong>
+                                        </li>
+                                    </ul>
+                                    <div class="alert alert-info">
+                                        <p>
+                                            Ces informations doivent être modifiées sur votre fournisseur d'identité.
+                                            <br>
+                                            - Si votre compte a été créé sur ProConnect, vous pouvez modifier votre informations personnelles sur <a href="https://app.moncomptepro.beta.gouv.fr/personal-information">ProConnect</a>.
+                                            <br>
+                                            - Si ProConnect vous permet de vous connecter avec un autre fournisseur d'identité, c'est à celui-ci de mettre
+                                            à jour vos informations personnelle.
+                                            <br>
+                                            En cas de doute, vous pouvez contacter <a href="mailto:support@agentconnect.gouv.fr ">le support ProConnect</a>
+                                        </p>
+                                        <p class="mb-0">Une fois modifiée, vos informations seront mises à jour à votre prochaine connexion.</p>
+                                    </div>
+                                    <hr class="my-4">
+                                    {% bootstrap_form_errors form type="all" %}
+                                {% elif ic_account_url %}
                                     <ul class="list-unstyled">
                                         <li>
                                             Prénom : <strong>{{ user.first_name|title }}</strong>

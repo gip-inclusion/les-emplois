@@ -9,10 +9,7 @@ from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.users.enums import IdentityProvider, UserKind
 from tests.institutions.factories import LaborInspectorFactory
-from tests.openid_connect.inclusion_connect.test import (
-    override_inclusion_connect_settings,
-)
-from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
+from tests.openid_connect.test import sso_parametrize
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -21,10 +18,10 @@ from tests.users.factories import (
 )
 
 
+@sso_parametrize
 @respx.mock
-@override_inclusion_connect_settings
-def test_prescriber_using_django_has_to_activate_ic_account(client):
-    user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO, email=OIDC_USERINFO["email"])
+def test_prescriber_using_django_has_to_activate_sso_account(client, sso_setup):
+    user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO, email=sso_setup.oidc_userinfo["email"])
     client.force_login(user)
     url = reverse("dashboard:index")
     response = client.get(url, follow=True)
@@ -35,21 +32,26 @@ def test_prescriber_using_django_has_to_activate_ic_account(client):
         "previous_url": activate_ic_account_url,
         "user_email": user.email,
     }
-    url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
+    if sso_setup.identity_provider == IdentityProvider.INCLUSION_CONNECT:
+        url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
+    else:
+        url = escape(f"{reverse('pro_connect:authorize')}?{urlencode(params)}")
     assertContains(response, url + '"')
-    response = mock_oauth_dance(
+    response = sso_setup.mock_oauth_dance(
         client,
         UserKind.PRESCRIBER,
         previous_url=activate_ic_account_url,
     )
     user.refresh_from_db()
-    assert user.identity_provider == IdentityProvider.INCLUSION_CONNECT
+    assert user.identity_provider == sso_setup.identity_provider
 
 
+@sso_parametrize
 @respx.mock
-@override_inclusion_connect_settings
-def test_employer_using_django_has_to_activate_ic_account(client):
-    user = EmployerFactory(with_company=True, identity_provider=IdentityProvider.DJANGO, email=OIDC_USERINFO["email"])
+def test_employer_using_django_has_to_activate_sso_account(client, sso_setup):
+    user = EmployerFactory(
+        with_company=True, identity_provider=IdentityProvider.DJANGO, email=sso_setup.oidc_userinfo["email"]
+    )
     client.force_login(user)
     url = reverse("dashboard:index")
     response = client.get(url, follow=True)
@@ -60,15 +62,18 @@ def test_employer_using_django_has_to_activate_ic_account(client):
         "previous_url": activate_ic_account_url,
         "user_email": user.email,
     }
-    url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
+    if sso_setup.identity_provider == IdentityProvider.INCLUSION_CONNECT:
+        url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
+    else:
+        url = escape(f"{reverse('pro_connect:authorize')}?{urlencode(params)}")
     assertContains(response, url + '"')
-    response = mock_oauth_dance(
+    response = sso_setup.mock_oauth_dance(
         client,
         UserKind.EMPLOYER,
         previous_url=activate_ic_account_url,
     )
     user.refresh_from_db()
-    assert user.identity_provider == IdentityProvider.INCLUSION_CONNECT
+    assert user.identity_provider == sso_setup.identity_provider
 
 
 @pytest.mark.parametrize(

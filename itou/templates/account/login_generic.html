@@ -14,9 +14,23 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-lg-6">
+                    <div class="alert alert-important">
+                        <p class="mb-0">Inclusion Connect devient ProConnect</p>
+                    </div>
                     <div class="c-form mb-5">
                         {% if uses_inclusion_connect %}
-                            {% if inclusion_connect_url %}
+                            {% if pro_connect_url %}
+                                <div class="text-center">
+                                    <a href="{{ pro_connect_url }}" class="proconnect-button" {% matomo_event "connexion "|add:matomo_account_type "clic" "se-connecter-avec-pro-connect" %}>
+                                    </a>
+                                    <p>
+                                        <a href="https://proconnect.gouv.fr/" target="_blank" rel="noopener noreferrer" title="Qu’est-ce que AgentConnect ? - nouvelle fenêtre">
+                                            Qu’est-ce que ProConnect ?
+                                        </a>
+                                    </p>
+                                </div>
+
+                            {% elif inclusion_connect_url %}
                                 <div class="text-center">
                                     <a href="{{ inclusion_connect_url }}" class="btn-inclusion-connect" {% matomo_event "connexion "|add:matomo_account_type "clic" "se-connecter-avec-inclusion-connect" %}>
                                         <picture>

@@ -416,3 +416,19 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
 .w-lg-400px .select2-selection__rendered {
     white-space: nowrap !important;
 }
+
+
+/* Pro Connect button theme */
+.proconnect-button {
+  background-color: transparent !important;
+  background-image: url("../img/pro_connect_bouton.svg");
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  width: 214px;
+  height: 56px;
+  display: inline-block;
+}
+
+.proconnect-button:hover {
+  background-image: url("../img/pro_connect_bouton_hover.svg");
+}

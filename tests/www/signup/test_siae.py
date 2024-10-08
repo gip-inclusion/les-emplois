@@ -1,16 +1,12 @@
-from unittest import mock
-
 import httpx
 import respx
-from django.conf import settings
 from django.contrib import messages
-from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
-from django.test import override_settings
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
 from freezegun import freeze_time
+from pytest_django.asserts import assertContains, assertMessages, assertNumQueries, assertRedirects
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
@@ -20,27 +16,26 @@ from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.templatetags.format_filters import format_siret
-from itou.utils.templatetags.theme_inclusion import static_theme_images
 from itou.utils.urls import get_tally_form_url
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWithMembershipAndJobsFactory
-from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
-from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
+from tests.openid_connect.test import sso_parametrize
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, PrescriberFactory
-from tests.utils.test import BASE_NUM_QUERIES, ItouClient, TestCase
+from tests.utils.test import BASE_NUM_QUERIES, ItouClient
 
 
-class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
-    def test_choose_user_kind(self):
+class TestCompanySignup:
+    def test_choose_user_kind(self, client):
         url = reverse("signup:choose_user_kind")
-        response = self.client.get(url)
-        self.assertContains(response, "Employeur inclusif")
+        response = client.get(url)
+        assertContains(response, "Employeur inclusif")
 
-        response = self.client.post(url, data={"kind": UserKind.EMPLOYER})
-        self.assertRedirects(response, reverse("signup:company_select"))
+        response = client.post(url, data={"kind": UserKind.EMPLOYER})
+        assertRedirects(response, reverse("signup:company_select"))
 
+    @sso_parametrize
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
-    def test_join_an_company_without_members(self):
+    def test_join_an_company_without_members(self, client, sso_setup):
         """
         A user joins a company without members.
         """
@@ -48,31 +43,31 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
         assert 0 == company.members.count()
 
         url = reverse("signup:company_select")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         # Find a company by SIREN.
-        response = self.client.get(url, {"siren": company.siret[:9]})
+        response = client.get(url, {"siren": company.siret[:9]})
         assert response.status_code == 200
 
         # Choose a company between results.
         post_data = {"siaes": company.pk}
         # Pass `siren` in request.GET
-        response = self.client.post(f"{url}?siren={company.siret[:9]}", data=post_data)
+        response = client.post(f"{url}?siren={company.siret[:9]}", data=post_data)
         assert response.status_code == 302
-        self.assertRedirects(response, reverse("search:employers_home"))
+        assertRedirects(response, reverse("search:employers_home"))
 
         assert len(mail.outbox) == 1
         email = mail.outbox[0]
         assert "Un nouvel utilisateur souhaite rejoindre votre structure" in email.subject
 
         magic_link = company.signup_magic_link
-        response = self.client.get(magic_link)
+        response = client.get(magic_link)
         assert response.status_code == 200
 
         # No error when opening magic link a second time.
-        response = self.client.get(magic_link)
-        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
+        response = client.get(magic_link)
+        sso_setup.assertContainsButton(response)
 
         # Check IC will redirect to the correct url
         token = company.get_token()
@@ -83,23 +78,23 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
-        self.assertContains(response, url + '"')
+        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        assertContains(response, url + '"')
 
-        response = mock_oauth_dance(
-            self.client,
+        response = sso_setup.mock_oauth_dance(
+            client,
             KIND_EMPLOYER,
             previous_url=previous_url,
             next_url=next_url,
         )
-        response = self.client.get(response.url)
+        response = client.get(response.url)
         # Check user is redirected to the welcoming tour
-        self.assertRedirects(response, reverse("welcoming_tour:index"))
+        assertRedirects(response, reverse("welcoming_tour:index"))
         # Check user sees the employer tour
-        response = self.client.get(response.url)
-        self.assertContains(response, "Publiez vos offres, augmentez votre visibilité")
+        response = client.get(response.url)
+        assertContains(response, "Publiez vos offres, augmentez votre visibilité")
 
-        user = User.objects.get(email=OIDC_USERINFO["email"])
+        user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
 
         # Check `User` state.
         assert user.kind == UserKind.EMPLOYER
@@ -111,16 +106,17 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
         assert len(mail.outbox) == 1
 
         # Magic link is no longer valid because company.members.count() has changed.
-        response = self.client.get(magic_link, follow=True)
-        self.assertRedirects(response, reverse("signup:company_select"))
+        response = client.get(magic_link, follow=True)
+        assertRedirects(response, reverse("signup:company_select"))
         expected_message = (
             "Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription."
         )
-        self.assertContains(response, escape(expected_message))
+        assertContains(response, escape(expected_message))
 
+    @sso_parametrize
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
-    def test_join_an_company_without_members_as_an_existing_employer(self):
+    def test_join_an_company_without_members_as_an_existing_employer(self, client, sso_setup):
         """
         A user joins a company without members.
         """
@@ -128,14 +124,16 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
         assert 0 == company.members.count()
 
         user = EmployerFactory(
-            username=OIDC_USERINFO["sub"], email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True
+            username=sso_setup.oidc_userinfo["sub"],
+            email=sso_setup.oidc_userinfo["email"],
+            has_completed_welcoming_tour=True,
         )
         CompanyMembershipFactory(user=user)
         assert 1 == user.company_set.count()
 
         magic_link = company.signup_magic_link
-        response = self.client.get(magic_link)
-        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
+        response = client.get(magic_link)
+        sso_setup.assertContainsButton(response)
 
         # Check IC will redirect to the correct url
         token = company.get_token()
@@ -146,40 +144,43 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
-        self.assertContains(response, url + '"')
+        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        assertContains(response, url + '"')
 
-        response = mock_oauth_dance(
-            self.client,
+        response = sso_setup.mock_oauth_dance(
+            client,
             KIND_EMPLOYER,
             previous_url=previous_url,
             next_url=next_url,
         )
-        response = self.client.get(response.url)
+        response = client.get(response.url)
         # Check user is redirected to the dashboard
-        self.assertRedirects(response, reverse("dashboard:index"))
+        assertRedirects(response, reverse("dashboard:index"))
 
         # Check `User` state.
         assert company.has_admin(user)
         assert 1 == company.members.count()
         assert 2 == user.company_set.count()
 
+    @sso_parametrize
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
-    def test_join_an_company_without_members_as_an_existing_employer_returns_on_other_browser(self):
+    def test_join_an_company_without_members_as_an_existing_employer_returns_on_other_browser(self, client, sso_setup):
         """
         A user joins a company without members.
         """
         company = CompanyFactory(kind=CompanyKind.ETTI)
 
         user = EmployerFactory(
-            username=OIDC_USERINFO["sub"], email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True
+            username=sso_setup.oidc_userinfo["sub"],
+            email=sso_setup.oidc_userinfo["email"],
+            has_completed_welcoming_tour=True,
         )
         CompanyMembershipFactory(user=user)
 
         magic_link = company.signup_magic_link
-        response = self.client.get(magic_link)
-        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
+        response = client.get(magic_link)
+        sso_setup.assertContainsButton(response)
 
         # Check IC will redirect to the correct url
         token = company.get_token()
@@ -190,12 +191,12 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
-        self.assertContains(response, url + '"')
+        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        assertContains(response, url + '"')
 
         other_client = ItouClient()
-        response = mock_oauth_dance(
-            self.client,
+        response = sso_setup.mock_oauth_dance(
+            client,
             KIND_EMPLOYER,
             previous_url=previous_url,
             next_url=next_url,
@@ -203,20 +204,18 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
         )
         response = other_client.get(response.url)
         # Check user is redirected to the dashboard
-        self.assertRedirects(response, reverse("dashboard:index"))
+        assertRedirects(response, reverse("dashboard:index"))
 
         # Check `User` state.
         assert company.has_admin(user)
         assert 1 == company.members.count()
         assert 2 == user.company_set.count()
 
-    def test_user_invalid_company_id(self):
+    def test_user_invalid_company_id(self, client):
         company = CompanyFactory(kind=CompanyKind.ETTI)
-        response = self.client.get(
-            reverse("signup:employer", kwargs={"company_id": "0", "token": company.get_token()})
-        )
-        self.assertRedirects(response, reverse("signup:company_select"))
-        self.assertMessages(
+        response = client.get(reverse("signup:employer", kwargs={"company_id": "0", "token": company.get_token()}))
+        assertRedirects(response, reverse("signup:company_select"))
+        assertMessages(
             response,
             [
                 messages.Message(
@@ -226,15 +225,15 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
             ],
         )
 
-    def test_join_invalid_company_id(self):
+    def test_join_invalid_company_id(self, client):
         user = EmployerFactory(with_company=True)
-        self.client.force_login(user)
+        client.force_login(user)
         company = CompanyFactory(kind=CompanyKind.ETTI)
-        response = self.client.get(
+        response = client.get(
             reverse("signup:company_join", kwargs={"company_id": "0", "token": company.get_token()}), follow=True
         )
-        self.assertRedirects(response, reverse("signup:company_select"))
-        self.assertMessages(
+        assertRedirects(response, reverse("signup:company_select"))
+        assertMessages(
             response,
             [
                 messages.Message(
@@ -244,15 +243,16 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
             ],
         )
 
+    @sso_parametrize
     @respx.mock
-    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    @override_settings(
-        API_INSEE_BASE_URL="https://insee.fake",
-        API_INSEE_SIRENE_BASE_URL="https://entreprise.fake",
-        API_INSEE_CONSUMER_KEY="foo",
-        API_INSEE_CONSUMER_SECRET="bar",
-    )
-    def test_create_facilitator(self, mock_call_ban_geocoding_api):
+    def test_create_facilitator(self, client, mocker, settings, sso_setup):
+        settings.API_INSEE_BASE_URL = "https://insee.fake"
+        settings.API_INSEE_SIRENE_BASE_URL = "https://entreprise.fake"
+        settings.API_INSEE_CONSUMER_KEY = "foo"
+        settings.API_INSEE_CONSUMER_SECRET = "bar"
+        mock_call_ban_geocoding_api = mocker.patch(
+            "itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK
+        )
         respx.post(f"{settings.API_INSEE_BASE_URL}/token").mock(
             return_value=httpx.Response(200, json=INSEE_API_RESULT_MOCK)
         )
@@ -268,26 +268,26 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
         respx.get(f"{settings.API_INSEE_SIRENE_BASE_URL}/siret/{FAKE_SIRET}").mock(
             return_value=httpx.Response(404, json={})
         )
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         mock_call_ban_geocoding_api.assert_not_called()
-        self.assertContains(response, f"SIRET « {FAKE_SIRET} » non reconnu.")
+        assertContains(response, f"SIRET « {FAKE_SIRET} » non reconnu.")
 
         # Mock a valid answer from the server
         respx.get(f"{settings.API_INSEE_SIRENE_BASE_URL}/siret/{FAKE_SIRET}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         mock_call_ban_geocoding_api.assert_called_once()
-        self.assertRedirects(response, reverse("signup:facilitator_user"))
+        assertRedirects(response, reverse("signup:facilitator_user"))
 
         # Checks that the SIRET and  the enterprise name are present in the second step
-        response = self.client.post(url, data=post_data, follow=True)
-        self.assertContains(response, "Centre communal")
-        self.assertContains(response, format_siret(FAKE_SIRET))
+        response = client.post(url, data=post_data, follow=True)
+        assertContains(response, "Centre communal")
+        assertContains(response, format_siret(FAKE_SIRET))
 
         # Now, we're on the second page.
         url = reverse("signup:facilitator_user")
-        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
+        sso_setup.assertContainsButton(response)
 
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:facilitator_user")
@@ -297,23 +297,23 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
-        self.assertContains(response, url + '"')
+        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        assertContains(response, url + '"')
 
-        response = mock_oauth_dance(
-            self.client,
+        response = sso_setup.mock_oauth_dance(
+            client,
             KIND_EMPLOYER,
             previous_url=previous_url,
             next_url=next_url,
         )
-        response = self.client.get(response.url)
+        response = client.get(response.url)
         # Check user is redirected to the welcoming tour
-        self.assertRedirects(response, reverse("welcoming_tour:index"))
+        assertRedirects(response, reverse("welcoming_tour:index"))
         # Check user sees the employer tour
-        response = self.client.get(response.url)
-        self.assertContains(response, "Publiez vos offres, augmentez votre visibilité")
+        response = client.get(response.url)
+        assertContains(response, "Publiez vos offres, augmentez votre visibilité")
 
-        user = User.objects.get(email=OIDC_USERINFO["email"])
+        user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
 
         # Check `User` state.
         assert user.kind == UserKind.EMPLOYER
@@ -325,14 +325,14 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
         # No sent email.
         assert len(mail.outbox) == 0
 
-    def test_facilitator_base_signup_process(self):
+    def test_facilitator_base_signup_process(self, client):
         url = reverse("signup:company_select")
-        response = self.client.get(url, {"siren": "111111111"})  # not existing SIREN
-        self.assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
-        self.assertContains(response, get_tally_form_url("wA799W"))
-        self.assertContains(response, reverse("signup:facilitator_search"))
+        response = client.get(url, {"siren": "111111111"})  # not existing SIREN
+        assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
+        assertContains(response, get_tally_form_url("wA799W"))
+        assertContains(response, reverse("signup:facilitator_search"))
 
-    def test_company_select_does_not_die_under_requests(self):
+    def test_company_select_does_not_die_under_requests(self, client):
         companies = (
             CompanyWithMembershipAndJobsFactory(siret="40219166200001"),
             CompanyWithMembershipAndJobsFactory(siret="40219166200002"),
@@ -349,47 +349,46 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
         # ensure we only perform 4 requests, whatever the number of companies sharing the
         # same SIREN. Before, this request was issuing 3*N slow requests, N being the
         # number of companies.
-        with self.assertNumQueries(
+        with assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # SELECT companies with active admins
             + 1  # SELECT the conventions for those companies
             + 1  # prefetch memberships
             + 1  # prefetch users associated with those memberships
         ):
-            response = self.client.get(url, {"siren": "402191662"})
+            response = client.get(url, {"siren": "402191662"})
         assert response.status_code == 200
-        self.assertContains(response, "402191662", count=7)  # 1 input + 6 results
-        self.assertContains(response, "00001", count=1)
-        self.assertContains(response, "00002", count=1)
-        self.assertContains(response, "00003", count=1)
-        self.assertContains(response, "00004", count=1)
-        self.assertContains(response, "00005", count=2)
+        assertContains(response, "402191662", count=7)  # 1 input + 6 results
+        assertContains(response, "00001", count=1)
+        assertContains(response, "00002", count=1)
+        assertContains(response, "00003", count=1)
+        assertContains(response, "00004", count=1)
+        assertContains(response, "00005", count=2)
 
 
-class CompanySignupViewsExceptionsTest(MessagesTestMixin, TestCase):
-    def test_non_staff_cant_join_a_company(self):
-        company = CompanyFactory(kind=CompanyKind.ETTI)
-        assert 0 == company.members.count()
+def test_non_staff_cant_join_a_company(client):
+    company = CompanyFactory(kind=CompanyKind.ETTI)
+    assert 0 == company.members.count()
 
-        user = PrescriberFactory(email=OIDC_USERINFO["email"])
-        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+    user = PrescriberFactory()
+    client.login(email=user.email, password=DEFAULT_PASSWORD)
 
-        # Skip IC process and jump to joining the company.
-        token = company.get_token()
-        url = reverse("signup:company_join", args=(company.pk, token))
+    # Skip IC process and jump to joining the company.
+    token = company.get_token()
+    url = reverse("signup:company_join", args=(company.pk, token))
 
-        response = self.client.get(url)
-        self.assertMessages(
-            response,
-            [
-                messages.Message(
-                    messages.ERROR,
-                    "Vous ne pouvez pas rejoindre une structure avec ce compte car vous n'êtes pas employeur.",
-                )
-            ],
-        )
-        self.assertRedirects(response, reverse("search:employers_home"))
+    response = client.get(url)
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                messages.ERROR,
+                "Vous ne pouvez pas rejoindre une structure avec ce compte car vous n'êtes pas employeur.",
+            )
+        ],
+    )
+    assertRedirects(response, reverse("search:employers_home"))
 
-        # Check `User` state.
-        assert not company.has_admin(user)
-        assert 0 == company.members.count()
+    # Check `User` state.
+    assert not company.has_admin(user)
+    assert 0 == company.members.count()

@@ -48,6 +48,8 @@ urlpatterns = [
     path("franceconnect/", include("itou.openid_connect.france_connect.urls")),
     # Inclusion Connect URLs.
     path("inclusion_connect/", include("itou.openid_connect.inclusion_connect.urls")),
+    # ProConnect URLs.
+    path("pro_connect/", include("itou.openid_connect.pro_connect.urls")),
     # --------------------------------------------------------------------------------------
     # API.
     path("api/v1/", include("itou.api.urls", namespace="v1")),

@@ -6,11 +6,10 @@ import respx
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.shortcuts import reverse
 from django.utils.html import escape
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertRedirects, assertTemplateUsed
 
 from itou.invitations.models import PrescriberWithOrgInvitation
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -18,12 +17,10 @@ from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.prescriber import get_current_org_or_404
-from itou.utils.templatetags.theme_inclusion import static_theme_images
 from itou.utils.urls import add_url_params
 from tests.companies.factories import CompanyFactory
 from tests.invitations.factories import PrescriberWithOrgSentInvitationFactory
-from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
-from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
+from tests.openid_connect.test import sso_parametrize
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import ItouClient, TestCase, assert_previous_step
@@ -221,9 +218,9 @@ class TestPEOrganizationInvitation:
         )
 
 
-class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectBaseTestCase):
-    def setUp(self):
-        super().setUp()
+class TestAcceptPrescriberWithOrgInvitation:
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         self.organization = PrescriberOrganizationWithMembershipFactory()
         # Create a second member to make sure emails are also
         # sent to regular members
@@ -233,11 +230,11 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
 
     def assert_invitation_is_accepted(self, response, user, invitation, new_user=True):
         if new_user:
-            self.assertRedirects(response, reverse("welcoming_tour:index"))
+            assertRedirects(response, reverse("welcoming_tour:index"))
         elif user.identity_provider == IdentityProvider.DJANGO:
-            self.assertRedirects(response, reverse("dashboard:activate_ic_account"))
+            assertRedirects(response, reverse("dashboard:activate_ic_account"))
         else:
-            self.assertRedirects(response, reverse("dashboard:index"))
+            assertRedirects(response, reverse("dashboard:index"))
 
         user.refresh_from_db()
         invitation.refresh_from_db()
@@ -248,7 +245,7 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
         assert self.organization.members.count() == 3
 
         # Make sure there's a welcome message.
-        self.assertContains(
+        assertContains(
             response, escape(f"Vous êtes désormais membre de l'organisation {self.organization.display_name}.")
         )
 
@@ -262,11 +259,12 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
         # A user can be member of one or more organizations
         assert current_org in user.prescriberorganization_set.all()
 
+    @sso_parametrize
     @respx.mock
-    def test_accept_prescriber_org_invitation(self):
+    def test_accept_prescriber_org_invitation(self, client, sso_setup):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
-        response = self.client.get(invitation.acceptance_link)
-        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
+        response = client.get(invitation.acceptance_link)
+        sso_setup.assertContainsButton(response)
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
@@ -278,29 +276,29 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
-        self.assertContains(response, url + '"')
+        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        assertContains(response, url + '"')
 
         # Singup fails on Inclusion Connect with email different than the one from the invitation
-        response = mock_oauth_dance(
-            self.client,
+        response = sso_setup.mock_oauth_dance(
+            client,
             UserKind.PRESCRIBER,
             user_email=invitation.email,
             channel="invitation",
             previous_url=previous_url,
             next_url=next_url,
-            expected_redirect_url=add_url_params(reverse("inclusion_connect:logout"), {"redirect_url": previous_url}),
+            expected_redirect_url=add_url_params(sso_setup.logout_url, {"redirect_url": previous_url}),
         )
         # Inclusion connect redirects to previous_url
-        response = self.client.get(previous_url, follow=True)
+        response = client.get(previous_url, follow=True)
         # Signup should have failed : as the email used in IC isn't the one from the invitation
-        self.assertMessages(
+        assertMessages(
             response,
             [
                 messages.Message(
                     messages.ERROR,
                     "L’adresse e-mail que vous avez utilisée pour vous connecter avec "
-                    "Inclusion Connect (michel@lestontons.fr) ne correspond pas à "
+                    f"{sso_setup.identity_provider.label} (michel@lestontons.fr) ne correspond pas à "
                     f"l’adresse e-mail de l’invitation ({invitation.email}).",
                 )
             ],
@@ -308,10 +306,10 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
         assert not User.objects.filter(email=invitation.email).exists()
 
         # Singup works on Inclusion Connect with the correct email
-        invitation.email = OIDC_USERINFO["email"]
+        invitation.email = sso_setup.oidc_userinfo["email"]
         invitation.save()
-        response = mock_oauth_dance(
-            self.client,
+        response = sso_setup.mock_oauth_dance(
+            client,
             UserKind.PRESCRIBER,
             user_email=invitation.email,
             channel="invitation",
@@ -319,17 +317,18 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
             next_url=next_url,
         )
         # Follow the redirection.
-        response = self.client.get(response.url, follow=True)
-        self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
+        response = client.get(response.url, follow=True)
+        assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         user = User.objects.get(email=invitation.email)
         self.assert_invitation_is_accepted(response, user, invitation)
 
+    @sso_parametrize
     @respx.mock
-    def test_accept_prescriber_org_invitation_returns_on_other_browser(self):
+    def test_accept_prescriber_org_invitation_returns_on_other_browser(self, client, sso_setup):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
-        response = self.client.get(invitation.acceptance_link)
-        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
+        response = client.get(invitation.acceptance_link)
+        sso_setup.assertContainsButton(response)
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
@@ -341,14 +340,14 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
-        self.assertContains(response, url + '"')
+        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        assertContains(response, url + '"')
 
         other_client = ItouClient()
-        invitation.email = OIDC_USERINFO["email"]
+        invitation.email = sso_setup.oidc_userinfo["email"]
         invitation.save()
-        response = mock_oauth_dance(
-            self.client,
+        response = sso_setup.mock_oauth_dance(
+            client,
             UserKind.PRESCRIBER,
             user_email=invitation.email,
             channel="invitation",
@@ -358,12 +357,12 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
         )
         # Follow the redirection.
         response = other_client.get(response.url, follow=True)
-        self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
+        assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         user = User.objects.get(email=invitation.email)
         self.assert_invitation_is_accepted(response, user, invitation)
 
-    def test_accept_existing_user_is_prescriber_without_org(self):
+    def test_accept_existing_user_is_prescriber_without_org(self, client):
         user = PrescriberFactory(has_completed_welcoming_tour=True)
         invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
@@ -372,13 +371,13 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
             last_name=user.last_name,
             email=user.email,
         )
-        self.client.force_login(user)
-        response = self.client.get(invitation.acceptance_link, follow=True)
+        client.force_login(user)
+        response = client.get(invitation.acceptance_link, follow=True)
         # /invitations/<uui>/join_company then /welcoming_tour/index
         assert len(response.redirect_chain) == 2
         self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
 
-    def test_accept_existing_user_email_different_case(self):
+    def test_accept_existing_user_email_different_case(self, client):
         user = PrescriberFactory(has_completed_welcoming_tour=True, email="HEY@example.com")
         invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
@@ -387,11 +386,11 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
             last_name=user.last_name,
             email="hey@example.com",
         )
-        self.client.force_login(user)
-        response = self.client.get(invitation.acceptance_link, follow=True)
+        client.force_login(user)
+        response = client.get(invitation.acceptance_link, follow=True)
         self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
 
-    def test_accept_existing_user_belongs_to_another_organization(self):
+    def test_accept_existing_user_belongs_to_another_organization(self, client):
         user = PrescriberOrganizationWithMembershipFactory().members.first()
         user.has_completed_welcoming_tour = True
         user.save()
@@ -402,16 +401,17 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
             last_name=user.last_name,
             email=user.email,
         )
-        self.client.force_login(user)
-        response = self.client.get(invitation.acceptance_link, follow=True)
+        client.force_login(user)
+        response = client.get(invitation.acceptance_link, follow=True)
         self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
 
+    @sso_parametrize
     @respx.mock
-    def test_accept_existing_user_not_logged_in_using_IC(self):
+    def test_accept_existing_user_not_logged_in_using_PC(self, client, sso_setup):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         user = PrescriberFactory(
-            username=OIDC_USERINFO["sub"],
-            email=OIDC_USERINFO["email"],
+            username=sso_setup.oidc_userinfo["sub"],
+            email=sso_setup.oidc_userinfo["email"],
             has_completed_welcoming_tour=True,
         )
         # The user verified its email
@@ -423,7 +423,7 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
             last_name=user.last_name,
             email=user.email,
         )
-        response = self.client.get(invitation.acceptance_link, follow=True)
+        response = client.get(invitation.acceptance_link, follow=True)
         assert reverse("login:prescriber") in response.wsgi_request.get_full_path()
         assert not invitation.accepted
         next_url = reverse("invitations_views:join_prescriber_organization", args=(invitation.pk,))
@@ -433,11 +433,11 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
-        self.assertContains(response, url + '"')
+        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        assertContains(response, url + '"')
 
-        response = mock_oauth_dance(
-            self.client,
+        response = sso_setup.mock_oauth_dance(
+            client,
             UserKind.PRESCRIBER,
             user_email=user.email,
             channel="invitation",
@@ -445,12 +445,12 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
             next_url=next_url,
         )
         # Follow the redirection.
-        response = self.client.get(response.url, follow=True)
+        response = client.get(response.url, follow=True)
 
         assert response.context["user"].is_authenticated
         self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
 
-    def test_accept_existing_user_not_logged_in_using_django_auth(self):
+    def test_accept_existing_user_not_logged_in_using_django_auth(self, client):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         user = PrescriberFactory(has_completed_welcoming_tour=True, identity_provider="DJANGO")
         # The user verified its email
@@ -462,11 +462,11 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
             last_name=user.last_name,
             email=user.email,
         )
-        response = self.client.get(invitation.acceptance_link, follow=True)
+        response = client.get(invitation.acceptance_link, follow=True)
         assert reverse("login:prescriber") in response.wsgi_request.get_full_path()
         assert not invitation.accepted
 
-        response = self.client.post(
+        response = client.post(
             response.wsgi_request.get_full_path(),
             data={"login": user.email, "password": DEFAULT_PASSWORD},
             follow=True,
