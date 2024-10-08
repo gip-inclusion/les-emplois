@@ -1,5 +1,9 @@
 # Journal des modifications
 
+## 2024-10-08
+
+Recette ProConnect
+
 ## 2024-10-07
 
 ### Ajouté
