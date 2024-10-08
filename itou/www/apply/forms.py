@@ -166,7 +166,7 @@ class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):
 
 
 class CreateOrUpdateJobSeekerStep1Form(
-    JobSeekerNIRUpdateMixin, JobSeekerProfileFieldsMixin, BirthPlaceAndCountryMixin, forms.ModelForm
+    JobSeekerNIRUpdateMixin, BirthPlaceAndCountryMixin, JobSeekerProfileFieldsMixin, forms.ModelForm
 ):
     REQUIRED_FIELDS = [
         "title",
