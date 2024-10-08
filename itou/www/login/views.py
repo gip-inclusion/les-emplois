@@ -30,7 +30,7 @@ class ItouLoginView(LoginView):
         if not settings.INCLUSION_CONNECT_BASE_URL:
             return None
 
-        if self.user_kind in [UserKind.LABOR_INSPECTOR, UserKind.JOB_SEEKER]:
+        if self.user_kind not in [UserKind.EMPLOYER, UserKind.PRESCRIBER]:
             return None
 
         params = {
@@ -42,6 +42,22 @@ class ItouLoginView(LoginView):
 
         return add_url_params(reverse("inclusion_connect:authorize"), params)
 
+    def _get_pro_connect_url(self, context):
+        if not settings.PRO_CONNECT_BASE_URL:
+            return None
+
+        if self.user_kind not in [UserKind.EMPLOYER, UserKind.PRESCRIBER]:
+            return None
+
+        params = {
+            "user_kind": self.user_kind,
+            "previous_url": self.request.get_full_path(),
+        }
+        if context["redirect_field_value"]:
+            params["next_url"] = context["redirect_field_value"]
+
+        return add_url_params(reverse("pro_connect:authorize"), params)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         login_url = reverse("account_login")
@@ -52,6 +68,7 @@ class ItouLoginView(LoginView):
             "signup_allowed": True,
             "redirect_field_value": get_safe_url(self.request, REDIRECT_FIELD_NAME),
             "inclusion_connect_url": self._get_inclusion_connect_url(context),
+            "pro_connect_url": self._get_pro_connect_url(context),
         }
         return context | extra_context
 
@@ -63,7 +80,10 @@ class ItouLoginView(LoginView):
                     "next_url": next_url,
                     "channel": InclusionConnectChannel.MAP_CONSEILLER.value,
                 }
-                redirect_to = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+                if settings.PRO_CONNECT_BASE_URL:
+                    redirect_to = f"{reverse('pro_connect:authorize')}?{urlencode(params)}"
+                else:
+                    redirect_to = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
                 return HttpResponseRedirect(redirect_to)
         return super().dispatch(request, *args, **kwargs)
 

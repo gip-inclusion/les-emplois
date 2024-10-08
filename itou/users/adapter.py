@@ -7,6 +7,7 @@ from django.utils.http import urlencode
 from itou.openid_connect.france_connect.constants import FRANCE_CONNECT_SESSION_STATE, FRANCE_CONNECT_SESSION_TOKEN
 from itou.openid_connect.inclusion_connect.constants import INCLUSION_CONNECT_SESSION_KEY
 from itou.openid_connect.pe_connect.constants import PE_CONNECT_SESSION_TOKEN
+from itou.openid_connect.pro_connect.constants import PRO_CONNECT_SESSION_KEY
 from itou.utils.urls import get_safe_url
 
 
@@ -57,6 +58,14 @@ class UserAdapter(DefaultAccountAdapter):
         Tests are in itou.inclusion_connect.tests.
         """
         redirect_url = reverse("search:employers_home")
+        # ProConnect
+        pro_session = request.session.get(PRO_CONNECT_SESSION_KEY)
+        if pro_session:
+            token = pro_session["token"]
+            if token:
+                params = {"token": token}
+                pro_connect_base_logout_url = reverse("pro_connect:logout")
+                return f"{pro_connect_base_logout_url}?{urlencode(params)}"
         # Inclusion Connect
         ic_session = request.session.get(INCLUSION_CONNECT_SESSION_KEY)
         if ic_session:

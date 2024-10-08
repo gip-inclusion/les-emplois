@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     "itou.openid_connect.france_connect",
     "itou.openid_connect.inclusion_connect",
     "itou.openid_connect.pe_connect",
+    "itou.openid_connect.pro_connect",
     "itou.invitations",
     "itou.external_data",
     "itou.metabase",
@@ -416,6 +417,11 @@ FRANCE_CONNECT_CLIENT_SECRET = os.getenv("FRANCE_CONNECT_CLIENT_SECRET")
 INCLUSION_CONNECT_BASE_URL = os.getenv("INCLUSION_CONNECT_BASE_URL")
 INCLUSION_CONNECT_CLIENT_ID = os.getenv("INCLUSION_CONNECT_CLIENT_ID")
 INCLUSION_CONNECT_CLIENT_SECRET = os.getenv("INCLUSION_CONNECT_CLIENT_SECRET")
+
+PRO_CONNECT_BASE_URL = os.getenv("PRO_CONNECT_BASE_URL")
+PRO_CONNECT_CLIENT_ID = os.getenv("PRO_CONNECT_CLIENT_ID")
+PRO_CONNECT_CLIENT_SECRET = os.getenv("PRO_CONNECT_CLIENT_SECRET")
+PRO_CONNECT_FT_IDP_HINT = os.getenv("PRO_CONNECT_FT_IDP_HINT")
 
 TALLY_URL = os.getenv("TALLY_URL")
 

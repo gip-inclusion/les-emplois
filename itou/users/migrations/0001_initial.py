@@ -299,6 +299,7 @@ class Migration(migrations.Migration):
                             ("DJANGO", "Django"),
                             ("FC", "FranceConnect"),
                             ("IC", "Inclusion Connect"),
+                            ("PC", "ProConnect"),
                             ("PEC", "Pôle emploi Connect"),
                         ],
                         default="DJANGO",

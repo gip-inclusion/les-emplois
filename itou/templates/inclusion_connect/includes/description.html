@@ -2,13 +2,28 @@
 {% load theme_inclusion %}
 {% load matomo %}
 
-<h2>Créez un compte les emplois de l’inclusion avec Inclusion Connect</h2>
-<p class="mt-5">
-    Inclusion Connect est une solution de connexion unique à plusieurs services publics réservée aux professionnels de l’inclusion.
-</p>
 
 
-{% if inclusion_connect_url %}
+{% if pro_connect_url %}
+
+    <h2>Créez un compte les emplois de l’inclusion avec ProConnect</h2>
+    <p class="mt-5">ProConnect est une solution de connexion unique à de nombreux services publics.</p>
+{% else %}
+    <h2>Créez un compte les emplois de l’inclusion avec Inclusion Connect</h2>
+    <p class="mt-5">
+        Inclusion Connect est une solution de connexion unique à plusieurs services publics réservée aux professionnels de l’inclusion.
+    </p>
+{% endif %}
+
+{% if pro_connect_url %}
+    <div class="text-center">
+        <a href="{{ pro_connect_url }}" class="proconnect-button" {% matomo_event "connexion "|add:matomo_account_type "clic" "se-connecter-avec-pro-connect" %}>
+        </a>
+        <br>
+
+        <a href="https://proconnect.gouv.fr/" class="btn btn-link" target="_blank">En savoir plus</a>
+    </div>
+{% elif inclusion_connect_url %}
     <div class="text-center">
         <a href="{{ inclusion_connect_url }}" class="btn-inclusion-connect" {% matomo_event "inscription "|add:matomo_account_type "clic" "se-connecter-avec-inclusion-connect" %}>
             <picture>

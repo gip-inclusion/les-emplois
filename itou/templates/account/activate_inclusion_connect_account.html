@@ -8,38 +8,63 @@
 
 {% block title %}Connexion {{ block.super }}{% endblock %}
 
-{% block body_class %}p-inclusion-connect{% endblock %}
-
 {% block content %}
     <section class="s-section pt-lg-3">
         <div class="s-section__container container">
             <div class="s-section__row row g-0">
                 <div class="s-section__col col-12 col-lg-6 bg-lg-white">
-                    <div class="bg-white p-3 py-lg-7 px-lg-8">
-                        <picture class="d-block mb-5">
-                            <img class="img-fluid" src="{% static_theme_images 'logo-inclusion-connect.svg' %}" width="240" alt="Inclusion Connect" />
-                        </picture>
-                        <h1 class="h2 mb-lg-4">Un accès unique à tous vos services !</h1>
-                        <p>Le service Inclusion Connect est à présent obligatoire pour se connecter à la plateforme des emplois.</p>
-                        <p>
-                            Il vous permettra d'accéder aux différents services partenaires avec <b>le même identifiant et le même mot de passe.</b>
-                        </p>
-                        <p>Il vous suffit de cliquer sur le bouton ci-desous pour activer votre compte</p>
-                        <a href="{{ inclusion_connect_url }}" class="btn btn-block btn-primary" {% matomo_event "activation "|add:matomo_account_type "clic" "activer-son-compte-inclusion-connect" %}>
-                            Activer mon compte Inclusion Connect
-                        </a>
-                        <a class="btn btn-link btn-block"
-                           href="https://plateforme-inclusion.notion.site/Un-compte-unique-pour-mes-services-num-riques-ded9135197654da590f5dde41d8bb68b"
-                           aria-label="Plus d'infos concernant Inclusion Connect"
-                           rel="noopener"
-                           target="_blank">
-                            <span>Plus d'infos</span>
-                            <i class="ri-external-link-line ri-lg"></i>
-                        </a>
-                    </div>
+                    {% if pro_connect_url %}
+                        <div class="bg-white p-3 py-lg-7 px-lg-8">
+                            <h1 class="h2 mb-lg-4">ProConnect, un accès unique à tous vos services !</h1>
+                            <p>Le service ProConnect est obligatoire pour se connecter au service les emplois de l'inclusion.</p>
+                            <p>
+                                Pour conserver l'accès à votre compte existant vous devez vous connecter ou créer un compte avec ProConnect à l'aide du bouton ci-dessous.
+                            </p>
+                            <p>
+                                Assurez vous que l'adresse e-mail utilisée soit la suivante :
+                                <br>
+                                <strong>{{ user.email }}</strong>
+                            </p>
+                            <div class="text-center">
+                                <a href="{{ pro_connect_url }}" class="proconnect-button" {% matomo_event "connexion "|add:matomo_account_type "clic" "se-connecter-avec-pro-connect" %}>
+                                </a>
+                            </div>
+                            <a class="btn btn-link btn-block" href="https://proconnect.gouv.fr/" aria-label="Plus d'infos concernant ProConnect" rel="noopener" target="_blank">
+                                <span>Plus d'infos</span>
+                                <i class="ri-external-link-line ri-lg"></i>
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="bg-white p-3 py-lg-7 px-lg-8">
+                            <picture class="d-block mb-5">
+                                <img class="img-fluid" src="{% static_theme_images 'logo-inclusion-connect.svg' %}" width="240" alt="Inclusion Connect" />
+                            </picture>
+                            <h1 class="h2 mb-lg-4">Un accès unique à tous vos services !</h1>
+                            <p>Le service Inclusion Connect est à présent obligatoire pour se connecter à la plateforme des emplois.</p>
+                            <p>
+                                Il vous permettra d'accéder aux différents services partenaires avec <b>le même identifiant et le même mot de passe.</b>
+                            </p>
+                            <p>Il vous suffit de cliquer sur le bouton ci-desous pour activer votre compte</p>
+                            <a href="{{ inclusion_connect_url }}" class="btn btn-block btn-primary" {% matomo_event "activation "|add:matomo_account_type "clic" "activer-son-compte-inclusion-connect" %}>
+                                Activer mon compte Inclusion Connect
+                            </a>
+                            <a class="btn btn-link btn-block"
+                               href="https://plateforme-inclusion.notion.site/Un-compte-unique-pour-mes-services-num-riques-ded9135197654da590f5dde41d8bb68b"
+                               aria-label="Plus d'infos concernant Inclusion Connect"
+                               rel="noopener"
+                               target="_blank">
+                                <span>Plus d'infos</span>
+                                <i class="ri-external-link-line ri-lg"></i>
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="s-section__col d-none d-lg-flex col-lg-6 p-lg-6 justify-content-center align-items-center bg-light">
-                    <img class="img-fluid" src="{% static 'img/illustration-ic.svg' %}" alt="" loading="lazy">
+                    {% if pro_connect_url %}
+                        <img class="img-fluid" src="{% static 'img/illustration-pc.svg' %}" alt="" loading="lazy">
+                    {% else %}
+                        <img class="img-fluid" src="{% static 'img/illustration-ic.svg' %}" alt="" loading="lazy">
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -7,7 +7,7 @@ from django.test import override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.html import escape
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.users import enums as users_enums
@@ -16,7 +16,7 @@ from itou.utils import constants as global_constants
 from itou.utils.urls import add_url_params
 from itou.www.login.forms import ItouLoginForm
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
-from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
+from tests.openid_connect.test import sso_parametrize
 from tests.users.factories import (
     DEFAULT_PASSWORD,
     EmployerFactory,
@@ -28,6 +28,7 @@ from tests.utils.test import TestCase, reload_module
 
 
 CONNECT_WITH_IC = "Se connecter avec Inclusion Connect"
+PRO_CONNECT_BTN = 'class="proconnect-button"'
 
 
 class ItouLoginTest(TestCase):
@@ -67,109 +68,119 @@ class ItouLoginFormTest(TestCase):
         assert "FranceConnect" in form.errors["__all__"][0]
 
 
-class PrescriberLoginTest(InclusionConnectBaseTestCase):
-    def test_login_options(self):
+class TestPrescriberLogin:
+    @sso_parametrize
+    def test_login_options(self, client, sso_setup):
         url = reverse("login:prescriber")
-        response = self.client.get(url)
-        self.assertContains(response, CONNECT_WITH_IC)
+        response = client.get(url)
+        sso_setup.assertContainsButton(response)
         params = {
             "user_kind": UserKind.PRESCRIBER,
             "previous_url": url,
         }
-        inclusion_connect_url = escape(add_url_params(reverse("inclusion_connect:authorize"), params))
-        self.assertContains(response, inclusion_connect_url + '"')
-        self.assertContains(response, "Adresse e-mail")
-        self.assertContains(response, "Mot de passe")
+        sso_url = escape(add_url_params(sso_setup.authorize_url, params))
+        assertContains(response, sso_url + '"')
+        assertContains(response, "Adresse e-mail")
+        assertContains(response, "Mot de passe")
 
         url_with_next = add_url_params(reverse("login:prescriber"), {"next": "/next_url"})
-        response = self.client.get(url_with_next)
+        response = client.get(url_with_next)
         params = {
             "user_kind": UserKind.PRESCRIBER,
             "previous_url": url_with_next,
             "next_url": "/next_url",
         }
-        inclusion_connect_url = escape(add_url_params(reverse("inclusion_connect:authorize"), params))
-        self.assertContains(response, inclusion_connect_url + '"')
+        sso_url = escape(add_url_params(sso_setup.authorize_url, params))
+        assertContains(response, sso_url + '"')
 
-    def test_login_using_django(self):
+    @sso_parametrize
+    def test_login_using_django(self, client, sso_setup):
         user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
         url = reverse("login:prescriber")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         form_data = {
             "login": user.email,
             "password": DEFAULT_PASSWORD,
         }
-        response = self.client.post(url, data=form_data)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
+        response = client.post(url, data=form_data)
+        assertRedirects(response, reverse("account_email_verification_sent"))
 
-    def test_login_using_django_but_has_sso_provider(self):
-        user = PrescriberFactory(identity_provider=users_enums.IdentityProvider.INCLUSION_CONNECT)
+    @sso_parametrize
+    def test_login_using_django_but_has_sso_provider(self, client, sso_setup):
+        user = PrescriberFactory(identity_provider=sso_setup.identity_provider)
         url = reverse("login:prescriber")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         form_data = {
             "login": user.email,
             "password": "a",
         }
-        response = self.client.post(url, data=form_data)
-        self.assertContains(
-            response, "Votre compte est relié à Inclusion Connect. Merci de vous connecter avec ce service."
+        response = client.post(url, data=form_data)
+        assertContains(
+            response,
+            f"Votre compte est relié à {sso_setup.identity_provider.label}. "
+            "Merci de vous connecter avec ce service.",
         )
 
 
-class EmployerLoginTest(InclusionConnectBaseTestCase):
-    def test_login_options(self):
+class TestEmployerLogin:
+    @sso_parametrize
+    def test_login_options(self, client, sso_setup):
         url = reverse("login:employer")
-        response = self.client.get(url)
-        self.assertContains(response, CONNECT_WITH_IC)
+        response = client.get(url)
+        sso_setup.assertContainsButton(response)
         params = {
             "user_kind": UserKind.EMPLOYER,
             "previous_url": url,
         }
-        inclusion_connect_url = escape(add_url_params(reverse("inclusion_connect:authorize"), params))
-        self.assertContains(response, inclusion_connect_url + '"')
-        self.assertContains(response, "Adresse e-mail")
-        self.assertContains(response, "Mot de passe")
+        inclusion_connect_url = escape(add_url_params(sso_setup.authorize_url, params))
+        assertContains(response, inclusion_connect_url + '"')
+        assertContains(response, "Adresse e-mail")
+        assertContains(response, "Mot de passe")
 
         url_with_next = add_url_params(reverse("login:employer"), {"next": "/next_url"})
-        response = self.client.get(url_with_next)
+        response = client.get(url_with_next)
         params = {
             "user_kind": UserKind.EMPLOYER,
             "previous_url": url_with_next,
             "next_url": "/next_url",
         }
-        inclusion_connect_url = escape(add_url_params(reverse("inclusion_connect:authorize"), params))
-        self.assertContains(response, inclusion_connect_url + '"')
+        inclusion_connect_url = escape(add_url_params(sso_setup.authorize_url, params))
+        assertContains(response, inclusion_connect_url + '"')
 
-    def test_login_using_django(self):
+    @sso_parametrize
+    def test_login_using_django(self, client, sso_setup):
         user = EmployerFactory(identity_provider=IdentityProvider.DJANGO)
         url = reverse("login:employer")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         form_data = {
             "login": user.email,
             "password": DEFAULT_PASSWORD,
         }
-        response = self.client.post(url, data=form_data)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
+        response = client.post(url, data=form_data)
+        assertRedirects(response, reverse("account_email_verification_sent"))
 
-    def test_login_using_django_but_has_sso_provider(self):
-        user = EmployerFactory(identity_provider=users_enums.IdentityProvider.INCLUSION_CONNECT)
+    @sso_parametrize
+    def test_login_using_django_but_has_sso_provider(self, client, sso_setup):
+        user = EmployerFactory(identity_provider=sso_setup.identity_provider)
         url = reverse("login:employer")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         form_data = {
             "login": user.email,
             "password": "a",
         }
-        response = self.client.post(url, data=form_data)
-        self.assertContains(
-            response, "Votre compte est relié à Inclusion Connect. Merci de vous connecter avec ce service."
+        response = client.post(url, data=form_data)
+        assertContains(
+            response,
+            f"Votre compte est relié à {sso_setup.identity_provider.label}. "
+            "Merci de vous connecter avec ce service.",
         )
 
 
@@ -178,6 +189,7 @@ class LaborInspectorLoginTest(TestCase):
         url = reverse("login:labor_inspector")
         response = self.client.get(url)
         self.assertNotContains(response, CONNECT_WITH_IC)
+        self.assertNotContains(response, PRO_CONNECT_BTN)
         self.assertContains(response, "Adresse e-mail")
         self.assertContains(response, "Mot de passe")
 

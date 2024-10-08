@@ -1,4 +1,10 @@
 # Journal des changements techniques majeurs
+## 2024-09-23
+
+- Ajout des variables d'environnement `PRO_CONNECT_*`
+  la recette ProConnect peut être utilisée en créant une recette jetable
+  et en suivant les indications de la note bitwarden
+
 ## 2024-09-22
 
 - Ajout de la variable d'environnement `API_PARTICULIER_TOKEN` pour appeler l'API en local.

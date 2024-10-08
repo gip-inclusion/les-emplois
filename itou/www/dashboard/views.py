@@ -277,7 +277,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
         return HttpResponseRedirect(success_url)
 
     ic_account_url = None
-    if request.user.identity_provider == IdentityProvider.INCLUSION_CONNECT and settings.INCLUSION_CONNECT_BASE_URL:
+    if request.user.identity_provider == IdentityProvider.INCLUSION_CONNECT:
         # SSO users do not have access to edit_user_email dedicated view:
         # this field allows them to discover their dedicated process
         ic_login_params = {
@@ -417,7 +417,7 @@ class AccountMigrationView(LoginRequiredMixin, TemplateView):
             return HttpResponseRedirect(reverse("dashboard:index"))
         return super().dispatch(request, *args, **kwargs)
 
-    def _get_inclusion_connect_base_params(self):
+    def _get_params(self):
         params = {
             "user_kind": self.request.user.kind,
             "previous_url": self.request.get_full_path(),
@@ -430,10 +430,15 @@ class AccountMigrationView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        params = self._get_inclusion_connect_base_params()
+        params = self._get_params()
         inclusion_connect_url = add_url_params(reverse("inclusion_connect:activate_account"), params)
+        pro_connect_url = (
+            add_url_params(reverse("pro_connect:authorize"), params) if settings.PRO_CONNECT_BASE_URL else None
+        )
+
         extra_context = {
             "inclusion_connect_url": inclusion_connect_url,
+            "pro_connect_url": pro_connect_url,
             "matomo_account_type": MATOMO_ACCOUNT_TYPE[self.request.user.kind],
         }
         return context | extra_context
