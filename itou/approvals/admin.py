@@ -204,14 +204,6 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "created_at",
     )
     list_select_related = ("user__jobseeker_profile",)
-    search_fields = (
-        "pk",
-        "number",
-        "user__first_name__unaccent",
-        "user__last_name__unaccent",
-        "user__email",
-        "user__jobseeker_profile__nir",
-    )
     list_filter = (
         IsValidFilter,
         StartDateFilter,
@@ -308,6 +300,33 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         if obj:
             return ("origin",) + self.readonly_fields
         return self.readonly_fields
+
+    def get_search_fields(self, request):
+        search_fields = []
+        search_term = request.GET.get("q", "").strip()
+        if len(search_term) <= 12 and (
+            search_term.startswith(models.Approval.ASP_ITOU_PREFIX) or search_term.isdecimal()
+        ):
+            if len(search_term) == 12:
+                search_fields.append("number__exact")
+            elif search_term.startswith(models.Approval.ASP_ITOU_PREFIX):
+                search_fields.append("number__startswith")
+            else:
+                # Handle partial numbers not starting with the prefix (migrated PEApproval)
+                search_fields.append("number__contains")
+
+        if search_term.isdecimal() and len(search_term) <= 15:
+            if len(search_term) == 15:  # Complete NIR
+                search_fields.append("user__jobseeker_profile__nir__exact")
+            else:
+                search_fields.append("user__jobseeker_profile__nir__contains")
+
+        if not search_fields:
+            search_fields.append("user__email")
+            if "@" not in search_term:
+                search_fields.append("user__first_name__unaccent")
+                search_fields.append("user__last_name__unaccent")
+        return search_fields
 
     def save_model(self, request, obj, form, change):
         if not change:

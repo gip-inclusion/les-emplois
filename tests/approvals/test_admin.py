@@ -170,3 +170,63 @@ def test_check_inconsistency_check(admin_client):
             )
         ],
     )
+
+
+def test_search_fields(admin_client):
+    list_url = reverse("admin:approvals_approval_changelist")
+    approval1 = ApprovalFactory(
+        user__first_name="Jean Michel",
+        user__last_name="Dupont",
+        user__email="jean.michel@example.com",
+        user__jobseeker_profile__nir="190031398700953",
+        origin_pe_approval=True,
+        number="123456789012",
+    )
+    url_1 = reverse("admin:approvals_approval_change", kwargs={"object_id": approval1.pk})
+    approval2 = ApprovalFactory(
+        user__first_name="Pierre François",
+        user__last_name="Martin",
+        user__email="pierre.francois@example.com",
+        user__jobseeker_profile__nir="",
+    )
+    url_2 = reverse("admin:approvals_approval_change", kwargs={"object_id": approval2.pk})
+
+    # Nothing to hide
+    response = admin_client.get(list_url)
+    assertContains(response, url_1)
+    assertContains(response, url_2)
+
+    # Search by approval number
+    response = admin_client.get(list_url, {"q": approval2.number})
+    assertNotContains(response, url_1)
+    assertContains(response, url_2)
+
+    # Search by partial number
+    response = admin_client.get(list_url, {"q": approval1.number[1:-1]})
+    assertContains(response, url_1)
+    assertNotContains(response, url_2)
+
+    # Search by NIR
+    response = admin_client.get(list_url, {"q": approval1.user.jobseeker_profile.nir})
+    assertContains(response, url_1)
+    assertNotContains(response, url_2)
+
+    # Search by NIR truncated
+    response = admin_client.get(list_url, {"q": approval1.user.jobseeker_profile.nir[:-2]})
+    assertContains(response, url_1)
+    assertNotContains(response, url_2)
+
+    # Search on email
+    response = admin_client.get(list_url, {"q": "michel@example"})
+    assertContains(response, url_1)
+    assertNotContains(response, url_2)
+
+    # Search on first_name
+    response = admin_client.get(list_url, {"q": "françois"})
+    assertNotContains(response, url_1)
+    assertContains(response, url_2)
+
+    # Search on last_name
+    response = admin_client.get(list_url, {"q": "martin"})
+    assertNotContains(response, url_1)
+    assertContains(response, url_2)
