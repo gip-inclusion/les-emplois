@@ -993,7 +993,7 @@
       "geocoding_updated_at": null,
       "groups": [],
       "has_completed_welcoming_tour": true,
-      "identity_provider": "IC",
+      "identity_provider": "DJANGO",
       "insee_city": null,
       "is_active": true,
       "is_staff": false,
