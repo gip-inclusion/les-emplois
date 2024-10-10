@@ -190,11 +190,11 @@ ASSET_INFOS = {
     },
     "theme-inclusion": {
         "download": {
-            "url": "https://github.com/gip-inclusion/itou-theme/archive/refs/tags/v2.2.6.zip",
-            "sha256": "3f8e7e6d939d8dd3771472838a9be6912e339ee09f35500df358629c8a48d868",
+            "url": "https://github.com/gip-inclusion/itou-theme/archive/refs/tags/v2.2.7.zip",
+            "sha256": "22a8dcce919b9ad1fe224af058540bea868047e6f9dd2558f9b9696bd0e0152b",
         },
         "extract": {
-            "origin": "itou-theme-2.2.6/dist",
+            "origin": "itou-theme-2.2.7/dist",
             "destination": "vendor/theme-inclusion/",
             "files": [
                 "javascripts/app.js",
