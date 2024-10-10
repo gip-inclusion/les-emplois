@@ -29,12 +29,15 @@
 
                                 {# Split form fields for easier collapsible behaviour #}
                                 {% bootstrap_field form.start_at %}
-                                <div id="collapse_end_at" class="collapse{% if not form.set_default_end_date.value %} show{% endif %}">
+
+                                <div id="collapse_{{ form.end_at.name }}"
+                                     class="collapse{% if not form.set_default_end_date.value %} show{% endif %}"
+                                     aria-expanded="{% if not form.set_default_end_date.value %}true{% else %}false{% endif %}">
                                     {% bootstrap_field form.end_at %}
                                 </div>
-                                <div role="button" data-bs-toggle="collapse" data-bs-target="#collapse_end_at" aria-controls="collapse_end_at">
-                                    {% bootstrap_field form.set_default_end_date %}
-                                </div>
+
+                                {% bootstrap_field form.set_default_end_date %}
+
                                 {% bootstrap_field form.reason %}
 
                                 <div class="alert alert-info" role="status">
