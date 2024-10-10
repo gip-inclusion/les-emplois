@@ -1047,8 +1047,7 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         self.fields["selected_jobs"].choices = self._get_choices_for_jobs()
 
     def _get_choices_for_sender(self, users):
-        users = [user for user in users if user.get_full_name()]
-        users = [(user.id, user.get_full_name().title()) for user in users]
+        users = [(user.id, user_full_name) for user in users if (user_full_name := user.get_full_name())]
         return sorted(users, key=lambda user: user[1])
 
     def _get_choices_for_administrativecriteria(self):
@@ -1133,8 +1132,7 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
         return queryset
 
     def _get_choices_for_job_seeker(self, users):
-        users = [user for user in users if user.get_full_name()]
-        users = [(user.id, user.get_full_name().title()) for user in users]
+        users = [(user.id, user_full_name) for user in users if (user_full_name := user.get_full_name())]
         return sorted(users, key=lambda user: user[1])
 
     def get_sender_prescriber_organization_choices(self):
@@ -1163,15 +1161,13 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
         self.fields["to_companies"].choices += self.get_to_companies_choices()
 
     def _get_choices_for_job_seeker(self, users):
-        users = [user for user in users if user.get_full_name()]
         users = [
             (
                 user.id,
-                mask_unless(
-                    user.get_full_name().title(), predicate=self.request_user.can_view_personal_information(user)
-                ),
+                mask_unless(user_full_name, predicate=self.request_user.can_view_personal_information(user)),
             )
             for user in users
+            if (user_full_name := user.get_full_name())
         ]
         return sorted(users, key=lambda user: user[1])
 
