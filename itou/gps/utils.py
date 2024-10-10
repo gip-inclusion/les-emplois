@@ -60,7 +60,7 @@ def parse_gps_advisors_file(import_file):
     if count_nir_invalid_length:
         logger.warning(f"There are {count_nir_invalid_length} included NIR values of invalid length after treatment.")
 
-    cache.set(GPS_ADVISORS_KEY, nir_to_contact)
+    cache.set(GPS_ADVISORS_KEY, nir_to_contact, timeout=60 * 60 * 24 * 14)  # two weeks
     return nir_to_contact
 
 
@@ -73,6 +73,10 @@ def create_or_update_advisor(jobseeker_profile, nir_to_contact, commit=True):
     # prepare to create or update FranceTravailContact
     try:
         advisor = jobseeker_profile.advisor_information
+
+        if (advisor.name, advisor.email) == (contact_name, contact_email):
+            return None, False
+
         advisor.name = contact_name
         advisor.email = contact_email
     except FranceTravailContact.DoesNotExist:
