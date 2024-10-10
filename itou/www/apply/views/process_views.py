@@ -95,7 +95,11 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
             "eligibility_diagnosis__author_siae",
             "eligibility_diagnosis__author_prescriber_organization",
             "eligibility_diagnosis__job_seeker__jobseeker_profile",
-        ).prefetch_related("selected_jobs"),
+        ).prefetch_related(
+            "selected_jobs",
+            "eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
+            "geiq_eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
+        ),
         id=job_application_id,
         job_seeker=request.user,
     )
@@ -112,12 +116,21 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
         job_application.to_company.kind == CompanyKind.GEIQ
         and _get_geiq_eligibility_diagnosis(job_application, only_prescriber=False)
     )
+    if geiq_eligibility_diagnosis:
+        geiq_eligibility_diagnosis.criteria_display = geiq_eligibility_diagnosis.get_criteria_display_qs(
+            hiring_start_at=job_application.hiring_start_at
+        )
+    eligibility_diagnosis = job_application.get_eligibility_diagnosis()
+    if eligibility_diagnosis:
+        eligibility_diagnosis.criteria_display = eligibility_diagnosis.get_criteria_display_qs(
+            hiring_start_at=job_application.hiring_start_at
+        )
 
     context = {
         "can_view_personal_information": request.user.can_view_personal_information(job_application.job_seeker),
         "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
         "display_refusal_info": False,
-        "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
+        "eligibility_diagnosis": eligibility_diagnosis,
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "job_application": job_application,
@@ -155,7 +168,11 @@ def details_for_company(request, job_application_id, template_name="apply/proces
             "approval",
             "archived_by",
         )
-        .prefetch_related("selected_jobs__appellation")
+        .prefetch_related(
+            "selected_jobs__appellation",
+            "eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
+            "geiq_eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
+        )
         .annotate(
             has_pending_rdv_insertion_invitation_request=Exists(
                 InvitationRequest.objects.filter(
@@ -202,12 +219,22 @@ def details_for_company(request, job_application_id, template_name="apply/proces
         job_application.to_company.kind == CompanyKind.GEIQ
         and _get_geiq_eligibility_diagnosis(job_application, only_prescriber=False)
     )
+    if geiq_eligibility_diagnosis:
+        geiq_eligibility_diagnosis.criteria_display = geiq_eligibility_diagnosis.get_criteria_display_qs(
+            hiring_start_at=job_application.hiring_start_at
+        )
+
+    eligibility_diagnosis = job_application.get_eligibility_diagnosis()
+    if eligibility_diagnosis:
+        eligibility_diagnosis.criteria_display = eligibility_diagnosis.get_criteria_display_qs(
+            hiring_start_at=job_application.hiring_start_at
+        )
 
     context = {
         "can_view_personal_information": True,  # SIAE members have access to personal info
         "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
         "display_refusal_info": False,
-        "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
+        "eligibility_diagnosis": eligibility_diagnosis,
         "eligibility_diagnosis_by_siae_required": job_application.eligibility_diagnosis_by_siae_required(),
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
@@ -248,7 +275,11 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "to_company",
         "approval",
         "archived_by",
-    ).prefetch_related("selected_jobs__appellation")
+    ).prefetch_related(
+        "selected_jobs__appellation",
+        "eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
+        "geiq_eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
+    )
     job_application = get_object_or_404(queryset, id=job_application_id)
 
     transition_logs = job_application.logs.select_related("user").all()
@@ -268,6 +299,16 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         job_application.to_company.kind == CompanyKind.GEIQ
         and _get_geiq_eligibility_diagnosis(job_application, only_prescriber=True)
     )
+    if geiq_eligibility_diagnosis:
+        geiq_eligibility_diagnosis.criteria_display = geiq_eligibility_diagnosis.get_criteria_display_qs(
+            hiring_start_at=job_application.hiring_start_at
+        )
+
+    eligibility_diagnosis = job_application.get_eligibility_diagnosis()
+    if eligibility_diagnosis:
+        eligibility_diagnosis.criteria_display = eligibility_diagnosis.get_criteria_display_qs(
+            hiring_start_at=job_application.hiring_start_at
+        )
 
     # Refused applications information is providen to prescribers
     if display_refusal_info := job_application.is_refused_for_other_reason:
@@ -280,7 +321,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     context = {
         "can_view_personal_information": request.user.can_view_personal_information(job_application.job_seeker),
         "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
-        "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
+        "eligibility_diagnosis": eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "job_application": job_application,
         "transition_logs": transition_logs,

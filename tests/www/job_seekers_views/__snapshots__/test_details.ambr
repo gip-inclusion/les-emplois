@@ -954,7 +954,7 @@
 # ---
 # name: test_job_application_tab[job seeker details view with sent job applications]
   dict({
-    'num_queries': 17,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -1451,6 +1451,26 @@
           ORDER BY 10 DESC,
                    "eligibility_eligibilitydiagnosis"."created_at" DESC
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_selectedadministrativecriteria"."id",
+                 "eligibility_selectedadministrativecriteria"."certified",
+                 "eligibility_selectedadministrativecriteria"."certified_at",
+                 "eligibility_selectedadministrativecriteria"."certification_period",
+                 "eligibility_selectedadministrativecriteria"."data_returned_by_api",
+                 "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id",
+                 "eligibility_selectedadministrativecriteria"."administrative_criteria_id",
+                 "eligibility_selectedadministrativecriteria"."created_at"
+          FROM "eligibility_selectedadministrativecriteria"
+          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s)
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

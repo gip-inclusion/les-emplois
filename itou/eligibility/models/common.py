@@ -74,11 +74,12 @@ class AbstractEligibilityDiagnosisModel(models.Model):
     def is_valid(self):
         return bool(self.expires_at and self.expires_at > timezone.now())
 
+    @property
+    def is_from_employer(self):
+        return self.author_kind in (AuthorKind.GEIQ, AuthorKind.EMPLOYER)
+
     def criteria_can_be_certified(self):
-        return (
-            self.author_kind in (AuthorKind.GEIQ, AuthorKind.EMPLOYER)
-            and self.administrative_criteria.certifiable().exists()
-        )
+        return self.is_from_employer and self.administrative_criteria.certifiable().exists()
 
     def get_author_kind_display(self):
         if self.sender_kind == SenderKind.PRESCRIBER and (
@@ -107,6 +108,9 @@ class AbstractEligibilityDiagnosisModel(models.Model):
                 "certified_at",
             ],
         )
+
+    def get_criteria_display_qs(self, hiring_start_at=None):
+        return self.selected_administrative_criteria.with_is_considered_certified(hiring_start_at=hiring_start_at)
 
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):

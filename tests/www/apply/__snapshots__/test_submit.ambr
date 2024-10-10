@@ -629,6 +629,26 @@
         'origin': list([
           'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
+          'hire_confirmation[www/apply/views/submit_views.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_selectedadministrativecriteria"."id",
+                 "eligibility_selectedadministrativecriteria"."certified",
+                 "eligibility_selectedadministrativecriteria"."certified_at",
+                 "eligibility_selectedadministrativecriteria"."certification_period",
+                 "eligibility_selectedadministrativecriteria"."data_returned_by_api",
+                 "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id",
+                 "eligibility_selectedadministrativecriteria"."administrative_criteria_id",
+                 "eligibility_selectedadministrativecriteria"."created_at"
+          FROM "eligibility_selectedadministrativecriteria"
+          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
           '_accept[www/apply/views/common.py]',
           'hire_confirmation[www/apply/views/submit_views.py]',
         ]),
@@ -834,41 +854,6 @@
                            AND U2."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'WithNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IncludeNode[apply/submit/hire_confirmation.html]',
-          'BlockNode[apply/submit_base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/submit_base.html]',
-          'ExtendsNode[apply/submit/hire_confirmation.html]',
-          '_accept[www/apply/views/common.py]',
-          'hire_confirmation[www/apply/views/submit_views.py]',
-        ]),
-        'sql': '''
-          SELECT "eligibility_administrativecriteria"."id",
-                 "eligibility_administrativecriteria"."kind",
-                 "eligibility_administrativecriteria"."level",
-                 "eligibility_administrativecriteria"."name",
-                 "eligibility_administrativecriteria"."desc",
-                 "eligibility_administrativecriteria"."written_proof",
-                 "eligibility_administrativecriteria"."written_proof_url",
-                 "eligibility_administrativecriteria"."written_proof_validity",
-                 "eligibility_administrativecriteria"."ui_rank",
-                 "eligibility_administrativecriteria"."created_at",
-                 "eligibility_administrativecriteria"."created_by_id"
-          FROM "eligibility_administrativecriteria"
-          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
-          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
-          ORDER BY "eligibility_administrativecriteria"."level" ASC,
-                   "eligibility_administrativecriteria"."ui_rank" ASC
         ''',
       }),
       dict({

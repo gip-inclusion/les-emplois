@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility import models
-from itou.eligibility.enums import AuthorKind
+from itou.eligibility.enums import AdministrativeCriteriaAnnex, AuthorKind
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
@@ -45,12 +45,14 @@ def _get_geiq_administrative_criteria(self, create, extracted, **kwargs):
 
 
 def _get_geiq_certifiable_criteria(self, create, extracted, **kwargs):
-    qs = models.GEIQAdministrativeCriteria.objects.certifiable()
+    qs = models.GEIQAdministrativeCriteria.objects.exclude(annex=AdministrativeCriteriaAnnex.NO_ANNEX).certifiable()
     _add_administrative_criteria(self, create, extracted, qs, **kwargs)
 
 
 def _get_geiq_not_certifiable_criteria(self, create, extracted, **kwargs):
-    qs = models.GEIQAdministrativeCriteria.objects.not_certifiable()
+    qs = models.GEIQAdministrativeCriteria.objects.exclude(
+        annex=AdministrativeCriteriaAnnex.NO_ANNEX
+    ).not_certifiable()
     _add_administrative_criteria(self, create, extracted, qs, **kwargs)
 
 

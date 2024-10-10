@@ -160,10 +160,12 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
     def author_structure(self):
         return self.author_geiq or self.author_prescriber_organization
 
-    @property
-    def administrative_criteria_display(self):
-        # for templates
-        return self.administrative_criteria.exclude(annex=AdministrativeCriteriaAnnex.NO_ANNEX).order_by("ui_rank")
+    def get_criteria_display_qs(self, hiring_start_at=None):
+        return (
+            super()
+            .get_criteria_display_qs(hiring_start_at)
+            .exclude(administrative_criteria__annex=AdministrativeCriteriaAnnex.NO_ANNEX)
+        )
 
     @classmethod
     @transaction.atomic()
