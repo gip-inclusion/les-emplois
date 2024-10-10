@@ -61,10 +61,11 @@ class Command(BaseCommand):
 
                 for profile in implicated_profiles:
                     advisor, created = create_or_update_advisor(profile, nir_to_contact, commit=False)
-                    if created:
-                        contacts_to_create.append(advisor)
-                    else:
-                        contacts_to_update.append(advisor)
+                    if advisor:
+                        if created:
+                            contacts_to_create.append(advisor)
+                        else:
+                            contacts_to_update.append(advisor)
 
                 if wet_run:
                     FranceTravailContact.objects.bulk_create(contacts_to_create)
