@@ -54,10 +54,10 @@
                                         {% include "apply/includes/job_seeker_info.html" with job_seeker=job_seeker job_application=None with_matomo_event=True can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request csrf_token=csrf_token SenderKind=SenderKind only %}
                                     </div>
                                     {% if iae_eligibility_diagnosis %}
-                                        {% include "job_seekers_views/includes/eligibility_diagnosis.html" with eligibility_diagnosis=iae_eligibility_diagnosis kind="IAE" request=request only %}
+                                        {% include "job_seekers_views/includes/eligibility_diagnosis.html" with eligibility_diagnosis=iae_eligibility_diagnosis kind="IAE" request=request itou_help_center_url=ITOU_HELP_CENTER_URL only %}
                                     {% endif %}
                                     {% if geiq_eligibility_diagnosis %}
-                                        {% include "job_seekers_views/includes/eligibility_diagnosis.html" with eligibility_diagnosis=geiq_eligibility_diagnosis kind="GEIQ" with_allowance=request.user.is_employer request=request only %}
+                                        {% include "job_seekers_views/includes/eligibility_diagnosis.html" with eligibility_diagnosis=geiq_eligibility_diagnosis kind="GEIQ" with_allowance=request.user.is_employer request=request itou_help_center_url=ITOU_HELP_CENTER_URL only %}
                                     {% endif %}
                                 </div>
                                 {% if approval %}
