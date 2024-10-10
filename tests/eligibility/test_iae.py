@@ -644,3 +644,17 @@ def test_with_is_considered_certified():
         days=AbstractSelectedAdministrativeCriteria.CERTIFICATION_GRACE_PERIOD_DAYS + 1
     )
     assert_considered_valid_count(hiring_start_at=hiring_start_at, expected=0)
+
+
+def test_is_from_employer():
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
+    assert diagnosis.is_from_employer
+
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
+    assert not diagnosis.is_from_employer
+
+    diagnosis = IAEEligibilityDiagnosisFactory(from_employer=True)
+    assert diagnosis.is_from_employer
+
+    diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
+    assert not diagnosis.is_from_employer

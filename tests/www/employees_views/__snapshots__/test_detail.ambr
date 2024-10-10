@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestEmployeeDetailView.test_detail_view[employee detail view]
   dict({
-    'num_queries': 24,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -553,6 +553,26 @@
           FROM "approvals_suspension"
           WHERE "approvals_suspension"."approval_id" IN (%s)
           ORDER BY "approvals_suspension"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'EmployeeDetailView.get_job_application[www/employees_views/views.py]',
+          'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_selectedadministrativecriteria"."id",
+                 "eligibility_selectedadministrativecriteria"."certified",
+                 "eligibility_selectedadministrativecriteria"."certified_at",
+                 "eligibility_selectedadministrativecriteria"."certification_period",
+                 "eligibility_selectedadministrativecriteria"."data_returned_by_api",
+                 "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id",
+                 "eligibility_selectedadministrativecriteria"."administrative_criteria_id",
+                 "eligibility_selectedadministrativecriteria"."created_at"
+          FROM "eligibility_selectedadministrativecriteria"
+          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s)
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

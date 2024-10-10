@@ -33,10 +33,14 @@ class JobSeekerDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         if self.request.user.is_prescriber or (
             self.request.user.is_employer and self.request.current_organization.kind == CompanyKind.GEIQ
         ):
-            geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
-                self.object,
-                for_geiq=self.request.current_organization if self.request.user.is_employer else None,
-            ).first()
+            geiq_eligibility_diagnosis = (
+                GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
+                    self.object,
+                    for_geiq=self.request.current_organization if self.request.user.is_employer else None,
+                )
+                .prefetch_related("selected_administrative_criteria__administrative_criteria")
+                .first()
+            )
 
         approval = None
         iae_eligibility_diagnosis = None
@@ -47,7 +51,14 @@ class JobSeekerDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
             iae_eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
                 self.object,
                 for_siae=self.request.current_organization if self.request.user.is_employer else None,
+                prefetch=["selected_administrative_criteria__administrative_criteria"],
             )
+
+        if geiq_eligibility_diagnosis:
+            geiq_eligibility_diagnosis.criteria_display = geiq_eligibility_diagnosis.get_criteria_display_qs()
+
+        if iae_eligibility_diagnosis:
+            iae_eligibility_diagnosis.criteria_display = iae_eligibility_diagnosis.get_criteria_display_qs()
 
         return super().get_context_data(**kwargs) | {
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,

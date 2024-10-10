@@ -1725,16 +1725,27 @@ def hire_confirmation(
         public_id=job_seeker_public_id,
     )
     if company.kind == CompanyKind.GEIQ:
-        geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, company).first()
+        geiq_eligibility_diagnosis = (
+            GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, company)
+            .prefetch_related("selected_administrative_criteria__administrative_criteria")
+            .first()
+        )
+        if geiq_eligibility_diagnosis:
+            geiq_eligibility_diagnosis.criteria_display = geiq_eligibility_diagnosis.get_criteria_display_qs()
         eligibility_diagnosis = None
+
     else:
         _check_job_seeker_approval(request, job_seeker, company)
         # General IAE eligibility case
-        eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker, for_siae=company)
+        eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
+            job_seeker, for_siae=company, prefetch=["selected_administrative_criteria__administrative_criteria"]
+        )
         if eligibility_diagnosis is not None:
             # The job_seeker object already contains a lot of information: no need to re-retrieve it
             eligibility_diagnosis.job_seeker = job_seeker
+            eligibility_diagnosis.criteria_display = eligibility_diagnosis.get_criteria_display_qs()
         geiq_eligibility_diagnosis = None
+
     return common_views._accept(
         request,
         company,

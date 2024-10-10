@@ -78,6 +78,7 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
             )
             .prefetch_related(
                 "approval__suspension_set",
+                "eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
                 Prefetch(
                     "approval__prolongationrequest_set",
                     queryset=ProlongationRequest.objects.select_related(
@@ -103,12 +104,19 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
             else:
                 approval = self.object.approvals.order_by("-end_at").first()
 
+        eligibility_diagnosis = job_application and job_application.get_eligibility_diagnosis()
+        if eligibility_diagnosis:
+            hiring_start_at = job_application.hiring_start_at if job_application else None
+            eligibility_diagnosis.criteria_display = eligibility_diagnosis.get_criteria_display_qs(
+                hiring_start_at=hiring_start_at
+            )
+
         context["can_view_personal_information"] = True  # SIAE members have access to personal info
         context["can_edit_personal_information"] = self.request.user.can_edit_personal_information(self.object)
         context["approval"] = approval
         context["job_application"] = job_application
         context["matomo_custom_title"] = "Profil salarié"
-        context["eligibility_diagnosis"] = job_application and job_application.get_eligibility_diagnosis()
+        context["eligibility_diagnosis"] = eligibility_diagnosis
         context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("approvals:list"))
         context["link_immersion_facile"] = None
 
