@@ -2,23 +2,28 @@ import datetime
 import logging
 import random
 from itertools import product
-from unittest import mock
 
 import factory
 import pytest
 from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
-from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.template.defaultfilters import urlencode as urlencode_filter
-from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateUsed
-from unittest_parametrize import ParametrizedTestCase, parametrize
+from pytest_django.asserts import (
+    assertContains,
+    assertFormError,
+    assertMessages,
+    assertNotContains,
+    assertNumQueries,
+    assertRedirects,
+    assertTemplateNotUsed,
+    assertTemplateUsed,
+)
 
 from itou.approvals.models import Approval, Suspension
 from itou.asp.models import Commune
@@ -59,7 +64,7 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import TestCase, assert_previous_step, assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup
 
 
 logger = logging.getLogger(__name__)
@@ -74,8 +79,7 @@ REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY = (
 
 
 @pytest.mark.ignore_unknown_variable_template_error("has_form_error", "with_matomo_event")
-@pytest.mark.usefixtures("unittest_compatibility")
-class ProcessViewsTest(MessagesTestMixin, TestCase):
+class TestProcessViews:
     DIAGORIENTE_INVITE_TITLE = "Ce candidat n’a pas de CV ?"
     DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE = "Invitez le prescripteur à en créer un via notre partenaire Diagoriente."
     DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE = "Invitez-le à en créer un via notre partenaire Diagoriente."
@@ -103,10 +107,10 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         "<small>Motif de refus non partagé avec le candidat</small><strong>Autre</strong>"
     )
 
-    @classmethod
-    def setUpTestData(cls):
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
-        cls.cities = create_test_cities(["54", "57"], num_per_department=2)
+        self.cities = create_test_cities(["54", "57"], num_per_department=2)
 
     def get_random_city(self):
         return random.choice(self.cities)
@@ -115,7 +119,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
         return soup.find("ul", attrs={"id": "transition_logs_" + str(job_application.id)})
 
-    def test_details_for_company_from_approval(self, *args, **kwargs):
+    def test_details_for_company_from_approval(self, client, snapshot):
         """Display the details of a job application coming from the approval detail page."""
 
         job_application = JobApplicationFactory(
@@ -123,21 +127,21 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         )
         company = job_application.to_company
         employer = company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         back_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
         url = add_url_params(
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             {"back_url": back_url},
         )
-        with assertSnapshotQueries(self.snapshot(name="job application detail for company")):
-            response = self.client.get(url)
-        self.assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
-        self.assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
-        self.assertContains(response, job_application.job_seeker.jobseeker_profile.pole_emploi_id)
-        self.assertContains(response, job_application.job_seeker.phone.replace(" ", ""))
-        self.assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)  # the company is not a GEIQ
-        self.assertContains(response, f"{back_url}?back_url={urlencode_filter(url)}")
+        with assertSnapshotQueries(snapshot(name="job application detail for company")):
+            response = client.get(url)
+        assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
+        assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
+        assertContains(response, job_application.job_seeker.jobseeker_profile.pole_emploi_id)
+        assertContains(response, job_application.job_seeker.phone.replace(" ", ""))
+        assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)  # the company is not a GEIQ
+        assertContains(response, f"{back_url}?back_url={urlencode_filter(url)}")
         assert_previous_step(response, back_url)
 
         job_application.job_seeker.created_by = employer
@@ -148,19 +152,19 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         job_application.job_seeker.jobseeker_profile.save()
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertContains(response, "Modifier les informations")
-        self.assertContains(response, '<small>Adresse</small><i class="text-disabled">Non renseignée</i>', html=True)
-        self.assertContains(response, '<small>Téléphone</small><i class="text-disabled">Non renseigné</i>', html=True)
-        self.assertContains(
+        response = client.get(url)
+        assertContains(response, "Modifier les informations")
+        assertContains(response, '<small>Adresse</small><i class="text-disabled">Non renseignée</i>', html=True)
+        assertContains(response, '<small>Téléphone</small><i class="text-disabled">Non renseigné</i>', html=True)
+        assertContains(
             response, '<small>Curriculum vitae</small><i class="text-disabled">Non renseigné</i>', html=True
         )
-        self.assertContains(
+        assertContains(
             response,
             '<small>Identifiant France Travail</small><i class="text-disabled">Non renseigné</i>',
             html=True,
         )
-        self.assertContains(
+        assertContains(
             response, '<small>Numéro de sécurité sociale</small><i class="text-disabled">Non renseigné</i>', html=True
         )
         assert_previous_step(response, back_url)  # Back_url is restored from session
@@ -169,18 +173,18 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         job_application.job_seeker.jobseeker_profile.save()
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label)
+        response = client.get(url)
+        assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label)
 
         # Test resume presence:
         resume_link = "https://server.com/sylvester-stallone.pdf"
         job_application = JobApplicationSentByJobSeekerFactory(to_company=company, resume_link=resume_link)
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertContains(response, resume_link)
-        self.assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
+        response = client.get(url)
+        assertContains(response, resume_link)
+        assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
 
-    def test_details_for_company_from_list(self, *args, **kwargs):
+    def test_details_for_company_from_list(self, client, snapshot):
         """Display the details of a job application coming from the job applications list."""
 
         job_application = JobApplicationFactory(
@@ -188,20 +192,20 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         )
         company = job_application.to_company
         employer = company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         back_url = f"{reverse('apply:list_for_siae')}?job_seeker={job_application.job_seeker.id}"
         url = add_url_params(
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             {"back_url": back_url},
         )
-        with assertSnapshotQueries(self.snapshot(name="job application detail for company")):
-            response = self.client.get(url)
-        self.assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
-        self.assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
-        self.assertContains(response, job_application.job_seeker.jobseeker_profile.pole_emploi_id)
-        self.assertContains(response, job_application.job_seeker.phone.replace(" ", ""))
-        self.assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)  # the company is not a GEIQ
+        with assertSnapshotQueries(snapshot(name="job application detail for company")):
+            response = client.get(url)
+        assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
+        assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
+        assertContains(response, job_application.job_seeker.jobseeker_profile.pole_emploi_id)
+        assertContains(response, job_application.job_seeker.phone.replace(" ", ""))
+        assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)  # the company is not a GEIQ
         assert_previous_step(response, back_url, back_to_list=True)
 
         job_application.job_seeker.created_by = employer
@@ -212,19 +216,19 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         job_application.job_seeker.jobseeker_profile.save()
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertContains(response, "Modifier les informations")
-        self.assertContains(response, '<small>Adresse</small><i class="text-disabled">Non renseignée</i>', html=True)
-        self.assertContains(response, '<small>Téléphone</small><i class="text-disabled">Non renseigné</i>', html=True)
-        self.assertContains(
+        response = client.get(url)
+        assertContains(response, "Modifier les informations")
+        assertContains(response, '<small>Adresse</small><i class="text-disabled">Non renseignée</i>', html=True)
+        assertContains(response, '<small>Téléphone</small><i class="text-disabled">Non renseigné</i>', html=True)
+        assertContains(
             response, '<small>Curriculum vitae</small><i class="text-disabled">Non renseigné</i>', html=True
         )
-        self.assertContains(
+        assertContains(
             response,
             '<small>Identifiant France Travail</small><i class="text-disabled">Non renseigné</i>',
             html=True,
         )
-        self.assertContains(
+        assertContains(
             response, '<small>Numéro de sécurité sociale</small><i class="text-disabled">Non renseigné</i>', html=True
         )
         assert_previous_step(response, back_url, back_to_list=True)  # Back_url is restored from session
@@ -233,32 +237,32 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         job_application.job_seeker.jobseeker_profile.save()
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label)
+        response = client.get(url)
+        assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label)
 
         # Test resume presence:
         resume_link = "https://server.com/sylvester-stallone.pdf"
         job_application = JobApplicationSentByJobSeekerFactory(to_company=company, resume_link=resume_link)
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertContains(response, resume_link)
-        self.assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
+        response = client.get(url)
+        assertContains(response, resume_link)
+        assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
 
-    def test_details_archived(self):
+    def test_details_archived(self, client):
         UNARCHIVE = "Désarchiver"
         job_application = JobApplicationFactory(
             archived_at=datetime.datetime(2024, 9, 2, 11, 11, 11, tzinfo=timezone.get_current_timezone()),
         )
         to_company = job_application.to_company
-        self.client.force_login(to_company.members.get())
-        response = self.client.get(
+        client.force_login(to_company.members.get())
+        response = client.get(
             reverse(
                 "apply:details_for_company",
                 kwargs={"job_application_id": job_application.pk},
             )
         )
-        self.assertContains(response, UNARCHIVE)
-        self.assertContains(
+        assertContains(response, UNARCHIVE)
+        assertContains(
             response,
             """
             <p>
@@ -274,14 +278,14 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         to_company.members.add(gilles)
         job_application.archived_by = gilles
         job_application.save(update_fields=["archived_by"])
-        response = self.client.get(
+        response = client.get(
             reverse(
                 "apply:details_for_company",
                 kwargs={"job_application_id": job_application.pk},
             )
         )
-        self.assertContains(response, UNARCHIVE)
-        self.assertContains(
+        assertContains(response, UNARCHIVE)
+        assertContains(
             response,
             """
             <p>
@@ -293,15 +297,15 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             count=1,
         )
 
-        self.client.force_login(job_application.sender)
-        response = self.client.get(
+        client.force_login(job_application.sender)
+        response = client.get(
             reverse(
                 "apply:details_for_prescriber",
                 kwargs={"job_application_id": job_application.pk},
             )
         )
-        self.assertNotContains(response, UNARCHIVE)
-        self.assertContains(
+        assertNotContains(response, UNARCHIVE)
+        assertContains(
             response,
             """
             <p>
@@ -313,15 +317,15 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             count=1,
         )
 
-        self.client.force_login(job_application.job_seeker)
-        response = self.client.get(
+        client.force_login(job_application.job_seeker)
+        response = client.get(
             reverse(
                 "apply:details_for_jobseeker",
                 kwargs={"job_application_id": job_application.pk},
             )
         )
-        self.assertNotContains(response, UNARCHIVE)
-        self.assertContains(
+        assertNotContains(response, UNARCHIVE)
+        assertContains(
             response,
             """
             <p>Cette candidature a été archivée par l’employeur le 2 septembre 2024 à 11:11.</p>
@@ -330,19 +334,19 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             count=1,
         )
 
-    def test_details_for_company_as_prescriber(self, *args, **kwargs):
+    def test_details_for_company_as_prescriber(self, client):
         """As a prescriber, I cannot access the job_applications details for companies."""
 
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         prescriber = job_application.sender_prescriber_organization.members.first()
 
-        self.client.force_login(prescriber)
+        client.force_login(prescriber)
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 404
 
-    def test_details_for_prescriber(self, *args, **kwargs):
+    def test_details_for_prescriber(self, client):
         """As a prescriber, I can access the job_applications details for prescribers."""
 
         appelation = Appellation.objects.first()
@@ -354,19 +358,19 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         )
         prescriber = job_application.sender_prescriber_organization.members.first()
 
-        self.client.force_login(prescriber)
+        client.force_login(prescriber)
 
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
+        response = client.get(url)
         # Job seeker nir is displayed
-        self.assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
+        assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
         # Approval is displayed
-        self.assertContains(response, "Numéro de PASS IAE")
+        assertContains(response, "Numéro de PASS IAE")
         # Sender phone is displayed
-        self.assertContains(response, format_phone(job_application.sender.phone))
+        assertContains(response, format_phone(job_application.sender.phone))
 
-        self.assertContains(response, '<small>Adresse</small><i class="text-disabled">Non renseignée</i>', html=True)
-        self.assertContains(
+        assertContains(response, '<small>Adresse</small><i class="text-disabled">Non renseignée</i>', html=True)
+        assertContains(
             response, '<small>Curriculum vitae</small><i class="text-disabled">Non renseigné</i>', html=True
         )
         assert_previous_step(response, reverse("apply:list_prescriptions"), back_to_list=True)
@@ -374,30 +378,30 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         # Has link to job description with back_url set
         job_description = job_application.selected_jobs.first()
         job_description_url = f"{job_description.get_absolute_url()}?back_url={url}"
-        self.assertContains(response, job_description_url)
+        assertContains(response, job_description_url)
 
         job_application.job_seeker.jobseeker_profile.nir = ""
         job_application.job_seeker.jobseeker_profile.save()
-        response = self.client.get(url)
-        self.assertContains(
+        response = client.get(url)
+        assertContains(
             response, '<small>Numéro de sécurité sociale</small><i class="text-disabled">Non renseigné</i>', html=True
         )
 
         job_application.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
         job_application.job_seeker.jobseeker_profile.save()
-        response = self.client.get(url)
-        self.assertContains(response, LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER.label, html=True)
+        response = client.get(url)
+        assertContains(response, LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER.label, html=True)
 
-    def test_details_for_prescriber_as_company_when_i_am_not_the_sender(self):
+    def test_details_for_prescriber_as_company_when_i_am_not_the_sender(self, client):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 404
 
-    def test_details_for_prescriber_as_company_when_i_am_the_sender(self):
+    def test_details_for_prescriber_as_company_when_i_am_the_sender(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
         job_application = JobApplicationFactory(
@@ -405,13 +409,13 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             sender=employer,
             sender_company=company,
         )
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
-    def test_details_for_unauthorized_prescriber(self, *args, **kwargs):
+    def test_details_for_unauthorized_prescriber(self, client):
         """As an unauthorized prescriber I cannot access personnal information of arbitrary job seekers"""
         prescriber = PrescriberFactory()
         job_application = JobApplicationFactory(
@@ -423,27 +427,27 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             sender=prescriber,
             sender_kind=job_applications_enums.SenderKind.PRESCRIBER,
         )
-        self.client.force_login(prescriber)
+        client.force_login(prescriber)
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
-        self.assertContains(response, "<small>Prénom</small><strong>S…</strong>", html=True)
-        self.assertContains(response, "<small>Nom</small><strong>U…</strong>", html=True)
-        self.assertContains(response, "S… U…")
-        self.assertNotContains(response, job_application.job_seeker.email)
-        self.assertNotContains(response, job_application.job_seeker.phone)
-        self.assertNotContains(response, job_application.job_seeker.post_code)
-        self.assertNotContains(response, "Supersecretname")
-        self.assertNotContains(response, "Unknown")
+        response = client.get(url)
+        assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
+        assertContains(response, "<small>Prénom</small><strong>S…</strong>", html=True)
+        assertContains(response, "<small>Nom</small><strong>U…</strong>", html=True)
+        assertContains(response, "S… U…")
+        assertNotContains(response, job_application.job_seeker.email)
+        assertNotContains(response, job_application.job_seeker.phone)
+        assertNotContains(response, job_application.job_seeker.post_code)
+        assertNotContains(response, "Supersecretname")
+        assertNotContains(response, "Unknown")
 
-    def test_details_for_job_seeker(self, *args, **kwargs):
+    def test_details_for_job_seeker(self, client):
         """As a job seeker, I can access the job_applications details for job seekers."""
         job_seeker = JobSeekerFactory()
 
         job_application = JobApplicationFactory(job_seeker=job_seeker, job_seeker_with_address=True)
         job_application.process()
 
-        self.client.force_login(job_seeker)
+        client.force_login(job_seeker)
 
         url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
         # 1. SELECT django session
@@ -465,27 +469,27 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         # 14. SAVEPOINT
         # 15. UPDATE django session
         # 16. RELEASE SAVEPOINT
-        with self.assertNumQueries(16):
-            response = self.client.get(url)
-        self.assertContains(response, format_nir(job_seeker.jobseeker_profile.nir))
-        self.assertContains(response, job_seeker.email)
-        self.assertContains(response, job_seeker.post_code)
-        self.assertContains(response, job_seeker.address_line_1)
-        self.assertContains(response, job_seeker.city)
-        self.assertContains(response, f"<small>Prénom</small><strong>{job_seeker.first_name}</strong>", html=True)
-        self.assertContains(response, f"<small>Nom</small><strong>{job_seeker.last_name.upper()}</strong>", html=True)
-        self.assertContains(
+        with assertNumQueries(16):
+            response = client.get(url)
+        assertContains(response, format_nir(job_seeker.jobseeker_profile.nir))
+        assertContains(response, job_seeker.email)
+        assertContains(response, job_seeker.post_code)
+        assertContains(response, job_seeker.address_line_1)
+        assertContains(response, job_seeker.city)
+        assertContains(response, f"<small>Prénom</small><strong>{job_seeker.first_name}</strong>", html=True)
+        assertContains(response, f"<small>Nom</small><strong>{job_seeker.last_name.upper()}</strong>", html=True)
+        assertContains(
             response,
             f"{job_seeker.first_name} {job_seeker.last_name.upper()}",
             html=True,
         )
 
         # phone sender is hidden for job seeker
-        self.assertNotContains(response, format_phone(job_application.sender.phone))
+        assertNotContains(response, format_phone(job_application.sender.phone))
 
         assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
 
-    def test_details_for_job_seeker_as_other_user(self, *args, **kwargs):
+    def test_details_for_job_seeker_as_other_user(self, client, subtests):
         job_application = JobApplicationFactory()
         url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
 
@@ -495,12 +499,12 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             PrescriberFactory(),
             LaborInspectorFactory(membership=True),
         ]:
-            with self.subTest(user=user):
-                self.client.force_login(user)
-                response = self.client.get(url)
+            with subtests.test(user_kind=user.kind.label):
+                client.force_login(user)
+                response = client.get(url)
                 assert response.status_code == 404
 
-    def test_details_for_prescriber_with_transition_logs(self, *args, **kwargs):
+    def test_details_for_prescriber_with_transition_logs(self, client, snapshot):
         """As a prescriber, I can access transition logs for job_applications details for prescribers."""
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
             job_application = JobApplicationFactory(
@@ -516,15 +520,15 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             job_application.accept(user=user)
 
         prescriber = job_application.sender_prescriber_organization.members.first()
-        self.client.force_login(prescriber)
+        client.force_login(prescriber)
 
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
+        response = client.get(url)
         html_fragment = self._get_transition_logs_content(response, job_application)
 
-        assert str(html_fragment) == self.snapshot
+        assert str(html_fragment) == snapshot
 
-    def test_details_for_job_seeker_with_transition_logs(self, *args, **kwargs):
+    def test_details_for_job_seeker_with_transition_logs(self, client, snapshot):
         """As a prescriber, I can access transition logs for job_applications details for prescribers."""
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
             job_application = JobApplicationFactory(
@@ -539,15 +543,15 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         with freeze_time("2023-12-12 13:38:00", tz_offset=-1):
             job_application.accept(user=user)
 
-        self.client.force_login(job_application.job_seeker)
+        client.force_login(job_application.job_seeker)
 
         url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
+        response = client.get(url)
         html_fragment = self._get_transition_logs_content(response, job_application)
 
-        assert str(html_fragment) == self.snapshot
+        assert str(html_fragment) == snapshot
 
-    def test_details_for_company_with_transition_logs(self, *args, **kwargs):
+    def test_details_for_company_with_transition_logs(self, client, snapshot):
         """As a prescriber, I can access transition logs for job_applications details for prescribers."""
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
             job_application = JobApplicationFactory(
@@ -562,15 +566,15 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         with freeze_time("2023-12-12 13:38:00", tz_offset=-1):
             job_application.accept(user=user)
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
+        response = client.get(url)
         html_fragment = self._get_transition_logs_content(response, job_application)
 
-        assert str(html_fragment) == self.snapshot
+        assert str(html_fragment) == snapshot
 
-    def test_external_transfer_log_display(self):
+    def test_external_transfer_log_display(self, client, snapshot):
         job_seeker = JobSeekerFactory()
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
             job_app = JobApplicationFactory(
@@ -588,15 +592,15 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         with freeze_time("2023-12-12 13:38:00", tz_offset=-1):
             job_app.external_transfer(user=employer, target_company=other_company)
 
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_app.pk})
-        response = self.client.get(url)
+        response = client.get(url)
         html_fragment = self._get_transition_logs_content(response, job_app)
 
-        assert str(html_fragment) == self.snapshot
+        assert str(html_fragment) == snapshot
 
-    def test_details_for_company_transition_logs_hides_hired_by_other(self, *args, **kwargs):
+    def test_details_for_company_transition_logs_hides_hired_by_other(self, client, snapshot):
         job_seeker = JobSeekerFactory()
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
             job_app1 = JobApplicationFactory(
@@ -617,15 +621,15 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         with freeze_time("2023-12-12 13:38:00", tz_offset=-1):
             job_app2.accept(user=user2)
 
-        self.client.force_login(user1)
+        client.force_login(user1)
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_app1.pk})
-        response = self.client.get(url)
+        response = client.get(url)
         html_fragment = self._get_transition_logs_content(response, job_app1)
 
-        assert str(html_fragment) == self.snapshot
+        assert str(html_fragment) == snapshot
 
-    def test_details_for_job_seeker_when_refused(self, *args, **kwargs):
+    def test_details_for_job_seeker_when_refused(self, client):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             state=job_applications_enums.JobApplicationState.REFUSED,
@@ -633,26 +637,26 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             answer_to_prescriber="undisclosed",
             refusal_reason="other",
         )
-        self.client.force_login(job_application.job_seeker)
+        client.force_login(job_application.job_seeker)
         url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
-        self.assertNotContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
-        self.assertNotContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
-        self.assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
-        self.assertContains(response, f"<p>{job_application.answer}</p>", html=True)
-        self.assertNotContains(response, "<small>Commentaire privé de l'employeur</small>")
-        self.assertNotContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
+        response = client.get(url)
+        assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
+        assertNotContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
+        assertNotContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
+        assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
+        assertContains(response, f"<p>{job_application.answer}</p>", html=True)
+        assertNotContains(response, "<small>Commentaire privé de l'employeur</small>")
+        assertNotContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
 
         # Test with refusal reason shared with job seeker
         job_application.refusal_reason_shared_with_job_seeker = True
         job_application.save()
-        response = self.client.get(url)
-        self.assertContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
-        self.assertNotContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
-        self.assertNotContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
+        response = client.get(url)
+        assertContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
+        assertNotContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
+        assertNotContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
 
-    def test_details_for_prescriber_when_refused(self, *args, **kwargs):
+    def test_details_for_prescriber_when_refused(self, client):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             state=job_applications_enums.JobApplicationState.REFUSED,
@@ -661,26 +665,26 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             refusal_reason="other",
         )
         prescriber = job_application.sender_prescriber_organization.members.first()
-        self.client.force_login(prescriber)
+        client.force_login(prescriber)
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
-        self.assertNotContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
-        self.assertContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
-        self.assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
-        self.assertContains(response, f"<p>{job_application.answer}</p>", html=True)
-        self.assertContains(response, "<small>Commentaire privé de l'employeur</small>")
-        self.assertContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
+        response = client.get(url)
+        assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
+        assertNotContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
+        assertContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
+        assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
+        assertContains(response, f"<p>{job_application.answer}</p>", html=True)
+        assertContains(response, "<small>Commentaire privé de l'employeur</small>")
+        assertContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
 
         # Test with refusal reason shared with job seeker
         job_application.refusal_reason_shared_with_job_seeker = True
         job_application.save()
-        response = self.client.get(url)
-        self.assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
-        self.assertContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
-        self.assertNotContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
+        response = client.get(url)
+        assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
+        assertContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
+        assertNotContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
 
-    def test_details_for_company_when_refused(self, *args, **kwargs):
+    def test_details_for_company_when_refused(self, client):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             state=job_applications_enums.JobApplicationState.REFUSED,
@@ -689,26 +693,26 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             refusal_reason="other",
         )
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
-        self.assertNotContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
-        self.assertContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
-        self.assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
-        self.assertContains(response, f"<p>{job_application.answer}</p>", html=True)
-        self.assertContains(response, "<small>Commentaire privé de l'employeur</small>")
-        self.assertContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
+        response = client.get(url)
+        assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
+        assertNotContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
+        assertContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
+        assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
+        assertContains(response, f"<p>{job_application.answer}</p>", html=True)
+        assertContains(response, "<small>Commentaire privé de l'employeur</small>")
+        assertContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
 
         # Test with refusal reason shared with job seeker
         job_application.refusal_reason_shared_with_job_seeker = True
         job_application.save()
-        response = self.client.get(url)
-        self.assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
-        self.assertContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
-        self.assertNotContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
+        response = client.get(url)
+        assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
+        assertContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
+        assertNotContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
 
-    def test_company_information_displayed_for_prescriber_when_refused(self, *args, **kwargs):
+    def test_company_information_displayed_for_prescriber_when_refused(self, client, subtests):
         """
         As a prescriber, the company's contact details are displayed
         when the application is refused for the "other" reason
@@ -724,18 +728,18 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             refusal_reason=job_applications_enums.RefusalReason.OTHER,
         )
         prescriber = job_application.sender_prescriber_organization.members.first()
-        self.client.force_login(prescriber)
+        client.force_login(prescriber)
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
 
-        with self.subTest("Test without workflow logging"):
-            response = self.client.get(url)
-            self.assertTrue(response.context["display_refusal_info"])
-            self.assertIsNone(response.context["refused_by"])
-            self.assertEqual(response.context["refusal_contact_email"], "refused_job_application@example.com")
-            self.assertContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE)
-            self.assertContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY)
+        with subtests.test("Test without workflow logging"):
+            response = client.get(url)
+            assert response.context["display_refusal_info"]
+            assert response.context["refused_by"] is None
+            assert response.context["refusal_contact_email"] == "refused_job_application@example.com"
+            assertContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE)
+            assertContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY)
 
-        with self.subTest("Test with the log of the workflow to retrieve the user who refused the application"):
+        with subtests.test("Test with the log of the workflow to retrieve the user who refused the application"):
             company_user = job_application.to_company.members.first()
             job_application.logs.create(
                 transition=JobApplicationWorkflow.TRANSITION_REFUSE,
@@ -744,29 +748,29 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
                 user=company_user,
             )
             url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
-            response = self.client.get(url)
-            self.assertTrue(response.context["display_refusal_info"])
-            self.assertEqual(response.context["refused_by"], company_user)
-            self.assertEqual(response.context["refusal_contact_email"], company_user.email)
-            self.assertContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE)
-            self.assertContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY)
+            response = client.get(url)
+            assert response.context["display_refusal_info"]
+            assert response.context["refused_by"] == company_user
+            assert response.context["refusal_contact_email"] == company_user.email
+            assertContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE)
+            assertContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY)
 
         # With any other reason, the section should not be displayed
         for refusal_reason in job_applications_enums.RefusalReason.values:
             if refusal_reason == job_applications_enums.RefusalReason.OTHER:
                 continue
-            with self.subTest("Test all other refused reasons", refusal_reason=refusal_reason):
+            with subtests.test("Test all other refused reasons", refusal_reason=refusal_reason):
                 job_application.refusal_reason = refusal_reason
                 job_application.save()
                 url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
-                response = self.client.get(url)
-                self.assertFalse(response.context["display_refusal_info"])
-                self.assertIsNone(response.context["refused_by"])
-                self.assertEqual(response.context["refusal_contact_email"], "")
-                self.assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE)
-                self.assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY)
+                response = client.get(url)
+                assert not response.context["display_refusal_info"]
+                assert response.context["refused_by"] is None
+                assert response.context["refusal_contact_email"] == ""
+                assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE)
+                assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY)
 
-    def test_company_information_not_displayed_for_job_seeker_when_refused(self, *args, **kwargs):
+    def test_company_information_not_displayed_for_job_seeker_when_refused(self, client):
         """As a job seeker, I can't see the company's contact details when the application is refused"""
 
         job_application = JobApplicationFactory(
@@ -778,16 +782,16 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             answer_to_prescriber="undisclosed",
             refusal_reason=job_applications_enums.RefusalReason.OTHER,
         )
-        self.client.force_login(job_application.job_seeker)
+        client.force_login(job_application.job_seeker)
         url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertFalse(response.context["display_refusal_info"])
-        self.assertNotIn("refused_by", response.context)
-        self.assertNotIn("refusal_contact_email", response.context)
-        self.assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE)
-        self.assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY)
+        response = client.get(url)
+        assert not response.context["display_refusal_info"]
+        assert "refused_by" not in response.context
+        assert "refusal_contact_email" not in response.context
+        assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE)
+        assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY)
 
-    def test_company_information_not_displayed_for_company_when_refused(self, *args, **kwargs):
+    def test_company_information_not_displayed_for_company_when_refused(self, client):
         """As the company's employee, I don't see my own company's contact details when the application is refused"""
 
         job_application = JobApplicationFactory(
@@ -799,42 +803,42 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             answer_to_prescriber="undisclosed",
             refusal_reason=job_applications_enums.RefusalReason.OTHER,
         )
-        self.client.force_login(job_application.to_company.members.first())
+        client.force_login(job_application.to_company.members.first())
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertFalse(response.context["display_refusal_info"])
-        self.assertNotIn("refused_by", response.context)
-        self.assertNotIn("refusal_contact_email", response.context)
-        self.assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE)
-        self.assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY)
+        response = client.get(url)
+        assert not response.context["display_refusal_info"]
+        assert "refused_by" not in response.context
+        assert "refusal_contact_email" not in response.context
+        assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE)
+        assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY)
 
-    def test_process(self, *args, **kwargs):
+    def test_process(self, client):
         """Ensure that the `process` transition is triggered."""
 
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         url = reverse("apply:process", kwargs={"job_application_id": job_application.pk})
-        response = self.client.post(url)
+        response = client.post(url)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        self.assertRedirects(response, next_url)
+        assertRedirects(response, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.state.is_processing
 
-    def test_refuse_session_prefix(self, *args, **kwargs):
+    def test_refuse_session_prefix(self, client):
         """Ensure that each refusal session is isolated from each other."""
 
         job_application = JobApplicationFactory()
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
-        assert f"wizard_job_application_{job_application.pk}_refuse" not in self.client.session
+        client.force_login(employer)
+        assert f"wizard_job_application_{job_application.pk}_refuse" not in client.session
 
         url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "reason"})
-        self.client.get(url)
+        client.get(url)
 
-        assert self.client.session[f"wizard_job_application_{job_application.pk}_refuse"] == {
+        assert client.session[f"wizard_job_application_{job_application.pk}_refuse"] == {
             "step": None,
             "step_data": {},
             "step_files": {},
@@ -845,8 +849,8 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             f"job_application_{job_application.pk}_refuse-current_step": "reason",
             "reason-refusal_reason": job_applications_enums.RefusalReason.HIRED_ELSEWHERE,
         }
-        self.client.post(url, data=post_data)
-        assert self.client.session[f"wizard_job_application_{job_application.pk}_refuse"] == {
+        client.post(url, data=post_data)
+        assert client.session[f"wizard_job_application_{job_application.pk}_refuse"] == {
             "step": "job-seeker-answer",
             "step_data": {
                 "reason": {
@@ -864,8 +868,8 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             f"job_application_{job_application_2.pk}_refuse-current_step": "reason",
             "reason-refusal_reason": job_applications_enums.RefusalReason.NON_ELIGIBLE,
         }
-        self.client.post(url, data=post_data)
-        assert self.client.session[f"wizard_job_application_{job_application.pk}_refuse"] == {
+        client.post(url, data=post_data)
+        assert client.session[f"wizard_job_application_{job_application.pk}_refuse"] == {
             "step": "job-seeker-answer",
             "step_data": {
                 "reason": {
@@ -876,8 +880,8 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             "step_files": {"reason": {}},
             "extra_data": {},
         }
-        assert f"wizard_job_application_{job_application_2.pk}_refuse" in self.client.session
-        assert self.client.session[f"wizard_job_application_{job_application_2.pk}_refuse"] == {
+        assert f"wizard_job_application_{job_application_2.pk}_refuse" in client.session
+        assert client.session[f"wizard_job_application_{job_application_2.pk}_refuse"] == {
             "step": "job-seeker-answer",
             "step_data": {
                 "reason": {
@@ -889,53 +893,53 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             "extra_data": {},
         }
 
-    def test_refuse_from_prescriber(self, *args, **kwargs):
+    def test_refuse_from_prescriber(self, client):
         """Ensure that the `refuse` transition is triggered through the expected workflow for a prescriber."""
 
         state = random.choice(JobApplicationWorkflow.CAN_BE_REFUSED_STATES)
         reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, state=state)
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         refusal_reason_url = reverse(
             "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "reason"}
         )
-        response = self.client.get(refusal_reason_url)
-        self.assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
+        response = client.get(refusal_reason_url)
+        assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
 
         post_data = {
             f"job_application_{job_application.pk}_refuse-current_step": "reason",
             "reason-refusal_reason": reason,
             "reason-refusal_reason_shared_with_job_seeker": True,
         }
-        response = self.client.post(refusal_reason_url, data=post_data, follow=True)
+        response = client.post(refusal_reason_url, data=post_data, follow=True)
         job_seeker_answer_url = reverse(
             "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "job-seeker-answer"}
         )
-        self.assertRedirects(response, job_seeker_answer_url)
-        self.assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
-        self.assertContains(response, "Réponse au candidat")
-        self.assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        assertRedirects(response, job_seeker_answer_url)
+        assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
+        assertContains(response, "Réponse au candidat")
+        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
 
         post_data = {
             f"job_application_{job_application.pk}_refuse-current_step": "job-seeker-answer",
             "job-seeker-answer-job_seeker_answer": "Message au candidat",
         }
-        response = self.client.post(job_seeker_answer_url, data=post_data, follow=True)
+        response = client.post(job_seeker_answer_url, data=post_data, follow=True)
         prescriber_answer_url = reverse(
             "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "prescriber-answer"}
         )
-        self.assertRedirects(response, prescriber_answer_url)
-        self.assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
-        self.assertContains(response, "Réponse au prescripteur")
-        self.assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        assertRedirects(response, prescriber_answer_url)
+        assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
+        assertContains(response, "Réponse au prescripteur")
+        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
 
         post_data = {
             f"job_application_{job_application.pk}_refuse-current_step": "prescriber-answer",
             "prescriber-answer-prescriber_answer": "Message au prescripteur",
         }
-        response = self.client.post(prescriber_answer_url, data=post_data, follow=True)
+        response = client.post(prescriber_answer_url, data=post_data, follow=True)
         done_url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "done"})
         final_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         assert response.redirect_chain == [(done_url, 302), (final_url, 302)]
@@ -943,34 +947,34 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.state.is_refused
 
-    def test_refuse_from_job_seeker(self, *args, **kwargs):
+    def test_refuse_from_job_seeker(self, client):
         """Ensure that the `refuse` transition is triggered through the expected workflow for a job seeker."""
 
         state = random.choice(JobApplicationWorkflow.CAN_BE_REFUSED_STATES)
         reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
         job_application = JobApplicationSentByJobSeekerFactory(state=state)
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         refusal_reason_url = reverse(
             "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "reason"}
         )
-        response = self.client.get(refusal_reason_url)
-        self.assertContains(response, "<strong>Étape 1</strong>/2 : Choix du motif de refus", html=True)
+        response = client.get(refusal_reason_url)
+        assertContains(response, "<strong>Étape 1</strong>/2 : Choix du motif de refus", html=True)
 
         post_data = {
             f"job_application_{job_application.pk}_refuse-current_step": "reason",
             "reason-refusal_reason": reason,
             "reason-refusal_reason_shared_with_job_seeker": False,
         }
-        response = self.client.post(refusal_reason_url, data=post_data, follow=True)
+        response = client.post(refusal_reason_url, data=post_data, follow=True)
         job_seeker_answer_url = reverse(
             "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "job-seeker-answer"}
         )
-        self.assertRedirects(response, job_seeker_answer_url)
-        self.assertContains(response, "<strong>Étape 2</strong>/2 : Message au candidat", html=True)
-        self.assertContains(response, "Réponse au candidat")
-        self.assertContains(
+        assertRedirects(response, job_seeker_answer_url)
+        assertContains(response, "<strong>Étape 2</strong>/2 : Message au candidat", html=True)
+        assertContains(response, "Réponse au candidat")
+        assertContains(
             response,
             f"<strong>Motif de refus :</strong> {reason_label} " "<em>(Motif non communiqué au candidat)</em>",
             html=True,
@@ -980,7 +984,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             f"job_application_{job_application.pk}_refuse-current_step": "job-seeker-answer",
             "job-seeker-answer-job_seeker_answer": "Message au candidat",
         }
-        response = self.client.post(job_seeker_answer_url, data=post_data, follow=True)
+        response = client.post(job_seeker_answer_url, data=post_data, follow=True)
         done_url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "done"})
         final_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         assert response.redirect_chain == [(done_url, 302), (final_url, 302)]
@@ -988,7 +992,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.state.is_refused
 
-    def test_refuse_labels_for_prescriber_or_orienteur(self, *args, **kwargs):
+    def test_refuse_labels_for_prescriber_or_orienteur(self, client):
         """
         Ensure that the `refuse` is correctly adapted for prescribers depending their status:
         - Authorized prescriber: labeled "prescripteur"
@@ -997,135 +1001,135 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         """
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         refusal_reason_url = reverse(
             "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "reason"}
         )
-        response = self.client.get(refusal_reason_url)
-        self.assertContains(
+        response = client.get(refusal_reason_url)
+        assertContains(
             response,
             "la transparence sur les motifs de refus est importante pour le candidat comme pour le prescripteur.",
         )
-        self.assertContains(response, "Choisir le motif de refus envoyé au prescripteur")
-        self.assertContains(response, "Autre (détails à fournir dans le message au prescripteur)", html=True)
+        assertContains(response, "Choisir le motif de refus envoyé au prescripteur")
+        assertContains(response, "Autre (détails à fournir dans le message au prescripteur)", html=True)
 
         post_data = {
             f"job_application_{job_application.pk}_refuse-current_step": "reason",
             "reason-refusal_reason": job_applications_enums.RefusalReason.OTHER,
         }
-        response = self.client.post(refusal_reason_url, data=post_data, follow=True)
+        response = client.post(refusal_reason_url, data=post_data, follow=True)
         job_seeker_answer_url = reverse(
             "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "job-seeker-answer"}
         )
-        self.assertRedirects(response, job_seeker_answer_url)
-        self.assertContains(response, "Une copie de ce message sera adressée au prescripteur.")
+        assertRedirects(response, job_seeker_answer_url)
+        assertContains(response, "Une copie de ce message sera adressée au prescripteur.")
 
         post_data = {
             f"job_application_{job_application.pk}_refuse-current_step": "job-seeker-answer",
             "job-seeker-answer-job_seeker_answer": "Message au candidat",
         }
-        response = self.client.post(job_seeker_answer_url, data=post_data, follow=True)
+        response = client.post(job_seeker_answer_url, data=post_data, follow=True)
         prescriber_answer_url = reverse(
             "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "prescriber-answer"}
         )
-        self.assertRedirects(response, prescriber_answer_url)
-        self.assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
-        self.assertContains(response, "Réponse au prescripteur")
-        self.assertContains(response, "Vous pouvez partager un message au prescripteur uniquement")
-        self.assertContains(response, "Commentaire envoyé au prescripteur (n’est pas communiqué au candidat)")
+        assertRedirects(response, prescriber_answer_url)
+        assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
+        assertContains(response, "Réponse au prescripteur")
+        assertContains(response, "Vous pouvez partager un message au prescripteur uniquement")
+        assertContains(response, "Commentaire envoyé au prescripteur (n’est pas communiqué au candidat)")
 
         # Un-authorize prescriber (ie. considered as "orienteur")
         job_application.sender_prescriber_organization.is_authorized = False
         job_application.sender_prescriber_organization.save(update_fields=["is_authorized"])
 
-        response = self.client.get(refusal_reason_url)
-        self.assertContains(
+        response = client.get(refusal_reason_url)
+        assertContains(
             response,
             "la transparence sur les motifs de refus est importante pour le candidat comme pour l’orienteur.",
         )
-        self.assertContains(response, "Choisir le motif de refus envoyé à l’orienteur")
-        self.assertContains(response, "Autre (détails à fournir dans le message à l’orienteur)", html=True)
+        assertContains(response, "Choisir le motif de refus envoyé à l’orienteur")
+        assertContains(response, "Autre (détails à fournir dans le message à l’orienteur)", html=True)
 
-        response = self.client.get(job_seeker_answer_url)
-        self.assertContains(response, "Une copie de ce message sera adressée à l’orienteur.")
+        response = client.get(job_seeker_answer_url)
+        assertContains(response, "Une copie de ce message sera adressée à l’orienteur.")
 
-        response = self.client.get(prescriber_answer_url)
-        self.assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
-        self.assertContains(response, "Réponse à l’orienteur")
-        self.assertContains(response, "Vous pouvez partager un message à l’orienteur uniquement")
-        self.assertContains(response, "Commentaire envoyé à l’orienteur (n’est pas communiqué au candidat)")
+        response = client.get(prescriber_answer_url)
+        assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
+        assertContains(response, "Réponse à l’orienteur")
+        assertContains(response, "Vous pouvez partager un message à l’orienteur uniquement")
+        assertContains(response, "Commentaire envoyé à l’orienteur (n’est pas communiqué au candidat)")
 
         # Remove prescriber's organization membership (ie. considered as "orienteur solo")
         job_application.sender_prescriber_organization.members.clear()
         job_application.sender_prescriber_organization = None
         job_application.save(update_fields=["sender_prescriber_organization"])
 
-        response = self.client.get(refusal_reason_url)
-        self.assertContains(
+        response = client.get(refusal_reason_url)
+        assertContains(
             response,
             "la transparence sur les motifs de refus est importante pour le candidat comme pour l’orienteur.",
         )
-        self.assertContains(response, "Choisir le motif de refus envoyé à l’orienteur")
-        self.assertContains(response, "Autre (détails à fournir dans le message à l’orienteur)", html=True)
+        assertContains(response, "Choisir le motif de refus envoyé à l’orienteur")
+        assertContains(response, "Autre (détails à fournir dans le message à l’orienteur)", html=True)
 
-        response = self.client.get(job_seeker_answer_url)
-        self.assertContains(response, "Une copie de ce message sera adressée à l’orienteur.")
+        response = client.get(job_seeker_answer_url)
+        assertContains(response, "Une copie de ce message sera adressée à l’orienteur.")
 
-        response = self.client.get(prescriber_answer_url)
-        self.assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
-        self.assertContains(response, "Réponse à l’orienteur")
-        self.assertContains(response, "Vous pouvez partager un message à l’orienteur uniquement")
-        self.assertContains(response, "Commentaire envoyé à l’orienteur (n’est pas communiqué au candidat)")
+        response = client.get(prescriber_answer_url)
+        assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
+        assertContains(response, "Réponse à l’orienteur")
+        assertContains(response, "Vous pouvez partager un message à l’orienteur uniquement")
+        assertContains(response, "Commentaire envoyé à l’orienteur (n’est pas communiqué au candidat)")
 
-    def test_refuse_incompatible_state(self, *args, **kwargs):
+    def test_refuse_incompatible_state(self, client):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             state=job_applications_enums.JobApplicationState.ACCEPTED,
         )
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "reason"})
-        response = self.client.get(url)
+        response = client.get(url)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        self.assertRedirects(response, next_url)
-        self.assertMessages(response, [messages.Message(messages.ERROR, "Action impossible.")])
+        assertRedirects(response, next_url)
+        assertMessages(response, [messages.Message(messages.ERROR, "Action impossible.")])
 
         job_application.refresh_from_db()
         assert not job_application.state.is_refused
 
-    def test_refuse_already_refused(self, *args, **kwargs):
+    def test_refuse_already_refused(self, client):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             state=job_applications_enums.JobApplicationState.REFUSED,
         )
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "reason"})
-        response = self.client.get(url)
+        response = client.get(url)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        self.assertRedirects(response, next_url)
-        self.assertMessages(response, [messages.Message(messages.ERROR, "Action déjà effectuée.")])
+        assertRedirects(response, next_url)
+        assertMessages(response, [messages.Message(messages.ERROR, "Action déjà effectuée.")])
 
         job_application.refresh_from_db()
         assert job_application.state.is_refused
 
-    def test_refuse_step_bypass(self, *args, **kwargs):
+    def test_refuse_step_bypass(self, client):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             state=job_applications_enums.JobApplicationState.NEW,
         )
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "job-seeker-answer"})
-        response = self.client.get(url)
+        response = client.get(url)
         next_url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "reason"})
-        self.assertRedirects(response, next_url)
+        assertRedirects(response, next_url)
 
-    def test_postpone_from_prescriber(self, *args, **kwargs):
+    def test_postpone_from_prescriber(self, client, snapshot, subtests):
         """Ensure that the `postpone` transition is triggered."""
 
         states = [
@@ -1138,7 +1142,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
 
         for state in states:
             mail.outbox = []
-            with self.subTest(state=state):
+            with subtests.test(state=state.label):
                 job_application = JobApplicationFactory(
                     job_seeker=job_seeker,
                     to_company=company,
@@ -1146,29 +1150,29 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
                     state=state,
                 )
                 employer = job_application.to_company.members.first()
-                self.client.force_login(employer)
+                client.force_login(employer)
 
                 url = reverse("apply:postpone", kwargs={"job_application_id": job_application.pk})
-                response = self.client.get(url)
+                response = client.get(url)
                 assert response.status_code == 200
 
                 post_data = {"answer": ""}
-                response = self.client.post(url, data=post_data)
+                response = client.post(url, data=post_data)
                 next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-                self.assertRedirects(response, next_url)
+                assertRedirects(response, next_url)
 
                 job_application = JobApplication.objects.get(pk=job_application.pk)
                 assert job_application.state.is_postponed
 
                 [mail_to_job_seeker, mail_to_prescriber] = mail.outbox
                 assert mail_to_job_seeker.to == [job_application.job_seeker.email]
-                assert mail_to_job_seeker.subject == self.snapshot(name="postpone_email_to_job_seeker_subject")
-                assert mail_to_job_seeker.body == self.snapshot(name="postpone_email_to_job_seeker_body")
+                assert mail_to_job_seeker.subject == snapshot(name="postpone_email_to_job_seeker_subject")
+                assert mail_to_job_seeker.body == snapshot(name="postpone_email_to_job_seeker_body")
                 assert mail_to_prescriber.to == [job_application.sender.email]
-                assert mail_to_prescriber.subject == self.snapshot(name="postpone_email_to_proxy_subject")
-                assert mail_to_prescriber.body == self.snapshot(name="postpone_email_to_proxy_body")
+                assert mail_to_prescriber.subject == snapshot(name="postpone_email_to_proxy_subject")
+                assert mail_to_prescriber.body == snapshot(name="postpone_email_to_proxy_body")
 
-    def test_postpone_from_job_seeker(self, *args, **kwargs):
+    def test_postpone_from_job_seeker(self, client, snapshot, subtests):
         """Ensure that the `postpone` transition is triggered."""
 
         states = [
@@ -1181,7 +1185,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
 
         for state in states:
             mail.outbox = []
-            with self.subTest(state=state):
+            with subtests.test(state=state.label):
                 job_application = JobApplicationFactory(
                     job_seeker=job_seeker,
                     to_company=company,
@@ -1190,25 +1194,25 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
                     state=state,
                 )
                 employer = job_application.to_company.members.first()
-                self.client.force_login(employer)
+                client.force_login(employer)
 
                 url = reverse("apply:postpone", kwargs={"job_application_id": job_application.pk})
-                response = self.client.get(url)
+                response = client.get(url)
                 assert response.status_code == 200
 
                 post_data = {"answer": "On vous rappellera."}
-                response = self.client.post(url, data=post_data)
+                response = client.post(url, data=post_data)
                 next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-                self.assertRedirects(response, next_url)
+                assertRedirects(response, next_url)
 
                 job_application = JobApplication.objects.get(pk=job_application.pk)
                 assert job_application.state.is_postponed
                 [mail_to_job_seeker] = mail.outbox
                 assert mail_to_job_seeker.to == [job_application.job_seeker.email]
-                assert mail_to_job_seeker.subject == self.snapshot(name="postpone_email_to_job_seeker_subject")
-                assert mail_to_job_seeker.body == self.snapshot(name="postpone_email_to_job_seeker_body")
+                assert mail_to_job_seeker.subject == snapshot(name="postpone_email_to_job_seeker_subject")
+                assert mail_to_job_seeker.body == snapshot(name="postpone_email_to_job_seeker_body")
 
-    def test_postpone_from_employer_orienter(self, *args, **kwargs):
+    def test_postpone_from_employer_orienter(self, client, snapshot, subtests):
         """Ensure that the `postpone` transition is triggered."""
 
         states = [
@@ -1221,7 +1225,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
 
         for state in states:
             mail.outbox = []
-            with self.subTest(state=state):
+            with subtests.test(state=state.label):
                 job_application = JobApplicationFactory(
                     job_seeker=job_seeker,
                     to_company=company,
@@ -1229,28 +1233,28 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
                     state=state,
                 )
                 employer = job_application.to_company.members.first()
-                self.client.force_login(employer)
+                client.force_login(employer)
 
                 url = reverse("apply:postpone", kwargs={"job_application_id": job_application.pk})
-                response = self.client.get(url)
+                response = client.get(url)
                 assert response.status_code == 200
 
                 post_data = {"answer": "On vous rappellera."}
-                response = self.client.post(url, data=post_data)
+                response = client.post(url, data=post_data)
                 next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-                self.assertRedirects(response, next_url)
+                assertRedirects(response, next_url)
 
                 job_application = JobApplication.objects.get(pk=job_application.pk)
                 assert job_application.state.is_postponed
                 [mail_to_job_seeker, mail_to_other_employer] = mail.outbox
                 assert mail_to_job_seeker.to == [job_application.job_seeker.email]
-                assert mail_to_job_seeker.subject == self.snapshot(name="postpone_email_to_job_seeker_subject")
-                assert mail_to_job_seeker.body == self.snapshot(name="postpone_email_to_job_seeker_body")
+                assert mail_to_job_seeker.subject == snapshot(name="postpone_email_to_job_seeker_subject")
+                assert mail_to_job_seeker.body == snapshot(name="postpone_email_to_job_seeker_body")
                 assert mail_to_other_employer.to == [job_application.sender.email]
-                assert mail_to_other_employer.subject == self.snapshot(name="postpone_email_to_proxy_subject")
-                assert mail_to_other_employer.body == self.snapshot(name="postpone_email_to_proxy_body")
+                assert mail_to_other_employer.subject == snapshot(name="postpone_email_to_proxy_subject")
+                assert mail_to_other_employer.body == snapshot(name="postpone_email_to_proxy_body")
 
-    def test_eligibility(self, *args, **kwargs):
+    def test_eligibility(self, client):
         """Test eligibility."""
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
@@ -1260,7 +1264,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
 
         assert job_application.state.is_processing
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_company
@@ -1272,15 +1276,15 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         criterion3 = AdministrativeCriteria.objects.level2().get(pk=15)
 
         url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
-        self.assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
+        assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
 
         # Ensure that some criteria are mandatory.
         post_data = {
             f"{criterion1.key}": "false",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
         assert response.context["form_administrative_criteria"].errors
 
@@ -1291,9 +1295,9 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             f"{criterion2.key}": "true",
             f"{criterion3.key}": "true",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         next_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        self.assertRedirects(response, next_url)
+        assertRedirects(response, next_url)
 
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_company
@@ -1312,7 +1316,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         assert criterion2 in administrative_criteria
         assert criterion3 in administrative_criteria
 
-    def test_eligibility_for_company_not_subject_to_eligibility_rules(self, *args, **kwargs):
+    def test_eligibility_for_company_not_subject_to_eligibility_rules(self, client):
         """Test eligibility for a company not subject to eligibility rules."""
 
         job_application = JobApplicationFactory(
@@ -1321,13 +1325,13 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             to_company__kind=CompanyKind.GEIQ,
         )
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 404
 
-    def test_eligibility_for_siae_with_suspension_sanction(self, *args, **kwargs):
+    def test_eligibility_for_siae_with_suspension_sanction(self, client):
         """Test eligibility for an Siae that has been suspended."""
 
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
@@ -1340,15 +1344,13 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         )
 
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertContains(
-            response, "suite aux mesures prises dans le cadre du contrôle a posteriori", status_code=403
-        )
+        response = client.get(url)
+        assertContains(response, "suite aux mesures prises dans le cadre du contrôle a posteriori", status_code=403)
 
-    def test_eligibility_state_for_job_application(self, *args, **kwargs):
+    def test_eligibility_state_for_job_application(self, client):
         """The eligibility diagnosis page must only be accessible
         in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES states."""
         company = CompanyFactory(with_membership=True)
@@ -1363,34 +1365,34 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             if state in JobApplicationWorkflow.JOB_APPLICATION_PROCESSED_STATES:
                 job_application.processed_at = timezone.now()
             job_application.save()
-            self.client.force_login(employer)
+            client.force_login(employer)
             url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
-            response = self.client.get(url)
+            response = client.get(url)
             assert response.status_code == 200
-            self.client.logout()
+            client.logout()
 
         # Wrong state
         job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
         job_application.processed_at = timezone.now()
         job_application.save()
-        self.client.force_login(employer)
+        client.force_login(employer)
         url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 404
-        self.client.logout()
+        client.logout()
 
-    def test_cancel(self, *args, **kwargs):
+    def test_cancel(self, client):
         # Hiring date is today: cancellation should be possible.
         job_application = JobApplicationFactory(with_approval=True, to_company__subject_to_eligibility=True)
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertContains(response, "Confirmer l'annulation de l'embauche")
-        self.assertContains(
+        response = client.get(url)
+        assertContains(response, "Confirmer l'annulation de l'embauche")
+        assertContains(
             response, "En validant, <b>vous renoncez aux aides au poste</b> liées à cette candidature pour tous"
         )
-        self.assertNotContains(
+        assertNotContains(
             response,
             "En annulant cette embauche, vous confirmez que le salarié n’avait pas encore commencé à "
             "travailler dans votre structure.",
@@ -1399,32 +1401,32 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         post_data = {
             "confirm": "true",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        self.assertRedirects(response, next_url)
+        assertRedirects(response, next_url)
 
         job_application.refresh_from_db()
         assert job_application.state.is_cancelled
 
-    def test_cancel_saie_not_subject_to_eligibility(self, *args, **kwargs):
+    def test_cancel_saie_not_subject_to_eligibility(self, client):
         # Hiring date is today: cancellation should be possible.
         job_application = JobApplicationFactory(with_approval=True, to_company__not_subject_to_eligibility=True)
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertContains(response, "Confirmer l'annulation de l'embauche")
-        self.assertNotContains(
+        response = client.get(url)
+        assertContains(response, "Confirmer l'annulation de l'embauche")
+        assertNotContains(
             response, "En validant, <b>vous renoncez aux aides au poste</b> liées à cette candidature pour tous"
         )
-        self.assertContains(
+        assertContains(
             response,
             "En annulant cette embauche, vous confirmez que le salarié n’avait pas encore commencé à "
             "travailler dans votre structure.",
         )
         # Not need to the form POST, only the warning above changes
 
-    def test_cannot_cancel(self, *args, **kwargs):
+    def test_cannot_cancel(self, client):
         job_application = JobApplicationFactory(
             with_approval=True,
             hiring_start_at=timezone.localdate() + relativedelta(days=1),
@@ -1433,100 +1435,96 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         # Add a blocking employee record
         EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED)
 
-        self.client.force_login(employer)
+        client.force_login(employer)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
+        response = client.get(url)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        self.assertRedirects(response, next_url)
+        assertRedirects(response, next_url)
 
         job_application.refresh_from_db()
         assert not job_application.state.is_cancelled
 
-    def test_diagoriente_section_as_job_seeker(self):
+    def test_diagoriente_section_as_job_seeker(self, client):
         job_application = JobApplicationFactory(with_approval=True, resume_link="")
 
-        self.client.force_login(job_application.job_seeker)
-        response = self.client.get(
+        client.force_login(job_application.job_seeker)
+        response = client.get(
             reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
         )
-        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+        assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
 
-    def test_diagoriente_section_as_prescriber(self):
+    def test_diagoriente_section_as_prescriber(self, client):
         job_application = JobApplicationFactory(
             with_approval=True,
             sent_by_authorized_prescriber_organisation=True,
             resume_link="",
         )
         prescriber = job_application.sender_prescriber_organization.members.first()
-        self.client.force_login(prescriber)
+        client.force_login(prescriber)
 
-        response = self.client.get(
+        response = client.get(
             reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         )
-        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+        assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
 
         # Un-authorize prescriber (ie. considered as "orienteur")
         job_application.sender_prescriber_organization.is_authorized = False
         job_application.sender_prescriber_organization.save(update_fields=["is_authorized"])
-        response = self.client.get(
+        response = client.get(
             reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         )
-        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+        assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
 
         # Remove prescriber's organization membership (ie. considered as "orienteur solo")
         job_application.sender_prescriber_organization.members.clear()
         job_application.sender_prescriber_organization = None
         job_application.save(update_fields=["sender_prescriber_organization"])
-        response = self.client.get(
+        response = client.get(
             reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         )
-        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+        assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
 
-    def test_diagoriente_section_as_employee_for_prescriber(self):
+    def test_diagoriente_section_as_employee_for_prescriber(self, client):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             resume_link="https://myresume.com/me",
         )
         company = job_application.to_company
         employee = company.members.first()
-        self.client.force_login(employee)
+        client.force_login(employee)
 
         # Test with resume
-        response = self.client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        )
-        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
+        assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
 
         # Unset resume on job application, should now include Diagoriente section
         job_application.resume_link = ""
         job_application.save(update_fields=["resume_link"])
-        response = self.client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        )
-        self.assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
-        self.assertContains(response, self.DIAGORIENTE_INVITE_TITLE)
-        self.assertContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
-        self.assertContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
+        response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
+        assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        assertContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        assertContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        assertContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
 
-    def test_diagoriente_section_as_employee_for_job_seeker(self):
+    def test_diagoriente_section_as_employee_for_job_seeker(self, client):
         job_application = JobApplicationFactory(
             with_approval=True,
             resume_link="https://myresume.com/me",
@@ -1534,38 +1532,34 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         )
         company = job_application.to_company
         employee = company.members.first()
-        self.client.force_login(employee)
+        client.force_login(employee)
 
         # Test with resume
-        response = self.client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        )
-        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
+        assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
 
         # Unset resume on job application, should now include Diagoriente section
         job_application.resume_link = ""
         job_application.save(update_fields=["resume_link"])
-        response = self.client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        )
-        self.assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
-        self.assertContains(response, self.DIAGORIENTE_INVITE_TITLE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
-        self.assertContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
-        self.assertContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
+        response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
+        assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        assertContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        assertContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        assertContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
 
-    def test_diagoriente_invite_as_job_seeker(self):
+    def test_diagoriente_invite_as_job_seeker(self, client):
         job_application = JobApplicationFactory(with_approval=True, resume_link="")
 
-        self.client.force_login(job_application.job_seeker)
-        response = self.client.post(
+        client.force_login(job_application.job_seeker)
+        response = client.post(
             reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk})
         )
         assert response.status_code == 404
         assert len(mail.outbox) == 0
 
-    def test_diagoriente_invite_as_job_prescriber(self):
+    def test_diagoriente_invite_as_job_prescriber(self, client):
         job_application = JobApplicationFactory(
             with_approval=True,
             sent_by_authorized_prescriber_organisation=True,
@@ -1573,117 +1567,117 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         )
         prescriber = job_application.sender_prescriber_organization.members.first()
 
-        self.client.force_login(prescriber)
-        response = self.client.post(
+        client.force_login(prescriber)
+        response = client.post(
             reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk})
         )
         assert response.status_code == 404
         assert len(mail.outbox) == 0
 
-    @freeze_time("2023-12-12 13:37:00", as_kwarg="frozen_time")
-    def test_diagoriente_invite_as_employee_for_authorized_prescriber(self, frozen_time):
-        job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
-            resume_link="https://myresume.com/me",
-        )
-        company = job_application.to_company
-        employee = company.members.first()
-        self.client.force_login(employee)
-
-        # Should not perform any action if a resume is set
-        response = self.client.post(
-            reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
-            follow=True,
-        )
-        self.assertMessages(response, [])
-        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
-        job_application.refresh_from_db()
-        assert job_application.diagoriente_invite_sent_at is None
-        assert len(mail.outbox) == 0
-
-        # Unset resume, should now update the timestamp and send the mail
-        job_application.resume_link = ""
-        job_application.save(update_fields=["resume_link"])
-        frozen_time.tick()
-        initial_invite_time = frozen_time()
-        response = self.client.post(
-            reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
-            follow=True,
-        )
-        self.assertMessages(
-            response, [messages.Message(messages.SUCCESS, "L'invitation à utiliser Diagoriente a été envoyée.")]
-        )
-        self.assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
-        self.assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
-        job_application.refresh_from_db()
-        assert job_application.diagoriente_invite_sent_at == initial_invite_time.replace(tzinfo=datetime.UTC)
-        assert len(mail.outbox) == 1
-        assert self.DIAGORIENTE_INVITE_EMAIL_SUBJECT in mail.outbox[0].subject
-        assert (
-            self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_1.format(
-                company_name=job_application.to_company.display_name,
-                job_seeker_name=job_application.job_seeker.get_full_name(),
+    def test_diagoriente_invite_as_employee_for_authorized_prescriber(self, client):
+        with freeze_time("2023-12-12 13:37:00") as frozen_time:
+            job_application = JobApplicationFactory(
+                sent_by_authorized_prescriber_organisation=True,
+                resume_link="https://myresume.com/me",
             )
-            in mail.outbox[0].body
-        )
-        assert self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_2 in mail.outbox[0].body
-        assert (
-            self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_1.format(
-                company_name=job_application.to_company.display_name
+            company = job_application.to_company
+            employee = company.members.first()
+            client.force_login(employee)
+
+            # Should not perform any action if a resume is set
+            response = client.post(
+                reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
+                follow=True,
             )
-            not in mail.outbox[0].body
-        )
-        assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 not in mail.outbox[0].body
+            assertMessages(response, [])
+            assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+            assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+            assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+            assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+            assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+            assertNotContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
+            job_application.refresh_from_db()
+            assert job_application.diagoriente_invite_sent_at is None
+            assert len(mail.outbox) == 0
 
-        # Concurrent/subsequent calls should not perform any action
-        frozen_time.tick()
-        response = self.client.post(
-            reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
-            follow=True,
-        )
-        self.assertMessages(response, [])
-        self.assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
-        self.assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
-        job_application.refresh_from_db()
-        assert job_application.diagoriente_invite_sent_at == initial_invite_time.replace(tzinfo=datetime.UTC)
-        assert len(mail.outbox) == 1
+            # Unset resume, should now update the timestamp and send the mail
+            job_application.resume_link = ""
+            job_application.save(update_fields=["resume_link"])
+            frozen_time.tick()
+            initial_invite_time = frozen_time()
+            response = client.post(
+                reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
+                follow=True,
+            )
+            assertMessages(
+                response, [messages.Message(messages.SUCCESS, "L'invitation à utiliser Diagoriente a été envoyée.")]
+            )
+            assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+            assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+            assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+            assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+            assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+            assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
+            job_application.refresh_from_db()
+            assert job_application.diagoriente_invite_sent_at == initial_invite_time.replace(tzinfo=datetime.UTC)
+            assert len(mail.outbox) == 1
+            assert self.DIAGORIENTE_INVITE_EMAIL_SUBJECT in mail.outbox[0].subject
+            assert (
+                self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_1.format(
+                    company_name=job_application.to_company.display_name,
+                    job_seeker_name=job_application.job_seeker.get_full_name(),
+                )
+                in mail.outbox[0].body
+            )
+            assert self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_2 in mail.outbox[0].body
+            assert (
+                self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_1.format(
+                    company_name=job_application.to_company.display_name
+                )
+                not in mail.outbox[0].body
+            )
+            assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 not in mail.outbox[0].body
 
-    def test_diagoriente_invite_as_employee_for_unauthorized_prescriber(self):
+            # Concurrent/subsequent calls should not perform any action
+            frozen_time.tick()
+            response = client.post(
+                reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
+                follow=True,
+            )
+            assertMessages(response, [])
+            assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+            assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+            assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+            assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+            assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+            assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
+            job_application.refresh_from_db()
+            assert job_application.diagoriente_invite_sent_at == initial_invite_time.replace(tzinfo=datetime.UTC)
+            assert len(mail.outbox) == 1
+
+    def test_diagoriente_invite_as_employee_for_unauthorized_prescriber(self, client):
         job_application = JobApplicationFactory(
             sender_prescriber_organization__is_authorized=False,
             resume_link="",
         )
         company = job_application.to_company
         employee = company.members.first()
-        self.client.force_login(employee)
+        client.force_login(employee)
 
         with freeze_time("2023-12-12 13:37:00") as initial_invite_time:
-            response = self.client.post(
+            response = client.post(
                 reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
                 follow=True,
             )
-        self.assertMessages(
+        assertMessages(
             response, [messages.Message(messages.SUCCESS, "L'invitation à utiliser Diagoriente a été envoyée.")]
         )
-        self.assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
-        self.assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
+        assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+        assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
         job_application.refresh_from_db()
         assert job_application.diagoriente_invite_sent_at == initial_invite_time().replace(tzinfo=datetime.UTC)
         assert len(mail.outbox) == 1
@@ -1704,7 +1698,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         )
         assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 not in mail.outbox[0].body
 
-    def test_diagoriente_invite_as_employee_for_job_seeker(self):
+    def test_diagoriente_invite_as_employee_for_job_seeker(self, client):
         job_application = JobApplicationFactory(
             with_approval=True,
             resume_link="",
@@ -1712,22 +1706,22 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         )
         company = job_application.to_company
         employee = company.members.first()
-        self.client.force_login(employee)
+        client.force_login(employee)
 
         with freeze_time("2023-12-12 13:37:00") as initial_invite_time:
-            response = self.client.post(
+            response = client.post(
                 reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
                 follow=True,
             )
-        self.assertMessages(
+        assertMessages(
             response, [messages.Message(messages.SUCCESS, "L'invitation à utiliser Diagoriente a été envoyée.")]
         )
-        self.assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
-        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
-        self.assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
+        assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+        assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
         job_application.refresh_from_db()
         assert job_application.diagoriente_invite_sent_at == initial_invite_time().replace(tzinfo=datetime.UTC)
         assert len(mail.outbox) == 1
@@ -1749,18 +1743,23 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 in mail.outbox[0].body
 
 
-@override_settings(API_BAN_BASE_URL="http://ban-api", TALLY_URL="https://tally.so")
-@pytest.mark.usefixtures("unittest_compatibility")
-class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
+class TestProcessAcceptViews:
     BIRTH_COUNTRY_LABEL = "Pays de naissance"
     BIRTH_PLACE_LABEL = "Commune de naissance"
 
-    @classmethod
-    def setUpTestData(cls):
-        cls.company = CompanyFactory(with_membership=True, with_jobs=True, name="La brigade - entreprise par défaut")
-        cls.job_seeker = JobSeekerFactory(
+    @pytest.fixture(autouse=True)
+    def setup_method(self, settings, mocker):
+        self.company = CompanyFactory(with_membership=True, with_jobs=True, name="La brigade - entreprise par défaut")
+        self.job_seeker = JobSeekerFactory(
             with_pole_emploi_id=True,
             with_ban_api_mocked_address=True,
+        )
+
+        settings.API_BAN_BASE_URL = "http://ban-api"
+        settings.TALLY_URL = "https://tally.so"
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
 
     def create_job_application(self, *args, **kwargs):
@@ -1833,11 +1832,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             **certified_criteria_default_fields,
         } | extra_post_data
 
-    @mock.patch(
-        "itou.utils.apis.geocoding.get_geocoding_data",
-        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-    )
-    def accept_job_application(self, geocoding_mock, job_application, post_data=None, assert_successful=True):
+    def accept_job_application(self, client, job_application, post_data=None, assert_successful=True):
         """
         This is not a test. It's a shortcut to process "apply:accept" view steps:
         - GET
@@ -1847,15 +1842,14 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         If needed a job description can be passed as parameter, as it is now mandatory for each hiring.
         If not provided, a new one will be created and linked to the given job application.
         """
-
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url_accept)
-        self.assertContains(response, "Confirmation de l’embauche")
+        response = client.get(url_accept)
+        assertContains(response, "Confirmation de l’embauche")
         # Make sure modal is hidden.
         assert response.headers.get("HX-Trigger") is None
 
         post_data = self._accept_view_post_data(job_application=job_application, post_data=post_data)
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
+        response = client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
 
         if assert_successful:
             # Easier to debug than just a « sorry, the modal goes on a strike ».
@@ -1876,14 +1870,14 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             assert response.headers.get("HX-Trigger") is None
 
         post_data = post_data | {"confirmed": "True"}
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
+        response = client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         # django-htmx triggers a client side redirect when it receives a response with the HX-Redirect header.
         # It renders an HttpResponseRedirect subclass which, unfortunately, responds with a 200 status code.
         # I guess it's normal as it's an AJAX response.
         # See https://django-htmx.readthedocs.io/en/latest/http.html#django_htmx.http.HttpResponseClientRedirect # noqa
         if assert_successful:
-            self.assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
+            assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
         return response, next_url
 
     _nominal_cases = list(
@@ -1893,25 +1887,25 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         )
     )
 
-    @parametrize(
+    @pytest.mark.parametrize(
         "hiring_end_at,state",
         _nominal_cases,
         ids=[state + ("_no_end_date" if not end_at else "") for end_at, state in _nominal_cases],
     )
-    def test_nominal_case(self, *, hiring_end_at, state):
+    def test_nominal_case(self, client, hiring_end_at, state):
         today = timezone.localdate()
         job_application = self.create_job_application(state=state)
         previous_last_checked_at = self.job_seeker.last_checked_at
 
         employer = self.company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
         # Good duration.
         hiring_start_at = today
         post_data = {
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT) if hiring_end_at else ""
         }
 
-        _, next_url = self.accept_job_application(job_application=job_application, post_data=post_data)
+        _, next_url = self.accept_job_application(client, job_application, post_data=post_data)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.hiring_start_at == hiring_start_at
@@ -1919,39 +1913,36 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert job_application.state.is_accepted
 
         # test how hiring_end_date is displayed
-        response = self.client.get(next_url)
+        response = client.get(next_url)
         # test case hiring_end_at
         if hiring_end_at:
-            self.assertContains(
+            assertContains(
                 response,
                 f"<small>Fin</small><strong>{date_format(hiring_end_at, 'd F Y')}</strong>",
                 html=True,
             )
         else:
-            self.assertContains(response, '<small>Fin</small><i class="text-disabled">Non renseigné</i>', html=True)
+            assertContains(response, '<small>Fin</small><i class="text-disabled">Non renseigné</i>', html=True)
         # last_checked_at has been updated
         assert job_application.job_seeker.last_checked_at > previous_last_checked_at
 
-    @mock.patch(
-        "itou.utils.apis.geocoding.get_geocoding_data",
-        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-    )
-    @mock.patch(
-        "itou.utils.apis.api_particulier.APIParticulierClient._request",
-        return_value=rsa_certified_mocker(),
-    )
     @freeze_time("2024-09-11")
-    def test_select_other_job_description_for_job_application(self, rsa_certified_mock, geocoding_mock):
+    def test_select_other_job_description_for_job_application(self, client, mocker):
+        rsa_certified_mock = mocker.patch(
+            "itou.utils.apis.api_particulier.APIParticulierClient._request",
+            return_value=rsa_certified_mocker(),
+        )
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
+
         # Not sure if it's relevant to test it here.
         # I'd rather test job applications' edge cases alone, without certifiable criteria,
         # but test certifiable criteria aside to separate concerns.
         job_application = self.create_job_application(with_certifiable_criteria=True)
         employer = self.company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
+        response = client.get(url)
 
         assertContains(response, "Postes ouverts au recrutement")
         assertNotContains(response, "Postes fermés au recrutement")
@@ -1963,14 +1954,14 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             "hired_job": AcceptForm.OTHER_HIRED_JOB,
         }
         post_data = self._accept_view_post_data(job_application=job_application, post_data=post_data)
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assertContains(response, "Localisation du poste")
         assertContains(response, "Préciser le nom du poste (code ROME)")
 
         city = City.objects.order_by("?").first()
         appellation = Appellation.objects.get(rome_id="M1805")
         post_data |= {"location": city.pk, "appellation": appellation.pk}
-        response = self.client.post(
+        response = client.post(
             url,
             data=post_data,
             headers={"hx-request": "true"},
@@ -1980,7 +1971,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
         # Modal window
         post_data |= {"confirmed": True}
-        response = self.client.post(url, data=post_data, follow=False, headers={"hx-request": "true"})
+        response = client.post(url, data=post_data, follow=False, headers={"hx-request": "true"})
         # Caution: should redirect after that point, but done via HTMX we get a 200 status code
         assert response.status_code == 200
         assert response.url == reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
@@ -1993,19 +1984,19 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert not job_application.hired_job.is_active
         assert job_application.hired_job.description == "La structure n’a pas encore renseigné cette rubrique"
 
-    def test_select_job_description_for_job_application(self):
+    def test_select_job_description_for_job_application(self, client, snapshot):
         job_application = self.create_job_application()
         employer = self.company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
+        response = client.get(url)
 
-        response = self.client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+        response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
 
         # Check optgroup labels
         job_description = JobDescriptionFactory(company=job_application.to_company, is_active=True)
-        response = self.client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+        response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
         assert response.status_code == 200
         assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
         assertContains(response, "Postes ouverts au recrutement")
@@ -2014,25 +2005,25 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
         # Inactive job description must also appear in select
         job_description = JobDescriptionFactory(company=job_application.to_company, is_active=False)
-        with assertSnapshotQueries(self.snapshot(name="accept view SQL queries")):
-            response = self.client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+        with assertSnapshotQueries(snapshot(name="accept view SQL queries")):
+            response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
         assert response.status_code == 200
         assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
         assertContains(response, "Postes ouverts au recrutement")
         assertContains(response, "Postes fermés au recrutement")
         assertNotContains(response, "Préciser le nom du poste (code ROME)")
 
-    def test_no_job_description_for_job_application(self):
+    def test_no_job_description_for_job_application(self, client):
         self.company.jobs.clear()
         job_application = self.create_job_application()
         employer = self.company.members.first()
-        self.client.force_login(employer)
-        response = self.client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+        client.force_login(employer)
+        response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
         assertNotContains(response, "Postes ouverts au recrutement")
         assertNotContains(response, "Postes fermés au recrutement")
         assertNotContains(response, "Préciser le nom du poste (code ROME)")
 
-    def test_wrong_dates(self):
+    def test_wrong_dates(self, client):
         today = timezone.localdate()
         job_application = self.create_job_application()
         hiring_start_at = today
@@ -2041,15 +2032,15 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         hiring_start_at = hiring_start_at - relativedelta(days=1)
 
         employer = self.company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
         post_data = {
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
         response, _ = self.accept_job_application(
-            job_application=job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False
         )
-        self.assertFormError(response.context["form_accept"], "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
+        assertFormError(response.context["form_accept"], "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
 
         # Wrong dates: end < start.
         hiring_start_at = today
@@ -2059,14 +2050,14 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
         response, _ = self.accept_job_application(
-            job_application=job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False
         )
-        self.assertFormError(response.context["form_accept"], None, JobApplication.ERROR_END_IS_BEFORE_START)
+        assertFormError(response.context["form_accept"], None, JobApplication.ERROR_END_IS_BEFORE_START)
 
-    def test_no_address(self):
+    def test_no_address(self, client):
         job_application = self.create_job_application()
         employer = self.company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         post_data = {
             "ban_api_resolved_address": "",
@@ -2080,13 +2071,11 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         }
 
         response, _ = self.accept_job_application(
-            job_application=job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False
         )
-        self.assertFormError(
-            response.context["form_user_address"], "address_for_autocomplete", "Ce champ est obligatoire."
-        )
+        assertFormError(response.context["form_user_address"], "address_for_autocomplete", "Ce champ est obligatoire.")
 
-    def test_no_diagnosis_on_job_application(self):
+    def test_no_diagnosis_on_job_application(self, client):
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=False)
         self.job_seeker.eligibility_diagnoses.add(diagnosis)
@@ -2094,27 +2083,27 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert job_application.eligibility_diagnosis is None
 
         employer = self.company.members.first()
-        self.client.force_login(employer)
-        self.accept_job_application(job_application=job_application, assert_successful=True, post_data={})
+        client.force_login(employer)
+        self.accept_job_application(client, job_application, assert_successful=True, post_data={})
 
-    def test_no_diagnosis(self):
+    def test_no_diagnosis(self, client):
         # if no, should not see the confirm button, nor accept posted data
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=False)
         assert job_application.eligibility_diagnosis is None
         job_application.job_seeker.eligibility_diagnoses.all().delete()
 
         employer = self.company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url_accept, follow=True)
-        self.assertRedirects(
+        response = client.get(url_accept, follow=True)
+        assertRedirects(
             response, reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         )
         assert "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée." == str(
             list(response.context["messages"])[-1]
         )
 
-    def test_with_active_suspension(self):
+    def test_with_active_suspension(self, client):
         """Test the `accept` transition with active suspension for active user"""
         employer = self.company.members.first()
         today = timezone.localdate()
@@ -2148,13 +2137,13 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         other_employer = job_application.to_company.members.first()
 
         # login with other company
-        self.client.force_login(other_employer)
+        client.force_login(other_employer)
         hiring_start_at = today + relativedelta(days=20)
 
         post_data = {
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
-        self.accept_job_application(job_application=job_application, post_data=post_data)
+        self.accept_job_application(client, job_application, post_data=post_data)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         suspension = job_application.approval.suspension_set.in_progress().last()
@@ -2166,7 +2155,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             days=(suspension.end_at - suspension.start_at).days
         )
 
-    def test_with_manual_approval_delivery(self):
+    def test_with_manual_approval_delivery(self, client):
         """
         Test the "manual approval delivery mode" path of the view.
         """
@@ -2180,7 +2169,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         job_application = self.create_job_application()
 
         employer = self.company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
@@ -2190,11 +2179,11 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
         }
 
-        self.accept_job_application(job_application=job_application, post_data=post_data)
+        self.accept_job_application(client, job_application, post_data=post_data)
         job_application.refresh_from_db()
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_MANUAL
 
-    def test_update_hiring_start_date_of_two_job_applications(self):
+    def test_update_hiring_start_date_of_two_job_applications(self, client):
         hiring_start_at = timezone.localdate() + relativedelta(months=2)
         hiring_end_at = hiring_start_at + relativedelta(months=2)
         approval_default_ending = Approval.get_default_end_date(start_at=hiring_start_at)
@@ -2220,13 +2209,13 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         # company 1 logs in and accepts the first job application.
         # The delivered approval should start at the same time as the contract.
         employer = self.company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
         post_data = {
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
 
-        self.accept_job_application(job_application=job_application, post_data=post_data)
+        self.accept_job_application(client, job_application, post_data=post_data)
 
         # First job application has been accepted.
         # All other job applications are obsolete.
@@ -2234,7 +2223,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert job_application.state.is_accepted
         assert job_application.approval.start_at == job_application.hiring_start_at
         assert job_application.approval.end_at == approval_default_ending
-        self.client.logout()
+        client.logout()
 
         # company 2 accepts the second job application
         # but its contract starts earlier than the approval delivered the first time.
@@ -2246,12 +2235,12 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         job_app_starting_earlier.refresh_from_db()
         assert job_app_starting_earlier.state.is_obsolete
 
-        self.client.force_login(employer)
+        client.force_login(employer)
         post_data = {
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
-        self.accept_job_application(job_application=job_app_starting_earlier, post_data=post_data)
+        self.accept_job_application(client, job_app_starting_earlier, post_data=post_data)
         job_app_starting_earlier.refresh_from_db()
 
         # Second job application has been accepted.
@@ -2259,7 +2248,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert job_app_starting_earlier.state.is_accepted
         assert job_app_starting_earlier.approval.start_at == job_app_starting_earlier.hiring_start_at
         assert job_app_starting_earlier.approval.end_at == approval_default_ending
-        self.client.logout()
+        client.logout()
 
         # company 3 accepts the third job application.
         # Its contract starts later than the corresponding approval.
@@ -2270,12 +2259,12 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         job_app_starting_later.refresh_from_db()
         assert job_app_starting_later.state.is_obsolete
 
-        self.client.force_login(employer)
+        client.force_login(employer)
         post_data = {
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
-        self.accept_job_application(job_application=job_app_starting_later, post_data=post_data)
+        self.accept_job_application(client, job_app_starting_later, post_data=post_data)
         job_app_starting_later.refresh_from_db()
 
         # Third job application has been accepted.
@@ -2283,7 +2272,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert job_app_starting_later.state.is_accepted
         assert job_app_starting_later.approval.start_at == job_app_starting_earlier.hiring_start_at
 
-    def test_with_double_user(self):
+    def test_with_double_user(self, client):
         job_application = self.create_job_application()
         job_seeker = job_application.job_seeker
 
@@ -2295,9 +2284,9 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
         # Accept the job application for the first job seeker.
         employer = self.company.members.first()
-        self.client.force_login(employer)
-        _, next_url = self.accept_job_application(job_application=job_application)
-        response = self.client.get(next_url)
+        client.force_login(employer)
+        _, next_url = self.accept_job_application(client, job_application)
+        response = client.get(next_url)
         assert "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. " not in str(
             list(response.context["messages"])[0]
         )
@@ -2316,27 +2305,23 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         another_job_application = self.create_job_application(job_seeker=almost_same_job_seeker)
 
         # Gracefully display a message instead of just plain crashing
-        _, next_url = self.accept_job_application(job_application=another_job_application)
-        response = self.client.get(next_url)
+        _, next_url = self.accept_job_application(client, another_job_application)
+        response = client.get(next_url)
         assert "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. " in str(
             list(response.context["messages"])[0]
         )
 
-    @mock.patch(
-        "itou.utils.apis.geocoding.get_geocoding_data",
-        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-    )
-    def test_nir_readonly(self, _mock):
+    def test_nir_readonly(self, client):
         job_application = self.create_job_application()
 
         employer = self.company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url_accept)
-        self.assertContains(response, "Confirmation de l’embauche")
+        response = client.get(url_accept)
+        assertContains(response, "Confirmation de l’embauche")
         # Check that the NIR field is disabled
-        self.assertContains(response, DISABLED_NIR)
-        self.assertContains(
+        assertContains(response, DISABLED_NIR)
+        assertContains(
             response,
             "Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.",
             html=True,
@@ -2345,11 +2330,11 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         job_application.job_seeker.last_login = None
         job_application.job_seeker.created_by = PrescriberFactory()
         job_application.job_seeker.save()
-        response = self.client.get(url_accept)
-        self.assertContains(response, "Confirmation de l’embauche")
+        response = client.get(url_accept)
+        assertContains(response, "Confirmation de l’embauche")
         # Check that the NIR field is disabled
-        self.assertContains(response, DISABLED_NIR)
-        self.assertContains(
+        assertContains(response, DISABLED_NIR)
+        assertContains(
             response,
             (
                 f'<a href="https://tally.so/r/wzxQlg?jobapplication={job_application.pk}" target="_blank" '
@@ -2358,32 +2343,32 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             html=True,
         )
 
-    def test_no_nir_update(self):
+    def test_no_nir_update(self, client):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.save()
         job_application = self.create_job_application()
 
         employer = self.company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url_accept)
-        self.assertContains(response, "Confirmation de l’embauche")
+        response = client.get(url_accept)
+        assertContains(response, "Confirmation de l’embauche")
         # Check that the NIR field is not disabled
-        self.assertNotContains(response, DISABLED_NIR)
+        assertNotContains(response, DISABLED_NIR)
 
         post_data = self._accept_view_post_data(job_application)
         response, _ = self.accept_job_application(
-            job_application=job_application, assert_successful=False, post_data=post_data
+            client, job_application, assert_successful=False, post_data=post_data
         )
-        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+        assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
 
         post_data["nir"] = "1234"
         response, _ = self.accept_job_application(
-            job_application=job_application, assert_successful=False, post_data=post_data
+            client, job_application, assert_successful=False, post_data=post_data
         )
-        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
-        self.assertFormError(
+        assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+        assertFormError(
             response.context["form_personal_data"],
             "nir",
             "Le numéro de sécurité sociale est trop court (15 caractères autorisés).",
@@ -2391,11 +2376,11 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
         NEW_NIR = "197013625838386"
         post_data["nir"] = NEW_NIR
-        self.accept_job_application(job_application=job_application, post_data=post_data)
+        self.accept_job_application(client, job_application, post_data=post_data)
         jobseeker_profile.refresh_from_db()
         assert jobseeker_profile.nir == NEW_NIR
 
-    def test_no_nir_other_user(self):
+    def test_no_nir_other_user(self, client):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.save()
@@ -2406,53 +2391,51 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         )
 
         employer = self.company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         post_data = {
             "pole_emploi_id": jobseeker_profile.pole_emploi_id,
             "nir": other_job_seeker.jobseeker_profile.nir,
         }
         response, _ = self.accept_job_application(
-            job_application=job_application, assert_successful=False, post_data=post_data
+            client, job_application, assert_successful=False, post_data=post_data
         )
-        self.assertContains(
-            response, "Le numéro de sécurité sociale est déjà associé à un autre utilisateur", html=True
-        )
-        self.assertFormError(
+        assertContains(response, "Le numéro de sécurité sociale est déjà associé à un autre utilisateur", html=True)
+        assertFormError(
             response.context["form_personal_data"],
             None,
             "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.",
         )
 
-    def test_no_nir_update_with_reason(self):
+    def test_no_nir_update_with_reason(self, client):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.save()
         job_application = self.create_job_application()
 
         employer = self.company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         post_data = self._accept_view_post_data(job_application=job_application)
         response, _ = self.accept_job_application(
-            job_application=job_application, assert_successful=False, post_data=post_data
+            client, job_application, assert_successful=False, post_data=post_data
         )
-        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+        assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
 
         # Check the box
         post_data["lack_of_nir"] = True
         response, _ = self.accept_job_application(
-            job_application=job_application, assert_successful=False, post_data=post_data
+            client, job_application, assert_successful=False, post_data=post_data
         )
-        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
-        self.assertContains(response, "Veuillez sélectionner un motif pour continuer", html=True)
+        assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+        assertContains(response, "Veuillez sélectionner un motif pour continuer", html=True)
 
         post_data["lack_of_nir_reason"] = LackOfNIRReason.NO_NIR
-        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
+        self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
         job_application.job_seeker.jobseeker_profile.refresh_from_db()
         assert job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NO_NIR
 
-    def test_lack_of_nir_reason_update(self):
+    def test_lack_of_nir_reason_update(self, client):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
@@ -2460,11 +2443,11 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         job_application = self.create_job_application()
 
         employer = self.company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url_accept)
-        self.assertContains(response, "Confirmation de l’embauche")
+        response = client.get(url_accept)
+        assertContains(response, "Confirmation de l’embauche")
         # Check that the NIR field is initially disabled
         # since the job seeker has a lack_of_nir_reason
         assert response.context["form_personal_data"].fields["nir"].disabled
@@ -2477,13 +2460,15 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             "lack_of_pole_emploi_id_reason": jobseeker_profile.lack_of_pole_emploi_id_reason,
         }
         post_data = self._accept_view_post_data(job_application=job_application, post_data=post_data)
-        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
+        self.accept_job_application(
+            client, job_application=job_application, post_data=post_data, assert_successful=True
+        )
         job_application.job_seeker.refresh_from_db()
         # New NIR is set and the lack_of_nir_reason is cleaned
         assert not job_application.job_seeker.jobseeker_profile.lack_of_nir_reason
         assert job_application.job_seeker.jobseeker_profile.nir == NEW_NIR
 
-    def test_lack_of_nir_reason_other_user(self):
+    def test_lack_of_nir_reason_other_user(self, client):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
@@ -2493,16 +2478,16 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         employer = self.company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
-        response = self.client.get(url_accept)
-        self.assertContains(response, "Confirmation de l’embauche")
+        response = client.get(url_accept)
+        assertContains(response, "Confirmation de l’embauche")
         # Check that the NIR field is initially disabled
         # since the job seeker has a lack_of_nir_reason
         assert response.context["form_personal_data"].fields["nir"].disabled
 
         # Check that the tally link is there
-        self.assertContains(
+        assertContains(
             response,
             (
                 f'<a href="https://tally.so/r/wzxQlg?jobapplication={job_application.pk}" target="_blank" '
@@ -2511,14 +2496,14 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             html=True,
         )
 
-    def test_accept_after_cancel(self):
+    def test_accept_after_cancel(self, client):
         # A canceled job application is not linked to an approval
         # unless the job seeker has an accepted job application.
         job_application = self.create_job_application(state=job_applications_enums.JobApplicationState.CANCELLED)
 
         employer = self.company.members.first()
-        self.client.force_login(employer)
-        self.accept_job_application(job_application=job_application)
+        client.force_login(employer)
+        self.accept_job_application(client, job_application=job_application)
 
         job_application.refresh_from_db()
         assert job_application.job_seeker.approvals.count() == 1
@@ -2526,12 +2511,12 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert approval.start_at == job_application.hiring_start_at
         assert job_application.state.is_accepted
 
-    @mock.patch(
-        "itou.utils.apis.api_particulier.APIParticulierClient._request",
-        return_value=rsa_certified_mocker(),
-    )
     @freeze_time("2024-09-11")
-    def test_accept_iae__criteria_can_be_certified(self, certify_rsa_mocker):
+    def test_accept_iae__criteria_can_be_certified(self, client, mocker):
+        certify_rsa_mocker = mocker.patch(
+            "itou.utils.apis.api_particulier.APIParticulierClient._request",
+            return_value=rsa_certified_mocker(),
+        )
         ######### Case 1: if BRSA is one the diagnosis criteria,
         ######### birth place and birth country are required.
         birthdate = datetime.date(1995, 12, 27)
@@ -2546,11 +2531,11 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
-        response = self.client.get(url_accept)
-        self.assertContains(response, self.BIRTH_COUNTRY_LABEL)
-        self.assertContains(response, self.BIRTH_PLACE_LABEL)
+        response = client.get(url_accept)
+        assertContains(response, self.BIRTH_COUNTRY_LABEL)
+        assertContains(response, self.BIRTH_PLACE_LABEL)
 
         # CertifiedCriteriaForm
         # Birth country is mandatory.
@@ -2560,14 +2545,14 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             "birth_place": "",
         }
         response, _ = self.accept_job_application(
-            job_application=job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False
         )
 
         # Wrong birth country and birth place.
         post_data["birth_country"] = "0012345"
         post_data["birth_place"] = "008765"
         response, _ = self.accept_job_application(
-            job_application=job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False
         )
         assert response.context["form_certified_criteria"].errors == {
             "birth_place": ["Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles."],
@@ -2588,7 +2573,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             "birth_country": "",
             "birth_place": birth_place.pk,
         }
-        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
+        self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
         certify_rsa_mocker.assert_called_once()
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
@@ -2606,12 +2591,12 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             )
             assert criterion.certified_at
 
-    @mock.patch(
-        "itou.utils.apis.api_particulier.APIParticulierClient._request",
-        return_value=rsa_certified_mocker(),
-    )
     @freeze_time("2024-09-11")
-    def test_accept_geiq__criteria_can_be_certified(self, certify_rsa_mocker):
+    def test_accept_geiq__criteria_can_be_certified(self, client, mocker):
+        certify_rsa_mocker = mocker.patch(
+            "itou.utils.apis.api_particulier.APIParticulierClient._request",
+            return_value=rsa_certified_mocker(),
+        )
         birthdate = datetime.date(1995, 12, 27)
         self.company.kind = CompanyKind.GEIQ
         self.company.save()
@@ -2627,11 +2612,11 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
-        response = self.client.get(url_accept)
-        self.assertContains(response, self.BIRTH_COUNTRY_LABEL)
-        self.assertContains(response, self.BIRTH_PLACE_LABEL)
+        response = client.get(url_accept)
+        assertContains(response, self.BIRTH_COUNTRY_LABEL)
+        assertContains(response, self.BIRTH_PLACE_LABEL)
 
         # CertifiedCriteriaForm
         # Birth country is mandatory.
@@ -2641,7 +2626,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             "birth_place": "",
         }
         response, _ = self.accept_job_application(
-            job_application=job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False
         )
 
         # Then set it.
@@ -2653,9 +2638,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             "birth_country": "",
             "birth_place": birth_place.pk,
         }
-        response, _ = self.accept_job_application(
-            job_application=job_application, post_data=post_data, assert_successful=True
-        )
+        response, _ = self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
         certify_rsa_mocker.assert_called_once()
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
@@ -2673,12 +2656,12 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             )
             assert criterion.certified_at
 
-    @mock.patch(
-        "itou.utils.apis.api_particulier.APIParticulierClient._request",
-        return_value=rsa_certified_mocker(),
-    )
     @freeze_time("2024-09-11")
-    def test_accept_no_siae__criteria_can_be_certified(self, _rsa_certified_mocker):
+    def test_accept_no_siae__criteria_can_be_certified(self, client, mocker):
+        mocker.patch(
+            "itou.utils.apis.api_particulier.APIParticulierClient._request",
+            return_value=rsa_certified_mocker(),
+        )
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True, with_jobs=True)
         job_application = self.create_job_application(
             with_certifiable_criteria=True,
@@ -2688,23 +2671,23 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
-        response = self.client.get(url_accept)
-        self.assertNotContains(response, self.BIRTH_COUNTRY_LABEL)
-        self.assertNotContains(response, self.BIRTH_PLACE_LABEL)
+        response = client.get(url_accept)
+        assertNotContains(response, self.BIRTH_COUNTRY_LABEL)
+        assertNotContains(response, self.BIRTH_PLACE_LABEL)
 
         post_data = self._accept_view_post_data(job_application=job_application)
         del post_data["birth_country"]
         del post_data["birth_place"]
-        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
+        self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
         jobseeker_profile.refresh_from_db()
         assert not jobseeker_profile.birth_country
         assert not jobseeker_profile.birth_place
 
-    def test_criteria__criteria_not_certificable(self):
+    def test_criteria__criteria_not_certificable(self, client):
         # ############################
         # No criteria to be certified: the form should not appear
         # and it should not be valid.
@@ -2713,24 +2696,24 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
-        response = self.client.get(url_accept)
-        self.assertNotContains(response, self.BIRTH_COUNTRY_LABEL)
-        self.assertNotContains(response, self.BIRTH_PLACE_LABEL)
+        response = client.get(url_accept)
+        assertNotContains(response, self.BIRTH_COUNTRY_LABEL)
+        assertNotContains(response, self.BIRTH_PLACE_LABEL)
 
         # CertifiedCriteriaForm
         post_data = self._accept_view_post_data(job_application=job_application)
         del post_data["birth_country"]
         del post_data["birth_place"]
-        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
+        self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
 
-    @mock.patch(
-        "itou.utils.apis.api_particulier.APIParticulierClient._request",
-        return_value=rsa_certified_mocker(),
-    )
     @freeze_time("2024-09-11")
-    def test_accept_updated_birthdate_invalidating_birth_place(self, _rsa_certified_mocker):
+    def test_accept_updated_birthdate_invalidating_birth_place(self, client, mocker):
+        mocker.patch(
+            "itou.utils.apis.api_particulier.APIParticulierClient._request",
+            return_value=rsa_certified_mocker(),
+        )
         # tests for a rare case where the birthdate will be cleaned for sharing between forms during the accept process
         job_application = self.create_job_application(with_certifiable_criteria=True)
 
@@ -2740,7 +2723,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert ed and ed.criteria_can_be_certified()
 
         employer = self.company.members.first()
-        self.client.force_login(employer)
+        client.force_login(employer)
 
         birth_place = Commune.objects.filter(start_date__gt=datetime.date(1901, 12, 1)).first()
         assert birth_place is not None  # required by test
@@ -2752,7 +2735,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         }
 
         response, _ = self.accept_job_application(
-            job_application=job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False
         )
         expected_msg = (
             f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {early_date:%d/%m/%Y}"
@@ -2764,7 +2747,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         # assert malformed birthdate does not crash view
         post_data["birthdate"] = "20240-001-001"
         response, _ = self.accept_job_application(
-            job_application=job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False
         )
 
         assert response.context.get("form_personal_data").errors == {"birthdate": ["Saisissez une date valide."]}
@@ -2772,221 +2755,218 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
         # test that fixing the birthdate fixes the form submission
         post_data["birthdate"] = birth_place.start_date + datetime.timedelta(days=1)
-        response, _ = self.accept_job_application(
-            job_application=job_application, post_data=post_data, assert_successful=True
-        )
+        response, _ = self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
 
 
-class ProcessTemplatesTest(TestCase):
+class TestProcessTemplates:
     """
     Test actions available in the details template for the different.
     states of a job application.
     """
 
-    @classmethod
-    def setUpTestData(cls):
-        """Set up data for the whole TestCase."""
-        cls.job_application = JobApplicationFactory(eligibility_diagnosis=None)
-        cls.employer = cls.job_application.to_company.members.first()
+    @pytest.fixture(autouse=True)
+    def setup_method(self, client):
+        self.job_application = JobApplicationFactory(eligibility_diagnosis=None)
+        self.employer = self.job_application.to_company.members.first()
 
-        kwargs = {"job_application_id": cls.job_application.pk}
-        cls.url_details = reverse("apply:details_for_company", kwargs=kwargs)
-        cls.url_process = reverse("apply:process", kwargs=kwargs)
-        cls.url_eligibility = reverse("apply:eligibility", kwargs=kwargs)
-        cls.url_refuse = reverse("apply:refuse", kwargs=kwargs)
-        cls.url_postpone = reverse("apply:postpone", kwargs=kwargs)
-        cls.url_accept = reverse("apply:accept", kwargs=kwargs)
+        kwargs = {"job_application_id": self.job_application.pk}
+        self.url_details = reverse("apply:details_for_company", kwargs=kwargs)
+        self.url_process = reverse("apply:process", kwargs=kwargs)
+        self.url_eligibility = reverse("apply:eligibility", kwargs=kwargs)
+        self.url_refuse = reverse("apply:refuse", kwargs=kwargs)
+        self.url_postpone = reverse("apply:postpone", kwargs=kwargs)
+        self.url_accept = reverse("apply:accept", kwargs=kwargs)
 
-    def test_details_template_for_state_new(self):
+    def test_details_template_for_state_new(self, client):
         """Test actions available when the state is new."""
-        self.client.force_login(self.employer)
-        response = self.client.get(self.url_details)
+        client.force_login(self.employer)
+        response = client.get(self.url_details)
         # Test template content.
-        self.assertContains(response, self.url_process)
-        self.assertNotContains(response, self.url_eligibility)
-        self.assertContains(response, self.url_refuse)
-        self.assertNotContains(response, self.url_postpone)
-        self.assertNotContains(response, self.url_accept)
+        assertContains(response, self.url_process)
+        assertNotContains(response, self.url_eligibility)
+        assertContains(response, self.url_refuse)
+        assertNotContains(response, self.url_postpone)
+        assertNotContains(response, self.url_accept)
 
-    def test_details_template_for_state_processing(self):
+    def test_details_template_for_state_processing(self, client):
         """Test actions available when the state is processing."""
-        self.client.force_login(self.employer)
+        client.force_login(self.employer)
         self.job_application.state = job_applications_enums.JobApplicationState.PROCESSING
         self.job_application.save()
-        response = self.client.get(self.url_details)
+        response = client.get(self.url_details)
         # Test template content.
-        self.assertNotContains(response, self.url_process)
-        self.assertContains(response, self.url_eligibility)
-        self.assertContains(response, self.url_refuse)
-        self.assertContains(response, self.url_postpone)
-        self.assertNotContains(response, self.url_accept)
+        assertNotContains(response, self.url_process)
+        assertContains(response, self.url_eligibility)
+        assertContains(response, self.url_refuse)
+        assertContains(response, self.url_postpone)
+        assertNotContains(response, self.url_accept)
 
-    def test_details_template_for_state_prior_to_hire(self):
+    def test_details_template_for_state_prior_to_hire(self, client):
         """Test actions available when the state is prior_to_hire."""
-        self.client.force_login(self.employer)
+        client.force_login(self.employer)
         self.job_application.state = job_applications_enums.JobApplicationState.PRIOR_TO_HIRE
         self.job_application.save()
-        response = self.client.get(self.url_details)
+        response = client.get(self.url_details)
         # Test template content.
-        self.assertNotContains(response, self.url_process)
-        self.assertContains(response, self.url_eligibility)
-        self.assertContains(response, self.url_refuse)
-        self.assertContains(response, self.url_postpone)
-        self.assertNotContains(response, self.url_accept)
+        assertNotContains(response, self.url_process)
+        assertContains(response, self.url_eligibility)
+        assertContains(response, self.url_refuse)
+        assertContains(response, self.url_postpone)
+        assertNotContains(response, self.url_accept)
 
-    def test_details_template_for_state_processing_but_suspended_siae(self):
+    def test_details_template_for_state_processing_but_suspended_siae(self, client):
         """Test actions available when the state is processing but SIAE is suspended"""
         Sanctions.objects.create(
             evaluated_siae=EvaluatedSiaeFactory(siae=self.job_application.to_company),
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
         )
-        self.client.force_login(self.employer)
+        client.force_login(self.employer)
         self.job_application.state = job_applications_enums.JobApplicationState.PROCESSING
         self.job_application.save()
-        response = self.client.get(self.url_details)
+        response = client.get(self.url_details)
         # Test template content.
-        self.assertNotContains(response, self.url_process)
-        self.assertNotContains(response, self.url_eligibility)
-        self.assertContains(
+        assertNotContains(response, self.url_process)
+        assertNotContains(response, self.url_eligibility)
+        assertContains(
             response,
             (
                 "Vous ne pouvez pas valider les critères d'éligibilité suite aux "
                 "mesures prises dans le cadre du contrôle a posteriori"
             ),
         )
-        self.assertContains(response, self.url_refuse)
-        self.assertContains(response, self.url_postpone)
-        self.assertNotContains(response, self.url_accept)
+        assertContains(response, self.url_refuse)
+        assertContains(response, self.url_postpone)
+        assertNotContains(response, self.url_accept)
 
-    def test_details_template_for_state_postponed(self):
+    def test_details_template_for_state_postponed(self, client):
         """Test actions available when the state is postponed."""
-        self.client.force_login(self.employer)
+        client.force_login(self.employer)
         self.job_application.state = job_applications_enums.JobApplicationState.POSTPONED
         self.job_application.save()
-        response = self.client.get(self.url_details)
+        response = client.get(self.url_details)
         # Test template content.
-        self.assertNotContains(response, self.url_process)
-        self.assertContains(response, self.url_eligibility)
-        self.assertContains(response, self.url_refuse)
-        self.assertNotContains(response, self.url_postpone)
-        self.assertNotContains(response, self.url_accept)
+        assertNotContains(response, self.url_process)
+        assertContains(response, self.url_eligibility)
+        assertContains(response, self.url_refuse)
+        assertNotContains(response, self.url_postpone)
+        assertNotContains(response, self.url_accept)
 
-    def test_details_template_for_state_postponed_valid_diagnosis(self):
+    def test_details_template_for_state_postponed_valid_diagnosis(self, client):
         """Test actions available when the state is postponed."""
-        self.client.force_login(self.employer)
+        client.force_login(self.employer)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_application.job_seeker)
         self.job_application.state = job_applications_enums.JobApplicationState.POSTPONED
         self.job_application.save()
-        response = self.client.get(self.url_details)
+        response = client.get(self.url_details)
         # Test template content.
-        self.assertNotContains(response, self.url_process)
-        self.assertNotContains(response, self.url_eligibility)
-        self.assertContains(response, self.url_refuse)
-        self.assertNotContains(response, self.url_postpone)
-        self.assertContains(response, self.url_accept)
+        assertNotContains(response, self.url_process)
+        assertNotContains(response, self.url_eligibility)
+        assertContains(response, self.url_refuse)
+        assertNotContains(response, self.url_postpone)
+        assertContains(response, self.url_accept)
 
-    def test_details_template_for_state_obsolete(self):
-        self.client.force_login(self.employer)
+    def test_details_template_for_state_obsolete(self, client):
+        client.force_login(self.employer)
         self.job_application.state = job_applications_enums.JobApplicationState.OBSOLETE
         self.job_application.processed_at = timezone.now()
         self.job_application.save()
 
-        response = self.client.get(self.url_details)
+        response = client.get(self.url_details)
 
         # Test template content.
-        self.assertNotContains(response, self.url_process)
-        self.assertContains(response, self.url_eligibility)
-        self.assertNotContains(response, self.url_refuse)
-        self.assertNotContains(response, self.url_postpone)
-        self.assertNotContains(response, self.url_accept)
+        assertNotContains(response, self.url_process)
+        assertContains(response, self.url_eligibility)
+        assertNotContains(response, self.url_refuse)
+        assertNotContains(response, self.url_postpone)
+        assertNotContains(response, self.url_accept)
 
-    def test_details_template_for_state_obsolete_valid_diagnosis(self):
-        self.client.force_login(self.employer)
+    def test_details_template_for_state_obsolete_valid_diagnosis(self, client):
+        client.force_login(self.employer)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_application.job_seeker)
         self.job_application.state = job_applications_enums.JobApplicationState.OBSOLETE
         self.job_application.processed_at = timezone.now()
         self.job_application.save()
 
-        response = self.client.get(self.url_details)
+        response = client.get(self.url_details)
 
         # Test template content.
-        self.assertNotContains(response, self.url_process)
-        self.assertNotContains(response, self.url_eligibility)
-        self.assertNotContains(response, self.url_refuse)
-        self.assertNotContains(response, self.url_postpone)
-        self.assertContains(response, self.url_accept)
+        assertNotContains(response, self.url_process)
+        assertNotContains(response, self.url_eligibility)
+        assertNotContains(response, self.url_refuse)
+        assertNotContains(response, self.url_postpone)
+        assertContains(response, self.url_accept)
 
-    def test_details_template_for_state_refused(self):
+    def test_details_template_for_state_refused(self, client):
         """Test actions available for other states."""
-        self.client.force_login(self.employer)
+        client.force_login(self.employer)
         self.job_application.state = job_applications_enums.JobApplicationState.REFUSED
         self.job_application.processed_at = timezone.now()
         self.job_application.save()
-        response = self.client.get(self.url_details)
+        response = client.get(self.url_details)
         # Test template content.
-        self.assertNotContains(response, self.url_process)
-        self.assertContains(response, self.url_eligibility)
-        self.assertNotContains(response, self.url_refuse)
-        self.assertNotContains(response, self.url_postpone)
-        self.assertNotContains(response, self.url_accept)
+        assertNotContains(response, self.url_process)
+        assertContains(response, self.url_eligibility)
+        assertNotContains(response, self.url_refuse)
+        assertNotContains(response, self.url_postpone)
+        assertNotContains(response, self.url_accept)
 
-    def test_details_template_for_state_refused_valid_diagnosis(self):
+    def test_details_template_for_state_refused_valid_diagnosis(self, client):
         """Test actions available for other states."""
-        self.client.force_login(self.employer)
+        client.force_login(self.employer)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_application.job_seeker)
         self.job_application.state = job_applications_enums.JobApplicationState.REFUSED
         self.job_application.processed_at = timezone.now()
         self.job_application.save()
-        response = self.client.get(self.url_details)
+        response = client.get(self.url_details)
         # Test template content.
-        self.assertNotContains(response, self.url_process)
-        self.assertNotContains(response, self.url_eligibility)
-        self.assertNotContains(response, self.url_refuse)
-        self.assertNotContains(response, self.url_postpone)
-        self.assertContains(response, self.url_accept)
+        assertNotContains(response, self.url_process)
+        assertNotContains(response, self.url_eligibility)
+        assertNotContains(response, self.url_refuse)
+        assertNotContains(response, self.url_postpone)
+        assertContains(response, self.url_accept)
 
-    def test_details_template_for_state_canceled(self):
+    def test_details_template_for_state_canceled(self, client):
         """Test actions available for other states."""
-        self.client.force_login(self.employer)
+        client.force_login(self.employer)
         self.job_application.state = job_applications_enums.JobApplicationState.CANCELLED
         self.job_application.processed_at = timezone.now()
         self.job_application.save()
-        response = self.client.get(self.url_details)
+        response = client.get(self.url_details)
         # Test template content.
-        self.assertNotContains(response, self.url_process)
-        self.assertContains(response, self.url_eligibility)
-        self.assertNotContains(response, self.url_refuse)
-        self.assertNotContains(response, self.url_postpone)
-        self.assertNotContains(response, self.url_accept)
+        assertNotContains(response, self.url_process)
+        assertContains(response, self.url_eligibility)
+        assertNotContains(response, self.url_refuse)
+        assertNotContains(response, self.url_postpone)
+        assertNotContains(response, self.url_accept)
 
-    def test_details_template_for_state_canceled_valid_diagnosis(self):
+    def test_details_template_for_state_canceled_valid_diagnosis(self, client):
         """Test actions available for other states."""
-        self.client.force_login(self.employer)
+        client.force_login(self.employer)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_application.job_seeker)
         self.job_application.state = job_applications_enums.JobApplicationState.CANCELLED
         self.job_application.processed_at = timezone.now()
         self.job_application.save()
-        response = self.client.get(self.url_details)
+        response = client.get(self.url_details)
         # Test template content.
-        self.assertNotContains(response, self.url_process)
-        self.assertNotContains(response, self.url_eligibility)
-        self.assertNotContains(response, self.url_refuse)
-        self.assertNotContains(response, self.url_postpone)
-        self.assertContains(response, self.url_accept)
+        assertNotContains(response, self.url_process)
+        assertNotContains(response, self.url_eligibility)
+        assertNotContains(response, self.url_refuse)
+        assertNotContains(response, self.url_postpone)
+        assertContains(response, self.url_accept)
 
-    def test_details_template_for_state_accepted(self):
+    def test_details_template_for_state_accepted(self, client):
         """Test actions available for other states."""
-        self.client.force_login(self.employer)
+        client.force_login(self.employer)
         self.job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
         self.job_application.processed_at = timezone.now()
         self.job_application.save()
-        response = self.client.get(self.url_details)
+        response = client.get(self.url_details)
         # Test template content.
-        self.assertNotContains(response, self.url_process)
-        self.assertNotContains(response, self.url_eligibility)
-        self.assertNotContains(response, self.url_refuse)
-        self.assertNotContains(response, self.url_postpone)
-        self.assertNotContains(response, self.url_accept)
+        assertNotContains(response, self.url_process)
+        assertNotContains(response, self.url_eligibility)
+        assertNotContains(response, self.url_refuse)
+        assertNotContains(response, self.url_postpone)
+        assertNotContains(response, self.url_accept)
 
 
 class TestProcessTransferJobApplication:

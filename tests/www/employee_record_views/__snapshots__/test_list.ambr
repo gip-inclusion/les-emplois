@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: ListEmployeeRecordsTest.test_employee_record_to_disable
+# name: TestListEmployeeRecords.test_employee_record_to_disable
   '''
   <div class="c-box--results__footer">
                   <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
@@ -11,14 +11,14 @@
               </div>
   '''
 # ---
-# name: ListEmployeeRecordsTest.test_employee_record_to_disable_with_nir_associated_to_other[action]
+# name: TestListEmployeeRecords.test_employee_record_to_disable_with_nir_associated_to_other[action]
   '''
   <div class="c-box--results__footer">
                   <a aria-label="Régulariser le n° de sécurité sociale Jane DOE (ouverture dans un nouvel onglet)" class="btn btn-primary btn-block w-100 w-md-auto has-external-link" href="https://tally.so/r/wzxQlg?employeerecord=[PK of EmployeeRecord]" rel="noopener" target="_blank">Régulariser le n° de sécurité sociale</a>
               </div>
   '''
 # ---
-# name: ListEmployeeRecordsTest.test_employee_record_to_disable_with_nir_associated_to_other[alert]
+# name: TestListEmployeeRecords.test_employee_record_to_disable_with_nir_associated_to_other[alert]
   '''
   <div class="alert alert-warning" role="status">
               <div class="row">
@@ -37,14 +37,14 @@
           </div>
   '''
 # ---
-# name: ListEmployeeRecordsTest.test_employee_records_with_a_prolongation_need_to_be_updated[action]
+# name: TestListEmployeeRecords.test_employee_records_with_a_prolongation_need_to_be_updated[action]
   '''
   <div class="c-box--results__footer">
                   <a aria-label="Mettre à jour la fiche salarié de Jane DOE" class="btn btn-primary btn-block w-100 w-md-auto" href="/employee_record/create/[PK of JobApplication]">Mettre à jour</a>
               </div>
   '''
 # ---
-# name: ListEmployeeRecordsTest.test_employee_records_with_a_prolongation_need_to_be_updated[alert]
+# name: TestListEmployeeRecords.test_employee_records_with_a_prolongation_need_to_be_updated[alert]
   '''
   <div class="alert alert-warning" role="status">
               <div class="row">
@@ -63,14 +63,14 @@
           </div>
   '''
 # ---
-# name: ListEmployeeRecordsTest.test_employee_records_with_a_suspension_need_to_be_updated[action]
+# name: TestListEmployeeRecords.test_employee_records_with_a_suspension_need_to_be_updated[action]
   '''
   <div class="c-box--results__footer">
                   <a aria-label="Mettre à jour la fiche salarié de Jane DOE" class="btn btn-primary btn-block w-100 w-md-auto" href="/employee_record/create/[PK of JobApplication]">Mettre à jour</a>
               </div>
   '''
 # ---
-# name: ListEmployeeRecordsTest.test_employee_records_with_a_suspension_need_to_be_updated[alert]
+# name: TestListEmployeeRecords.test_employee_records_with_a_suspension_need_to_be_updated[alert]
   '''
   <div class="alert alert-warning" role="status">
               <div class="row">
@@ -89,14 +89,14 @@
           </div>
   '''
 # ---
-# name: ListEmployeeRecordsTest.test_employee_records_with_nir_associated_to_other[action]
+# name: TestListEmployeeRecords.test_employee_records_with_nir_associated_to_other[action]
   '''
   <div class="c-box--results__footer">
                   <a aria-label="Régulariser le n° de sécurité sociale Jane DOE (ouverture dans un nouvel onglet)" class="btn btn-primary btn-block w-100 w-md-auto has-external-link" href="https://tally.so/r/wzxQlg?jobapplication=[PK of JobApplication]" rel="noopener" target="_blank">Régulariser le n° de sécurité sociale</a>
               </div>
   '''
 # ---
-# name: ListEmployeeRecordsTest.test_employee_records_with_nir_associated_to_other[alert]
+# name: TestListEmployeeRecords.test_employee_records_with_nir_associated_to_other[alert]
   '''
   <div class="alert alert-warning" role="status">
               <div class="row">
@@ -115,7 +115,7 @@
           </div>
   '''
 # ---
-# name: ListEmployeeRecordsTest.test_existing_employee_records_with_a_prolongation_does_not_show_need_to_be_updated_message
+# name: TestListEmployeeRecords.test_existing_employee_records_with_a_prolongation_does_not_show_need_to_be_updated_message
   '''
   <div class="c-box--results__footer">
                   <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
@@ -127,7 +127,7 @@
               </div>
   '''
 # ---
-# name: ListEmployeeRecordsTest.test_existing_employee_records_with_a_suspension_does_not_show_need_to_be_updated_message
+# name: TestListEmployeeRecords.test_existing_employee_records_with_a_suspension_does_not_show_need_to_be_updated_message
   '''
   <div class="c-box--results__footer">
                   <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
@@ -139,7 +139,7 @@
               </div>
   '''
 # ---
-# name: ListEmployeeRecordsTest.test_new_employee_records_sorted[employee records]
+# name: TestListEmployeeRecords.test_new_employee_records_sorted[employee records]
   dict({
     'num_queries': 12,
     'queries': list([

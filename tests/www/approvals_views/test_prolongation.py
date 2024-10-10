@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.utils.html import escape
 from django.utils.http import urlencode
 from freezegun import freeze_time
+from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual, assertRedirects
 
 from itou.approvals.enums import ProlongationReason
 from itou.approvals.models import Prolongation
@@ -18,26 +19,24 @@ from tests.approvals.factories import ProlongationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import TestCase, parse_response_to_soup
+from tests.utils.test import parse_response_to_soup
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-@freeze_time("2023-08-23")
-class ApprovalProlongationTest(TestCase):
+class TestApprovalProlongation:
     PROLONGATION_EMAIL_REPORT_TEXT = "- Fiche bilan :"
 
-    def setUp(self):
-        """
-        Create test objects.
-        """
-        super().setUp()
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
+        with freeze_time("2023-08-23"):
+            self.prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+            self.prescriber = self.prescriber_organization.members.first()
 
-        self.prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
-        self.prescriber = self.prescriber_organization.members.first()
+            self._setup_with_company_kind(CompanyKind.EI)
 
-        self._setup_with_company_kind(CompanyKind.EI)
+            yield
 
     def _setup_with_company_kind(self, siae_kind: CompanyKind):
+        # freeze_time does not wotk inside factories
         today = timezone.localdate()
         self.job_application = JobApplicationFactory(
             with_approval=True,
@@ -52,19 +51,19 @@ class ApprovalProlongationTest(TestCase):
         self.approval = self.job_application.approval
         assert 0 == self.approval.prolongation_set.count()
 
-    def test_prolong_approval_view(self):
+    def test_prolong_approval_view(self, client, faker):
         """
         Test the creation of a prolongation.
         """
 
-        self.client.force_login(self.employer)
+        client.force_login(self.employer)
 
         back_url = reverse("search:employers_home")
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         url = f"{url}?{params}"
 
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
         assert response.context["preview"] is False
 
@@ -78,8 +77,8 @@ class ApprovalProlongationTest(TestCase):
             # Preview.
             "preview": "1",
         }
-        response = self.client.post(url, data=post_data)
-        self.assertContains(response, escape("Sélectionnez un choix valide."))
+        response = client.post(url, data=post_data)
+        assertContains(response, escape("Sélectionnez un choix valide."))
 
         # With valid reason
         reason = ProlongationReason.SENIOR
@@ -89,15 +88,15 @@ class ApprovalProlongationTest(TestCase):
             "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "reason": reason,
             "email": self.prescriber.email,
-            "contact_email": self.faker.email(),
-            "contact_phone": self.faker.phone_number(),
+            "contact_email": faker.email(),
+            "contact_phone": faker.phone_number(),
             "prescriber_organization": self.prescriber_organization.pk,
             # Preview.
             "preview": "1",
         }
 
         # Go to preview.
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
         assert response.context["preview"] is True
 
@@ -105,9 +104,9 @@ class ApprovalProlongationTest(TestCase):
         del post_data["preview"]
         post_data["save"] = 1
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
-        self.assertRedirects(response, back_url)
+        assertRedirects(response, back_url)
 
         prolongation_request = self.approval.prolongationrequest_set.get()
         assert prolongation_request.created_by == self.employer
@@ -123,20 +122,20 @@ class ApprovalProlongationTest(TestCase):
         assert len(email.to) == 1
         assert email.to[0] == post_data["email"]
 
-    def test_prolong_approval_view_prepopulates_SENIOR_CDI(self):
-        self.client.force_login(self.employer)
-        response = self.client.post(
+    def test_prolong_approval_view_prepopulates_SENIOR_CDI(self, client, snapshot):
+        client.force_login(self.employer)
+        response = client.post(
             reverse("approvals:prolongation_form_for_reason", kwargs={"approval_id": self.approval.pk}),
             {"reason": ProlongationReason.SENIOR_CDI},
         )
         soup = parse_response_to_soup(response)
         [end_at_field] = soup.select("[name=end_at]")
-        assert str(end_at_field.parent) == self.snapshot(name="value is set to max_end_at")
+        assert str(end_at_field.parent) == snapshot(name="value is set to max_end_at")
 
-    def test_prolong_approval_view_bad_reason(self):
-        self.client.force_login(self.employer)
+    def test_prolong_approval_view_bad_reason(self, client):
+        client.force_login(self.employer)
         end_at = timezone.localdate() + relativedelta(months=1)
-        response = self.client.post(
+        response = client.post(
             reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
             {
                 "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -144,13 +143,13 @@ class ApprovalProlongationTest(TestCase):
                 "email": self.prescriber.email,
             },
         )
-        self.assertContains(
+        assertContains(
             response,
             '<div class="invalid-feedback">Sélectionnez un choix valide. invalid n’en fait pas partie.</div>',
             count=1,
         )
 
-    def test_prolongation_approval_view_with_disabled_values(self):
+    def test_prolongation_approval_view_with_disabled_values(self, client, snapshot):
         """
         Test the deactivation of reasons if too many prolongations have already been created.
         """
@@ -173,11 +172,11 @@ class ApprovalProlongationTest(TestCase):
         ]
 
         with freeze_time(prolongation.end_at):
-            self.client.force_login(self.employer)
-            response = self.client.get(url)
+            client.force_login(self.employer)
+            response = client.get(url)
             # Check the information card
             soup = parse_response_to_soup(response, selector="div:has(> #disabledChoicesCollapseInfo)")
-            assert str(soup) == self.snapshot(name="missing_reason_info")
+            assert str(soup) == snapshot(name="missing_reason_info")
             # Check the reason field
             assert response.context["form"]["reason"].field.widget.disabled_values == {"RQTH"}
             assert {v for v, _label in response.context["form"]["reason"].field._choices} == {
@@ -187,11 +186,11 @@ class ApprovalProlongationTest(TestCase):
             }
             # Check reason field
             soup = parse_response_to_soup(response, selector="div:has(> #id_reason)", replace_in_attr=replace_in_attr)
-            assert str(soup) == self.snapshot(name="RQTH disabled")
+            assert str(soup) == snapshot(name="RQTH disabled")
 
             # Try using a disabled choice
-            response = self.client.post(url, data={"reason": ProlongationReason.RQTH})
-            self.assertContains(response, "Sélectionnez un choix valide.")
+            response = client.post(url, data={"reason": ProlongationReason.RQTH})
+            assertContains(response, "Sélectionnez un choix valide.")
 
         # Add even more prolongations
         other_prolongation = ProlongationFactory(
@@ -201,11 +200,11 @@ class ApprovalProlongationTest(TestCase):
             reason=ProlongationReason.RQTH,
         )
         with freeze_time(other_prolongation.end_at):
-            self.client.force_login(self.employer)
-            response = self.client.get(url)
+            client.force_login(self.employer)
+            response = client.get(url)
             # Check the information card is still there
             soup = parse_response_to_soup(response, selector="div:has(> #disabledChoicesCollapseInfo)")
-            assert str(soup) == self.snapshot(name="missing_reason_info")
+            assert str(soup) == snapshot(name="missing_reason_info")
             # Check the reason field: SENIOR is now also disabled
             assert response.context["form"]["reason"].field.widget.disabled_values == {
                 "RQTH",
@@ -217,11 +216,11 @@ class ApprovalProlongationTest(TestCase):
             }
             # Check reason field
             soup = parse_response_to_soup(response, selector="div:has(> #id_reason)", replace_in_attr=replace_in_attr)
-            assert str(soup) == self.snapshot(name="RQTH & SENIOR disabled")
+            assert str(soup) == snapshot(name="RQTH & SENIOR disabled")
 
-    def test_prolong_approval_view_no_end_at(self):
-        self.client.force_login(self.employer)
-        response = self.client.post(
+    def test_prolong_approval_view_no_end_at(self, client, snapshot):
+        client.force_login(self.employer)
+        response = client.post(
             reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
             {
                 # end_at is missing.
@@ -231,11 +230,11 @@ class ApprovalProlongationTest(TestCase):
         )
         soup = parse_response_to_soup(response)
         [end_at_field] = soup.select("[name=end_at]")
-        assert str(end_at_field.parent) == self.snapshot()
+        assert str(end_at_field.parent) == snapshot()
 
-    def test_htmx_on_reason(self):
-        self.client.force_login(self.employer)
-        response = self.client.get(
+    def test_htmx_on_reason(self, client):
+        client.force_login(self.employer)
+        response = client.get(
             reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
         )
         assert response.status_code == 200
@@ -246,7 +245,7 @@ class ApprovalProlongationTest(TestCase):
             "end_at": self.approval.end_at + relativedelta(days=30),
             "email": self.prescriber.email,
         }
-        response = self.client.post(
+        response = client.post(
             reverse("approvals:prolongation_form_for_reason", kwargs={"approval_id": self.approval.pk}),
             data,
         )
@@ -255,7 +254,7 @@ class ApprovalProlongationTest(TestCase):
             "#id_reason",  # RQTH
             response,
         )
-        response = self.client.post(
+        response = client.post(
             reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
             data,
         )
@@ -263,18 +262,18 @@ class ApprovalProlongationTest(TestCase):
         fresh_page = parse_response_to_soup(response, selector="#main")
         assertSoupEqual(page, fresh_page)
 
-    def test_htmx_on_reason_with_back_url(self):
-        self.client.force_login(self.employer)
+    def test_htmx_on_reason_with_back_url(self, client, snapshot):
+        client.force_login(self.employer)
         back_url = "/somewhere/over/the/rainbow"
         page_url = add_url_params(
             reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
             params={"back_url": back_url},
         )
-        response = self.client.get(page_url)
+        response = client.get(page_url)
         assert response.status_code == 200
         page = parse_response_to_soup(response, selector="#main")
         [reset_button] = page.select("a[aria-label='Annuler la saisie de ce formulaire']")
-        assert str(reset_button) == self.snapshot(name="reset button with correct back_url")
+        assert str(reset_button) == snapshot(name="reset button with correct back_url")
 
         [reason] = page.select("#id_reason")
         expected_hx_post = add_url_params(
@@ -288,24 +287,24 @@ class ApprovalProlongationTest(TestCase):
             "end_at": self.approval.end_at + relativedelta(days=30),
             "email": self.prescriber.email,
         }
-        response = self.client.post(reason["hx-post"], data)
+        response = client.post(reason["hx-post"], data)
         update_page_with_htmx(
             page,
             "#id_reason",  # RQTH
             response,
         )
-        response = self.client.post(page_url, data)
+        response = client.post(page_url, data)
         assert response.status_code == 200
         fresh_page = parse_response_to_soup(response, selector="#main")
         assertSoupEqual(page, fresh_page)
         [reset_button] = fresh_page.select("a[aria-label='Annuler la saisie de ce formulaire']")
-        assert str(reset_button) == self.snapshot(name="reset button with correct back_url")
+        assert str(reset_button) == snapshot(name="reset button with correct back_url")
 
     @freeze_time("2023-08-23")
-    def test_end_at_limits(self):
+    def test_end_at_limits(self, client, snapshot, subtests):
         assert len(ProlongationReason.choices) == 6
 
-        self.client.force_login(self.employer)
+        client.force_login(self.employer)
         for end_at, reason in [
             (self.approval.end_at + timedelta(days=10 * 365), ProlongationReason.SENIOR_CDI),
             (self.approval.end_at + timedelta(days=365), ProlongationReason.COMPLETE_TRAINING),
@@ -314,8 +313,8 @@ class ApprovalProlongationTest(TestCase):
             (self.approval.end_at + timedelta(days=365), ProlongationReason.PARTICULAR_DIFFICULTIES),
             # Since December 1, 2021, HEALTH_CONTEXT reason can no longer be used
         ]:
-            with self.subTest(reason):
-                response = self.client.post(
+            with subtests.test(reason.label):
+                response = client.post(
                     reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
                     data={
                         "reason": reason,
@@ -326,9 +325,9 @@ class ApprovalProlongationTest(TestCase):
                 )
                 soup = parse_response_to_soup(response)
                 [end_at_field] = soup.select("[name=end_at]")
-                assert str(end_at_field.parent) == self.snapshot(name=reason)
+                assert str(end_at_field.parent) == snapshot(name=reason)
 
-    def test_end_at_with_existing_prolongation(self):
+    def test_end_at_with_existing_prolongation(self, client, snapshot):
         reason = ProlongationReason.RQTH
         # RQTH max prolongation duration is 3 years, this prolongation consumes 2.5 years.
         # Only 183 days remain.
@@ -340,10 +339,10 @@ class ApprovalProlongationTest(TestCase):
             reason=reason,
         )
         with freeze_time(end_at):
-            self.client.force_login(self.employer)
+            client.force_login(self.employer)
 
             # Check htmx response
-            response = self.client.post(
+            response = client.post(
                 reverse("approvals:prolongation_form_for_reason", kwargs={"approval_id": self.approval.pk}),
                 data={
                     "reason": reason,
@@ -351,10 +350,10 @@ class ApprovalProlongationTest(TestCase):
             )
             # Check the information card
             soup = parse_response_to_soup(response, selector="div:has(> #maxEndAtCollapseInfo)")
-            assert str(soup) == self.snapshot(name="max_limit_info")
+            assert str(soup) == snapshot(name="max_limit_info")
 
             url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
-            response = self.client.post(
+            response = client.post(
                 url,
                 data={
                     "reason": reason,
@@ -365,9 +364,9 @@ class ApprovalProlongationTest(TestCase):
                 },
             )
             soup = parse_response_to_soup(response, selector="div:has(> #maxEndAtCollapseInfo)")
-            assert str(soup) == self.snapshot(name="max_limit_info")
+            assert str(soup) == snapshot(name="max_limit_info")
             max_end_at = self.approval.end_at + timedelta(days=3 * 365)
-            self.assertContains(
+            assertContains(
                 response,
                 f"""
                 <div class="invalid-feedback">
@@ -377,21 +376,21 @@ class ApprovalProlongationTest(TestCase):
                 html=True,
                 count=1,
             )
-            self.assertQuerySetEqual(Prolongation.objects.all(), [prolongation])
+            assertQuerySetEqual(Prolongation.objects.all(), [prolongation])
 
-    def test_prolong_approval_view_without_prescriber(self):
+    def test_prolong_approval_view_without_prescriber(self, client):
         """
         Test the creation of a prolongation without prescriber.
         """
 
-        self.client.force_login(self.employer)
+        client.force_login(self.employer)
 
         back_url = reverse("search:employers_home")
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         url = f"{url}?{params}"
 
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
         assert response.context["preview"] is False
 
@@ -406,7 +405,7 @@ class ApprovalProlongationTest(TestCase):
         }
 
         # Go to preview.
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
         assert response.context["preview"] is True
 
@@ -414,9 +413,9 @@ class ApprovalProlongationTest(TestCase):
         del post_data["preview"]
         post_data["save"] = 1
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
-        self.assertRedirects(response, back_url)
+        assertRedirects(response, back_url)
 
         assert 1 == self.approval.prolongation_set.count()
 
@@ -435,14 +434,14 @@ class ApprovalProlongationTest(TestCase):
     # TODO: Consider switching to time-machine:
     # https://github.com/adamchainz/time-machine
     @freeze_time()
-    def test_prolongation_report_file(self):
+    def test_prolongation_report_file(self, client, faker, xlsx_file):
         # Check that report file object is saved and linked to prolongation
         # Bad reason types are checked by UI (JS) and ultimately by DB constraints
 
         self._setup_with_company_kind(CompanyKind.AI)
-        self.client.force_login(self.employer)
+        client.force_login(self.employer)
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
-        response = self.client.get(url)
+        response = client.get(url)
 
         reason = ProlongationReason.RQTH
         end_at = self.approval.end_at + relativedelta(days=30)
@@ -451,14 +450,14 @@ class ApprovalProlongationTest(TestCase):
             "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "reason": reason,
             "email": self.prescriber.email,
-            "contact_email": self.faker.email(),
-            "contact_phone": self.faker.phone_number(),
-            "report_file": self.xlsx_file,
+            "contact_email": faker.email(),
+            "contact_phone": faker.phone_number(),
+            "report_file": xlsx_file,
             "prescriber_organization": self.prescriber_organization.pk,
             "preview": "1",
         }
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
         assert response.context["preview"] is True
 
@@ -467,9 +466,9 @@ class ApprovalProlongationTest(TestCase):
         del post_data["report_file"]
         post_data["save"] = 1
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
-        self.assertRedirects(response, reverse("dashboard:index"))
+        assertRedirects(response, reverse("dashboard:index"))
 
         prolongation_request = self.approval.prolongationrequest_set.get()
         assert prolongation_request.report_file
@@ -487,10 +486,10 @@ class ApprovalProlongationTest(TestCase):
         )
         assert self.PROLONGATION_EMAIL_REPORT_TEXT in email.body
 
-    def test_check_single_prescriber_organization(self):
-        self.client.force_login(self.employer)
+    def test_check_single_prescriber_organization(self, client, faker):
+        client.force_login(self.employer)
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
-        self.client.get(url)
+        client.get(url)
 
         reason = ProlongationReason.SENIOR
         end_at = self.approval.end_at + relativedelta(days=30)
@@ -499,16 +498,16 @@ class ApprovalProlongationTest(TestCase):
             "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "reason": reason,
             "email": self.prescriber.email,
-            "contact_email": self.faker.email(),
-            "contact_phone": self.faker.phone_number(),
+            "contact_email": faker.email(),
+            "contact_phone": faker.phone_number(),
             "edit": "1",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
 
-        self.assertContains(response, self.prescriber_organization)
-        self.assertNotContains(response, "Sélectionnez l'organisation du prescripteur habilité")
+        assertContains(response, self.prescriber_organization)
+        assertNotContains(response, "Sélectionnez l'organisation du prescripteur habilité")
 
-    def test_check_multiple_prescriber_organization(self):
+    def test_check_multiple_prescriber_organization(self, client, snapshot, faker):
         # Link prescriber to another prescriber organization
         other_prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         other_prescriber_organization.members.add(self.prescriber)
@@ -520,9 +519,9 @@ class ApprovalProlongationTest(TestCase):
             is_active=False,
         )
 
-        self.client.force_login(self.employer)
+        client.force_login(self.employer)
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
-        self.client.get(url)
+        client.get(url)
 
         reason = ProlongationReason.SENIOR
         end_at = self.approval.end_at + relativedelta(days=30)
@@ -531,26 +530,26 @@ class ApprovalProlongationTest(TestCase):
             "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "reason": reason,
             "email": self.prescriber.email,
-            "contact_email": self.faker.email(),
-            "contact_phone": self.faker.phone_number(),
+            "contact_email": faker.email(),
+            "contact_phone": faker.phone_number(),
             "edit": "1",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
 
-        self.assertContains(response, self.prescriber_organization)
-        self.assertContains(response, other_prescriber_organization)
-        self.assertNotContains(response, inactive_prescriber_organization)
+        assertContains(response, self.prescriber_organization)
+        assertContains(response, other_prescriber_organization)
+        assertNotContains(response, inactive_prescriber_organization)
 
         error_msg = parse_response_to_soup(response, selector="div#check_prescriber_email .invalid-feedback")
-        assert str(error_msg) == self.snapshot(name="prescriber is member of many organizations")
+        assert str(error_msg) == snapshot(name="prescriber is member of many organizations")
 
-    def test_check_invalid_prescriber(self):
+    def test_check_invalid_prescriber(self, client, snapshot, faker):
         unauthorized_prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=False)
         prescriber = unauthorized_prescriber_organization.members.first()
 
-        self.client.force_login(self.employer)
+        client.force_login(self.employer)
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
-        self.client.get(url)
+        client.get(url)
 
         reason = ProlongationReason.SENIOR
         end_at = self.approval.end_at + relativedelta(days=30)
@@ -559,11 +558,11 @@ class ApprovalProlongationTest(TestCase):
             "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "reason": reason,
             "email": prescriber.email,
-            "contact_email": self.faker.email(),
-            "contact_phone": self.faker.phone_number(),
+            "contact_email": faker.email(),
+            "contact_phone": faker.phone_number(),
             "edit": "1",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
 
         error_msg = parse_response_to_soup(response, selector="input#id_email + .invalid-feedback")
-        assert str(error_msg) == self.snapshot(name="unknown authorized prescriber")
+        assert str(error_msg) == snapshot(name="unknown authorized prescriber")

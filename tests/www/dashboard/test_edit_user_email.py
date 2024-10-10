@@ -9,25 +9,24 @@ from tests.users.factories import (
     JobSeekerFactory,
     PrescriberFactory,
 )
-from tests.utils.test import TestCase
 
 
-class ChangeEmailViewTest(TestCase):
-    def test_update_email(self):
+class TestChangeEmailView:
+    def test_update_email(self, client):
         user = JobSeekerFactory()
         old_email = user.email
         new_email = "jean@gabin.fr"
 
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("dashboard:edit_user_email")
-        response = self.client.get(url)
+        response = client.get(url)
 
         email_address = EmailAddress(email=old_email, verified=True, primary=True)
         email_address.user = user
         email_address.save()
 
         post_data = {"email": new_email, "email_confirmation": new_email}
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         # User is logged out
@@ -39,14 +38,14 @@ class ChangeEmailViewTest(TestCase):
         # User cannot log in with his old address
         post_data = {"login": old_email, "password": DEFAULT_PASSWORD}
         url = reverse("login:job_seeker")
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
         assert not response.context_data["form"].is_valid()
 
         # User cannot log in until confirmation
         post_data = {"login": new_email, "password": DEFAULT_PASSWORD}
         url = reverse("login:job_seeker")
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
         assert response.url == reverse("account_email_verification_sent")
 
@@ -59,10 +58,10 @@ class ChangeEmailViewTest(TestCase):
         # Confirm email + auto login.
         confirmation_token = EmailConfirmationHMAC(user.emailaddress_set.first()).key
         confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
-        response = self.client.post(confirm_email_url)
+        response = client.post(confirm_email_url)
         assert response.status_code == 302
         assert response.url == reverse("welcoming_tour:index")
-        response = self.client.get(response.url)
+        response = client.get(response.url)
         assert response.context.get("user").is_authenticated
 
         user.refresh_from_db()
@@ -72,21 +71,21 @@ class ChangeEmailViewTest(TestCase):
         assert new_address.email == new_email
         assert new_address.verified
 
-    def test_update_email_forbidden(self):
+    def test_update_email_forbidden(self, client):
         url = reverse("dashboard:edit_user_email")
 
         job_seeker = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
-        self.client.force_login(job_seeker)
-        response = self.client.get(url)
+        client.force_login(job_seeker)
+        response = client.get(url)
         assert response.status_code == 403
 
         prescriber = PrescriberFactory()
-        self.client.force_login(prescriber)
-        response = self.client.get(url)
+        client.force_login(prescriber)
+        response = client.get(url)
         assert response.status_code == 403
 
 
-class EditUserEmailFormTest(TestCase):
+class TestEditUserEmailForm:
     def test_invalid_form(self):
         old_email = "bernard@blier.fr"
 

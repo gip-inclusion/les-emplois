@@ -6,25 +6,24 @@ from django.http.request import urlencode
 from django.urls import reverse
 from django.utils import dateformat, timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.job_applications.enums import ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL, JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJobsFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.utils.test import TestCase
 
 
-class EditContractTest(TestCase):
+class TestEditContract:
     """
     Checks:
     - updating a job application hiring start date when it starts in the future
     - coherence of PASS start / end date
     """
 
-    def setUp(self):
-        super().setUp()
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         company_1 = CompanyWithMembershipAndJobsFactory(name="Evil Corp.", membership__user__first_name="Elliot")
         company_2 = CompanyWithMembershipAndJobsFactory(
             name="Duke of Hazard Corp.", membership__user__first_name="Roscoe"
@@ -63,13 +62,13 @@ class EditContractTest(TestCase):
         assert self.job_application_1.approval.can_postpone_start_date
         assert not self.old_job_application.approval.can_postpone_start_date
 
-    def test_future_contract_date(self):
+    def test_future_contract_date(self, client):
         """
         Checks possibility of changing hiring start date to a future date.
         """
-        self.client.force_login(self.user1)
+        client.force_login(self.user1)
 
-        response = self.client.get(self.url)
+        response = client.get(self.url)
 
         assert response.status_code == 200
 
@@ -81,9 +80,9 @@ class EditContractTest(TestCase):
             "hiring_end_at": future_end_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
 
-        response = self.client.post(self.url, data=post_data)
+        response = client.post(self.url, data=post_data)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application_1.id})
-        self.assertRedirects(response, next_url)
+        assertRedirects(response, next_url)
 
         self.job_application_1.refresh_from_db()
 
@@ -91,18 +90,18 @@ class EditContractTest(TestCase):
         assert self.job_application_1.hiring_end_at == future_end_date
 
         # test how hiring_end_date is displayed
-        response = self.client.get(next_url)
-        self.assertContains(
+        response = client.get(next_url)
+        assertContains(
             response, f"<small>Fin</small><strong>{dateformat.format(future_end_date, 'd F Y')}</strong>", html=True
         )
 
-    def test_future_contract_date_without_hiring_end_at(self):
+    def test_future_contract_date_without_hiring_end_at(self, client):
         """
         Checks possibility of changing hiring start date to a future date, with no hiring_end_at date.
         """
-        self.client.force_login(self.user1)
+        client.force_login(self.user1)
 
-        response = self.client.get(self.url)
+        response = client.get(self.url)
 
         assert response.status_code == 200
 
@@ -115,9 +114,9 @@ class EditContractTest(TestCase):
             "hiring_end_at": "",
         }
 
-        response = self.client.post(self.url, data=post_data)
+        response = client.post(self.url, data=post_data)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application_1.id})
-        self.assertRedirects(response, next_url)
+        assertRedirects(response, next_url)
 
         self.job_application_1.refresh_from_db()
 
@@ -129,9 +128,9 @@ class EditContractTest(TestCase):
             "hiring_start_at": future_start_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
 
-        response = self.client.post(self.url, data=post_data)
+        response = client.post(self.url, data=post_data)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application_1.id})
-        self.assertRedirects(response, next_url)
+        assertRedirects(response, next_url)
 
         self.job_application_1.refresh_from_db()
 
@@ -139,16 +138,16 @@ class EditContractTest(TestCase):
         assert self.job_application_1.hiring_end_at == future_end_date
 
         # test how hiring_end_date is displayed
-        response = self.client.get(next_url)
-        self.assertContains(response, '<small>Fin</small><i class="text-disabled">Non renseigné</i>', html=True)
+        response = client.get(next_url)
+        assertContains(response, '<small>Fin</small><i class="text-disabled">Non renseigné</i>', html=True)
 
-    def test_past_contract_date(self):
+    def test_past_contract_date(self, client):
         """
         Past contract start date are not allowed
         """
-        self.client.force_login(self.user1)
+        client.force_login(self.user1)
 
-        response = self.client.get(self.url)
+        response = client.get(self.url)
 
         assert response.status_code == 200
 
@@ -159,18 +158,18 @@ class EditContractTest(TestCase):
             "hiring_end_at": self.job_application_1.hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
 
-        response = self.client.post(self.url, data=post_data)
+        response = client.post(self.url, data=post_data)
         assert response.status_code == 200
 
-    def test_max_postpone_contract_date(self):
+    def test_max_postpone_contract_date(self, client):
         """
         The contract start date can only be postponed of 30 days
         """
 
-        self.client.force_login(self.user1)
+        client.force_login(self.user1)
 
         url = reverse("apply:edit_contract_start_date", kwargs={"job_application_id": self.job_application_1.id})
-        response = self.client.get(url)
+        response = client.get(url)
 
         assert response.status_code == 200
 
@@ -181,16 +180,16 @@ class EditContractTest(TestCase):
             "hiring_end_at": self.job_application_1.hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
 
-    def test_postpone_approval(self):
+    def test_postpone_approval(self, client):
         """
         If hiring date is postponed,
         approval start date must be updated accordingly (if there is an approval)
         """
-        self.client.force_login(self.user1)
-        response = self.client.get(self.url)
+        client.force_login(self.user1)
+        response = client.get(self.url)
 
         future_start_date = timezone.localdate() + relativedelta(days=20)
         future_end_date = timezone.localdate() + relativedelta(days=60)
@@ -200,22 +199,22 @@ class EditContractTest(TestCase):
             "hiring_end_at": future_end_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
 
-        response = self.client.post(self.url, data=post_data)
+        response = client.post(self.url, data=post_data)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application_1.id})
-        self.assertRedirects(response, next_url)
+        assertRedirects(response, next_url)
 
         self.job_application_1.refresh_from_db()
 
         assert self.job_application_1.approval is not None
         assert self.job_application_1.hiring_start_at == self.job_application_1.approval.start_at
 
-    def test_start_date_with_previous_approval(self):
+    def test_start_date_with_previous_approval(self, client):
         """
         When the job application is linked to a previous approval,
         check that approval dates are not updated if the hiring date change
         """
-        self.client.force_login(self.user2)
-        response = self.client.get(self.old_url)
+        client.force_login(self.user2)
+        response = client.get(self.old_url)
 
         future_start_date = timezone.localdate() + relativedelta(days=5)
         future_end_date = timezone.localdate() + relativedelta(days=60)
@@ -225,18 +224,18 @@ class EditContractTest(TestCase):
             "hiring_end_at": future_end_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
 
-        response = self.client.post(self.old_url, data=post_data)
+        response = client.post(self.old_url, data=post_data)
 
         assert response.status_code == 302
         assert self.job_application_2.hiring_start_at > self.job_application_2.approval.start_at
 
-    def test_do_not_update_approval(self):
+    def test_do_not_update_approval(self, client):
         """
         Previously running approval start date must not be updated
         when postponing contract dates
         """
-        self.client.force_login(self.user2)
-        response = self.client.get(self.old_url)
+        client.force_login(self.user2)
+        response = client.get(self.old_url)
 
         approval = self.job_application_2.approval
 
@@ -248,7 +247,7 @@ class EditContractTest(TestCase):
             "hiring_end_at": future_end_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
 
-        response = self.client.post(self.old_url, data=post_data)
+        response = client.post(self.old_url, data=post_data)
         assert response.status_code == 200
 
 

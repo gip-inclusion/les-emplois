@@ -1,13 +1,12 @@
 import math
 from datetime import UTC, date, datetime
-from unittest import mock
 
 import pytest
 from django.contrib.gis.geos import Point
 from django.test import override_settings
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertContains, assertFormError, assertNotContains, assertNumQueries, assertRedirects
 
 from itou.cities.models import City
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title
@@ -18,12 +17,11 @@ from tests.users.factories import (
     JobSeekerFactory,
     PrescriberFactory,
 )
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, parse_response_to_soup
 from tests.www.dashboard.test_edit_job_seeker_info import DISABLED_NIR
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class EditUserInfoViewTest(TestCase):
+class TestEditUserInfoView:
     NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
     EMAIL_LABEL = "Adresse électronique"
     NIR_FIELD_ID = "id_nir"
@@ -31,8 +29,8 @@ class EditUserInfoViewTest(TestCase):
     LACK_OF_NIR_REASON_FIELD_ID = "id_lack_of_nir_reason"
     BIRTHDATE_FIELD_NAME = "birthdate"
 
-    def setUp(self):
-        super().setUp()
+    @pytest.fixture(autouse=True)
+    def setup_method(self, mocker):
         self.city = City.objects.create(
             name="Geispolsheim",
             slug="geispolsheim-67",
@@ -40,6 +38,10 @@ class EditUserInfoViewTest(TestCase):
             coords=Point(7.644817, 48.515883),
             post_codes=["67118"],
             code_insee="67152",
+        )
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
 
     def address_form_fields(self, fill_mode=""):
@@ -67,15 +69,11 @@ class EditUserInfoViewTest(TestCase):
 
     @override_settings(TALLY_URL="https://tally.so")
     @freeze_time("2023-03-10")
-    @mock.patch(
-        "itou.utils.apis.geocoding.get_geocoding_data",
-        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-    )
-    def test_edit_with_nir(self, _mock):
+    def test_edit_with_nir(self, client, mocker):
         user = JobSeekerFactory(jobseeker_profile__nir="178122978200508")
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("dashboard:edit_user_info")
-        with self.assertNumQueries(
+        with assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # session
             + 1  # user
@@ -83,15 +81,15 @@ class EditUserInfoViewTest(TestCase):
             + 1  # external_data_externaldataimport (extra_data)
             + 3  # update session with savepoint & release
         ):
-            response = self.client.get(url)
+            response = client.get(url)
         # There's a specific view to edit the email so we don't show it here
-        self.assertNotContains(response, self.EMAIL_LABEL)
+        assertNotContains(response, self.EMAIL_LABEL)
         # Check that the NIR field is disabled
-        self.assertContains(response, DISABLED_NIR)
-        self.assertContains(response, self.LACK_OF_NIR_FIELD_ID)
-        self.assertContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
-        self.assertContains(response, self.BIRTHDATE_FIELD_NAME)
-        self.assertContains(
+        assertContains(response, DISABLED_NIR)
+        assertContains(response, self.LACK_OF_NIR_FIELD_ID)
+        assertContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
+        assertContains(response, self.BIRTHDATE_FIELD_NAME)
+        assertContains(
             response,
             (
                 f'<a href="https://tally.so/r/wzxQlg?jobseeker={user.pk}" target="_blank" rel="noopener">'
@@ -109,7 +107,7 @@ class EditUserInfoViewTest(TestCase):
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         } | self.address_form_fields(fill_mode="ban_api")
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         user = User.objects.get(id=user.id)
@@ -122,11 +120,11 @@ class EditUserInfoViewTest(TestCase):
         # Ensure that the job seeker cannot edit email here.
         assert user.email != post_data["email"]
 
-    def test_edit_title_required(self):
+    def test_edit_title_required(self, client):
         user = JobSeekerFactory()
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("dashboard:edit_user_info")
-        response = self.client.get(url)
+        response = client.get(url)
         post_data = {
             "email": user.email,
             "title": "",
@@ -139,17 +137,17 @@ class EditUserInfoViewTest(TestCase):
             "nir": user.jobseeker_profile.nir,
         } | self.address_form_fields()
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
         assert response.context["form"].errors.get("title") == ["Ce champ est obligatoire."]
 
-    def test_inconsistent_nir_title_birthdate(self):
+    def test_inconsistent_nir_title_birthdate(self, client):
         user = JobSeekerFactory(
             jobseeker_profile__nir="178122978200508",
             title="M",
             jobseeker_profile__birthdate=datetime(1978, 12, 20, tzinfo=UTC),
         )
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("dashboard:edit_user_info")
 
         # Inconsistent title
@@ -163,10 +161,10 @@ class EditUserInfoViewTest(TestCase):
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "lack_of_nir": False,
         } | self.address_form_fields()
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
 
         assert response.status_code == 200
-        self.assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE % "")
+        assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE % "")
         user = User.objects.get(id=user.id)
 
         # Ensure that the job seeker did not change the title.
@@ -183,22 +181,22 @@ class EditUserInfoViewTest(TestCase):
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "lack_of_nir": False,
         } | self.address_form_fields()
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
 
         assert response.status_code == 200
-        self.assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
+        assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
         user = User.objects.get(id=user.id)
 
         # Ensure that the job seeker did not change the birthdate.
         assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") != post_data["birthdate"]
 
-    def test_validate_nir_unknown_birth_month(self):
+    def test_validate_nir_unknown_birth_month(self, client):
         user = JobSeekerFactory(
             jobseeker_profile__nir="178332978200553",
             title="M",
             jobseeker_profile__birthdate=datetime(1978, 12, 20, tzinfo=UTC),
         )
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("dashboard:edit_user_info")
 
         # the month isn't between 1 and 12 -> only check for the year
@@ -212,19 +210,19 @@ class EditUserInfoViewTest(TestCase):
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "lack_of_nir": False,
         } | self.address_form_fields()
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assertRedirects(response, reverse("dashboard:index"))
         user = User.objects.get(id=user.id)
         # The birthdate was updated
         assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
 
-    def test_validate_nir_unknown_birth_month_bad_year(self):
+    def test_validate_nir_unknown_birth_month_bad_year(self, client):
         user = JobSeekerFactory(
             jobseeker_profile__nir="178332978200553",
             title="M",
             jobseeker_profile__birthdate=datetime(1978, 12, 20, tzinfo=UTC),
         )
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("dashboard:edit_user_info")
 
         # Inconsistant birth year
@@ -238,41 +236,36 @@ class EditUserInfoViewTest(TestCase):
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "lack_of_nir": False,
         } | self.address_form_fields()
-        response = self.client.post(url, data=post_data)
-        self.assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
+        response = client.post(url, data=post_data)
+        assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
         user = User.objects.get(id=user.id)
 
         # Ensure that the job seeker did not change the birthdate.
         assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") != post_data["birthdate"]
 
-    def test_required_address_fields_are_present(self):
+    def test_required_address_fields_are_present(self, client):
         user = JobSeekerFactory(with_address=True)
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("dashboard:edit_user_info")
-        response = self.client.get(url)
+        response = client.get(url)
 
         # Those fields are required for the autocomplete javascript to work
         # Explicitly test the presence of the fields to help a future developer :)
-        self.assertContains(response, 'id="id_address_line_1"')
-        self.assertContains(response, 'id="id_address_line_2"')
-        self.assertContains(response, 'id="id_post_code"')
-        self.assertContains(response, 'id="id_city"')
-        self.assertContains(response, 'id="id_insee_code"')
-        self.assertContains(response, 'id="id_fill_mode"')
-        self.assertContains(response, 'id="id_ban_api_resolved_address"')
+        assertContains(response, 'id="id_address_line_1"')
+        assertContains(response, 'id="id_address_line_2"')
+        assertContains(response, 'id="id_post_code"')
+        assertContains(response, 'id="id_city"')
+        assertContains(response, 'id="id_insee_code"')
+        assertContains(response, 'id="id_fill_mode"')
+        assertContains(response, 'id="id_ban_api_resolved_address"')
 
-    @pytest.mark.usefixtures("unittest_compatibility")
     @freeze_time("2023-03-10")
     @override_settings(API_BAN_BASE_URL="http://ban-api")
-    @mock.patch(
-        "itou.utils.apis.geocoding.get_geocoding_data",
-        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-    )
-    def test_update_address(self, _mock):
+    def test_update_address(self, client, snapshot):
         user = JobSeekerFactory(with_address=True, jobseeker_profile__nir="178122978200508")
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("dashboard:edit_user_info")
-        response = self.client.get(url)
+        response = client.get(url)
         # Address is mandatory.
         post_data = {
             "title": "M",
@@ -285,7 +278,7 @@ class EditUserInfoViewTest(TestCase):
         }
 
         # Check that address field is mandatory
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
         assert not response.context["form"].is_valid()
         assert response.context["form"].errors.get("address_for_autocomplete") == ["Ce champ est obligatoire."]
@@ -293,18 +286,16 @@ class EditUserInfoViewTest(TestCase):
         # Check that when we post a different address than the one of the user and
         # there is an error in the form (title is missing), the new address is displayed in the select
         # instead of the one attached to the user
-        response = self.client.post(
-            url, data=post_data | {"title": ""} | self.address_form_fields(fill_mode="ban_api")
-        )
+        response = client.post(url, data=post_data | {"title": ""} | self.address_form_fields(fill_mode="ban_api"))
         assert response.status_code == 200
         assert not response.context["form"].is_valid()
         assert response.context["form"].errors.get("title") == ["Ce champ est obligatoire."]
         results_section = parse_response_to_soup(response, selector="#id_address_for_autocomplete")
-        assert str(results_section) == self.snapshot(name="user address input on error")
+        assert str(results_section) == snapshot(name="user address input on error")
 
         # Now try again in fallback mode (ban_api_resolved_address is missing)
         post_data = post_data | self.address_form_fields(fill_mode="fallback")
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
 
         assert response.status_code == 302
         user.refresh_from_db()
@@ -312,7 +303,7 @@ class EditUserInfoViewTest(TestCase):
 
         # Now try again providing every required field.
         post_data = post_data | self.address_form_fields(fill_mode="ban_api")
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
 
         assert response.status_code == 302
         user.refresh_from_db()
@@ -320,15 +311,15 @@ class EditUserInfoViewTest(TestCase):
 
         # Ensure the job seeker's address is displayed in the autocomplete input field.
         url = reverse("dashboard:edit_user_info")
-        response = self.client.get(url)
+        response = client.get(url)
         results_section = parse_response_to_soup(response, selector="#id_address_for_autocomplete")
-        assert str(results_section) == self.snapshot(name="user address input")
+        assert str(results_section) == snapshot(name="user address input")
 
-    def test_update_address_unavailable_api(self):
+    def test_update_address_unavailable_api(self, client):
         user = JobSeekerFactory(jobseeker_profile__nir="178122978200508")
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("dashboard:edit_user_info")
-        response = self.client.get(url)
+        response = client.get(url)
         # Address is mandatory.
         post_data = {
             "title": "M",
@@ -344,7 +335,7 @@ class EditUserInfoViewTest(TestCase):
             "address_line_2": "Appartement 16",
             "post_code": "75010",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
         user.refresh_from_db()
         assert user.address_line_1 == post_data["address_line_1"]
@@ -352,22 +343,18 @@ class EditUserInfoViewTest(TestCase):
         assert user.post_code == post_data["post_code"]
 
     @freeze_time("2023-03-10")
-    @mock.patch(
-        "itou.utils.apis.geocoding.get_geocoding_data",
-        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-    )
-    def test_edit_with_lack_of_nir_reason(self, _mock):
+    def test_edit_with_lack_of_nir_reason(self, client):
         user = JobSeekerFactory(
             jobseeker_profile__nir="", jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER
         )
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("dashboard:edit_user_info")
-        response = self.client.get(url)
+        response = client.get(url)
         # Check that the NIR field is disabled (it can be reenabled via lack_of_nir check box)
-        self.assertContains(response, DISABLED_NIR)
-        self.assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label, html=True)
-        self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
-        self.assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
+        assertContains(response, DISABLED_NIR)
+        assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label, html=True)
+        assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+        assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
 
         NEW_NIR = "1 781 22978200508"
         post_data = {
@@ -382,7 +369,7 @@ class EditUserInfoViewTest(TestCase):
             "nir": NEW_NIR,
         } | self.address_form_fields(fill_mode="ban_api")
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         user.refresh_from_db()
@@ -392,14 +379,14 @@ class EditUserInfoViewTest(TestCase):
         self._test_address_autocomplete(user=user, post_data=post_data)
 
     @freeze_time("2023-03-10")
-    def test_edit_without_nir_information(self):
+    def test_edit_without_nir_information(self, client):
         user = JobSeekerFactory(jobseeker_profile__nir="", jobseeker_profile__lack_of_nir_reason="")
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("dashboard:edit_user_info")
-        response = self.client.get(url)
+        response = client.get(url)
         # Check that the NIR field is enabled
         assert not response.context["form"]["nir"].field.disabled
-        self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+        assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
 
         NEW_NIR = "1 781 22978200508"
         post_data = {
@@ -413,23 +400,23 @@ class EditUserInfoViewTest(TestCase):
             "lack_of_nir": False,
             "nir": NEW_NIR,
         } | self.address_form_fields()
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         user.jobseeker_profile.refresh_from_db()
         assert user.jobseeker_profile.lack_of_nir_reason == ""
         assert user.jobseeker_profile.nir == NEW_NIR.replace(" ", "")
 
-    def test_edit_existing_nir(self):
+    def test_edit_existing_nir(self, client):
         other_jobseeker = JobSeekerFactory()
 
         user = JobSeekerFactory(jobseeker_profile__nir="", jobseeker_profile__lack_of_nir_reason="")
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("dashboard:edit_user_info")
-        response = self.client.get(url)
+        response = client.get(url)
         # Check that the NIR field is enabled
         assert not response.context["form"]["nir"].field.disabled
-        self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+        assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
 
         post_data = {
             "email": "bob@saintclar.net",
@@ -446,19 +433,15 @@ class EditUserInfoViewTest(TestCase):
             "lack_of_nir": False,
             "nir": other_jobseeker.jobseeker_profile.nir,
         }
-        response = self.client.post(url, data=post_data)
-        self.assertContains(response, "Le numéro de sécurité sociale est déjà associé à un autre utilisateur")
+        response = client.post(url, data=post_data)
+        assertContains(response, "Le numéro de sécurité sociale est déjà associé à un autre utilisateur")
 
         user.jobseeker_profile.refresh_from_db()
         assert user.jobseeker_profile.lack_of_nir_reason == ""
         assert user.jobseeker_profile.nir == ""
 
     @freeze_time("2023-03-10")
-    @mock.patch(
-        "itou.utils.apis.geocoding.get_geocoding_data",
-        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-    )
-    def test_edit_sso(self, _mock):
+    def test_edit_sso(self, client):
         user = JobSeekerFactory(
             identity_provider=IdentityProvider.FRANCE_CONNECT,
             first_name="Not Bob",
@@ -466,10 +449,10 @@ class EditUserInfoViewTest(TestCase):
             jobseeker_profile__birthdate=date(1970, 1, 1),
             title="M",
         )
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("dashboard:edit_user_info")
-        response = self.client.get(url)
-        self.assertContains(response, self.EMAIL_LABEL)
+        response = client.get(url)
+        assertContains(response, self.EMAIL_LABEL)
 
         post_data = {
             "email": "bob@saintclar.net",
@@ -481,7 +464,7 @@ class EditUserInfoViewTest(TestCase):
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         } | self.address_form_fields(fill_mode="ban_api")
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         user = User.objects.get(id=user.id)
@@ -494,16 +477,16 @@ class EditUserInfoViewTest(TestCase):
         assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") != post_data["birthdate"]
         assert user.email != post_data["email"]
 
-    def test_edit_without_title(self):
+    def test_edit_without_title(self, client, snapshot):
         MISSING_INFOS_WARNING_ID = "missing-infos-warning"
         user = JobSeekerFactory(with_address=True, title="", phone="", address_line_1="")
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("dashboard:edit_user_info")
 
         # No phone and no title and no address
-        response = self.client.get(url)
+        response = client.get(url)
         warning_text = parse_response_to_soup(response, selector=f"#{MISSING_INFOS_WARNING_ID}")
-        assert str(warning_text) == self.snapshot(name="missing title warning with phone and address")
+        assert str(warning_text) == snapshot(name="missing title warning with phone and address")
 
         # Phone but no title and no birthdate
         user.phone = "0123456789"
@@ -516,22 +499,22 @@ class EditUserInfoViewTest(TestCase):
         )
         user.jobseeker_profile.birthdate = None
         user.jobseeker_profile.save(update_fields={"birthdate"})
-        response = self.client.get(url)
+        response = client.get(url)
         warning_text = parse_response_to_soup(response, selector=f"#{MISSING_INFOS_WARNING_ID}")
-        assert str(warning_text) == self.snapshot(name="missing title warning without phone and with birthdate")
+        assert str(warning_text) == snapshot(name="missing title warning without phone and with birthdate")
 
         # No phone but title
         user.phone = ""
         user.title = Title.MME
         user.save(update_fields=("phone", "title"))
-        response = self.client.get(url)
-        self.assertNotContains(response, MISSING_INFOS_WARNING_ID)
+        response = client.get(url)
+        assertNotContains(response, MISSING_INFOS_WARNING_ID)
 
-    def test_edit_with_invalid_pole_emploi_id(self):
+    def test_edit_with_invalid_pole_emploi_id(self, client):
         user = JobSeekerFactory()
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("dashboard:edit_user_info")
-        response = self.client.get(url)
+        response = client.get(url)
         post_data = {
             "email": user.email,
             "title": user.title,
@@ -548,22 +531,22 @@ class EditUserInfoViewTest(TestCase):
             "lack_of_nir": False,
             "nir": user.jobseeker_profile.nir,
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
-        self.assertFormError(
+        assertFormError(
             response.context["form"],
             "pole_emploi_id",
             "Assurez-vous que cette valeur comporte au plus 8 caractères (actuellement 9).",
         )
-        self.assertFormError(
+        assertFormError(
             response.context["form"],
             None,
             "Renseignez soit un identifiant France Travail, soit la raison de son absence.",
         )
         post_data["pole_emploi_id"] = "invalide"  # No length issue but validate_pole_emploi_id shouldn't be happy
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
-        self.assertFormError(
+        assertFormError(
             response.context["form"],
             "pole_emploi_id",
             (
@@ -572,7 +555,7 @@ class EditUserInfoViewTest(TestCase):
             ),
         )
 
-    def test_edit_as_prescriber_PC(self):
+    def test_edit_as_prescriber_PC(self, client):
         original_user = PrescriberFactory(
             email="bob@saintclair.tld",
             first_name="Not Bob",
@@ -580,17 +563,17 @@ class EditUserInfoViewTest(TestCase):
             phone="0600000000",
             identity_provider=IdentityProvider.PRO_CONNECT,
         )
-        self.client.force_login(original_user)
+        client.force_login(original_user)
         url = reverse("dashboard:edit_user_info")
-        response = self.client.get(url)
-        self.assertNotContains(response, self.NIR_FIELD_ID)
-        self.assertNotContains(response, self.LACK_OF_NIR_FIELD_ID)
-        self.assertNotContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
-        self.assertNotContains(response, self.BIRTHDATE_FIELD_NAME)
-        self.assertContains(response, f"Prénom : <strong>{original_user.first_name.title()}</strong>")
-        self.assertContains(response, f"Nom : <strong>{original_user.last_name.upper()}</strong>")
-        self.assertContains(response, f"Adresse e-mail : <strong>{original_user.email}</strong>")
-        self.assertContains(response, "Ces informations doivent être modifiées sur votre fournisseur d'identité.")
+        response = client.get(url)
+        assertNotContains(response, self.NIR_FIELD_ID)
+        assertNotContains(response, self.LACK_OF_NIR_FIELD_ID)
+        assertNotContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
+        assertNotContains(response, self.BIRTHDATE_FIELD_NAME)
+        assertContains(response, f"Prénom : <strong>{original_user.first_name.title()}</strong>")
+        assertContains(response, f"Nom : <strong>{original_user.last_name.upper()}</strong>")
+        assertContains(response, f"Adresse e-mail : <strong>{original_user.email}</strong>")
+        assertContains(response, "Ces informations doivent être modifiées sur votre fournisseur d'identité.")
 
         post_data = {
             "email": "notbob@notsaintclair.com",
@@ -598,7 +581,7 @@ class EditUserInfoViewTest(TestCase):
             "last_name": "Saint Clair",
             "phone": "0610203050",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         updated_user = User.objects.get(pk=original_user.pk)
@@ -607,7 +590,7 @@ class EditUserInfoViewTest(TestCase):
         assert updated_user.last_name == original_user.last_name
         assert updated_user.phone == post_data["phone"]
 
-    def test_edit_as_prescriber_IC(self):
+    def test_edit_as_prescriber_IC(self, client):
         with inclusion_connect_setup():
             original_user = PrescriberFactory(
                 email="bob@saintclair.tld",
@@ -616,17 +599,17 @@ class EditUserInfoViewTest(TestCase):
                 phone="0600000000",
                 identity_provider=IdentityProvider.INCLUSION_CONNECT,
             )
-            self.client.force_login(original_user)
+            client.force_login(original_user)
             url = reverse("dashboard:edit_user_info")
-            response = self.client.get(url)
-            self.assertNotContains(response, self.NIR_FIELD_ID)
-            self.assertNotContains(response, self.LACK_OF_NIR_FIELD_ID)
-            self.assertNotContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
-            self.assertNotContains(response, self.BIRTHDATE_FIELD_NAME)
-            self.assertContains(response, f"Prénom : <strong>{original_user.first_name.title()}</strong>")
-            self.assertContains(response, f"Nom : <strong>{original_user.last_name.upper()}</strong>")
-            self.assertContains(response, f"Adresse e-mail : <strong>{original_user.email}</strong>")
-            self.assertContains(response, "Modifier ces informations")
+            response = client.get(url)
+            assertNotContains(response, self.NIR_FIELD_ID)
+            assertNotContains(response, self.LACK_OF_NIR_FIELD_ID)
+            assertNotContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
+            assertNotContains(response, self.BIRTHDATE_FIELD_NAME)
+            assertContains(response, f"Prénom : <strong>{original_user.first_name.title()}</strong>")
+            assertContains(response, f"Nom : <strong>{original_user.last_name.upper()}</strong>")
+            assertContains(response, f"Adresse e-mail : <strong>{original_user.email}</strong>")
+            assertContains(response, "Modifier ces informations")
 
             post_data = {
                 "email": "notbob@notsaintclair.com",
@@ -634,7 +617,7 @@ class EditUserInfoViewTest(TestCase):
                 "last_name": "Saint Clair",
                 "phone": "0610203050",
             }
-            response = self.client.post(url, data=post_data)
+            response = client.post(url, data=post_data)
             assert response.status_code == 302
 
             updated_user = User.objects.get(pk=original_user.pk)

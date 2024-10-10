@@ -1,8 +1,6 @@
 from datetime import datetime, timedelta
 
-import pytest
 from django.urls import reverse
-from faker import Faker
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.cities.models import City
@@ -18,13 +16,9 @@ from tests.users.factories import (
     JobSeekerProfileFactory,
     PrescriberFactory,
 )
-from tests.utils.test import TestCase
 
 
-faker = Faker()
-
-
-class CheckJobSeekerNirFormTest(TestCase):
+class TestCheckJobSeekerNirForm:
     def test_form_job_seeker_not_found(self):
         # This NIR is unique.
         nir = JobSeekerProfileFactory.build().nir
@@ -240,9 +234,8 @@ class TestAcceptForm:
         assert form.is_valid()
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
-    def test_save_geiq_form_fields_from_view(self):
+class TestJobApplicationAcceptFormWithGEIQFields:
+    def test_save_geiq_form_fields_from_view(self, client, faker):
         # non-GEIQ accept case tests are in `tests_process.py`
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         create_test_cities(["54", "57"], num_per_department=2)
@@ -252,28 +245,28 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         city = City.objects.order_by("?").first()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
-        self.client.force_login(job_application.to_company.members.first())
+        client.force_login(job_application.to_company.members.first())
 
-        response = self.client.get(url_accept)
+        response = client.get(url_accept)
         assert response.status_code == 200
 
         post_data = {
             "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
             "hiring_end_at": f"{faker.future_date(end_date='+3M'):%Y-%m-%d}",
-            "prehiring_guidance_days": self.faker.pyint(),
+            "prehiring_guidance_days": faker.pyint(),
             "nb_hours_per_week": 4,
             "contract_type_details": "contract details",
             "contract_type": str(ContractType.OTHER),
             "qualification_type": QualificationType.CCN,
             "qualification_level": QualificationLevel.NOT_RELEVANT,
-            "planned_training_hours": self.faker.pyint(),
+            "planned_training_hours": faker.pyint(),
             "location": city.pk,
             "answer": "foo",
             "hired_job": job_description.pk,
             "confirmed": True,
         }
 
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
+        response = client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
 
         # See https://django-htmx.readthedocs.io/en/latest/http.html#django_htmx.http.HttpResponseClientRedirect # noqa
         assert response.status_code == 200
@@ -290,34 +283,34 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         assert job_application.qualification_type == post_data["qualification_type"]
         assert not job_application.inverted_vae_contract
 
-    def test_geiq_inverted_vae_fields(self):
+    def test_geiq_inverted_vae_fields(self, client, faker):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, state="processing")
         job_description = JobDescriptionFactory(company=job_application.to_company)
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
-        self.client.force_login(job_application.to_company.members.first())
+        client.force_login(job_application.to_company.members.first())
 
-        response = self.client.get(url_accept)
+        response = client.get(url_accept)
         assert response.status_code == 200
 
         post_data = {
             "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
             "hiring_end_at": f"{faker.future_date(end_date='+3M'):%Y-%m-%d}",
             "hired_job": job_description.pk,
-            "prehiring_guidance_days": self.faker.pyint(),
+            "prehiring_guidance_days": faker.pyint(),
             "nb_hours_per_week": 4,
             "contract_type_details": "",
             "contract_type": str(ContractType.PROFESSIONAL_TRAINING),
             "inverted_vae_contract": "on",
             "qualification_type": QualificationType.CCN,
             "qualification_level": QualificationLevel.NOT_RELEVANT,
-            "planned_training_hours": self.faker.pyint(),
+            "planned_training_hours": faker.pyint(),
             "answer": "foo",
             "confirmed": "True",
         }
 
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
+        response = client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
         assert response.status_code == 200
 
         job_application.refresh_from_db()
@@ -325,7 +318,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         assert job_application.contract_type_details == post_data["contract_type_details"]
         assert job_application.inverted_vae_contract
 
-    def test_apply_with_past_hiring_date(self):
+    def test_apply_with_past_hiring_date(self, client, faker):
         CANNOT_BACKDATE_TEXT = "Il n'est pas possible d'antidater un contrat."
         # GEIQ can temporarily accept job applications with a past hiring date
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
@@ -334,26 +327,26 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.EI, state="processing")
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
-        self.client.force_login(job_application.to_company.members.first())
+        client.force_login(job_application.to_company.members.first())
 
-        response = self.client.get(url_accept)
+        response = client.get(url_accept)
         assert response.status_code == 200
 
         post_data = {
             "hiring_start_at": f"{faker.past_date(start_date='-1d'):%Y-%m-%d}",
             "hiring_end_at": f"{faker.future_date(end_date='+3M'):%Y-%m-%d}",
-            "prehiring_guidance_days": self.faker.pyint(),
+            "prehiring_guidance_days": faker.pyint(),
             "nb_hours_per_week": 5,
             "contract_type_details": "contract details",
             "contract_type": str(ContractType.OTHER),
             "qualification_type": QualificationType.CCN,
             "qualification_level": QualificationLevel.LEVEL_4,
-            "planned_training_hours": self.faker.pyint(),
+            "planned_training_hours": faker.pyint(),
             "answer": "foobar",
             "confirmed": "True",
         }
 
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
+        response = client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
 
         assert response.status_code == 200
         assertContains(response, CANNOT_BACKDATE_TEXT)
@@ -367,8 +360,8 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         post_data |= {"hired_job": job_description.pk}
 
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        self.client.force_login(job_application.to_company.members.first())
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
+        client.force_login(job_application.to_company.members.first())
+        response = client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
 
         assert response.status_code == 200
         assertNotContains(response, CANNOT_BACKDATE_TEXT)
@@ -385,13 +378,13 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         "<b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
     )
 
-    def test_specific_iae_mentions_in_accept_form(self):
+    def test_specific_iae_mentions_in_accept_form(self, client):
         def _response(kind):
             job_application = JobApplicationFactory(to_company__kind=kind, state="processing")
             url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
-            self.client.force_login(job_application.to_company.members.first())
-            response = self.client.get(url_accept)
+            client.force_login(job_application.to_company.members.first())
+            response = client.get(url_accept)
 
             assert response.status_code == 200
             return response
@@ -405,7 +398,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             assertNotContains(_response(kind), self.HELP_END_AT)
 
 
-class CertifiedCriteriaInfoRequiredFormTest(TestCase):
+class TestCertifiedCriteriaInfoRequiredForm:
     def test_submit_valid(self):
         job_seeker = JobSeekerFactory(
             with_ban_api_mocked_address=True,

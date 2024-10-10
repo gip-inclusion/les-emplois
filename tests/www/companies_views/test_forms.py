@@ -1,14 +1,15 @@
+import pytest
+
 from itou.companies.enums import CompanyKind, ContractType
 from itou.www.companies_views.forms import EditJobDescriptionDetailsForm, EditJobDescriptionForm
 from tests.cities.factories import create_city_guerande
 from tests.companies.factories import CompanyFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.utils.test import TestCase
 
 
-class EditJobDescriptionFormTest(TestCase):
-    def setUp(self):
-        super().setUp()
+class TestEditJobDescriptionForm:
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         # Needed to create sample ROME codes and job appellations (no fixture for ROME codes)
         create_test_romes_and_appellations(["M1805", "N1101"], appellations_per_rome=2)
         # Same for location field
@@ -222,7 +223,7 @@ class EditJobDescriptionFormTest(TestCase):
         assert not cleaned_data.get("is_qpv_mandatory")
 
 
-class EditJobDescriptionDetailsFormTest(TestCase):
+class TestEditJobDescriptionDetailsForm:
     def test_company_fields(self):
         company = CompanyFactory()
 

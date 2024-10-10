@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: SendCheckAuthorizedMembersEmailManagementCommandTest.test_check_authorized_members_email_content_members_link[company]
+# name: TestSendCheckAuthorizedMembersEmailManagementCommand.test_check_authorized_members_email_content_members_link[company]
   '''
   Bonjour,
   
@@ -21,7 +21,7 @@
   http://localhost:8000
   '''
 # ---
-# name: SendCheckAuthorizedMembersEmailManagementCommandTest.test_check_authorized_members_email_content_members_link[institution]
+# name: TestSendCheckAuthorizedMembersEmailManagementCommand.test_check_authorized_members_email_content_members_link[institution]
   '''
   Bonjour,
   
@@ -43,7 +43,7 @@
   http://localhost:8000
   '''
 # ---
-# name: SendCheckAuthorizedMembersEmailManagementCommandTest.test_check_authorized_members_email_content_members_link[prescriber_organization]
+# name: TestSendCheckAuthorizedMembersEmailManagementCommand.test_check_authorized_members_email_content_members_link[prescriber_organization]
   '''
   Bonjour,
   
@@ -65,7 +65,7 @@
   http://localhost:8000
   '''
 # ---
-# name: SendCheckAuthorizedMembersEmailManagementCommandTest.test_check_authorized_members_email_content_one_admin
+# name: TestSendCheckAuthorizedMembersEmailManagementCommand.test_check_authorized_members_email_content_one_admin
   '''
   Bonjour,
   
@@ -87,7 +87,7 @@
   http://localhost:8000
   '''
 # ---
-# name: SendCheckAuthorizedMembersEmailManagementCommandTest.test_check_authorized_members_email_content_two_admins
+# name: TestSendCheckAuthorizedMembersEmailManagementCommand.test_check_authorized_members_email_content_two_admins
   '''
   Bonjour,
   

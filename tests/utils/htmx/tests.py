@@ -5,26 +5,11 @@ from bs4 import BeautifulSoup
 from django.urls import reverse
 from django_htmx.middleware import HtmxDetails
 
-from tests.utils.htmx.test import HtmxTestCase, assertSoupEqual, update_page_with_htmx
+from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import parse_response_to_soup
 
 
-# Unittest style
-class HtmxRequestFactoryTest(HtmxTestCase):
-    def test_get(self):
-        response = self.htmx_client.get(reverse("search:employers_home"))
-        assert response.status_code == 200
-        assert isinstance(response.wsgi_request.htmx, HtmxDetails)
-        assert response.wsgi_request.htmx.boosted is False
-
-    def test_post(self):
-        response = self.htmx_client.post(reverse("search:employers_home"))
-        assert response.status_code == 200
-        assert isinstance(response.wsgi_request.htmx, HtmxDetails)
-        assert response.wsgi_request.htmx.boosted is False
-
-
-# Pytest style
+# Test htmx request factory
 def test_htmx_client(htmx_client):
     response = htmx_client.get(reverse("search:employers_home"))
     assert response.status_code == 200

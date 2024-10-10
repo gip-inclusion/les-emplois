@@ -16,102 +16,98 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.test import TestCase
 
 
-class UserHijackPermTestCase(TestCase):
-    def test_user_does_not_exist(self):
+class TestUserHijackPerm:
+    def test_user_does_not_exist(self, client):
         hijacker = ItouStaffFactory(is_superuser=True)
-        self.client.force_login(hijacker)
-        response = self.client.post(reverse("hijack:acquire"), {"user_pk": 0, "next": "/foo/"})
+        client.force_login(hijacker)
+        response = client.post(reverse("hijack:acquire"), {"user_pk": 0, "next": "/foo/"})
         assert response.status_code == 404
 
-    def test_superuser(self):
+    def test_superuser(self, client, caplog):
         hijacked = JobSeekerFactory()
         hijacker = ItouStaffFactory(is_superuser=True)
-        self.client.force_login(hijacker)
+        client.force_login(hijacker)
 
-        with self.assertLogs() as cm:
-            response = self.client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
+        response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assert response.status_code == 302
         assert response["Location"] == "/foo/"
-        assert cm.records[0].message == f"admin={hijacker} has started impersonation of user={hijacked}"
+        assert caplog.records[0].message == f"admin={hijacker} has started impersonation of user={hijacked}"
+        caplog.clear()
 
-        with self.assertLogs() as cm:
-            response = self.client.post(reverse("hijack:release"), {"user_pk": hijacked.pk, "next": "/bar/"})
+        response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk, "next": "/bar/"})
         assert response.status_code == 302
         assert response["Location"] == "/bar/"
-        assert cm.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
+        assert caplog.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
 
-    def test_disallowed_hijackers(self):
+    def test_disallowed_hijackers(self, client):
         hijacked = PrescriberFactory()
 
         hijacker = PrescriberFactory(is_active=False)  # Not staff nor active
-        self.client.force_login(hijacker)
-        response = self.client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
+        client.force_login(hijacker)
+        response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assert response.status_code == 302
         assert response["Location"] == "/accounts/login/?next=/hijack/acquire/"
 
         hijacker = PrescriberFactory()  # active but not staff or superuser
-        self.client.force_login(hijacker)
-        response = self.client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
+        client.force_login(hijacker)
+        response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assert response.status_code == 403
 
         with override_settings(HIJACK_ALLOWED_USER_EMAILS=["foo@test.com", "bar@baz.org"]):
             # active staff but not superuser and email not in the whitelist
             hijacker = ItouStaffFactory(email="not@inthelist.com")
-            self.client.force_login(hijacker)
-            response = self.client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
+            client.force_login(hijacker)
+            response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
             assert response.status_code == 403
 
-    @override_settings(HIJACK_ALLOWED_USER_EMAILS=["foo@test.com", "bar@baz.org"])
-    def test_allowed_staff_hijacker(self):
+    def test_allowed_staff_hijacker(self, client, caplog, settings):
+        settings.HIJACK_ALLOWED_USER_EMAILS = ["foo@test.com", "bar@baz.org"]
         hijacked = PrescriberFactory()
         hijacker = ItouStaffFactory(email="bar@baz.org")
-        self.client.force_login(hijacker)
+        client.force_login(hijacker)
 
-        with self.assertLogs() as cm:
-            response = self.client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
+        response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assert response.status_code == 302
         assert response["Location"] == "/foo/"
-        assert cm.records[0].message == f"admin={hijacker} has started impersonation of user={hijacked}"
+        assert caplog.records[0].message == f"admin={hijacker} has started impersonation of user={hijacked}"
+        caplog.clear()
 
-        with self.assertLogs() as cm:
-            response = self.client.post(reverse("hijack:release"), {"user_pk": hijacked.pk, "next": "/bar/"})
+        response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk, "next": "/bar/"})
         assert response.status_code == 302
         assert response["Location"] == "/bar/"
-        assert cm.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
+        assert caplog.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
 
-    @override_settings(HIJACK_ALLOWED_USER_EMAILS=["foo@test.com", "bar@baz.org"])
-    def test_allowed_django_prescriber(self):
+    def test_allowed_django_prescriber(self, client, caplog, settings):
+        settings.HIJACK_ALLOWED_USER_EMAILS = ["foo@test.com", "bar@baz.org"]
         hijacked = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
         hijacker = ItouStaffFactory(email="bar@baz.org")
-        self.client.force_login(hijacker)
+        client.force_login(hijacker)
 
-        with self.assertLogs() as cm:
-            response = self.client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
+        response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assert response.status_code == 302
         assert response["Location"] == "/foo/"
-        assert cm.records[0].message == f"admin={hijacker} has started impersonation of user={hijacked}"
+        assert caplog.records[0].message == f"admin={hijacker} has started impersonation of user={hijacked}"
+        caplog.clear()
 
-        with self.assertLogs() as cm:
-            response = self.client.post(reverse("hijack:release"), {"user_pk": hijacked.pk, "next": "/bar/"})
+        response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk, "next": "/bar/"})
         assert response.status_code == 302
         assert response["Location"] == "/bar/"
-        assert cm.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
+        assert caplog.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
 
-    def test_release_redirects_to_admin(self):
+    def test_release_redirects_to_admin(self, client):
         hijacked = JobSeekerFactory()
         hijacker = ItouStaffFactory(is_superuser=True)
-        self.client.force_login(hijacker)
+        client.force_login(hijacker)
 
         initial_url = reverse("admin:users_user_changelist")
 
-        response = self.client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk}, HTTP_REFERER=initial_url)
+        response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk}, HTTP_REFERER=initial_url)
         assert response.status_code == 302
         assert response["Location"] == "/dashboard/"
 
-        response = self.client.post(reverse("hijack:release"), {"user_pk": hijacked.pk})
+        response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk})
         assert response.status_code == 302
         assert response["Location"] == "/admin/users/user/"
 

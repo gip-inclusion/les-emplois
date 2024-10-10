@@ -1,8 +1,6 @@
 from urllib.parse import urlparse
 
-import pytest
-
-from tests.utils.test import ItouClient, TestCase, parse_response_to_soup
+from tests.utils.test import ItouClient, parse_response_to_soup
 
 
 class HtmxClient(ItouClient):
@@ -14,24 +12,6 @@ class HtmxClient(ItouClient):
         }
         extra = htmx_headers | extra
         return super().generic(method=method, path=path, data=data, content_type=content_type, secure=secure, **extra)
-
-
-# Compatibility with Unittest
-class HtmxTestCase(TestCase):
-    """
-    Mimic a response to an HTMX request.
-
-    Usage
-    ```
-    class MyTestWithUnittest(itou.utils.htmx.test.HtmxTestCase):
-        def a_test(self):
-            response = self.htmx_client.get("/)
-    ```
-    """
-
-    @pytest.fixture(autouse=True)
-    def htmx_client(self):
-        self.htmx_client = HtmxClient()
 
 
 def _handle_swap(page, *, target, new_elements, mode):

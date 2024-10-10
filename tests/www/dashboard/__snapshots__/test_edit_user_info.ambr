@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: EditUserInfoViewTest.test_edit_without_title[missing title warning with phone and address]
+# name: TestEditUserInfoView.test_edit_without_title[missing title warning with phone and address]
   '''
   <div class="alert alert-warning" id="missing-infos-warning" role="status">
                                   <div class="row">
@@ -70,7 +70,7 @@
                               </div>
   '''
 # ---
-# name: EditUserInfoViewTest.test_edit_without_title[missing title warning without phone and with birthdate]
+# name: TestEditUserInfoView.test_edit_without_title[missing title warning without phone and with birthdate]
   '''
   <div class="alert alert-warning" id="missing-infos-warning" role="status">
                                   <div class="row">
@@ -141,7 +141,7 @@
                               </div>
   '''
 # ---
-# name: EditUserInfoViewTest.test_update_address[user address input on error]
+# name: TestEditUserInfoView.test_update_address[user address input on error]
   '''
   <select aria-describedby="id_address_for_autocomplete_helptext" class="form-select django-select2" data-ajax--url="http://ban-api/search/" data-allow-clear="false" data-minimum-input-length="3" data-placeholder="Ex. 102 Quai de Jemmapes 75010 Paris" data-theme="bootstrap-5" id="id_address_for_autocomplete" lang="fr" name="address_for_autocomplete">
     <option value="0">37 B Rue du Général De Gaulle, 67118 Geispolsheim</option>
@@ -149,7 +149,7 @@
   </select>
   '''
 # ---
-# name: EditUserInfoViewTest.test_update_address[user address input]
+# name: TestEditUserInfoView.test_update_address[user address input]
   '''
   <select aria-describedby="id_address_for_autocomplete_helptext" class="form-select django-select2" data-ajax--url="http://ban-api/search/" data-allow-clear="false" data-minimum-input-length="3" data-placeholder="Ex. 102 Quai de Jemmapes 75010 Paris" data-theme="bootstrap-5" id="id_address_for_autocomplete" lang="fr" name="address_for_autocomplete">
     <option selected="" value="0">37 B Rue du Général De Gaulle, 67118 Geispolsheim</option>

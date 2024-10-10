@@ -8,7 +8,6 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.db.models import Max
 from django.forms.models import model_to_dict
-from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
@@ -56,18 +55,19 @@ from tests.job_applications.factories import (
 )
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import TestCase, get_rows_from_streaming_response
+from tests.utils.test import get_rows_from_streaming_response
 
 
-@override_settings(
-    API_ESD={
-        "BASE_URL": "https://base.domain",
-        "AUTH_BASE_URL": "https://authentication-domain.fr",
-        "KEY": "foobar",
-        "SECRET": "pe-secret",
-    }
-)
-class JobApplicationModelTest(TestCase):
+class TestJobApplicationModel:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, settings):
+        settings.API_ESD = {
+            "BASE_URL": "https://base.domain",
+            "AUTH_BASE_URL": "https://authentication-domain.fr",
+            "KEY": "foobar",
+            "SECRET": "pe-secret",
+        }
+
     def test_eligibility_diagnosis_by_siae_required(self):
         job_application = JobApplicationFactory(
             state=JobApplicationState.PROCESSING,
@@ -123,11 +123,11 @@ class JobApplicationModelTest(TestCase):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         assert job_application.is_sent_by_authorized_prescriber
 
-    def test_is_refused_for_other_reason(self):
+    def test_is_refused_for_other_reason(self, subtests):
         job_application = JobApplicationFactory()
         for state in JobApplicationState.values:
             for refusal_reason in RefusalReason.values:
-                with self.subTest(
+                with subtests.test(
                     "Test state and refusal_reason permutations", state=state, refusal_reason=refusal_reason
                 ):
                     job_application.state = state
@@ -138,7 +138,7 @@ class JobApplicationModelTest(TestCase):
                     else:
                         assert not job_application.is_refused_for_other_reason
 
-    def test_get_sender_kind_display(self):
+    def test_get_sender_kind_display(self, subtests):
         non_siae_items = [
             (JobApplicationSentByCompanyFactory(to_company__kind=kind), "Employeur")
             for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS]
@@ -151,24 +151,23 @@ class JobApplicationModelTest(TestCase):
         ] + non_siae_items
 
         for job_application, sender_kind_display in items:
-            with self.subTest(sender_kind_display):
+            with subtests.test(sender_kind_display):
                 assert job_application.get_sender_kind_display() == sender_kind_display
 
     def test_application_on_non_job_seeker(self):
-        with self.assertRaisesRegex(
-            ValidationError,
-            "Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte candidat",
-        ):
+        with pytest.raises(ValidationError) as excinfo:
             JobApplicationFactory(job_seeker=PrescriberFactory()).clean()
+        assert "Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte candidat" in str(
+            excinfo.value
+        )
 
     def test_inverted_vae_contract(self):
         JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, inverted_vae_contract=True).clean()
         JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, inverted_vae_contract=False).clean()
         JobApplicationFactory(to_company__kind=CompanyKind.EI, inverted_vae_contract=None).clean()
-        with self.assertRaisesRegex(
-            ValidationError, "Un contrat associé à une VAE inversée n'est possible que pour les GEIQ"
-        ):
+        with pytest.raises(ValidationError) as excinfo:
             JobApplicationFactory(to_company__kind=CompanyKind.AI, inverted_vae_contract=True).clean()
+        assert "Un contrat associé à une VAE inversée n'est possible que pour les GEIQ" in str(excinfo.value)
 
 
 def test_can_be_cancelled():
@@ -332,8 +331,7 @@ def test_prescriptions_of_exclude_auto_prescription():
     assert list(JobApplication.objects.prescriptions_of(job_application.sender, job_application.to_company)) == []
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class JobApplicationQuerySetTest(TestCase):
+class TestJobApplicationQuerySet:
     def test_created_in_past(self):
         now = timezone.now()
         hours_ago_10 = now - timezone.timedelta(hours=10)
@@ -700,14 +698,14 @@ class JobApplicationQuerySetTest(TestCase):
         assert JobApplication.objects.with_accepted_at().count() == JobApplication.objects.count()
         assert JobApplication.objects.with_accepted_at().first().accepted_at == expected_created_at
 
-    def test_accept_without_sender(self):
+    def test_accept_without_sender(self, django_capture_on_commit_callbacks):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         job_application.process()
         # User account is deleted.
         job_application.sender = None
         job_application.save(update_fields=["sender"])
         employer = job_application.to_company.members.first()
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=employer)
         recipients = []
         for email in mail.outbox:
@@ -739,10 +737,9 @@ class JobApplicationQuerySetTest(TestCase):
         assert job_application.accepted_at != job_application.created_at
 
 
-class JobApplicationNotificationsTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        # Set up data for the whole TestCase.
+class TestJobApplicationNotifications:
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
 
     def test_new_for_company(self):
@@ -946,7 +943,7 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.answer in email.body
         assert job_application.answer_to_prescriber not in email.body
 
-    def test_refuse_without_sender(self):
+    def test_refuse_without_sender(self, django_capture_on_commit_callbacks):
         # When sent by authorized prescriber.
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
@@ -957,7 +954,7 @@ class JobApplicationNotificationsTest(TestCase):
         # User account is deleted.
         job_application.sender = None
         job_application.save(update_fields=["sender"])
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.refuse(user=job_application.to_company.members.first())
         [email] = mail.outbox
         assert email.to == [job_application.job_seeker.email]
@@ -1029,7 +1026,7 @@ class JobApplicationNotificationsTest(TestCase):
         assert "PASS IAE" not in email.body
         assert global_constants.ITOU_HELP_CENTER_URL in email.body
 
-    def test_manually_deliver_approval(self, *args, **kwargs):
+    def test_manually_deliver_approval(self, django_capture_on_commit_callbacks):
         staff_member = ItouStaffFactory()
         job_seeker = JobSeekerFactory(
             jobseeker_profile__nir="",
@@ -1045,7 +1042,7 @@ class JobApplicationNotificationsTest(TestCase):
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
         )
         job_application.accept(user=job_application.to_company.members.first())
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.manually_deliver_approval(delivered_by=staff_member)
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_number_sent_at is not None
@@ -1054,7 +1051,7 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.approval_manually_refused_by is None
         assert len(mail.outbox) == 1
 
-    def test_manually_refuse_approval(self):
+    def test_manually_refuse_approval(self, django_capture_on_commit_callbacks):
         staff_member = ItouStaffFactory()
         job_seeker = JobSeekerFactory(
             jobseeker_profile__nir="",
@@ -1068,7 +1065,7 @@ class JobApplicationNotificationsTest(TestCase):
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
         )
         job_application.accept(user=job_application.to_company.members.first())
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.manually_refuse_approval(refused_by=staff_member)
         assert job_application.approval_manually_refused_by == staff_member
         assert job_application.approval_manually_refused_at is not None
@@ -1077,13 +1074,13 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.approval_number_sent_at is None
         assert len(mail.outbox) == 1
 
-    def test_cancel_sent_by_prescriber(self):
+    def test_cancel_sent_by_prescriber(self, django_capture_on_commit_callbacks):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True, state=JobApplicationState.ACCEPTED
         )
 
         cancellation_user = job_application.to_company.active_members.first()
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.cancel(user=cancellation_user)
         assert len(mail.outbox) == 2
 
@@ -1097,12 +1094,12 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.job_seeker.get_full_name() in mail.outbox[0].body
         assert mail.outbox[0].body == mail.outbox[1].body
 
-    def test_cancel_sent_by_job_seeker(self):
+    def test_cancel_sent_by_job_seeker(self, django_capture_on_commit_callbacks):
         # When sent by jobseeker.
         job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationState.ACCEPTED)
 
         cancellation_user = job_application.to_company.active_members.first()
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.cancel(user=cancellation_user)
         assert len(mail.outbox) == 1
 
@@ -1114,7 +1111,7 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.sender.get_full_name() in mail.outbox[0].body
         assert job_application.job_seeker.get_full_name() in mail.outbox[0].body
 
-    def test_cancel_without_sender(self):
+    def test_cancel_without_sender(self, django_capture_on_commit_callbacks):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True, state=JobApplicationState.ACCEPTED
         )
@@ -1122,26 +1119,29 @@ class JobApplicationNotificationsTest(TestCase):
         job_application.sender = None
         job_application.save(update_fields=["sender"])
         cancellation_user = job_application.to_company.active_members.first()
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.cancel(user=cancellation_user)
         [email] = mail.outbox
         assert email.to == [cancellation_user.email]
 
 
-@override_settings(
-    API_ESD={
-        "BASE_URL": "https://base.domain",
-        "AUTH_BASE_URL": "https://authentication-domain.fr",
-        "KEY": "foobar",
-        "SECRET": "pe-secret",
-    }
-)
-class JobApplicationWorkflowTest(TestCase):
+class TestJobApplicationWorkflow:
     SENT_PASS_EMAIL_SUBJECT = "PASS IAE pour"
     ACCEPT_EMAIL_SUBJECT_PROXY = "Candidature acceptée et votre avis sur les emplois de l'inclusion"
     ACCEPT_EMAIL_SUBJECT_JOB_SEEKER = "Candidature acceptée"
 
-    def test_accept_job_application_sent_by_job_seeker_and_make_others_obsolete(self):
+    @pytest.fixture(autouse=True)
+    def setup_method(self, settings):
+        settings.API_ESD = {
+            "BASE_URL": "https://base.domain",
+            "AUTH_BASE_URL": "https://authentication-domain.fr",
+            "KEY": "foobar",
+            "SECRET": "pe-secret",
+        }
+
+    def test_accept_job_application_sent_by_job_seeker_and_make_others_obsolete(
+        self, django_capture_on_commit_callbacks
+    ):
         """
         When a job seeker's application is accepted, the others are marked obsolete.
         """
@@ -1163,7 +1163,7 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_seeker.job_applications.pending().count() == 4
 
         job_application = job_seeker.job_applications.filter(state=JobApplicationState.PROCESSING).first()
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
 
         assert job_seeker.job_applications.filter(state=JobApplicationState.ACCEPTED).count() == 1
@@ -1176,7 +1176,7 @@ class JobApplicationWorkflowTest(TestCase):
         # Email sent to the job seeker.
         assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
-    def test_accept_obsolete(self):
+    def test_accept_obsolete(self, django_capture_on_commit_callbacks):
         """
         An obsolete job application can be accepted.
         """
@@ -1200,7 +1200,7 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_seeker.job_applications.count() == 6
 
         job_application = job_seeker.job_applications.filter(state=JobApplicationState.OBSOLETE).first()
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
 
         assert job_seeker.job_applications.filter(state=JobApplicationState.ACCEPTED).count() == 2
@@ -1213,7 +1213,9 @@ class JobApplicationWorkflowTest(TestCase):
         # Email sent to the job seeker.
         assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
-    def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval(self):
+    def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval(
+        self, django_capture_on_commit_callbacks
+    ):
         """
         When a Pôle emploi approval already exists, it is reused.
         """
@@ -1225,7 +1227,7 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationState.PROCESSING
         )
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval.number == pe_approval.number
@@ -1243,13 +1245,15 @@ class JobApplicationWorkflowTest(TestCase):
         # Email sent to the job seeker.
         assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
-    def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval_with_nir(self):
+    def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval_with_nir(
+        self, django_capture_on_commit_callbacks
+    ):
         job_seeker = JobSeekerFactory(jobseeker_profile__pole_emploi_id="", jobseeker_profile__birthdate=None)
         pe_approval = PoleEmploiApprovalFactory(nir=job_seeker.jobseeker_profile.nir)
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationState.PROCESSING
         )
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval.number == pe_approval.number
@@ -1267,7 +1271,9 @@ class JobApplicationWorkflowTest(TestCase):
         # Email sent to the job seeker.
         assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
-    def test_accept_job_application_sent_by_job_seeker_with_forgotten_pole_emploi_id(self):
+    def test_accept_job_application_sent_by_job_seeker_with_forgotten_pole_emploi_id(
+        self, django_capture_on_commit_callbacks
+    ):
         """
         When a Pôle emploi ID is forgotten, a manual approval delivery is triggered.
         """
@@ -1279,7 +1285,7 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationState.PROCESSING
         )
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_MANUAL
@@ -1290,7 +1296,9 @@ class JobApplicationWorkflowTest(TestCase):
         # Email sent to the job seeker.
         assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
-    def test_accept_job_application_sent_by_job_seeker_with_a_nir_no_pe_approval(self):
+    def test_accept_job_application_sent_by_job_seeker_with_a_nir_no_pe_approval(
+        self, django_capture_on_commit_callbacks
+    ):
         job_seeker = JobSeekerFactory(
             jobseeker_profile__pole_emploi_id="",
         )
@@ -1299,7 +1307,7 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationState.PROCESSING,
             eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
         )
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC
@@ -1313,7 +1321,9 @@ class JobApplicationWorkflowTest(TestCase):
         # Email sent to the job seeker.
         assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
-    def test_accept_job_application_sent_by_job_seeker_with_a_pole_emploi_id_no_pe_approval(self):
+    def test_accept_job_application_sent_by_job_seeker_with_a_pole_emploi_id_no_pe_approval(
+        self, django_capture_on_commit_callbacks
+    ):
         job_seeker = JobSeekerFactory(
             jobseeker_profile__nir="",
             with_pole_emploi_id=True,
@@ -1323,7 +1333,7 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationState.PROCESSING,
             eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
         )
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC
@@ -1333,7 +1343,9 @@ class JobApplicationWorkflowTest(TestCase):
         # Email sent to the job seeker.
         assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
-    def test_accept_job_application_sent_by_job_seeker_unregistered_no_pe_approval(self):
+    def test_accept_job_application_sent_by_job_seeker_unregistered_no_pe_approval(
+        self, django_capture_on_commit_callbacks
+    ):
         job_seeker = JobSeekerFactory(
             jobseeker_profile__nir="",
             jobseeker_profile__pole_emploi_id="",
@@ -1344,7 +1356,7 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationState.PROCESSING,
             eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
         )
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC
@@ -1358,7 +1370,7 @@ class JobApplicationWorkflowTest(TestCase):
         # Email sent to the job seeker.
         assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
-    def test_accept_job_application_sent_by_prescriber(self):
+    def test_accept_job_application_sent_by_prescriber(self, django_capture_on_commit_callbacks):
         """
         Accept a job application sent by an "orienteur".
         """
@@ -1368,7 +1380,7 @@ class JobApplicationWorkflowTest(TestCase):
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
@@ -1389,7 +1401,7 @@ class JobApplicationWorkflowTest(TestCase):
         # Email sent to the proxy.
         assert self.ACCEPT_EMAIL_SUBJECT_PROXY in mail.outbox[2].subject
 
-    def test_accept_job_application_sent_by_authorized_prescriber(self):
+    def test_accept_job_application_sent_by_authorized_prescriber(self, django_capture_on_commit_callbacks):
         """
         Accept a job application sent by an authorized prescriber.
         """
@@ -1400,7 +1412,7 @@ class JobApplicationWorkflowTest(TestCase):
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
         assert job_application.to_company.is_subject_to_eligibility_rules
         assert job_application.approval is not None
@@ -1422,7 +1434,9 @@ class JobApplicationWorkflowTest(TestCase):
         # Email sent to the proxy.
         assert self.ACCEPT_EMAIL_SUBJECT_PROXY in mail.outbox[2].subject
 
-    def test_accept_job_application_sent_by_authorized_prescriber_with_approval_in_waiting_period(self):
+    def test_accept_job_application_sent_by_authorized_prescriber_with_approval_in_waiting_period(
+        self, django_capture_on_commit_callbacks
+    ):
         """
         An authorized prescriber can bypass the waiting period.
         """
@@ -1444,7 +1458,7 @@ class JobApplicationWorkflowTest(TestCase):
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
@@ -1488,7 +1502,9 @@ class JobApplicationWorkflowTest(TestCase):
         with pytest.raises(xwf_models.AbortTransition):
             job_application.accept(user=job_application.to_company.members.first())
 
-    def test_accept_job_application_sent_by_job_seeker_in_waiting_period_valid_diagnosis(self):
+    def test_accept_job_application_sent_by_job_seeker_in_waiting_period_valid_diagnosis(
+        self, django_capture_on_commit_callbacks
+    ):
         """
         A job seeker with a valid diagnosis can start an IAE path
         even if he's in a waiting period.
@@ -1509,7 +1525,7 @@ class JobApplicationWorkflowTest(TestCase):
         assert diagnosis.is_valid
 
         job_application = JobApplicationSentByJobSeekerFactory(job_seeker=user, state=JobApplicationState.PROCESSING)
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
@@ -1525,7 +1541,7 @@ class JobApplicationWorkflowTest(TestCase):
         # Email sent to the job seeker.
         assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
-    def test_accept_job_application_by_siae_with_no_approval(self):
+    def test_accept_job_application_by_siae_with_no_approval(self, django_capture_on_commit_callbacks):
         """
         A SIAE can hire somebody without getting approval if they don't want one
         Basically the same as the 'accept' part, except we don't create an approval
@@ -1537,7 +1553,7 @@ class JobApplicationWorkflowTest(TestCase):
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
         assert job_application.to_company.is_subject_to_eligibility_rules
         assert job_application.approval is None
@@ -1550,7 +1566,7 @@ class JobApplicationWorkflowTest(TestCase):
         # Email sent to the proxy.
         assert self.ACCEPT_EMAIL_SUBJECT_PROXY in mail.outbox[1].subject
 
-    def test_accept_job_application_by_siae_not_subject_to_eligibility_rules(self):
+    def test_accept_job_application_by_siae_not_subject_to_eligibility_rules(self, django_capture_on_commit_callbacks):
         """
         No approval should be delivered for an employer not subject to eligibility rules.
         """
@@ -1559,7 +1575,7 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.GEIQ,
         )
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
         assert not job_application.to_company.is_subject_to_eligibility_rules
         assert job_application.approval is None
@@ -1599,7 +1615,7 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.to_company.is_subject_to_eligibility_rules
         assert job_application.eligibility_diagnosis == eligibility_diagnosis
 
-    def test_refuse(self):
+    def test_refuse(self, django_capture_on_commit_callbacks):
         user = JobSeekerFactory()
         kwargs = {"job_seeker": user, "sender": user, "sender_kind": SenderKind.JOB_SEEKER}
 
@@ -1610,7 +1626,7 @@ class JobApplicationWorkflowTest(TestCase):
         assert user.job_applications.pending().count() == 2
 
         for job_application in user.job_applications.all():
-            with self.captureOnCommitCallbacks(execute=True):
+            with django_capture_on_commit_callbacks(execute=True):
                 job_application.refuse(user=EmployerFactory())
             # Check sent email.
             assert len(mail.outbox) == 1
@@ -1717,7 +1733,7 @@ def test_job_application_transition_unarchives(transition, from_state):
     assert job_application.archived_at is None
 
 
-class JobApplicationXlsxExportTest(TestCase):
+class TestJobApplicationXlsxExport:
     def test_xlsx_export_contains_the_necessary_info(self, *args, **kwargs):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
         job_seeker = JobSeekerFactory(title=Title.MME)
@@ -2010,7 +2026,7 @@ class JobApplicationXlsxExportTest(TestCase):
             _resolve_title(title="", nir="0")
 
 
-class JobApplicationAdminFormTest(TestCase):
+class TestJobApplicationAdminForm:
     def test_job_application_admin_form_validation(self):
         form_fields_list = [
             "job_seeker",
@@ -2216,12 +2232,12 @@ class JobApplicationAdminFormTest(TestCase):
         ]
 
 
-class JobApplicationsEnumsTest(TestCase):
-    def test_refusal_reason(self):
+class TestJobApplicationsEnums:
+    def test_refusal_reason(self, subtests):
         """Some reasons are kept for history but not displayed to end users."""
         hidden_choices = RefusalReason.hidden()
         for choice in hidden_choices:
             reasons = [choice[0] for choice in RefusalReason.displayed_choices()]
             assert len(reasons) > 0
-            with self.subTest(choice):
+            with subtests.test(choice.label):
                 assert choice.value not in reasons

@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: JobDescriptionListViewTest.test_job_application_list_response_content[job applications list]
+# name: TestJobDescriptionListView.test_job_application_list_response_content[job applications list]
   dict({
     'num_queries': 15,
     'queries': list([
