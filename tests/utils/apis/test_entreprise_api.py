@@ -3,18 +3,21 @@ import json
 import logging
 
 import httpx
+import pytest
 import respx
 from django.conf import settings
-from django.test import SimpleTestCase, override_settings
 
 from itou.utils.apis import api_entreprise
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 
 
-@override_settings(
-    API_INSEE_BASE_URL="https://fake.insee.url", API_INSEE_CONSUMER_KEY="foo", API_INSEE_CONSUMER_SECRET="bar"
-)
-class INSEEApiTest(SimpleTestCase):
+class TestINSEEApi:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, settings):
+        settings.API_INSEE_BASE_URL = "https://fake.insee.url"
+        settings.API_INSEE_CONSUMER_KEY = "foo"
+        settings.API_INSEE_CONSUMER_SECRET = "bar"
+
     @respx.mock
     def test_access_token(self):
         endpoint = respx.post(f"{settings.API_INSEE_BASE_URL}/token").respond(200, json=INSEE_API_RESULT_MOCK)
@@ -27,37 +30,33 @@ class INSEEApiTest(SimpleTestCase):
         assert access_token == INSEE_API_RESULT_MOCK["access_token"]
 
     @respx.mock
-    def test_access_token_with_http_error(self):
+    def test_access_token_with_http_error(self, caplog):
         respx.post(f"{settings.API_INSEE_BASE_URL}/token").respond(400)
+        caplog.set_level(logging.ERROR)
 
-        with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
-            access_token = api_entreprise.get_access_token()
-
+        access_token = api_entreprise.get_access_token()
         assert access_token is None
-        assert "Failed to retrieve an access token" in cm.records[0].message
-        assert cm.records[0].exc_info[0] is httpx.HTTPStatusError
+        assert "Failed to retrieve an access token" in caplog.records[0].message
+        assert caplog.records[0].exc_info[0] is httpx.HTTPStatusError
 
     @respx.mock
-    def test_access_token_with_json_error(self):
+    def test_access_token_with_json_error(self, caplog):
         respx.post(f"{settings.API_INSEE_BASE_URL}/token").respond(200, content=b"not-json")
+        caplog.set_level(logging.ERROR)
 
-        with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
-            access_token = api_entreprise.get_access_token()
-
+        access_token = api_entreprise.get_access_token()
         assert access_token is None
-        assert "Failed to retrieve an access token" in cm.records[0].message
-        assert cm.records[0].exc_info[0] is json.JSONDecodeError
+        assert "Failed to retrieve an access token" in caplog.records[0].message
+        assert caplog.records[0].exc_info[0] is json.JSONDecodeError
 
 
-@override_settings(
-    API_INSEE_BASE_URL="https://fake.insee.url",
-    API_INSEE_SIRENE_BASE_URL="https://api.entreprise.fake.com",
-    API_INSEE_CONSUMER_KEY="foo",
-    API_INSEE_CONSUMER_SECRET="bar",
-)
-class ApiEntrepriseTest(SimpleTestCase):
-    def setUp(self):
-        super().setUp()
+class TestApiEntreprise:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, settings):
+        settings.API_INSEE_BASE_URL = "https://fake.insee.url"
+        settings.API_INSEE_SIRENE_BASE_URL = "https://api.entreprise.fake.com"
+        settings.API_INSEE_CONSUMER_KEY = "foo"
+        settings.API_INSEE_CONSUMER_SECRET = "bar"
 
         self.token_endpoint = respx.post(f"{settings.API_INSEE_BASE_URL}/token").respond(
             200,
@@ -102,14 +101,13 @@ class ApiEntrepriseTest(SimpleTestCase):
         assert result == (None, "Problème de connexion à la base Sirene. Essayez ultérieurement.")
 
     @respx.mock
-    def test_etablissement_get_or_error_with_request_error(self):
+    def test_etablissement_get_or_error_with_request_error(self, caplog):
         self.siret_endpoint.mock(side_effect=httpx.RequestError)
+        caplog.set_level(logging.ERROR)
 
-        with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
-            result = api_entreprise.etablissement_get_or_error("26570134200148")
-
+        result = api_entreprise.etablissement_get_or_error("26570134200148")
         assert result == (None, "Problème de connexion à la base Sirene. Essayez ultérieurement.")
-        assert cm.records[0].message.startswith("A request to the INSEE API failed")
+        assert caplog.records[0].message.startswith("A request to the INSEE API failed")
 
     @respx.mock
     def test_etablissement_get_or_error_with_other_http_bad_request_error(self):
@@ -136,49 +134,45 @@ class ApiEntrepriseTest(SimpleTestCase):
         assert result == (None, "SIRET « 26570134200148 » non reconnu.")
 
     @respx.mock
-    def test_etablissement_get_or_error_with_http_error(self):
+    def test_etablissement_get_or_error_with_http_error(self, caplog):
         self.siret_endpoint.respond(401)
+        caplog.set_level(logging.ERROR)
 
-        with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
-            result = api_entreprise.etablissement_get_or_error("26570134200148")
-
+        result = api_entreprise.etablissement_get_or_error("26570134200148")
         assert result == (None, "Problème de connexion à la base Sirene. Essayez ultérieurement.")
-        assert cm.records[0].message.startswith("Error while fetching")
+        assert caplog.records[0].message.startswith("Error while fetching")
 
     @respx.mock
-    def test_etablissement_get_or_error_when_content_is_not_json(self):
+    def test_etablissement_get_or_error_when_content_is_not_json(self, caplog):
         self.siret_endpoint.respond(200, content=b"not-json")
+        caplog.set_level(logging.ERROR)
 
-        with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
-            result = api_entreprise.etablissement_get_or_error("26570134200148")
-
+        result = api_entreprise.etablissement_get_or_error("26570134200148")
         assert result == (None, "Le format de la réponse API Entreprise est non valide.")
-        assert cm.records[0].message.startswith("Invalid format of response from API Entreprise")
-        assert cm.records[0].exc_info[0] is json.JSONDecodeError
+        assert caplog.records[0].message.startswith("Invalid format of response from API Entreprise")
+        assert caplog.records[0].exc_info[0] is json.JSONDecodeError
 
     @respx.mock
-    def test_etablissement_get_or_error_when_content_is_missing_data(self):
+    def test_etablissement_get_or_error_when_content_is_missing_data(self, caplog):
         self.siret_endpoint.respond(200, json={})
+        caplog.set_level(logging.ERROR)
 
-        with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
-            result = api_entreprise.etablissement_get_or_error("26570134200148")
-
+        result = api_entreprise.etablissement_get_or_error("26570134200148")
         assert result == (None, "Le format de la réponse API Entreprise est non valide.")
-        assert cm.records[0].message.startswith("Invalid format of response from API Entreprise")
-        assert cm.records[0].exc_info[0] is KeyError
+        assert caplog.records[0].message.startswith("Invalid format of response from API Entreprise")
+        assert caplog.records[0].exc_info[0] is KeyError
 
     @respx.mock
-    def test_etablissement_get_or_error_when_content_is_missing_historical_data(self):
+    def test_etablissement_get_or_error_when_content_is_missing_historical_data(self, caplog):
         data = copy.deepcopy(ETABLISSEMENT_API_RESULT_MOCK)
         data["etablissement"]["periodesEtablissement"] = []
         self.siret_endpoint.respond(200, json=data)
+        caplog.set_level(logging.ERROR)
 
-        with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
-            result = api_entreprise.etablissement_get_or_error("26570134200148")
-
+        result = api_entreprise.etablissement_get_or_error("26570134200148")
         assert result == (None, "Le format de la réponse API Entreprise est non valide.")
-        assert cm.records[0].message.startswith("Invalid format of response from API Entreprise")
-        assert cm.records[0].exc_info[0] is IndexError
+        assert caplog.records[0].message.startswith("Invalid format of response from API Entreprise")
+        assert caplog.records[0].exc_info[0] is IndexError
 
     @respx.mock
     def test_etablissement_get_or_error_with_missing_address_number(self):

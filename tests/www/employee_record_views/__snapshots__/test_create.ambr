@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: CreateEmployeeRecordStep2Test.test_job_seeker_address_geolocated
+# name: TestCreateEmployeeRecordStep2.test_job_seeker_address_geolocated
   '''
   <form action="/employee_record/create_step_2/[PK of JobApplication]" method="post">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -341,6 +341,6 @@
               </form>
   '''
 # ---
-# name: CreateEmployeeRecordStep5Test.test_employee_record_status
+# name: TestCreateEmployeeRecordStep5.test_employee_record_status
   Message(level=25, message="La création de cette fiche salariée est terminée||Vous pouvez suivre l'avancement de son traitement par l'ASP en sélectionnant les différents statuts.", extra_tags='toast')
 # ---

@@ -4,12 +4,12 @@ import html5lib
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
-from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils import dateformat, timezone
 from freezegun import freeze_time
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertNumQueries, assertRedirects
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.siae_evaluations import enums as evaluation_enums
@@ -35,7 +35,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, parse_response_to_soup
 from tests.www.siae_evaluations_views.test_siaes_views import TestSiaeEvaluatedJobApplicationView
 
 
@@ -81,33 +81,33 @@ def get_evaluated_administrative_criteria(institution):
     return evaluated_job_application.evaluated_administrative_criteria.first()
 
 
-class SamplesSelectionViewTest(TestCase):
-    def setUp(self):
-        super().setUp()
+class TestSamplesSelectionView:
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         membership = InstitutionMembershipFactory(institution__name="DDETS Ille et Vilaine")
         self.user = membership.user
         self.institution = membership.institution
         self.url = reverse("siae_evaluations_views:samples_selection")
 
-    def test_access(self):
-        response = self.client.get(self.url)
+    def test_access(self, client):
+        response = client.get(self.url)
         assert response.status_code == 302
 
         # institution without active campaign
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
+        client.force_login(self.user)
+        response = client.get(self.url)
         assert response.status_code == 404
 
         # institution with active campaign to select
         evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
-        response = self.client.get(self.url)
-        self.assertContains(response, "Sélection des salariés à contrôler")
+        response = client.get(self.url)
+        assertContains(response, "Sélection des salariés à contrôler")
 
         # institution with active campaign selected
         evaluation_campaign.percent_set_at = timezone.now()
         evaluation_campaign.save(update_fields=["percent_set_at"])
-        response = self.client.get(self.url)
-        self.assertContains(
+        response = client.get(self.url)
+        assertContains(
             response, "Vous serez notifié lorsque l'étape de transmission des pièces justificatives commencera."
         )
 
@@ -115,15 +115,15 @@ class SamplesSelectionViewTest(TestCase):
         evaluation_campaign.percent_set_at = timezone.now()
         evaluation_campaign.ended_at = timezone.now()
         evaluation_campaign.save(update_fields=["percent_set_at", "ended_at"])
-        response = self.client.get(self.url)
+        response = client.get(self.url)
         assert response.status_code == 404
 
-    def test_content(self):
+    def test_content(self, client):
         evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
         back_url = reverse("dashboard:index")
 
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
+        client.force_login(self.user)
+        response = client.get(self.url)
 
         assert response.context["institution"] == self.institution
         assert response.context["evaluation_campaign"] == evaluation_campaign
@@ -154,14 +154,14 @@ class SamplesSelectionViewTest(TestCase):
         assert not form.is_valid()
         assert form.errors["chosen_percent"] == ["Assurez-vous que cette valeur est inférieure ou égale à 40."]
 
-    def test_post_form(self):
+    def test_post_form(self, client):
         evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
 
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
+        client.force_login(self.user)
+        response = client.get(self.url)
 
         post_data = {"chosen_percent": evaluation_enums.EvaluationChosenPercent.MIN}
-        response = self.client.post(self.url, data=post_data)
+        response = client.post(self.url, data=post_data)
         assert response.status_code == 302
 
         updated_evaluation_campaign = EvaluationCampaign.objects.get(pk=evaluation_campaign.pk)
@@ -169,19 +169,18 @@ class SamplesSelectionViewTest(TestCase):
         assert updated_evaluation_campaign.chosen_percent == post_data["chosen_percent"]
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class InstitutionEvaluatedSiaeListViewTest(TestCase):
-    def setUp(self):
-        super().setUp()
+class TestInstitutionEvaluatedSiaeListView:
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         membership = InstitutionMembershipFactory()
         self.user = membership.user
         self.institution = membership.institution
 
-    def test_access(self):
-        self.client.force_login(self.user)
+    def test_access(self, client, snapshot):
+        client.force_login(self.user)
 
         # institution without evaluation_campaign
-        response = self.client.get(
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
                 kwargs={"evaluation_campaign_pk": 1},
@@ -198,7 +197,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         )
         evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         EvaluatedAdministrativeCriteriaFactory.create(evaluated_job_application=evaluated_job_app)
-        response = self.client.get(
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
                 kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
@@ -209,30 +208,30 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         # institution with evaluation_campaign in "siae upload its proofs" phase
         evaluation_campaign.evaluations_asked_at = timezone.now()
         evaluation_campaign.save(update_fields=["evaluations_asked_at"])
-        response = self.client.get(
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
                 kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
             )
         )
-        self.assertContains(response, "Liste des Siae à contrôler", html=True, count=1)
+        assertContains(response, "Liste des Siae à contrôler", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="waiting state")
+        assert str(state_div) == snapshot(name="waiting state")
 
         # institution with ended evaluation_campaign
         evaluation_campaign.ended_at = timezone.now()
         evaluation_campaign.save(update_fields=["ended_at"])
-        response = self.client.get(
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
                 kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
             )
         )
-        self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
+        assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="notification pending state")
+        assert str(state_div) == snapshot(name="notification pending state")
 
-    def test_recently_closed_campaign(self):
+    def test_recently_closed_campaign(self, client, snapshot):
         evaluated_siae = EvaluatedSiaeFactory(
             pk=1000,
             complete=True,
@@ -240,18 +239,18 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
             evaluation_campaign__institution=self.institution,
         )
-        self.client.force_login(self.user)
+        client.force_login(self.user)
         url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",
             kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
         )
-        response = self.client.get(url)
+        response = client.get(url)
         detail_url = reverse(
             "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         detail_url_with_back_url = f"{detail_url}?back_url={urlencode(url)}"
-        self.assertContains(
+        assertContains(
             response,
             f"""
             <a href="{detail_url_with_back_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
@@ -261,11 +260,11 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             html=True,
             count=1,
         )
-        self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
+        assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="final accepted state")
+        assert str(state_div) == snapshot(name="final accepted state")
 
-    def test_siae_refused_can_be_notified(self):
+    def test_siae_refused_can_be_notified(self, client, snapshot):
         evaluated_siae = EvaluatedSiaeFactory(
             pk=1000,
             complete=True,
@@ -273,20 +272,20 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             evaluation_campaign__institution=self.institution,
         )
-        self.client.force_login(self.user)
+        client.force_login(self.user)
         url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",
             kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
         )
-        response = self.client.get(url)
-        self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
+        response = client.get(url)
+        assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="notification pending state")
+        assert str(state_div) == snapshot(name="notification pending state")
         notify_url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_notify_step1",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
-        self.assertContains(
+        assertContains(
             response,
             f"""
             <a class="btn btn-primary btn-block w-100 w-md-auto" href="{notify_url}">
@@ -303,7 +302,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         )
         detail_url_with_back_url = f"{detail_url}?back_url={urlencode(url)}"
 
-        self.assertContains(
+        assertContains(
             response,
             f"""
             <a href="{detail_url_with_back_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
@@ -314,7 +313,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             count=1,
         )
 
-    def test_siae_incomplete_refused_can_be_notified(self):
+    def test_siae_incomplete_refused_can_be_notified(self, client, snapshot):
         evaluated_siae = EvaluatedSiaeFactory(
             pk=1000,
             for_snapshot=True,
@@ -322,20 +321,20 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=10),
             evaluation_campaign__ended_at=timezone.now(),
         )
-        self.client.force_login(self.user)
+        client.force_login(self.user)
         url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",
             kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
         )
-        response = self.client.get(url)
-        self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
+        response = client.get(url)
+        assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="notification pending state")
+        assert str(state_div) == snapshot(name="notification pending state")
         notify_url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_notify_step1",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
-        self.assertContains(
+        assertContains(
             response,
             f"""
             <a class="btn btn-primary btn-block w-100 w-md-auto" href="{notify_url}">
@@ -350,7 +349,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         detail_url_with_back_url = f"{detail_url}?back_url={url}"
-        self.assertContains(
+        assertContains(
             response,
             f'<a href="{detail_url_with_back_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">'
             "Voir le résultat</a>",
@@ -358,7 +357,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             count=1,
         )
 
-    def test_siae_incomplete_refused_can_be_notified_after_review(self):
+    def test_siae_incomplete_refused_can_be_notified_after_review(self, client, snapshot):
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=10),
@@ -369,20 +368,20 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         )
         evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         EvaluatedAdministrativeCriteriaFactory.create(evaluated_job_application=evaluated_job_app)
-        self.client.force_login(self.user)
+        client.force_login(self.user)
         url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",
             kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
         )
-        response = self.client.get(url)
-        self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
+        response = client.get(url)
+        assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="notification pending state")
+        assert str(state_div) == snapshot(name="notification pending state")
         notify_url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_notify_step1",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
-        self.assertContains(
+        assertContains(
             response,
             f"""
             <a class="btn btn-primary btn-block w-100 w-md-auto" href="{notify_url}">
@@ -398,7 +397,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         )
         detail_url_with_back_url = f"{detail_url}?back_url={urlencode(url)}"
 
-        self.assertContains(
+        assertContains(
             response,
             f"""
             <a href="{detail_url_with_back_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
@@ -409,7 +408,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             count=1,
         )
 
-    def test_notified_siae(self):
+    def test_notified_siae(self, client, snapshot):
         evaluated_siae = EvaluatedSiaeFactory(
             pk=1000,
             complete=True,
@@ -420,15 +419,15 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.client.force_login(self.user)
+        client.force_login(self.user)
         url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",
             kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
         )
-        response = self.client.get(url)
-        self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
+        response = client.get(url)
+        assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="final refused state")
+        assert str(state_div) == snapshot(name="final refused state")
         sanction_url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_sanction",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -438,7 +437,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         detail_url_with_back_url = f"{detail_url}?back_url={urlencode(url)}"
-        self.assertContains(
+        assertContains(
             response,
             f"""
             <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{sanction_url}">
@@ -452,15 +451,15 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             count=1,
         )
 
-    def test_closed_campaign(self):
+    def test_closed_campaign(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
         )
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
                 kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign.pk},
@@ -468,23 +467,23 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         )
         assert response.status_code == 404
 
-    def test_content(self):
-        self.client.force_login(self.user)
+    def test_content(self, client):
+        client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
         _ = create_evaluated_siae_consistent_datas(evaluation_campaign)
-        response = self.client.get(
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
                 kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
             )
         )
         assert response.context["back_url"] == reverse("dashboard:index")
-        self.assertContains(response, dateformat.format(evaluation_campaign.evaluations_asked_at, "d F Y"))
+        assertContains(response, dateformat.format(evaluation_campaign.evaluations_asked_at, "d F Y"))
 
-    def test_siae_infos(self):
-        self.client.force_login(self.user)
+    def test_siae_infos(self, client, snapshot):
+        client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
@@ -500,11 +499,11 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
         )
 
-        response = self.client.get(url)
-        self.assertContains(response, evaluated_siae)
+        response = client.get(url)
+        assertContains(response, evaluated_siae)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="waiting state")
-        self.assertContains(
+        assert str(state_div) == snapshot(name="waiting state")
+        assertContains(
             response,
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
@@ -516,34 +515,34 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             submitted_at=timezone.now(),
             proof=FileFactory(),
         )
-        response = self.client.get(url)
+        response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="to process state")
+        assert str(state_div) == snapshot(name="to process state")
 
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED)
 
-        response = self.client.get(url)
+        response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="in progress state")
+        assert str(state_div) == snapshot(name="in progress state")
 
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED)
 
-        response = self.client.get(url)
+        response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="in progress state")
+        assert str(state_div) == snapshot(name="in progress state")
 
         # REVIEWED
         review_time = timezone.now()
         evaluated_siae.reviewed_at = review_time
         evaluated_siae.save(update_fields=["reviewed_at"])
 
-        response = self.client.get(url)
+        response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="adversarial stage state")
+        assert str(state_div) == snapshot(name="adversarial stage state")
 
         # Upload new proof
         EvaluatedAdministrativeCriteria.objects.filter(
@@ -554,44 +553,44 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             submitted_at=None,
         )
 
-        response = self.client.get(url)
+        response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="adversarial waiting state")
+        assert str(state_div) == snapshot(name="adversarial waiting state")
 
         # Submit new proof
         EvaluatedAdministrativeCriteria.objects.update(submitted_at=timezone.now())
 
-        response = self.client.get(url)
+        response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="adversarial to process state")
+        assert str(state_div) == snapshot(name="adversarial to process state")
 
         # DDETS sets to refused
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED)
 
-        response = self.client.get(url)
+        response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="adversarial in progress state")
+        assert str(state_div) == snapshot(name="adversarial in progress state")
 
         # DDETS sets to accepted
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED)
 
-        response = self.client.get(url)
+        response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="adversarial in progress state")
+        assert str(state_div) == snapshot(name="adversarial in progress state")
 
         # DDETS validates its final review
         evaluated_siae.final_reviewed_at = review_time
         evaluated_siae.save(update_fields=["final_reviewed_at"])
-        response = self.client.get(url)
+        response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="final accepted state")
+        assert str(state_div) == snapshot(name="final accepted state")
 
-    def test_siae_infos_with_submission_freezed_at(self):
-        self.client.force_login(self.user)
+    def test_siae_infos_with_submission_freezed_at(self, client, snapshot):
+        client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
@@ -610,31 +609,31 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         evaluation_campaign.freeze(timezone.now())
 
         assert evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.PENDING
-        response = self.client.get(url)
-        self.assertContains(response, evaluated_siae)
+        response = client.get(url)
+        assertContains(response, evaluated_siae)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="identified issue state")
+        assert str(state_div) == snapshot(name="identified issue state")
 
         # Simulate the SUBMITTABLE state
         del evaluated_siae.state_from_applications
         EvaluatedAdministrativeCriteria.objects.update(proof=FileFactory())
         assert evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
-        response = self.client.get(url)
-        self.assertContains(response, evaluated_siae)
+        response = client.get(url)
+        assertContains(response, evaluated_siae)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="identified issue state")
+        assert str(state_div) == snapshot(name="identified issue state")
 
         # Simulate the SUBMITTED state
         del evaluated_siae.state_from_applications
         EvaluatedAdministrativeCriteria.objects.update(submitted_at=submission_time)
         assert evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.SUBMITTED
-        response = self.client.get(url)
-        self.assertContains(response, evaluated_siae)
+        response = client.get(url)
+        assertContains(response, evaluated_siae)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == self.snapshot(name="to process state")
+        assert str(state_div) == snapshot(name="to process state")
 
-    def test_num_queries(self):
-        self.client.force_login(self.user)
+    def test_num_queries(self, client):
+        client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
@@ -645,7 +644,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
         )
 
-        with self.assertNumQueries(
+        with assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # django session
             + 2  # fetch user & its memberships (middleware)
@@ -653,11 +652,11 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             + 3  # fetch evaluated_siae and its prefetch_related eval_job_app & eval_admin_crit
             + 3  # savepoint, update session, release savepoint
         ):
-            response = self.client.get(url)
+            response = client.get(url)
         assert response.status_code == 200
 
 
-class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
+class TestInstitutionEvaluatedSiaeDetailView:
     control_text = "Lorsque vous aurez contrôlé"
     submit_text = "Valider"
     forced_positive_text = (
@@ -673,17 +672,17 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         "<b>le résultat du contrôle est négatif</b>."
     )
 
-    def setUp(self):
-        super().setUp()
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         membership = InstitutionMembershipFactory(institution__name="DDETS 14")
         self.user = membership.user
         self.institution = membership.institution
 
-    def test_access(self):
-        self.client.force_login(self.user)
+    def test_access(self, client):
+        client.force_login(self.user)
 
         # institution without evaluation_campaign
-        response = self.client.get(
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": 99999},
@@ -699,30 +698,30 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
 
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 404
 
         # institution with evaluation_campaign in "siae upload its proofs" phase
         evaluation_campaign.evaluations_asked_at = timezone.now()
         evaluation_campaign.save(update_fields=["evaluations_asked_at"])
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         # institution with ended evaluation_campaign
         evaluation_campaign.ended_at = timezone.now()
         evaluation_campaign.save(update_fields=["ended_at"])
-        response = self.client.get(url)
-        self.assertNotContains(response, self.submit_text)
+        response = client.get(url)
+        assertNotContains(response, self.submit_text)
 
-    def test_recently_closed_campaign(self):
+    def test_recently_closed_campaign(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
             evaluation_campaign__institution=self.institution,
         )
         job_app = evaluated_siae.evaluated_job_applications.get()
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -732,12 +731,12 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             "siae_evaluations_views:evaluated_job_application",
             kwargs={"evaluated_job_application_pk": job_app.pk},
         )
-        self.assertContains(
+        assertContains(
             response,
             '<span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span>',
             count=1,
         )
-        self.assertContains(
+        assertContains(
             response,
             f"""
             <a href="{url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
@@ -747,10 +746,10 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             html=True,
             count=1,
         )
-        self.assertNotContains(response, self.control_text)
-        self.assertNotContains(response, self.submit_text)
+        assertNotContains(response, self.control_text)
+        assertNotContains(response, self.submit_text)
 
-    def test_campaign_closed_before_final_evaluation_refused_review_not_submitted(self):
+    def test_campaign_closed_before_final_evaluation_refused_review_not_submitted(self, client):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution,
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
@@ -770,28 +769,28 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         evaluation_campaign.close()
 
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(
+        assertContains(
             response,
             '<span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>',
             html=True,
             count=1,
         )
-        self.assertNotContains(response, self.control_text)
-        self.assertNotContains(response, self.submit_text)
+        assertNotContains(response, self.control_text)
+        assertNotContains(response, self.submit_text)
         # The institution reviewed but forgot to validate
         # auto-validation kicked in and the final result is refused
-        self.assertNotContains(response, self.forced_positive_text, html=True)
-        self.assertNotContains(response, self.forced_positive_text_transition_to_adversarial_stage, html=True)
-        self.assertNotContains(response, self.forced_negative_text, html=True)
+        assertNotContains(response, self.forced_positive_text, html=True)
+        assertNotContains(response, self.forced_positive_text_transition_to_adversarial_stage, html=True)
+        assertNotContains(response, self.forced_negative_text, html=True)
 
-    def test_transition_to_adversarial_phase_before_institution_review_submitted(self):
+    def test_transition_to_adversarial_phase_before_institution_review_submitted(self, client):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution,
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
@@ -806,14 +805,14 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         evaluation_campaign.transition_to_adversarial_phase()
 
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <span class="badge badge-sm rounded-pill text-nowrap bg-emploi-light text-primary">
@@ -823,15 +822,15 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             html=True,
             count=1,
         )
-        self.assertNotContains(response, self.control_text)
-        self.assertNotContains(response, self.submit_text)
+        assertNotContains(response, self.control_text)
+        assertNotContains(response, self.submit_text)
         # Was not reviewed by the institution, assume valid (following rules in
         # most administrations).
-        self.assertNotContains(response, self.forced_positive_text, html=True)
-        self.assertContains(response, self.forced_positive_text_transition_to_adversarial_stage, html=True, count=1)
-        self.assertNotContains(response, self.forced_negative_text, html=True)
+        assertNotContains(response, self.forced_positive_text, html=True)
+        assertContains(response, self.forced_positive_text_transition_to_adversarial_stage, html=True, count=1)
+        assertNotContains(response, self.forced_negative_text, html=True)
 
-    def test_refused_does_not_show_accepted_by_default(self):
+    def test_refused_does_not_show_accepted_by_default(self, client):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution,
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
@@ -852,26 +851,26 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
         )
 
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(
+        assertContains(
             response,
             '<span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>',
             html=True,
             count=1,
         )
-        self.assertNotContains(response, self.control_text)
-        self.assertNotContains(response, self.submit_text)
-        self.assertNotContains(response, self.forced_positive_text, html=True)
-        self.assertNotContains(response, self.forced_positive_text_transition_to_adversarial_stage, html=True)
-        self.assertNotContains(response, self.forced_negative_text, html=True)
+        assertNotContains(response, self.control_text)
+        assertNotContains(response, self.submit_text)
+        assertNotContains(response, self.forced_positive_text, html=True)
+        assertNotContains(response, self.forced_positive_text_transition_to_adversarial_stage, html=True)
+        assertNotContains(response, self.forced_negative_text, html=True)
 
-    def test_campaign_closed_before_final_evaluation_adversarial_stage_review_not_submitted(self):
+    def test_campaign_closed_before_final_evaluation_adversarial_stage_review_not_submitted(self, client):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution,
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
@@ -891,14 +890,14 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         evaluation_campaign.close()
 
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <span class="badge badge-sm rounded-pill text-nowrap bg-emploi-light text-primary">
@@ -908,15 +907,15 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             html=True,
             count=1,
         )
-        self.assertNotContains(response, self.control_text)
-        self.assertNotContains(response, self.submit_text)
+        assertNotContains(response, self.control_text)
+        assertNotContains(response, self.submit_text)
         # Was not reviewed by the institution, assume valid (following rules in
         # most administrations).
-        self.assertContains(response, self.forced_positive_text, html=True, count=1)
-        self.assertNotContains(response, self.forced_positive_text_transition_to_adversarial_stage, html=True)
-        self.assertNotContains(response, self.forced_negative_text, html=True)
+        assertContains(response, self.forced_positive_text, html=True, count=1)
+        assertNotContains(response, self.forced_positive_text_transition_to_adversarial_stage, html=True)
+        assertNotContains(response, self.forced_negative_text, html=True)
 
-    def test_campaign_closed_before_final_evaluation_no_docs(self):
+    def test_campaign_closed_before_final_evaluation_no_docs(self, client):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution,
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
@@ -926,33 +925,33 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, siae__name="les petits jardins")
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
 
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(
+        assertContains(
             response,
             '<span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Non téléversés</span>',
             html=True,
             count=1,
         )
-        self.assertNotContains(response, self.control_text)
-        self.assertNotContains(response, self.submit_text)
-        self.assertNotContains(response, self.forced_positive_text, html=True)
-        self.assertContains(response, self.forced_negative_text, html=True, count=1)
+        assertNotContains(response, self.control_text)
+        assertNotContains(response, self.submit_text)
+        assertNotContains(response, self.forced_positive_text, html=True)
+        assertContains(response, self.forced_negative_text, html=True, count=1)
 
-    def test_closed_campaign(self):
+    def test_closed_campaign(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
         )
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -960,8 +959,8 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         assert response.status_code == 404
 
-    def test_content(self):
-        self.client.force_login(self.user)
+    def test_content(self, client):
+        client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
@@ -995,19 +994,19 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
         # EvaluatedAdministrativeCriteria not yet submitted
         pending_status = "En attente"
-        response = self.client.get(add_url_params(url, {"back_url": back_url}))
-        self.assertContains(response, evaluated_siae)
+        response = client.get(add_url_params(url, {"back_url": back_url}))
+        assertContains(response, evaluated_siae)
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
-        self.assertContains(response, formatted_number, html=True, count=1)
-        self.assertContains(response, evaluated_job_application.job_application.job_seeker.get_full_name())
-        self.assertContains(response, format_phone(evaluated_siae.siae.phone))
+        assertContains(response, formatted_number, html=True, count=1)
+        assertContains(response, evaluated_job_application.job_application.job_seeker.get_full_name())
+        assertContains(response, format_phone(evaluated_siae.siae.phone))
 
         assert response.context["back_url"] == back_url
-        self.assertNotContains(response, evaluated_job_application_url)
-        self.assertContains(response, back_url)
-        self.assertContains(response, validation_url)
-        self.assertContains(response, self.control_text)
-        self.assertContains(
+        assertNotContains(response, evaluated_job_application_url)
+        assertContains(response, back_url)
+        assertContains(response, validation_url)
+        assertContains(response, self.control_text)
+        assertContains(
             response,
             f"""
             <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">
@@ -1020,8 +1019,8 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         # Check without phone now
         evaluated_siae.siae.phone = ""
         evaluated_siae.siae.save(update_fields=("phone",))
-        response = self.client.get(url)
-        self.assertContains(
+        response = client.get(url)
+        assertContains(
             response, """<p>Numéro de téléphone à utiliser au besoin :<span>Non renseigné</span>""", html=True
         )
 
@@ -1030,25 +1029,25 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria = evaluated_job_application.evaluated_administrative_criteria.first()
         evaluated_administrative_criteria.proof = FileFactory()
         evaluated_administrative_criteria.save(update_fields=["proof"])
-        response = self.client.get(url)
-        self.assertNotContains(response, back_url)
-        self.assertContains(response, uploaded_status)
-        self.assertContains(response, validation_button_disabled, html=True, count=1)
-        self.assertContains(response, self.control_text)
+        response = client.get(url)
+        assertNotContains(response, back_url)
+        assertContains(response, uploaded_status)
+        assertContains(response, validation_button_disabled, html=True, count=1)
+        assertContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteria submitted
         submitted_status = "À traiter"
         adversarial_submitted_status = "Nouveaux justificatifs à traiter"
         evaluated_administrative_criteria.submitted_at = timezone.now()
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
-        response = self.client.get(url)
-        self.assertContains(response, evaluated_job_application_url)
-        self.assertNotContains(response, uploaded_status)
-        self.assertNotContains(response, pending_status)
-        self.assertNotContains(response, adversarial_submitted_status)
-        self.assertContains(response, validation_button_disabled, html=True, count=1)
-        self.assertContains(response, self.control_text)
-        self.assertContains(
+        response = client.get(url)
+        assertContains(response, evaluated_job_application_url)
+        assertNotContains(response, uploaded_status)
+        assertNotContains(response, pending_status)
+        assertNotContains(response, adversarial_submitted_status)
+        assertContains(response, validation_button_disabled, html=True, count=1)
+        assertContains(response, self.control_text)
+        assertContains(
             response,
             f"""
             <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
@@ -1062,13 +1061,13 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         # EvaluatedAdministrativeCriteria Accepted
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
-        self.assertContains(response, self.control_text)
+        assertContains(response, self.control_text)
 
-        response = self.client.get(url)
-        self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, validation_button, html=True, count=2)
-        self.assertContains(response, self.control_text)
-        self.assertContains(
+        response = client.get(url)
+        assertContains(response, evaluated_job_application_url)
+        assertContains(response, validation_button, html=True, count=2)
+        assertContains(response, self.control_text)
+        assertContains(
             response,
             """
             <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">
@@ -1084,11 +1083,11 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae.final_reviewed_at = timezone.now()
         evaluated_siae.save(update_fields=["reviewed_at", "final_reviewed_at"])
 
-        response = self.client.get(url)
-        self.assertContains(response, evaluated_job_application_url)
-        self.assertNotContains(response, self.submit_text)
-        self.assertNotContains(response, self.control_text)
-        self.assertContains(
+        response = client.get(url)
+        assertContains(response, evaluated_job_application_url)
+        assertNotContains(response, self.submit_text)
+        assertNotContains(response, self.control_text)
+        assertContains(
             response,
             """
             <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">
@@ -1107,11 +1106,11 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae.final_reviewed_at = None
         evaluated_siae.save(update_fields=["reviewed_at", "final_reviewed_at"])
 
-        response = self.client.get(url)
-        self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, validation_button, html=True, count=2)
-        self.assertContains(response, self.control_text)
-        self.assertContains(
+        response = client.get(url)
+        assertContains(response, evaluated_job_application_url)
+        assertContains(response, validation_button, html=True, count=2)
+        assertContains(response, self.control_text)
+        assertContains(
             response,
             f"""
             <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">
@@ -1126,11 +1125,11 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae.reviewed_at = timezone.now()
         evaluated_siae.save(update_fields=["reviewed_at"])
 
-        response = self.client.get(url)
-        self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, validation_button_disabled, html=True, count=1)
-        self.assertContains(response, self.control_text)
-        self.assertContains(
+        response = client.get(url)
+        assertContains(response, evaluated_job_application_url)
+        assertContains(response, validation_button_disabled, html=True, count=1)
+        assertContains(response, self.control_text)
+        assertContains(
             response,
             """
             <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">
@@ -1151,33 +1150,33 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         evaluated_administrative_criteria.submitted_at = None
         evaluated_administrative_criteria.save(update_fields=["proof", "review_state", "submitted_at", "uploaded_at"])
-        response = self.client.get(url)
-        self.assertContains(response, validation_button_disabled, html=True, count=1)
-        self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, uploaded_status)
-        self.assertContains(response, self.control_text)
+        response = client.get(url)
+        assertContains(response, validation_button_disabled, html=True, count=1)
+        assertContains(response, evaluated_job_application_url)
+        assertContains(response, uploaded_status)
+        assertContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteriaState.SUBMITTED (again)
         evaluated_administrative_criteria.submitted_at = timezone.now()
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
-        response = self.client.get(url)
-        self.assertContains(response, evaluated_job_application_url)
-        self.assertNotContains(response, uploaded_status)
-        self.assertNotContains(response, pending_status)
-        self.assertNotContains(response, refused_status)
-        self.assertContains(response, adversarial_submitted_status)
-        self.assertContains(response, validation_button_disabled, html=True, count=1)
-        self.assertContains(response, self.control_text)
+        response = client.get(url)
+        assertContains(response, evaluated_job_application_url)
+        assertNotContains(response, uploaded_status)
+        assertNotContains(response, pending_status)
+        assertNotContains(response, refused_status)
+        assertContains(response, adversarial_submitted_status)
+        assertContains(response, validation_button_disabled, html=True, count=1)
+        assertContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteriaState.ACCEPTED (again)
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
 
-        response = self.client.get(url)
-        self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, validation_button, html=True, count=2)
-        self.assertContains(response, self.control_text)
-        self.assertContains(
+        response = client.get(url)
+        assertContains(response, evaluated_job_application_url)
+        assertContains(response, validation_button, html=True, count=2)
+        assertContains(response, self.control_text)
+        assertContains(
             response,
             """
             <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">
@@ -1194,11 +1193,11 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae.final_reviewed_at = now
         evaluated_siae.save(update_fields=["reviewed_at", "final_reviewed_at"])
 
-        response = self.client.get(url)
-        self.assertContains(response, evaluated_job_application_url)
-        self.assertNotContains(response, self.submit_text)
-        self.assertNotContains(response, self.control_text)
-        self.assertContains(
+        response = client.get(url)
+        assertContains(response, evaluated_job_application_url)
+        assertNotContains(response, self.submit_text)
+        assertNotContains(response, self.control_text)
+        assertContains(
             response,
             """
             <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">
@@ -1218,11 +1217,11 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         evaluated_administrative_criteria.save(update_fields=["review_state"])
 
-        response = self.client.get(url)
-        self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, validation_button, html=True, count=2)
-        self.assertContains(response, self.control_text)
-        self.assertContains(
+        response = client.get(url)
+        assertContains(response, evaluated_job_application_url)
+        assertContains(response, validation_button, html=True, count=2)
+        assertContains(response, self.control_text)
+        assertContains(
             response,
             f"""
             <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">
@@ -1237,11 +1236,11 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae.final_reviewed_at = timezone.now()
         evaluated_siae.save(update_fields=["final_reviewed_at"])
 
-        response = self.client.get(url)
-        self.assertContains(response, evaluated_job_application_url)
-        self.assertNotContains(response, self.submit_text)
-        self.assertNotContains(response, self.control_text)
-        self.assertContains(
+        response = client.get(url)
+        assertContains(response, evaluated_job_application_url)
+        assertNotContains(response, self.submit_text)
+        assertNotContains(response, self.control_text)
+        assertContains(
             response,
             f"""
             <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">
@@ -1252,8 +1251,8 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             count=1,
         )
 
-    def test_content_with_submission_freezed_at(self):
-        self.client.force_login(self.user)
+    def test_content_with_submission_freezed_at(self, client):
+        client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
@@ -1284,17 +1283,17 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
         # EvaluatedAdministrativeCriteria not yet submitted
         not_transmitted_status = "Justificatifs non transmis"
-        response = self.client.get(add_url_params(url, {"back_url": back_url}))
-        self.assertContains(response, evaluated_siae)
+        response = client.get(add_url_params(url, {"back_url": back_url}))
+        assertContains(response, evaluated_siae)
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
-        self.assertContains(response, formatted_number, html=True, count=1)
-        self.assertContains(response, evaluated_job_application.job_application.job_seeker.get_full_name())
+        assertContains(response, formatted_number, html=True, count=1)
+        assertContains(response, evaluated_job_application.job_application.job_seeker.get_full_name())
         assert response.context["back_url"] == back_url
-        self.assertNotContains(response, evaluated_job_application_url)
-        self.assertContains(response, back_url)
-        self.assertContains(response, validation_url)
-        self.assertContains(response, self.control_text)
-        self.assertContains(
+        assertNotContains(response, evaluated_job_application_url)
+        assertContains(response, back_url)
+        assertContains(response, validation_url)
+        assertContains(response, self.control_text)
+        assertContains(
             response,
             f"""
             <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">
@@ -1309,9 +1308,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria = evaluated_job_application.evaluated_administrative_criteria.first()
         evaluated_administrative_criteria.proof = FileFactory()
         evaluated_administrative_criteria.save(update_fields=["proof"])
-        response = self.client.get(url)
-        self.assertNotContains(response, back_url)
-        self.assertContains(
+        response = client.get(url)
+        assertNotContains(response, back_url)
+        assertContains(
             response,
             f"""
             <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">
@@ -1321,21 +1320,21 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             html=True,
             count=1,
         )
-        self.assertContains(response, validation_button_disabled, html=True, count=1)
-        self.assertContains(response, self.control_text)
+        assertContains(response, validation_button_disabled, html=True, count=1)
+        assertContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteria submitted
         submitted_status = "À traiter"
         adversarial_submitted_status = "Nouveaux justificatifs à traiter"
         evaluated_administrative_criteria.submitted_at = timezone.now()
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
-        response = self.client.get(url)
-        self.assertContains(response, evaluated_job_application_url)
-        self.assertNotContains(response, not_transmitted_status)
-        self.assertNotContains(response, adversarial_submitted_status)
-        self.assertContains(response, validation_button_disabled, html=True, count=1)
-        self.assertContains(response, self.control_text)
-        self.assertContains(
+        response = client.get(url)
+        assertContains(response, evaluated_job_application_url)
+        assertNotContains(response, not_transmitted_status)
+        assertNotContains(response, adversarial_submitted_status)
+        assertContains(response, validation_button_disabled, html=True, count=1)
+        assertContains(response, self.control_text)
+        assertContains(
             response,
             f"""
             <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
@@ -1356,23 +1355,23 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         evaluated_administrative_criteria.submitted_at = None
         evaluated_administrative_criteria.save(update_fields=["proof", "review_state", "submitted_at", "uploaded_at"])
-        response = self.client.get(url)
-        self.assertContains(response, validation_button_disabled, html=True, count=1)
-        self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, not_transmitted_status)
-        self.assertContains(response, self.control_text)
+        response = client.get(url)
+        assertContains(response, validation_button_disabled, html=True, count=1)
+        assertContains(response, evaluated_job_application_url)
+        assertContains(response, not_transmitted_status)
+        assertContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteriaState.SUBMITTED (again)
         evaluated_administrative_criteria.submitted_at = timezone.now()
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
-        response = self.client.get(url)
-        self.assertContains(response, evaluated_job_application_url)
-        self.assertNotContains(response, not_transmitted_status)
-        self.assertContains(response, adversarial_submitted_status)
-        self.assertContains(response, validation_button_disabled, html=True, count=1)
-        self.assertContains(response, self.control_text)
+        response = client.get(url)
+        assertContains(response, evaluated_job_application_url)
+        assertNotContains(response, not_transmitted_status)
+        assertContains(response, adversarial_submitted_status)
+        assertContains(response, validation_button_disabled, html=True, count=1)
+        assertContains(response, self.control_text)
 
-    def test_job_app_status_evaluation_is_final_pending(self):
+    def test_job_app_status_evaluation_is_final_pending(self, client):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution,
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
@@ -1380,20 +1379,20 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(
+        assertContains(
             response,
             '<span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Non téléversés</span>',
             count=1,
         )
 
-    def test_job_app_status_evaluation_is_final_processing(self):
+    def test_job_app_status_evaluation_is_final_processing(self, client):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution,
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
@@ -1403,14 +1402,14 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app)
         EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app, proof=None)
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <span class="badge badge-sm rounded-pill text-nowrap bg-warning text-white">
@@ -1421,7 +1420,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             count=1,
         )
 
-    def test_job_app_status_evaluation_is_final_uploaded(self):
+    def test_job_app_status_evaluation_is_final_uploaded(self, client):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution,
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
@@ -1430,14 +1429,14 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
         evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app)
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <span class="badge badge-sm rounded-pill text-nowrap bg-warning text-white">
@@ -1448,7 +1447,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             count=1,
         )
 
-    def test_job_app_status_evaluation_is_final_submitted(self):
+    def test_job_app_status_evaluation_is_final_submitted(self, client):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution,
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
@@ -1460,14 +1459,14 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             evaluated_job_application=evaluated_job_app,
             submitted_at=timezone.now() - relativedelta(days=1),
         )
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <span class="badge badge-sm rounded-pill text-nowrap bg-emploi-light text-primary">
@@ -1477,7 +1476,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             count=1,
         )
 
-    def test_job_app_status_evaluation_is_final_accepted(self):
+    def test_job_app_status_evaluation_is_final_accepted(self, client):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution,
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
@@ -1494,20 +1493,20 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             submitted_at=timezone.now() - relativedelta(days=1),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(
+        assertContains(
             response,
             '<span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span>',
             count=1,
         )
 
-    def test_job_app_status_evaluation_is_final_refused(self):
+    def test_job_app_status_evaluation_is_final_refused(self, client):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution,
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
@@ -1524,20 +1523,20 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             submitted_at=timezone.now() - relativedelta(days=1),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
         )
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(
+        assertContains(
             response,
             '<span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>',
             count=1,
         )
 
-    def test_job_app_status_evaluation_is_final_refused_2(self):
+    def test_job_app_status_evaluation_is_final_refused_2(self, client):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution,
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
@@ -1554,21 +1553,21 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             submitted_at=timezone.now() - relativedelta(days=1),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
         )
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(
+        assertContains(
             response,
             '<span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>',
             count=1,
         )
 
-    def test_notification_pending_show_view_evaluated_admin_criteria(self):
-        self.client.force_login(self.user)
+    def test_notification_pending_show_view_evaluated_admin_criteria(self, client):
+        client.force_login(self.user)
         evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
@@ -1579,13 +1578,13 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             "siae_evaluations_views:evaluated_job_application",
             kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
         )
-        response = self.client.get(
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(
+        assertContains(
             response,
             f"""
             <a href="{evaluated_job_application_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
@@ -1596,7 +1595,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             count=1,
         )
 
-    def test_job_seeker_infos_for_institution_state(self):
+    def test_job_seeker_infos_for_institution_state(self, client):
         en_attente = "En attente"
         uploaded = "Justificatifs téléversés"
         a_traiter = "À traiter"
@@ -1613,45 +1612,45 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
 
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
         # not yet submitted by Siae
-        response = self.client.get(url)
-        self.assertContains(response, en_attente)
+        response = client.get(url)
+        assertContains(response, en_attente)
 
         # submittable by SIAE
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
         ).update(proof=FileFactory())
 
-        response = self.client.get(url)
-        self.assertContains(response, uploaded)
+        response = client.get(url)
+        assertContains(response, uploaded)
 
         # submitted by Siae
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
         ).update(submitted_at=timezone.now())
 
-        response = self.client.get(url)
-        self.assertContains(response, a_traiter)
+        response = client.get(url)
+        assertContains(response, a_traiter)
 
         # refused
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED)
 
-        response = self.client.get(url)
-        self.assertContains(response, refuse)
+        response = client.get(url)
+        assertContains(response, refuse)
 
         # accepted
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED)
 
-        response = self.client.get(url)
-        self.assertContains(response, valide)
+        response = client.get(url)
+        assertContains(response, valide)
 
-    def test_job_seeker_infos_for_institution_state_submission_freezed_at(self):
+    def test_job_seeker_infos_for_institution_state_submission_freezed_at(self, client):
         not_transmitted = "Justificatifs non transmis"
         a_traiter = "À traiter"
         refuse = "Problème constaté"
@@ -1668,45 +1667,45 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
 
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
         # not yet submitted by Siae
-        response = self.client.get(url)
-        self.assertContains(response, not_transmitted)
+        response = client.get(url)
+        assertContains(response, not_transmitted)
 
         # submittable by SIAE
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
         ).update(proof=FileFactory())
 
-        response = self.client.get(url)
-        self.assertContains(response, not_transmitted)
+        response = client.get(url)
+        assertContains(response, not_transmitted)
 
         # submitted by Siae
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
         ).update(submitted_at=timezone.now())
 
-        response = self.client.get(url)
-        self.assertContains(response, a_traiter)
+        response = client.get(url)
+        assertContains(response, a_traiter)
 
         # refused
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED)
 
-        response = self.client.get(url)
-        self.assertContains(response, refuse)
+        response = client.get(url)
+        assertContains(response, refuse)
 
         # accepted
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED)
 
-        response = self.client.get(url)
-        self.assertContains(response, valide)
+        response = client.get(url)
+        assertContains(response, valide)
 
-    def test_job_application_adversarial_stage(self):
+    def test_job_application_adversarial_stage(self, client):
         reviewed_at = timezone.now()
         evaluated_job_application = EvaluatedJobApplicationFactory(
             evaluated_siae__reviewed_at=reviewed_at,
@@ -1719,18 +1718,18 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             submitted_at=reviewed_at - relativedelta(days=1),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
         )
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_job_application.evaluated_siae_id},
             )
         )
-        self.assertContains(response, "Phase contradictoire - En attente", html=True)
-        self.assertNotContains(response, self.forced_negative_text, html=True)
+        assertContains(response, "Phase contradictoire - En attente", html=True)
+        assertNotContains(response, self.forced_negative_text, html=True)
 
-    def test_num_queries_in_view(self):
-        self.client.force_login(self.user)
+    def test_num_queries_in_view(self, client):
+        client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
@@ -1742,7 +1741,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
 
-        with self.assertNumQueries(
+        with assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # django session
             + 2  # fetch user & its memberships (middleware)
@@ -1750,33 +1749,33 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             + 3  # fetch jobapplication, approvals & users
             + 3  # savepoint, update session, release savepoint
         ):
-            response = self.client.get(url)
+            response = client.get(url)
         assert response.status_code == 200
 
 
 class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
     not_submitted = "justificatifs non soumis"
 
-    @classmethod
-    def setUpTestData(cls):
+    @pytest.fixture(autouse=True)
+    def setup_mixin(self):
         membership = InstitutionMembershipFactory(institution__name="DDETS 14", institution__department="01")
-        cls.user = membership.user
-        cls.institution = membership.institution
+        self.user = membership.user
+        self.institution = membership.institution
 
-    def login(self, evaluated_siae):
-        self.client.force_login(self.user)
+    def login(self, client, evaluated_siae):
+        client.force_login(self.user)
 
-    def test_anonymous_access(self):
+    def test_anonymous_access(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             evaluation_campaign__institution=self.institution,
         )
         url = reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk})
-        response = self.client.get(url)
-        self.assertRedirects(response, reverse("account_login") + f"?next={url}")
+        response = client.get(url)
+        assertRedirects(response, reverse("account_login") + f"?next={url}")
 
-    def test_access_other_institution(self):
+    def test_access_other_institution(self, client):
         other_institution = InstitutionMembershipFactory(institution__department="02").institution
         evaluated_siae = EvaluatedSiaeFactory(
             # Evaluation of another institution.
@@ -1784,8 +1783,8 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             evaluation_campaign__institution=other_institution,
         )
-        self.login(evaluated_siae)
-        response = self.client.get(
+        self.login(client, evaluated_siae)
+        response = client.get(
             reverse(
                 self.urlname,
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -1793,10 +1792,10 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         )
         assert response.status_code == 404
 
-    def test_access_incomplete_on_active_campaign(self):
+    def test_access_incomplete_on_active_campaign(self, client):
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__institution=self.institution)
-        self.login(evaluated_siae)
-        response = self.client.get(
+        self.login(client, evaluated_siae)
+        response = client.get(
             reverse(
                 self.urlname,
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -1804,7 +1803,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         )
         assert response.status_code == 404
 
-    def test_access_notified_institution(self):
+    def test_access_notified_institution(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__institution=self.institution,
             complete=True,
@@ -1813,8 +1812,8 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae)
-        response = self.client.get(
+        self.login(client, evaluated_siae)
+        response = client.get(
             reverse(
                 self.urlname,
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -1822,13 +1821,13 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         )
         assert response.status_code == 404
 
-    def test_access_long_closed_campaign(self):
+    def test_access_long_closed_campaign(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
         )
-        self.login(evaluated_siae)
-        response = self.client.get(
+        self.login(client, evaluated_siae)
+        response = client.get(
             reverse(
                 self.urlname,
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -1837,7 +1836,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         assert response.status_code == 404
 
     @freeze_time("2023-01-24 11:11:00")
-    def test_data_card_statistics(self):
+    def test_data_card_statistics(self, client):
         company = CompanyFactory()
         previous_campaign = EvaluationCampaignFactory(
             institution=self.institution,
@@ -1910,15 +1909,15 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
             submitted_at=timezone.now() - relativedelta(days=5),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
-        self.login(evaluated_siae)
-        response = self.client.get(
+        self.login(client, evaluated_siae)
+        response = client.get(
             reverse(
                 self.urlname,
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}")
-        self.assertContains(
+        assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}")
+        assertContains(
             response,
             f"""
             <a target="_blank" href="/siae_evaluation/evaluated_siae_detail/{evaluated_siae.pk}/">
@@ -1931,16 +1930,16 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         )
         # 8 criteria, 3 refused. 3/7 * 100 = 37.5 %, rounded to the closest
         # integer by floatformat.
-        self.assertContains(response, "<li>38 % justificatifs refusés lors de votre contrôle</li>", count=1)
+        assertContains(response, "<li>38 % justificatifs refusés lors de votre contrôle</li>", count=1)
         # 1 criteria uploaded. 1/8 * 100 = 12.5 %, rounded to the closest
         # integer by floatformat.
-        self.assertContains(
+        assertContains(
             response,
             f"<li>13 % {self.not_submitted} par la SIAE (dont 1 téléversé sur 1 attendu)</li>",
             html=True,
             count=1,
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <h3>
@@ -1955,10 +1954,10 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
             html=True,
             count=1,
         )
-        self.assertContains(response, self.not_submitted, count=1)
+        assertContains(response, self.not_submitted, count=1)
 
     @freeze_time("2023-06-24 11:11:00")
-    def test_data_card_statistics_multiple_previous_campaigns_check_sanctions(self):
+    def test_data_card_statistics_multiple_previous_campaigns_check_sanctions(self, client):
         company = CompanyFactory()
         previous_campaign_1 = EvaluationCampaignFactory(
             institution=self.institution,
@@ -1998,8 +1997,8 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
             institution=self.institution, ended_at=timezone.now() - relativedelta(hours=1)
         )
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae=company)
-        self.login(evaluated_siae)
-        with self.assertNumQueries(
+        self.login(client, evaluated_siae)
+        with assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # Load session
             + 2  # Check user & its memberships
@@ -2008,7 +2007,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
             + 3  # Load evaluated siae infos + job application + criteria for previous campaigns
             + 3  # Update session
         ):
-            response = self.client.get(
+            response = client.get(
                 reverse(
                     self.urlname,
                     kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -2021,12 +2020,12 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         TOTAL_CUT = "<li>Suppression de l’aide au poste</li>"
         DEACTIVATION = "<li>Déconventionnement de la structure</li>"
 
-        self.assertContains(response, NO_SANCTION)
-        self.assertContains(response, DEACTIVATION)
-        self.assertNotContains(response, TEMP_SUSPENSION)
-        self.assertNotContains(response, FINAL_SUSPENSION)
-        self.assertNotContains(response, PARTIAL_CUT, html=True)
-        self.assertNotContains(response, TOTAL_CUT, html=True)
+        assertContains(response, NO_SANCTION)
+        assertContains(response, DEACTIVATION)
+        assertNotContains(response, TEMP_SUSPENSION)
+        assertNotContains(response, FINAL_SUSPENSION)
+        assertNotContains(response, PARTIAL_CUT, html=True)
+        assertNotContains(response, TOTAL_CUT, html=True)
 
         sanctions_1.no_sanction_reason = ""
         sanctions_1.suspension_dates = InclusiveDateRange(datetime.date(2022, 3, 1), datetime.date(2022, 3, 2))
@@ -2034,56 +2033,56 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         sanctions_1.subsidy_cut_percent = 50
         sanctions_1.save()
 
-        response = self.client.get(
+        response = client.get(
             reverse(
                 self.urlname,
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertNotContains(response, NO_SANCTION)
-        self.assertContains(response, TEMP_SUSPENSION)
-        self.assertNotContains(response, FINAL_SUSPENSION)
-        self.assertContains(response, PARTIAL_CUT, html=True)
-        self.assertNotContains(response, TOTAL_CUT, html=True)
-        self.assertContains(response, DEACTIVATION)
+        assertNotContains(response, NO_SANCTION)
+        assertContains(response, TEMP_SUSPENSION)
+        assertNotContains(response, FINAL_SUSPENSION)
+        assertContains(response, PARTIAL_CUT, html=True)
+        assertNotContains(response, TOTAL_CUT, html=True)
+        assertContains(response, DEACTIVATION)
 
         sanctions_1.suspension_dates = InclusiveDateRange(datetime.date(2022, 3, 1))
         sanctions_1.subsidy_cut_dates = InclusiveDateRange(datetime.date(2022, 3, 1), datetime.date(2022, 3, 2))
         sanctions_1.subsidy_cut_percent = 100
         sanctions_1.save()
 
-        response = self.client.get(
+        response = client.get(
             reverse(
                 self.urlname,
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertNotContains(response, NO_SANCTION)
-        self.assertNotContains(response, TEMP_SUSPENSION)
-        self.assertContains(response, FINAL_SUSPENSION)
-        self.assertNotContains(response, PARTIAL_CUT, html=True)
-        self.assertContains(response, TOTAL_CUT, html=True)
-        self.assertContains(response, DEACTIVATION)
+        assertNotContains(response, NO_SANCTION)
+        assertNotContains(response, TEMP_SUSPENSION)
+        assertContains(response, FINAL_SUSPENSION)
+        assertNotContains(response, PARTIAL_CUT, html=True)
+        assertContains(response, TOTAL_CUT, html=True)
+        assertContains(response, DEACTIVATION)
 
 
-class InstitutionEvaluatedSiaeNotifyViewStep1Test(InstitutionEvaluatedSiaeNotifyViewAccessTestMixin, TestCase):
+class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotifyViewAccessTestMixin):
     urlname = "siae_evaluations_views:institution_evaluated_siae_notify_step1"
 
-    def test_access_final_refused_control_active_campaign(self):
+    def test_access_final_refused_control_active_campaign(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__institution=self.institution,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
         )
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_notify_step1",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}", count=1)
-        self.assertContains(
+        assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}", count=1)
+        assertContains(
             response,
             f"""
             <a target="_blank" href="/siae_evaluation/evaluated_siae_detail/{evaluated_siae.pk}/">
@@ -2094,8 +2093,8 @@ class InstitutionEvaluatedSiaeNotifyViewStep1Test(InstitutionEvaluatedSiaeNotify
             html=True,
             count=1,
         )
-        self.assertContains(response, "<li>100 % justificatifs refusés lors de votre contrôle</li>", count=1)
-        self.assertContains(
+        assertContains(response, "<li>100 % justificatifs refusés lors de votre contrôle</li>", count=1)
+        assertContains(
             response,
             """
             <h3>
@@ -2106,25 +2105,25 @@ class InstitutionEvaluatedSiaeNotifyViewStep1Test(InstitutionEvaluatedSiaeNotify
             html=True,
             count=1,
         )
-        self.assertNotContains(response, self.not_submitted)
+        assertNotContains(response, self.not_submitted)
 
-    def test_access_incomplete_evaluation_closed_campaign(self):
+    def test_access_incomplete_evaluation_closed_campaign(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=4),
             evaluation_campaign__ended_at=timezone.now(),
         )
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_notify_step1",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}")
+        assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}")
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post(self):
+    def test_post(self, client):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2135,19 +2134,19 @@ class InstitutionEvaluatedSiaeNotifyViewStep1Test(InstitutionEvaluatedSiaeNotify
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=4),
             evaluation_campaign__ended_at=timezone.now() - relativedelta(hours=1),
         )
-        self.client.force_login(self.user)
+        client.force_login(self.user)
         text = (
             "Votre chat a mangé le justificatif, vous devrez suivre une formation protection contre les risques "
             "félins."
         )
-        response = self.client.post(
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             data={
                 "notification_reason": "MISSING_PROOF",
                 "notification_text": text,
             },
         )
-        self.assertRedirects(
+        assertRedirects(
             response,
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_notify_step2",
@@ -2159,15 +2158,15 @@ class InstitutionEvaluatedSiaeNotifyViewStep1Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_reason == "MISSING_PROOF"
         assert evaluated_siae.notification_text == text
 
-    def test_post_missing_data(self):
+    def test_post_missing_data(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             siae__name="Les petits jardins",
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=4),
             evaluation_campaign__ended_at=timezone.now() - relativedelta(hours=1),
         )
-        self.client.force_login(self.user)
-        response = self.client.post(
+        client.force_login(self.user)
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             data={
                 "notification_reason": "invalid data",
@@ -2178,7 +2177,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep1Test(InstitutionEvaluatedSiaeNotify
             "Merci de renseigner ici les raisons qui ont mené à un contrôle a posteriori des auto-prescriptions "
             "non conforme."
         )
-        self.assertContains(
+        assertContains(
             response,
             f"""
             <div class="form-group is-invalid form-group-required">
@@ -2195,19 +2194,19 @@ class InstitutionEvaluatedSiaeNotifyViewStep1Test(InstitutionEvaluatedSiaeNotify
             html=True,
             count=1,
         )
-        self.assertContains(
+        assertContains(
             response,
             '<label class="form-label">Raison principale</label>',
             count=1,
         )
-        self.assertContains(
+        assertContains(
             response,
             '<div class="invalid-feedback">Sélectionnez un choix valide. invalid data n’en fait pas partie.</div>',
             count=1,
         )
 
 
-class InstitutionEvaluatedSiaeNotifyViewStep2Test(InstitutionEvaluatedSiaeNotifyViewAccessTestMixin, TestCase):
+class TestInstitutionEvaluatedSiaeNotifyViewStep2(InstitutionEvaluatedSiaeNotifyViewAccessTestMixin):
     urlname = "siae_evaluations_views:institution_evaluated_siae_notify_step2"
 
     def assertChecked(self, response, checked_values):
@@ -2217,7 +2216,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep2Test(InstitutionEvaluatedSiaeNotify
         assert len(checkboxes) == 7
         assert sorted(c.get("value") for c in checkboxes if "checked" in c.attrib) == sorted(checked_values)
 
-    def test_get_empty_session(self):
+    def test_get_empty_session(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__institution=self.institution,
             complete=True,
@@ -2225,8 +2224,8 @@ class InstitutionEvaluatedSiaeNotifyViewStep2Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 self.urlname,
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -2234,7 +2233,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep2Test(InstitutionEvaluatedSiaeNotify
         )
         self.assertChecked(response, [])
 
-    def test_get_with_session_data(self):
+    def test_get_with_session_data(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__institution=self.institution,
             complete=True,
@@ -2242,13 +2241,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep2Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.client.force_login(self.user)
+        client.force_login(self.user)
         key = f"siae_evaluations_views:institution_evaluated_siae_notify-{evaluated_siae.pk}"
         checked = ["SUBSIDY_CUT_PERCENT", "TRAINING"]
-        session = self.client.session
+        session = client.session
         session[key] = {"sanctions": checked}
         session.save()
-        response = self.client.get(
+        response = client.get(
             reverse(
                 self.urlname,
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -2256,7 +2255,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep2Test(InstitutionEvaluatedSiaeNotify
         )
         self.assertChecked(response, checked)
 
-    def test_post_fills_session(self):
+    def test_post_fills_session(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__institution=self.institution,
             complete=True,
@@ -2264,16 +2263,16 @@ class InstitutionEvaluatedSiaeNotifyViewStep2Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.client.force_login(self.user)
+        client.force_login(self.user)
         checked = ["SUBSIDY_CUT_PERCENT", "TRAINING"]
-        response = self.client.post(
+        response = client.post(
             reverse(
                 self.urlname,
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
             data={"sanctions": checked},
         )
-        self.assertRedirects(
+        assertRedirects(
             response,
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_notify_step3",
@@ -2281,9 +2280,9 @@ class InstitutionEvaluatedSiaeNotifyViewStep2Test(InstitutionEvaluatedSiaeNotify
             ),
         )
         key = f"siae_evaluations_views:institution_evaluated_siae_notify-{evaluated_siae.pk}"
-        assert self.client.session[key] == {"sanctions": checked}
+        assert client.session[key] == {"sanctions": checked}
 
-    def test_post_without_data(self):
+    def test_post_without_data(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__institution=self.institution,
             complete=True,
@@ -2291,9 +2290,9 @@ class InstitutionEvaluatedSiaeNotifyViewStep2Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.client.force_login(self.user)
-        response = self.client.post(reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}))
-        self.assertContains(
+        client.force_login(self.user)
+        response = client.post(reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}))
+        assertContains(
             response,
             '<div class="invalid-feedback">Ce champ est obligatoire.</div>',
             html=True,
@@ -2301,7 +2300,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep2Test(InstitutionEvaluatedSiaeNotify
         )
         assert response.context["form"].errors == {"sanctions": ["Ce champ est obligatoire."]}
 
-    def test_post_all_sanctions_errors(self):
+    def test_post_all_sanctions_errors(self, client, subtests):
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__institution=self.institution,
             complete=True,
@@ -2309,7 +2308,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep2Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.client.force_login(self.user)
+        client.force_login(self.user)
         data_error = [
             (
                 ["TEMPORARY_SUSPENSION", "PERMANENT_SUSPENSION"],
@@ -2328,12 +2327,12 @@ class InstitutionEvaluatedSiaeNotifyViewStep2Test(InstitutionEvaluatedSiaeNotify
             ),
         ]
         for data, error in data_error:
-            with self.subTest(data):
-                response = self.client.post(
+            with subtests.test(data):
+                response = client.post(
                     reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
                     data={"sanctions": data},
                 )
-                self.assertContains(
+                assertContains(
                     response,
                     f'<div class="alert alert-danger" role="alert">{error}</div>',
                     html=True,
@@ -2341,17 +2340,17 @@ class InstitutionEvaluatedSiaeNotifyViewStep2Test(InstitutionEvaluatedSiaeNotify
                 )
 
 
-class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotifyViewAccessTestMixin, TestCase):
+class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotifyViewAccessTestMixin):
     urlname = "siae_evaluations_views:institution_evaluated_siae_notify_step3"
 
-    def login(self, evaluated_siae, sanctions=("TRAINING",)):
-        self.client.force_login(self.user)
+    def login(self, client, evaluated_siae, sanctions=("TRAINING",)):
+        client.force_login(self.user)
         key = f"siae_evaluations_views:institution_evaluated_siae_notify-{evaluated_siae.pk}"
-        session = self.client.session
+        session = client.session
         session[key] = {"sanctions": sanctions}
         session.save()
 
-    def test_get(self):
+    def test_get(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__institution=self.institution,
             complete=True,
@@ -2359,12 +2358,12 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae, sanctions=["TRAINING"])
-        response = self.client.get(reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}))
+        self.login(client, evaluated_siae, sanctions=["TRAINING"])
+        response = client.get(reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}))
         assert response.status_code == 200
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_training(self):
+    def test_post_training(self, client):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2377,12 +2376,12 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae, sanctions=["TRAINING"])
-        response = self.client.post(
+        self.login(client, evaluated_siae, sanctions=["TRAINING"])
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {"training_session": "RDV le lundi 8 à 15h à la DDETS"},
         )
-        self.assertRedirects(
+        assertRedirects(
             response,
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
@@ -2417,7 +2416,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_temporary_suspension(self):
+    def test_post_temporary_suspension(self, client):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2430,15 +2429,15 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
-        response = self.client.post(
+        self.login(client, evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {
                 "temporary_suspension_from": datetime.date(2023, 1, 1),
                 "temporary_suspension_to": datetime.date(2023, 2, 1),
             },
         )
-        self.assertRedirects(
+        assertRedirects(
             response,
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
@@ -2478,7 +2477,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_temporary_suspension_incorrect_date_order(self):
+    def test_post_temporary_suspension_incorrect_date_order(self, client):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2491,15 +2490,15 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
-        response = self.client.post(
+        self.login(client, evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {
                 "temporary_suspension_from": datetime.date(2023, 2, 1),
                 "temporary_suspension_to": datetime.date(2023, 1, 1),
             },
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="alert alert-danger" role="alert">
@@ -2515,7 +2514,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_temporary_suspension_missing_lower_date(self):
+    def test_post_temporary_suspension_missing_lower_date(self, client):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2528,12 +2527,12 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
-        response = self.client.post(
+        self.login(client, evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {"temporary_suspension_to": datetime.date(2023, 1, 1)},
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="form-group is-invalid form-group-required">
@@ -2561,7 +2560,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_temporary_suspension_missing_upper_date(self):
+    def test_post_temporary_suspension_missing_upper_date(self, client):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2574,12 +2573,12 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
-        response = self.client.post(
+        self.login(client, evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {"temporary_suspension_from": datetime.date(2023, 1, 1)},
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="form-group is-invalid form-group-required">
@@ -2607,7 +2606,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_temporary_suspension_bad_input(self):
+    def test_post_temporary_suspension_bad_input(self, client):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2620,8 +2619,8 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
-        response = self.client.post(
+        self.login(client, evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {
                 # Field is ignored.
@@ -2633,7 +2632,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         from tests.utils.test import pprint_html
 
         pprint_html(response, name="form")
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="form-group is-invalid form-group-required">
@@ -2655,7 +2654,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             html=True,
             count=1,
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="form-group is-invalid form-group-required">
@@ -2683,7 +2682,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_temporary_suspension_starts_in_less_than_a_month(self):
+    def test_post_temporary_suspension_starts_in_less_than_a_month(self, client):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2696,15 +2695,15 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
-        response = self.client.post(
+        self.login(client, evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {
                 "temporary_suspension_from": datetime.date(2022, 11, 20),
                 "temporary_suspension_to": datetime.date(2022, 11, 20),
             },
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="form-group is-invalid form-group-required">
@@ -2726,7 +2725,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             html=True,
             count=1,
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="form-group is-invalid form-group-required">
@@ -2754,7 +2753,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_permanent_suspension(self):
+    def test_post_permanent_suspension(self, client):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2767,12 +2766,12 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae, sanctions=["PERMANENT_SUSPENSION"])
-        response = self.client.post(
+        self.login(client, evaluated_siae, sanctions=["PERMANENT_SUSPENSION"])
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {"permanent_suspension": datetime.date(2023, 1, 1)},
         )
-        self.assertRedirects(
+        assertRedirects(
             response,
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
@@ -2811,7 +2810,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_permanent_suspension_bad_input(self):
+    def test_post_permanent_suspension_bad_input(self, client):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2824,8 +2823,8 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae, sanctions=["PERMANENT_SUSPENSION"])
-        response = self.client.post(
+        self.login(client, evaluated_siae, sanctions=["PERMANENT_SUSPENSION"])
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {
                 "permanent_suspension": "invalid",
@@ -2833,7 +2832,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                 "temporary_suspension_from": datetime.date(2023, 1, 1),
             },
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="form-group is-invalid form-group-required">
@@ -2861,7 +2860,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_subsidy_cut_percent(self):
+    def test_post_subsidy_cut_percent(self, client):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2874,8 +2873,8 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae, sanctions=["SUBSIDY_CUT_PERCENT"])
-        response = self.client.post(
+        self.login(client, evaluated_siae, sanctions=["SUBSIDY_CUT_PERCENT"])
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {
                 "subsidy_cut_percent": 20,
@@ -2883,7 +2882,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                 "subsidy_cut_to": datetime.date(2023, 6, 1),
             },
         )
-        self.assertRedirects(
+        assertRedirects(
             response,
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
@@ -2926,7 +2925,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_subsidy_percent_invalid_date_and_percent(self):
+    def test_post_subsidy_percent_invalid_date_and_percent(self, client):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2939,8 +2938,8 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae, sanctions=["SUBSIDY_CUT_PERCENT"])
-        response = self.client.post(
+        self.login(client, evaluated_siae, sanctions=["SUBSIDY_CUT_PERCENT"])
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {
                 "subsidy_cut_percent": "110",
@@ -2948,7 +2947,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                 "subsidy_cut_to": "invalid",
             },
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="form-group is-invalid form-group-required">
@@ -3008,7 +3007,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_subsidy_cut_full(self):
+    def test_post_subsidy_cut_full(self, client):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -3021,8 +3020,8 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae, sanctions=["SUBSIDY_CUT_FULL"])
-        response = self.client.post(
+        self.login(client, evaluated_siae, sanctions=["SUBSIDY_CUT_FULL"])
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {
                 "subsidy_cut_percent": 20,  # Ignored.
@@ -3030,7 +3029,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                 "subsidy_cut_to": datetime.date(2023, 6, 1),
             },
         )
-        self.assertRedirects(
+        assertRedirects(
             response,
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
@@ -3073,7 +3072,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_deactivation(self):
+    def test_post_deactivation(self, client):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -3086,12 +3085,12 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae, sanctions=["DEACTIVATION"])
-        response = self.client.post(
+        self.login(client, evaluated_siae, sanctions=["DEACTIVATION"])
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {"deactivation_reason": "Chat trop vorace."},
         )
-        self.assertRedirects(
+        assertRedirects(
             response,
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
@@ -3130,7 +3129,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_no_sanction(self):
+    def test_post_no_sanction(self, client):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -3143,12 +3142,12 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae, sanctions=["NO_SANCTIONS"])
-        response = self.client.post(
+        self.login(client, evaluated_siae, sanctions=["NO_SANCTIONS"])
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {"no_sanction_reason": "Chat trop mignon."},
         )
-        self.assertRedirects(
+        assertRedirects(
             response,
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
@@ -3183,7 +3182,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.no_sanction_reason == "Chat trop mignon."
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_combined_sanctions(self):
+    def test_post_combined_sanctions(self, client):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -3196,8 +3195,8 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(evaluated_siae, sanctions=["PERMANENT_SUSPENSION", "SUBSIDY_CUT_PERCENT", "DEACTIVATION"])
-        response = self.client.post(
+        self.login(client, evaluated_siae, sanctions=["PERMANENT_SUSPENSION", "SUBSIDY_CUT_PERCENT", "DEACTIVATION"])
+        response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {
                 "permanent_suspension": datetime.date(2023, 1, 1),
@@ -3207,7 +3206,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                 "deactivation_reason": "Chat trop vorace.",
             },
         )
-        self.assertRedirects(
+        assertRedirects(
             response,
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
@@ -3262,14 +3261,14 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
 
-class InstitutionEvaluatedJobApplicationViewTest(TestCase):
+class TestInstitutionEvaluatedJobApplicationView:
     btn_modifier_html = """
     <button class="btn btn-sm btn-primary" aria-label="Modifier l'état de ce justificatif">Modifier</button>
     """
     save_text = "Enregistrer le commentaire et retourner à la liste des auto-prescriptions"
 
-    def setUp(self):
-        super().setUp()
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         membership = InstitutionMembershipFactory()
         self.user = membership.user
         self.institution = membership.institution
@@ -3304,11 +3303,11 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             },
         )
 
-    def test_access(self):
-        self.client.force_login(self.user)
+    def test_access(self, client):
+        client.force_login(self.user)
 
         # institution without evaluation_campaign
-        response = self.client.get(
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": 1},
@@ -3320,7 +3319,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
         evaluated_siae = create_evaluated_siae_consistent_datas(evaluation_campaign)
         evaluated_job_application = evaluated_siae.evaluated_job_applications.first()
-        response = self.client.get(
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
@@ -3331,7 +3330,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         # institution with evaluation_campaign in "siae upload its proofs" phase
         evaluation_campaign.evaluations_asked_at = timezone.now()
         evaluation_campaign.save(update_fields=["evaluations_asked_at"])
-        response = self.client.get(
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
@@ -3339,7 +3338,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         )
         assert response.status_code == 200
 
-    def test_recently_closed_campaign(self):
+    def test_recently_closed_campaign(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
@@ -3347,8 +3346,8 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         )
         job_app = evaluated_siae.evaluated_job_applications.get()
         crit = job_app.evaluated_administrative_criteria.get()
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": job_app.pk},
@@ -3358,7 +3357,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             "siae_evaluations_views:view_proof",
             kwargs={"evaluated_administrative_criteria_id": crit.pk},
         )
-        self.assertContains(
+        assertContains(
             response,
             f"""
             <a href="{proof_url}"
@@ -3374,15 +3373,15 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             count=1,
         )
 
-    def test_post_recently_closed_campaign(self):
+    def test_post_recently_closed_campaign(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
             evaluation_campaign__institution=self.institution,
         )
         job_app = evaluated_siae.evaluated_job_applications.get()
-        self.client.force_login(self.user)
-        response = self.client.post(
+        client.force_login(self.user)
+        response = client.post(
             reverse(
                 "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": job_app.pk},
@@ -3391,7 +3390,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         )
         assert response.status_code == 404
 
-    def test_access_closed_campaign(self):
+    def test_access_closed_campaign(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
@@ -3399,8 +3398,8 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
         )
         job_app = evaluated_siae.evaluated_job_applications.get()
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": job_app.pk},
@@ -3408,14 +3407,14 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         )
         assert response.status_code == 404
 
-    def test_content(self):
-        self.client.force_login(self.user)
+    def test_content(self, client):
+        client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
         evaluated_siae = create_evaluated_siae_consistent_datas(evaluation_campaign)
         evaluated_job_application = evaluated_siae.evaluated_job_applications.first()
-        response = self.client.get(
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
@@ -3432,10 +3431,10 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             )
             + f"#{evaluated_job_application.pk}"
         )
-        self.assertContains(response, self.save_text, count=1)
-        self.assertNotContains(response, TestSiaeEvaluatedJobApplicationView.refusal_comment_txt)
+        assertContains(response, self.save_text, count=1)
+        assertNotContains(response, TestSiaeEvaluatedJobApplicationView.refusal_comment_txt)
 
-    def test_get_before_new_criteria_submitted(self):
+    def test_get_before_new_criteria_submitted(self, client):
         now = timezone.now()
         evaluated_job_application = EvaluatedJobApplicationFactory(
             evaluated_siae__evaluation_campaign__evaluations_asked_at=now - relativedelta(days=10),
@@ -3447,16 +3446,16 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             uploaded_at=now - relativedelta(days=2),
             # Not submitted.
         )
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
             )
         )
-        self.assertNotContains(response, self.btn_modifier_html, html=True)
+        assertNotContains(response, self.btn_modifier_html, html=True)
 
-    def test_can_modify_during_adversarial_stage_review(self):
+    def test_can_modify_during_adversarial_stage_review(self, client):
         now = timezone.now()
         evaluated_job_application = EvaluatedJobApplicationFactory(
             evaluated_siae__evaluation_campaign__evaluations_asked_at=now - relativedelta(days=10),
@@ -3470,16 +3469,16 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
 
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
             )
         )
-        self.assertContains(response, self.btn_modifier_html, html=True, count=1)
+        assertContains(response, self.btn_modifier_html, html=True, count=1)
 
-    def test_evaluations_from_previous_campaigns_read_only(self):
+    def test_evaluations_from_previous_campaigns_read_only(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
@@ -3488,19 +3487,19 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         past_job_application = evaluated_siae.evaluated_job_applications.get()
         crit = past_job_application.evaluated_administrative_criteria.get()
 
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": past_job_application.pk},
             )
         )
-        self.assertNotContains(response, self.save_text)
+        assertNotContains(response, self.save_text)
         proof_url = reverse(
             "siae_evaluations_views:view_proof",
             kwargs={"evaluated_administrative_criteria_id": crit.pk},
         )
-        self.assertContains(
+        assertContains(
             response,
             f"""
             <a href="{proof_url}"
@@ -3516,7 +3515,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             count=1,
         )
 
-    def test_post_to_evaluations_from_previous_campaigns(self):
+    def test_post_to_evaluations_from_previous_campaigns(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
@@ -3524,8 +3523,8 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         )
         past_job_application = evaluated_siae.evaluated_job_applications.get()
 
-        self.client.force_login(self.user)
-        response = self.client.post(
+        client.force_login(self.user)
+        response = client.post(
             reverse(
                 "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": past_job_application.pk},
@@ -3535,8 +3534,8 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         assert response.status_code == 404
 
     @pytest.mark.ignore_unknown_variable_template_error("reviewed_at")
-    def test_criterion_validation(self):
-        self.client.force_login(self.user)
+    def test_criterion_validation(self, client):
+        client.force_login(self.user)
 
         # fixme vincentporte : use EvaluatedAdministrativeCriteria instead
         evaluated_administrative_criteria = get_evaluated_administrative_criteria(self.institution)
@@ -3553,20 +3552,20 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluated_administrative_criteria.submitted_at = timezone.now()
         evaluated_administrative_criteria.proof = FileFactory()
         evaluated_administrative_criteria.save(update_fields=["submitted_at", "proof"])
-        response = self.client.get(url_view)
-        self.assertContains(response, refuse_url)
-        self.assertContains(response, accepte_url)
-        self.assertNotContains(response, reinit_url)
+        response = client.get(url_view)
+        assertContains(response, refuse_url)
+        assertContains(response, accepte_url)
+        assertNotContains(response, reinit_url)
 
         # accepted
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
 
-        response = self.client.get(url_view)
-        self.assertNotContains(response, refuse_url)
-        self.assertNotContains(response, accepte_url)
-        self.assertContains(response, reinit_url)
-        self.assertContains(
+        response = client.get(url_view)
+        assertNotContains(response, refuse_url)
+        assertNotContains(response, accepte_url)
+        assertContains(response, reinit_url)
+        assertContains(
             response, '<strong class="text-success"><i class="ri-check-line"></i> Validé</strong>', html=True
         )
 
@@ -3574,11 +3573,11 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
 
-        response = self.client.get(url_view)
-        self.assertNotContains(response, refuse_url)
-        self.assertNotContains(response, accepte_url)
-        self.assertContains(response, reinit_url)
-        self.assertContains(
+        response = client.get(url_view)
+        assertNotContains(response, refuse_url)
+        assertNotContains(response, accepte_url)
+        assertContains(response, reinit_url)
+        assertContains(
             response, '<strong class="text-danger"><i class="ri-close-line"></i> Refusé</strong>', html=True
         )
 
@@ -3586,10 +3585,10 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         evaluated_administrative_criteria.save(update_fields=["review_state"])
 
-        response = self.client.get(url_view)
-        self.assertContains(response, refuse_url)
-        self.assertContains(response, accepte_url)
-        self.assertNotContains(response, reinit_url)
+        response = client.get(url_view)
+        assertContains(response, refuse_url)
+        assertContains(response, accepte_url)
+        assertNotContains(response, reinit_url)
 
         # reviewed
         evaluated_administrative_criteria.evaluated_job_application.evaluated_siae.reviewed_at = timezone.now()
@@ -3597,10 +3596,10 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
 
-        response = self.client.get(url_view)
-        self.assertNotContains(response, refuse_url)
-        self.assertNotContains(response, accepte_url)
-        self.assertNotContains(response, reinit_url)
+        response = client.get(url_view)
+        assertNotContains(response, refuse_url)
+        assertNotContains(response, accepte_url)
+        assertNotContains(response, reinit_url)
 
     def test_form(self):
         evaluation_campaign = EvaluationCampaignFactory(
@@ -3621,8 +3620,8 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         # note vincentporte
         # to be added : readonly conditionnal field
 
-    def test_post_form(self):
-        self.client.force_login(self.user)
+    def test_post_form(self, client):
+        client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
@@ -3634,11 +3633,11 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
         )
 
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         post_data = {"labor_inspector_explanation": "test"}
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
         assert (
             response.url
@@ -3654,15 +3653,15 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             updated_evaluated_job_application.labor_inspector_explanation == post_data["labor_inspector_explanation"]
         )
 
-    def test_post_on_closed_campaign(self):
-        self.client.force_login(self.user)
+    def test_post_on_closed_campaign(self, client):
+        client.force_login(self.user)
         evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
             evaluation_campaign__institution=self.institution,
         )
         job_app = evaluated_siae.evaluated_job_applications.get()
-        response = self.client.post(
+        response = client.post(
             reverse(
                 "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": job_app.pk},
@@ -3674,8 +3673,8 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         # New explanation ignored.
         assert job_app.labor_inspector_explanation == ""
 
-    def test_num_queries_in_view(self):
-        self.client.force_login(self.user)
+    def test_num_queries_in_view(self, client):
+        client.force_login(self.user)
         # fixme vincentporte : use EvaluatedAdministrativeCriteria instead
         evaluated_administrative_criteria = get_evaluated_administrative_criteria(self.institution)
         EvaluatedAdministrativeCriteria.objects.create(
@@ -3691,7 +3690,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             "siae_evaluations_views:evaluated_job_application",
             kwargs={"evaluated_job_application_pk": evaluated_administrative_criteria.evaluated_job_application.pk},
         )
-        with self.assertNumQueries(
+        with assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # django session
             + 2  # fetch user & its memberships (middleware)
@@ -3700,12 +3699,12 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             + 2  # evaljobapp & its evalcriteria
             + 3  # savepoint, update session, release savepoint
         ):
-            response = self.client.get(url)
+            response = client.get(url)
         assert response.status_code == 200
 
     @pytest.mark.ignore_unknown_variable_template_error("reviewed_at")
-    def test_job_application_state_labels(self):
-        self.client.force_login(self.user)
+    def test_job_application_state_labels(self, client):
+        client.force_login(self.user)
         # fixme vincentporte : use EvaluatedAdministrativeCriteria instead
         evaluated_administrative_criteria = get_evaluated_administrative_criteria(self.institution)
         evaluated_administrative_criteria.proof = FileFactory()
@@ -3718,37 +3717,37 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         )
 
         # Unset
-        response = self.client.get(url_view)
-        self.assertContains(response, "bg-accent-03")
-        self.assertContains(response, "À traiter")
+        response = client.get(url_view)
+        assertContains(response, "bg-accent-03")
+        assertContains(response, "À traiter")
 
         # Refused
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
-        response = self.client.get(url_view)
-        self.assertContains(response, "bg-danger")
-        self.assertContains(response, "Problème constaté")
+        response = client.get(url_view)
+        assertContains(response, "bg-danger")
+        assertContains(response, "Problème constaté")
 
         # Accepted
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
-        response = self.client.get(url_view)
-        self.assertContains(response, "bg-success")
-        self.assertContains(response, "Validé")
+        response = client.get(url_view)
+        assertContains(response, "bg-success")
+        assertContains(response, "Validé")
 
 
-class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
-    def setUp(self):
-        super().setUp()
+class TestInstitutionEvaluatedAdministrativeCriteriaView:
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         membership = InstitutionMembershipFactory()
         self.user = membership.user
         self.institution = membership.institution
 
-    def test_access(self):
-        self.client.force_login(self.user)
+    def test_access(self, client):
+        client.force_login(self.user)
 
         # institution without evaluation_campaign
-        response = self.client.post(
+        response = client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={"evaluated_administrative_criteria_pk": 1, "action": "dummy"},
@@ -3761,7 +3760,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         evaluated_siae = create_evaluated_siae_consistent_datas(evaluation_campaign)
         evaluated_job_application = evaluated_siae.evaluated_job_applications.first()
         evaluated_administrative_criteria = evaluated_job_application.evaluated_administrative_criteria.first()
-        response = self.client.post(
+        response = client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
@@ -3775,7 +3774,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         # institution with evaluation_campaign in "siae upload its proofs" phase
         evaluation_campaign.evaluations_asked_at = timezone.now()
         evaluation_campaign.save(update_fields=["evaluations_asked_at"])
-        response = self.client.post(
+        response = client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
@@ -3789,7 +3788,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         # institution with ended evaluation_campaign
         evaluation_campaign.ended_at = timezone.now()
         evaluation_campaign.save(update_fields=["ended_at"])
-        response = self.client.post(
+        response = client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
@@ -3800,8 +3799,8 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         )
         assert response.status_code == 404
 
-    def test_actions_and_redirection(self):
-        self.client.force_login(self.user)
+    def test_actions_and_redirection(self, client):
+        client.force_login(self.user)
         # fixme vincentporte : use EvaluatedAdministrativeCriteria instead
         evaluated_administrative_criteria = get_evaluated_administrative_criteria(self.institution)
         redirect_url = reverse(
@@ -3810,7 +3809,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         )
 
         # action = dummy
-        response = self.client.post(
+        response = client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
@@ -3825,7 +3824,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         assert evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED == eval_admin_crit.review_state
 
         # action reinit
-        response = self.client.post(
+        response = client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
@@ -3840,7 +3839,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         assert evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING == eval_admin_crit.review_state
 
         # action = accept
-        response = self.client.post(
+        response = client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
@@ -3855,7 +3854,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         assert evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED == eval_admin_crit.review_state
 
         # action = refuse
-        response = self.client.post(
+        response = client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
@@ -3874,7 +3873,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         evsiae.reviewed_at = timezone.now()
         evsiae.save(update_fields=["reviewed_at"])
 
-        response = self.client.post(
+        response = client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
@@ -3889,20 +3888,20 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         assert evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2 == eval_admin_crit.review_state
 
 
-class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
-    @classmethod
-    def setUpTestData(cls):
+class TestInstitutionEvaluatedSiaeValidationView:
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         membership = InstitutionMembershipFactory()
-        cls.institution = membership.institution
-        cls.user = membership.user
-        cls.evaluation_campaign = EvaluationCampaignFactory(institution=membership.institution)
-        cls.evaluated_siae = create_evaluated_siae_consistent_datas(cls.evaluation_campaign)
+        self.institution = membership.institution
+        self.user = membership.user
+        self.evaluation_campaign = EvaluationCampaignFactory(institution=membership.institution)
+        self.evaluated_siae = create_evaluated_siae_consistent_datas(self.evaluation_campaign)
 
-    def test_access(self):
-        self.client.force_login(self.user)
+    def test_access(self, client):
+        client.force_login(self.user)
 
         # institution without evaluation_campaign
-        response = self.client.post(
+        response = client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_validation",
                 kwargs={"evaluated_siae_pk": 1},
@@ -3916,23 +3915,23 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
             kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
         )
 
-        response = self.client.post(url)
+        response = client.post(url)
         assert response.status_code == 404
 
         # institution with evaluation_campaign in "siae upload its proofs" phase
         self.evaluation_campaign.evaluations_asked_at = timezone.now()
         self.evaluation_campaign.save(update_fields=["evaluations_asked_at"])
-        response = self.client.post(url)
+        response = client.post(url)
         assert response.status_code == 302
 
         # institution with ended evaluation_campaign
         self.evaluation_campaign.ended_at = timezone.now()
         self.evaluation_campaign.save(update_fields=["ended_at"])
-        response = self.client.post(url)
+        response = client.post(url)
         assert response.status_code == 404
 
-    def test_actions_and_redirection(self):
-        self.client.force_login(self.user)
+    def test_actions_and_redirection(self, client):
+        client.force_login(self.user)
 
         self.evaluation_campaign.evaluations_asked_at = timezone.now()
         self.evaluation_campaign.save(update_fields=["evaluations_asked_at"])
@@ -3950,21 +3949,21 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
         )
 
         # before validation
-        response = self.client.post(url)
+        response = client.post(url)
         assert response.status_code == 302
         assert response.url == redirect_url
         self.evaluated_siae.refresh_from_db()
         assert self.evaluated_siae.reviewed_at is None
-        self.assertMessages(response, [])
+        assertMessages(response, [])
 
         # accepted
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=self.evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED)
-        response = self.client.post(url)
+        response = client.post(url)
         self.evaluated_siae.refresh_from_db()
         assert self.evaluated_siae.reviewed_at is not None
-        self.assertMessages(
+        assertMessages(
             response,
             [
                 messages.Message(
@@ -3974,7 +3973,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
                 )
             ],
         )
-        self.assertRedirects(response, redirect_url)
+        assertRedirects(response, redirect_url)
 
         # refused
         self.evaluated_siae.reviewed_at = None
@@ -3984,10 +3983,10 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
             evaluated_job_application__evaluated_siae=self.evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED)
 
-        response = self.client.post(url)
+        response = client.post(url)
         self.evaluated_siae.refresh_from_db()
         assert self.evaluated_siae.reviewed_at is not None
-        self.assertMessages(
+        assertMessages(
             response,
             [
                 messages.Message(
@@ -3997,17 +3996,17 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
                 )
             ],
         )
-        self.assertRedirects(response, redirect_url)
+        assertRedirects(response, redirect_url)
 
         # cannot validate twice
         timestamp = self.evaluated_siae.reviewed_at
-        response = self.client.post(url)
+        response = client.post(url)
         assert response.status_code == 302
         self.evaluated_siae.refresh_from_db()
         assert timestamp == self.evaluated_siae.reviewed_at
-        self.assertMessages(response, [])
+        assertMessages(response, [])
 
-    def test_accepted(self):
+    def test_accepted(self, client):
         evaluated_siae = EvaluatedSiaeFactory.create(
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=1),
@@ -4020,14 +4019,14 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
             submitted_at=timezone.now() - relativedelta(hours=1),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
-        self.client.force_login(self.user)
-        response = self.client.post(
+        client.force_login(self.user)
+        response = client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_validation",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertRedirects(
+        assertRedirects(
             response,
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
@@ -4036,7 +4035,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
         )
         assert mail.outbox == []
 
-    def test_accepted_after_adversarial(self):
+    def test_accepted_after_adversarial(self, client):
         evaluated_siae = EvaluatedSiaeFactory.create(
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=1),
@@ -4050,14 +4049,14 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
             submitted_at=timezone.now() - relativedelta(hours=1),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
-        self.client.force_login(self.user)
-        response = self.client.post(
+        client.force_login(self.user)
+        response = client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_validation",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertRedirects(
+        assertRedirects(
             response,
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
@@ -4066,7 +4065,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
         )
         assert mail.outbox == []
 
-    def test_refused(self):
+    def test_refused(self, client):
         evaluated_siae = EvaluatedSiaeFactory.create(
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=1),
@@ -4079,14 +4078,14 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
             submitted_at=timezone.now() - relativedelta(hours=1),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
         )
-        self.client.force_login(self.user)
-        response = self.client.post(
+        client.force_login(self.user)
+        response = client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_validation",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertRedirects(
+        assertRedirects(
             response,
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
@@ -4095,7 +4094,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
         )
         assert mail.outbox == []
 
-    def test_refused_after_adversarial(self):
+    def test_refused_after_adversarial(self, client):
         evaluated_siae = EvaluatedSiaeFactory.create(
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=1),
@@ -4109,14 +4108,14 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
             submitted_at=timezone.now() - relativedelta(hours=1),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
         )
-        self.client.force_login(self.user)
-        response = self.client.post(
+        client.force_login(self.user)
+        response = client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_validation",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertRedirects(
+        assertRedirects(
             response,
             reverse(
                 "siae_evaluations_views:evaluated_siae_detail",
@@ -4126,14 +4125,14 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
         assert mail.outbox == []
 
 
-class InstitutionCalendarViewTest(TestCase):
-    def setUp(self):
-        super().setUp()
+class TestInstitutionCalendarView:
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         membership = InstitutionMembershipFactory(institution__name="DDETS Ille et Vilaine")
         self.user = membership.user
         self.institution = membership.institution
 
-    def test_active_campaign_calendar(self):
+    def test_active_campaign_calendar(self, client):
         calendar_html = """
             <table class="table">
                 <thead class="thead-light">
@@ -4158,17 +4157,17 @@ class InstitutionCalendarViewTest(TestCase):
         evaluation_campaign = EvaluationCampaignFactory(institution=self.institution, calendar__html=calendar_html)
         calendar_url = reverse("siae_evaluations_views:campaign_calendar", args=[evaluation_campaign.pk])
 
-        self.client.force_login(self.user)
-        response = self.client.get(reverse("dashboard:index"))
+        client.force_login(self.user)
+        response = client.get(reverse("dashboard:index"))
         assert response.status_code == 200
-        self.assertContains(response, calendar_url)
+        assertContains(response, calendar_url)
 
-        response = self.client.get(calendar_url)
+        response = client.get(calendar_url)
         assert response.status_code == 200
-        self.assertContains(response, calendar_html)
+        assertContains(response, calendar_html)
 
         # Old campaigns don't have a calendar.
         evaluation_campaign.calendar.delete()
-        response = self.client.get(reverse("dashboard:index"))
+        response = client.get(reverse("dashboard:index"))
         assert response.status_code == 200
-        self.assertNotContains(response, calendar_url)
+        assertNotContains(response, calendar_url)

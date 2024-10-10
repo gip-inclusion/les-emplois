@@ -7,14 +7,13 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.db import IntegrityError
 from django.urls import reverse
 from django.utils.timezone import get_current_timezone
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.job_applications import models as job_applications_models
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
@@ -31,7 +30,6 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
 )
 from tests.users.factories import EmployerFactory, ItouStaffFactory, PrescriberFactory
-from tests.utils.test import TestCase
 
 
 class TestPrescriberOrganizationManager:
@@ -249,7 +247,7 @@ class TestPrescriberOrganizationModel:
         assert organization.is_head_office is True
 
 
-class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
+class TestPrescriberOrganizationAdmin:
     ACCEPT_BUTTON_LABEL = "Valider l'habilitation"
     REFUSE_BUTTON_LABEL = "Refuser l'habilitation"
     ACCEPT_AFTER_REFUSAL_BUTTON_LABEL = "Annuler le refus et valider l'habilitation"
@@ -260,20 +258,19 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
     }
 
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         # super user
-        cls.superuser = ItouStaffFactory(is_superuser=True)
+        self.superuser = ItouStaffFactory(is_superuser=True)
 
         # staff user with permissions
-        cls.user = ItouStaffFactory()
+        self.user = ItouStaffFactory()
         content_type = ContentType.objects.get_for_model(PrescriberOrganization)
         permission = Permission.objects.get(content_type=content_type, codename="change_prescriberorganization")
-        cls.user.user_permissions.add(permission)
+        self.user.user_permissions.add(permission)
 
-    def test_refuse_prescriber_habilitation_by_superuser(self):
-        self.client.force_login(self.superuser)
+    def test_refuse_prescriber_habilitation_by_superuser(self, client):
+        client.force_login(self.superuser)
 
         prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
@@ -284,8 +281,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
-        response = self.client.get(url)
-        self.assertContains(response, self.REFUSE_BUTTON_LABEL)
+        response = client.get(url)
+        assertContains(response, self.REFUSE_BUTTON_LABEL)
 
         post_data = {
             "id": prescriber_organization.pk,
@@ -298,7 +295,7 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             **self.FORMSETS_PAYLOAD,
         }
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
@@ -307,8 +304,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         assert updated_prescriber_organization.authorization_updated_by == self.superuser
         assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.REFUSED
 
-    def test_refuse_prescriber_habilitation_error(self):
-        self.client.force_login(self.superuser)
+    def test_refuse_prescriber_habilitation_error(self, client):
+        client.force_login(self.superuser)
 
         prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
@@ -323,8 +320,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
-        response = self.client.get(url)
-        self.assertContains(response, self.REFUSE_BUTTON_LABEL)
+        response = client.get(url)
+        assertContains(response, self.REFUSE_BUTTON_LABEL)
 
         post_data = {
             "id": prescriber_organization.pk,
@@ -337,9 +334,9 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             **self.FORMSETS_PAYLOAD,
         }
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
-        self.assertMessages(
+        assertMessages(
             response,
             [
                 messages.Message(
@@ -356,8 +353,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         assert updated_prescriber_organization.authorization_updated_by is None
         assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
-    def test_refuse_prescriber_habilitation_pending_status(self):
-        self.client.force_login(self.user)
+    def test_refuse_prescriber_habilitation_pending_status(self, client):
+        client.force_login(self.user)
 
         prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
@@ -370,8 +367,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
-        response = self.client.get(url)
-        self.assertContains(response, self.REFUSE_BUTTON_LABEL)
+        response = client.get(url)
+        assertContains(response, self.REFUSE_BUTTON_LABEL)
 
         post_data = {
             "id": prescriber_organization.pk,
@@ -383,7 +380,7 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             **self.FORMSETS_PAYLOAD,
         }
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
@@ -392,8 +389,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         assert updated_prescriber_organization.authorization_updated_by == self.user
         assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.REFUSED
 
-    def test_refuse_prescriber_habilitation_not_pending_status(self):
-        self.client.force_login(self.user)
+    def test_refuse_prescriber_habilitation_not_pending_status(self, client):
+        client.force_login(self.user)
 
         prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
@@ -404,8 +401,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
-        response = self.client.get(url)
-        self.assertNotContains(response, self.REFUSE_BUTTON_LABEL)
+        response = client.get(url)
+        assertNotContains(response, self.REFUSE_BUTTON_LABEL)
 
         post_data = {
             "id": prescriber_organization.pk,
@@ -417,7 +414,7 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             **self.FORMSETS_PAYLOAD,
         }
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 403
 
         updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
@@ -426,8 +423,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         assert updated_prescriber_organization.authorization_updated_by is None
         assert updated_prescriber_organization.authorization_status == prescriber_organization.authorization_status
 
-    def test_accept_prescriber_habilitation_by_superuser(self):
-        self.client.force_login(self.superuser)
+    def test_accept_prescriber_habilitation_by_superuser(self, client):
+        client.force_login(self.superuser)
 
         prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
@@ -438,8 +435,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
-        response = self.client.get(url)
-        self.assertContains(response, self.ACCEPT_BUTTON_LABEL)
+        response = client.get(url)
+        assertContains(response, self.ACCEPT_BUTTON_LABEL)
 
         post_data = {
             "id": prescriber_organization.pk,
@@ -451,7 +448,7 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             **self.FORMSETS_PAYLOAD,
         }
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
@@ -460,8 +457,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         assert updated_prescriber_organization.authorization_updated_by == self.superuser
         assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
-    def test_accept_prescriber_habilitation_pending_status(self):
-        self.client.force_login(self.user)
+    def test_accept_prescriber_habilitation_pending_status(self, client):
+        client.force_login(self.user)
 
         prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
@@ -474,8 +471,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
-        response = self.client.get(url)
-        self.assertContains(response, self.ACCEPT_BUTTON_LABEL)
+        response = client.get(url)
+        assertContains(response, self.ACCEPT_BUTTON_LABEL)
 
         post_data = {
             "id": prescriber_organization.pk,
@@ -487,7 +484,7 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             **self.FORMSETS_PAYLOAD,
         }
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
@@ -496,8 +493,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         assert updated_prescriber_organization.authorization_updated_by == self.user
         assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
-    def test_accept_prescriber_habilitation_refused_status(self):
-        self.client.force_login(self.user)
+    def test_accept_prescriber_habilitation_refused_status(self, client):
+        client.force_login(self.user)
 
         prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
@@ -510,8 +507,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
-        response = self.client.get(url)
-        self.assertContains(response, self.ACCEPT_AFTER_REFUSAL_BUTTON_LABEL)
+        response = client.get(url)
+        assertContains(response, self.ACCEPT_AFTER_REFUSAL_BUTTON_LABEL)
 
         post_data = {
             "id": prescriber_organization.pk,
@@ -523,7 +520,7 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             **self.FORMSETS_PAYLOAD,
         }
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
@@ -532,8 +529,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         assert updated_prescriber_organization.authorization_updated_by == self.user
         assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
-    def test_accept_prescriber_habilitation_other_status(self):
-        self.client.force_login(self.user)
+    def test_accept_prescriber_habilitation_other_status(self, client):
+        client.force_login(self.user)
 
         prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
@@ -544,7 +541,7 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         post_data = {
@@ -557,7 +554,7 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             **self.FORMSETS_PAYLOAD,
         }
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 403
 
         updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
@@ -566,12 +563,12 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         assert updated_prescriber_organization.authorization_updated_by is None
         assert updated_prescriber_organization.authorization_status == prescriber_organization.authorization_status
 
-    def test_prescriber_habilitation_readonly_user(self):
+    def test_prescriber_habilitation_readonly_user(self, client):
         ro_user = ItouStaffFactory()
         content_type = ContentType.objects.get_for_model(PrescriberOrganization)
         permission = Permission.objects.get(content_type=content_type, codename="view_prescriberorganization")
         ro_user.user_permissions.add(permission)
-        self.client.force_login(ro_user)
+        client.force_login(ro_user)
 
         prescriber_organization = PrescriberOrganizationFactory(
             siret="83987278500010",
@@ -581,22 +578,22 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
-        response = self.client.get(url)
-        self.assertNotContains(response, self.ACCEPT_BUTTON_LABEL)
-        self.assertNotContains(response, self.REFUSE_BUTTON_LABEL)
-        self.assertNotContains(response, self.ACCEPT_AFTER_REFUSAL_BUTTON_LABEL)
+        response = client.get(url)
+        assertNotContains(response, self.ACCEPT_BUTTON_LABEL)
+        assertNotContains(response, self.REFUSE_BUTTON_LABEL)
+        assertNotContains(response, self.ACCEPT_AFTER_REFUSAL_BUTTON_LABEL)
 
         prescriber_organization.authorization_status = PrescriberAuthorizationStatus.REFUSED
         prescriber_organization.save()
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
-        response = self.client.get(url)
-        self.assertNotContains(response, self.ACCEPT_BUTTON_LABEL)
-        self.assertNotContains(response, self.REFUSE_BUTTON_LABEL)
-        self.assertNotContains(response, self.ACCEPT_AFTER_REFUSAL_BUTTON_LABEL)
+        response = client.get(url)
+        assertNotContains(response, self.ACCEPT_BUTTON_LABEL)
+        assertNotContains(response, self.REFUSE_BUTTON_LABEL)
+        assertNotContains(response, self.ACCEPT_AFTER_REFUSAL_BUTTON_LABEL)
 
-    def test_accept_prescriber_habilitation_odc_to_is_brsa(self):
-        self.client.force_login(self.user)
+    def test_accept_prescriber_habilitation_odc_to_is_brsa(self, client):
+        client.force_login(self.user)
 
         prescriber_organization = PrescriberOrganizationFactory(
             siret="83987278500010",
@@ -610,8 +607,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
-        response = self.client.get(url)
-        self.assertContains(response, self.ACCEPT_BUTTON_LABEL)
+        response = client.get(url)
+        assertContains(response, self.ACCEPT_BUTTON_LABEL)
 
         assert not prescriber_organization.is_brsa
         post_data = {
@@ -625,7 +622,7 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             **self.FORMSETS_PAYLOAD,
         }
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
@@ -635,8 +632,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
         assert updated_prescriber_organization.is_brsa
 
-    def test_prevent_prescriber_habilitation_organization_type_other(self):
-        self.client.force_login(self.user)
+    def test_prevent_prescriber_habilitation_organization_type_other(self, client):
+        client.force_login(self.user)
 
         prescriber_organization = PrescriberOrganizationFactory(
             siret="83987278500010",
@@ -649,8 +646,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
-        response = self.client.get(url)
-        self.assertContains(response, self.ACCEPT_BUTTON_LABEL)
+        response = client.get(url)
+        assertContains(response, self.ACCEPT_BUTTON_LABEL)
 
         post_data = {
             "id": prescriber_organization.pk,
@@ -664,9 +661,9 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         }
 
         # cannot validate an organization typed "Other"
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
-        self.assertMessages(
+        assertMessages(
             response,
             [
                 messages.Message(
@@ -681,7 +678,7 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
 
         # can validate it with changed type
         post_data["kind"] = PrescriberOrganizationKind.PE
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
 
         assert response.status_code == 302
         updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
@@ -690,8 +687,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         assert updated_prescriber_organization.authorization_updated_by == self.user
         assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
-    def test_prevent_setting_prescriber_organization_to_other_once_accepted(self):
-        self.client.force_login(self.user)
+    def test_prevent_setting_prescriber_organization_to_other_once_accepted(self, client):
+        client.force_login(self.user)
 
         prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
@@ -712,7 +709,7 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             **self.FORMSETS_PAYLOAD,
         }
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
         expected_msg = "Cette organisation a été habilitée. Vous devez sélectionner un type différent de “Autre”."
         assert len(response.context["errors"]) == 1

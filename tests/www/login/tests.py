@@ -2,12 +2,11 @@ from urllib.parse import urlencode
 
 import respx
 from django.contrib import messages
-from django.contrib.messages.test import MessagesTestMixin
 from django.test import override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.html import escape
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.users import enums as users_enums
@@ -24,31 +23,31 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.test import TestCase, reload_module
+from tests.utils.test import reload_module
 
 
 CONNECT_WITH_IC = "Se connecter avec Inclusion Connect"
 PRO_CONNECT_BTN = 'class="proconnect-button"'
 
 
-class ItouLoginTest(TestCase):
-    def test_generic_view(self):
+class TestItouLogin:
+    def test_generic_view(self, client):
         # If a user type cannot be determined, don't prevent login.
         # Just show a generic login form.
         user = JobSeekerFactory()
         url = reverse("account_login")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         form_data = {
             "login": user.email,
             "password": DEFAULT_PASSWORD,
         }
-        response = self.client.post(url, data=form_data)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
+        response = client.post(url, data=form_data)
+        assertRedirects(response, reverse("account_email_verification_sent"))
 
 
-class ItouLoginFormTest(TestCase):
+class TestItouLoginForm:
     def test_error_if_user_has_sso_provider(self):
         """
         A user has created an account with another identity provider but tries to connect with Django.
@@ -184,42 +183,42 @@ class TestEmployerLogin:
         )
 
 
-class LaborInspectorLoginTest(TestCase):
-    def test_login_options(self):
+class TestLaborInspectorLogin:
+    def test_login_options(self, client):
         url = reverse("login:labor_inspector")
-        response = self.client.get(url)
-        self.assertNotContains(response, CONNECT_WITH_IC)
-        self.assertNotContains(response, PRO_CONNECT_BTN)
-        self.assertContains(response, "Adresse e-mail")
-        self.assertContains(response, "Mot de passe")
+        response = client.get(url)
+        assertNotContains(response, CONNECT_WITH_IC)
+        assertNotContains(response, PRO_CONNECT_BTN)
+        assertContains(response, "Adresse e-mail")
+        assertContains(response, "Mot de passe")
 
-    def test_login(self):
+    def test_login(self, client):
         user = LaborInspectorFactory()
         url = reverse("login:labor_inspector")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         form_data = {
             "login": user.email,
             "password": DEFAULT_PASSWORD,
         }
-        response = self.client.post(url, data=form_data)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
+        response = client.post(url, data=form_data)
+        assertRedirects(response, reverse("account_email_verification_sent"))
 
 
-class JopbSeekerLoginTest(MessagesTestMixin, TestCase):
-    def test_login(self):
+class TestJopbSeekerLogin:
+    def test_login(self, client):
         user = JobSeekerFactory()
         url = reverse("login:job_seeker")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         form_data = {
             "login": user.email,
             "password": DEFAULT_PASSWORD,
         }
-        response = self.client.post(url, data=form_data)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
+        response = client.post(url, data=form_data)
+        assertRedirects(response, reverse("account_email_verification_sent"))
 
     @respx.mock
     @override_settings(
@@ -228,7 +227,7 @@ class JopbSeekerLoginTest(MessagesTestMixin, TestCase):
         FRANCE_CONNECT_CLIENT_SECRET="IC_CLIENT_SECRET_123",
     )
     @reload_module(fc_constants)
-    def test_conflict_on_email_change_in_france_connect(self):
+    def test_conflict_on_email_change_in_france_connect(self, client):
         """
         The job seeker has 2 accounts : a django one, and a FC one, with 2 different email adresses.
         Then he changes the email adresse on FC to use the django account email.
@@ -241,8 +240,8 @@ class JopbSeekerLoginTest(MessagesTestMixin, TestCase):
         )
 
         # Temporary NIR is not stored with user information.
-        response = mock_oauth_dance(self.client, expected_route="login:job_seeker")
-        self.assertMessages(
+        response = mock_oauth_dance(client, expected_route="login:job_seeker")
+        assertMessages(
             response,
             [
                 messages.Message(

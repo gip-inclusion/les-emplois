@@ -1,10 +1,9 @@
 import datetime
-import os
 from urllib.parse import urljoin
 
 import httpx
+import pytest
 import respx
-from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.test import override_settings
@@ -31,27 +30,16 @@ from tests.rdv_insertion.factories import (
     ParticipationFactory,
     WebhookEventFactory,
 )
-from tests.utils.test import TestCase
 
 
-@override_settings(
-    RDV_SOLIDARITES_API_BASE_URL="https://rdv-solidarites.fake/api/v1/",
-    RDV_SOLIDARITES_EMAIL="tech@inclusion.beta.gouv.fr",
-    RDV_SOLIDARITES_PASSWORD="password",
-    RDV_SOLIDARITES_TOKEN_EXPIRY=86000,
-    RDV_INSERTION_API_BASE_URL="https://rdv-insertion.fake/api/v1/",
-    CACHES={
-        "default": {
-            "BACKEND": "itou.utils.cache.UnclearableCache",
-            "LOCATION": f"{os.environ['REDIS_URL']}?db={os.environ['REDIS_DB']}",
-            "KEY_PREFIX": "test_rdv_insertion",
-        }
-    },
-)
-class RDVInsertionTokenRenewalTest(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+class TestRDVInsertionTokenRenewal:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, settings):
+        settings.RDV_SOLIDARITES_API_BASE_URL = "https://rdv-solidarites.fake/api/v1/"
+        settings.RDV_SOLIDARITES_EMAIL = "tech@inclusion.beta.gouv.fr"
+        settings.RDV_SOLIDARITES_PASSWORD = "password"
+        settings.RDV_SOLIDARITES_TOKEN_EXPIRY = 86000
+        settings.RDV_INSERTION_API_BASE_URL = "https://rdv-insertion.fake/api/v1/"
         respx.post(
             urljoin(settings.RDV_SOLIDARITES_API_BASE_URL, "auth/sign_in"), name="rdv_solidarites_sign_in"
         ).mock(
@@ -93,13 +81,13 @@ class RDVInsertionTokenRenewalTest(TestCase):
         respx.routes["rdv_solidarites_sign_in"].mock(
             return_value=httpx.Response(401, json=RDV_INSERTION_AUTH_FAILURE_BODY)
         )
-        with self.assertRaises(httpx.HTTPStatusError):
+        with pytest.raises(httpx.HTTPStatusError):
             get_api_credentials()
         assert respx.routes["rdv_solidarites_sign_in"].call_count == 1
         assert cache.ttl(RDV_S_CREDENTIALS_CACHE_KEY) == 0  # Cache key not found (0: not found / None: no expiry)
 
         # Subsequent calls should not hit the cache for failed attempts
-        with self.assertRaises(httpx.HTTPStatusError):
+        with pytest.raises(httpx.HTTPStatusError):
             get_api_credentials()
         assert respx.routes["rdv_solidarites_sign_in"].call_count == 2
         assert cache.ttl(RDV_S_CREDENTIALS_CACHE_KEY) == 0
@@ -107,7 +95,7 @@ class RDVInsertionTokenRenewalTest(TestCase):
     @respx.mock
     @override_settings(RDV_SOLIDARITES_API_BASE_URL=None)
     def test_renewal_failure_rdvi_misconfiguration(self):
-        with self.assertRaises(ImproperlyConfigured):
+        with pytest.raises(ImproperlyConfigured):
             get_api_credentials()
         assert not respx.routes["rdv_solidarites_sign_in"].called
         assert cache.ttl(RDV_S_CREDENTIALS_CACHE_KEY) == 0

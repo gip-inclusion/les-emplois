@@ -1,11 +1,12 @@
 import datetime
 
 import httpx
+import pytest
 from django.core.files.storage import default_storage
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import Sanctions
@@ -20,17 +21,16 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import EmployerFactory
-from tests.utils.test import TestCase
 
 
-class EvaluatedSiaeSanctionViewTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
+class TestEvaluatedSiaeSanctionView:
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         institution_membership = InstitutionMembershipFactory(institution__name="DDETS 87")
-        cls.institution_user = institution_membership.user
+        self.institution_user = institution_membership.user
         company_membership = CompanyMembershipFactory(company__name="Les petits jardins")
-        cls.employer = company_membership.user
-        cls.evaluated_siae = EvaluatedSiaeFactory(
+        self.employer = company_membership.user
+        self.evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             evaluation_campaign__institution=institution_membership.institution,
@@ -40,37 +40,37 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat. Séparé de son chat pendant une journée.",
         )
-        cls.sanctions = Sanctions.objects.create(
-            evaluated_siae=cls.evaluated_siae,
+        self.sanctions = Sanctions.objects.create(
+            evaluated_siae=self.evaluated_siae,
             training_session="RDV le 18 avril à 14h dans les locaux de Pôle Emploi.",
         )
-        cls.return_evaluated_siae_list_link_html = (
+        self.return_evaluated_siae_list_link_html = (
             '<a class="btn btn-primary float-end" '
-            f'href="/siae_evaluation/institution_evaluated_siae_list/{cls.evaluated_siae.evaluation_campaign_id}/">'
+            f'href="/siae_evaluation/institution_evaluated_siae_list/{self.evaluated_siae.evaluation_campaign_id}/">'
             "Revenir à la liste des SIAE</a>"
         )
-        cls.return_dashboard_link_html = (
+        self.return_dashboard_link_html = (
             '<a class="btn btn-primary float-end" href="/dashboard/">Retour au Tableau de bord</a>'
         )
 
     def assertSanctionContent(self, response):
-        self.assertContains(
+        assertContains(
             response,
             '<h1>Notification de sanction pour <span class="text-info">Les petits jardins</span></h1>',
             html=True,
             count=1,
         )
-        self.assertContains(
+        assertContains(
             response,
             '<b>Résultat :</b> <b class="text-danger">Négatif</b>',
             count=1,
         )
-        self.assertContains(
+        assertContains(
             response,
             '<b>Raison principale :</b> <b class="text-info">Pièce justificative incorrecte</b>',
             count=1,
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <p>
@@ -86,47 +86,47 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
             count=1,
         )
 
-    def test_anonymous_view_siae(self):
+    def test_anonymous_view_siae(self, client):
         url = reverse(
             "siae_evaluations_views:siae_sanction",
             kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
         )
-        response = self.client.get(url)
-        self.assertRedirects(response, reverse("account_login") + f"?next={url}")
+        response = client.get(url)
+        assertRedirects(response, reverse("account_login") + f"?next={url}")
 
-    def test_anonymous_view_institution(self):
+    def test_anonymous_view_institution(self, client):
         url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_sanction",
             kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
         )
-        response = self.client.get(url)
-        self.assertRedirects(response, reverse("account_login") + f"?next={url}")
+        response = client.get(url)
+        assertRedirects(response, reverse("account_login") + f"?next={url}")
 
-    def test_view_as_institution(self):
-        self.client.force_login(self.institution_user)
-        response = self.client.get(
+    def test_view_as_institution(self, client):
+        client.force_login(self.institution_user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_sanction",
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
         self.assertSanctionContent(response)
-        self.assertContains(
+        assertContains(
             response,
             self.return_evaluated_siae_list_link_html,
             html=True,
             count=1,
         )
-        self.assertNotContains(
+        assertNotContains(
             response,
             self.return_dashboard_link_html,
             html=True,
         )
 
-    def test_view_as_other_institution(self):
+    def test_view_as_other_institution(self, client):
         other = InstitutionMembershipFactory()
-        self.client.force_login(other.user)
-        response = self.client.get(
+        client.force_login(other.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_sanction",
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
@@ -134,31 +134,31 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
         )
         assert response.status_code == 404
 
-    def test_view_as_siae(self):
-        self.client.force_login(self.employer)
-        response = self.client.get(
+    def test_view_as_siae(self, client):
+        client.force_login(self.employer)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:siae_sanction",
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
         self.assertSanctionContent(response)
-        self.assertContains(
+        assertContains(
             response,
             self.return_dashboard_link_html,
             html=True,
             count=1,
         )
-        self.assertNotContains(
+        assertNotContains(
             response,
             self.return_evaluated_siae_list_link_html,
             html=True,
         )
 
-    def test_view_as_other_siae(self):
+    def test_view_as_other_siae(self, client):
         company_membership = CompanyMembershipFactory()
-        self.client.force_login(company_membership.user)
-        response = self.client.get(
+        client.force_login(company_membership.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:siae_sanction",
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
@@ -166,16 +166,16 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
         )
         assert response.status_code == 404
 
-    def test_training_session(self):
-        self.client.force_login(self.institution_user)
-        response = self.client.get(
+    def test_training_session(self, client):
+        client.force_login(self.institution_user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_sanction",
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
         self.assertSanctionContent(response)
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="card-body">
@@ -196,19 +196,19 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
             count=1,
         )
 
-    def test_temporary_suspension(self):
+    def test_temporary_suspension(self, client):
         self.sanctions.training_session = ""
         self.sanctions.suspension_dates = InclusiveDateRange(datetime.date(2023, 1, 1), datetime.date(2023, 6, 1))
         self.sanctions.save()
-        self.client.force_login(self.institution_user)
-        response = self.client.get(
+        client.force_login(self.institution_user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_sanction",
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
         self.assertSanctionContent(response)
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="card-body">
@@ -232,19 +232,19 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
             count=1,
         )
 
-    def test_permanent_suspension(self):
+    def test_permanent_suspension(self, client):
         self.sanctions.training_session = ""
         self.sanctions.suspension_dates = InclusiveDateRange(datetime.date(2023, 1, 1))
         self.sanctions.save()
-        self.client.force_login(self.institution_user)
-        response = self.client.get(
+        client.force_login(self.institution_user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_sanction",
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
         self.assertSanctionContent(response)
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="card-body">
@@ -269,20 +269,20 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
             count=1,
         )
 
-    def test_subsidy_cut_rate(self):
+    def test_subsidy_cut_rate(self, client):
         self.sanctions.training_session = ""
         self.sanctions.subsidy_cut_dates = InclusiveDateRange(datetime.date(2023, 1, 1), datetime.date(2023, 6, 1))
         self.sanctions.subsidy_cut_percent = 35
         self.sanctions.save()
-        self.client.force_login(self.institution_user)
-        response = self.client.get(
+        client.force_login(self.institution_user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_sanction",
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
         self.assertSanctionContent(response)
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="card-body">
@@ -309,20 +309,20 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
             count=1,
         )
 
-    def test_subsidy_cut_full(self):
+    def test_subsidy_cut_full(self, client):
         self.sanctions.training_session = ""
         self.sanctions.subsidy_cut_dates = InclusiveDateRange(datetime.date(2023, 1, 1), datetime.date(2023, 6, 1))
         self.sanctions.subsidy_cut_percent = 100
         self.sanctions.save()
-        self.client.force_login(self.institution_user)
-        response = self.client.get(
+        client.force_login(self.institution_user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_sanction",
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
         self.assertSanctionContent(response)
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="card-body">
@@ -349,19 +349,19 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
             count=1,
         )
 
-    def test_deactivation(self):
+    def test_deactivation(self, client):
         self.sanctions.training_session = ""
         self.sanctions.deactivation_reason = "Mauvais comportement, rien ne va. On arrête tout."
         self.sanctions.save()
-        self.client.force_login(self.institution_user)
-        response = self.client.get(
+        client.force_login(self.institution_user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_sanction",
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
         self.assertSanctionContent(response)
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="card-body">
@@ -388,19 +388,19 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
             count=1,
         )
 
-    def test_no_sanction(self):
+    def test_no_sanction(self, client):
         self.sanctions.training_session = ""
         self.sanctions.no_sanction_reason = "Ça ira pour cette fois."
         self.sanctions.save()
-        self.client.force_login(self.institution_user)
-        response = self.client.get(
+        client.force_login(self.institution_user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_sanction",
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
         self.assertSanctionContent(response)
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="card-body">

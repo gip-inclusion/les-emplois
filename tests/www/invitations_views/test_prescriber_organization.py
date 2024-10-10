@@ -23,15 +23,15 @@ from tests.invitations.factories import PrescriberWithOrgSentInvitationFactory
 from tests.openid_connect.test import sso_parametrize
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import ItouClient, TestCase, assert_previous_step
+from tests.utils.test import ItouClient, assert_previous_step
 
 
 INVITATION_URL = reverse("invitations_views:invite_prescriber_with_org")
 
 
-class TestSendPrescriberWithOrgInvitation(TestCase):
-    def setUp(self):
-        super().setUp()
+class TestSendPrescriberWithOrgInvitation:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, client):
         self.organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.CAP_EMPLOI)
         self.sender = self.organization.members.first()
         self.guest_data = {"first_name": "Léonie", "last_name": "Bathiat", "email": "leonie@example.com"}
@@ -44,7 +44,7 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
             "form-0-last_name": self.guest_data["last_name"],
             "form-0-email": self.guest_data["email"],
         }
-        self.client.force_login(self.sender)
+        client.force_login(self.sender)
 
     def assert_created_invitation(self):
         invitation = PrescriberWithOrgInvitation.objects.get(organization=self.organization)
@@ -52,32 +52,32 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         assert invitation.last_name == self.post_data["form-0-last_name"]
         assert invitation.email == self.post_data["form-0-email"]
 
-    def test_invite_previous_step_link(self):
-        response = self.client.get(INVITATION_URL)
+    def test_invite_previous_step_link(self, client):
+        response = client.get(INVITATION_URL)
         assert_previous_step(response, reverse("prescribers_views:members"))
 
-    def test_invite_not_existing_user(self):
-        response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
-        self.assertRedirects(response, INVITATION_URL)
+    def test_invite_not_existing_user(self, client):
+        response = client.post(INVITATION_URL, data=self.post_data, follow=True)
+        assertRedirects(response, INVITATION_URL)
         self.assert_created_invitation()
 
-    def test_invite_not_existing_user_with_prefill(self):
-        response = self.client.get(
+    def test_invite_not_existing_user_with_prefill(self, client):
+        response = client.get(
             INVITATION_URL, data={"first_name": "Emma", "last_name": "Watson", "email": "emma@example.com"}
         )
         # The form is prefilled with GET params (if valid)
-        self.assertContains(response, "Emma")
+        assertContains(response, "Emma")
 
-    def test_invite_existing_user_is_prescriber_without_org(self):
+    def test_invite_existing_user_is_prescriber_without_org(self, client):
         guest = PrescriberFactory()
         self.post_data["form-0-first_name"] = guest.first_name
         self.post_data["form-0-last_name"] = guest.last_name
         self.post_data["form-0-email"] = guest.email
-        response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
-        self.assertRedirects(response, INVITATION_URL)
+        response = client.post(INVITATION_URL, data=self.post_data, follow=True)
+        assertRedirects(response, INVITATION_URL)
         self.assert_created_invitation()
 
-    def test_invite_former_member(self):
+    def test_invite_former_member(self, client):
         """
         Admins can "deactivate" members of the organization (making the membership inactive).
         A deactivated member must be able to receive new invitations.
@@ -87,8 +87,8 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         self.post_data["form-0-first_name"] = guest.first_name
         self.post_data["form-0-last_name"] = guest.last_name
         self.post_data["form-0-email"] = guest.email
-        response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
-        self.assertRedirects(response, INVITATION_URL)
+        response = client.post(INVITATION_URL, data=self.post_data, follow=True)
+        assertRedirects(response, INVITATION_URL)
         self.assert_created_invitation()
 
         # Deactivate user
@@ -99,15 +99,15 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         membership.save()
         assert guest not in self.organization.active_members
         # Invite user (the revenge)
-        response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
-        self.assertRedirects(response, INVITATION_URL)
+        response = client.post(INVITATION_URL, data=self.post_data, follow=True)
+        assertRedirects(response, INVITATION_URL)
         invitations_count = PrescriberWithOrgInvitation.objects.filter(organization=self.organization).count()
         assert invitations_count == 2
 
 
-class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
-    def setUp(self):
-        super().setUp()
+class TestSendPrescriberWithOrgInvitationExceptions:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, client):
         self.organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.CAP_EMPLOI)
         self.sender = self.organization.members.first()
 
@@ -116,9 +116,9 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         assert response.context["formset"].errors[0]["email"][0] == reason
         assert not PrescriberWithOrgInvitation.objects.exists()
 
-    def test_invite_existing_user_is_employer(self):
+    def test_invite_existing_user_is_employer(self, client):
         guest = CompanyFactory(with_membership=True).members.first()
-        self.client.force_login(self.sender)
+        client.force_login(self.sender)
         post_data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "0",
@@ -129,13 +129,13 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
             "form-0-email": guest.email,
         }
 
-        response = self.client.post(INVITATION_URL, data=post_data)
+        response = client.post(INVITATION_URL, data=post_data)
         assert response.status_code == 200
         self.assert_invalid_user(response, "Cet utilisateur n'est pas un prescripteur.")
 
-    def test_invite_existing_user_is_job_seeker(self):
+    def test_invite_existing_user_is_job_seeker(self, client):
         guest = JobSeekerFactory()
-        self.client.force_login(self.sender)
+        client.force_login(self.sender)
         post_data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "0",
@@ -145,15 +145,15 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
             "form-0-last_name": guest.last_name,
             "form-0-email": guest.email,
         }
-        response = self.client.post(INVITATION_URL, data=post_data)
+        response = client.post(INVITATION_URL, data=post_data)
         assert response.status_code == 200
         self.assert_invalid_user(response, "Cet utilisateur n'est pas un prescripteur.")
 
-    def test_already_a_member(self):
+    def test_already_a_member(self, client):
         # The invited user is already a member
         self.organization.members.add(PrescriberFactory())
         guest = self.organization.members.exclude(email=self.sender.email).first()
-        self.client.force_login(self.sender)
+        client.force_login(self.sender)
         post_data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "0",
@@ -163,7 +163,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
             "form-0-last_name": guest.last_name,
             "form-0-email": guest.email,
         }
-        response = self.client.post(INVITATION_URL, data=post_data)
+        response = client.post(INVITATION_URL, data=post_data)
         assert response.status_code == 200
         self.assert_invalid_user(response, "Cette personne fait déjà partie de votre organisation.")
 
@@ -475,13 +475,13 @@ class TestAcceptPrescriberWithOrgInvitation:
         self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
 
 
-class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
-    def setUp(self):
-        super().setUp()
+class TestAcceptPrescriberWithOrgInvitationExceptions:
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         self.organization = PrescriberOrganizationWithMembershipFactory()
         self.sender = self.organization.members.first()
 
-    def test_existing_user_is_not_prescriber(self):
+    def test_existing_user_is_not_prescriber(self, client):
         user = CompanyFactory(with_membership=True).members.first()
         invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
@@ -491,22 +491,22 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
             email=user.email,
         )
 
-        self.client.force_login(user)
-        response = self.client.get(invitation.acceptance_link, follow=True)
+        client.force_login(user)
+        response = client.get(invitation.acceptance_link, follow=True)
         assert response.status_code == 403
         invitation.refresh_from_db()
         assert not invitation.accepted
 
-    def test_connected_user_is_not_the_invited_user(self):
+    def test_connected_user_is_not_the_invited_user(self, client):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
-        self.client.force_login(self.sender)
-        response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertRedirects(response, reverse("account_logout"))
+        client.force_login(self.sender)
+        response = client.get(invitation.acceptance_link, follow=True)
+        assertRedirects(response, reverse("account_logout"))
         invitation.refresh_from_db()
         assert not invitation.accepted
-        self.assertContains(response, escape("Un utilisateur est déjà connecté."))
+        assertContains(response, escape("Un utilisateur est déjà connecté."))
 
-    def test_expired_invitation_with_new_user(self):
+    def test_expired_invitation_with_new_user(self, client):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         invitation.sent_at -= timedelta(days=invitation.DEFAULT_VALIDITY_DAYS)
         invitation.save()
@@ -518,10 +518,10 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
             "password1": DEFAULT_PASSWORD,
             "password2": DEFAULT_PASSWORD,
         }
-        response = self.client.post(invitation.acceptance_link, data=post_data, follow=True)
-        self.assertContains(response, escape("Cette invitation n'est plus valide."))
+        response = client.post(invitation.acceptance_link, data=post_data, follow=True)
+        assertContains(response, escape("Cette invitation n'est plus valide."))
 
-    def test_expired_invitation_with_existing_user(self):
+    def test_expired_invitation_with_existing_user(self, client):
         user = PrescriberFactory()
         invitation = PrescriberWithOrgSentInvitationFactory(
             first_name=user.first_name,
@@ -535,12 +535,12 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
         assert invitation.has_expired
 
         # GET or POST in this case
-        response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertContains(response, escape("Cette invitation n'est plus valide."))
+        response = client.get(invitation.acceptance_link, follow=True)
+        assertContains(response, escape("Cette invitation n'est plus valide."))
 
-        self.client.force_login(user)
+        client.force_login(user)
         # Try to bypass the first check by directly reaching the join endpoint
         join_url = reverse("invitations_views:join_prescriber_organization", kwargs={"invitation_id": invitation.id})
-        response = self.client.get(join_url, follow=True)
+        response = client.get(join_url, follow=True)
         # The 2 views return the same error message
-        self.assertContains(response, escape("Cette invitation n'est plus valide."))
+        assertContains(response, escape("Cette invitation n'est plus valide."))

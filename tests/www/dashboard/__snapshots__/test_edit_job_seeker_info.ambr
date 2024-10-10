@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: EditJobSeekerInfo.test_edit_by_company_with_nir[view queries]
+# name: TestEditJobSeekerInfo.test_edit_by_company_with_nir[view queries]
   dict({
     'num_queries': 12,
     'queries': list([
@@ -319,7 +319,7 @@
     ]),
   })
 # ---
-# name: EditJobSeekerInfo.test_edit_by_prescriber[view queries]
+# name: TestEditJobSeekerInfo.test_edit_by_prescriber[view queries]
   dict({
     'num_queries': 11,
     'queries': list([

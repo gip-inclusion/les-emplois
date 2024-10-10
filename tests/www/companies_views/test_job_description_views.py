@@ -1,11 +1,11 @@
 import pytest
 from django.contrib import messages
 from django.contrib.gis.geos import Point
-from django.contrib.messages.test import MessagesTestMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from freezegun import freeze_time
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertNumQueries, assertRedirects
 
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType
@@ -16,12 +16,12 @@ from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, assert_previous_step, assertSnapshotQueries
+from tests.utils.test import BASE_NUM_QUERIES, assert_previous_step, assertSnapshotQueries
 
 
-class JobDescriptionAbstractTest(TestCase):
-    def setUp(self):
-        super().setUp()
+class JobDescriptionAbstract:
+    @pytest.fixture(autouse=True)
+    def abstract_setup_method(self):
         city_slug = "paris-75"
         self.paris_city = City.objects.create(
             name="Paris", slug=city_slug, department="75", post_codes=["75001"], coords=Point(5, 23)
@@ -76,42 +76,40 @@ class JobDescriptionAbstractTest(TestCase):
         self.edit_details_url = reverse("companies_views:edit_job_description_details")
         self.edit_preview_url = reverse("companies_views:edit_job_description_preview")
 
-    def _login(self, user):
-        self.client.force_login(user)
+    def _login(self, client, user):
+        client.force_login(user)
 
-        response = self.client.get(self.url)
+        response = client.get(self.url)
 
         return response
 
 
-class JobDescriptionListViewTest(MessagesTestMixin, JobDescriptionAbstractTest):
-    def setUp(self):
-        super().setUp()
-
+class TestJobDescriptionListView(JobDescriptionAbstract):
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         self.url = self.list_url + "?page=1"
 
-    @pytest.mark.usefixtures("unittest_compatibility")
-    def test_job_application_list_response_content(self):
-        self.client.force_login(self.user)
-        with assertSnapshotQueries(self.snapshot(name="job applications list")):
-            response = self.client.get(self.url)
+    def test_job_application_list_response_content(self, client, snapshot, subtests):
+        client.force_login(self.user)
+        with assertSnapshotQueries(snapshot(name="job applications list")):
+            response = client.get(self.url)
 
         assert self.company.job_description_through.count() == 4
-        self.assertContains(
+        assertContains(
             response,
             '<p class="mb-0">4 métiers exercés</p>',
             html=True,
             count=1,
         )
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
 
         for job in self.company.job_description_through.all():
-            with self.subTest(job.pk):
+            with subtests.test(job.pk):
                 job_description_link = f"{job.get_absolute_url()}?back_url={urlencode(self.url)}"
-                self.assertContains(response, job_description_link)
-                self.assertContains(response, f"toggle_job_description_form_{job.pk}")
-                self.assertContains(response, f"#_delete_modal_{job.pk}")
-                self.assertContains(
+                assertContains(response, job_description_link)
+                assertContains(response, f"toggle_job_description_form_{job.pk}")
+                assertContains(response, f"#_delete_modal_{job.pk}")
+                assertContains(
                     response,
                     f"""<input type="hidden" name="job_description_id" value="{job.pk}"/>""",
                     html=True,
@@ -120,35 +118,35 @@ class JobDescriptionListViewTest(MessagesTestMixin, JobDescriptionAbstractTest):
 
         assert_previous_step(response, reverse("dashboard:index"))
 
-    def test_block_job_applications(self):
-        response = self._login(self.user)
+    def test_block_job_applications(self, client):
+        response = self._login(client, self.user)
 
         assert response.status_code == 200
         post_data = {"action": "block_job_applications", "block_job_applications": "on"}
 
-        response = self.client.post(self.url, data=post_data)
+        response = client.post(self.url, data=post_data)
 
-        self.assertRedirects(response, self.url)
+        assertRedirects(response, self.url)
         assert not self.company.block_job_applications
 
-        response = self.client.post(self.url, data={})
+        response = client.post(self.url, data={})
         self.company.refresh_from_db()
 
-        self.assertRedirects(response, self.url)
+        assertRedirects(response, self.url)
         assert self.company.block_job_applications
 
     @freeze_time("2021-06-21 10:10:10.10")
-    def test_toggle_job_description_activity(self):
-        response = self._login(self.user)
+    def test_toggle_job_description_activity(self, client):
+        response = self._login(client, self.user)
 
         assert response.status_code == 200
 
         job_description = self.company.job_description_through.first()
         post_data = {"job_description_id": job_description.pk, "action": "toggle_active"}
-        response = self.client.post(self.url, data=post_data)
+        response = client.post(self.url, data=post_data)
         job_description.refresh_from_db()
 
-        self.assertRedirects(response, self.url)
+        assertRedirects(response, self.url)
         assert not job_description.is_active
         assert job_description.field_history == [
             {
@@ -164,10 +162,10 @@ class JobDescriptionListViewTest(MessagesTestMixin, JobDescriptionAbstractTest):
             "job_description_is_active": "on",
             "action": "toggle_active",
         }
-        response = self.client.post(self.url, data=post_data)
+        response = client.post(self.url, data=post_data)
         job_description.refresh_from_db()
 
-        self.assertRedirects(response, self.url)
+        assertRedirects(response, self.url)
         assert job_description.is_active
         assert job_description.field_history == [
             {
@@ -184,20 +182,20 @@ class JobDescriptionListViewTest(MessagesTestMixin, JobDescriptionAbstractTest):
             },
         ]
 
-        self.assertMessages(response, [messages.Message(messages.SUCCESS, "Le recrutement est maintenant ouvert.")])
+        assertMessages(response, [messages.Message(messages.SUCCESS, "Le recrutement est maintenant ouvert.")])
 
         # Check that we do not crash on unexisting job description
         job_description.delete()
-        response = self.client.post(self.url, data=post_data)
-        self.assertRedirects(response, self.url)
-        self.assertMessages(
+        response = client.post(self.url, data=post_data)
+        assertRedirects(response, self.url)
+        assertMessages(
             response,
             [messages.Message(messages.ERROR, "La fiche de poste que vous souhaitiez modifier n'existe plus.")],
         )
 
         # Trying to update job description from an other company does nothing
         other_company_job_description = JobDescriptionFactory(is_active=False)
-        response = self.client.post(
+        response = client.post(
             self.url,
             data={
                 "job_description_id": other_company_job_description.pk,
@@ -205,16 +203,16 @@ class JobDescriptionListViewTest(MessagesTestMixin, JobDescriptionAbstractTest):
                 "action": "toggle_active",
             },
         )
-        self.assertRedirects(response, self.url)
-        self.assertMessages(
+        assertRedirects(response, self.url)
+        assertMessages(
             response,
             [messages.Message(messages.ERROR, "La fiche de poste que vous souhaitiez modifier n'existe plus.")],
         )
         other_company_job_description.refresh_from_db()
         assert not other_company_job_description.is_active
 
-    def test_delete_job_descriptions(self):
-        response = self._login(self.user)
+    def test_delete_job_descriptions(self, client):
+        response = self._login(client, self.user)
 
         assert response.status_code == 200
 
@@ -223,53 +221,52 @@ class JobDescriptionListViewTest(MessagesTestMixin, JobDescriptionAbstractTest):
             "job_description_id": job_description.pk,
             "action": "delete",
         }
-        response = self.client.post(self.url, data=post_data)
-        self.assertRedirects(response, self.url)
-        self.assertMessages(response, [messages.Message(messages.SUCCESS, "La fiche de poste a été supprimée.")])
+        response = client.post(self.url, data=post_data)
+        assertRedirects(response, self.url)
+        assertMessages(response, [messages.Message(messages.SUCCESS, "La fiche de poste a été supprimée.")])
 
         with pytest.raises(ObjectDoesNotExist):
             JobDescription.objects.get(pk=job_description.id)
 
         # Second delete does not crash (and simply does nothing)
-        response = self.client.post(self.url, data=post_data)
-        self.assertRedirects(response, self.url)
-        self.assertMessages(
+        response = client.post(self.url, data=post_data)
+        assertRedirects(response, self.url)
+        assertMessages(
             response,
             [messages.Message(messages.WARNING, "La fiche de poste que vous souhaitez supprimer n'existe plus.")],
         )
 
         # Trying to delete job description from an other company does nothing
         other_company_job_description = JobDescriptionFactory()
-        response = self.client.post(
+        response = client.post(
             self.url,
             data={
                 "job_description_id": other_company_job_description.pk,
                 "action": "delete",
             },
         )
-        self.assertRedirects(response, self.url)
-        self.assertMessages(
+        assertRedirects(response, self.url)
+        assertMessages(
             response,
             [messages.Message(messages.WARNING, "La fiche de poste que vous souhaitez supprimer n'existe plus.")],
         )
         assert JobDescription.objects.filter(pk=other_company_job_description.pk).exists()
 
 
-class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
-    def setUp(self):
-        super().setUp()
-
+class TestEditJobDescriptionView(JobDescriptionAbstract):
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         self.url = self.edit_url
 
-    def test_edit_job_description_company(self):
-        response = self._login(self.user)
+    def test_edit_job_description_company(self, client, subtests):
+        response = self._login(client, self.user)
 
         assert response.status_code == 200
 
         # Step 1: edit job description
-        response = self.client.get(self.edit_url)
+        response = client.get(self.edit_url)
 
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
 
         post_data = {
             "appellation": "11076",  # Must be a non existing one for the company
@@ -279,14 +276,14 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
             "other_contract_type": "other_contract_type",
             "open_positions": 5,
         }
-        response = self.client.post(self.edit_url, data=post_data)
+        response = client.post(self.edit_url, data=post_data)
 
-        self.assertRedirects(response, self.edit_details_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in self.client.session
+        assertRedirects(response, self.edit_details_url)
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
 
-        session_data = self.client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        session_data = client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
         for k, v in post_data.items():
-            with self.subTest(k):
+            with subtests.test(k):
                 assert v == session_data.get(k)
 
         # Step 2: edit job description details
@@ -296,30 +293,30 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
             "is_resume_mandatory": True,
         }
 
-        response = self.client.post(self.edit_details_url, data=post_data)
+        response = client.post(self.edit_details_url, data=post_data)
 
-        self.assertRedirects(response, self.edit_preview_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in self.client.session
+        assertRedirects(response, self.edit_preview_url)
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
 
-        session_data = self.client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        session_data = client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
         for k, v in post_data.items():
-            with self.subTest(k):
+            with subtests.test(k):
                 assert v == session_data.get(k)
 
         # Step 3: preview and validation
-        response = self.client.get(self.edit_preview_url)
+        response = client.get(self.edit_preview_url)
 
-        self.assertContains(response, "description")
-        self.assertContains(response, "profile_description")
-        self.assertContains(response, "Curriculum Vitae")
+        assertContains(response, "description")
+        assertContains(response, "profile_description")
+        assertContains(response, "Curriculum Vitae")
 
-        response = self.client.post(self.edit_preview_url)
+        response = client.post(self.edit_preview_url)
 
-        self.assertRedirects(response, self.list_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
+        assertRedirects(response, self.list_url)
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
         assert self.company.job_description_through.count() == 5
 
-    def test_edit_job_description_opcs(self):
+    def test_edit_job_description_opcs(self, client, subtests):
         opcs = CompanyFactory(
             department="75",
             coords=self.paris_city.coords,
@@ -330,14 +327,14 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         user_opcs = opcs.members.first()
         opcs.jobs.add(*self.appellations)
 
-        response = self._login(user_opcs)
+        response = self._login(client, user_opcs)
 
         assert response.status_code == 200
 
         # Step 1: edit job description
-        response = self.client.get(self.edit_url)
+        response = client.get(self.edit_url)
 
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
 
         post_data = {
             "appellation": "11076",  # Must be a non existing one for the company
@@ -348,14 +345,14 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
             "other_contract_type": "other_contract_type",
             "open_positions": 5,
         }
-        response = self.client.post(self.edit_url, data=post_data)
+        response = client.post(self.edit_url, data=post_data)
 
-        self.assertRedirects(response, self.edit_details_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in self.client.session
+        assertRedirects(response, self.edit_details_url)
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
 
-        session_data = self.client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        session_data = client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
         for k, v in post_data.items():
-            with self.subTest(k):
+            with subtests.test(k):
                 assert v == session_data.get(k)
 
         # Step 2: edit job description details and check the rendered markdown
@@ -366,44 +363,44 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
             "is_qpv_mandatory": True,
         }
 
-        response = self.client.post(self.edit_details_url, data=post_data)
+        response = client.post(self.edit_details_url, data=post_data)
 
-        self.assertRedirects(response, self.edit_preview_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in self.client.session
+        assertRedirects(response, self.edit_preview_url)
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
 
-        session_data = self.client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        session_data = client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
         for k, v in post_data.items():
-            with self.subTest(k):
+            with subtests.test(k):
                 assert v == session_data.get(k)
 
         # Step 3: preview and validation
-        response = self.client.get(self.edit_preview_url)
-        self.assertContains(response, "<strong>Lorem ipsum</strong><br>\nSpan")
-        self.assertContains(response, "profile_<em>description</em>")
-        self.assertContains(response, "Whatever market description")
-        self.assertContains(response, "Curriculum Vitae")
+        response = client.get(self.edit_preview_url)
+        assertContains(response, "<strong>Lorem ipsum</strong><br>\nSpan")
+        assertContains(response, "profile_<em>description</em>")
+        assertContains(response, "Whatever market description")
+        assertContains(response, "Curriculum Vitae")
         # Rendering of `is_qpv_mandatory`
-        self.assertContains(response, "typologies de public particulières")
+        assertContains(response, "typologies de public particulières")
 
-        response = self.client.post(self.edit_preview_url)
+        response = client.post(self.edit_preview_url)
 
-        self.assertRedirects(response, self.list_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
+        assertRedirects(response, self.list_url)
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
         assert opcs.job_description_through.count() == 5
 
-    def test_empty_session_during_edit(self):
+    def test_empty_session_during_edit(self, client):
         # If the session data have been erased during one of the job description
         # crestion / update tunnel (browser navigation for instance),
         # then redirect to the first step.
 
-        response = self._login(self.user)
+        response = self._login(client, self.user)
 
         assert response.status_code == 200
 
         # Step 1: edit job description
-        response = self.client.get(self.edit_url)
+        response = client.get(self.edit_url)
 
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
 
         post_data = {
             "appellation": "11076",  # Must be a non existing one for the company
@@ -414,26 +411,26 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
             "other_contract_type": "other_contract_type",
             "open_positions": 5,
         }
-        response = self.client.post(self.edit_url, data=post_data)
+        response = client.post(self.edit_url, data=post_data)
 
-        self.assertRedirects(response, self.edit_details_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in self.client.session
+        assertRedirects(response, self.edit_details_url)
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
 
         # Remove session data
-        # - do not remove directly from client (i.e self.client.session.pop(...) )
+        # - do not remove directly from client (i.e client.session.pop(...) )
         # - don't forget to call session.save()
-        session = self.client.session
+        session = client.session
         session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY)
         session.save()
 
         assert session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY) is None
 
-        response = self.client.get(self.edit_details_url)
-        self.assertRedirects(response, self.edit_url)
+        response = client.get(self.edit_details_url)
+        assertRedirects(response, self.edit_url)
 
         # Step 1 + 2
-        response = self.client.post(self.edit_url, data=post_data)
-        response = self.client.post(self.edit_details_url, data=post_data)
+        response = client.post(self.edit_url, data=post_data)
+        response = client.post(self.edit_details_url, data=post_data)
         post_data = {
             "description": "description",
             "profile_description": "profile_description",
@@ -441,26 +438,25 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
             "is_qpv_mandatory": True,
         }
 
-        response = self.client.post(self.edit_details_url, data=post_data)
+        response = client.post(self.edit_details_url, data=post_data)
 
-        self.assertRedirects(response, self.edit_preview_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in self.client.session
+        assertRedirects(response, self.edit_preview_url)
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
 
         # Remove session data
-        session = self.client.session
+        session = client.session
         session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY)
         session.save()
 
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
 
-        response = self.client.get(self.edit_preview_url)
-        self.assertRedirects(response, self.edit_url)
+        response = client.get(self.edit_preview_url)
+        assertRedirects(response, self.edit_url)
 
 
-class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
-    def setUp(self):
-        super().setUp()
-
+class TestUpdateJobDescriptionView(JobDescriptionAbstract):
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         self.job_description = self.company.job_description_through.filter(location__isnull=False).first()
         self.update_url = reverse(
             "companies_views:update_job_description",
@@ -475,39 +471,39 @@ class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
     def initial_location_name(location):
         return location.name
 
-    def test_update_job_description(self):
-        response = self._login(self.user)
+    def test_update_job_description(self, client):
+        response = self._login(client, self.user)
 
         assert response.status_code == 200
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
 
-        response = self.client.get(self.update_url, follow=True)
+        response = client.get(self.update_url, follow=True)
 
-        self.assertRedirects(response, self.edit_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in self.client.session
+        assertRedirects(response, self.edit_url)
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
 
-        session_data = self.client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        session_data = client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
 
         assert session_data.get("pk") == self.job_description.pk
-        self.assertContains(response, self.job_description.appellation.name)
+        assertContains(response, self.job_description.appellation.name)
 
         # At this point, we're redirected to 'edit_job_description'
 
-    def test_update_job_description_remove_location(self):
+    def test_update_job_description_remove_location(self, client, subtests):
         assert self.job_description.location is not None
         initial_location = self.job_description.location
 
-        response = self._login(self.user)
+        response = self._login(client, self.user)
         assert response.status_code == 200
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
 
-        response = self.client.get(self.update_url, follow=True)
-        self.assertRedirects(response, self.edit_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in self.client.session
+        response = client.get(self.update_url, follow=True)
+        assertRedirects(response, self.edit_url)
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
 
         # Step 1: edit job description
-        response = self.client.get(self.edit_url)
-        self.assertContains(response, self.initial_location_name(initial_location))
+        response = client.get(self.edit_url)
+        assertContains(response, self.initial_location_name(initial_location))
 
         post_data = {
             "appellation": self.job_description.appellation.code,
@@ -518,13 +514,13 @@ class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
             "other_contract_type": "other_contract_type",
             "open_positions": self.job_description.open_positions,
         }
-        response = self.client.post(self.edit_url, data=post_data)
+        response = client.post(self.edit_url, data=post_data)
 
-        self.assertRedirects(response, self.edit_details_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in self.client.session
-        session_data = self.client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        assertRedirects(response, self.edit_details_url)
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
+        session_data = client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
         for k, v in post_data.items():
-            with self.subTest(k):
+            with subtests.test(k):
                 if k == "location":
                     # We cannot send None in post_data
                     assert session_data.get(k) is None
@@ -537,30 +533,30 @@ class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
             "profile_description": "profile_description",
             "is_resume_mandatory": True,
         }
-        response = self.client.post(self.edit_details_url, data=post_data)
-        self.assertRedirects(response, self.edit_preview_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in self.client.session
-        session_data = self.client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        response = client.post(self.edit_details_url, data=post_data)
+        assertRedirects(response, self.edit_preview_url)
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
+        session_data = client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
         for k, v in post_data.items():
-            with self.subTest(k):
+            with subtests.test(k):
                 assert v == session_data.get(k)
 
         # Step 3: preview
-        response = self.client.get(self.edit_preview_url)
-        self.assertNotContains(response, self.initial_location_name(initial_location))
+        response = client.get(self.edit_preview_url)
+        assertNotContains(response, self.initial_location_name(initial_location))
 
         # Step 4: validation
-        response = self.client.post(self.edit_preview_url)
-        self.assertRedirects(response, self.list_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
+        response = client.post(self.edit_preview_url)
+        assertRedirects(response, self.list_url)
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
 
         self.job_description.refresh_from_db()
         assert self.job_description.location is None
 
 
-class JobDescriptionCardTest(JobDescriptionAbstractTest):
-    def setUp(self):
-        super().setUp()
+class TestJobDescriptionCard(JobDescriptionAbstract):
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         self.job_description = self.company.job_description_through.first()
         self.url = reverse(
             "companies_views:job_description_card",
@@ -580,21 +576,21 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             kwargs={"job_description_id": job_description.pk},
         )
 
-    def test_employer_card_actions(self):
+    def test_employer_card_actions(self, client):
         # Checks if company can update their job descriptions
-        response = self._login(self.user)
+        response = self._login(client, self.user)
 
-        self.assertContains(response, "Modifier la fiche de poste")
-        self.assertContains(response, self.update_job_description_url(self.job_description))
-        self.assertContains(response, "Retour vers la liste des postes")
-        self.assertContains(response, reverse("companies_views:job_description_list"))
-        self.assertNotContains(response, self.apply_start_url(self.company))
+        assertContains(response, "Modifier la fiche de poste")
+        assertContains(response, self.update_job_description_url(self.job_description))
+        assertContains(response, "Retour vers la liste des postes")
+        assertContains(response, reverse("companies_views:job_description_list"))
+        assertNotContains(response, self.apply_start_url(self.company))
 
-    def test_prescriber_card_actions(self):
+    def test_prescriber_card_actions(self, client):
         # Checks if non-employers can apply to opened job descriptions
-        self.client.force_login(PrescriberOrganizationWithMembershipFactory().members.first())
+        client.force_login(PrescriberOrganizationWithMembershipFactory().members.first())
 
-        with self.assertNumQueries(
+        with assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # fetch django session
             + 1  # fetch user
@@ -604,19 +600,19 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             + 1  # fetch companies_jobdescription (others_active_jobs)
             + 3  # update session
         ):
-            response = self.client.get(self.url)
+            response = client.get(self.url)
 
-        self.assertContains(response, "Postuler auprès de l'employeur inclusif")
-        self.assertContains(response, self.apply_start_url(self.company))
-        self.assertNotContains(
+        assertContains(response, "Postuler auprès de l'employeur inclusif")
+        assertContains(response, self.apply_start_url(self.company))
+        assertNotContains(
             response,
             self.update_job_description_url(self.job_description),
         )
 
-    def test_job_seeker_card_actions(self):
-        self.client.force_login(JobSeekerFactory())
+    def test_job_seeker_card_actions(self, client):
+        client.force_login(JobSeekerFactory())
 
-        with self.assertNumQueries(
+        with assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # fetch django session
             + 1  # fetch user
@@ -624,38 +620,38 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             + 1  # fetch companies_jobdescription (others_active_jobs)
             + 3  # update session
         ):
-            response = self.client.get(self.url)
+            response = client.get(self.url)
 
-        self.assertContains(response, "Postuler auprès de l'employeur inclusif")
-        self.assertContains(response, self.apply_start_url(self.company))
-        self.assertNotContains(response, self.update_job_description_url(self.job_description))
+        assertContains(response, "Postuler auprès de l'employeur inclusif")
+        assertContains(response, self.apply_start_url(self.company))
+        assertNotContains(response, self.update_job_description_url(self.job_description))
 
-    def test_anonymous_card_actions(self):
-        response = self.client.get(self.url)
+    def test_anonymous_card_actions(self, client):
+        response = client.get(self.url)
 
-        self.assertContains(response, "Postuler auprès de l'employeur inclusif")
-        self.assertContains(response, self.apply_start_url(self.company))
-        self.assertNotContains(response, self.update_job_description_url(self.job_description))
+        assertContains(response, "Postuler auprès de l'employeur inclusif")
+        assertContains(response, self.apply_start_url(self.company))
+        assertNotContains(response, self.update_job_description_url(self.job_description))
 
-    def test_display_placeholder_for_empty_fields(self):
+    def test_display_placeholder_for_empty_fields(self, client):
         PLACE_HOLDER = "La structure n'a pas encore renseigné cette rubrique"
 
-        response = self._login(self.user)
+        response = self._login(client, self.user)
 
         # Job description created in setup has empty description fields
-        self.assertContains(response, PLACE_HOLDER, count=2)
+        assertContains(response, PLACE_HOLDER, count=2)
 
         self.job_description.description = "a job description"
         self.job_description.save()
-        response = self.client.get(self.url)
+        response = client.get(self.url)
 
-        self.assertContains(response, "a job description")
-        self.assertContains(response, PLACE_HOLDER)
+        assertContains(response, "a job description")
+        assertContains(response, PLACE_HOLDER)
 
         self.job_description.profile_description = "a profile description"
         self.job_description.save()
-        response = self.client.get(self.url)
+        response = client.get(self.url)
 
-        self.assertContains(response, "a job description")
-        self.assertContains(response, "a profile description")
-        self.assertNotContains(response, PLACE_HOLDER)
+        assertContains(response, "a job description")
+        assertContains(response, "a profile description")
+        assertNotContains(response, PLACE_HOLDER)

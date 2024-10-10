@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: ApprovalSuspendActionChoiceViewTest.test_context[view queries]
+# name: TestApprovalSuspendActionChoiceView.test_context[view queries]
   dict({
     'num_queries': 13,
     'queries': list([
@@ -410,7 +410,7 @@
     ]),
   })
 # ---
-# name: ApprovalSuspendUpdateEndDateViewTest.test_context[view queries]
+# name: TestApprovalSuspendUpdateEndDateView.test_context[view queries]
   dict({
     'num_queries': 13,
     'queries': list([
@@ -821,7 +821,7 @@
     ]),
   })
 # ---
-# name: ApprovalSuspendViewTest.test_delete_suspension[delete_suspension_form]
+# name: TestApprovalSuspendView.test_delete_suspension[delete_suspension_form]
   '''
   <div class="c-form">
                           <p>
@@ -907,7 +907,7 @@
                       </div>
   '''
 # ---
-# name: ApprovalSuspendViewTest.test_delete_suspension[view queries]
+# name: TestApprovalSuspendView.test_delete_suspension[view queries]
   dict({
     'num_queries': 13,
     'queries': list([
@@ -1318,7 +1318,7 @@
     ]),
   })
 # ---
-# name: ApprovalSuspendViewTest.test_update_suspension[view queries]
+# name: TestApprovalSuspendView.test_update_suspension[view queries]
   dict({
     'num_queries': 15,
     'queries': list([

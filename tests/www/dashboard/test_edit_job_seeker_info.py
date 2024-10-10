@@ -1,11 +1,11 @@
 import math
-from unittest import mock
 
 import pytest
 from allauth.account.models import EmailAddress
 from django.contrib.gis.geos import Point
 from django.test import override_settings
 from django.urls import reverse
+from pytest_django.asserts import assertContains, assertFormError, assertNotContains, assertRedirects
 
 from itou.cities.models import City
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
@@ -19,19 +19,18 @@ from tests.prescribers import factories as prescribers_factories
 from tests.users.factories import (
     PrescriberFactory,
 )
-from tests.utils.test import TestCase, assertSnapshotQueries
+from tests.utils.test import assertSnapshotQueries
 
 
 DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class EditJobSeekerInfo(TestCase):
+class TestEditJobSeekerInfo:
     NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
     EMAIL_LABEL = "Adresse électronique"
 
-    def setUp(self):
-        super().setUp()
+    @pytest.fixture(autouse=True)
+    def setup_method(self, client):
         self.city = City.objects.create(
             name="Geispolsheim",
             slug="geispolsheim-67",
@@ -62,11 +61,11 @@ class EditJobSeekerInfo(TestCase):
         assert math.isclose(user.longitude, geocoding_data.get("longitude"), abs_tol=1e-5)
 
     @override_settings(TALLY_URL="https://tally.so")
-    @mock.patch(
-        "itou.utils.apis.geocoding.get_geocoding_data",
-        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-    )
-    def test_edit_by_company_with_nir(self, _mock):
+    def test_edit_by_company_with_nir(self, client, mocker, snapshot):
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+        )
         job_application = JobApplicationSentByPrescriberFactory(job_seeker__jobseeker_profile__nir="178122978200508")
         user = job_application.to_company.members.first()
 
@@ -75,7 +74,7 @@ class EditJobSeekerInfo(TestCase):
         job_application.job_seeker.save()
         previous_last_checked_at = job_application.job_seeker.last_checked_at
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         back_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
         url = reverse(
@@ -83,9 +82,9 @@ class EditJobSeekerInfo(TestCase):
         )
         url = f"{url}?back_url={back_url}&from_application={job_application.pk}"
 
-        with assertSnapshotQueries(self.snapshot(name="view queries")):
-            response = self.client.get(url)
-        self.assertContains(
+        with assertSnapshotQueries(snapshot(name="view queries")):
+            response = client.get(url)
+        assertContains(
             response,
             (
                 f'<a href="https://tally.so/r/wzxQlg?jobapplication={job_application.pk}" target="_blank" '
@@ -103,7 +102,7 @@ class EditJobSeekerInfo(TestCase):
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         } | self.address_form_fields
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
 
         assert response.status_code == 302
         assert response.url == back_url
@@ -119,7 +118,7 @@ class EditJobSeekerInfo(TestCase):
             "phone": "0610203050",
             "address_line_2": "Sous l'escalier",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         job_seeker.refresh_from_db()
 
         assert job_seeker.phone == post_data["phone"]
@@ -128,11 +127,11 @@ class EditJobSeekerInfo(TestCase):
         # last_checked_at should have been updated
         assert job_seeker.last_checked_at > previous_last_checked_at
 
-    @mock.patch(
-        "itou.utils.apis.geocoding.get_geocoding_data",
-        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-    )
-    def test_edit_by_company_with_lack_of_nir_reason(self, _mock):
+    def test_edit_by_company_with_lack_of_nir_reason(self, client, mocker):
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+        )
         job_application = JobApplicationSentByPrescriberFactory(
             job_seeker__jobseeker_profile__nir="",
             job_seeker__jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
@@ -144,7 +143,7 @@ class EditJobSeekerInfo(TestCase):
         job_application.job_seeker.save()
         previous_last_checked_at = job_application.job_seeker.last_checked_at
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         back_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
         url = reverse(
@@ -152,11 +151,11 @@ class EditJobSeekerInfo(TestCase):
         )
         url = f"{url}?back_url={back_url}"
 
-        response = self.client.get(url)
-        self.assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label, html=True)
-        self.assertContains(response, DISABLED_NIR)
-        self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
-        self.assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
+        response = client.get(url)
+        assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label, html=True)
+        assertContains(response, DISABLED_NIR)
+        assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+        assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
 
         NEW_NIR = "1 781 22978200508"
         post_data = {
@@ -170,7 +169,7 @@ class EditJobSeekerInfo(TestCase):
             "nir": NEW_NIR,
         } | self.address_form_fields
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
 
         assert response.status_code == 302
         assert response.url == back_url
@@ -182,11 +181,11 @@ class EditJobSeekerInfo(TestCase):
         # last_checked_at should have been updated
         assert job_seeker.last_checked_at > previous_last_checked_at
 
-    @mock.patch(
-        "itou.utils.apis.geocoding.get_geocoding_data",
-        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-    )
-    def test_edit_by_company_without_nir_information(self, _mock):
+    def test_edit_by_company_without_nir_information(self, client, mocker):
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+        )
         job_application = JobApplicationSentByPrescriberFactory(
             job_seeker__jobseeker_profile__nir="", job_seeker__jobseeker_profile__lack_of_nir_reason=""
         )
@@ -197,7 +196,7 @@ class EditJobSeekerInfo(TestCase):
         job_application.job_seeker.save()
         previous_last_checked_at = job_application.job_seeker.last_checked_at
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         back_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
         url = reverse(
@@ -205,10 +204,10 @@ class EditJobSeekerInfo(TestCase):
         )
         url = f"{url}?back_url={back_url}"
 
-        response = self.client.get(url)
+        response = client.get(url)
         # Check that the NIR field is enabled
         assert not response.context["form"]["nir"].field.disabled
-        self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+        assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
 
         post_data = {
             "email": "bob@saintclar.net",
@@ -220,13 +219,13 @@ class EditJobSeekerInfo(TestCase):
             "lack_of_nir": False,
         } | self.address_form_fields
 
-        response = self.client.post(url, data=post_data)
-        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+        response = client.post(url, data=post_data)
+        assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
 
         post_data["lack_of_nir"] = True
-        response = self.client.post(url, data=post_data)
-        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
-        self.assertContains(response, "Veuillez sélectionner un motif pour continuer", html=True)
+        response = client.post(url, data=post_data)
+        assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+        assertContains(response, "Veuillez sélectionner un motif pour continuer", html=True)
 
         post_data.update(
             {
@@ -234,14 +233,14 @@ class EditJobSeekerInfo(TestCase):
                 "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER.value,
             }
         )
-        response = self.client.post(url, data=post_data)
-        self.assertRedirects(response, expected_url=back_url)
+        response = client.post(url, data=post_data)
+        assertRedirects(response, expected_url=back_url)
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
         assert job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
         assert job_seeker.jobseeker_profile.nir == ""
 
-        response = self.client.get(url)
-        self.assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
+        response = client.get(url)
+        assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
 
         post_data.update(
             {
@@ -249,9 +248,9 @@ class EditJobSeekerInfo(TestCase):
                 "nir": "1234",
             }
         )
-        response = self.client.post(url, data=post_data)
-        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
-        self.assertFormError(
+        response = client.post(url, data=post_data)
+        assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+        assertFormError(
             response.context["form"],
             "nir",
             "Le numéro de sécurité sociale est trop court (15 caractères autorisés).",
@@ -259,8 +258,8 @@ class EditJobSeekerInfo(TestCase):
 
         NEW_NIR = "1 781 22978200508"
         post_data["nir"] = NEW_NIR
-        response = self.client.post(url, data=post_data)
-        self.assertRedirects(response, expected_url=back_url)
+        response = client.post(url, data=post_data)
+        assertRedirects(response, expected_url=back_url)
 
         job_seeker.refresh_from_db()
         assert job_seeker.jobseeker_profile.lack_of_nir_reason == ""
@@ -269,7 +268,7 @@ class EditJobSeekerInfo(TestCase):
         # last_checked_at should have been updated
         assert job_seeker.last_checked_at > previous_last_checked_at
 
-    def test_edit_by_prescriber(self):
+    def test_edit_by_prescriber(self, client, snapshot):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         user = job_application.sender
 
@@ -277,15 +276,15 @@ class EditJobSeekerInfo(TestCase):
         job_application.job_seeker.created_by = user
         job_application.job_seeker.save()
 
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse(
             "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
         )
-        with assertSnapshotQueries(self.snapshot(name="view queries")):
-            response = self.client.get(url)
+        with assertSnapshotQueries(snapshot(name="view queries")):
+            response = client.get(url)
         assert response.status_code == 200
 
-    def test_edit_by_prescriber_of_organization(self):
+    def test_edit_by_prescriber_of_organization(self, client):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         prescriber = job_application.sender
 
@@ -298,41 +297,41 @@ class EditJobSeekerInfo(TestCase):
         prescribers_factories.PrescriberMembershipFactory(
             user=other_prescriber, organization=job_application.sender_prescriber_organization
         )
-        self.client.force_login(other_prescriber)
+        client.force_login(other_prescriber)
         url = reverse(
             "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
         )
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
-    def test_edit_autonomous_not_allowed(self):
+    def test_edit_autonomous_not_allowed(self, client):
         job_application = JobApplicationSentByPrescriberFactory()
         # The job seeker manages his own personal information (autonomous)
         user = job_application.sender
-        self.client.force_login(user)
+        client.force_login(user)
 
         url = reverse(
             "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
         )
 
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 403
 
-    def test_edit_not_allowed(self):
+    def test_edit_not_allowed(self, client):
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
         job_application = JobApplicationSentByPrescriberFactory(job_seeker__created_by=PrescriberFactory())
 
         # Lambda prescriber not member of the sender organization
         prescriber = PrescriberFactory()
-        self.client.force_login(prescriber)
+        client.force_login(prescriber)
         url = reverse(
             "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
         )
 
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 403
 
-    def test_name_is_required(self):
+    def test_name_is_required(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         job_application = JobApplicationSentByPrescriberFactory(to_company=company, job_seeker__created_by=user)
@@ -343,14 +342,14 @@ class EditJobSeekerInfo(TestCase):
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         } | self.address_form_fields
 
-        self.client.force_login(user)
-        response = self.client.post(
+        client.force_login(user)
+        response = client.post(
             reverse(
                 "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
             ),
             data=post_data,
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="form-group is-invalid form-group-required">
@@ -363,7 +362,7 @@ class EditJobSeekerInfo(TestCase):
             html=True,
             count=1,
         )
-        self.assertContains(
+        assertContains(
             response,
             """
             <div class="form-group is-invalid form-group-required">
@@ -377,11 +376,11 @@ class EditJobSeekerInfo(TestCase):
             count=1,
         )
 
-    @mock.patch(
-        "itou.utils.apis.geocoding.get_geocoding_data",
-        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-    )
-    def test_edit_email_when_unconfirmed(self, _mock):
+    def test_edit_email_when_unconfirmed(self, client, mocker):
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+        )
         """
         The SIAE can edit the email of a jobseeker it works with, provided he did not confirm its email.
         """
@@ -392,7 +391,7 @@ class EditJobSeekerInfo(TestCase):
             to_company=company, job_seeker__created_by=user, job_seeker__jobseeker_profile__nir="178122978200508"
         )
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         back_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
         url = reverse(
@@ -400,8 +399,8 @@ class EditJobSeekerInfo(TestCase):
         )
         url = f"{url}?back_url={back_url}"
 
-        response = self.client.get(url)
-        self.assertContains(response, self.EMAIL_LABEL)
+        response = client.get(url)
+        assertContains(response, self.EMAIL_LABEL)
 
         post_data = {
             "title": "M",
@@ -412,7 +411,7 @@ class EditJobSeekerInfo(TestCase):
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         } | self.address_form_fields
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
 
         assert response.status_code == 302
         assert response.url == back_url
@@ -425,17 +424,17 @@ class EditJobSeekerInfo(TestCase):
             "phone": "0610203050",
             "address_line_2": "Sous l'escalier",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         job_seeker.refresh_from_db()
 
         assert job_seeker.phone == post_data["phone"]
         self._test_address_autocomplete(user=job_seeker, post_data=post_data)
 
-    @mock.patch(
-        "itou.utils.apis.geocoding.get_geocoding_data",
-        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-    )
-    def test_edit_email_when_confirmed(self, _mock):
+    def test_edit_email_when_confirmed(self, client, mocker):
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+        )
         new_email = "bidou@yopmail.com"
         job_application = JobApplicationSentByPrescriberFactory(job_seeker__jobseeker_profile__nir="178122978200508")
         user = job_application.to_company.members.first()
@@ -449,7 +448,7 @@ class EditJobSeekerInfo(TestCase):
         EmailAddress.objects.create(user=job_seeker, email=job_seeker.email, verified=True)
 
         # Now the SIAE wants to edit the jobseeker email. The field is not available, and it cannot be bypassed
-        self.client.force_login(user)
+        client.force_login(user)
 
         back_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
         url = reverse(
@@ -457,8 +456,8 @@ class EditJobSeekerInfo(TestCase):
         )
         url = f"{url}?back_url={back_url}"
 
-        response = self.client.get(url)
-        self.assertNotContains(response, self.EMAIL_LABEL)
+        response = client.get(url)
+        assertNotContains(response, self.EMAIL_LABEL)
 
         post_data = {
             "title": "M",
@@ -469,7 +468,7 @@ class EditJobSeekerInfo(TestCase):
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         } | self.address_form_fields
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
 
         assert response.status_code == 302
         assert response.url == back_url
@@ -487,13 +486,13 @@ class EditJobSeekerInfo(TestCase):
             "phone": "0610203050",
             "address_line_2": "Sous l'escalier",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         job_seeker.refresh_from_db()
 
         assert job_seeker.phone == post_data["phone"]
         self._test_address_autocomplete(user=job_seeker, post_data=post_data)
 
-    def test_edit_no_address_does_not_crash(self):
+    def test_edit_no_address_does_not_crash(self, client):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         user = job_application.sender
 
@@ -501,7 +500,7 @@ class EditJobSeekerInfo(TestCase):
         job_application.job_seeker.created_by = user
         job_application.job_seeker.save()
 
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse(
             "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
         )
@@ -514,6 +513,6 @@ class EditJobSeekerInfo(TestCase):
             "post_code": "35400",
             "city": "Saint-Malo",
         }
-        response = self.client.post(url, data=post_data)
-        self.assertContains(response, "Ce champ est obligatoire.")
+        response = client.post(url, data=post_data)
+        assertContains(response, "Ce champ est obligatoire.")
         assert response.context["form"].errors["address_for_autocomplete"] == ["Ce champ est obligatoire."]

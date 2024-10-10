@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: CardViewTest.test_block_job_applications[nav-tabs]
+# name: TestCardView.test_block_job_applications[nav-tabs]
   '''
   <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" role="tablist">
                           <li class="nav-item" role="presentation">
@@ -19,7 +19,7 @@
                       </ul>
   '''
 # ---
-# name: CardViewTest.test_block_job_applications[tab-content]
+# name: TestCardView.test_block_job_applications[tab-content]
   '''
   <div class="tab-content">
                           <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
@@ -66,7 +66,7 @@
                       </div>
   '''
 # ---
-# name: CardViewTest.test_card_active_and_other_jobs[nav-tabs]
+# name: TestCardView.test_card_active_and_other_jobs[nav-tabs]
   '''
   <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" role="tablist">
                           <li class="nav-item" role="presentation">
@@ -86,7 +86,7 @@
                       </ul>
   '''
 # ---
-# name: CardViewTest.test_card_active_and_other_jobs[tab-content]
+# name: TestCardView.test_card_active_and_other_jobs[tab-content]
   '''
   <div class="tab-content">
                           <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
@@ -172,7 +172,7 @@
                       </div>
   '''
 # ---
-# name: CardViewTest.test_card_no_active_jobs[nav-tabs]
+# name: TestCardView.test_card_no_active_jobs[nav-tabs]
   '''
   <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" role="tablist">
                           <li class="nav-item" role="presentation">
@@ -192,7 +192,7 @@
                       </ul>
   '''
 # ---
-# name: CardViewTest.test_card_no_active_jobs[tab-content]
+# name: TestCardView.test_card_no_active_jobs[tab-content]
   '''
   <div class="tab-content">
                           <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
@@ -248,7 +248,7 @@
                       </div>
   '''
 # ---
-# name: CardViewTest.test_card_no_active_members
+# name: TestCardView.test_card_no_active_members
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
@@ -414,7 +414,7 @@
           </main>
   '''
 # ---
-# name: CardViewTest.test_card_no_other_jobs[nav-tabs]
+# name: TestCardView.test_card_no_other_jobs[nav-tabs]
   '''
   <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" role="tablist">
                           <li class="nav-item" role="presentation">
@@ -427,7 +427,7 @@
                       </ul>
   '''
 # ---
-# name: CardViewTest.test_card_no_other_jobs[tab-content]
+# name: TestCardView.test_card_no_other_jobs[tab-content]
   '''
   <div class="tab-content">
                           <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
@@ -479,7 +479,7 @@
                       </div>
   '''
 # ---
-# name: CardViewTest.test_card_tally_url_no_user
+# name: TestCardView.test_card_tally_url_no_user
   '''
   <div class="c-box c-box--action">
           <h2 class="visually-hidden">Actions rapides</h2>
@@ -511,7 +511,7 @@
       </div>
   '''
 # ---
-# name: CardViewTest.test_card_tally_url_with_user
+# name: TestCardView.test_card_tally_url_with_user
   '''
   <div class="c-box c-box--action">
           <h2 class="visually-hidden">Actions rapides</h2>
@@ -543,7 +543,7 @@
       </div>
   '''
 # ---
-# name: JobDescriptionCardViewTest.test_card_tally_url_no_user
+# name: TestJobDescriptionCardView.test_card_tally_url_no_user
   '''
   <div class="c-box c-box--action">
           <h2 class="visually-hidden">Actions rapides</h2>
@@ -586,7 +586,7 @@
       </div>
   '''
 # ---
-# name: JobDescriptionCardViewTest.test_card_tally_url_with_user[with_other_jobs]
+# name: TestJobDescriptionCardView.test_card_tally_url_with_user[with_other_jobs]
   '''
   <div class="c-box c-box--action">
           <h2 class="visually-hidden">Actions rapides</h2>
@@ -636,7 +636,7 @@
       </div>
   '''
 # ---
-# name: JobDescriptionCardViewTest.test_card_tally_url_with_user[without_other_jobs]
+# name: TestJobDescriptionCardView.test_card_tally_url_with_user[without_other_jobs]
   '''
   <div class="c-box c-box--action">
           <h2 class="visually-hidden">Actions rapides</h2>

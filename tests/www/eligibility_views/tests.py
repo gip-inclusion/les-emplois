@@ -1,3 +1,4 @@
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
@@ -9,10 +10,9 @@ from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
-from tests.utils.test import TestCase
 
 
-class AdministrativeCriteriaFormTest(TestCase):
+class TestAdministrativeCriteriaForm:
     """
     Test AdministrativeCriteriaForm.
     """
@@ -183,7 +183,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         assert AdministrativeCriteriaForm(prescriber, None, data={}).is_valid()
 
 
-class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
+class TestAdministrativeCriteriaOfJobApplicationForm:
     def test_job_application(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
@@ -220,21 +220,20 @@ class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
             in form.fields.keys()
         )
 
-    def test_num_level2_admin_criteria(self):
-        for kind in CompanyKind:
-            with self.subTest(kind):
-                company = CompanyFactory(kind=kind, with_membership=True)
-                user = company.members.first()
+    @pytest.mark.parametrize("kind", CompanyKind)
+    def test_num_level2_admin_criteria(self, kind):
+        company = CompanyFactory(kind=kind, with_membership=True)
+        user = company.members.first()
 
-                job_application = JobApplicationFactory(
-                    with_approval=True,
-                    to_company=company,
-                    sender_company=company,
-                    hiring_start_at=timezone.now() - relativedelta(months=2),
-                )
-                form = AdministrativeCriteriaOfJobApplicationForm(user, company, job_application=job_application)
+        job_application = JobApplicationFactory(
+            with_approval=True,
+            to_company=company,
+            sender_company=company,
+            hiring_start_at=timezone.now() - relativedelta(months=2),
+        )
+        form = AdministrativeCriteriaOfJobApplicationForm(user, company, job_application=job_application)
 
-                if kind in [CompanyKind.ETTI, CompanyKind.AI]:
-                    assert 2 == form.num_level2_admin_criteria
-                else:
-                    assert 3 == form.num_level2_admin_criteria
+        if kind in [CompanyKind.ETTI, CompanyKind.AI]:
+            assert 2 == form.num_level2_admin_criteria
+        else:
+            assert 3 == form.num_level2_admin_criteria

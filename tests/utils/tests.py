@@ -25,7 +25,7 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.template import Context, Template
 from django.template.loader import render_to_string
-from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape
@@ -90,7 +90,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.test import TestCase, create_fake_postcode, parse_response_to_soup
+from tests.utils.test import create_fake_postcode, parse_response_to_soup
 
 
 def get_response_for_middlewaremixin(request):
@@ -488,7 +488,7 @@ def test_logout_as_labor_inspector_multiple_institutions(client):
     assertContains(response, institution2.name)
 
 
-class UtilsValidatorsTest(TestCase):
+class TestUtilsValidators:
     def test_validate_alphanumeric(self):
         with pytest.raises(ValidationError):
             alphanumeric("1245a_89871")
@@ -633,7 +633,7 @@ class UtilsValidatorsTest(TestCase):
             validate_html("<script>$('.green');</script>")
 
 
-class UtilsTemplateTagsTestCase(TestCase):
+class TestUtilsTemplateTags:
     def test_url_add_query(self):
         """Test `url_add_query` template tag."""
 
@@ -760,8 +760,8 @@ class UtilsTemplateTagsTestCase(TestCase):
             == "F… M… L…"
         )
 
-    @override_settings(TALLY_URL="https://foobar")
-    def test_tally_url_custom_template_tag(self):
+    def test_tally_url_custom_template_tag(self, settings):
+        settings.TALLY_URL = "https://foobar"
         test_id = 1234
         context = {
             "test_id": test_id,
@@ -772,7 +772,7 @@ class UtilsTemplateTagsTestCase(TestCase):
         assert f"url:{get_tally_form_url('abcde', pk=test_id, hard='coded')}" == out
 
 
-class UtilsTemplateFiltersTestCase(TestCase):
+class TestUtilsTemplateFilters:
     def test_format_phone(self):
         """Test `format_phone` template filter."""
         assert format_filters.format_phone("") == ""
@@ -793,7 +793,7 @@ class UtilsTemplateFiltersTestCase(TestCase):
         # SIRET
         assert format_filters.format_siret("12345678912345") == "123 456 789 12345"
 
-    def test_format_nir(self):
+    def test_format_nir(self, subtests):
         test_cases = [
             (
                 "141068078200557",
@@ -811,10 +811,10 @@ class UtilsTemplateFiltersTestCase(TestCase):
             ("12345678910", "12345678910"),
         ]
         for nir, expected in test_cases:
-            with self.subTest(nir):
+            with subtests.test(nir):
                 assert format_filters.format_nir(nir) == expected
 
-    def test_format_approval_number(self):
+    def test_format_approval_number(self, subtests):
         test_cases = [
             ("", ""),
             ("XXXXX3500001", '<span>XXXXX</span><span class="ms-1">35</span><span class="ms-1">00001</span>'),
@@ -822,11 +822,11 @@ class UtilsTemplateFiltersTestCase(TestCase):
             ("foo", '<span>foo</span><span class="ms-1"></span><span class="ms-1"></span>'),
         ]
         for number, expected in test_cases:
-            with self.subTest(number):
+            with subtests.test(number):
                 assert format_filters.format_approval_number(number) == expected
 
 
-class UtilsUrlsTestCase(TestCase):
+class TestUtilsUrls:
     def test_add_url_params(self):
         """Test `urls.add_url_params()`."""
 
@@ -924,7 +924,7 @@ class MockedCompanySignupTokenGenerator(CompanySignupTokenGenerator):
         return self._now_val
 
 
-class CompanySignupTokenGeneratorTest(TestCase):
+class TestCompanySignupTokenGenerator:
     def test_make_token(self):
         company = Company.objects.create()
         p0 = CompanySignupTokenGenerator()
@@ -985,7 +985,7 @@ class CompanySignupTokenGeneratorTest(TestCase):
         assert p0.check_token(company, tk1) is False
 
 
-class CnilCompositionPasswordValidatorTest(SimpleTestCase):
+class TestCnilCompositionPasswordValidator:
     def test_validate(self):
         # Good passwords.
 
@@ -1016,75 +1016,74 @@ class CnilCompositionPasswordValidatorTest(SimpleTestCase):
         assert CnilCompositionPasswordValidator().get_help_text() == CnilCompositionPasswordValidator.HELP_MSG
 
 
-class SupportRemarkAdminViewsTest(TestCase):
-    def test_add_support_remark_to_suspension(self):
-        today = timezone.localdate()
-        job_app = JobApplicationFactory(with_approval=True)
-        approval = job_app.approval
+def test_add_support_remark_to_suspension(client):
+    today = timezone.localdate()
+    job_app = JobApplicationFactory(with_approval=True)
+    approval = job_app.approval
 
-        suspension = SuspensionFactory(
-            approval=approval,
-            start_at=today,
-            end_at=today + relativedelta(months=2),
-            reason=Suspension.Reason.BROKEN_CONTRACT.value,
-        )
+    suspension = SuspensionFactory(
+        approval=approval,
+        start_at=today,
+        end_at=today + relativedelta(months=2),
+        reason=Suspension.Reason.BROKEN_CONTRACT.value,
+    )
 
-        url = reverse("admin:approvals_suspension_change", args=[suspension.pk])
+    url = reverse("admin:approvals_suspension_change", args=[suspension.pk])
 
-        # Not enough perms.
-        user = PrescriberFactory()
-        self.client.force_login(user)
-        response = self.client.get(url)
-        assert response.status_code == 302
+    # Not enough perms.
+    user = PrescriberFactory()
+    client.force_login(user)
+    response = client.get(url)
+    assert response.status_code == 302
 
-        # Add needed perms
-        user = ItouStaffFactory()
-        self.client.force_login(user)
-        suspension_content_type = ContentType.objects.get_for_model(Suspension)
-        permission = Permission.objects.get(content_type=suspension_content_type, codename="change_suspension")
-        user.user_permissions.add(permission)
-        remark_content_type = ContentType.objects.get_for_model(PkSupportRemark)
-        permission = Permission.objects.get(content_type=remark_content_type, codename="view_pksupportremark")
-        user.user_permissions.add(permission)
-        permission = Permission.objects.get(content_type=remark_content_type, codename="add_pksupportremark")
-        user.user_permissions.add(permission)
+    # Add needed perms
+    user = ItouStaffFactory()
+    client.force_login(user)
+    suspension_content_type = ContentType.objects.get_for_model(Suspension)
+    permission = Permission.objects.get(content_type=suspension_content_type, codename="change_suspension")
+    user.user_permissions.add(permission)
+    remark_content_type = ContentType.objects.get_for_model(PkSupportRemark)
+    permission = Permission.objects.get(content_type=remark_content_type, codename="view_pksupportremark")
+    user.user_permissions.add(permission)
+    permission = Permission.objects.get(content_type=remark_content_type, codename="add_pksupportremark")
+    user.user_permissions.add(permission)
 
-        # With good perms.
-        response = self.client.get(url)
-        assert response.status_code == 200
+    # With good perms.
+    response = client.get(url)
+    assert response.status_code == 200
 
-        fake = fk(locale="fr_FR")
-        fake_remark = fake.sentence()
+    fake = fk(locale="fr_FR")
+    fake_remark = fake.sentence()
 
-        # Get initial data for suspension form
-        post_data = response.context["adminform"].form.initial
+    # Get initial data for suspension form
+    post_data = response.context["adminform"].form.initial
 
-        # Compose manually dict for remark inlines fields because context doesn't provide it easily
-        post_data.update(
-            {
-                "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
-                "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
-                "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": "0",
-                "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": "1",
-                "utils-pksupportremark-content_type-object_id-0-remark": fake_remark,
-                "utils-pksupportremark-content_type-object_id-0-id": "",
-                "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
-                "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
-                "_save": "Enregistrer",
-            }
-        )
-        self.client.post(url, data=post_data)
+    # Compose manually dict for remark inlines fields because context doesn't provide it easily
+    post_data.update(
+        {
+            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": "1",
+            "utils-pksupportremark-content_type-object_id-0-remark": fake_remark,
+            "utils-pksupportremark-content_type-object_id-0-id": "",
+            "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
+            "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
+            "_save": "Enregistrer",
+        }
+    )
+    client.post(url, data=post_data)
 
-        # Is the remark created ?
-        remark = PkSupportRemark.objects.filter(content_type=suspension_content_type, object_id=suspension.pk).first()
-        assert remark.remark == fake_remark
+    # Is the remark created ?
+    remark = PkSupportRemark.objects.filter(content_type=suspension_content_type, object_id=suspension.pk).first()
+    assert remark.remark == fake_remark
 
-        # Is the remark displayed in admin change form ?
-        response = self.client.get(url)
-        self.assertContains(response, escape(fake_remark))
+    # Is the remark displayed in admin change form ?
+    response = client.get(url)
+    assertContains(response, escape(fake_remark))
 
 
-class SessionNamespaceTest(TestCase):
+class TestSessionNamespace:
     def _get_session_store(self):
         return importlib.import_module(settings.SESSION_ENGINE).SessionStore()
 
@@ -1156,7 +1155,7 @@ class SessionNamespaceTest(TestCase):
         assert ns.name not in session  # .init() wasn't called
 
 
-class JSONTest(TestCase):
+class TestJSON:
     SYMMETRIC_CONVERSION = [
         (None, "null"),
         (False, "false"),
@@ -1451,7 +1450,7 @@ def test_active_announcement_campaign_context_processor(client, empty_active_ann
     assert response.context["active_campaign_announce"] == campaign
 
 
-class UtilsParseResponseToSoupTest(TestCase):
+class TestUtilsParseResponseToSoup:
     def test_parse_wo_selector(self):
         html = '<html><head></head><body><div id="foo">bar</div></body></html>'
         response = HttpResponse(html)

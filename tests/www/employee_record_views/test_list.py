@@ -3,11 +3,11 @@ import datetime
 import factory
 import pytest
 from dateutil.relativedelta import relativedelta
-from django.contrib.messages.test import MessagesTestMixin
 from django.template.defaultfilters import title, urlencode
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains
 
 from itou.common_apps.address.departments import department_from_postcode
 from itou.companies.enums import CompanyKind
@@ -21,15 +21,14 @@ from tests.employee_record import factories as employee_record_factories
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import TestCase, assert_previous_step, assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
+class TestListEmployeeRecords:
     URL = reverse_lazy("employee_record_views:list")
 
-    def setUp(self):
-        super().setUp()
+    @pytest.fixture(autouse=True)
+    def setup_method(self, client):
         # User must be super user for UI first part (tmp)
         self.company = CompanyWithMembershipAndJobsFactory(name="Evil Corp.", membership__user__first_name="Elliot")
         self.user = self.company.members.get(first_name="Elliot")
@@ -41,19 +40,19 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
         )
         self.job_seeker = self.job_application.job_seeker
 
-    def test_permissions(self):
+    def test_permissions(self, client):
         """
         Non-eligible SIAE should not be able to access this list
         """
         company = CompanyWithMembershipAndJobsFactory(
             kind=factory.fuzzy.FuzzyChoice(set(CompanyKind) - set(Company.ASP_EMPLOYEE_RECORD_KINDS)),
         )
-        self.client.force_login(company.members.get())
+        client.force_login(company.members.get())
 
-        response = self.client.get(self.URL)
+        response = client.get(self.URL)
         assert response.status_code == 403
 
-    def test_new_employee_records_list(self):
+    def test_new_employee_records_list(self, client):
         """
         Check if previous_step and back_url parmaeters are where we need them
         """
@@ -63,90 +62,88 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
             job_application__hiring_start_at=timezone.now() - relativedelta(days=15),
         )
         record.update_as_ready()
-        self.client.force_login(self.user)
+        client.force_login(self.user)
         url = f"{self.URL}?status=READY"
-        response = self.client.get(url)
+        response = client.get(url)
         assert_previous_step(response, reverse("dashboard:index"))
 
         # Check record summary link has back_url set
         record_base_url = reverse("employee_record_views:summary", kwargs={"employee_record_id": record.pk})
         record_url = f"{record_base_url}?back_url={urlencode(url)}"
-        self.assertContains(response, record_url)
+        assertContains(response, record_url)
 
-    def test_new_employee_records(self):
+    def test_new_employee_records(self, client):
         """
         Check if new employee records / job applications are displayed in the list
         """
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
-        response = self.client.get(self.URL)
+        response = client.get(self.URL)
 
-        self.assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
-        self.assertContains(response, "Ville non renseignée")
+        assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
+        assertContains(response, "Ville non renseignée")
 
-    def test_status_filter(self):
+    def test_status_filter(self, client):
         """
         Check status filter
         """
         # No status defined
-        self.client.force_login(self.user)
+        client.force_login(self.user)
         approval_number_formatted = format_filters.format_approval_number(self.job_application.approval.number)
 
-        response = self.client.get(self.URL)
-        self.assertContains(response, approval_number_formatted)
+        response = client.get(self.URL)
+        assertContains(response, approval_number_formatted)
 
         # Or NEW
-        response = self.client.get(self.URL + "?status=NEW")
-        self.assertContains(response, approval_number_formatted)
+        response = client.get(self.URL + "?status=NEW")
+        assertContains(response, approval_number_formatted)
 
         # More complete tests to come with fixtures files
         for status in [Status.SENT, Status.REJECTED, Status.PROCESSED]:
-            response = self.client.get(self.URL + f"?status={status.value}")
-            self.assertNotContains(response, approval_number_formatted)
+            response = client.get(self.URL + f"?status={status.value}")
+            assertNotContains(response, approval_number_formatted)
 
-    def test_job_seeker_filter(self):
+    def test_job_seeker_filter(self, client):
         approval_number_formatted = format_filters.format_approval_number(self.job_application.approval.number)
         other_job_application = JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
         other_approval_number_formatted = format_filters.format_approval_number(other_job_application.approval.number)
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
-        response = self.client.get(self.URL)
-        self.assertContains(response, approval_number_formatted)
-        self.assertContains(response, other_approval_number_formatted)
+        response = client.get(self.URL)
+        assertContains(response, approval_number_formatted)
+        assertContains(response, other_approval_number_formatted)
 
-        response = self.client.get(self.URL + f"?job_seeker={self.job_seeker.pk}")
-        self.assertContains(response, approval_number_formatted)
-        self.assertNotContains(response, other_approval_number_formatted)
+        response = client.get(self.URL + f"?job_seeker={self.job_seeker.pk}")
+        assertContains(response, approval_number_formatted)
+        assertNotContains(response, other_approval_number_formatted)
 
-        response = self.client.get(self.URL + "?job_seeker=0")
-        self.assertContains(response, "Sélectionnez un choix valide. 0 n’en fait pas partie.")
-        self.assertContains(response, approval_number_formatted)
-        self.assertContains(response, other_approval_number_formatted)
+        response = client.get(self.URL + "?job_seeker=0")
+        assertContains(response, "Sélectionnez un choix valide. 0 n’en fait pas partie.")
+        assertContains(response, approval_number_formatted)
+        assertContains(response, other_approval_number_formatted)
 
-    def test_employee_records_approval_display(self):
-        self.client.force_login(self.user)
+    def test_employee_records_approval_display(self, client):
+        client.force_login(self.user)
         approval = self.job_application.approval
         approval.start_at = datetime.date(2023, 9, 2)
         approval.end_at = datetime.date(2024, 10, 11)
         approval.save()
 
-        response = self.client.get(self.URL)
+        response = client.get(self.URL)
 
-        self.assertContains(response, "<small>Date de début</small><strong>02/09/2023</strong>", html=True)
-        self.assertContains(
-            response, "<small>Date prévisionnelle de fin</small><strong>11/10/2024</strong>", html=True
-        )
+        assertContains(response, "<small>Date de début</small><strong>02/09/2023</strong>", html=True)
+        assertContains(response, "<small>Date prévisionnelle de fin</small><strong>11/10/2024</strong>", html=True)
 
-    def test_employee_records_with_a_suspension_need_to_be_updated(self):
-        self.client.force_login(self.user)
+    def test_employee_records_with_a_suspension_need_to_be_updated(self, client, snapshot):
+        client.force_login(self.user)
         approvals_factories.SuspensionFactory(
             approval=self.job_application.approval, siae=self.job_application.to_company
         )
 
-        response = self.client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL + "?status=NEW")
 
         # Global message alert
-        assert str(parse_response_to_soup(response, selector=".s-title-02 .alert")) == self.snapshot(name="alert")
+        assert str(parse_response_to_soup(response, selector=".s-title-02 .alert")) == snapshot(name="alert")
 
         # Item message alert
         assert str(
@@ -155,19 +152,21 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
                 selector=".employee-records-list .c-box--results__footer",
                 replace_in_attr=[self.job_application],
             )
-        ) == self.snapshot(name="action")
+        ) == snapshot(name="action")
 
-    def test_existing_employee_records_with_a_suspension_does_not_show_need_to_be_updated_message(self):
-        self.client.force_login(self.user)
+    def test_existing_employee_records_with_a_suspension_does_not_show_need_to_be_updated_message(
+        self, client, snapshot
+    ):
+        client.force_login(self.user)
         employee_record = EmployeeRecordFactory(job_application=self.job_application)
         approvals_factories.SuspensionFactory(
             approval=self.job_application.approval, siae=self.job_application.to_company
         )
 
-        response = self.client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL + "?status=NEW")
 
         # Global message alert
-        self.assertMessages(response, [])
+        assertMessages(response, [])
 
         # Item message alert
         assert (
@@ -178,20 +177,20 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
                     replace_in_attr=[self.job_application, employee_record],
                 )
             )
-            == self.snapshot()
+            == snapshot()
         )
 
-    def test_employee_records_with_a_prolongation_need_to_be_updated(self):
-        self.client.force_login(self.user)
+    def test_employee_records_with_a_prolongation_need_to_be_updated(self, client, snapshot):
+        client.force_login(self.user)
         approvals_factories.ProlongationFactory(
             approval=self.job_application.approval,
             declared_by_siae=self.job_application.to_company,
         )
 
-        response = self.client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL + "?status=NEW")
 
         # Global message alert
-        assert str(parse_response_to_soup(response, selector=".s-title-02 .alert")) == self.snapshot(name="alert")
+        assert str(parse_response_to_soup(response, selector=".s-title-02 .alert")) == snapshot(name="alert")
         # Item message alert
         assert str(
             parse_response_to_soup(
@@ -199,20 +198,22 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
                 selector=".employee-records-list .c-box--results__footer",
                 replace_in_attr=[self.job_application],
             )
-        ) == self.snapshot(name="action")
+        ) == snapshot(name="action")
 
-    def test_existing_employee_records_with_a_prolongation_does_not_show_need_to_be_updated_message(self):
-        self.client.force_login(self.user)
+    def test_existing_employee_records_with_a_prolongation_does_not_show_need_to_be_updated_message(
+        self, client, snapshot
+    ):
+        client.force_login(self.user)
         employee_record = EmployeeRecordFactory(job_application=self.job_application)
         approvals_factories.ProlongationFactory(
             approval=self.job_application.approval,
             declared_by_siae=self.job_application.to_company,
         )
 
-        response = self.client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL + "?status=NEW")
 
         # Global message alert
-        self.assertMessages(response, [])
+        assertMessages(response, [])
         # Item message alert
         assert (
             str(
@@ -222,14 +223,14 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
                     replace_in_attr=[self.job_application, employee_record],
                 )
             )
-            == self.snapshot()
+            == snapshot()
         )
 
-    def test_employee_record_to_disable(self):
-        self.client.force_login(self.user)
+    def test_employee_record_to_disable(self, client, snapshot):
+        client.force_login(self.user)
         employee_record = employee_record_factories.EmployeeRecordFactory(job_application=self.job_application)
 
-        response = self.client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL + "?status=NEW")
 
         assert (
             str(
@@ -239,21 +240,21 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
                     replace_in_attr=[self.job_application, employee_record],
                 )
             )
-            == self.snapshot()
+            == snapshot()
         )
 
     @override_settings(TALLY_URL="https://tally.so")
-    def test_employee_records_with_nir_associated_to_other(self):
-        self.client.force_login(self.user)
+    def test_employee_records_with_nir_associated_to_other(self, client, snapshot):
+        client.force_login(self.user)
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
         self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
 
-        response = self.client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL + "?status=NEW")
 
-        self.assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
+        assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
         # Global message alert
-        assert str(parse_response_to_soup(response, selector=".s-title-02 .alert")) == self.snapshot(name="alert")
+        assert str(parse_response_to_soup(response, selector=".s-title-02 .alert")) == snapshot(name="alert")
         # Item message alert
         assert str(
             parse_response_to_soup(
@@ -261,21 +262,21 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
                 selector=".employee-records-list .c-box--results__footer",
                 replace_in_attr=[self.job_application],
             )
-        ) == self.snapshot(name="action")
+        ) == snapshot(name="action")
 
     @override_settings(TALLY_URL="https://tally.so")
-    def test_employee_record_to_disable_with_nir_associated_to_other(self):
-        self.client.force_login(self.user)
+    def test_employee_record_to_disable_with_nir_associated_to_other(self, client, snapshot):
+        client.force_login(self.user)
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
         self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
         new_er = employee_record_factories.EmployeeRecordFactory(job_application=self.job_application)
 
-        response = self.client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL + "?status=NEW")
 
-        self.assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
+        assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
         # Global message alert
-        assert str(parse_response_to_soup(response, selector=".s-title-02 .alert")) == self.snapshot(name="alert")
+        assert str(parse_response_to_soup(response, selector=".s-title-02 .alert")) == snapshot(name="alert")
         # Item message alert
         assert str(
             parse_response_to_soup(
@@ -283,25 +284,25 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
                 selector=".employee-records-list .c-box--results__footer",
                 replace_in_attr=[new_er],
             )
-        ) == self.snapshot(name="action")
+        ) == snapshot(name="action")
 
-    def test_rejected_without_custom_message(self):
-        self.client.force_login(self.user)
+    def test_rejected_without_custom_message(self, client, faker):
+        client.force_login(self.user)
 
         record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_company=self.company)
         record.update_as_ready()
-        record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
+        record.update_as_sent(faker.asp_batch_filename(), 1, None)
         record.update_as_rejected("0012", "JSON Invalide", None)
 
-        response = self.client.get(self.URL + "?status=REJECTED")
-        self.assertContains(response, "Erreur 0012")
-        self.assertContains(response, "JSON Invalide")
+        response = client.get(self.URL + "?status=REJECTED")
+        assertContains(response, "Erreur 0012")
+        assertContains(response, "JSON Invalide")
 
         hexa_commune = record.job_application.job_seeker.jobseeker_profile.hexa_commune
-        self.assertContains(response, f"{department_from_postcode(hexa_commune.code)} - {title(hexa_commune.name)}")
+        assertContains(response, f"{department_from_postcode(hexa_commune.code)} - {title(hexa_commune.name)}")
 
-    def test_rejected_custom_messages(self):
-        self.client.force_login(self.user)
+    def test_rejected_custom_messages(self, client, subtests):
+        client.force_login(self.user)
 
         record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_company=self.company)
 
@@ -328,17 +329,17 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
             ),
         ]
         for err_code, err_message, custom_err_message in tests_specs:
-            with self.subTest(err_code):
+            with subtests.test(err_code):
                 record.status = Status.SENT
                 record.update_as_rejected(err_code, err_message, "{}")
 
-                response = self.client.get(self.URL + "?status=REJECTED")
-                self.assertContains(response, f"Erreur {err_code}")
-                self.assertNotContains(response, err_message)
-                self.assertContains(response, custom_err_message)
+                response = client.get(self.URL + "?status=REJECTED")
+                assertContains(response, f"Erreur {err_code}")
+                assertNotContains(response, err_message)
+                assertContains(response, custom_err_message)
 
-    def _check_employee_record_order(self, url, first_job_application, second_job_application):
-        response = self.client.get(url)
+    def _check_employee_record_order(self, client, url, first_job_application, second_job_application):
+        response = client.get(url)
         response_text = response.content.decode(response.charset)
         # The index method raises ValueError if the value isn't found
         first_job_seeker_position = response_text.index(
@@ -349,11 +350,11 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
         )
         assert first_job_seeker_position < second_job_seeker_position
 
-    def test_new_employee_records_sorted(self):
+    def test_new_employee_records_sorted(self, client, snapshot):
         """
         Check if new employee records / job applications are correctly sorted
         """
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
         job_applicationA = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
@@ -367,21 +368,25 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
         )
 
         # Zzzzz's hiring start is more recent
-        self._check_employee_record_order(self.URL, job_applicationZ, job_applicationA)
+        self._check_employee_record_order(client, self.URL, job_applicationZ, job_applicationA)
 
         # order with -hiring_start_at is the default
-        self._check_employee_record_order(self.URL + "?order=-hiring_start_at", job_applicationZ, job_applicationA)
-        self._check_employee_record_order(self.URL + "?order=hiring_start_at", job_applicationA, job_applicationZ)
+        self._check_employee_record_order(
+            client, self.URL + "?order=-hiring_start_at", job_applicationZ, job_applicationA
+        )
+        self._check_employee_record_order(
+            client, self.URL + "?order=hiring_start_at", job_applicationA, job_applicationZ
+        )
 
         # Zzzzz after Aaaaa
-        self._check_employee_record_order(self.URL + "?order=name", job_applicationA, job_applicationZ)
-        self._check_employee_record_order(self.URL + "?order=-name", job_applicationZ, job_applicationA)
+        self._check_employee_record_order(client, self.URL + "?order=name", job_applicationA, job_applicationZ)
+        self._check_employee_record_order(client, self.URL + "?order=-name", job_applicationZ, job_applicationA)
 
-        with assertSnapshotQueries(self.snapshot(name="employee records")):
-            self.client.get(self.URL)
+        with assertSnapshotQueries(snapshot(name="employee records")):
+            client.get(self.URL)
 
-    def test_rejected_employee_records_sorted(self):
-        self.client.force_login(self.user)
+    def test_rejected_employee_records_sorted(self, client, snapshot):
+        client.force_login(self.user)
 
         recordA = employee_record_factories.EmployeeRecordWithProfileFactory(
             job_application__to_company=self.company,
@@ -400,16 +405,18 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
 
         # Zzzzz's hiring start is more recent
         self._check_employee_record_order(
-            self.URL + "?status=REJECTED", recordZ.job_application, recordA.job_application
+            client, self.URL + "?status=REJECTED", recordZ.job_application, recordA.job_application
         )
 
         # order with -hiring_start_at is the default
         self._check_employee_record_order(
+            client,
             self.URL + "?status=REJECTED&order=-hiring_start_at",
             recordZ.job_application,
             recordA.job_application,
         )
         self._check_employee_record_order(
+            client,
             self.URL + "?status=REJECTED&order=hiring_start_at",
             recordA.job_application,
             recordZ.job_application,
@@ -417,18 +424,20 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
 
         # Zzzzz after Aaaaa
         self._check_employee_record_order(
+            client,
             self.URL + "?status=REJECTED&order=name",
             recordA.job_application,
             recordZ.job_application,
         )
         self._check_employee_record_order(
+            client,
             self.URL + "?status=REJECTED&order=-name",
             recordZ.job_application,
             recordA.job_application,
         )
 
-    def test_ready_employee_records_sorted(self):
-        self.client.force_login(self.user)
+    def test_ready_employee_records_sorted(self, client, snapshot):
+        client.force_login(self.user)
 
         recordA = employee_record_factories.EmployeeRecordWithProfileFactory(
             job_application__to_company=self.company,
@@ -444,15 +453,19 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
             record.update_as_ready()
 
         # Zzzzz's hiring start is more recent
-        self._check_employee_record_order(self.URL + "?status=READY", recordZ.job_application, recordA.job_application)
+        self._check_employee_record_order(
+            client, self.URL + "?status=READY", recordZ.job_application, recordA.job_application
+        )
 
         # order with -hiring_start_at is the default
         self._check_employee_record_order(
+            client,
             self.URL + "?status=READY&order=-hiring_start_at",
             recordZ.job_application,
             recordA.job_application,
         )
         self._check_employee_record_order(
+            client,
             self.URL + "?status=READY&order=hiring_start_at",
             recordA.job_application,
             recordZ.job_application,
@@ -460,31 +473,33 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
 
         # Zzzzz after Aaaaa
         self._check_employee_record_order(
+            client,
             self.URL + "?status=READY&order=name",
             recordA.job_application,
             recordZ.job_application,
         )
         self._check_employee_record_order(
+            client,
             self.URL + "?status=READY&order=-name",
             recordZ.job_application,
             recordA.job_application,
         )
 
-    def test_display_result_count(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.URL + "?status=NEW")
-        self.assertContains(response, "1 résultat")
+    def test_display_result_count(self, client):
+        client.force_login(self.user)
+        response = client.get(self.URL + "?status=NEW")
+        assertContains(response, "1 résultat")
 
         JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
-        response = self.client.get(self.URL + "?status=NEW")
-        self.assertContains(response, "2 résultats")
+        response = client.get(self.URL + "?status=NEW")
+        assertContains(response, "2 résultats")
 
-        response = self.client.get(self.URL + "?status=READY")
-        self.assertContains(response, "0 résultat")
+        response = client.get(self.URL + "?status=READY")
+        assertContains(response, "0 résultat")
 
-    def test_htmx(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.URL, {"status": "NEW"})
+    def test_htmx(self, client):
+        client.force_login(self.user)
+        response = client.get(self.URL, {"status": "NEW"})
         simulated_page = parse_response_to_soup(response)
 
         [new_status] = simulated_page.find_all("input", attrs={"name": "status", "value": "NEW"})
@@ -492,31 +507,31 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
         [ready_status] = simulated_page.find_all("input", attrs={"name": "status", "value": "READY"})
         ready_status["checked"] = ""
 
-        response = self.client.get(self.URL, {"status": "READY"}, headers={"HX-Request": "true"})
+        response = client.get(self.URL, {"status": "READY"}, headers={"HX-Request": "true"})
         update_page_with_htmx(simulated_page, f"form[hx-get='{self.URL}']", response)
 
-        response = self.client.get(self.URL + "?status=READY")
+        response = client.get(self.URL + "?status=READY")
         fresh_page = parse_response_to_soup(response)
         assertSoupEqual(simulated_page, fresh_page)
 
-    def test_htmx_order(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.URL, {"status": "NEW"})
+    def test_htmx_order(self, client):
+        client.force_login(self.user)
+        response = client.get(self.URL, {"status": "NEW"})
         simulated_page = parse_response_to_soup(response)
 
         # Page JavaScript does that.
         [order_field] = simulated_page.find_all("input", attrs={"name": "order"})
         order_field["value"] = "name"
-        response = self.client.get(self.URL, {"status": "NEW", "order": "name"}, headers={"HX-Request": "true"})
+        response = client.get(self.URL, {"status": "NEW", "order": "name"}, headers={"HX-Request": "true"})
         update_page_with_htmx(simulated_page, f"form[hx-get='{self.URL}']", response)
 
-        response = self.client.get(self.URL, {"status": "NEW", "order": "name"})
+        response = client.get(self.URL, {"status": "NEW", "order": "name"})
         fresh_page = parse_response_to_soup(response)
         assertSoupEqual(simulated_page, fresh_page)
 
-    def test_htmx_new_employee_record_updates_badge_count(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.URL, {"status": "NEW"})
+    def test_htmx_new_employee_record_updates_badge_count(self, client):
+        client.force_login(self.user)
+        response = client.get(self.URL, {"status": "NEW"})
         simulated_page = parse_response_to_soup(response)
         # This new application should update the counter badge on NEW.
         new_job_app = JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
@@ -526,10 +541,10 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
         [ready_status] = simulated_page.find_all("input", attrs={"name": "status", "value": "READY"})
         ready_status["checked"] = ""
 
-        response = self.client.get(self.URL, {"status": "READY"}, headers={"HX-Request": "true"})
+        response = client.get(self.URL, {"status": "READY"}, headers={"HX-Request": "true"})
         update_page_with_htmx(simulated_page, f"form[hx-get='{self.URL}']", response)
 
-        response = self.client.get(self.URL + "?status=READY")
+        response = client.get(self.URL + "?status=READY")
         fresh_page = parse_response_to_soup(response)
         # Reloading the job seekers select2 with HTMX would change the
         # select input the form listens to via hx-trigger, causing the

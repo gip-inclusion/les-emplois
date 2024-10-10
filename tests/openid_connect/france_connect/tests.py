@@ -5,11 +5,10 @@ import pytest
 import respx
 from django.contrib import auth
 from django.core.exceptions import ValidationError
-from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.openid_connect.france_connect import constants
@@ -18,7 +17,7 @@ from itou.openid_connect.models import EmailInUseException, InvalidKindException
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from tests.users.factories import JobSeekerFactory, UserFactory
-from tests.utils.test import TestCase, reload_module
+from tests.utils.test import reload_module
 
 
 FC_USERINFO = {
@@ -60,13 +59,15 @@ def mock_oauth_dance(client, expected_route="dashboard:index"):
     return response
 
 
-@override_settings(
-    FRANCE_CONNECT_BASE_URL="https://france.connect.fake",
-    FRANCE_CONNECT_CLIENT_ID="FC_CLIENT_ID_123",
-    FRANCE_CONNECT_CLIENT_SECRET="FC_CLIENT_SECRET_123",
-)
-@reload_module(constants)
-class FranceConnectTest(TestCase):
+class TestFranceConnect:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, settings):
+        settings.FRANCE_CONNECT_BASE_URL = "https://france.connect.fake"
+        settings.FRANCE_CONNECT_CLIENT_ID = "FC_CLIENT_ID_123"
+        settings.FRANCE_CONNECT_CLIENT_SECRET = "FC_CLIENT_SECRET_123"
+        with reload_module(constants):
+            yield
+
     def test_state_delete(self):
         state = FranceConnectState.objects.create(state="foo")
 
@@ -98,9 +99,9 @@ class FranceConnectTest(TestCase):
         with freeze_time("2022-10-13 12:00:01"):
             assert not FranceConnectState.get_from_state(state).is_valid()
 
-    def test_authorize(self):
+    def test_authorize(self, client):
         url = reverse("france_connect:authorize")
-        response = self.client.get(url, follow=False)
+        response = client.get(url, follow=False)
         # Don't use assertRedirects to avoid fetch
         assert response.url.startswith(constants.FRANCE_CONNECT_ENDPOINT_AUTHORIZE)
 
@@ -227,25 +228,25 @@ class FranceConnectTest(TestCase):
 
             user.delete()
 
-    def test_callback_no_code(self):
+    def test_callback_no_code(self, client):
         url = reverse("france_connect:callback")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 302
 
-    def test_callback_no_state(self):
+    def test_callback_no_state(self, client):
         url = reverse("france_connect:callback")
-        response = self.client.get(url, data={"code": "123"})
+        response = client.get(url, data={"code": "123"})
         assert response.status_code == 302
 
-    def test_callback_invalid_state(self):
+    def test_callback_invalid_state(self, client):
         url = reverse("france_connect:callback")
-        response = self.client.get(url, data={"code": "123", "state": "000"})
+        response = client.get(url, data={"code": "123", "state": "000"})
         assert response.status_code == 302
 
     @respx.mock
-    def test_callback(self):
+    def test_callback(self, client):
         # New created job seeker has no title and is redirected to complete its infos
-        mock_oauth_dance(self.client, expected_route="dashboard:edit_user_info")
+        mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
         assert User.objects.count() == 1
         user = User.objects.get(email=FC_USERINFO["email"])
         assert user.first_name == FC_USERINFO["given_name"]
@@ -255,51 +256,51 @@ class FranceConnectTest(TestCase):
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
 
     @respx.mock
-    def test_callback_redirect_on_invalid_kind_exception(self):
+    def test_callback_redirect_on_invalid_kind_exception(self, client):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
 
         for kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER, UserKind.LABOR_INSPECTOR]:
             user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, kind=kind)
-            mock_oauth_dance(self.client, expected_route=f"login:{kind}")
+            mock_oauth_dance(client, expected_route=f"login:{kind}")
             user.delete()
 
-    def test_logout_no_id_token(self):
+    def test_logout_no_id_token(self, client):
         url = reverse("france_connect:logout")
-        response = self.client.get(url + "?")
+        response = client.get(url + "?")
         assert response.status_code == 400
         assert response.json()["message"] == "Le paramètre « id_token » est manquant."
 
-    def test_logout(self):
+    def test_logout(self, client):
         url = reverse("france_connect:logout")
-        response = self.client.get(url, data={"id_token": "123"})
+        response = client.get(url, data={"id_token": "123"})
         expected_url = (
             f"{constants.FRANCE_CONNECT_ENDPOINT_LOGOUT}?id_token_hint=123&state=&"
             "post_logout_redirect_uri=http%3A%2F%2Flocalhost:8000%2Fsearch%2Femployers"
         )
-        self.assertRedirects(response, expected_url, fetch_redirect_response=False)
+        assertRedirects(response, expected_url, fetch_redirect_response=False)
 
     @respx.mock
-    def test_django_account_logout_from_fc(self):
+    def test_django_account_logout_from_fc(self, client):
         """
         When ac IC user wants to log out from his local account,
         he should be logged out too from IC.
         """
         # New created job seeker has no title and is redirected to complete its infos
-        response = mock_oauth_dance(self.client, expected_route="dashboard:edit_user_info")
-        assert auth.get_user(self.client).is_authenticated
+        response = mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
+        assert auth.get_user(client).is_authenticated
         logout_url = reverse("account_logout")
-        self.assertContains(response, logout_url)
-        assert self.client.session.get(constants.FRANCE_CONNECT_SESSION_TOKEN)
+        assertContains(response, logout_url)
+        assert client.session.get(constants.FRANCE_CONNECT_SESSION_TOKEN)
 
-        response = self.client.post(logout_url)
+        response = client.post(logout_url)
         expected_redirection = reverse("france_connect:logout")
         # For simplicity, exclude GET params. They are tested elsewhere anyway..
         assert response.url.startswith(expected_redirection)
 
-        response = self.client.get(response.url)
+        response = client.get(response.url)
         # The following redirection is tested in self.test_logout_with_redirection
         assert response.status_code == 302
-        assert not auth.get_user(self.client).is_authenticated
+        assert not auth.get_user(client).is_authenticated
 
 
 @pytest.mark.parametrize(

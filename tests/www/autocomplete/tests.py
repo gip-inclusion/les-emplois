@@ -1,25 +1,24 @@
+import pytest
 from django.urls import reverse
 
 from itou.asp.models import Commune
 from tests.cities.factories import create_test_cities
 from tests.companies.factories import CompanyFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.utils.test import TestCase
 
 
-class JobsAutocompleteTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        # Set up data for the whole TestCase.
+class TestJobsAutocomplete:
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         create_test_romes_and_appellations(["N1101", "N4105"])
         # Update:
         # - autocomplete URL now needs a SIAE parameter (for existing ROME filtering)
         # - this URL does not accept create / update / delete of elements (removed some some tests)
-        cls.company = CompanyFactory()
-        cls.url = reverse("autocomplete:jobs")
+        self.company = CompanyFactory()
+        self.url = reverse("autocomplete:jobs")
 
-    def test_search_multi_words(self):
-        response = self.client.get(
+    def test_search_multi_words(self, client):
+        response = client.get(
             self.url,
             {
                 "term": "cariste ferroviaire",
@@ -36,8 +35,8 @@ class JobsAutocompleteTest(TestCase):
         }
         assert response.json() == expected
 
-    def test_search_case_insensitive_and_explicit_rome_code(self):
-        response = self.client.get(
+    def test_search_case_insensitive_and_explicit_rome_code(self, client):
+        response = client.get(
             self.url,
             {
                 "term": "CHAUFFEUR livreuse n4105",
@@ -54,8 +53,8 @@ class JobsAutocompleteTest(TestCase):
         }
         assert response.json() == expected
 
-    def test_search_empty_chars(self):
-        response = self.client.get(
+    def test_search_empty_chars(self, client):
+        response = client.get(
             self.url,
             {
                 "term": "    ",
@@ -64,8 +63,8 @@ class JobsAutocompleteTest(TestCase):
         assert response.status_code == 200
         assert response.json() == {"results": []}
 
-    def test_search_full_label(self):
-        response = self.client.get(
+    def test_search_full_label(self, client):
+        response = client.get(
             self.url,
             {
                 "term": "Conducteur / Conductrice de chariot élévateur de l'armée (N1101)",
@@ -82,8 +81,8 @@ class JobsAutocompleteTest(TestCase):
         }
         assert response.json() == expected
 
-    def test_search_special_chars(self):
-        response = self.client.get(
+    def test_search_special_chars(self, client):
+        response = client.get(
             self.url,
             {
                 "term": "conducteur:* & & de:* & !chariot:* & <eleva:*>>>> & armee:* & `(((()))`):*",
@@ -101,14 +100,14 @@ class JobsAutocompleteTest(TestCase):
         assert response.json() == expected
 
 
-class Select2CitiesAutocompleteTest(TestCase):
-    def test_autocomplete(self):
+class TestSelect2CitiesAutocomplete:
+    def test_autocomplete(self, client):
         cities = create_test_cities(["01", "75", "93"], num_per_department=20)
         city_slug_to_pk = {city.slug: city.pk for city in cities}
 
         url = reverse("autocomplete:cities")
 
-        response = self.client.get(url, {"term": "sai"})
+        response = client.get(url, {"term": "sai"})
         assert response.status_code == 200
         assert response.json() == {
             "results": [
@@ -120,7 +119,7 @@ class Select2CitiesAutocompleteTest(TestCase):
         }
 
         # Try with slug parameter
-        response = self.client.get(url, {"term": "sai", "slug": ""})
+        response = client.get(url, {"term": "sai", "slug": ""})
         assert response.status_code == 200
         assert response.json() == {
             "results": [
@@ -132,7 +131,7 @@ class Select2CitiesAutocompleteTest(TestCase):
         }
 
         # the request still finds results when dashes were forgotten
-        response = self.client.get(url, {"term": "saint g"})
+        response = client.get(url, {"term": "saint g"})
         assert response.status_code == 200
         assert response.json() == {
             "results": [
@@ -142,13 +141,13 @@ class Select2CitiesAutocompleteTest(TestCase):
         }
 
         # and is also able to remove the dashes if entered
-        response = self.client.get(url, {"term": "la-cour"})
+        response = client.get(url, {"term": "la-cour"})
         assert response.status_code == 200
         assert response.json() == {
             "results": [{"id": city_slug_to_pk["la-courneuve-93"], "text": "La Courneuve (93)"}]
         }
 
-        response = self.client.get(url, {"term": "chat"})
+        response = client.get(url, {"term": "chat"})
         assert response.status_code == 200
         assert response.json() == {
             "results": [
@@ -156,11 +155,11 @@ class Select2CitiesAutocompleteTest(TestCase):
             ]
         }
 
-        response = self.client.get(url, {"term": "    "})
+        response = client.get(url, {"term": "    "})
         assert response.status_code == 200
         assert response.json() == {"results": []}
 
-        response = self.client.get(url, {"term": "paris"})
+        response = client.get(url, {"term": "paris"})
         assert response.status_code == 200
         assert response.json() == {
             "results": [
@@ -187,7 +186,7 @@ class Select2CitiesAutocompleteTest(TestCase):
             ]
         }
 
-        response = self.client.get(url, {"term": "paris 8"})
+        response = client.get(url, {"term": "paris 8"})
         assert response.status_code == 200
         assert response.json() == {
             "results": [
@@ -195,14 +194,14 @@ class Select2CitiesAutocompleteTest(TestCase):
             ]
         }
 
-        response = self.client.get(url, {"term": "toulouse"})
+        response = client.get(url, {"term": "toulouse"})
         assert response.status_code == 200
         assert response.json() == {"results": []}
 
-    def test_queryset_is_ordered_before_truncation(self):
+    def test_queryset_is_ordered_before_truncation(self, client):
         cities = create_test_cities(["01", "02", "54", "57", "62", "75", "93"], num_per_department=20)
         city_slug_to_pk = {city.slug: city.pk for city in cities}
-        response = self.client.get(reverse("autocomplete:cities"), {"term": "e"})
+        response = client.get(reverse("autocomplete:cities"), {"term": "e"})
         assert response.status_code == 200
         assert response.json() == {
             "results": [
@@ -260,11 +259,11 @@ class Select2CitiesAutocompleteTest(TestCase):
         }
 
 
-class CommunesAutocompleteTest(TestCase):
-    def test_autocomplete(self):
+class TestCommunesAutocomplete:
+    def test_autocomplete(self, client):
         url = reverse("autocomplete:communes")
 
-        response = self.client.get(url, {"term": "sai"})
+        response = client.get(url, {"term": "sai"})
         assert response.status_code == 200
         assert response.json() == {
             "results": [
@@ -275,7 +274,7 @@ class CommunesAutocompleteTest(TestCase):
         }
 
         # the request still finds results when dashes were forgotten
-        response = self.client.get(url, {"term": "saint j"})
+        response = client.get(url, {"term": "saint j"})
         assert response.status_code == 200
         assert response.json() == {
             "results": [
@@ -283,11 +282,11 @@ class CommunesAutocompleteTest(TestCase):
             ]
         }
 
-        response = self.client.get(url, {"term": "    "})
+        response = client.get(url, {"term": "    "})
         assert response.status_code == 200
         assert response.json() == {"results": []}
 
-        response = self.client.get(url, {"term": "ILL"})
+        response = client.get(url, {"term": "ILL"})
         assert response.status_code == 200
         assert response.json() == {
             "results": [
