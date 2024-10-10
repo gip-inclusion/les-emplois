@@ -63,6 +63,7 @@ def test_job_application_multiple_jobs():
                 data-bs-toggle="collapse"
                 data-bs-target="#collapse-job-application-{job_application.pk}"
                 aria-expanded="false"
+                type="button"
                 aria-controls="collapse-job-application-{job_application.pk}">
             <span>3 postes recherchés</span>
         </button>
