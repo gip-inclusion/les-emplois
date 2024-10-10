@@ -185,7 +185,25 @@ class AbstractAdministrativeCriteria(models.Model):
         return self.kind in self.CAN_BE_CERTIFIED_KINDS
 
 
+class SelectedAdministrativeCriteriaQuerySet(models.QuerySet):
+    def with_is_considered_certified(self, hiring_start_at=None):
+        if not hiring_start_at:
+            # could be:
+            # is_certified = models.Q(certification_period__contains=timezone.now())
+            # but not validated by UX for the moment.
+            is_certified = models.Value(False)
+        else:
+            validity_period = InclusiveDateRange(
+                hiring_start_at - datetime.timedelta(days=self.model.CERTIFICATION_GRACE_PERIOD_DAYS),
+                hiring_start_at,
+            )
+            is_certified = models.Q(certification_period__overlap=validity_period, certified=True)
+        return self.annotate(is_considered_certified=is_certified)
+
+
 class AbstractSelectedAdministrativeCriteria(models.Model):
+    CERTIFICATION_GRACE_PERIOD_DAYS = 90
+
     certified = models.BooleanField(blank=True, null=True, verbose_name="certifié par l'API Particulier")
     certified_at = models.DateTimeField(blank=True, null=True, verbose_name="certifié le")
     certification_period = InclusiveDateRangeField(blank=True, null=True, verbose_name="période de certification")
@@ -195,6 +213,8 @@ class AbstractSelectedAdministrativeCriteria(models.Model):
 
     class Meta:
         abstract = True
+
+    objects = SelectedAdministrativeCriteriaQuerySet.as_manager()
 
     def certify(self, save=False):
         client = APIParticulierClient(job_seeker=self.eligibility_diagnosis.job_seeker)
