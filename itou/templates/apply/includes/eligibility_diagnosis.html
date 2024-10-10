@@ -1,95 +1,86 @@
 {% if siae.is_subject_to_eligibility_rules or request.user.is_prescriber %}
     {% if eligibility_diagnosis and eligibility_diagnosis.is_considered_valid %}
+        <hr class="my-4">
         {% if is_sent_by_authorized_prescriber %}
-            {% comment %}
-                Les candidatures envoyées par des prescripteurs habilités ne sont pas affichées de manière
-                hiérarchisée afin de ne pas induire les employeurs en erreur.
-                Avec des critères hiérarchisés, ils ont tendance à penser que le candidat n'est pas éligible car pas suffisamment de critère de niveau 2 par exemple
-            {% endcomment %}
-            <hr class="my-4">
             <h3>Éligibilité à l'IAE</h3>
-            <p>
-                Confirmée par
-                <b>{{ eligibility_diagnosis.author.get_full_name }}</b>
-                {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
-                {% if eligibility_diagnosis.author_prescriber_organization %}
-                    ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
-                {% endif %}
-            </p>
-
-            {% with eligibility_diagnosis.administrative_criteria.all as administrative_criteria %}
-                {% if administrative_criteria %}
-                    <p>
-                        <span class="badge badge-sm rounded-pill bg-secondary">Situation administrative du candidat</span>
-                    </p>
-                    {# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#regroup #}
-                    {% regroup administrative_criteria|dictsort:"level" by get_level_display as levels %}
-                    <ul>
-                        {% for level in levels %}
-                            {% for criteria in level.list %}<li>{{ criteria.name }}</li>{% endfor %}
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endwith %}
-
-            <p>
-                <i>
-                    Ce diagnostic est valide du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au
-                    {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
-                </i>
-            </p>
         {% else %}
-
-            {% if eligibility_diagnosis is not None %}
-                <hr class="my-4">
-                <h3>Critères d'éligibilité</h3>
-                <p>
-                    Validés par
-                    <b>{{ eligibility_diagnosis.author.get_full_name }}</b>
-                    {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
-                    {% if eligibility_diagnosis.author_prescriber_organization %}
-                        ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
-                    {% endif %}
-                    le
-                    <b>{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</b>.
-                </p>
-
-                {% with eligibility_diagnosis.administrative_criteria.all as administrative_criteria %}
-                    {% if administrative_criteria %}
-                        <p>
-                            <span class="badge badge-sm rounded-pill bg-secondary">Critères administratifs</span>
-                        </p>
-                        {# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#regroup #}
-                        {% regroup administrative_criteria|dictsort:"level" by get_level_display as levels %}
-                        <ul>
-                            {% for level in levels %}
-                                <li>
-                                    <b>{{ level.grouper }}</b>
-                                    <ul>
-                                        {% for criteria in level.list %}<li>{{ criteria.name }}</li>{% endfor %}
-                                    </ul>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                {% endwith %}
-
-                <p>
-                    <i>
-                        Ce diagnostic expire le
-                        {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
-                    </i>
-                </p>
+            <h3>Critères d'éligibilité</h3>
+        {% endif %}
+        <p>
+            {% if is_sent_by_authorized_prescriber %}
+                Confirmée par
+            {% else %}
+                Validés par
             {% endif %}
+            <strong>{{ eligibility_diagnosis.author.get_full_name }}</strong>
+            {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
+            {% if eligibility_diagnosis.author_prescriber_organization %}
+                ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
+            {% endif %}
+            le
+            <span class="fw-bold">{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</span>.
+        </p>
 
+        {% if eligibility_diagnosis.criteria_display %}
+            {% with eligibility_diagnosis.criteria_display as selected_administrative_criteria %}
+                <p>
+                    <span class="badge badge-sm rounded-pill bg-secondary">
+                        {% if is_sent_by_authorized_prescriber %}
+                            Situation administrative du candidat
+                        {% else %}
+                            Critères administratifs
+                        {% endif %}
+                    </span>
+                </p>
+                {# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#regroup #}
+                {% regroup selected_administrative_criteria|dictsort:"administrative_criteria.level" by administrative_criteria.get_level_display as levels_list %}
+                <ul>
+                    {% for level, criteria in levels_list %}
+                        <li>
+                            {% comment %}
+                            Les candidatures envoyées par des prescripteurs habilités ne sont pas affichées de manière
+                            hiérarchisée afin de ne pas induire les employeurs en erreur.
+                            Avec des critères hiérarchisés, ils ont tendance à penser que le candidat n'est pas éligible car pas suffisamment de critères de niveau 2 par exemple.
+                            {% endcomment %}
+                            {% if not is_sent_by_authorized_prescriber %}<b>{{ level }}</b>{% endif %}
+                            <ul>
+                                {% for criterion in criteria %}
+                                    <li>
+                                        <span>{{ criterion.administrative_criteria.name }}</span>
+                                        {% if eligibility_diagnosis.is_from_employer and criterion.is_considered_certified %}
+                                            <span class="badge badge-sm rounded-pill bg-info-lighter text-info ms-3 me-1">
+                                                <i class="ri-verified-badge-fill" aria-hidden="true"></i>
+                                                Certifié
+                                            </span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endwith %}
+        {% endif %}
 
         {% endif %}
+
+        <p>
+            <i>
+                {% if is_sent_by_authorized_prescriber %}
+                    Ce diagnostic est valide du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au
+                    {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
+                {% else %}
+                    Ce diagnostic expire le
+                    {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
+                {% endif %}
+            </i>
+        </p>
 
     {% elif job_seeker.latest_pe_approval and job_seeker.latest_pe_approval.is_valid %}
         <hr class="my-4">
         <h3>Critères d'éligibilité</h3>
         <p>
-            Validés par <b>France Travail</b>.
+            Validés par <span class="fw-bold">France Travail</span>.
         </p>
 
     {% elif expired_eligibility_diagnosis %}
