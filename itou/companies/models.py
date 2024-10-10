@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.gis.measure import D
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxValueValidator
@@ -26,6 +27,7 @@ from itou.companies.enums import (
 from itou.users.enums import UserKind
 from itou.utils.emails import get_email_message
 from itou.utils.tokens import company_signup_token_generator
+from itou.utils.triggers import FieldsHistory
 from itou.utils.urls import get_absolute_url, get_tally_form_url
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
 
@@ -180,11 +182,14 @@ class CompanyManager(models.Manager.from_queryset(CompanyQuerySet)):
     use_in_migrations = True
 
     def get_queryset(self):
-        return super().get_queryset().exclude(siret=POLE_EMPLOI_SIRET)
+        return super().get_queryset().exclude(siret=POLE_EMPLOI_SIRET).defer("fields_history")
 
 
 class CompanyUnfilteredManager(models.Manager.from_queryset(CompanyQuerySet)):
     use_in_migrations = True
+
+    def get_queryset(self):
+        return super().get_queryset().defer("fields_history")
 
 
 class Company(AddressMixin, OrganizationAbstract):
@@ -292,12 +297,22 @@ class Company(AddressMixin, OrganizationAbstract):
         related_query_name="company",
     )
 
+    fields_history = ArrayField(
+        models.JSONField(
+            encoder=DjangoJSONEncoder,
+        ),
+        verbose_name="historique des champs modifiés sur le modèle",
+        default=list,
+        db_default=[],
+    )
+
     objects = CompanyManager()
     unfiltered_objects = CompanyUnfilteredManager()
 
     class Meta:
         verbose_name = "entreprise"
         unique_together = ("siret", "kind")
+        triggers = [FieldsHistory(name="company_fields_history", fields=["siret"])]
 
     @property
     def accept_survey_url(self):

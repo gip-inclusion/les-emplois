@@ -1,9 +1,11 @@
+import datetime
 from datetime import timedelta
 from unittest import mock
 
 import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import ProgrammingError, transaction
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -508,3 +510,48 @@ def test_jobdescription_is_active_field_history():
             "at": "2020-06-21T08:29:34Z",
         },
     ]
+
+
+def test_company_siret_field_history():
+    company = CompanyFactory(siret="00000000000000")
+    assert company.fields_history == []
+
+    company.siret = "00000000000001"
+    company.save()
+    company.refresh_from_db()
+    fields_history = [
+        {k: v for k, v in operation.items() if k != "_timestamp"} for operation in company.fields_history
+    ]
+    assert fields_history == [{"before": {"siret": "00000000000000"}, "after": {"siret": "00000000000001"}}]
+    assert datetime.datetime.fromisoformat(company.fields_history[0]["_timestamp"]).timestamp() == pytest.approx(
+        datetime.datetime.now().timestamp()
+    )
+
+    company.siret = "00000000000002"
+    company.save()
+    company.refresh_from_db()
+    fields_history = [
+        {k: v for k, v in operation.items() if k != "_timestamp"} for operation in company.fields_history
+    ]
+    assert fields_history == [
+        {"before": {"siret": "00000000000000"}, "after": {"siret": "00000000000001"}},
+        {"before": {"siret": "00000000000001"}, "after": {"siret": "00000000000002"}},
+    ]
+    assert datetime.datetime.fromisoformat(company.fields_history[1]["_timestamp"]).timestamp() == pytest.approx(
+        datetime.datetime.now().timestamp()
+    )
+
+
+def test_company_field_history_raise(faker):
+    company = CompanyFactory(siret="00000000000000")
+    assert company.fields_history == []
+
+    company.fields_history = [faker.pydict()]
+    with pytest.raises(ProgrammingError, match='Modification du champ "fields_history" interdit'):
+        with transaction.atomic():
+            company.save()
+
+    company.siret = "00000000000001"
+    with pytest.raises(ProgrammingError, match='Modification du champ "fields_history" interdit'):
+        with transaction.atomic():
+            company.save()

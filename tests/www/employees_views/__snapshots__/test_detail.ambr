@@ -410,6 +410,7 @@
                  T8."job_app_score",
                  T8."is_searchable",
                  T8."rdv_solidarites_id",
+                 T8."fields_history",
                  T9."id",
                  T9."address_line_1",
                  T9."address_line_2",
@@ -786,7 +787,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "companies_company"
           WHERE "companies_company"."id" = %s
           LIMIT 21
@@ -1101,7 +1103,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "job_applications_jobapplication"
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
           LEFT OUTER JOIN "users_user" T4 ON ("job_applications_jobapplication"."sender_id" = T4."id")

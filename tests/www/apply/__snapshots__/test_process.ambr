@@ -334,7 +334,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "companies_company"
           WHERE "companies_company"."id" = %s
           LIMIT 21
@@ -495,7 +496,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "eligibility_eligibilitydiagnosis"
           INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
@@ -672,7 +674,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "eligibility_eligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
           INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")
@@ -805,7 +808,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "eligibility_eligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
           INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")
@@ -1414,6 +1418,7 @@
                  T15."job_app_score",
                  T15."is_searchable",
                  T15."rdv_solidarites_id",
+                 T15."fields_history",
                  "eligibility_geiqeligibilitydiagnosis"."id",
                  "eligibility_geiqeligibilitydiagnosis"."author_id",
                  "eligibility_geiqeligibilitydiagnosis"."author_kind",
@@ -1490,6 +1495,7 @@
                  T18."job_app_score",
                  T18."is_searchable",
                  T18."rdv_solidarites_id",
+                 T18."fields_history",
                  T19."id",
                  T19."address_line_1",
                  T19."address_line_2",
@@ -1556,6 +1562,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  T20."id",
                  T20."password",
                  T20."last_login",
@@ -2516,6 +2523,7 @@
                  T15."job_app_score",
                  T15."is_searchable",
                  T15."rdv_solidarites_id",
+                 T15."fields_history",
                  "eligibility_geiqeligibilitydiagnosis"."id",
                  "eligibility_geiqeligibilitydiagnosis"."author_id",
                  "eligibility_geiqeligibilitydiagnosis"."author_kind",
@@ -2592,6 +2600,7 @@
                  T18."job_app_score",
                  T18."is_searchable",
                  T18."rdv_solidarites_id",
+                 T18."fields_history",
                  T19."id",
                  T19."address_line_1",
                  T19."address_line_2",
@@ -2658,6 +2667,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  T20."id",
                  T20."password",
                  T20."last_login",
@@ -3563,6 +3573,7 @@
                  T13."job_app_score",
                  T13."is_searchable",
                  T13."rdv_solidarites_id",
+                 T13."fields_history",
                  T14."id",
                  T14."password",
                  T14."last_login",
@@ -3629,7 +3640,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
           LEFT OUTER JOIN "rdv_insertion_participation" ON ("users_user"."id" = "rdv_insertion_participation"."job_seeker_id")
@@ -3866,7 +3878,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "eligibility_eligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
           INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")

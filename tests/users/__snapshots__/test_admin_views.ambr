@@ -416,7 +416,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" T3 ON ("job_applications_jobapplication"."job_seeker_id" = T3."id")
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
