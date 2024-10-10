@@ -263,6 +263,7 @@ class TestExistingUserLogin:
         FRANCE_CONNECT_BASE_URL="http://localhost:8080",
         PEAMU_AUTH_BASE_URL="http://localhost:8080",
         INCLUSION_CONNECT_BASE_URL="http://localhost:8080",
+        PRO_CONNECT_BASE_URL="http://localhost:8080",
     )
     def test_login(self, client, snapshot, identity_provider):
         # Renders only the component for the identity provider in-use by this account
@@ -274,12 +275,18 @@ class TestExistingUserLogin:
 
     @pytest.mark.parametrize(
         "identity_provider",
-        [IdentityProvider.FRANCE_CONNECT, IdentityProvider.PE_CONNECT, IdentityProvider.INCLUSION_CONNECT],
+        [
+            IdentityProvider.FRANCE_CONNECT,
+            IdentityProvider.PE_CONNECT,
+            IdentityProvider.PRO_CONNECT,
+            IdentityProvider.INCLUSION_CONNECT,
+        ],
     )
     @override_settings(
         FRANCE_CONNECT_BASE_URL=None,
         PEAMU_AUTH_BASE_URL=None,
         INCLUSION_CONNECT_BASE_URL=None,
+        PRO_CONNECT_BASE_URL=None,
     )
     def test_login_disabled_provider(self, client, snapshot, identity_provider):
         user_kind = IdentityProvider.supported_user_kinds[identity_provider][0]

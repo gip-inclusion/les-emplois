@@ -13,6 +13,8 @@
                     <div class="c-form mb-5">
                         {% if login_provider == "IC" %}
                             {% include "account/includes/login_inclusion_connect.html" %}
+                        {% elif login_provider == "PC" %}
+                            {% include "account/includes/login_pro_connect.html" %}
                         {% elif login_provider == "FC" %}
                             <p class="h4">Se connecter avec FranceConnect</p>
                             {% if show_france_connect %}
