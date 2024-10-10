@@ -451,7 +451,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "approvals_suspension"
           LEFT OUTER JOIN "companies_company" ON ("approvals_suspension"."siae_id" = "companies_company"."id")
           WHERE "approvals_suspension"."approval_id" IN (%s)
@@ -562,6 +563,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  T5."id",
                  T5."password",
                  T5."last_login",
@@ -729,6 +731,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  T6."id",
                  T6."password",
                  T6."last_login",
@@ -1159,7 +1162,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "approvals_suspension"
           LEFT OUTER JOIN "companies_company" ON ("approvals_suspension"."siae_id" = "companies_company"."id")
           WHERE "approvals_suspension"."approval_id" IN (%s)
@@ -1258,6 +1262,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  T5."id",
                  T5."password",
                  T5."last_login",
@@ -1425,6 +1430,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  T6."id",
                  T6."password",
                  T6."last_login",
@@ -1762,7 +1768,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "approvals_suspension"
           LEFT OUTER JOIN "companies_company" ON ("approvals_suspension"."siae_id" = "companies_company"."id")
           WHERE "approvals_suspension"."approval_id" IN (%s)
@@ -1892,6 +1899,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  T5."id",
                  T5."password",
                  T5."last_login",
@@ -2059,6 +2067,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  T6."id",
                  T6."password",
                  T6."last_login",
@@ -2711,7 +2720,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "approvals_suspension"
           LEFT OUTER JOIN "companies_company" ON ("approvals_suspension"."siae_id" = "companies_company"."id")
           WHERE "approvals_suspension"."approval_id" IN (%s)
@@ -2910,6 +2920,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  T5."id",
                  T5."password",
                  T5."last_login",
@@ -3077,6 +3088,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  T6."id",
                  T6."password",
                  T6."last_login",
@@ -3420,7 +3432,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "approvals_suspension"
           LEFT OUTER JOIN "companies_company" ON ("approvals_suspension"."siae_id" = "companies_company"."id")
           WHERE "approvals_suspension"."approval_id" IN (%s)
@@ -3519,6 +3532,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  T5."id",
                  T5."password",
                  T5."last_login",
@@ -3686,6 +3700,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  T6."id",
                  T6."password",
                  T6."last_login",
@@ -4023,7 +4038,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "approvals_suspension"
           LEFT OUTER JOIN "companies_company" ON ("approvals_suspension"."siae_id" = "companies_company"."id")
           WHERE "approvals_suspension"."approval_id" IN (%s)
@@ -4153,6 +4169,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  T5."id",
                  T5."password",
                  T5."last_login",
@@ -4320,6 +4337,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  T6."id",
                  T6."password",
                  T6."last_login",

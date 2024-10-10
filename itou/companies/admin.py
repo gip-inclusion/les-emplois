@@ -1,3 +1,5 @@
+from pprint import pformat
+
 from django.contrib import admin, messages
 from django.contrib.admin.utils import display_for_value
 from django.core.exceptions import PermissionDenied
@@ -159,15 +161,23 @@ class CompanyAdmin(ItouGISMixin, OrganizationAdmin):
                     "provided_support",
                     "source",
                     "convention",
-                    "created_by",
-                    "created_at",
-                    "updated_at",
                     "is_searchable",
                     "block_job_applications",
                     "job_applications_blocked_at",
                     "approvals_list",
                     "rdv_solidarites_id",
                 )
+            },
+        ),
+        (
+            "Audit",
+            {
+                "fields": (
+                    "created_by",
+                    "created_at",
+                    "updated_at",
+                    "fields_history_formatted",
+                ),
             },
         ),
         (
@@ -203,6 +213,7 @@ class CompanyAdmin(ItouGISMixin, OrganizationAdmin):
             "job_applications_blocked_at",
             "geocoding_score",
             "approvals_list",
+            "fields_history_formatted",
         ]
         if obj:
             readonly_fields.append("kind")
@@ -265,6 +276,10 @@ class CompanyAdmin(ItouGISMixin, OrganizationAdmin):
         count = Approval.objects.is_assigned_to(obj.id).count()
         valid_count = Approval.objects.is_assigned_to(obj.id).valid().count()
         return format_html('<a href="{}">Liste des {} Pass IAE (dont {} valides)</a>', url, count, valid_count)
+
+    @admin.display(description="historique des champs modifiés sur le modèle")
+    def fields_history_formatted(self, obj):
+        return format_html("<pre><code>{}</code></pre>", pformat(obj.fields_history, width=120))
 
     def get_urls(self):
         urls = super().get_urls()

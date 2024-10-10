@@ -689,7 +689,8 @@
                              T3."convention_id",
                              T3."job_app_score",
                              T3."is_searchable",
-                             T3."rdv_solidarites_id"
+                             T3."rdv_solidarites_id",
+                             T3."fields_history"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "companies_company" T3 ON ("job_applications_jobapplication"."sender_company_id" = T3."id")
           WHERE "job_applications_jobapplication"."to_company_id" = %s
@@ -973,6 +974,7 @@
                  T11."job_app_score",
                  T11."is_searchable",
                  T11."rdv_solidarites_id",
+                 T11."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1039,6 +1041,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
                  "companies_siaeconvention"."siret_signature",
@@ -1211,7 +1214,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "companies_company"
           WHERE "companies_company"."id" IN (%s)
         ''',

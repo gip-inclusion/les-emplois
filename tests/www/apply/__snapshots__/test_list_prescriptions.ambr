@@ -536,7 +536,8 @@
                              "companies_company"."convention_id",
                              "companies_company"."job_app_score",
                              "companies_company"."is_searchable",
-                             "companies_company"."rdv_solidarites_id"
+                             "companies_company"."rdv_solidarites_id",
+                             "companies_company"."fields_history"
           FROM "job_applications_jobapplication"
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
           WHERE "job_applications_jobapplication"."sender_id" = %s
@@ -779,6 +780,7 @@
                  T8."job_app_score",
                  T8."is_searchable",
                  T8."rdv_solidarites_id",
+                 T8."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -845,6 +847,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
                  "companies_siaeconvention"."siret_signature",
@@ -1477,6 +1480,7 @@
                  T8."job_app_score",
                  T8."is_searchable",
                  T8."rdv_solidarites_id",
+                 T8."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1543,6 +1547,7 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  "companies_siaeconvention"."id",
                  "companies_siaeconvention"."kind",
                  "companies_siaeconvention"."siret_signature",
@@ -1848,7 +1853,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "eligibility_eligibilitydiagnosis"
           INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
@@ -2024,7 +2030,8 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "eligibility_eligibilitydiagnosis"
           INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")

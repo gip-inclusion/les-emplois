@@ -139,6 +139,7 @@ class ItouModelAdmin(ModelAdmin):
             .get_queryset(request)
             .select_related(*select_related_fields)
             .prefetch_related(*prefetch_related_fields)
+            .defer(None)  # Clear possible deferred fields
         )
 
     def get_object(self, request, object_id, from_field=None):
