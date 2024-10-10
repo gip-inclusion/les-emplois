@@ -59,7 +59,7 @@ class EligibilityDiagnosisManager(models.Manager):
         """
         return job_seeker.has_valid_approval or bool(self.last_considered_valid(job_seeker, for_siae=for_siae))
 
-    def last_considered_valid(self, job_seeker, for_siae=None):
+    def last_considered_valid(self, job_seeker, for_siae=None, prefetch=None):
         """
         Retrieves the given job seeker's last considered valid diagnosis or None.
 
@@ -77,6 +77,10 @@ class EligibilityDiagnosisManager(models.Manager):
             .annotate(from_prescriber=Case(When(author_kind=AuthorKind.PRESCRIBER, then=1), default=0))
             .order_by("-from_prescriber", "-created_at")
         )
+
+        if prefetch:
+            query = query.prefetch_related(*prefetch)
+
         if not job_seeker.has_valid_approval:
             query = query.valid()
         # Otherwise, a diagnosis is considered valid for the duration of an
