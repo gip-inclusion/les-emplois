@@ -1,4 +1,5 @@
-import pytest  # noqa
+import pytest
+from django import forms
 from django.template import Context, Template
 from django.urls import reverse
 
@@ -82,3 +83,23 @@ class TestNav:
         for entry in NAV_ENTRIES.values():
             for view_name in entry.active_view_names:
                 reverse(view_name)
+
+
+class TestThemeInclusion:
+    def test_collapse_field(self, snapshot):
+        class NIRForm(forms.Form):
+            no_nir = forms.BooleanField()
+            nir = forms.CharField()
+
+        template = Template('{% load theme_inclusion %}{% collapse_field form.no_nir target_id="nir" %}')
+        assert template.render(Context({"form": NIRForm()})) == snapshot()
+
+    def test_collapse_field_multiple_controls(self):
+        class NIRForm(forms.Form):
+            no_nir = forms.BooleanField()
+            nir = forms.CharField()
+
+        field_markup = '{% collapse_field form.no_nir target_id="nir" %}'
+        template = Template("{% load theme_inclusion %}" + field_markup * 2)
+        with pytest.raises(NotImplementedError):
+            template.render(Context({"form": NIRForm()}))

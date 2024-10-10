@@ -8,7 +8,10 @@
         <p class="mb-0">
             <strong class="text-uppercase">{{ ITOU_ENVIRONMENT }} - Données fictives</strong>
             {% if not user.is_authenticated %}
-                <i class="ri-arrow-right-line"></i> <a href="" role="button" data-bs-toggle="modal" data-bs-target="#testAccountsModal">Voir les comptes de démonstration</a>
+                <i class="ri-arrow-right-line" aria-hidden="true"></i>
+                <button type="button" class="text-white text-decoration-underline" data-bs-toggle="modal" data-bs-target="#testAccountsModal">
+                    Voir les comptes de démonstration
+                </button>
             {% endif %}
         </p>
     </div>

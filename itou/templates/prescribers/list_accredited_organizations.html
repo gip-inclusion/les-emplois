@@ -29,9 +29,14 @@
                                         -
                                         <span class="text-muted">{{ org.city }}</span>
                                         <br>
-                                        <a data-bs-toggle="collapse" href="#collapse_membership_{{ org.pk }}" role="button" aria-expanded="false" aria-controls="collapse_membership_{{ org.pk }}">
+                                        <button class="text-start text-decoration-underline"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#collapse_membership_{{ org.pk }}"
+                                                type="button"
+                                                aria-expanded="false"
+                                                aria-controls="collapse_membership_{{ org.pk }}">
                                             Voir les membres
-                                        </a>
+                                        </button>
                                     </p>
                                     <div class="collapse" id="collapse_membership_{{ org.pk }}">
                                         <div class="table-responsive">

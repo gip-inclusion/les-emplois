@@ -559,3 +559,6 @@
   
   '''
 # ---
+# name: TestThemeInclusion.test_collapse_field
+  '<div class="form-group form-group-required"><div class="form-check"><input type="checkbox" name="no_nir" data-bs-toggle="collapse" data-bs-target="#nir" aria-controls="nir" class="form-check-input" required id="id_no_nir"><label class="form-check-label" for="id_no_nir">No nir</label></div></div>'
+# ---

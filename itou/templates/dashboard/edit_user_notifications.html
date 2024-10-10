@@ -26,9 +26,9 @@
                             <ul class="list-group list-group-flush list-group-collapse">
                                 {% for category_slug, category in notification_form.layout.items %}
                                     <li class="list-group-item list-group-item-action notification-collapse">
-                                        <a class="fw-bold" role="button" data-bs-toggle="collapse" href="#collapse-{{ category_slug }}" aria-expanded="false" aria-controls="collapse-{{ category_slug }}">
+                                        <button class="fw-bold w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ category_slug }}" aria-expanded="false" aria-controls="collapse-{{ category_slug }}">
                                             {{ category.name }}
-                                        </a>
+                                        </button>
                                         <div class="collapse" id="collapse-{{ category_slug }}">
                                             {% if category.notifications|length > 1 %}
                                                 <div class="mb-n3 mt-3">
