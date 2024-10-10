@@ -17,14 +17,41 @@
         </p>
     {% endif %}
 
-    {% with criteria=diagnosis.administrative_criteria_display %}
-        {% if criteria %}
-            <h4>Situation administrative du candidat</h4>
-            <ul>
-                {% for c in criteria|dictsort:"ui_rank" %}<li>{{ c.name }}</li>{% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
+    {% if diagnosis.criteria_display %}
+        <h4>Situation administrative du candidat</h4>
+        <ul>
+            {% for criterion in diagnosis.criteria_display|dictsort:"administrative_criteria.ui_rank" %}
+                <li>
+                    {{ criterion.administrative_criteria.name }}
+                    {% if diagnosis.is_from_employer and criterion.is_considered_certified %}
+                        <span class="badge badge-sm rounded-pill bg-info-lighter text-info ms-3 me-1">
+                            <i class="ri-verified-badge-fill" aria-hidden="true"></i>
+                            Certifié
+                        </span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if diagnosis.criteria_can_be_certified %}
+        <div class="c-box bg-info-lightest my-4 p-0">
+            <button class="has-collapse-caret w-100 text-start d-block d-flex justify-content-between font-weight-bold text-left p-3 align-items-center"
+                    type="button"
+                    data-bs-target="#collapse-certif-help-text"
+                    data-bs-toggle="collapse"
+                    aria-expanded="false"
+                    aria-controls="collapse-certif-help-text">
+                <div>
+                    <i class="ri-lightbulb-line font-weight-medium pe-2" aria-hidden="true"></i>
+                    <span>Pourquoi certains de mes critères peuvent-ils être certifiés ?</span>
+                </div>
+            </button>
+            <div id="collapse-certif-help-text" class="collapse justify-content-between pb-4 ps-5 pe-3">
+                <span>Nous sommes en train de nous connecter progressivement aux différents services de l’État qui délivrent les justificatifs correspondant aux critères administratifs. Retrouvez le détail des conditions dans <a href="{{ itou_help_center_url }}/articles/14733921254161--Les-crit%C3%A8res-d-%C3%A9ligibilit%C3%A9-IAE#h_01J28K61VYBEBMK0CRVSHWRKRG" target="_blank" rel="noreferrer">notre documentation</a>.</span> <i class="ri-external-link-line ri-lg"></i>
+            </div>
+        </div>
+    {% endif %}
 
     {% if diagnosis.allowance_amount %}
         <p>
