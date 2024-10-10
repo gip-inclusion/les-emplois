@@ -194,7 +194,7 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
     assert filters_form.fields["job_seeker"].choices == [
         (a_b_job_seeker.pk, "A… B…"),
         (c_d_job_seeker.pk, "C… D…"),
-        (created_job_seeker.pk, "Zorro Martin"),
+        (created_job_seeker.pk, "Zorro MARTIN"),
     ]
 
 
