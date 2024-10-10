@@ -1,6 +1,7 @@
+{% load buttons_form %}
 {% load django_bootstrap5 %}
 {% load static %}
-{% load buttons_form %}
+{% load theme_inclusion %}
 {% load url_add_query %}
 
 <div class="row">
@@ -15,9 +16,7 @@
                     {% bootstrap_field form.education_level %}
 
                     {% if not is_registered_to_pole_emploi %}
-                        <div role="button" data-bs-toggle="collapse" data-bs-target="#collapse_pole_emploi" aria-controls="collapse_pole_emploi">
-                            {% bootstrap_field form.pole_emploi %}
-                        </div>
+                        {% collapse_field form.pole_emploi target_id="collapse_pole_emploi" %}
                         <div id="collapse_pole_emploi" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.pole_emploi.value %} show{% endif %}">
                             {% bootstrap_field form.pole_emploi_id %}
                             {% bootstrap_field form.pole_emploi_since %}
@@ -32,10 +31,7 @@
 
                     {% bootstrap_field form.resourceless %}
 
-                    <div role="button" data-bs-toggle="collapse" data-bs-target="#collapse_unemployed" aria-controls="collapse_unemployed">
-                        {% bootstrap_field form.unemployed %}
-                    </div>
-
+                    {% collapse_field form.unemployed target_id="collapse_unemployed" %}
                     <div id="collapse_unemployed" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.unemployed.value %} show{% endif %}">
                         {% bootstrap_field form.unemployed_since %}
                     </div>
@@ -43,34 +39,22 @@
                     {% bootstrap_field form.rqth_employee %}
                     {% bootstrap_field form.oeth_employee %}
 
-                    <div role="button" data-bs-toggle="collapse" data-bs-target="#collapse_rsa_allocation" aria-controls="collapse_rsa_allocation">
-                        {% bootstrap_field form.rsa_allocation %}
-                    </div>
-
+                    {% collapse_field form.rsa_allocation target_id="collapse_rsa_allocation" %}
                     <div id="collapse_rsa_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.rsa_allocation.value %} show{% endif %}">
                         {% bootstrap_field form.rsa_markup %}
                         {% bootstrap_field form.rsa_allocation_since %}
                     </div>
 
-                    <div role="button" data-bs-toggle="collapse" data-bs-target="#collapse_ass_allocation" aria-controls="collapse_ass_allocation">
-                        {% bootstrap_field form.ass_allocation %}
-                    </div>
-
+                    {% collapse_field form.ass_allocation target_id="collapse_ass_allocation" %}
                     <div id="collapse_ass_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.ass_allocation.value %} show{% endif %}">
                         {% bootstrap_field form.ass_allocation_since %}
                     </div>
 
-                    <div role="button" data-bs-toggle="collapse" data-bs-target="#collapse_aah_allocation" aria-controls="collapse_aah_allocation">
-                        {% bootstrap_field form.aah_allocation %}
-                    </div>
-
+                    {% collapse_field form.aah_allocation target_id="collapse_aah_allocation" %}
                     <div id="collapse_aah_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.aah_allocation.value %} show{% endif %}">
                         {% bootstrap_field form.aah_allocation_since %}
                     </div>
                 </fieldset>
-
-
-
 
                 {% url "employee_record_views:create_step_2" job_application.id as secondary_url %}
                 {% url "employee_record_views:list" as reset_url %}

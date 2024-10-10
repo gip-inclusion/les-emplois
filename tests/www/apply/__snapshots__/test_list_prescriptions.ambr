@@ -1131,7 +1131,7 @@
 # name: test_exports_as_pole_emploi_prescriber
   '''
   <div class="c-info mb-3 mb-md-4" id="besoin-dun-chiffre">
-                              <button aria-controls="collapseBesoinChiffre" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseBesoinChiffre" data-bs-toggle="collapse">
+                              <button aria-controls="collapseBesoinChiffre" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseBesoinChiffre" data-bs-toggle="collapse" type="button">
                                   <span>Besoin d'un chiffre ?</span>
                               </button>
                               

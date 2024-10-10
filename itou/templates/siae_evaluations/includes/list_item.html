@@ -22,7 +22,7 @@
             </div>
             {% if item.evaluated_administrative_criteria.all %}
                 <div class="c-info c-info--secondary mt-3">
-                    <button class="c-info__summary" data-bs-toggle="collapse" data-bs-target="#collapseItemsEvaluated{{ item.pk }}" aria-expanded="true" aria-controls="collapseItemsEvaluated{{ item.pk }}">
+                    <button class="c-info__summary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseItemsEvaluated{{ item.pk }}" aria-expanded="true" aria-controls="collapseItemsEvaluated{{ item.pk }}">
                         <span>{{ item.evaluated_administrative_criteria.count }} justificatif{{ item.evaluated_administrative_criteria.count|pluralizefr }}</span>
                     </button>
                     <div class="c-info__detail collapse show" id="collapseItemsEvaluated{{ item.pk }}">

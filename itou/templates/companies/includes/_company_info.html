@@ -1,7 +1,13 @@
 {% load url_add_query %}
 
 <div class="c-box c-box--structure {{ extra_box_class|default:'' }}">
-    <div class="c-box--structure__summary" data-bs-toggle="collapse" data-bs-target="#collapseBoxStructure" aria-expanded="{{ show|default:False|yesno:'true,false' }}" aria-controls="collapseBoxStructure">
+    <div class="c-box--structure__summary"
+         role="button"
+         data-bs-toggle="collapse"
+         data-bs-target="#collapseBoxStructure"
+         aria-expanded="{{ show|default:False|yesno:'true,false' }}"
+         aria-controls="collapseBoxStructure"
+         tabindex="0">
         <i class="ri-community-line"></i>
         <div>
             <span data-bs-toggle="tooltip" data-bs-title="{{ company.get_kind_display }}">{{ company.kind }}</span>

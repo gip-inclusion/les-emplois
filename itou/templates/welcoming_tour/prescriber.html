@@ -27,7 +27,9 @@
                                         Découvrez un outil qui accélère la mise en relation des candidats à l’insertion auprès des employeurs inclusifs et simplifie la mission des acteurs de l’IAE.
                                     </p>
                                     <p class="my-3">
-                                        <a class="btn btn-sm btn-primary" href="#welcoming_tour" role="button" data-bs-slide="next">Suivant</a>
+                                        <button type="button" data-bs-target="#welcoming_tour" class="btn btn-sm btn-primary" data-bs-slide="next">
+                                            Suivant
+                                        </button>
                                     </p>
                                 </div>
                             </div>
@@ -42,8 +44,12 @@
                                         Profitez d’un outil mutualisé d’accompagnement de l’IAE : mise en relation simplifiée, partage entre acteurs, simplification des procédures d’agrément, réduction des délais de recrutement.
                                     </p>
                                     <p class="my-3">
-                                        <a class="btn btn-sm btn-secondary" href="#welcoming_tour" role="button" data-bs-slide="prev">Précédent</a>
-                                        <a class="btn btn-sm btn-primary" href="#welcoming_tour" role="button" data-bs-slide="next">Suivant</a>
+                                        <button type="button" data-bs-target="#welcoming_tour" class="btn btn-sm btn-secondary" data-bs-slide="prev">
+                                            Précédent
+                                        </button>
+                                        <button type="button" data-bs-target="#welcoming_tour" class="btn btn-sm btn-primary" data-bs-slide="next">
+                                            Suivant
+                                        </button>
                                     </p>
                                 </div>
                             </div>
@@ -64,15 +70,17 @@
                                         Bonne découverte et bon accompagnement.
                                     </p>
                                     <p class="my-3">
-                                        <a class="btn btn-sm btn-secondary" href="#welcoming_tour" role="button" data-bs-slide="prev">Précédent</a>
-                                        <a class="btn btn-sm btn-primary" href="{% url 'dashboard:index' %}" role="button" data-bs-slide="next">Terminer</a>
+                                        <button type="button" data-bs-target="#welcoming_tour" class="btn btn-sm btn-secondary" data-bs-slide="prev">
+                                            Précédent
+                                        </button>
+                                        <a href="{% url 'dashboard:index' %}" class="btn btn-sm btn-primary">Terminer</a>
                                     </p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <p class="text-center my-3">
-                        <a href="{% url 'dashboard:index' %}" class="btn btn-sm btn-sm btn-link">Ignorer la présentation</a>
+                        <a href="{% url 'dashboard:index' %}" class="btn btn-sm btn-link">Ignorer la présentation</a>
                     </p>
                 </div>
             </div>

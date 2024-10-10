@@ -3,6 +3,7 @@ import math
 from django import template
 from django.contrib.messages import constants as message_constants
 from django.templatetags.static import static
+from django_bootstrap5.templatetags.django_bootstrap5 import bootstrap_field
 
 
 register = template.Library()
@@ -64,3 +65,28 @@ def stepper_progress(wizard):
 @register.simple_tag
 def get_form_field(form, field_name):
     return form[field_name]
+
+
+@register.simple_tag
+def collapse_field(bound_field, *, target_id, **kwargs):
+    """
+    A bootstrap_field that toggles a collapse element.
+
+    Using a custom template tag allows setting the data attributes directly in the template,
+    next to where the field is rendered, for a better locality of behavior than specifying
+    the attributes in the form.
+
+    :arg django.forms.boundfield.BoundField bound_field: field to render with bootstrap_field
+    :keyword str target_id: id attribute of the HTML element to collapse
+    """
+    field_spec = bound_field.field
+    collapse_attrs = {
+        "data-bs-toggle": "collapse",
+        "data-bs-target": f"#{target_id}",
+        "aria-controls": target_id,
+    }
+    for attr, value in collapse_attrs.items():
+        if attr in field_spec.widget.attrs:
+            raise NotImplementedError("The field must be present once on the page")
+        field_spec.widget.attrs[attr] = value
+    return bootstrap_field(bound_field, **kwargs)
