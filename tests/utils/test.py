@@ -16,7 +16,7 @@ from django.db.backends.utils import CursorDebugWrapper
 from django.template import Template
 from django.template.base import Node
 from django.template.loader import render_to_string
-from django.test import Client, TestCase as BaseTestCase
+from django.test import Client, TestCase
 from django.test.utils import CaptureQueriesContext, TestContextDecorator
 from pytest_django.asserts import assertContains, assertNotContains
 
@@ -123,10 +123,6 @@ class ItouClient(NoInlineClient):
     def request(self, *args, **kwargs):
         with TestCase.captureOnCommitCallbacks(execute=True):
             return super().request(*args, **kwargs)
-
-
-class TestCase(BaseTestCase):
-    client_class = ItouClient
 
 
 class reload_module(TestContextDecorator):

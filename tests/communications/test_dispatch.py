@@ -1,3 +1,6 @@
+import re
+
+import pytest
 from django.core import mail
 
 from itou.communications import registry as notifications_registry
@@ -13,14 +16,13 @@ from itou.communications.dispatch.utils import (
 )
 from itou.communications.models import NotificationRecord, NotificationSettings
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import TestCase
 
 from .utils import FakeNotificationClassesMixin
 
 
-class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
-    def setUp(self):
-        super().setUp()
+class TestBaseNotification(FakeNotificationClassesMixin):
+    def setup_method(self):
+        super().setup_method()
         self.user = PrescriberFactory(email="testuser@beta.gouv.fr", membership=True)
         self.organization = self.user.prescriberorganization_set.first()
 
@@ -28,8 +30,6 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
         class ManageableNotification(self.TestNotification):
             name = "Manageable"
             category = "Manageable"
-
-        self.addCleanup(notifications_registry.unregister, ManageableNotification)
 
         @notifications_registry.register
         class ManageableNonApplicableNotification(self.TestNotification):
@@ -39,15 +39,11 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
             def is_applicable(self):
                 return False
 
-        self.addCleanup(notifications_registry.unregister, ManageableNonApplicableNotification)
-
         @notifications_registry.register
         class NonManageableNotification(self.TestNotification):
             name = "NonManageable"
             category = "NonManageable"
             can_be_disabled = False
-
-        self.addCleanup(notifications_registry.unregister, NonManageableNotification)
 
         @notifications_registry.register
         class NonManageableNonApplicableNotification(self.TestNotification):
@@ -58,8 +54,6 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
             def is_applicable(self):
                 return False
 
-        self.addCleanup(notifications_registry.unregister, NonManageableNonApplicableNotification)
-
         self.ManageableNotification = ManageableNotification
         self.ManageableNonApplicableNotification = ManageableNonApplicableNotification
         self.NonManageableNotification = NonManageableNotification
@@ -67,9 +61,15 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
 
         sync_notifications(NotificationRecord)
 
+    def teardown_method(self):
+        notifications_registry.unregister(self.ManageableNotification)
+        notifications_registry.unregister(self.ManageableNonApplicableNotification)
+        notifications_registry.unregister(self.NonManageableNotification)
+        notifications_registry.unregister(self.NonManageableNonApplicableNotification)
+
     def test_method_init(self):
-        with self.assertRaisesMessage(
-            TypeError, "BaseNotification.__init__() missing 1 required positional argument: 'user'"
+        with pytest.raises(
+            TypeError, match=re.escape("BaseNotification.__init__() missing 1 required positional argument: 'user")
         ):
             self.TestNotification()
 
@@ -160,9 +160,10 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
         }
 
 
-class EmailNotificationTest(FakeNotificationClassesMixin, TestCase):
-    def setUp(self):
-        super().setUp()
+class TestEmailNotification(FakeNotificationClassesMixin):
+    def setup_method(self):
+        super().setup_method()
+
         self.user = PrescriberFactory(email="testuser@beta.gouv.fr", membership=True)
         self.organization = self.user.prescriberorganization_set.first()
 
@@ -173,8 +174,6 @@ class EmailNotificationTest(FakeNotificationClassesMixin, TestCase):
             subject_template = "layout/base_email_text_subject.txt"
             body_template = "layout/base_email_text_body.txt"
 
-        self.addCleanup(notifications_registry.unregister, ManageableNotification)
-
         @notifications_registry.register
         class NonManageableNotification(EmailNotification):
             name = "NonManageable"
@@ -183,27 +182,30 @@ class EmailNotificationTest(FakeNotificationClassesMixin, TestCase):
             body_template = "layout/base_email_text_body.txt"
             can_be_disabled = False
 
-        self.addCleanup(notifications_registry.unregister, NonManageableNotification)
-
         self.ManageableNotification = ManageableNotification
+        self.NonManageableNotification = NonManageableNotification
 
         sync_notifications(NotificationRecord)
+
+    def teardown_method(self):
+        notifications_registry.unregister(self.ManageableNotification)
+        notifications_registry.unregister(self.NonManageableNotification)
 
     def test_method_build(self):
         email = self.ManageableNotification(self.user, self.organization).build()
         assert email.to == [self.user.email]
         assert "Cet email est envoyé depuis un environnement de démonstration" in email.body
 
-    def test_method_send(self):
-        with self.captureOnCommitCallbacks(execute=True):
+    def test_method_send(self, django_capture_on_commit_callbacks):
+        with django_capture_on_commit_callbacks(execute=True):
             self.ManageableNotification(self.user, self.organization).send()
         assert len(mail.outbox) == 1
         assert mail.outbox[0].to == [self.user.email]
         assert "Cet email est envoyé depuis un environnement de démonstration" in mail.outbox[0].body
 
 
-class ProfiledNotificationTest(TestCase):
-    def setUp(self):
+class TestProfiledNotification:
+    def setup_method(self):
         self.job_seeker = JobSeekerFactory()
         self.employer = EmployerFactory(with_company=True)
         self.employer_structure = self.employer.company_set.first()
