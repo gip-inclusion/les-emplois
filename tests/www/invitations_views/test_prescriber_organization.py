@@ -6,7 +6,6 @@ import respx
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib import messages
-from django.core import mail
 from django.shortcuts import reverse
 from django.utils.html import escape
 from pytest_django.asserts import assertContains, assertMessages, assertRedirects, assertTemplateUsed
@@ -228,7 +227,7 @@ class TestAcceptPrescriberWithOrgInvitation:
         self.organization.save()
         self.sender = self.organization.members.first()
 
-    def assert_invitation_is_accepted(self, response, user, invitation, new_user=True):
+    def assert_invitation_is_accepted(self, response, user, invitation, mailoutbox, new_user=True):
         if new_user:
             assertRedirects(response, reverse("welcoming_tour:index"))
         elif user.identity_provider == IdentityProvider.DJANGO:
@@ -250,9 +249,9 @@ class TestAcceptPrescriberWithOrgInvitation:
         )
 
         # A confirmation e-mail is sent to the invitation sender.
-        assert len(mail.outbox) == 1
-        assert len(mail.outbox[0].to) == 1
-        assert invitation.sender.email == mail.outbox[0].to[0]
+        assert len(mailoutbox) == 1
+        assert len(mailoutbox[0].to) == 1
+        assert invitation.sender.email == mailoutbox[0].to[0]
 
         # Assert the user sees his new organization dashboard.
         current_org = get_current_org_or_404(response.wsgi_request)
@@ -261,7 +260,7 @@ class TestAcceptPrescriberWithOrgInvitation:
 
     @sso_parametrize
     @respx.mock
-    def test_accept_prescriber_org_invitation(self, client, sso_setup):
+    def test_accept_prescriber_org_invitation(self, client, mailoutbox, sso_setup):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         response = client.get(invitation.acceptance_link)
         sso_setup.assertContainsButton(response)
@@ -321,11 +320,11 @@ class TestAcceptPrescriberWithOrgInvitation:
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         user = User.objects.get(email=invitation.email)
-        self.assert_invitation_is_accepted(response, user, invitation)
+        self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
 
     @sso_parametrize
     @respx.mock
-    def test_accept_prescriber_org_invitation_returns_on_other_browser(self, client, sso_setup):
+    def test_accept_prescriber_org_invitation_returns_on_other_browser(self, client, mailoutbox, sso_setup):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         response = client.get(invitation.acceptance_link)
         sso_setup.assertContainsButton(response)
@@ -360,9 +359,9 @@ class TestAcceptPrescriberWithOrgInvitation:
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         user = User.objects.get(email=invitation.email)
-        self.assert_invitation_is_accepted(response, user, invitation)
+        self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
 
-    def test_accept_existing_user_is_prescriber_without_org(self, client):
+    def test_accept_existing_user_is_prescriber_without_org(self, client, mailoutbox):
         user = PrescriberFactory(has_completed_welcoming_tour=True)
         invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
@@ -375,9 +374,9 @@ class TestAcceptPrescriberWithOrgInvitation:
         response = client.get(invitation.acceptance_link, follow=True)
         # /invitations/<uui>/join_company then /welcoming_tour/index
         assert len(response.redirect_chain) == 2
-        self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
+        self.assert_invitation_is_accepted(response, user, invitation, mailoutbox, new_user=False)
 
-    def test_accept_existing_user_email_different_case(self, client):
+    def test_accept_existing_user_email_different_case(self, client, mailoutbox):
         user = PrescriberFactory(has_completed_welcoming_tour=True, email="HEY@example.com")
         invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
@@ -388,9 +387,9 @@ class TestAcceptPrescriberWithOrgInvitation:
         )
         client.force_login(user)
         response = client.get(invitation.acceptance_link, follow=True)
-        self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
+        self.assert_invitation_is_accepted(response, user, invitation, mailoutbox, new_user=False)
 
-    def test_accept_existing_user_belongs_to_another_organization(self, client):
+    def test_accept_existing_user_belongs_to_another_organization(self, client, mailoutbox):
         user = PrescriberOrganizationWithMembershipFactory().members.first()
         user.has_completed_welcoming_tour = True
         user.save()
@@ -403,11 +402,11 @@ class TestAcceptPrescriberWithOrgInvitation:
         )
         client.force_login(user)
         response = client.get(invitation.acceptance_link, follow=True)
-        self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
+        self.assert_invitation_is_accepted(response, user, invitation, mailoutbox, new_user=False)
 
     @sso_parametrize
     @respx.mock
-    def test_accept_existing_user_not_logged_in_using_PC(self, client, sso_setup):
+    def test_accept_existing_user_not_logged_in_using_PC(self, client, mailoutbox, sso_setup):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         user = PrescriberFactory(
             username=sso_setup.oidc_userinfo["sub"],
@@ -448,9 +447,9 @@ class TestAcceptPrescriberWithOrgInvitation:
         response = client.get(response.url, follow=True)
 
         assert response.context["user"].is_authenticated
-        self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
+        self.assert_invitation_is_accepted(response, user, invitation, mailoutbox, new_user=False)
 
-    def test_accept_existing_user_not_logged_in_using_django_auth(self, client):
+    def test_accept_existing_user_not_logged_in_using_django_auth(self, client, mailoutbox):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         user = PrescriberFactory(has_completed_welcoming_tour=True, identity_provider="DJANGO")
         # The user verified its email
@@ -472,7 +471,7 @@ class TestAcceptPrescriberWithOrgInvitation:
             follow=True,
         )
         assert response.context["user"].is_authenticated
-        self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
+        self.assert_invitation_is_accepted(response, user, invitation, mailoutbox, new_user=False)
 
 
 class TestAcceptPrescriberWithOrgInvitationExceptions:

@@ -1,4 +1,3 @@
-from django.core import mail
 from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.html import escape
@@ -31,7 +30,7 @@ class TestSendSingleCompanyInvitation:
             "form-0-email": self.guest_data["email"],
         }
 
-    def test_send_one_invitation(self, client):
+    def test_send_one_invitation(self, client, mailoutbox):
         client.force_login(self.sender)
         response = client.get(INVITATION_URL)
 
@@ -52,7 +51,7 @@ class TestSendSingleCompanyInvitation:
         assert invitation.sent
 
         # Make sure an email has been sent to the invited person
-        outbox_emails = [receiver for message in mail.outbox for receiver in message.to]
+        outbox_emails = [receiver for message in mailoutbox for receiver in message.to]
         assert self.post_data["form-0-email"] in outbox_emails
 
     def test_send_invitation_user_already_exists(self, client):

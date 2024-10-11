@@ -7,7 +7,7 @@ from tests.prescribers.factories import PrescriberOrganizationWith2MembershipFac
 
 
 class TestPrescribersOrganizationAdminMembersManagement:
-    def test_add_admin(self, client):
+    def test_add_admin(self, client, mailoutbox):
         """
         Check the ability for an admin to add another admin to the organization
         """
@@ -27,9 +27,9 @@ class TestPrescribersOrganizationAdminMembersManagement:
         assert response.status_code == 302
 
         organization.refresh_from_db()
-        assert_set_admin_role__creation(user=guest, organization=organization)
+        assert_set_admin_role__creation(guest, organization, mailoutbox)
 
-    def test_remove_admin(self, client):
+    def test_remove_admin(self, client, mailoutbox):
         """
         Check the ability for an admin to remove another admin
         """
@@ -54,7 +54,7 @@ class TestPrescribersOrganizationAdminMembersManagement:
         assert response.status_code == 302
 
         organization.refresh_from_db()
-        assert_set_admin_role__removal(user=guest, organization=organization)
+        assert_set_admin_role__removal(guest, organization, mailoutbox)
 
     def test_admin_management_permissions(self, client):
         """

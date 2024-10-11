@@ -1,7 +1,6 @@
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
-from django.core import mail
 from django.core.files.storage import default_storage
 from django.urls import reverse
 from django.utils import dateformat, html, timezone
@@ -1019,7 +1018,7 @@ class TestSiaeSubmitProofsView:
         evaluated_administrative_criteria.refresh_from_db()
         assert evaluated_administrative_criteria.submitted_at is None
 
-    def test_submitted_email(self, client):
+    def test_submitted_email(self, client, mailoutbox):
         institution_membership = InstitutionMembershipFactory()
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(
             self.company, self.user, institution=institution_membership.institution
@@ -1029,8 +1028,8 @@ class TestSiaeSubmitProofsView:
         response = client.post(self.url(evaluated_job_application.evaluated_siae))
         assert response.status_code == 302
 
-        assert len(mail.outbox) == 1
-        email = mail.outbox[0]
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
         assert (
             f"[DEV] [Contrôle a posteriori] La structure { evaluated_job_application.evaluated_siae.siae.kind } "
             f"{ evaluated_job_application.evaluated_siae.siae.name } a transmis ses pièces justificatives."

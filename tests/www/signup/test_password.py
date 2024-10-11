@@ -1,7 +1,6 @@
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str
 from django.conf import settings
-from django.core import mail
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
@@ -17,7 +16,7 @@ class TestPasswordReset:
         key = default_token_generator.make_token(user)
         return reverse("account_reset_password_from_key", kwargs={"uidb36": uidb36, "key": key})
 
-    def test_password_reset_flow(self, client):
+    def test_password_reset_flow(self, client, mailoutbox):
         user = JobSeekerFactory(last_login=timezone.now(), password="somethingElse%")
 
         # Ask for password reset.
@@ -32,8 +31,8 @@ class TestPasswordReset:
         assertRedirects(response, f"{next_url}?{args}")
 
         # Check sent email.
-        assert len(mail.outbox) == 1
-        email = mail.outbox[0]
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
         assert "Réinitialisation de votre mot de passe" in email.subject
         assert (
             "Si vous n'avez pas demandé la réinitialisation de votre mot de passe, vous pouvez ignorer ce message"

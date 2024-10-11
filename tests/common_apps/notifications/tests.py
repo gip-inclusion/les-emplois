@@ -1,5 +1,3 @@
-from django.core import mail
-
 from itou.job_applications.notifications import NewSpontaneousJobAppEmployersNotification
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -72,11 +70,11 @@ class TestNotificationsBaseClass:
         recipients = self.notification.get_recipients()
         assert len(recipients) == 0
 
-    def test_send(self, django_capture_on_commit_callbacks):
+    def test_send(self, django_capture_on_commit_callbacks, mailoutbox):
         with django_capture_on_commit_callbacks(execute=True):
             self.notification.send()
 
-        receivers = [receiver for message in mail.outbox for receiver in message.to]
+        receivers = [receiver for message in mailoutbox for receiver in message.to]
         assert self.notification.email.to == receivers
 
 

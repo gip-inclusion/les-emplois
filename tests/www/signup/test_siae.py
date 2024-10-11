@@ -1,7 +1,6 @@
 import httpx
 import respx
 from django.contrib import messages
-from django.core import mail
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -35,7 +34,7 @@ class TestCompanySignup:
     @sso_parametrize
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
-    def test_join_an_company_without_members(self, client, sso_setup):
+    def test_join_an_company_without_members(self, client, mailoutbox, sso_setup):
         """
         A user joins a company without members.
         """
@@ -57,8 +56,8 @@ class TestCompanySignup:
         assert response.status_code == 302
         assertRedirects(response, reverse("search:employers_home"))
 
-        assert len(mail.outbox) == 1
-        email = mail.outbox[0]
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
         assert "Un nouvel utilisateur souhaite rejoindre votre structure" in email.subject
 
         magic_link = company.signup_magic_link
@@ -103,7 +102,7 @@ class TestCompanySignup:
         assert 1 == company.members.count()
 
         # No new sent email.
-        assert len(mail.outbox) == 1
+        assert len(mailoutbox) == 1
 
         # Magic link is no longer valid because company.members.count() has changed.
         response = client.get(magic_link, follow=True)
@@ -245,7 +244,7 @@ class TestCompanySignup:
 
     @sso_parametrize
     @respx.mock
-    def test_create_facilitator(self, client, mocker, settings, sso_setup):
+    def test_create_facilitator(self, client, mocker, mailoutbox, settings, sso_setup):
         settings.API_INSEE_BASE_URL = "https://insee.fake"
         settings.API_INSEE_SIRENE_BASE_URL = "https://entreprise.fake"
         settings.API_INSEE_CONSUMER_KEY = "foo"
@@ -323,7 +322,7 @@ class TestCompanySignup:
         assert 1 == company.members.count()
 
         # No sent email.
-        assert len(mail.outbox) == 0
+        assert len(mailoutbox) == 0
 
     def test_facilitator_base_signup_process(self, client):
         url = reverse("signup:company_select")

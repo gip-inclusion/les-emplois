@@ -26,7 +26,7 @@ class TestCompanyAdmin:
         response = parse_response_to_soup(response, selector=".field-approvals_list")
         assert str(response) == snapshot(name="approvals list")
 
-    def test_deactivate_last_admin(self, admin_client):
+    def test_deactivate_last_admin(self, admin_client, mailoutbox):
         company = CompanyFactory(with_membership=True)
         membership = company.memberships.first()
         assert membership.is_admin
@@ -69,9 +69,9 @@ class TestCompanyAdmin:
             ),
         )
 
-        assert_set_admin_role__removal(membership.user, company)
+        assert_set_admin_role__removal(membership.user, company, mailoutbox)
 
-    def test_delete_admin(self, admin_client):
+    def test_delete_admin(self, admin_client, mailoutbox):
         company = CompanyFactory(with_membership=True)
         membership = company.memberships.first()
         assert membership.is_admin
@@ -108,9 +108,9 @@ class TestCompanyAdmin:
         assertRedirects(response, change_url, fetch_redirect_response=False)
         response = admin_client.get(change_url)
 
-        assert_set_admin_role__removal(membership.user, company)
+        assert_set_admin_role__removal(membership.user, company, mailoutbox)
 
-    def test_add_admin(self, admin_client):
+    def test_add_admin(self, admin_client, mailoutbox):
         company = CompanyFactory(with_membership=True)
         membership = company.memberships.first()
         employer = EmployerFactory()
@@ -150,7 +150,7 @@ class TestCompanyAdmin:
         assertRedirects(response, change_url, fetch_redirect_response=False)
         response = admin_client.get(change_url)
 
-        assert_set_admin_role__creation(employer, company)
+        assert_set_admin_role__creation(employer, company, mailoutbox)
 
 
 @freeze_time("2024-05-17T11:11:11+02:00")

@@ -3,7 +3,6 @@ import uuid
 import respx
 from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
-from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertFormError, assertRedirects
@@ -183,7 +182,7 @@ class TestJobSeekerSignup:
         assert job_seeker.title == "M"
         assert job_seeker.has_jobseeker_profile
 
-    def test_job_seeker_signup(self, client, snapshot):
+    def test_job_seeker_signup(self, client, snapshot, mailoutbox):
         """Job-seeker signup."""
         # NIR is set on a previous step and tested separately.
         # See self.test_job_seeker_nir
@@ -232,8 +231,8 @@ class TestJobSeekerSignup:
         assert not user_email.verified
 
         # Check sent email.
-        assert len(mail.outbox) == 1
-        email = mail.outbox[0]
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
         assert "Confirmez votre adresse e-mail" in email.subject
         assert "Afin de finaliser votre inscription, cliquez sur le lien suivant" in email.body
         assert email.from_email == settings.DEFAULT_FROM_EMAIL

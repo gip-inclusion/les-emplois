@@ -4,7 +4,6 @@ import respx
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user
-from django.core import mail
 from django.shortcuts import reverse
 from django.utils.html import escape
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
@@ -23,7 +22,7 @@ from tests.utils.test import ItouClient
 
 
 class TestAcceptInvitation:
-    def assert_accepted_invitation(self, response, invitation, user):
+    def assert_accepted_invitation(self, response, invitation, user, mailoutbox):
         user.refresh_from_db()
         invitation.refresh_from_db()
         assert user.kind == UserKind.EMPLOYER
@@ -31,9 +30,9 @@ class TestAcceptInvitation:
         assert invitation.accepted_at
 
         # A confirmation e-mail is sent to the invitation sender.
-        assert len(mail.outbox) == 1
-        assert len(mail.outbox[0].to) == 1
-        assert invitation.sender.email == mail.outbox[0].to[0]
+        assert len(mailoutbox) == 1
+        assert len(mailoutbox[0].to) == 1
+        assert invitation.sender.email == mailoutbox[0].to[0]
 
         # Make sure there's a welcome message.
         assertContains(
@@ -47,7 +46,7 @@ class TestAcceptInvitation:
 
     @sso_parametrize
     @respx.mock
-    def test_accept_invitation_signup(self, client, sso_setup):
+    def test_accept_invitation_signup(self, client, mailoutbox, sso_setup):
         invitation = SentEmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"])
         response = client.get(invitation.acceptance_link, follow=True)
         sso_setup.assertContainsButton(response)
@@ -84,11 +83,11 @@ class TestAcceptInvitation:
         assert (total_users_before + 1) == total_users_after
 
         user = User.objects.get(email=invitation.email)
-        self.assert_accepted_invitation(response, invitation, user)
+        self.assert_accepted_invitation(response, invitation, user, mailoutbox)
 
     @sso_parametrize
     @respx.mock
-    def test_accept_invitation_signup_returns_on_other_browser(self, client, sso_setup):
+    def test_accept_invitation_signup_returns_on_other_browser(self, client, mailoutbox, sso_setup):
         invitation = SentEmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"])
         response = client.get(invitation.acceptance_link, follow=True)
         sso_setup.assertContainsButton(response)
@@ -127,11 +126,11 @@ class TestAcceptInvitation:
         assert (total_users_before + 1) == total_users_after
 
         user = User.objects.get(email=invitation.email)
-        self.assert_accepted_invitation(response, invitation, user)
+        self.assert_accepted_invitation(response, invitation, user, mailoutbox)
 
     @sso_parametrize
     @respx.mock
-    def test_accept_invitation_signup_bad_email_case(self, client, sso_setup):
+    def test_accept_invitation_signup_bad_email_case(self, client, mailoutbox, sso_setup):
         invitation = SentEmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"].upper())
         response = client.get(invitation.acceptance_link, follow=True)
         sso_setup.assertContainsButton(response)
@@ -166,11 +165,11 @@ class TestAcceptInvitation:
         assert last_url == reverse("welcoming_tour:index")
 
         user = User.objects.get(email=invitation.email)
-        self.assert_accepted_invitation(response, invitation, user)
+        self.assert_accepted_invitation(response, invitation, user, mailoutbox)
 
     @sso_parametrize
     @respx.mock
-    def test_accept_existing_user_not_logged_in_using_ProConnect(self, client, sso_setup):
+    def test_accept_existing_user_not_logged_in_using_ProConnect(self, client, mailoutbox, sso_setup):
         invitation = SentEmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"])
         user = EmployerFactory(
             username=sso_setup.oidc_userinfo["sub"],
@@ -202,7 +201,7 @@ class TestAcceptInvitation:
         response = client.get(response.url, follow=True)
 
         assert response.context["user"].is_authenticated
-        self.assert_accepted_invitation(response, invitation, user)
+        self.assert_accepted_invitation(response, invitation, user, mailoutbox)
 
     def test_accept_invitation_logged_in_user(self, client):
         # A logged in user should log out before accepting an invitation.
@@ -296,7 +295,7 @@ class TestAcceptInvitation:
         response = client.get(invitation.acceptance_link, follow=True)
         assertContains(response, escape("Invitation acceptée"))
 
-    def test_accept_existing_user_already_member_of_inactive_siae(self, client):
+    def test_accept_existing_user_already_member_of_inactive_siae(self, client, mailoutbox):
         """
         An inactive SIAE user (i.e. attached to a single inactive SIAE)
         can only be ressucitated by being invited to a new SIAE.
@@ -320,7 +319,7 @@ class TestAcceptInvitation:
 
         current_company = get_current_company_or_404(response.wsgi_request)
         assert company.pk == current_company.pk
-        self.assert_accepted_invitation(response, invitation, user)
+        self.assert_accepted_invitation(response, invitation, user, mailoutbox)
 
     @sso_parametrize
     @respx.mock
@@ -389,14 +388,14 @@ class TestAcceptInvitation:
         assert not invitation.accepted
         assertContains(response, "Un utilisateur est déjà connecté.")
 
-    def test_accept_existing_user_email_different_case(self, client):
+    def test_accept_existing_user_email_different_case(self, client, mailoutbox):
         user = EmployerFactory(has_completed_welcoming_tour=True, email="HEY@example.com")
         invitation = SentEmployerInvitationFactory(
             email="hey@example.com",
         )
         client.force_login(user)
         response = client.get(invitation.acceptance_link, follow=True)
-        self.assert_accepted_invitation(response, invitation, user)
+        self.assert_accepted_invitation(response, invitation, user, mailoutbox)
 
     def test_expired_invitation_old_link(self, client):
         user = EmployerFactory()

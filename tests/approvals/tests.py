@@ -10,7 +10,6 @@ from django.contrib import messages
 from django.contrib.admin import AdminSite
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.core import mail
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError, ProgrammingError, connection, transaction
 from django.forms import model_to_dict
@@ -1038,7 +1037,7 @@ class TestAutomaticApprovalAdminViews:
 
 class TestCustomApprovalAdminViews:
     @pytest.mark.ignore_unknown_variable_template_error("has_view_permission", "subtitle")
-    def test_manually_add_approval(self, client):
+    def test_manually_add_approval(self, client, mailoutbox):
         # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
         # with a manual verification.
         job_seeker = JobSeekerFactory(
@@ -1054,9 +1053,6 @@ class TestCustomApprovalAdminViews:
             with_iae_eligibility_diagnosis=True,
         )
         job_application.accept(user=job_application.to_company.members.first())
-
-        # Delete emails sent by previous transition.
-        mail.outbox = []
 
         url = reverse("admin:approvals_approval_manually_add_approval", args=[job_application.pk])
 
@@ -1136,8 +1132,8 @@ class TestCustomApprovalAdminViews:
         assert approval.origin_siae_siret == job_application.to_company.siret
         assert not approval.origin_prescriber_organization_kind
 
-        assert len(mail.outbox) == 1
-        email = mail.outbox[0]
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
         assert approval.number_with_spaces in email.body
 
     def test_employee_record_status(self, subtests):
