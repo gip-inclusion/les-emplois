@@ -1734,7 +1734,6 @@
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IncludeNode[apply/process_details_company.html]',
           'IfNode[apply/process_details_company.html]',
-          'BlockNode[apply/process_base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
@@ -1770,7 +1769,6 @@
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IncludeNode[apply/process_details_company.html]',
           'IfNode[apply/process_details_company.html]',
-          'BlockNode[apply/process_base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
@@ -1802,10 +1800,26 @@
       }),
       dict({
         'origin': list([
+          'JobApplication.can_be_cancelled[job_applications/models.py]',
+          'IfNode[apply/process_details_company.html]',
+          'BlockNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "employee_record_employeerecord"
+          WHERE "employee_record_employeerecord"."job_application_id" = %s
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'ForNode[apply/includes/transition_logs.html]',
           'WithNode[apply/includes/transition_logs.html]',
           'IncludeNode[apply/process_details_company.html]',
-          'BlockNode[apply/process_base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
@@ -1856,23 +1870,6 @@
           LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplicationtransitionlog"."user_id" = "users_user"."id")
           WHERE "job_applications_jobapplicationtransitionlog"."job_application_id" = %s
           ORDER BY "job_applications_jobapplicationtransitionlog"."timestamp" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplication.can_be_cancelled[job_applications/models.py]',
-          'IfNode[apply/process_details_company.html]',
-          'BlockNode[apply/process_base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "employee_record_employeerecord"
-          WHERE "employee_record_employeerecord"."job_application_id" = %s
-          LIMIT 1
         ''',
       }),
       dict({
@@ -2704,7 +2701,6 @@
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IncludeNode[apply/process_details_company.html]',
           'IfNode[apply/process_details_company.html]',
-          'BlockNode[apply/process_base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
@@ -2740,7 +2736,6 @@
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IncludeNode[apply/process_details_company.html]',
           'IfNode[apply/process_details_company.html]',
-          'BlockNode[apply/process_base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
@@ -2772,10 +2767,26 @@
       }),
       dict({
         'origin': list([
+          'JobApplication.can_be_cancelled[job_applications/models.py]',
+          'IfNode[apply/process_details_company.html]',
+          'BlockNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "employee_record_employeerecord"
+          WHERE "employee_record_employeerecord"."job_application_id" = %s
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'ForNode[apply/includes/transition_logs.html]',
           'WithNode[apply/includes/transition_logs.html]',
           'IncludeNode[apply/process_details_company.html]',
-          'BlockNode[apply/process_base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
@@ -2826,23 +2837,6 @@
           LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplicationtransitionlog"."user_id" = "users_user"."id")
           WHERE "job_applications_jobapplicationtransitionlog"."job_application_id" = %s
           ORDER BY "job_applications_jobapplicationtransitionlog"."timestamp" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplication.can_be_cancelled[job_applications/models.py]',
-          'IfNode[apply/process_details_company.html]',
-          'BlockNode[apply/process_base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "employee_record_employeerecord"
-          WHERE "employee_record_employeerecord"."job_application_id" = %s
-          LIMIT 1
         ''',
       }),
       dict({
