@@ -31,8 +31,7 @@
                                 {% bootstrap_field form.start_at %}
 
                                 <div id="collapse_{{ form.end_at.name }}"
-                                     class="collapse{% if not form.set_default_end_date.value %} show{% endif %}"
-                                     aria-expanded="{% if not form.set_default_end_date.value %}true{% else %}false{% endif %}">
+                                     class="collapse{% if not form.set_default_end_date.value %} show{% endif %}">
                                     {% bootstrap_field form.end_at %}
                                 </div>
 
