@@ -9,7 +9,6 @@ from tests.employee_record.factories import EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
 class TestReactivateEmployeeRecords:
     NEXT_URL = reverse_lazy("employee_record_views:list")
 
@@ -22,9 +21,9 @@ class TestReactivateEmployeeRecords:
         self.employee_record = EmployeeRecordWithProfileFactory(job_application=self.job_application)
         self.url = reverse("employee_record_views:reactivate", args=(self.employee_record.id,))
 
-    def test_reactivate_employee_record(self, client):
+    def test_reactivate_employee_record(self, client, faker):
         self.employee_record.update_as_ready()
-        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
+        self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
         self.employee_record.update_as_processed(process_code, process_message, "{}")
         self.employee_record.update_as_disabled()

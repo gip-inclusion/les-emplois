@@ -1,5 +1,6 @@
 from datetime import date
 
+import pytest
 from django.db import IntegrityError
 
 from itou.communications import registry as notifications_registry
@@ -10,11 +11,10 @@ from itou.files.models import File
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
 from tests.companies.factories import CompanyMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import TestCase
 
 
-class NotificationModelTest(TestCase):
-    def setUp(self):
+class TestNotificationModel:
+    def setup_method(self):
         class TestNotification(BaseNotification):
             pass
 
@@ -23,16 +23,19 @@ class NotificationModelTest(TestCase):
             name = "First"
             category = "First"
 
-        self.addCleanup(notifications_registry.unregister, FirstNotification)
-
         @notifications_registry.register
         class SecondNotification(TestNotification):
             name = "Second"
             category = "Second"
 
-        self.addCleanup(notifications_registry.unregister, SecondNotification)
+        self.FirstNotification = FirstNotification
+        self.SecondNotification = SecondNotification
 
         sync_notifications(NotificationRecord)
+
+    def teardown_method(self):
+        notifications_registry.unregister(self.FirstNotification)
+        notifications_registry.unregister(self.SecondNotification)
 
     def test_managers(self):
         assert NotificationRecord.objects.filter(category__in=["First", "Second"]).count() == 2
@@ -49,8 +52,8 @@ class NotificationModelTest(TestCase):
         assert str(notifications[1]) == "Second"
 
 
-class NotificationSettingsModelTest(TestCase):
-    def setUp(self):
+class TestNotificationSettingsModel:
+    def setup_method(self):
         self.job_seeker = JobSeekerFactory(first_name="John", last_name="Doe", with_disabled_notifications=True)
         self.employer = EmployerFactory(
             first_name="Alice", last_name="Doe", with_company=True, with_disabled_notifications=True
@@ -101,22 +104,22 @@ class NotificationSettingsModelTest(TestCase):
         )
 
 
-class AnnouncementCampaignModelTest(TestCase):
+class TestAnnouncementCampaignModel:
     def test_end_date(self):
         campaign = AnnouncementCampaignFactory(start_date=date(2024, 1, 1))
-        self.assertEqual(campaign.end_date, date(2024, 1, 31))
+        assert campaign.end_date == date(2024, 1, 31)
 
     def test_max_items_constraint_too_low(self):
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             AnnouncementCampaignFactory(max_items=0)
 
     def test_max_items_constraint_too_high(self):
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             AnnouncementCampaignFactory(max_items=11)
 
     def test_start_date_day_constraint(self):
         # must be on first day of month
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             AnnouncementCampaignFactory(start_date=date(2024, 1, 2))
 
     def test_start_date_conflict_constraint(self):
@@ -126,11 +129,11 @@ class AnnouncementCampaignModelTest(TestCase):
         existing_campaign.save()
 
         # cannot conflict existing date with a new instance
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             AnnouncementCampaignFactory(start_date=existing_campaign.start_date)
 
 
-class AnnouncementItemModelTest(TestCase):
+class TestAnnouncementItemModel:
     def test_file_update(self):
         item = AnnouncementItemFactory(image_storage=None, with_image=True)
         item.save()

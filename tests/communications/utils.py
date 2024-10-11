@@ -2,7 +2,7 @@ from itou.communications.dispatch.base import BaseNotification
 
 
 class FakeNotificationClassesMixin:
-    def setUp(self):
+    def setup_method(self):
         class TestNotification(BaseNotification):
             pass
 

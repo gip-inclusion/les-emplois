@@ -5,13 +5,13 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications.enums import JobApplicationState
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
@@ -22,17 +22,10 @@ from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
-    JobApplicationSentByPrescriberFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.prescribers.factories import (
-    PrescriberMembershipFactory,
-    PrescriberOrganizationWithMembershipFactory,
-)
-from tests.users.factories import JobSeekerFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import (
-    TestCase,
     assert_previous_step,
     assertSnapshotQueries,
     get_rows_from_streaming_response,
@@ -40,116 +33,34 @@ from tests.utils.test import (
 )
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class ProcessListSiaeTest(TestCase):
+class TestProcessListSiae:
     SELECTED_JOBS = "selected_jobs"
 
-    @classmethod
-    def setUpTestData(cls):
-        """
-        Create three organizations with two members each:
-        - pole_emploi: job seekers agency.
-        - l_envol: an emergency center for homeless people.
-        - hit_pit: a boxing gym looking for boxers.
+    def test_list_for_siae(self, client, snapshot):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
 
-        Pole Emploi prescribers:
-        - Thibault
-        - laurie
-
-        L'envol prescribers:
-        - Audrey
-        - Manu
-
-        Hit Pit staff:
-        - Eddie
-        """
-
-        # Pole Emploi
-        pole_emploi = PrescriberOrganizationWithMembershipFactory(
-            authorized=True, name="Pôle emploi", membership__user__first_name="Thibault"
-        )
-        PrescriberMembershipFactory(organization=pole_emploi, user__first_name="Laurie")
-        thibault_pe = pole_emploi.members.get(first_name="Thibault")
-        laurie_pe = pole_emploi.members.get(first_name="Laurie")
-
-        # L'Envol
-        l_envol = PrescriberOrganizationWithMembershipFactory(name="L'Envol", membership__user__first_name="Manu")
-        PrescriberMembershipFactory(organization=l_envol, user__first_name="Audrey")
-        audrey_envol = l_envol.members.get(first_name="Audrey")
-
-        # Hit Pit
-        hit_pit = CompanyFactory(name="Hit Pit", with_membership=True, membership__user__first_name="Eddie")
-        eddie_hit_pit = hit_pit.members.get(first_name="Eddie")
-
-        # Now send applications
-        states = list(JobApplicationWorkflow.states)
-        remaining_states, last_state = states[:-1], states[-1]
-        common_kwargs = {
-            "to_company": hit_pit,
-            "sender_prescriber_organization": pole_emploi,
-            "eligibility_diagnosis": None,
-        }
-        for i, state in enumerate(remaining_states):
-            creation_date = timezone.now() - timezone.timedelta(days=i)
-            JobApplicationSentByPrescriberFactory(
-                **common_kwargs,
-                state=state,
-                created_at=creation_date,
-                sender=thibault_pe,
-            )
-        # Treat Maggie specially, tests rely on her.
-        creation_date = timezone.now() - timezone.timedelta(days=i + 1)
-        maggie = JobSeekerFactory(first_name="Maggie")
-        JobApplicationSentByPrescriberFactory(
-            **common_kwargs,
-            state=last_state,
-            created_at=creation_date,
-            sender=thibault_pe,
-            job_seeker=maggie,
-        )
-        JobApplicationSentByPrescriberFactory(
-            **common_kwargs,
-            sender=laurie_pe,
-            job_seeker=maggie,
-        )
-
-        # Variables available for unit tests
-        cls.pole_emploi = pole_emploi
-        cls.hit_pit = hit_pit
-        cls.l_envol = l_envol
-        cls.thibault_pe = thibault_pe
-        cls.laurie_pe = laurie_pe
-        cls.eddie_hit_pit = eddie_hit_pit
-        cls.audrey_envol = audrey_envol
-        cls.maggie = maggie
-
-    def test_list_for_siae(self):
-        """
-        Eddie wants to see a list of job applications sent to his SIAE.
-        """
         city = create_city_saint_andre()
         create_test_romes_and_appellations(["N4105"], appellations_per_rome=2)
         appellations = Appellation.objects.all()[:2]
-        job1 = JobDescriptionFactory(company=self.hit_pit, appellation=appellations[0], location=city)
-        job2 = JobDescriptionFactory(company=self.hit_pit, appellation=appellations[1], location=city)
-        for job_application in JobApplication.objects.all():
-            job_application.selected_jobs.set([job1, job2])
+        job1 = JobDescriptionFactory(company=company, appellation=appellations[0], location=city)
+        job2 = JobDescriptionFactory(company=company, appellation=appellations[1], location=city)
 
-        # Add a diagnosis present on 2 applications
-        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.maggie)
-        level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
-        level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()
-        diagnosis.administrative_criteria.add(level1_criterion)
-        diagnosis.administrative_criteria.add(level2_criterion)
+        # A job application without eligibility diagnosis
+        job_app = JobApplicationFactory(to_company=company, selected_jobs=[job1, job2], eligibility_diagnosis=None)
+        # Two with it (ensure there are no 1+N queries)
+        JobApplicationFactory.create_batch(2, to_company=company, selected_jobs=[job1, job2])
+        # A job application for another company
+        JobApplicationFactory()
 
-        self.client.force_login(self.eddie_hit_pit)
-        with assertSnapshotQueries(self.snapshot(name="view queries")):
-            response = self.client.get(reverse("apply:list_for_siae"))
+        client.force_login(employer)
+        with assertSnapshotQueries(snapshot(name="view queries")):
+            response = client.get(reverse("apply:list_for_siae"))
 
         total_applications = len(response.context["job_applications_page"].object_list)
 
-        # Result page should contain all SIAE's job applications.
-        assert total_applications == self.hit_pit.job_applications_received.count()
+        # Result page should contain all the company's job applications.
+        assert total_applications == 3
 
         assert_previous_step(response, reverse("dashboard:index"))
 
@@ -160,7 +71,6 @@ class ProcessListSiaeTest(TestCase):
         assertContains(response, export_url)
 
         # Has job application card link with back_url set
-        job_app = JobApplication.objects.first()
         job_application_link = unquote(
             add_url_params(
                 reverse("apply:details_for_company", kwargs={"job_application_id": job_app.pk}),
@@ -211,9 +121,11 @@ class ProcessListSiaeTest(TestCase):
             response, reverse("job_seekers_views:details", kwargs={"public_id": job_app.job_seeker.public_id})
         )
 
-    def test_list_for_siae_show_criteria(self):
-        # Add a diagnosis present on 2 applications
-        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.maggie)
+    def test_list_for_siae_show_criteria(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
         criteria = AdministrativeCriteria.objects.filter(
             name__in=[
                 # Level 1 criteria
@@ -226,11 +138,14 @@ class ProcessListSiaeTest(TestCase):
         )
         assert len(criteria) == 4
         diagnosis.administrative_criteria.add(*criteria)
+        JobApplicationFactory(
+            job_seeker=diagnosis.job_seeker,
+            to_company=company,
+            eligibility_diagnosis=None,  # fallback on the jobseeker's
+        )
 
-        self.client.force_login(self.eddie_hit_pit)
-        # Only show maggie's applications
-        params = {"job_seeker": self.maggie.id}
-        response = self.client.get(reverse("apply:list_for_siae"), params)
+        client.force_login(employer)
+        response = client.get(reverse("apply:list_for_siae"))
 
         # 4 criteria: all are shown
         assertContains(response, "<li>Allocataire AAH</li>", html=True)
@@ -242,7 +157,7 @@ class ProcessListSiaeTest(TestCase):
         # Add a 5th criterion to the diagnosis
         diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(name="DETLD (+ 24 mois)"))
 
-        response = self.client.get(reverse("apply:list_for_siae"), params)
+        response = client.get(reverse("apply:list_for_siae"))
         # Only the 3 first are shown (ordered by level & name)
         # The 4th line has been replaced by "+ 2 autres critères"
         assertContains(response, "<li>Allocataire AAH</li>", html=True)
@@ -255,16 +170,23 @@ class ProcessListSiaeTest(TestCase):
         # No selected jobs, the filter should not appear.
         assertNotContains(response, self.SELECTED_JOBS)
 
-    def test_list_for_siae_hide_criteria_for_non_SIAE_employers(self):
-        # Add a diagnosis present on 2 applications
-        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.maggie)
+    def test_list_for_siae_hide_criteria_for_non_SIAE_employers(self, client, subtests):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
         # Level 1 criteria
         diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(name="Allocataire AAH"))
+        JobApplicationFactory(
+            job_seeker=diagnosis.job_seeker,
+            to_company=company,
+            eligibility_diagnosis=None,  # fallback on the jobseeker's
+        )
 
         TITLE = '<p class="h5">Critères administratifs IAE</p>'
         CRITERION = "<li>Allocataire AAH</li>"
 
-        self.client.force_login(self.eddie_hit_pit)
+        client.force_login(employer)
 
         expect_to_see_criteria = {
             CompanyKind.EA: False,
@@ -278,11 +200,10 @@ class ProcessListSiaeTest(TestCase):
             CompanyKind.ETTI: True,
         }
         for kind in CompanyKind:
-            with self.subTest(kind=kind):
-                self.hit_pit.kind = kind
-                self.hit_pit.save(update_fields=("kind",))
-                # Only show maggie's applications
-                response = self.client.get(reverse("apply:list_for_siae"), {"job_seeker": self.maggie.id})
+            with subtests.test(kind=kind.label):
+                company.kind = kind
+                company.save(update_fields=("kind",))
+                response = client.get(reverse("apply:list_for_siae"))
                 if expect_to_see_criteria[kind]:
                     assertContains(response, TITLE, html=True)
                     assertContains(response, CRITERION, html=True)
@@ -290,70 +211,73 @@ class ProcessListSiaeTest(TestCase):
                     assertNotContains(response, TITLE, html=True)
                     assertNotContains(response, CRITERION, html=True)
 
-    def test_list_for_siae_filtered_by_one_state(self):
-        """
-        Eddie wants to see only accepted job applications.
-        """
-        self.client.force_login(self.eddie_hit_pit)
-        state_accepted = JobApplicationState.ACCEPTED
-        response = self.client.get(reverse("apply:list_for_siae"), {"states": [state_accepted]})
+    def test_list_for_siae_filtered_by_one_state(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+
+        accepted_job_application = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
+        JobApplicationFactory(to_company=company, state=JobApplicationState.NEW)
+
+        client.force_login(employer)
+        response = client.get(reverse("apply:list_for_siae"), {"states": [JobApplicationState.ACCEPTED]})
 
         applications = response.context["job_applications_page"].object_list
+        assert applications == [accepted_job_application]
 
-        assert len(applications) == 1
-        assert applications[0].state == state_accepted
-
-    def test_list_for_siae_filtered_by_state_prior_to_hire(self):
-        """
-        Eddie wants to see only job applications in prior_to_hire state
-        """
+    def test_list_for_siae_filtered_by_state_prior_to_hire(self, client):
         PRIOR_TO_HIRE_LABEL = "Action préalable à l’embauche</label>"
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
 
-        # prior_to_hire filter doesn't exist for non-GEIQ SIAE and is ignored
-        self.client.force_login(self.eddie_hit_pit)
+        JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
+        prior_to_hire_job_app = JobApplicationFactory(to_company=company, state=JobApplicationState.PRIOR_TO_HIRE)
+
+        # prior_to_hire filter doesn't exist for non-GEIQ companies and is ignored
+        client.force_login(employer)
         params = {"states": [JobApplicationState.PRIOR_TO_HIRE]}
-        response = self.client.get(reverse("apply:list_for_siae"), params)
+        response = client.get(reverse("apply:list_for_siae"), params)
         assertNotContains(response, PRIOR_TO_HIRE_LABEL)
 
         applications = response.context["job_applications_page"].object_list
-        assert len(applications) == 9
+        assert len(applications) == 2
 
         # With a GEIQ user, the filter is present and works
-        self.hit_pit.kind = CompanyKind.GEIQ
-        self.hit_pit.save()
-        response = self.client.get(reverse("apply:list_for_siae"), params)
+        company.kind = CompanyKind.GEIQ
+        company.save()
+        response = client.get(reverse("apply:list_for_siae"), params)
         assertContains(response, PRIOR_TO_HIRE_LABEL)
 
         applications = response.context["job_applications_page"].object_list
-        assert len(applications) == 1
-        assert applications[0].state == JobApplicationState.PRIOR_TO_HIRE
+        assert applications == [prior_to_hire_job_app]
 
-    def test_list_for_siae_filtered_by_many_states(self):
-        """
-        Eddie wants to see NEW and PROCESSING job applications.
-        """
-        self.client.force_login(self.eddie_hit_pit)
+    def test_list_for_siae_filtered_by_many_states(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+
+        JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
+        new_job_app = JobApplicationFactory(to_company=company, state=JobApplicationState.NEW)
+        processing_job_app = JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING)
+
+        client.force_login(employer)
         job_applications_states = [JobApplicationState.NEW, JobApplicationState.PROCESSING]
-        response = self.client.get(reverse("apply:list_for_siae"), {"states": job_applications_states})
+        response = client.get(reverse("apply:list_for_siae"), {"states": job_applications_states})
 
         applications = response.context["job_applications_page"].object_list
+        assertQuerySetEqual(applications, [new_job_app, processing_job_app], ordered=False)
 
-        assert len(applications) == 3
-        assert applications[0].state.name in job_applications_states
+    def test_list_for_siae_filtered_by_dates(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
 
-    def test_list_for_siae_filtered_by_dates(self):
-        """
-        Eddie wants to see job applications sent at a specific date.
-        """
-        self.client.force_login(self.eddie_hit_pit)
         date_format = DuetDatePickerWidget.INPUT_DATE_FORMAT
-        job_applications = self.hit_pit.job_applications_received.order_by("created_at")
-        jobs_in_range = job_applications[3:]
-        start_date = jobs_in_range[0].created_at
+        for i in range(4):
+            JobApplicationFactory(to_company=company, created_at=timezone.now() - timezone.timedelta(days=i))
+        job_applications = list(company.job_applications_received.order_by("created_at"))
 
-        # Negative indexing is not allowed in querysets
-        end_date = jobs_in_range[len(jobs_in_range) - 1].created_at
-        response = self.client.get(
+        client.force_login(employer)
+        start_date = job_applications[1].created_at
+        end_date = job_applications[-2].created_at
+        response = client.get(
             reverse("apply:list_for_siae"),
             {
                 "start_date": timezone.localdate(start_date).strftime(date_format),
@@ -362,89 +286,85 @@ class ProcessListSiaeTest(TestCase):
         )
         applications = response.context["job_applications_page"].object_list
 
-        assert len(applications) == 6
-        assert applications[0].created_at >= start_date
-        assert applications[0].created_at <= end_date
+        assert len(applications) == 2
+        assert all(start_date <= job_app.created_at <= end_date for job_app in applications)
 
-    def test_list_for_siae_empty_dates_in_params(self):
+    def test_list_for_siae_empty_dates_in_params(self, client):
         """
         Our form uses a Datepicker that adds empty start and end dates
         in the HTTP query if they are not filled in by the user.
         Make sure the template loads all available job applications if fields are empty.
         """
-        self.client.force_login(self.eddie_hit_pit)
-        response = self.client.get(add_url_params(reverse("apply:list_for_siae"), {"start_date": "", "end_date": ""}))
-        total_applications = len(response.context["job_applications_page"].object_list)
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
 
-        assert total_applications == self.hit_pit.job_applications_received.count()
+        job_app = JobApplicationFactory(to_company=company)
 
-    def test_list_for_siae_filtered_by_sender_organization_name(self):
-        """
-        Eddie wants to see applications sent by Pôle emploi.
-        """
-        self.client.force_login(self.eddie_hit_pit)
-        sender_organization = self.pole_emploi
-        response = self.client.get(
-            reverse("apply:list_for_siae"), {"sender_prescriber_organizations": [sender_organization.id]}
-        )
+        client.force_login(employer)
+        response = client.get(add_url_params(reverse("apply:list_for_siae"), {"start_date": "", "end_date": ""}))
+        assert response.context["job_applications_page"].object_list == [job_app]
 
-        applications = response.context["job_applications_page"].object_list
+    def test_list_for_siae_filtered_by_sender_organization_name(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
 
-        assert len(applications) == 9
-        assert applications[0].sender_prescriber_organization.id == sender_organization.id
+        job_app_1 = JobApplicationFactory(to_company=company, sent_by_authorized_prescriber_organisation=True)
+        job_app_2 = JobApplicationFactory(to_company=company, sent_by_authorized_prescriber_organisation=True)
+        _job_app_3 = JobApplicationFactory(to_company=company, sent_by_authorized_prescriber_organisation=True)
 
-    def test_list_for_siae_filtered_by_sender_name(self):
-        """
-        Eddie wants to see applications sent by a member of Pôle emploi.
-        """
-        self.client.force_login(self.eddie_hit_pit)
-        sender = self.thibault_pe
-        response = self.client.get(reverse("apply:list_for_siae"), {"senders": [sender.id]})
-
-        applications = response.context["job_applications_page"].object_list
-
-        assert len(applications) == 8
-        assert applications[0].sender.id == sender.id
-
-    def test_list_for_siae_filtered_by_job_seeker_name(self):
-        """
-        Eddie wants to see Maggie's job applications.
-        """
-        self.client.force_login(self.eddie_hit_pit)
-        response = self.client.get(reverse("apply:list_for_siae"), {"job_seeker": self.maggie.pk})
-
-        applications = response.context["job_applications_page"].object_list
-
-        assert len(applications) == 2
-        assert applications[0].job_seeker_id == self.maggie.pk
-
-    def test_list_for_siae_filtered_by_many_organization_names(self):
-        """
-        Eddie wants to see applications sent by Pôle emploi and L'Envol.
-        """
-        self.client.force_login(self.eddie_hit_pit)
-        senders_ids = [self.pole_emploi.id, self.l_envol.id]
-        response = self.client.get(
+        client.force_login(employer)
+        response = client.get(
             reverse("apply:list_for_siae"),
-            {"sender_prescriber_organizations": [self.thibault_pe.id, self.audrey_envol.id]},
+            {"sender_prescriber_organizations": [job_app_1.sender_prescriber_organization.id]},
         )
+        assert response.context["job_applications_page"].object_list == [job_app_1]
 
+        response = client.get(
+            reverse("apply:list_for_siae"),
+            {
+                "sender_prescriber_organizations": [
+                    job_app_1.sender_prescriber_organization.id,
+                    job_app_2.sender_prescriber_organization.id,
+                ]
+            },
+        )
         applications = response.context["job_applications_page"].object_list
+        assertQuerySetEqual(applications, [job_app_1, job_app_2], ordered=False)
 
-        assert len(applications) == 9
-        assert applications[0].sender_prescriber_organization.id in senders_ids
+    def test_list_for_siae_filtered_by_sender_name(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
 
-    def test_list_for_siae_filtered_by_pass_state(self):
-        """
-        Eddie wants to see applications with a suspended or in progress IAE PASS.
-        """
+        job_app = JobApplicationFactory(to_company=company)
+        _another_job_app = JobApplicationFactory(to_company=company)
+
+        client.force_login(employer)
+        response = client.get(reverse("apply:list_for_siae"), {"senders": [job_app.sender.id]})
+        assert response.context["job_applications_page"].object_list == [job_app]
+
+    def test_list_for_siae_filtered_by_job_seeker_name(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+
+        job_app = JobApplicationFactory(to_company=company)
+        _another_job_app = JobApplicationFactory(to_company=company)
+
+        client.force_login(employer)
+        response = client.get(reverse("apply:list_for_siae"), {"job_seeker": job_app.job_seeker.pk})
+        assert response.context["job_applications_page"].object_list == [job_app]
+
+    def test_list_for_siae_filtered_by_pass_state(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+
         now = timezone.now()
         yesterday = (now - timezone.timedelta(days=1)).date()
-        self.client.force_login(self.eddie_hit_pit)
-        states_filter = {"states": [JobApplicationState.ACCEPTED, JobApplicationState.NEW]}
+        client.force_login(employer)
+
+        JobApplicationFactory(to_company=company)
 
         # Without approval
-        response = self.client.get(reverse("apply:list_for_siae"), {**states_filter, "pass_iae_active": True})
+        response = client.get(reverse("apply:list_for_siae"), {"pass_iae_active": True})
         assert len(response.context["job_applications_page"].object_list) == 0
 
         # With a job_application with an approval
@@ -453,30 +373,18 @@ class ProcessListSiaeTest(TestCase):
             state=JobApplicationState.ACCEPTED,
             hiring_start_at=yesterday,
             approval__start_at=yesterday,
-            to_company=self.hit_pit,
+            to_company=company,
         )
-        response = self.client.get(reverse("apply:list_for_siae"), {**states_filter, "pass_iae_active": True})
-        applications = response.context["job_applications_page"].object_list
-        assert len(applications) == 1
-        assert job_application in applications
+        response = client.get(reverse("apply:list_for_siae"), {"pass_iae_active": True})
+        assert response.context["job_applications_page"].object_list == [job_application]
 
         # Check that adding pass_iae_suspended does not hide the application
-        response = self.client.get(
-            reverse("apply:list_for_siae"),
-            {
-                **states_filter,
-                "pass_iae_active": True,
-                "pass_iae_suspended": True,
-            },
-        )
-        applications = response.context["job_applications_page"].object_list
-        assert len(applications) == 1
-        assert job_application in applications
+        response = client.get(reverse("apply:list_for_siae"), {"pass_iae_active": True, "pass_iae_suspended": True})
+        assert response.context["job_applications_page"].object_list == [job_application]
 
         # But pass_iae_suspended alone does not show the application
-        suspended_filter = {**states_filter, "pass_iae_suspended": True}
-        response = self.client.get(reverse("apply:list_for_siae"), suspended_filter)
-        assert len(response.context["job_applications_page"].object_list) == 0
+        response = client.get(reverse("apply:list_for_siae"), {"pass_iae_suspended": True})
+        assert response.context["job_applications_page"].object_list == []
 
         # Now with a suspension
         SuspensionFactory(
@@ -484,79 +392,72 @@ class ProcessListSiaeTest(TestCase):
             start_at=yesterday,
             end_at=now + timezone.timedelta(days=2),
         )
-        response = self.client.get(reverse("apply:list_for_siae"), suspended_filter)
-
-        applications = response.context["job_applications_page"].object_list
-        assert len(applications) == 1
-        assert job_application in applications
+        response = client.get(reverse("apply:list_for_siae"), {"pass_iae_suspended": True})
+        assert response.context["job_applications_page"].object_list == [job_application]
 
         # Check that adding pass_iae_active does not hide the application
-        response = self.client.get(reverse("apply:list_for_siae"), {**suspended_filter, "pass_iae_active": True})
+        response = client.get(reverse("apply:list_for_siae"), {"pass_iae_active": True, "pass_iae_suspended": True})
+        assert response.context["job_applications_page"].object_list == [job_application]
 
-        applications = response.context["job_applications_page"].object_list
-        assert len(applications) == 1
-        assert job_application in applications
+    def test_list_for_siae_filtered_by_eligibility_validated(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
 
-    def test_list_for_siae_filtered_by_eligibility_validated(self):
-        """
-        Eddie wants to see applications of job seeker for whom
-        the diagnosis of eligibility has been validated.
-        """
-        self.client.force_login(self.eddie_hit_pit)
-        params = {"eligibility_validated": True}
+        job_app = JobApplicationFactory(to_company=company, eligibility_diagnosis=None)
+        _another_job_app = JobApplicationFactory(to_company=company, eligibility_diagnosis=None)
 
-        response = self.client.get(reverse("apply:list_for_siae"), params)
-        assert len(response.context["job_applications_page"].object_list) == 0
+        client.force_login(employer)
+        response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
+        assert response.context["job_applications_page"].object_list == []
 
         # Authorized prescriber diagnosis
-        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.maggie)
-        response = self.client.get(reverse("apply:list_for_siae"), params)
-        # Maggie has two applications, one created in the state loop and the other created by SentByPrescriberFactory
-        assert len(response.context["job_applications_page"].object_list) == 2
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_app.job_seeker)
+        response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
+        assert response.context["job_applications_page"].object_list == [job_app]
 
         # Make sure the diagnostic expired - it should be ignored
         diagnosis.expires_at = timezone.now() - datetime.timedelta(days=diagnosis.EXPIRATION_DELAY_MONTHS * 31 + 1)
         diagnosis.save(update_fields=("expires_at",))
-        response = self.client.get(reverse("apply:list_for_siae"), params)
-        assert len(response.context["job_applications_page"].object_list) == 0
+        response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
+        assert response.context["job_applications_page"].object_list == []
 
-        # Diagnosis made by eddie_hit_pit's SIAE
+        # Diagnosis made by employer's SIAE
         diagnosis.delete()
         diagnosis = IAEEligibilityDiagnosisFactory(
-            job_seeker=self.maggie, from_employer=True, author_siae=self.hit_pit
+            job_seeker=job_app.job_seeker, from_employer=True, author_siae=company
         )
-        response = self.client.get(reverse("apply:list_for_siae"), params)
-        # Maggie has two applications, one created in the state loop and the other created by SentByPrescriberFactory
-        assert len(response.context["job_applications_page"].object_list) == 2
+        response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
+        assert response.context["job_applications_page"].object_list == [job_app]
 
         # Diagnosis made by an other SIAE - it should be ignored
         diagnosis.delete()
-        diagnosis = IAEEligibilityDiagnosisFactory(job_seeker=self.maggie, from_employer=True)
-        response = self.client.get(reverse("apply:list_for_siae"), params)
-        assert len(response.context["job_applications_page"].object_list) == 0
+        diagnosis = IAEEligibilityDiagnosisFactory(job_seeker=job_app.job_seeker, from_employer=True)
+        response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
+        assert response.context["job_applications_page"].object_list == []
 
         # With a valid approval
-        approval = ApprovalFactory(user=self.maggie, with_origin_values=True)  # origin_values needed to delete it
-        response = self.client.get(reverse("apply:list_for_siae"), params)
-        # Maggie has two applications, one created in the state loop and the other created by SentByPrescriberFactory
-        assert len(response.context["job_applications_page"].object_list) == 2
+        approval = ApprovalFactory(
+            user=job_app.job_seeker,
+            with_origin_values=True,  # origin_values needed to delete it
+        )
+        response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
+        assert response.context["job_applications_page"].object_list == [job_app]
 
         # With an expired approval
         approval_diagnosis = approval.eligibility_diagnosis
         approval.delete()
         approval_diagnosis.delete()
         approval = ApprovalFactory(expired=True)
-        response = self.client.get(reverse("apply:list_for_siae"), params)
-        assert len(response.context["job_applications_page"].object_list) == 0
+        response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
+        assert response.context["job_applications_page"].object_list == []
 
-    def test_list_for_siae_filtered_by_administrative_criteria(self):
-        """
-        Eddie wants to see applications of job seeker for whom
-        the diagnosis of eligibility has been validated with specific criteria.
-        """
-        self.client.force_login(self.eddie_hit_pit)
+    def test_list_for_siae_filtered_by_administrative_criteria(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        client.force_login(employer)
 
-        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.maggie)
+        job_app = JobApplicationFactory(to_company=company, eligibility_diagnosis=None)
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_app.job_seeker)
 
         level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
         level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()
@@ -569,65 +470,60 @@ class ProcessListSiaeTest(TestCase):
         diagnosis.save()
 
         # Filter by level1 criterion
-        response = self.client.get(reverse("apply:list_for_siae"), {"criteria": [level1_criterion.pk]})
-        applications = response.context["job_applications_page"].object_list
-        assert len(applications) == 2
+        response = client.get(reverse("apply:list_for_siae"), {"criteria": [level1_criterion.pk]})
+        assert response.context["job_applications_page"].object_list == [job_app]
 
         # Filter by level2 criterion
-        response = self.client.get(reverse("apply:list_for_siae"), {"criteria": [level2_criterion.pk]})
-        applications = response.context["job_applications_page"].object_list
-        assert len(applications) == 2
+        response = client.get(reverse("apply:list_for_siae"), {"criteria": [level2_criterion.pk]})
+        assert response.context["job_applications_page"].object_list == [job_app]
 
         # Filter by two criteria
-        response = self.client.get(
-            reverse("apply:list_for_siae"), {"criteria": [level1_criterion.pk, level2_criterion.pk]}
-        )
-        applications = response.context["job_applications_page"].object_list
-        assert len(applications) == 2
+        response = client.get(reverse("apply:list_for_siae"), {"criteria": [level1_criterion.pk, level2_criterion.pk]})
+        assert response.context["job_applications_page"].object_list == [job_app]
 
         # Filter by other criteria
-        response = self.client.get(reverse("apply:list_for_siae"), {"criteria": [level1_other_criterion.pk]})
-        applications = response.context["job_applications_page"].object_list
-        assert len(applications) == 0
+        response = client.get(reverse("apply:list_for_siae"), {"criteria": [level1_other_criterion.pk]})
+        assert response.context["job_applications_page"].object_list == []
 
-    def test_list_for_siae_filtered_by_jobseeker_department(self):
-        """
-        Eddie wants to see applications of job seeker who live in given department.
-        """
-        self.client.force_login(self.eddie_hit_pit)
+    def test_list_for_siae_filtered_by_jobseeker_department(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
 
-        # Maggie moves to Department 37
-        self.maggie.post_code = "37000"
-        self.maggie.save()
+        job_app = JobApplicationFactory(
+            to_company=company,
+            job_seeker__with_address=True,
+            job_seeker__post_code="37000",
+        )
+        _another_job_app = JobApplicationFactory(
+            to_company=company,
+            job_seeker__with_address=True,
+            job_seeker__post_code="75002",
+        )
 
-        response = self.client.get(reverse("apply:list_for_siae"), {"departments": ["37"]})
-        applications = response.context["job_applications_page"].object_list
+        client.force_login(employer)
+        response = client.get(reverse("apply:list_for_siae"), {"departments": ["37"]})
+        assert response.context["job_applications_page"].object_list == [job_app]
 
-        # Maggie has two applications and is the only one living in department 37.
-        assert len(applications) == 2
-
-    def test_list_for_siae_filtered_by_selected_job(self):
-        """
-        Eddie wants to see applications with a given job appellation.
-        """
-        self.client.force_login(self.eddie_hit_pit)
+    def test_list_for_siae_filtered_by_selected_job(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
 
         create_test_romes_and_appellations(["M1805", "N1101"], appellations_per_rome=2)
         (appellation1, appellation2) = Appellation.objects.all().order_by("?")[:2]
-        JobApplicationSentByJobSeekerFactory(to_company=self.hit_pit, selected_jobs=[appellation1])
-        JobApplicationSentByJobSeekerFactory(to_company=self.hit_pit, selected_jobs=[appellation2])
+        job_app = JobApplicationSentByJobSeekerFactory(to_company=company, selected_jobs=[appellation1])
+        _another_job_app = JobApplicationSentByJobSeekerFactory(to_company=company, selected_jobs=[appellation2])
 
-        response = self.client.get(reverse("apply:list_for_siae"), {"selected_jobs": [appellation1.pk]})
-        applications = response.context["job_applications_page"].object_list
+        client.force_login(employer)
+        response = client.get(reverse("apply:list_for_siae"), {"selected_jobs": [appellation1.pk]})
+        assert response.context["job_applications_page"].object_list == [job_app]
 
-        assert len(applications) == 1
-        assert appellation1 in [job_desc.appellation for job_desc in applications[0].selected_jobs.all()]
-
-    def test_prescriptions(self):
-        self.client.force_login(self.eddie_hit_pit)
+    def test_prescriptions(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        client.force_login(employer)
         url = reverse("apply:list_prescriptions")
-        response = self.client.get(url)
-        self.assertContains(response, f'hx-get="{url}"')
+        response = client.get(url)
+        assertContains(response, f'hx-get="{url}"')
 
 
 @pytest.mark.parametrize("filter_state", JobApplicationWorkflow.states)
