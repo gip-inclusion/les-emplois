@@ -1,5 +1,4 @@
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
-from django.core import mail
 from django.urls import reverse
 
 from itou.users.enums import IdentityProvider
@@ -12,7 +11,7 @@ from tests.users.factories import (
 
 
 class TestChangeEmailView:
-    def test_update_email(self, client):
+    def test_update_email(self, client, mailoutbox):
         user = JobSeekerFactory()
         old_email = user.email
         new_email = "jean@gabin.fr"
@@ -50,7 +49,7 @@ class TestChangeEmailView:
         assert response.url == reverse("account_email_verification_sent")
 
         # User receives an email to confirm his new address.
-        email = mail.outbox[0]
+        email = mailoutbox[0]
         assert "Confirmez votre adresse e-mail" in email.subject
         assert "Afin de finaliser votre inscription, cliquez sur le lien suivant" in email.body
         assert email.to[0] == new_email

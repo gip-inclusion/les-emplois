@@ -8,7 +8,6 @@ import pytest
 from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
-from django.core import mail
 from django.template.defaultfilters import urlencode as urlencode_filter
 from django.urls import reverse
 from django.utils import timezone
@@ -1115,7 +1114,7 @@ class TestProcessViews:
         next_url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "reason"})
         assertRedirects(response, next_url)
 
-    def test_postpone_from_prescriber(self, client, snapshot, subtests):
+    def test_postpone_from_prescriber(self, client, snapshot, mailoutbox, subtests):
         """Ensure that the `postpone` transition is triggered."""
 
         states = [
@@ -1127,7 +1126,7 @@ class TestProcessViews:
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
         for state in states:
-            mail.outbox = []
+            mailoutbox.clear()
             with subtests.test(state=state.label):
                 job_application = JobApplicationFactory(
                     job_seeker=job_seeker,
@@ -1150,7 +1149,7 @@ class TestProcessViews:
                 job_application = JobApplication.objects.get(pk=job_application.pk)
                 assert job_application.state.is_postponed
 
-                [mail_to_job_seeker, mail_to_prescriber] = mail.outbox
+                [mail_to_job_seeker, mail_to_prescriber] = mailoutbox
                 assert mail_to_job_seeker.to == [job_application.job_seeker.email]
                 assert mail_to_job_seeker.subject == snapshot(name="postpone_email_to_job_seeker_subject")
                 assert mail_to_job_seeker.body == snapshot(name="postpone_email_to_job_seeker_body")
@@ -1158,7 +1157,7 @@ class TestProcessViews:
                 assert mail_to_prescriber.subject == snapshot(name="postpone_email_to_proxy_subject")
                 assert mail_to_prescriber.body == snapshot(name="postpone_email_to_proxy_body")
 
-    def test_postpone_from_job_seeker(self, client, snapshot, subtests):
+    def test_postpone_from_job_seeker(self, client, snapshot, mailoutbox, subtests):
         """Ensure that the `postpone` transition is triggered."""
 
         states = [
@@ -1170,7 +1169,7 @@ class TestProcessViews:
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
         for state in states:
-            mail.outbox = []
+            mailoutbox.clear()
             with subtests.test(state=state.label):
                 job_application = JobApplicationFactory(
                     job_seeker=job_seeker,
@@ -1193,12 +1192,12 @@ class TestProcessViews:
 
                 job_application = JobApplication.objects.get(pk=job_application.pk)
                 assert job_application.state.is_postponed
-                [mail_to_job_seeker] = mail.outbox
+                [mail_to_job_seeker] = mailoutbox
                 assert mail_to_job_seeker.to == [job_application.job_seeker.email]
                 assert mail_to_job_seeker.subject == snapshot(name="postpone_email_to_job_seeker_subject")
                 assert mail_to_job_seeker.body == snapshot(name="postpone_email_to_job_seeker_body")
 
-    def test_postpone_from_employer_orienter(self, client, snapshot, subtests):
+    def test_postpone_from_employer_orienter(self, client, snapshot, mailoutbox, subtests):
         """Ensure that the `postpone` transition is triggered."""
 
         states = [
@@ -1210,7 +1209,7 @@ class TestProcessViews:
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
         for state in states:
-            mail.outbox = []
+            mailoutbox.clear()
             with subtests.test(state=state.label):
                 job_application = JobApplicationFactory(
                     job_seeker=job_seeker,
@@ -1232,7 +1231,7 @@ class TestProcessViews:
 
                 job_application = JobApplication.objects.get(pk=job_application.pk)
                 assert job_application.state.is_postponed
-                [mail_to_job_seeker, mail_to_other_employer] = mail.outbox
+                [mail_to_job_seeker, mail_to_other_employer] = mailoutbox
                 assert mail_to_job_seeker.to == [job_application.job_seeker.email]
                 assert mail_to_job_seeker.subject == snapshot(name="postpone_email_to_job_seeker_subject")
                 assert mail_to_job_seeker.body == snapshot(name="postpone_email_to_job_seeker_body")
@@ -1535,7 +1534,7 @@ class TestProcessViews:
         assertContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
         assertNotContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
 
-    def test_diagoriente_invite_as_job_seeker(self, client):
+    def test_diagoriente_invite_as_job_seeker(self, client, mailoutbox):
         job_application = JobApplicationFactory(with_approval=True, resume_link="")
 
         client.force_login(job_application.job_seeker)
@@ -1543,9 +1542,9 @@ class TestProcessViews:
             reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk})
         )
         assert response.status_code == 404
-        assert len(mail.outbox) == 0
+        assert len(mailoutbox) == 0
 
-    def test_diagoriente_invite_as_job_prescriber(self, client):
+    def test_diagoriente_invite_as_job_prescriber(self, client, mailoutbox):
         job_application = JobApplicationFactory(
             with_approval=True,
             sent_by_authorized_prescriber_organisation=True,
@@ -1558,9 +1557,9 @@ class TestProcessViews:
             reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk})
         )
         assert response.status_code == 404
-        assert len(mail.outbox) == 0
+        assert len(mailoutbox) == 0
 
-    def test_diagoriente_invite_as_employee_for_authorized_prescriber(self, client):
+    def test_diagoriente_invite_as_employee_for_authorized_prescriber(self, client, mailoutbox):
         with freeze_time("2023-12-12 13:37:00") as frozen_time:
             job_application = JobApplicationFactory(
                 sent_by_authorized_prescriber_organisation=True,
@@ -1584,7 +1583,7 @@ class TestProcessViews:
             assertNotContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
             job_application.refresh_from_db()
             assert job_application.diagoriente_invite_sent_at is None
-            assert len(mail.outbox) == 0
+            assert len(mailoutbox) == 0
 
             # Unset resume, should now update the timestamp and send the mail
             job_application.resume_link = ""
@@ -1606,23 +1605,23 @@ class TestProcessViews:
             assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
             job_application.refresh_from_db()
             assert job_application.diagoriente_invite_sent_at == initial_invite_time.replace(tzinfo=datetime.UTC)
-            assert len(mail.outbox) == 1
-            assert self.DIAGORIENTE_INVITE_EMAIL_SUBJECT in mail.outbox[0].subject
+            assert len(mailoutbox) == 1
+            assert self.DIAGORIENTE_INVITE_EMAIL_SUBJECT in mailoutbox[0].subject
             assert (
                 self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_1.format(
                     company_name=job_application.to_company.display_name,
                     job_seeker_name=job_application.job_seeker.get_full_name(),
                 )
-                in mail.outbox[0].body
+                in mailoutbox[0].body
             )
-            assert self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_2 in mail.outbox[0].body
+            assert self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_2 in mailoutbox[0].body
             assert (
                 self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_1.format(
                     company_name=job_application.to_company.display_name
                 )
-                not in mail.outbox[0].body
+                not in mailoutbox[0].body
             )
-            assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 not in mail.outbox[0].body
+            assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 not in mailoutbox[0].body
 
             # Concurrent/subsequent calls should not perform any action
             frozen_time.tick()
@@ -1639,9 +1638,9 @@ class TestProcessViews:
             assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
             job_application.refresh_from_db()
             assert job_application.diagoriente_invite_sent_at == initial_invite_time.replace(tzinfo=datetime.UTC)
-            assert len(mail.outbox) == 1
+            assert len(mailoutbox) == 1
 
-    def test_diagoriente_invite_as_employee_for_unauthorized_prescriber(self, client):
+    def test_diagoriente_invite_as_employee_for_unauthorized_prescriber(self, client, mailoutbox):
         job_application = JobApplicationFactory(
             sender_prescriber_organization__is_authorized=False,
             resume_link="",
@@ -1666,25 +1665,25 @@ class TestProcessViews:
         assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
         job_application.refresh_from_db()
         assert job_application.diagoriente_invite_sent_at == initial_invite_time().replace(tzinfo=datetime.UTC)
-        assert len(mail.outbox) == 1
-        assert self.DIAGORIENTE_INVITE_EMAIL_SUBJECT in mail.outbox[0].subject
+        assert len(mailoutbox) == 1
+        assert self.DIAGORIENTE_INVITE_EMAIL_SUBJECT in mailoutbox[0].subject
         assert (
             self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_1.format(
                 company_name=job_application.to_company.display_name,
                 job_seeker_name=job_application.job_seeker.get_full_name(),
             )
-            in mail.outbox[0].body
+            in mailoutbox[0].body
         )
-        assert self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_2 in mail.outbox[0].body
+        assert self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_2 in mailoutbox[0].body
         assert (
             self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_1.format(
                 company_name=job_application.to_company.display_name
             )
-            not in mail.outbox[0].body
+            not in mailoutbox[0].body
         )
-        assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 not in mail.outbox[0].body
+        assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 not in mailoutbox[0].body
 
-    def test_diagoriente_invite_as_employee_for_job_seeker(self, client):
+    def test_diagoriente_invite_as_employee_for_job_seeker(self, client, mailoutbox):
         job_application = JobApplicationFactory(
             with_approval=True,
             resume_link="",
@@ -1710,23 +1709,23 @@ class TestProcessViews:
         assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
         job_application.refresh_from_db()
         assert job_application.diagoriente_invite_sent_at == initial_invite_time().replace(tzinfo=datetime.UTC)
-        assert len(mail.outbox) == 1
-        assert self.DIAGORIENTE_INVITE_EMAIL_SUBJECT in mail.outbox[0].subject
+        assert len(mailoutbox) == 1
+        assert self.DIAGORIENTE_INVITE_EMAIL_SUBJECT in mailoutbox[0].subject
         assert (
             self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_1.format(
                 company_name=job_application.to_company.display_name,
                 job_seeker_name=job_application.job_seeker.get_full_name(),
             )
-            not in mail.outbox[0].body
+            not in mailoutbox[0].body
         )
-        assert self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_2 not in mail.outbox[0].body
+        assert self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_2 not in mailoutbox[0].body
         assert (
             self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_1.format(
                 company_name=job_application.to_company.display_name
             )
-            in mail.outbox[0].body
+            in mailoutbox[0].body
         )
-        assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 in mail.outbox[0].body
+        assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 in mailoutbox[0].body
 
 
 class TestProcessAcceptViews:

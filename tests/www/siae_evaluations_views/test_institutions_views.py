@@ -4,7 +4,6 @@ import html5lib
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
-from django.core import mail
 from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils import dateformat, timezone
@@ -2341,7 +2340,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert response.status_code == 200
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_training(self, client):
+    def test_post_training(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2370,7 +2369,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notified_at == timezone.now()
         assert evaluated_siae.notification_reason == "INVALID_PROOF"
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        [email] = mail.outbox
+        [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
         assert email.subject == "[DEV] Notification de sanction"
         assert email.body == (
@@ -2394,7 +2393,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_temporary_suspension(self, client):
+    def test_post_temporary_suspension(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2426,7 +2425,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notified_at == timezone.now()
         assert evaluated_siae.notification_reason == "INVALID_PROOF"
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        [email] = mail.outbox
+        [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
         assert email.subject == "[DEV] Notification de sanction"
         assert email.body == (
@@ -2455,7 +2454,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_temporary_suspension_incorrect_date_order(self, client):
+    def test_post_temporary_suspension_incorrect_date_order(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2487,12 +2486,12 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             count=1,
         )
         evaluated_siae.refresh_from_db()
-        assert [] == mail.outbox
+        assert [] == mailoutbox
         with pytest.raises(Sanctions.DoesNotExist):
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_temporary_suspension_missing_lower_date(self, client):
+    def test_post_temporary_suspension_missing_lower_date(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2533,12 +2532,12 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             count=1,
         )
         evaluated_siae.refresh_from_db()
-        assert [] == mail.outbox
+        assert [] == mailoutbox
         with pytest.raises(Sanctions.DoesNotExist):
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_temporary_suspension_missing_upper_date(self, client):
+    def test_post_temporary_suspension_missing_upper_date(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2579,12 +2578,12 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             count=1,
         )
         evaluated_siae.refresh_from_db()
-        assert [] == mail.outbox
+        assert [] == mailoutbox
         with pytest.raises(Sanctions.DoesNotExist):
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_temporary_suspension_bad_input(self, client):
+    def test_post_temporary_suspension_bad_input(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2655,12 +2654,12 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             count=1,
         )
         evaluated_siae.refresh_from_db()
-        assert [] == mail.outbox
+        assert [] == mailoutbox
         with pytest.raises(Sanctions.DoesNotExist):
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_temporary_suspension_starts_in_less_than_a_month(self, client):
+    def test_post_temporary_suspension_starts_in_less_than_a_month(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2726,12 +2725,12 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             count=1,
         )
         evaluated_siae.refresh_from_db()
-        assert [] == mail.outbox
+        assert [] == mailoutbox
         with pytest.raises(Sanctions.DoesNotExist):
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_permanent_suspension(self, client):
+    def test_post_permanent_suspension(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2760,7 +2759,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notified_at == timezone.now()
         assert evaluated_siae.notification_reason == "INVALID_PROOF"
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        [email] = mail.outbox
+        [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
         assert email.subject == "[DEV] Notification de sanction"
         assert email.body == (
@@ -2788,7 +2787,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_permanent_suspension_bad_input(self, client):
+    def test_post_permanent_suspension_bad_input(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2833,12 +2832,12 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             count=1,
         )
         evaluated_siae.refresh_from_db()
-        assert [] == mail.outbox
+        assert [] == mailoutbox
         with pytest.raises(Sanctions.DoesNotExist):
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_subsidy_cut_percent(self, client):
+    def test_post_subsidy_cut_percent(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2871,7 +2870,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notified_at == timezone.now()
         assert evaluated_siae.notification_reason == "INVALID_PROOF"
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        [email] = mail.outbox
+        [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
         assert email.subject == "[DEV] Notification de sanction"
         assert email.body == (
@@ -2903,7 +2902,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_subsidy_percent_invalid_date_and_percent(self, client):
+    def test_post_subsidy_percent_invalid_date_and_percent(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2980,12 +2979,12 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             count=1,
         )
         evaluated_siae.refresh_from_db()
-        assert [] == mail.outbox
+        assert [] == mailoutbox
         with pytest.raises(Sanctions.DoesNotExist):
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_subsidy_cut_full(self, client):
+    def test_post_subsidy_cut_full(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -3018,7 +3017,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notified_at == timezone.now()
         assert evaluated_siae.notification_reason == "INVALID_PROOF"
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        [email] = mail.outbox
+        [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
         assert email.subject == "[DEV] Notification de sanction"
         assert email.body == (
@@ -3050,7 +3049,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_deactivation(self, client):
+    def test_post_deactivation(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -3079,7 +3078,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notified_at == timezone.now()
         assert evaluated_siae.notification_reason == "INVALID_PROOF"
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        [email] = mail.outbox
+        [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
         assert email.subject == "[DEV] Notification de sanction"
         assert email.body == (
@@ -3107,7 +3106,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_no_sanction(self, client):
+    def test_post_no_sanction(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -3136,7 +3135,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notified_at == timezone.now()
         assert evaluated_siae.notification_reason == "INVALID_PROOF"
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        [email] = mail.outbox
+        [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
         assert email.subject == "[DEV] Notification de sanction"
         assert email.body == (
@@ -3160,7 +3159,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.no_sanction_reason == "Chat trop mignon."
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_combined_sanctions(self, client):
+    def test_post_combined_sanctions(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -3195,7 +3194,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notified_at == timezone.now()
         assert evaluated_siae.notification_reason == "INVALID_PROOF"
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        [email] = mail.outbox
+        [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
         assert email.subject == "[DEV] Notification de sanctions"
         assert email.body == (
@@ -3976,7 +3975,7 @@ class TestInstitutionEvaluatedSiaeValidationView:
         assert timestamp == self.evaluated_siae.reviewed_at
         assertMessages(response, [])
 
-    def test_accepted(self, client):
+    def test_accepted(self, client, mailoutbox):
         evaluated_siae = EvaluatedSiaeFactory.create(
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=1),
@@ -4003,9 +4002,9 @@ class TestInstitutionEvaluatedSiaeValidationView:
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
-        assert mail.outbox == []
+        assert mailoutbox == []
 
-    def test_accepted_after_adversarial(self, client):
+    def test_accepted_after_adversarial(self, client, mailoutbox):
         evaluated_siae = EvaluatedSiaeFactory.create(
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=1),
@@ -4033,9 +4032,9 @@ class TestInstitutionEvaluatedSiaeValidationView:
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
-        assert mail.outbox == []
+        assert mailoutbox == []
 
-    def test_refused(self, client):
+    def test_refused(self, client, mailoutbox):
         evaluated_siae = EvaluatedSiaeFactory.create(
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=1),
@@ -4062,9 +4061,9 @@ class TestInstitutionEvaluatedSiaeValidationView:
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
-        assert mail.outbox == []
+        assert mailoutbox == []
 
-    def test_refused_after_adversarial(self, client):
+    def test_refused_after_adversarial(self, client, mailoutbox):
         evaluated_siae = EvaluatedSiaeFactory.create(
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=1),
@@ -4092,7 +4091,7 @@ class TestInstitutionEvaluatedSiaeValidationView:
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
-        assert mail.outbox == []
+        assert mailoutbox == []
 
 
 class TestInstitutionCalendarView:

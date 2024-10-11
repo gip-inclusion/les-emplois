@@ -2,7 +2,6 @@ from datetime import timedelta
 
 import pytest
 from dateutil.relativedelta import relativedelta
-from django.core import mail
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape
@@ -51,7 +50,7 @@ class TestApprovalProlongation:
         self.approval = self.job_application.approval
         assert 0 == self.approval.prolongation_set.count()
 
-    def test_prolong_approval_view(self, client, faker):
+    def test_prolong_approval_view(self, client, mailoutbox, faker):
         """
         Test the creation of a prolongation.
         """
@@ -117,8 +116,8 @@ class TestApprovalProlongation:
         assert not prolongation_request.report_file
 
         # An email should have been sent to the chosen authorized prescriber.
-        assert len(mail.outbox) == 1
-        email = mail.outbox[0]
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
         assert len(email.to) == 1
         assert email.to[0] == post_data["email"]
 
@@ -378,7 +377,7 @@ class TestApprovalProlongation:
             )
             assertQuerySetEqual(Prolongation.objects.all(), [prolongation])
 
-    def test_prolong_approval_view_without_prescriber(self, client):
+    def test_prolong_approval_view_without_prescriber(self, client, mailoutbox):
         """
         Test the creation of a prolongation without prescriber.
         """
@@ -427,14 +426,14 @@ class TestApprovalProlongation:
         assert prolongation.reason == post_data["reason"]
 
         # No email should have been sent.
-        assert len(mail.outbox) == 0
+        assert len(mailoutbox) == 0
 
     # Boto3 uses the current time to sign the request, and cannot be ignored due to
     # https://github.com/spulec/freezegun/pull/430
     # TODO: Consider switching to time-machine:
     # https://github.com/adamchainz/time-machine
     @freeze_time()
-    def test_prolongation_report_file(self, client, faker, xlsx_file):
+    def test_prolongation_report_file(self, client, faker, xlsx_file, mailoutbox):
         # Check that report file object is saved and linked to prolongation
         # Bad reason types are checked by UI (JS) and ultimately by DB constraints
 
@@ -474,7 +473,7 @@ class TestApprovalProlongation:
         assert prolongation_request.report_file
         assert prolongation_request.report_file.key == "prolongation_report/empty.xlsx"
 
-        [email] = mail.outbox
+        [email] = mailoutbox
         assert email.to == [post_data["email"]]
         assert email.subject == f"[DEV] Demande de prolongation du PASS IAE de {self.approval.user.get_full_name()}"
         assert (

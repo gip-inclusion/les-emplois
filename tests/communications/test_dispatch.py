@@ -1,7 +1,6 @@
 import re
 
 import pytest
-from django.core import mail
 
 from itou.communications import registry as notifications_registry
 from itou.communications.apps import sync_notifications
@@ -196,12 +195,12 @@ class TestEmailNotification(FakeNotificationClassesMixin):
         assert email.to == [self.user.email]
         assert "Cet email est envoyé depuis un environnement de démonstration" in email.body
 
-    def test_method_send(self, django_capture_on_commit_callbacks):
+    def test_method_send(self, django_capture_on_commit_callbacks, mailoutbox):
         with django_capture_on_commit_callbacks(execute=True):
             self.ManageableNotification(self.user, self.organization).send()
-        assert len(mail.outbox) == 1
-        assert mail.outbox[0].to == [self.user.email]
-        assert "Cet email est envoyé depuis un environnement de démonstration" in mail.outbox[0].body
+        assert len(mailoutbox) == 1
+        assert mailoutbox[0].to == [self.user.email]
+        assert "Cet email est envoyé depuis un environnement de démonstration" in mailoutbox[0].body
 
 
 class TestProfiledNotification:

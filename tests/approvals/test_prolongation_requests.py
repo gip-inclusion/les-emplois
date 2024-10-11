@@ -4,7 +4,6 @@ import itertools
 
 import pytest
 from dateutil.relativedelta import relativedelta
-from django.core import mail
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from freezegun import freeze_time
@@ -61,7 +60,7 @@ def test_grant():
 
 
 @freeze_time()
-def test_deny(django_capture_on_commit_callbacks):
+def test_deny(django_capture_on_commit_callbacks, mailoutbox):
     prolongation_request = ProlongationRequestFactory()
     deny_information = ProlongationRequestDenyInformationFactory.build(request=None)
 
@@ -81,7 +80,7 @@ def test_deny(django_capture_on_commit_callbacks):
         prolongation_request.deny_information.proposed_actions_explanation
         == deny_information.proposed_actions_explanation
     )
-    assert [email.to for email in mail.outbox] == [
+    assert [email.to for email in mailoutbox] == [
         [prolongation_request.declared_by.email],
         [prolongation_request.approval.user.email],
     ]

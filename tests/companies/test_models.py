@@ -3,7 +3,6 @@ from unittest import mock
 
 import pytest
 from django.conf import settings
-from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
@@ -162,7 +161,7 @@ class TestCompanyModel:
         assert company_2.has_member(company_1_admin_user)
         assert not company_2.has_admin(company_1_admin_user)
 
-    def test_new_signup_activation_email_to_official_contact(self, django_capture_on_commit_callbacks):
+    def test_new_signup_activation_email_to_official_contact(self, django_capture_on_commit_callbacks, mailoutbox):
         company = CompanyFactory(with_membership=True)
         token = company.get_token()
         with mock.patch("itou.utils.tokens.CompanySignupTokenGenerator.make_token", return_value=token):
@@ -173,8 +172,8 @@ class TestCompanyModel:
             with django_capture_on_commit_callbacks(execute=True):
                 message.send()
 
-            assert len(mail.outbox) == 1
-            email = mail.outbox[0]
+            assert len(mailoutbox) == 1
+            email = mailoutbox[0]
             assert "Un nouvel utilisateur souhaite rejoindre votre structure" in email.subject
             assert "Ouvrez le lien suivant pour procéder à l'inscription" in email.body
             assert company.signup_magic_link in email.body

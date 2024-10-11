@@ -5,7 +5,6 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
 from freezegun import freeze_time
@@ -220,7 +219,7 @@ class TestImportSiaeManagementCommands:
             assert check_whether_signup_is_possible_for_all_siaes() == 0
 
     def test_activate_your_account_email_for_a_siae_without_members_but_with_auth_email(
-        self, django_capture_on_commit_callbacks
+        self, django_capture_on_commit_callbacks, mailoutbox
     ):
         with freeze_time("2022-10-10"), django_capture_on_commit_callbacks(execute=True) as commit_callbacks:
             create_new_siaes(
@@ -228,9 +227,9 @@ class TestImportSiaeManagementCommands:
                 get_conventions_by_siae_key(get_vue_af_df()),
             )
         assert len(commit_callbacks) == 6
-        assert len(mail.outbox) == 6
-        assert reverse("signup:company_select") in mail.outbox[0].body
-        assert collections.Counter(mail.subject for mail in mail.outbox) == collections.Counter(
+        assert len(mailoutbox) == 6
+        assert reverse("signup:company_select") in mailoutbox[0].body
+        assert collections.Counter(mail.subject for mail in mailoutbox) == collections.Counter(
             f"[DEV] Activez le compte de votre {kind} {name} sur les emplois de l'inclusion"
             for (kind, name) in Company.objects.values_list("kind", "name")
         )

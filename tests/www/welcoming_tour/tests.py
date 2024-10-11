@@ -1,7 +1,6 @@
 import respx
 from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailConfirmationHMAC
-from django.core import mail
 from django.urls import reverse
 from pytest_django.asserts import assertTemplateUsed
 
@@ -87,7 +86,7 @@ class TestWelcomingTour:
 
 
 class TestWelcomingTourExceptions:
-    def test_new_job_seeker_is_redirected_after_welcoming_tour_test(self, client):
+    def test_new_job_seeker_is_redirected_after_welcoming_tour_test(self, client, mailoutbox):
         company = CompanyFactory(with_membership=True)
         job_seeker = JobSeekerFactory.build()
 
@@ -120,5 +119,5 @@ class TestWelcomingTourExceptions:
         # let's avoid too specific tests.
         assert response.wsgi_request.path.startswith("/apply")
 
-        content = mail.outbox[0].body
+        content = mailoutbox[0].body
         assert next_to in content

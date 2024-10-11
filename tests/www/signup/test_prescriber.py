@@ -3,7 +3,6 @@ import pytest
 import respx
 from django.conf import settings
 from django.contrib import auth, messages
-from django.core import mail
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -64,7 +63,7 @@ class TestPrescriberSignup:
 
     @sso_parametrize
     @respx.mock
-    def test_create_user_prescriber_member_of_france_travail(self, client, sso_setup):
+    def test_create_user_prescriber_member_of_france_travail(self, client, mailoutbox, sso_setup):
         organization = PrescriberPoleEmploiFactory()
 
         # Go through each step to ensure session data is recorded properly.
@@ -145,11 +144,13 @@ class TestPrescriberSignup:
         assert user.company_set.count() == 0
 
         # No email has been sent to support (validation/refusal of authorisation not needed).
-        assert len(mail.outbox) == 0
+        assert len(mailoutbox) == 0
 
     @sso_parametrize
     @respx.mock
-    def test_create_user_prescriber_with_authorized_org_returns_on_other_browser(self, client, mocker, sso_setup):
+    def test_create_user_prescriber_with_authorized_org_returns_on_other_browser(
+        self, client, mocker, mailoutbox, sso_setup
+    ):
         mock_call_ban_geocoding_api = mocker.patch(
             "itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK
         )
@@ -220,13 +221,13 @@ class TestPrescriberSignup:
         assert membership.is_admin
 
         # Check email has been sent to support (validation/refusal of authorisation needed).
-        assert len(mail.outbox) == 1
-        subject = mail.outbox[0].subject
+        assert len(mailoutbox) == 1
+        subject = mailoutbox[0].subject
         assert "Vérification de l'habilitation d'une nouvelle organisation" in subject
 
     @sso_parametrize
     @respx.mock
-    def test_create_user_prescriber_with_authorized_org_of_known_kind(self, client, mocker, sso_setup):
+    def test_create_user_prescriber_with_authorized_org_of_known_kind(self, client, mocker, mailoutbox, sso_setup):
         """
         Test the creation of a user of type prescriber with an authorized organization of *known* kind.
         """
@@ -298,7 +299,7 @@ class TestPrescriberSignup:
         assert membership.is_admin
 
         # Check email has been sent to support (validation/refusal of authorisation needed).
-        [email] = mail.outbox
+        [email] = mailoutbox
         assert "Vérification de l'habilitation d'une nouvelle organisation" in email.subject
         body_lines = email.body.splitlines()
         assert "- Nom : CENTRE COMMUNAL D'ACTION SOCIALE" in body_lines
@@ -307,7 +308,7 @@ class TestPrescriberSignup:
 
     @sso_parametrize
     @respx.mock
-    def test_create_user_prescriber_with_authorized_org_of_unknown_kind(self, client, mocker, sso_setup):
+    def test_create_user_prescriber_with_authorized_org_of_unknown_kind(self, client, mocker, mailoutbox, sso_setup):
         """
         Test the creation of a user of type prescriber with an authorized organization of *unknown* kind.
         """
@@ -396,13 +397,13 @@ class TestPrescriberSignup:
         assert membership.is_admin
 
         # Check email has been sent to support (validation/refusal of authorisation needed).
-        assert len(mail.outbox) == 1
-        subject = mail.outbox[0].subject
+        assert len(mailoutbox) == 1
+        subject = mailoutbox[0].subject
         assert "Vérification de l'habilitation d'une nouvelle organisation" in subject
 
     @sso_parametrize
     @respx.mock
-    def test_create_user_prescriber_with_unauthorized_org(self, client, mocker, sso_setup):
+    def test_create_user_prescriber_with_unauthorized_org(self, client, mocker, mailoutbox, sso_setup):
         """
         Test the creation of a user of type prescriber with an unauthorized organization.
         """
@@ -482,7 +483,7 @@ class TestPrescriberSignup:
         assert membership.is_admin
 
         # No email has been sent to support (validation/refusal of authorisation not needed).
-        assert len(mail.outbox) == 0
+        assert len(mailoutbox) == 0
 
     def test_create_user_prescriber_with_existing_siren_other_department(self, client):
         """
@@ -568,7 +569,7 @@ class TestPrescriberSignup:
 
     @sso_parametrize
     @respx.mock
-    def test_create_user_prescriber_without_org(self, client, sso_setup):
+    def test_create_user_prescriber_without_org(self, client, mailoutbox, sso_setup):
         """
         Test the creation of a user of type prescriber without organization.
         """
@@ -612,7 +613,7 @@ class TestPrescriberSignup:
         assert 0 == user.prescriberorganization_set.count()
 
         # No email has been sent to support (validation/refusal of authorisation not needed).
-        assert len(mail.outbox) == 0
+        assert len(mailoutbox) == 0
 
     @sso_parametrize
     @respx.mock
@@ -721,7 +722,7 @@ class TestPrescriberSignup:
         assertContains(response, "utilise déjà ce type d'organisation avec le même SIRET")
         mock_call_ban_geocoding_api.assert_called_once()
 
-    def test_form_to_request_for_an_invitation(self, client):
+    def test_form_to_request_for_an_invitation(self, client, mailoutbox):
         siret = "26570134200148"
         prescriber_org = PrescriberOrganizationWithMembershipFactory(siret=siret)
         prescriber_membership = prescriber_org.prescribermembership_set.first()
@@ -745,10 +746,10 @@ class TestPrescriberSignup:
         response = client.post(url, data=requestor)
         assert response.status_code == 302
 
-        assert len(mail.outbox) == 1
-        mail_subject = mail.outbox[0].subject
+        assert len(mailoutbox) == 1
+        mail_subject = mailoutbox[0].subject
         assert f"Demande pour rejoindre {prescriber_org.display_name}" in mail_subject
-        mail_body = mail.outbox[0].body
+        mail_body = mailoutbox[0].body
         assert prescriber_membership.user.get_full_name() in mail_body
         assert prescriber_membership.organization.display_name in mail_body
         invitation_url = f'{reverse("invitations_views:invite_prescriber_with_org")}?{urlencode(requestor)}'

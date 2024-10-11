@@ -71,7 +71,7 @@ class TestMembers:
         response = client.get(url)
         assertContains(response, self.MORE_ADMIN_MSG)
 
-    def test_add_admin(self, client):
+    def test_add_admin(self, client, mailoutbox):
         """
         Check the ability for an admin to add another admin to the company
         """
@@ -91,9 +91,9 @@ class TestMembers:
         assert response.status_code == 302
 
         institution.refresh_from_db()
-        assert_set_admin_role__creation(user=guest, organization=institution)
+        assert_set_admin_role__creation(guest, institution, mailoutbox)
 
-    def test_remove_admin(self, client):
+    def test_remove_admin(self, client, mailoutbox):
         """
         Check the ability for an admin to remove another admin
         """
@@ -118,4 +118,4 @@ class TestMembers:
         assert response.status_code == 302
 
         institution.refresh_from_db()
-        assert_set_admin_role__removal(user=guest, organization=institution)
+        assert_set_admin_role__removal(guest, institution, mailoutbox)

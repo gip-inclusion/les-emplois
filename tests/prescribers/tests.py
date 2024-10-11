@@ -7,7 +7,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.db import IntegrityError
@@ -60,7 +59,7 @@ class TestPrescriberOrganizationManager:
         accredited_orgs = PrescriberOrganization.objects.get_accredited_orgs_for(other_org)
         assert accredited_orgs.count() == 0
 
-    def test_create_organization(self, django_capture_on_commit_callbacks):
+    def test_create_organization(self, django_capture_on_commit_callbacks, mailoutbox):
         """
         Test `create_organization`.
         """
@@ -73,7 +72,7 @@ class TestPrescriberOrganizationManager:
                 },
             )
         assert 1 == PrescriberOrganization.objects.count()
-        assert len(mail.outbox) == 0
+        assert len(mailoutbox) == 0
 
         with django_capture_on_commit_callbacks(execute=True):
             org = PrescriberOrganization.objects.create_organization(
@@ -84,8 +83,8 @@ class TestPrescriberOrganizationManager:
                 },
             )
         assert 2 == PrescriberOrganization.objects.count()
-        assert len(mail.outbox) == 1
-        assert str(org.pk) in mail.outbox[0].body
+        assert len(mailoutbox) == 1
+        assert str(org.pk) in mailoutbox[0].body
 
 
 class TestPrescriberOrganizationModel:
@@ -824,7 +823,7 @@ def test_prevent_validated_authorization_if_other_constraint():
         )
 
 
-def test_deactivate_last_admin(admin_client):
+def test_deactivate_last_admin(admin_client, mailoutbox):
     organization = PrescriberOrganizationWithMembershipFactory()
     membership = organization.memberships.first()
     assert membership.is_admin
@@ -873,10 +872,10 @@ def test_deactivate_last_admin(admin_client):
         ),
     )
 
-    assert_set_admin_role__removal(membership.user, organization)
+    assert_set_admin_role__removal(membership.user, organization, mailoutbox)
 
 
-def test_delete_admin(admin_client):
+def test_delete_admin(admin_client, mailoutbox):
     organization = PrescriberOrganizationWithMembershipFactory()
     membership = organization.memberships.first()
     assert membership.is_admin
@@ -919,10 +918,10 @@ def test_delete_admin(admin_client):
     assertRedirects(response, change_url, fetch_redirect_response=False)
     response = admin_client.get(change_url)
 
-    assert_set_admin_role__removal(membership.user, organization)
+    assert_set_admin_role__removal(membership.user, organization, mailoutbox)
 
 
-def test_add_admin(admin_client):
+def test_add_admin(admin_client, mailoutbox):
     organization = PrescriberOrganizationWithMembershipFactory()
     membership = organization.memberships.first()
     prescriber = PrescriberFactory()
@@ -968,7 +967,7 @@ def test_add_admin(admin_client):
     assertRedirects(response, change_url, fetch_redirect_response=False)
     response = admin_client.get(change_url)
 
-    assert_set_admin_role__creation(prescriber, organization)
+    assert_set_admin_role__creation(prescriber, organization, mailoutbox)
 
 
 def test_prescriber_kinds_are_alphabetically_sorted():

@@ -1,4 +1,3 @@
-from django.core import mail
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 
@@ -96,7 +95,7 @@ class TestUserMembershipDeactivation:
         membership.refresh_from_db()
         assert membership.is_active
 
-    def test_deactivate_user(self, client):
+    def test_deactivate_user(self, client, mailoutbox):
         """
         Standard use case of user deactivation.
         Everything should be fine ...
@@ -121,8 +120,8 @@ class TestUserMembershipDeactivation:
 
         # Check mailbox
         # User must have been notified of deactivation (we're human after all)
-        assert len(mail.outbox) == 1
-        email = mail.outbox[0]
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
         assert f"[DEV] [Désactivation] Vous n'êtes plus membre de {organization.display_name}" == email.subject
         assert "Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion" in email.body
         assert email.to[0] == guest.email

@@ -71,7 +71,7 @@ class TestInstitutionModel:
             institution.add_or_activate_member(wrong_kind_user)
 
 
-def test_deactivate_last_admin(admin_client):
+def test_deactivate_last_admin(admin_client, mailoutbox):
     institution = InstitutionWithMembershipFactory(department="")
     membership = institution.memberships.first()
     assert membership.is_admin
@@ -112,10 +112,10 @@ def test_deactivate_last_admin(admin_client):
         ),
     )
 
-    assert_set_admin_role__removal(membership.user, institution)
+    assert_set_admin_role__removal(membership.user, institution, mailoutbox)
 
 
-def test_delete_admin(admin_client):
+def test_delete_admin(admin_client, mailoutbox):
     institution = InstitutionWithMembershipFactory(department="")
     membership = institution.memberships.first()
     assert membership.is_admin
@@ -150,10 +150,10 @@ def test_delete_admin(admin_client):
     assertRedirects(response, change_url, fetch_redirect_response=False)
     response = admin_client.get(change_url)
 
-    assert_set_admin_role__removal(membership.user, institution)
+    assert_set_admin_role__removal(membership.user, institution, mailoutbox)
 
 
-def test_add_admin(admin_client):
+def test_add_admin(admin_client, mailoutbox):
     institution = InstitutionWithMembershipFactory(department="")
     membership = institution.memberships.first()
     labor_inspector = LaborInspectorFactory()
@@ -191,7 +191,7 @@ def test_add_admin(admin_client):
     assertRedirects(response, change_url, fetch_redirect_response=False)
     response = admin_client.get(change_url)
 
-    assert_set_admin_role__creation(labor_inspector, institution)
+    assert_set_admin_role__creation(labor_inspector, institution, mailoutbox)
 
 
 @pytest.mark.parametrize(

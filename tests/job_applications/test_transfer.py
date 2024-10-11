@@ -1,6 +1,5 @@
 import pytest
 import xworkflows
-from django.core import mail
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
@@ -196,7 +195,7 @@ def test_workflow_transitions(subtests):
             job_application.save()  # Triggers transition check
 
 
-def test_transfer_must_notify_siae_and_job_seeker(django_capture_on_commit_callbacks):
+def test_transfer_must_notify_siae_and_job_seeker(django_capture_on_commit_callbacks, mailoutbox):
     # Send email notification of transfer to :
     # - origin SIAE
     # - job seeker
@@ -218,20 +217,20 @@ def test_transfer_must_notify_siae_and_job_seeker(django_capture_on_commit_callb
         job_application.transfer(user=origin_user, target_company=target_company)
 
     # Eligigibility diagnosis is done by SIAE : must not send an email
-    assert len(mail.outbox) == 2
+    assert len(mailoutbox) == 2
 
-    assert len(mail.outbox[0].to) == 1
-    assert origin_user.email in mail.outbox[0].to
-    assert f"[DEV] La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[0].subject
-    assert "a transféré la candidature de :" in mail.outbox[0].body
+    assert len(mailoutbox[0].to) == 1
+    assert origin_user.email in mailoutbox[0].to
+    assert f"[DEV] La candidature de {job_seeker.get_full_name()} a été transférée" == mailoutbox[0].subject
+    assert "a transféré la candidature de :" in mailoutbox[0].body
 
-    assert len(mail.outbox[1].to) == 1
-    assert job_application.job_seeker.email in mail.outbox[1].to
-    assert "Votre candidature a été transférée à une autre structure" in mail.outbox[1].subject
-    assert "a transféré votre candidature à la structure" in mail.outbox[1].body
+    assert len(mailoutbox[1].to) == 1
+    assert job_application.job_seeker.email in mailoutbox[1].to
+    assert "Votre candidature a été transférée à une autre structure" in mailoutbox[1].subject
+    assert "a transféré votre candidature à la structure" in mailoutbox[1].body
 
 
-def test_transfer_must_notify_prescriber(django_capture_on_commit_callbacks):
+def test_transfer_must_notify_prescriber(django_capture_on_commit_callbacks, mailoutbox):
     # Same test and conditions as above, but this time prescriber
     # at the origin of the eligibility disgnosis must be notified
     origin_company = CompanyFactory(with_membership=True)
@@ -251,17 +250,17 @@ def test_transfer_must_notify_prescriber(django_capture_on_commit_callbacks):
     with django_capture_on_commit_callbacks(execute=True):
         job_application.transfer(user=origin_user, target_company=target_company)
 
-    assert len(mail.outbox) == 3
+    assert len(mailoutbox) == 3
 
     # Other email content have been checked in previous test
     # Focusing on prescriber email content
-    assert len(mail.outbox[2].to) == 1
-    assert job_application.sender.email in mail.outbox[2].to
-    assert f"[DEV] La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[2].subject
-    assert "a transféré la candidature de :" in mail.outbox[2].body
+    assert len(mailoutbox[2].to) == 1
+    assert job_application.sender.email in mailoutbox[2].to
+    assert f"[DEV] La candidature de {job_seeker.get_full_name()} a été transférée" == mailoutbox[2].subject
+    assert "a transféré la candidature de :" in mailoutbox[2].body
 
 
-def test_transfer_notifications_to_many_employers(django_capture_on_commit_callbacks):
+def test_transfer_notifications_to_many_employers(django_capture_on_commit_callbacks, mailoutbox):
     # Same as test_transfer_must_notify_siae_and_job_seeker
     # but with to recipients for SIAE transfer notification
     origin_company = CompanyWith2MembershipsFactory()
@@ -281,14 +280,14 @@ def test_transfer_notifications_to_many_employers(django_capture_on_commit_callb
         job_application.transfer(user=origin_user_1, target_company=target_company)
 
     # Only checking SIAE email
-    assert len(mail.outbox) == 3
-    [first_mail_to] = mail.outbox[0].to
-    [second_mail_to] = mail.outbox[1].to
+    assert len(mailoutbox) == 3
+    [first_mail_to] = mailoutbox[0].to
+    [second_mail_to] = mailoutbox[1].to
     assert first_mail_to != second_mail_to
     assert first_mail_to in [origin_user_1.email, origin_user_2.email]
     assert second_mail_to in [origin_user_1.email, origin_user_2.email]
-    assert f"[DEV] La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[0].subject
-    assert f"[DEV] La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[1].subject
-    assert "a transféré la candidature de :" in mail.outbox[0].body
-    assert "a transféré la candidature de :" in mail.outbox[1].body
-    assert "[DEV] Votre candidature a été transférée à une autre structure" == mail.outbox[2].subject
+    assert f"[DEV] La candidature de {job_seeker.get_full_name()} a été transférée" == mailoutbox[0].subject
+    assert f"[DEV] La candidature de {job_seeker.get_full_name()} a été transférée" == mailoutbox[1].subject
+    assert "a transféré la candidature de :" in mailoutbox[0].body
+    assert "a transféré la candidature de :" in mailoutbox[1].body
+    assert "[DEV] Votre candidature a été transférée à une autre structure" == mailoutbox[2].subject
