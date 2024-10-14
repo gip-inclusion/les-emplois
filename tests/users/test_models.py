@@ -175,6 +175,7 @@ class TestModel:
         post_data = {"password1": "newPassword1%", "password2": "newPassword1%"}
         response = client.post(password_change_url_with_hidden_key, data=post_data)
         assertRedirects(response, reverse("welcoming_tour:index"))
+        assert user.has_verified_email
         client.logout()
 
         # E-mail already exists, this should raise an error.
