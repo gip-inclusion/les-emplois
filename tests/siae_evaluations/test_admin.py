@@ -263,3 +263,27 @@ def test_evaluated_job_application_state_display(admin_client):
         html=True,
         count=1,
     )
+
+
+def test_evaluated_job_application_state_display_in_evaluated_siae_admin(admin_client):
+    evaluated_job_app = EvaluatedJobApplicationFactory(
+        complete=True,
+        evaluated_siae__evaluation_campaign__evaluations_asked_at=timezone.now() - timedelta(days=60),
+    )
+    response = admin_client.get(
+        reverse(
+            "admin:siae_evaluations_evaluatedsiae_change",
+            kwargs={"object_id": evaluated_job_app.evaluated_siae.pk},
+        )
+    )
+    # Check evaluated job app state is properly displayed in its inline table
+    assertContains(
+        response,
+        """
+        <td class="field-state">
+          <p>SUBMITTED</p>
+        </td>
+        """,
+        html=True,
+        count=1,
+    )
