@@ -45,7 +45,7 @@ class EvaluatedJobApplicationsInline(ItouTabularInline):
         return super().get_queryset(request).prefetch_related("evaluated_administrative_criteria")
 
     def state(self, obj):
-        return obj.state
+        return obj.compute_state()
 
     @admin.display(description="lien vers les candidatures évaluées")
     def id_link(self, obj):
