@@ -269,7 +269,8 @@ class TestExistingUserLogin:
         # Renders only the component for the identity provider in-use by this account
         user_kind = IdentityProvider.supported_user_kinds[identity_provider][0]
         user = UserFactory(kind=user_kind, identity_provider=identity_provider, for_snapshot=True)
-        response = client.get(reverse("login:existing_user", args=(user.public_id,)))
+        url = f'{reverse("login:existing_user", args=(user.public_id,))}?back_url={reverse("signup:choose_user_kind")}'
+        response = client.get(url)
         assertNotContains(response, "Le mode de connexion associé à ce compte est désactivé")
         assert str(parse_response_to_soup(response, selector=".c-form")) == snapshot
 

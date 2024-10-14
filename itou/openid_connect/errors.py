@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -22,6 +24,7 @@ def format_error_modal_content(message_body, action_url, action_text):
 
 
 def redirect_with_error_sso_email_conflict_on_registration(request, user, sso_name):
+    redirect_url = reverse("signup:choose_user_kind")
     messages.error(
         request,
         format_error_modal_content(
@@ -34,9 +37,9 @@ def redirect_with_error_sso_email_conflict_on_registration(request, user, sso_na
                 sso_name,
                 redact_email_address(user.email),
             ),
-            reverse("login:existing_user", args=(user.public_id,)),
+            f'{reverse("login:existing_user", args=(user.public_id,))}?back_url={quote(redirect_url)}',
             "Je me connecte avec ce compte",
         ),
         extra_tags="modal sso_email_conflict_registration_failure",
     )
-    return HttpResponseRedirect(reverse("signup:choose_user_kind"))
+    return HttpResponseRedirect(redirect_url)

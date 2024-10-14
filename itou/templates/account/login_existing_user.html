@@ -3,7 +3,15 @@
 
 {% block title %}Connexion {{ block.super }}{% endblock %}
 
-{% block title_content %}<h1>Se connecter</h1>{% endblock %}
+{% block title_content %}
+    {% if back_url %}
+        <a href="{{ back_url }}" class="mt-2 mb-3 btn btn-ico btn-link ps-0">
+            <i class="ri-arrow-drop-left-line fw-medium" aria-hidden="true"></i>
+            <span>Retour</span>
+        </a>
+    {% endif %}
+    <h1>Se connecter</h1>
+{% endblock %}
 
 {% block content %}
     <section class="s-section">
