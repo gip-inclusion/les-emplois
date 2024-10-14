@@ -26,7 +26,7 @@ jobs:
 
     steps:
     - name: 📥 Checkout to the PR branch
-      uses: actions/checkout@v4.2.0
+      uses: actions/checkout@v4.2.1
       with:
         ref: ${{ github.head_ref }}
 
@@ -103,7 +103,7 @@ jobs:
 
     steps:
     - name: 📥 Checkout to the PR branch
-      uses: actions/checkout@v4.2.0
+      uses: actions/checkout@v4.2.1
       with:
         ref: ${{ github.head_ref }}
 
