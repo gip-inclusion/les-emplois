@@ -65,6 +65,11 @@ from tests.utils.test import assertSnapshotQueries
 
 
 BACK_BUTTON_ARIA_LABEL = "Retourner à l’étape précédente"
+LINK_RESET_MARKUP = (
+    '<a href="%s" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"'
+    ' aria-label="Annuler la saisie de ce formulaire">'
+)
+CONFIRM_RESET_MARKUP = '<a href="%s" class="btn btn-sm btn-danger">Confirmer l\'annulation</a>'
 
 
 class TestApply:
@@ -351,6 +356,7 @@ class TestApplyAsJobSeeker:
         """Apply as jobseeker."""
 
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
         user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
         client.force_login(user)
@@ -369,6 +375,7 @@ class TestApplyAsJobSeeker:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, LINK_RESET_MARKUP % reset_url_company)
 
         nir = "178122978200508"
         post_data = {"nir": nir, "confirm": 1}
@@ -390,6 +397,7 @@ class TestApplyAsJobSeeker:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, LINK_RESET_MARKUP % reset_url_company)
 
         post_data = {"birthdate": "20/12/1978", "phone": "0610203040", "pole_emploi_id": "1234567A"}
 
@@ -423,23 +431,12 @@ class TestApplyAsJobSeeker:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        # Check back_url is present
-        company_card_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
-        assertContains(
-            response,
-            f"""
-            <a href="{company_card_url}"
-               class="btn btn-block btn-outline-primary"
-               aria-label="{BACK_BUTTON_ARIA_LABEL}"
-               >
-                <span>Retour</span>
-            </a>
-            """,
-            html=True,
-            count=1,
-        )
+        assertContains(response, LINK_RESET_MARKUP % reset_url_company)
 
         selected_job = company.job_description_through.first()
+        reset_url_job_description = reverse(
+            "companies_views:job_description_card", kwargs={"job_description_id": selected_job.pk}
+        )
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
         assert response.status_code == 302
 
@@ -464,6 +461,7 @@ class TestApplyAsJobSeeker:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assertContains(response, "Envoyer la candidature")
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_job_description)
 
         with mock.patch(
             "itou.www.apply.views.submit_views.uuid.uuid4",
@@ -553,6 +551,10 @@ class TestApplyAsJobSeeker:
     def test_apply_as_job_seeker_from_job_description(self, client):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
         job_description = company.job_description_through.first()
+        reset_url_job_description = reverse(
+            "companies_views:job_description_card", kwargs={"job_description_id": job_description.pk}
+        )
+
         job_seeker = JobSeekerFactory(
             jobseeker_profile__nir="141068078200557",
             with_pole_emploi_id=True,
@@ -590,20 +592,7 @@ class TestApplyAsJobSeeker:
         assert response.url == next_url
         response = client.get(next_url)
 
-        back_url = reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
-        assertContains(
-            response,
-            f"""
-            <a href="{back_url}"
-               class="btn btn-block btn-outline-primary"
-               aria-label="{BACK_BUTTON_ARIA_LABEL}"
-               >
-                <span>Retour</span>
-            </a>
-            """,
-            html=True,
-            count=1,
-        )
+        assertContains(response, LINK_RESET_MARKUP % reset_url_job_description)
 
     def test_apply_as_job_seeker_resume_not_pdf(self, client):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
@@ -1062,6 +1051,7 @@ class TestApplyAsAuthorizedPrescriber:
 
     def test_apply_as_authorized_prescriber(self, client, pdf_file):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
         # test ZRR / QPV template loading
         city = create_city_in_zrr()
@@ -1091,6 +1081,7 @@ class TestApplyAsAuthorizedPrescriber:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, LINK_RESET_MARKUP % reset_url_company)
 
         response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assert response.status_code == 302
@@ -1106,6 +1097,7 @@ class TestApplyAsAuthorizedPrescriber:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
         assert response.status_code == 302
@@ -1139,6 +1131,7 @@ class TestApplyAsAuthorizedPrescriber:
                 kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
             ),
         )
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         geispolsheim = create_city_geispolsheim()
         birthdate = dummy_job_seeker.jobseeker_profile.birthdate
@@ -1172,6 +1165,7 @@ class TestApplyAsAuthorizedPrescriber:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         post_data = {
             "ban_api_resolved_address": dummy_job_seeker.geocoding_address,
@@ -1196,6 +1190,7 @@ class TestApplyAsAuthorizedPrescriber:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         post_data = {
             "education_level": dummy_job_seeker.jobseeker_profile.education_level,
@@ -1248,22 +1243,12 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        back_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
-        assertContains(
-            response,
-            f"""
-            <a href="{back_url}"
-               class="btn btn-block btn-outline-primary"
-               aria-label="{BACK_BUTTON_ARIA_LABEL}"
-               >
-                <span>Retour</span>
-            </a>
-            """,
-            html=True,
-            count=1,
-        )
+        assertContains(response, LINK_RESET_MARKUP % reset_url_company)
 
         selected_job = company.job_description_through.first()
+        reset_url_job_description = reverse(
+            "companies_views:job_description_card", kwargs={"job_description_id": selected_job.pk}
+        )
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
         assert response.status_code == 302
 
@@ -1286,6 +1271,7 @@ class TestApplyAsAuthorizedPrescriber:
         ):
             response = client.get(next_url)
             assert response.status_code == 200
+            assertContains(response, CONFIRM_RESET_MARKUP % reset_url_job_description)
             assert not EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=company)
             assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
 
@@ -1303,6 +1289,7 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assertContains(response, "Postuler")
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_job_description)
 
         with mock.patch(
             "itou.www.apply.views.submit_views.uuid.uuid4",
@@ -1432,6 +1419,7 @@ class TestApplyAsPrescriber:
     )
     def test_apply_as_prescriber(self, client, pdf_file):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
         user = PrescriberFactory()
         client.force_login(user)
@@ -1459,6 +1447,7 @@ class TestApplyAsPrescriber:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, LINK_RESET_MARKUP % reset_url_company)
 
         response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assert response.status_code == 302
@@ -1476,6 +1465,7 @@ class TestApplyAsPrescriber:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
         assert response.status_code == 302
@@ -1511,6 +1501,7 @@ class TestApplyAsPrescriber:
                 kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
             ),
         )
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         geispolsheim = create_city_geispolsheim()
         birthdate = dummy_job_seeker.jobseeker_profile.birthdate
@@ -1572,6 +1563,7 @@ class TestApplyAsPrescriber:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         post_data = {
             "ban_api_resolved_address": dummy_job_seeker.geocoding_address,
@@ -1595,6 +1587,7 @@ class TestApplyAsPrescriber:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         post_data = {
             "education_level": dummy_job_seeker.jobseeker_profile.education_level,
@@ -1667,8 +1660,12 @@ class TestApplyAsPrescriber:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, LINK_RESET_MARKUP % reset_url_company)
 
         selected_job = company.job_description_through.first()
+        reset_url_job_description = reverse(
+            "companies_views:job_description_card", kwargs={"job_description_id": selected_job.pk}
+        )
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
         assert response.status_code == 302
 
@@ -1695,6 +1692,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assertContains(response, "Postuler")
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_job_description)
 
         with mock.patch(
             "itou.www.apply.views.submit_views.uuid.uuid4",
@@ -1978,6 +1976,13 @@ class TestApplyAsCompany:
         )
 
     def _test_apply_as_company(self, client, user, company, dummy_job_seeker, pdf_file):
+        # Autoprescription: send to dashboard, otherwise send to other company card
+        reset_url = (
+            reverse("dashboard:index")
+            if company in user.company_set.all()
+            else reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        )
+
         # Entry point.
         # ----------------------------------------------------------------------
 
@@ -1992,6 +1997,7 @@ class TestApplyAsCompany:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, LINK_RESET_MARKUP % reset_url)
 
         response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assert response.status_code == 302
@@ -2009,6 +2015,7 @@ class TestApplyAsCompany:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
 
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
         assert response.status_code == 302
@@ -2043,6 +2050,7 @@ class TestApplyAsCompany:
                 kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
             ),
         )
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
 
         geispolsheim = create_city_geispolsheim()
         birthdate = dummy_job_seeker.jobseeker_profile.birthdate
@@ -2104,6 +2112,7 @@ class TestApplyAsCompany:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
 
         post_data = {
             "ban_api_resolved_address": dummy_job_seeker.geocoding_address,
@@ -2128,6 +2137,7 @@ class TestApplyAsCompany:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
 
         post_data = {
             "education_level": dummy_job_seeker.jobseeker_profile.education_level,
@@ -2181,8 +2191,16 @@ class TestApplyAsCompany:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, LINK_RESET_MARKUP % reset_url)
 
         selected_job = company.job_description_through.first()
+        # Autoprescription: after job selection, reset button sends to dashboard,
+        # otherwise sends to job description card
+        reset_url = (
+            reverse("dashboard:index")
+            if company in user.company_set.all()
+            else reverse("companies_views:job_description_card", kwargs={"job_description_id": selected_job.pk})
+        )
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
         assert response.status_code == 302
 
@@ -2209,6 +2227,7 @@ class TestApplyAsCompany:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assertContains(response, "Enregistrer" if user in company.members.all() else "Postuler")
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
 
         with mock.patch(
             "itou.www.apply.views.submit_views.uuid.uuid4",
@@ -2405,6 +2424,7 @@ class TestDirectHireFullProcess:
         """Apply as company (and create new job seeker)"""
 
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        reset_url_dashboard = reverse("dashboard:index")
 
         user = company.members.first()
         client.force_login(user)
@@ -2426,6 +2446,7 @@ class TestDirectHireFullProcess:
         check_nir_url = reverse("apply:check_nir_for_hire", kwargs={"company_pk": company.pk})
         response = client.get(check_nir_url)
         assert response.status_code == 200
+        assertContains(response, LINK_RESET_MARKUP % reset_url_dashboard)
 
         response = client.post(check_nir_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "preview": 1})
         assert response.status_code == 302
@@ -2442,6 +2463,7 @@ class TestDirectHireFullProcess:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
 
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
         assert response.status_code == 302
@@ -2476,6 +2498,7 @@ class TestDirectHireFullProcess:
                 kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
             ),
         )
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
 
         birthdate = dummy_job_seeker.jobseeker_profile.birthdate
 
@@ -2536,6 +2559,7 @@ class TestDirectHireFullProcess:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
 
         post_data = {
             "ban_api_resolved_address": dummy_job_seeker.geocoding_address,
@@ -2561,6 +2585,7 @@ class TestDirectHireFullProcess:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
 
         post_data = {
             "education_level": dummy_job_seeker.jobseeker_profile.education_level,
@@ -2596,6 +2621,7 @@ class TestDirectHireFullProcess:
 
         response = client.get(next_url)
         assert response.status_code == 200
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
 
         response = client.post(next_url)
         assert response.status_code == 302
@@ -2651,6 +2677,11 @@ class TestDirectHireFullProcess:
         response = client.get(next_url)
         assertTemplateNotUsed(response, "approvals/includes/status.html")
         assertContains(response, "Valider l’embauche")
+        check_infos_url = reverse(
+            "apply:check_job_seeker_info_for_hire",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
+        )
+        assertContains(response, LINK_RESET_MARKUP % check_infos_url)
 
         hiring_start_at = timezone.localdate()
         post_data = {
@@ -2706,6 +2737,7 @@ class TestDirectHireFullProcess:
     def test_hire_as_geiq(self, client):
         """Apply as GEIQ with pre-existing job seeker without previous application"""
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"), kind=CompanyKind.GEIQ)
+        reset_url_dashboard = reverse("dashboard:index")
         job_seeker = JobSeekerFactory()
 
         user = company.members.first()
@@ -2717,6 +2749,7 @@ class TestDirectHireFullProcess:
         check_nir_url = reverse("apply:check_nir_for_hire", kwargs={"company_pk": company.pk})
         response = client.get(check_nir_url)
         assert response.status_code == 200
+        assertContains(response, LINK_RESET_MARKUP % reset_url_dashboard)
 
         response = client.post(check_nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": 1})
         check_infos_url = reverse(
@@ -2737,6 +2770,7 @@ class TestDirectHireFullProcess:
         )
         assertContains(response, prev_applicaitons_url)
         assertContains(response, "Éligibilité GEIQ non confirmée")
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
 
         # Step check previous applications
         # ----------------------------------------------------------------------
@@ -2789,6 +2823,11 @@ class TestDirectHireFullProcess:
         response = client.get(confirmation_url)
         assertTemplateNotUsed(response, "approvals/includes/status.html")
         assertContains(response, "Valider l’embauche")
+        check_infos_url = reverse(
+            "apply:check_job_seeker_info_for_hire",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+        )
+        assertContains(response, LINK_RESET_MARKUP % check_infos_url)
 
         hiring_start_at = timezone.localdate()
         post_data = {
@@ -4351,19 +4390,9 @@ class TestCheckPreviousApplicationsView:
 
         response = client.get(self.application_jobs_url)
         company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
-        assertContains(
-            response,
-            f"""
-            <a href="{company_card_url}"
-               class="btn btn-block btn-outline-primary"
-               aria-label="{BACK_BUTTON_ARIA_LABEL}"
-               >
-                <span>Retour</span>
-            </a>
-            """,
-            html=True,
-            count=1,
-        )
+
+        # Reset URL is correct
+        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
     def test_with_previous_as_job_seeker(self, client):
         self._login_and_setup_session(client, self.job_seeker)
@@ -4383,22 +4412,10 @@ class TestCheckPreviousApplicationsView:
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
         assertRedirects(response, self.application_jobs_url)
 
-        # Check that the back URL is correct
+        # Reset URL is correct
         response = client.get(self.application_jobs_url)
         company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
-        assertContains(
-            response,
-            f"""
-            <a href="{company_card_url}"
-               class="btn btn-block btn-outline-primary"
-               aria-label="{BACK_BUTTON_ARIA_LABEL}"
-               >
-                <span>Retour</span>
-            </a>
-            """,
-            html=True,
-            count=1,
-        )
+        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
     def test_no_previous_as_authorized_prescriber(self, client):
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
@@ -4406,21 +4423,10 @@ class TestCheckPreviousApplicationsView:
         response = client.get(self.check_prev_applications_url)
         assertRedirects(response, self.application_jobs_url)
 
+        # Reset URL is correct
         response = client.get(self.application_jobs_url)
         company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
-        assertContains(
-            response,
-            f"""
-            <a href="{company_card_url}"
-               class="btn btn-block btn-outline-primary"
-               aria-label="{BACK_BUTTON_ARIA_LABEL}"
-               >
-                <span>Retour</span>
-            </a>
-            """,
-            html=True,
-            count=1,
-        )
+        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
     def test_with_previous_as_authorized_prescriber(self, client):
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
@@ -4440,22 +4446,10 @@ class TestCheckPreviousApplicationsView:
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
         assertRedirects(response, self.application_jobs_url)
 
-        # Check that the back URL is correct
+        # Reset URL is correct
         response = client.get(self.application_jobs_url)
         company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
-        assertContains(
-            response,
-            f"""
-            <a href="{company_card_url}"
-               class="btn btn-block btn-outline-primary"
-               aria-label="{BACK_BUTTON_ARIA_LABEL}"
-               >
-                <span>Retour</span>
-            </a>
-            """,
-            html=True,
-            count=1,
-        )
+        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
     def test_no_previous_as_employer(self, client):
         self._login_and_setup_session(client, self.company.members.first())
@@ -4485,21 +4479,10 @@ class TestCheckPreviousApplicationsView:
         response = client.get(self.check_prev_applications_url)
         assertRedirects(response, self.application_jobs_url)
 
+        # Reset URL is correct
         response = client.get(self.application_jobs_url)
         company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
-        assertContains(
-            response,
-            f"""
-            <a href="{company_card_url}"
-               class="btn btn-block btn-outline-primary"
-               aria-label="{BACK_BUTTON_ARIA_LABEL}"
-               >
-                <span>Retour</span>
-            </a>
-            """,
-            html=True,
-            count=1,
-        )
+        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
     def test_with_previous_as_another_employer(self, client):
         employer = EmployerFactory(with_company=True)
@@ -4524,22 +4507,10 @@ class TestCheckPreviousApplicationsView:
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
         assertRedirects(response, self.application_jobs_url)
 
-        # Check that the back URL is correct
+        # Reset URL is correct
         response = client.get(self.application_jobs_url)
         company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
-        assertContains(
-            response,
-            f"""
-            <a href="{company_card_url}"
-               class="btn btn-block btn-outline-primary"
-               aria-label="{BACK_BUTTON_ARIA_LABEL}"
-               >
-                <span>Retour</span>
-            </a>
-            """,
-            html=True,
-            count=1,
-        )
+        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
 
 @pytest.mark.ignore_unknown_variable_template_error(

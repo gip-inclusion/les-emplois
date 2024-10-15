@@ -134,6 +134,22 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
     def get_back_url(self):
         return None
 
+    def get_reset_url(self):
+        if self.hire_process or self.auto_prescription_process:
+            # The employer can come either by creating an application or hiring somebody.
+            # In both cases, the reset_url adds no value compared to going back to the dashboard.
+            return reverse("dashboard:index")
+
+        try:
+            selected_jobs = self.apply_session.get("selected_jobs", [])
+            [job_description] = selected_jobs
+        except (
+            KeyError,  # No apply_session
+            ValueError,  # No job description, or multiple job descriptions.
+        ):
+            return reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+        return reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description})
+
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "siae": self.company,
@@ -141,7 +157,7 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
             "hire_process": self.hire_process,
             "prescription_process": self.prescription_process,
             "auto_prescription_process": self.auto_prescription_process,
-            "reset_url": reverse("dashboard:index"),
+            "reset_url": self.get_reset_url(),
             "is_gps": self.is_gps,
             "page_title": "Postuler",
         }
@@ -949,18 +965,6 @@ class ApplicationJobsView(ApplicationBaseView):
             "progress": 25,
             "full_content_width": bool(job_descriptions_by_pk),
         }
-
-    def get_back_url(self):
-        if self.hire_process or self.auto_prescription_process:
-            # The employer can come either be creating an application or hiring somebody.
-            # In both cases, the back_url adds no value compared to going back to the dashboard.
-            return None
-        selected_jobs = self.apply_session.get("selected_jobs", [])
-        try:
-            [job_description] = selected_jobs
-        except ValueError:  # No job description, or multiple job descriptions.
-            return reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
-        return reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description})
 
 
 class RequireApplySessionMixin:
