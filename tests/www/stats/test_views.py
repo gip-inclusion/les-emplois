@@ -89,7 +89,7 @@ def test_stats_ft_log_visit(client, view_name):
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_cd_")],
 )
 def test_stats_cd_log_visit(client, settings, view_name):
-    prescriber_org = PrescriberOrganizationWithMembershipFactory(kind="DEPT", authorized=True)
+    prescriber_org = PrescriberOrganizationWithMembershipFactory(kind="DEPT", authorized=True, department="22")
     user = prescriber_org.members.get()
 
     settings.STATS_ACI_DEPARTMENT_WHITELIST = [prescriber_org.department]

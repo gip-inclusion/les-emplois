@@ -102,6 +102,10 @@ def can_view_stats_cd_aci(request):
     )
 
 
+def can_view_stats_cd_orga_etp(request):
+    return can_view_stats_cd(request) and request.current_organization.region in ["Bretagne", "Occitanie"]
+
+
 def can_view_stats_ft(request):
     return (
         request.user.is_prescriber
