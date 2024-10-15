@@ -39,7 +39,7 @@
                 {% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" only %}
             </div>
 
-            {% itou_buttons_form primary_label="Suivant" secondary_url=back_url primary_name="preview" primary_value="1" %}
+            {% itou_buttons_form primary_label="Suivant" secondary_url=back_url primary_name="preview" primary_value="1" reset_url=reset_url %}
         </div>
         {% if preview_mode %}
             <!-- Modal -->
