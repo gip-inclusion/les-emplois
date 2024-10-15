@@ -69,13 +69,19 @@ class Command(BaseCommand):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
     def retrieve_archive_of_the_week(self):
+        FILENAME_PREFIX = "FLUX_EA2_ITOU_"
+
         with asp_utils.get_sftp_connection() as sftp:
             self.stdout.write(f'Connected to "{settings.ASP_SFTP_HOST}" as "{settings.ASP_SFTP_USER}"')
             self.stdout.write(f'''Current remote dir is "{sftp.normalize('.')}"''')
             sftp.chdir(REMOTE_DOWNLOAD_DIR)  # Get into the download folder
 
             monday = monday_of_the_week().strftime("%Y%m%d")
-            files_of_the_week = [filename for filename in sftp.listdir() if filename > f"FLUX_EA2_ITOU_{monday}"]
+            files_of_the_week = [
+                filename
+                for filename in sftp.listdir()
+                if filename.startswith(FILENAME_PREFIX) and filename > f"{FILENAME_PREFIX}{monday}"
+            ]
             self.stdout.write(f"Files matching for this {monday=}: {files_of_the_week}")
             if not files_of_the_week:
                 raise RuntimeError(f"No file for this week: {monday}")
