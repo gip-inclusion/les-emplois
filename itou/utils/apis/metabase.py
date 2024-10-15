@@ -173,6 +173,9 @@ METABASE_DASHBOARDS = {
     "stats_ddets_iae_aci": {
         "dashboard_id": 327,
     },
+    "stats_ddets_iae_orga_etp": {
+        "dashboard_id": 485,
+    },
     #
     # Institution stats - DDETS LOG - department level.
     #
