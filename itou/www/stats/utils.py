@@ -14,6 +14,9 @@ from itou.prescribers.enums import (
 from itou.prescribers.models import PrescriberOrganization
 
 
+WHITELIST_IAE_ORGA_ETP_REGIONS = ["Bretagne", "Occitanie"]
+
+
 def can_view_stats_dashboard_widget(request):
     """
     Whether a stats section should be displayed on the user's dashboard.
@@ -65,7 +68,10 @@ def can_view_stats_siae_orga_etp(request):
     """
     Non official stats with very specific access rights.
     """
-    return can_view_stats_siae(request) and request.current_organization.pk in settings.STATS_SIAE_PK_WHITELIST
+    return can_view_stats_siae(request) and (
+        request.current_organization.pk in settings.STATS_SIAE_PK_WHITELIST
+        or request.current_organization.region in WHITELIST_IAE_ORGA_ETP_REGIONS
+    )
 
 
 def can_view_stats_cd(request):
