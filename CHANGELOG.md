@@ -1,5 +1,22 @@
 # Journal des modifications
 
+## 2024-10-14
+
+### Ajouté
+
+- [Connexion: Ajout de ProConnect pour les Prescripteurs et Employeurs](https://github.com/gip-inclusion/les-emplois/pull/4080)
+
+### Modifié
+
+- [Admin: suppression du total de tous les objets sur la page de liste de certains objets](https://github.com/gip-inclusion/les-emplois/pull/4906)
+- [Candidature: Amélioration de la validation du NIR](https://github.com/gip-inclusion/les-emplois/pull/4882)
+- [Candidature: Correction de la sélection de commune quand le code insee a changé depuis la naissance du candidat](https://github.com/gip-inclusion/les-emplois/pull/4903)
+- [GPS: mise à jour automatique du conseiller FT](https://github.com/gip-inclusion/les-emplois/pull/4869)
+- [PASS IAE: suppression lors de l'annulation de la dernière candidature acceptée](https://github.com/gip-inclusion/les-emplois/pull/4902)
+- [Pilotage : Utilisation du code INSEE enregistré plutôt que de l'inférer depuis le code postal](https://github.com/gip-inclusion/les-emplois/pull/4868)
+- [Tableau de bord: Suppression du bandeau GPS GEN-2146](https://github.com/gip-inclusion/les-emplois/pull/4907)
+- [UX/UI: Uniformisation des tableaux](https://github.com/gip-inclusion/les-emplois/pull/4861)
+
 ## 2024-10-07
 
 ### Ajouté
