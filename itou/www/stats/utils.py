@@ -14,6 +14,12 @@ from itou.prescribers.enums import (
 from itou.prescribers.models import PrescriberOrganization
 
 
+STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST = [
+    PrescriberOrganizationKind.CAP_EMPLOI,
+    PrescriberOrganizationKind.ML,
+]
+
+
 def can_view_stats_dashboard_widget(request):
     """
     Whether a stats section should be displayed on the user's dashboard.
@@ -110,10 +116,6 @@ def can_view_stats_ft(request):
 
 
 def can_view_stats_ph(request):
-    full_access_organization_kind_whitelist = [
-        PrescriberOrganizationKind.CAP_EMPLOI,
-        PrescriberOrganizationKind.ML,
-    ]
     limited_access_organization_kind_whitelist = [
         PrescriberOrganizationKind.CHRS,
         PrescriberOrganizationKind.CHU,
@@ -124,7 +126,7 @@ def can_view_stats_ph(request):
         request.user.is_prescriber
         and isinstance(request.current_organization, PrescriberOrganization)
         and (
-            request.current_organization.kind in full_access_organization_kind_whitelist
+            request.current_organization.kind in STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST
             or (
                 request.current_organization.kind in limited_access_organization_kind_whitelist
                 and request.current_organization.region

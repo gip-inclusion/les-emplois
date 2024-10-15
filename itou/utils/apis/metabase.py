@@ -9,13 +9,14 @@ ASP_SIAE_FILTER_KEY_FLAVOR1 = "identifiant_de_la_structure"
 ASP_SIAE_FILTER_KEY_FLAVOR2 = "id_asp_de_la_siae"
 ASP_SIAE_FILTER_KEY_FLAVOR3 = "id_asp_siae"
 C1_SIAE_FILTER_KEY = "identifiant_de_la_structure_(c1)"
+C1_PRESCRIBER_ORG_FILTER_KEY = "id_prescripteur"
 IAE_NETWORK_FILTER_KEY = "id_r%C3%A9seau"
 DEPARTMENT_FILTER_KEY = "d%C3%A9partement"
 REGION_FILTER_KEY = "r%C3%A9gion"
 PRESCRIBER_FILTER_KEY = "prescripteur"
 JOB_APPLICATION_ORIGIN_FILTER_KEY = "origine_candidature"
-PE_PRESCRIBER_FILTER_VALUE = "France Travail"
-PE_FILTER_VALUE = "France Travail"
+FT_PRESCRIBER_FILTER_VALUE = "France Travail"
+FT_FILTER_VALUE = "France Travail"
 
 METABASE_DASHBOARDS = {
     #
@@ -103,7 +104,7 @@ METABASE_DASHBOARDS = {
         "dashboard_id": 182,
     },
     "stats_ft_state_main": {
-        "dashboard_id": 149,
+        "dashboard_id": 479,
         "tally_popup_form_id": "mRG61J",
         "tally_embed_form_id": "3qLKad",
     },
@@ -119,7 +120,7 @@ METABASE_DASHBOARDS = {
     # Authorized Prescribers' stats
     #
     "stats_ph_state_main": {
-        "dashboard_id": 149,
+        "dashboard_id": 479,
         "tally_popup_form_id": "mRG61J",
         "tally_embed_form_id": "3qLKad",
     },
