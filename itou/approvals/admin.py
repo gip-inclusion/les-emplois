@@ -315,7 +315,9 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                 # Handle partial numbers not starting with the prefix (migrated PEApproval)
                 search_fields.append("number__contains")
 
-        if search_term.isdecimal() and len(search_term) <= 15:
+        if search_term.isdecimal() and 13 <= len(search_term) <= 15:
+            # Searching by NIR is much more expensive than by number
+            # so only do so for long numbers
             if len(search_term) == 15:  # Complete NIR
                 search_fields.append("user__jobseeker_profile__nir__exact")
             else:
