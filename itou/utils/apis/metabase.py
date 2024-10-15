@@ -221,6 +221,9 @@ METABASE_DASHBOARDS = {
         "tally_popup_form_id": "w2az2j",
         "tally_embed_form_id": "3Nlvzl",
     },
+    "stats_dreets_iae_orga_etp": {
+        "dashboard_id": 485,
+    },
     #
     # Institution stats - DRIHL - region level - IDF only.
     #
