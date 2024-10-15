@@ -661,6 +661,17 @@ def stats_ddets_iae_aci(request):
     )
 
 
+@login_required
+def stats_ddets_iae_orga_etp(request):
+    if not utils.can_view_stats_ddets_iae_orga_etp(request):
+        raise PermissionDenied
+
+    return render_stats_ddets_iae(
+        request=request,
+        page_title="Suivi des effectifs annuels et mensuels en ETP",
+    )
+
+
 def render_stats_ddets_log(request, page_title, extend_stats_to_whole_region):
     get_current_institution_or_404(request)
     if not utils.can_view_stats_ddets_log(request):

@@ -71,6 +71,7 @@ urlpatterns = [
     path("ddets/hiring", views.stats_ddets_iae_hiring, name="stats_ddets_iae_hiring"),
     path("ddets/state", views.stats_ddets_iae_state, name="stats_ddets_iae_state"),
     path("ddets/aci", views.stats_ddets_iae_aci, name="stats_ddets_iae_aci"),
+    path("ddets/orga_etp", views.stats_ddets_iae_orga_etp, name="stats_ddets_iae_orga_etp"),
     # Institution stats - DDETS LOG - department level.
     path("ddets_log/state", views.stats_ddets_log_state, name="stats_ddets_log_state"),
     # Institution stats - DREETS IAE - region level.

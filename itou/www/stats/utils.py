@@ -167,6 +167,10 @@ def can_view_stats_ddets_iae_aci(request):
     )
 
 
+def can_view_stats_ddets_iae_orga_etp(request):
+    return can_view_stats_ddets_iae(request) and request.current_organization.region in WHITELIST_IAE_ORGA_ETP_REGIONS
+
+
 def can_view_stats_ddets_log(request):
     return (
         request.user.is_labor_inspector
