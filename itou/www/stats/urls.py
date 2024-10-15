@@ -103,6 +103,7 @@ urlpatterns = [
     path("dreets/iae", views.stats_dreets_iae_iae, name="stats_dreets_iae_iae"),
     path("dreets/hiring", views.stats_dreets_iae_hiring, name="stats_dreets_iae_hiring"),
     path("dreets/state", views.stats_dreets_iae_hiring, name="stats_dreets_iae_state"),
+    path("dreets/orga_etp", views.stats_dreets_iae_orga_etp, name="stats_dreets_iae_orga_etp"),
     # Institution stats - DGEFP - nation level.
     path("dgefp/auto_prescription", views.stats_dgefp_iae_auto_prescription, name="stats_dgefp_iae_auto_prescription"),
     path(
