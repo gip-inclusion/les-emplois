@@ -90,11 +90,11 @@ jobs:
         scripts/clever-deploy --clever-cli "$CLEVER_CLI" --branch "$BRANCH" --app-alias "$REVIEW_APP_NAME"
 
     - name: 🍻 Add link to pull request
-      uses: thollander/actions-comment-pull-request@v2.5.0
+      uses: thollander/actions-comment-pull-request@v3.0.0
       with:
         message: |-
           🥁 La recette jetable est prête ! [👉 Je veux tester cette PR !](https://${{ env.DEPLOY_URL }})
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
   redeploy:
     runs-on: ubuntu-latest
