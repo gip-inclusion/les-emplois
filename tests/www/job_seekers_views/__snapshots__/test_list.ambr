@@ -254,6 +254,7 @@
       }),
       dict({
         'origin': list([
+          'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'JobSeekerListView.get_context_data[www/job_seekers_views/views.py]',
         ]),
         'sql': '''

@@ -230,11 +230,14 @@ origin_debug_sql = CursorDebugWrapper.debug_sql
 
 # List of functions that help identify the query origin
 OTHER_PACKAGES_ALLOWLIST = {
+    "count": "django/core/paginator.py",
     "first": "django/db/models/query.py",
-    "get_object": ("django/views/generic/detail.py",),
+    "get_object": ("django/views/generic/detail.py", "django/contrib/admin/options.py"),
     "_get_session_from_db": ("django/contrib/sessions/backends/db.py",),
     "__enter__": ("django/db/transaction.py",),
     "__exit__": ("django/db/transaction.py",),
+    "initial_form_count": "django/forms/models.py",
+    "list": "rest_framework/mixins.py",
     "save": ("django/contrib/sessions/backends/db.py",),
     "serialize_queryset_by_batch": "xlsx_streaming/streaming.py",
 }

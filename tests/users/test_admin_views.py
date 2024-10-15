@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertNumQueries, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.job_applications.enums import SenderKind
 from itou.users.enums import UserKind
@@ -20,7 +20,7 @@ from tests.users.factories import (
     JobSeekerProfileFactory,
     PrescriberFactory,
 )
-from tests.utils.test import BASE_NUM_QUERIES
+from tests.utils.test import assertSnapshotQueries
 
 
 def test_add_user(client):
@@ -294,7 +294,7 @@ def test_free_ic_email(admin_client):
     assert employer.email == "ic_user@email.com_old"
 
 
-def test_num_queries(admin_client):
+def test_num_queries(admin_client, snapshot):
     prescriber = PrescriberFactory()
     sent_job_application1 = JobApplicationFactory(
         sender=prescriber,
@@ -305,27 +305,7 @@ def test_num_queries(admin_client):
         sender=prescriber,
         sender_kind=SenderKind.PRESCRIBER,
     )
-    with assertNumQueries(
-        BASE_NUM_QUERIES
-        + 1  # Load Django session
-        + 1  # Load admin user
-        + 2  # savepoint & release
-        + 1  # load user
-        + 1  # companies_companymembership
-        + 1  # institutions_institutionmembership
-        + 1  # eligibility_eligibilitydiagnosis
-        + 1  # eligibility_geiqeligibilitydiagnosis
-        + 1  # approvals_approval
-        + 1  # account_emailaddress
-        + 1  # job_applications_jobapplication
-        + 1  # prescribers_prescribermembership
-        + 1  # utils_pksupportremark
-        + 1  # is_prescriber_with_authorized_org (exists)
-        + 1  # communications_notificationsettings
-        + 3  # savepoint, notificationsettings insert & release
-        + 1  # communications_notificationrecord
-        + 3  # savepoint, session update & release
-    ):
+    with assertSnapshotQueries(snapshot):
         response = admin_client.get(reverse("admin:users_user_change", kwargs={"object_id": prescriber.pk}))
     assert response.status_code == 200
 

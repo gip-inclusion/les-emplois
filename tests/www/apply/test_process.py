@@ -19,7 +19,6 @@ from pytest_django.asserts import (
     assertFormError,
     assertMessages,
     assertNotContains,
-    assertNumQueries,
     assertRedirects,
     assertTemplateNotUsed,
     assertTemplateUsed,
@@ -446,7 +445,7 @@ class TestProcessViews:
         assertNotContains(response, "Supersecretname")
         assertNotContains(response, "Unknown")
 
-    def test_details_for_job_seeker(self, client):
+    def test_details_for_job_seeker(self, client, snapshot):
         """As a job seeker, I can access the job_applications details for job seekers."""
         job_seeker = JobSeekerFactory()
 
@@ -456,26 +455,7 @@ class TestProcessViews:
         client.force_login(job_seeker)
 
         url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
-        # 1. SELECT django session
-        # 2. Load user
-        # 3. SAVEPOINT
-        # 4. SELECT job_application (and related objects)
-        # 5. Prefetch related selected_jobs
-        ### Fetch last_expired eligibility diagnosis
-        # 6. SELECT last valid approval
-        # 7. SELECT last valid pole emploi approval
-        # 8. SELECT eligibility diagnosis made by this SIAE
-        ### Template apply/includes/eligibility_diagnosis.html
-        # 9. SELECT administrative criteria
-        # 10. SELECT last valid approval (again, for the eligibility diag)
-        # 11. SELECT last valid pole emploi approval (again, for the eligibility diag)
-        ### Template apply/includes/transition_logs.html
-        # 12. SELECT job application transition logs
-        # 13. RELEASE SAVEPOINT
-        # 14. SAVEPOINT
-        # 15. UPDATE django session
-        # 16. RELEASE SAVEPOINT
-        with assertNumQueries(16):
+        with assertSnapshotQueries(snapshot):
             response = client.get(url)
         assertContains(response, format_nir(job_seeker.jobseeker_profile.nir))
         assertContains(response, job_seeker.email)

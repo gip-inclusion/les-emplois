@@ -169,6 +169,7 @@
       }),
       dict({
         'origin': list([
+          'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'job_description_list[www/companies_views/views.py]',
         ]),
