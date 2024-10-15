@@ -83,6 +83,9 @@ METABASE_DASHBOARDS = {
     "stats_cd_aci": {
         "dashboard_id": 327,
     },
+    "stats_cd_orga_etp": {
+        "dashboard_id": 485,
+    },
     #
     # Prescriber stats - FT.
     #
