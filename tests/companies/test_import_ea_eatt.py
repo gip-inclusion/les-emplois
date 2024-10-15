@@ -66,6 +66,9 @@ def test_retrieve_archive_of_the_week(faker, sftp_directory, command):
     monday = monday_of_the_week()
     monday_archive = sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR, faker.asp_ea2_filename(monday))
     monday_archive.write_bytes(faker.zip())
+    # Others files shouldn't create problems
+    sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR, faker.asp_batch_filename()).touch()
+
     assert command.retrieve_archive_of_the_week().getvalue()
 
 
