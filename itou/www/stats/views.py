@@ -766,6 +766,17 @@ def stats_dreets_iae_state(request):
     )
 
 
+@login_required
+def stats_dreets_iae_orga_etp(request):
+    if not utils.can_view_stats_dreets_iae_orga_etp(request):
+        raise PermissionDenied
+
+    return render_stats_dreets_iae(
+        request=request,
+        page_title="Suivi des effectifs annuels et mensuels en ETP",
+    )
+
+
 def render_stats_dgefp_iae(request, page_title, extra_params=None, extra_context=None):
     if extra_context is None:
         # Do not use mutable default arguments,

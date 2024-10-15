@@ -187,6 +187,10 @@ def can_view_stats_dreets_iae(request):
     )
 
 
+def can_view_stats_dreets_iae_orga_etp(request):
+    return can_view_stats_dreets_iae(request) and request.current_organization.region in ["Bretagne", "Occitanie"]
+
+
 def can_view_stats_dgefp_iae(request):
     """
     Users of the DGEFP institution can view the confidential DGEFP stats for all regions and departments.

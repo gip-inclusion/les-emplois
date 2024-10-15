@@ -232,7 +232,7 @@ def test_stats_ddets_log_log_visit(client, settings, view_name):
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_dreets_iae_")],
 )
 def test_stats_dreets_iae_log_visit(client, settings, view_name):
-    institution = InstitutionWithMembershipFactory(kind="DREETS IAE")
+    institution = InstitutionWithMembershipFactory(kind="DREETS IAE", department="22")
     user = institution.members.get()
 
     client.force_login(user)
