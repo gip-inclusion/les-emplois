@@ -5,7 +5,7 @@ from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils.html import escape
 from django.utils.http import urlencode
-from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractNature, ContractType, JobSource
@@ -17,7 +17,7 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import BASE_NUM_QUERIES, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
 DISTRICTS = "Arrondissements de Paris"
@@ -34,7 +34,7 @@ class TestSearchCompany:
         assert "company" not in response.context["form"]
 
     @override_settings(MATOMO_BASE_URL="https://matomo.example.com")
-    def test_district(self, client):
+    def test_district(self, client, snapshot):
         city_slug = "paris-75"
         paris_city = City.objects.create(
             name="Paris",
@@ -53,15 +53,7 @@ class TestSearchCompany:
         CompanyFactory(department="75", coords=paris_city.coords, post_code="75002")
 
         # Filter on city
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # select the city
-            + 1  # fetch initial companies (to extract the filters afterwards)
-            + 2  # two counts for the tab headers
-            + 1  # refetch the city for widget rendering
-            + 1  # actual select of the companies, with related objects and annotated distance
-            + 1  # prefetch active job descriptions
-        ):
+        with assertSnapshotQueries(snapshot):
             response = client.get(self.URL, {"city": city_slug})
 
         assertContains(response, "Emplois inclusifs à 25 km du centre de Paris (75)")
@@ -189,7 +181,7 @@ class TestSearchCompany:
             count=1,
         )
 
-    def test_order_by(self, client):
+    def test_order_by(self, client, snapshot):
         """
         Check company results sorting.
         Don't test sorting by active members to avoid creating too much data.
@@ -222,16 +214,7 @@ class TestSearchCompany:
         )
         created_companies.append(company)
 
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # find city
-            + 1  # find companies
-            + 1  # count companies
-            + 1  # count job descriptions
-            + 1  # refetch the city for widget rendering
-            + 1  # get companies infos
-            + 1  # get job descriptions infos
-        ):
+        with assertSnapshotQueries(snapshot):
             response = client.get(self.URL, {"city": guerande.slug})
         companies_results = response.context["results_page"]
 
@@ -288,7 +271,7 @@ class TestSearchCompany:
         assertContains(response, job_description_str)
         assertNotContains(response, no_hiring_str)
 
-    def test_company(self, client):
+    def test_company(self, client, snapshot):
         create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)
         # 3 companies in two departments to test distance and department filtering
         vannes = create_city_vannes()
@@ -318,16 +301,7 @@ class TestSearchCompany:
             kind=CompanyKind.AI,
         )
 
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # find city (city form field cleaning)
-            + 1  # find companies (add_form_choices)
-            + 1  # count companies (paginator)
-            + 1  # count job descriptions (job_descriptions_count from context)
-            + 1  # refetch the city for widget rendering
-            + 1  # get companies infos for page
-            + 1  # get job descriptions infos (prefetch with is_popular annotation)
-        ):
+        with assertSnapshotQueries(snapshot(name="SQL queries without company filter")):
             response = client.get(self.URL, {"city": guerande.slug, "distance": 100})
         assertContains(
             response,
@@ -335,16 +309,7 @@ class TestSearchCompany:
             html=True,
             count=1,
         )
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # find city (city form field cleaning)
-            + 1  # find companies (add_form_choices)
-            + 1  # count companies (paginator)
-            + 1  # count job descriptions (job_descriptions_count from context)
-            + 1  # refetch the city for widget rendering
-            + 1  # get companies infos for page
-            + 1  # get job descriptions infos (prefetch with is_popular annotation)
-        ):
+        with assertSnapshotQueries(snapshot(name="SQL queries with company filter")):
             response = client.get(self.URL, {"city": guerande.slug, "distance": 100, "company": guerande_company.pk})
         assertContains(
             response,
@@ -493,7 +458,7 @@ class TestJobDescriptionSearchView:
         response = client.get(self.URL, {"city": "foo-44"})
         assertContains(response, "Aucun résultat avec les filtres actuels.")
 
-    def test_results(self, client):
+    def test_results(self, client, snapshot):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city_slug = "paris-75"
         paris_city = City.objects.create(
@@ -505,15 +470,7 @@ class TestJobDescriptionSearchView:
         job = JobDescriptionFactory(company=company)
 
         # Filter on city
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # select the city
-            + 1  # select count of job descriptions for the paginator
-            + 1  # select job descriptions
-            + 1  # select prefetch job applications (for the popular annotation)
-            + 1  # select count companies
-            + 1  # select city (again) for the select2 widget display
-        ):
+        with assertSnapshotQueries(snapshot):
             response = client.get(self.URL, {"city": city_slug})
 
         assertContains(response, "Emplois inclusifs à 25 km du centre de Paris (75)")
@@ -555,7 +512,7 @@ class TestJobDescriptionSearchView:
         company_url = f"{company.get_card_url()}?back_url={urlencode_filter(response.wsgi_request.get_full_path())}"
         assertContains(response, company_url)
 
-    def test_district(self, client):
+    def test_district(self, client, snapshot):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city_slug = "paris-75"
         paris_city = City.objects.create(
@@ -567,15 +524,7 @@ class TestJobDescriptionSearchView:
         job = JobDescriptionFactory(company=company)
 
         # Filter on city
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # select the city
-            + 1  # select count of job descriptions for the paginator
-            + 1  # select job descriptions
-            + 1  # select prefetch job applications (for the popular annotation)
-            + 1  # select count companies
-            + 1  # select city (again) for the select2 widget display
-        ):
+        with assertSnapshotQueries(snapshot):
             response = client.get(self.URL, {"city": city_slug})
 
         assertContains(response, "Emplois inclusifs à 25 km du centre de Paris (75)")

@@ -225,6 +225,7 @@
       }),
       dict({
         'origin': list([
+          'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'ApprovalListView.get_context_data[www/approvals_views/views.py]',
           'ApprovalListView.get_context_data[www/approvals_views/views.py]',
         ]),

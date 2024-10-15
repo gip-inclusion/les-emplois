@@ -700,6 +700,7 @@
       }),
       dict({
         'origin': list([
+          'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'list_for_siae[www/apply/views/list_views.py]',
         ]),

@@ -1,7 +1,7 @@
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertNumQueries
+from pytest_django.asserts import assertContains
 
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -9,7 +9,7 @@ from itou.utils.mocks.address_format import mock_get_geocoding_data
 from tests.employee_record.factories import EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory
-from tests.utils.test import BASE_NUM_QUERIES
+from tests.utils.test import assertSnapshotQueries
 
 
 ENDPOINT_URL = reverse("v1:employee-records-list")
@@ -163,18 +163,10 @@ class TestEmployeeRecordAPIFetchList:
         assert len(result.get("results")) == 1
         assertContains(response, self.siae.siret)
 
-    def test_fetch_employee_record_list_query_count(self, api_client):
+    def test_fetch_employee_record_list_query_count(self, api_client, snapshot):
         api_client.force_login(self.employer)
 
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # Get the session
-            + 3  # Get the user, its memberships, and the SIAEs (middleware)
-            + 1  # Permissions check (EmployeeRecordAPIPermission)
-            + 1  # Get SIAEs of the member (EmployeeRecordViewSet.get_queryset)
-            + 2  # Get the employee records and the total count
-            + 3  # Save the session (with transaction)
-        ):
+        with assertSnapshotQueries(snapshot):
             api_client.get(ENDPOINT_URL, data={"status": list(Status)}, format="json")
 
     def test_show_phone_email_api(self, api_client, mocker):

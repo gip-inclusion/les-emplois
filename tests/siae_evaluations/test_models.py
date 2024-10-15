@@ -8,7 +8,6 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertNumQueries
 
 from itou.approvals.enums import Origin
 from itou.companies.enums import CompanyKind
@@ -48,6 +47,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.utils.test import assertSnapshotQueries
 
 
 def create_batch_of_job_applications(company):
@@ -445,7 +445,7 @@ class TestEvaluationCampaignManager:
 
         assert 2 == evaluation_campaign.eligible_siaes_under_ratio().count()
 
-    def test_populate(self, subtests):
+    def test_populate(self, snapshot, subtests):
         # integration tests
         evaluation_campaign = EvaluationCampaignFactory()
         company = CompanyFactory(department=evaluation_campaign.institution.department, with_membership=True)
@@ -455,23 +455,7 @@ class TestEvaluationCampaignManager:
         assert 0 == EvaluatedSiae.objects.all().count()
         assert 0 == EvaluatedJobApplication.objects.all().count()
 
-        with assertNumQueries(
-            1  # SAVEPOINT from transaction.atomic()
-            + 1  # UPDATE SET percent_set_at
-            + 1  # COUNT eligible job applications
-            + 1  # SELECT to_company_id and job application count for SIAE with at least 2 auto-prescriptions.
-            + 1  # SELECT SIAE details
-            + 1  # INSERT EvaluatedSiae
-            + 1  # COUNT eligible job applications
-            + 1  # SELECT job applications to evaluate
-            + 1  # INSERT EvaluatedJobApplication
-            + 1  # SELECT SIAE convention
-            + 1  # SELECT SIAE admin users
-            + 1  # SELECT institution users
-            + 1  # INSERT email for employer
-            + 1  # INSERT email for institution user
-            + 1  # RELEASE SAVEPOINT (end of transaction.atomic())
-        ):
+        with assertSnapshotQueries(snapshot):
             evaluation_campaign.populate(fake_now)
         evaluation_campaign.refresh_from_db()
 
