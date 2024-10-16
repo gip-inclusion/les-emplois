@@ -184,6 +184,10 @@ class _AssertSnapshotQueriesContext(CaptureQueriesContext):
         if re.match(r'^RELEASE +SAVEPOINT +".+?" *$', sql):
             # 'RELEASE SAVEPOINT "s124109847980928_x69"'
             return 'RELEASE SAVEPOINT "<snapshot>"'
+        if re.match(r'^ROLLBACK TO SAVEPOINT +".+?" *$', sql):
+            # 'ROLLBACK TO SAVEPOINT "s128384493710208_x1309"'
+            return 'ROLLBACK TO SAVEPOINT "<snapshot>"'
+
         return sqlparse.format(
             sql,
             keyword_case="upper",
