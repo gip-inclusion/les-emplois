@@ -45,6 +45,7 @@ def mock_rdvs_api(settings):
 
 class TestRdvInsertionDisplay:
     SEE_JOB_APPLICATION_LABEL = "Voir sa candidature"
+    SEE_JOB_APPLICATION_LABEL_FOR_JOB_SEEKER = "Voir ma candidature"
     INVITE_LABEL = "Proposer un rendez-vous"
     ONGOING_INVITE_LABEL = "Envoi en cours"
     INVITE_SENT_LABEL = "Invitation envoyée"
@@ -77,62 +78,119 @@ class TestRdvInsertionDisplay:
             for_snapshot=True,
         )
 
-    def test_list_no_rdv_insertion_button_when_not_configured(self, client):
+    @pytest.mark.parametrize(
+        "profile,view_name,job_application_label",
+        [
+            ("employer", "apply:list_for_siae", SEE_JOB_APPLICATION_LABEL),
+            ("job_seeker", "apply:list_for_job_seeker", SEE_JOB_APPLICATION_LABEL_FOR_JOB_SEEKER),
+        ],
+    )
+    def test_list_no_rdv_insertion_button_when_not_configured(
+        self, profile_login, client, profile, view_name, job_application_label
+    ):
         self.job_application.to_company.rdv_solidarites_id = None
         self.job_application.to_company.save()
 
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(reverse("apply:list_for_siae"))
-        assertContains(response, self.SEE_JOB_APPLICATION_LABEL)
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name))
+        assertContains(response, job_application_label)
         assertTemplateNotUsed(response, "apply/includes/buttons/rdv_insertion_invite.html")
 
-    def test_list_rdv_insertion_button_when_configured(self, client):
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(reverse("apply:list_for_siae"))
-        assertContains(response, self.SEE_JOB_APPLICATION_LABEL)
-        assertTemplateUsed(response, "apply/includes/buttons/rdv_insertion_invite.html")
-        assertContains(response, self.INVITE_LABEL)  # visible text
-        assertContains(response, self.ONGOING_INVITE_LABEL)  # loader text, not visible
+    @pytest.mark.parametrize(
+        "profile,view_name,job_application_label",
+        [
+            ("employer", "apply:list_for_siae", SEE_JOB_APPLICATION_LABEL),
+            ("job_seeker", "apply:list_for_job_seeker", SEE_JOB_APPLICATION_LABEL_FOR_JOB_SEEKER),
+        ],
+    )
+    def test_list_rdv_insertion_button_when_configured(
+        self, profile_login, client, profile, view_name, job_application_label
+    ):
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name))
+        assertContains(response, job_application_label)
+        if profile == "employer":
+            assertTemplateUsed(response, "apply/includes/buttons/rdv_insertion_invite.html")
+            assertContains(response, self.INVITE_LABEL)  # visible text
+            assertContains(response, self.ONGOING_INVITE_LABEL)  # loader text, not visible
+        else:
+            assertTemplateNotUsed(response, "apply/includes/buttons/rdv_insertion_invite.html")
+            assertNotContains(response, self.INVITE_LABEL)
+            assertNotContains(response, self.ONGOING_INVITE_LABEL)
         assertNotContains(response, self.INVITE_SENT_LABEL)
 
     @freeze_time("2024-07-29")
-    def test_list_rdv_insertion_button_when_configured_and_sent(self, client):
+    @pytest.mark.parametrize(
+        "profile,view_name,job_application_label",
+        [
+            ("employer", "apply:list_for_siae", SEE_JOB_APPLICATION_LABEL),
+            ("job_seeker", "apply:list_for_job_seeker", SEE_JOB_APPLICATION_LABEL_FOR_JOB_SEEKER),
+        ],
+    )
+    def test_list_rdv_insertion_button_when_configured_and_sent(
+        self, profile_login, client, profile, view_name, job_application_label
+    ):
         InvitationRequestFactory(
             job_seeker=self.job_application.job_seeker,
             company=self.job_application.to_company,
             created_at=timezone.now(),
         )
 
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(reverse("apply:list_for_siae"))
-        assertContains(response, self.SEE_JOB_APPLICATION_LABEL)
-        assertTemplateUsed(response, "apply/includes/buttons/rdv_insertion_invite.html")
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name))
+        assertContains(response, job_application_label)
+        if profile == "employer":
+            assertTemplateUsed(response, "apply/includes/buttons/rdv_insertion_invite.html")
+            assertContains(response, self.INVITE_SENT_LABEL)
+        else:
+            assertTemplateNotUsed(response, "apply/includes/buttons/rdv_insertion_invite.html")
+            assertNotContains(response, self.INVITE_SENT_LABEL)
         assertNotContains(response, self.INVITE_LABEL)
         assertNotContains(response, self.ONGOING_INVITE_LABEL)
-        assertContains(response, self.INVITE_SENT_LABEL)
 
     @freeze_time("2024-08-01")
-    def test_list_no_upcoming_appointments(self, client):
+    @pytest.mark.parametrize(
+        "profile,view_name,template_name",
+        [
+            ("employer", "apply:list_for_siae", "list_card_body_company"),
+            ("job_seeker", "apply:list_for_job_seeker", "list_card_body_jobseeker"),
+        ],
+    )
+    def test_list_no_upcoming_appointments(self, profile_login, client, profile, view_name, template_name):
         self.participation.appointment.delete()
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(reverse("apply:list_for_siae"))
-        assertTemplateUsed(response, "apply/includes/list_card_body_company.html")
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name))
+        assertTemplateUsed(response, f"apply/includes/{template_name}.html")
         assertNotContains(response, self.NEXT_APPOINTMENT_LABEL)
         assertNotContains(response, self.OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL)
         assertNotContains(response, self.OTHER_APPOINTMENTS_TWO_TOOLTIP_LABEL)
 
     @freeze_time("2024-08-01")
-    def test_list_with_one_upcoming_appointment(self, client):
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(reverse("apply:list_for_siae"))
-        assertTemplateUsed(response, "apply/includes/list_card_body_company.html")
+    @pytest.mark.parametrize(
+        "profile,view_name,template_name",
+        [
+            ("employer", "apply:list_for_siae", "list_card_body_company"),
+            ("job_seeker", "apply:list_for_job_seeker", "list_card_body_jobseeker"),
+        ],
+    )
+    def test_list_with_one_upcoming_appointment(self, profile_login, client, profile, view_name, template_name):
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name))
+        assertTemplateUsed(response, f"apply/includes/{template_name}.html")
         assertContains(response, self.NEXT_APPOINTMENT_LABEL)
         assertNotContains(response, self.OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL)
         assertNotContains(response, self.OTHER_APPOINTMENTS_TWO_TOOLTIP_LABEL)
 
     @freeze_time("2024-08-01")
-    def test_list_with_many_upcoming_appointments(self, client):
-        client.force_login(self.job_application.to_company.members.get())
+    @pytest.mark.parametrize(
+        "profile,view_name,template_name",
+        [
+            ("employer", "apply:list_for_siae", "list_card_body_company"),
+            ("job_seeker", "apply:list_for_job_seeker", "list_card_body_jobseeker"),
+        ],
+    )
+    def test_list_with_many_upcoming_appointments(self, profile_login, client, profile, view_name, template_name):
+        profile_login(profile, self.job_application)
 
         ParticipationFactory(
             job_seeker=self.job_application.job_seeker,
@@ -141,8 +199,8 @@ class TestRdvInsertionDisplay:
             appointment__status=Appointment.Status.UNKNOWN,
             appointment__start_at=datetime.datetime(2024, 9, 2, 8, 0, tzinfo=datetime.UTC),
         )
-        response = client.get(reverse("apply:list_for_siae"))
-        assertTemplateUsed(response, "apply/includes/list_card_body_company.html")
+        response = client.get(reverse(view_name))
+        assertTemplateUsed(response, f"apply/includes/{template_name}.html")
         assertContains(response, self.NEXT_APPOINTMENT_LABEL)
         assertContains(response, self.OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL)
         assertNotContains(response, self.OTHER_APPOINTMENTS_TWO_TOOLTIP_LABEL)
@@ -154,8 +212,8 @@ class TestRdvInsertionDisplay:
             appointment__status=Appointment.Status.UNKNOWN,
             appointment__start_at=datetime.datetime(2024, 9, 3, 8, 0, tzinfo=datetime.UTC),
         )
-        response = client.get(reverse("apply:list_for_siae"))
-        assertTemplateUsed(response, "apply/includes/list_card_body_company.html")
+        response = client.get(reverse(view_name))
+        assertTemplateUsed(response, f"apply/includes/{template_name}.html")
         assertContains(response, self.NEXT_APPOINTMENT_LABEL)
         assertNotContains(response, self.OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL)
         assertContains(response, self.OTHER_APPOINTMENTS_TWO_TOOLTIP_LABEL)
@@ -178,7 +236,18 @@ class TestRdvInsertionView:
         )
 
     @respx.mock
-    def test_rdv_insertion_not_configured(self, client, snapshot):
+    def test_rdv_insertion_invite_not_available_for_job_seeker(self, client):
+        client.force_login(self.job_application.job_seeker)
+        response = client.post(
+            reverse("apply:rdv_insertion_invite", kwargs={"job_application_id": self.job_application.pk}),
+            follow=True,
+        )
+        assert response.status_code == 404
+        assert InvitationRequest.objects.count() == 0
+        assert not respx.routes["rdv_solidarites_create_and_invite"].called
+
+    @respx.mock
+    def test_rdv_insertion_not_configured_for_employer(self, client, snapshot):
         assert InvitationRequest.objects.count() == 0
         self.job_application.to_company.rdv_solidarites_id = None
         self.job_application.to_company.save()

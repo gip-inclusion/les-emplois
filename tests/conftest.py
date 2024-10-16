@@ -535,3 +535,18 @@ def sftp_client_factory_fixture(sftp_host_key, sftp_directory):
         return paramiko.SFTPClient.from_transport(client_transport)
 
     return sftp_client_factory
+
+
+@pytest.fixture
+def profile_login(client):
+    def login(profile, job_application):
+        if profile == "employer":
+            client.force_login(job_application.to_company.members.first())
+        elif profile == "prescriber":
+            client.force_login(job_application.sender_prescriber_organization.members.first())
+        elif profile == "job_seeker":
+            client.force_login(job_application.job_seeker)
+        else:
+            raise ValueError(f"Invalid profile: '{profile}'")
+
+    return login
