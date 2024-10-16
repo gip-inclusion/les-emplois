@@ -2050,10 +2050,10 @@
       'Motifs de refus',
       'Éligibilité IAE validée',
       'Eligible au contrôle',
-      'Numéro PASS IAE',
-      'Début PASS IAE',
-      'Fin PASS IAE',
-      'Statut PASS IAE',
+      'Numéro PASS\xa0IAE',
+      'Début PASS\xa0IAE',
+      'Fin PASS\xa0IAE',
+      'Statut PASS\xa0IAE',
     ]),
     list([
       'MME',
@@ -2310,7 +2310,7 @@
       <fieldset>
           <legend>
               <button aria-controls="collapsePassIAE" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapsePassIAE" data-bs-toggle="collapse" type="button">
-                  Statut du PASS IAE
+                  Statut du PASS IAE
               </button>
           </legend>
           <div class="my-3 collapse" id="collapsePassIAE">

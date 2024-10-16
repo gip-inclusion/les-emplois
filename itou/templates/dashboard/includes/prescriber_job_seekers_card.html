@@ -12,7 +12,7 @@
                 <li class="d-flex justify-content-between align-items-center mb-3">
                     <a href="{% url 'approvals:prolongation_requests_list' %}?only_pending=on" class="btn-link btn-ico">
                         <i class="ri-list-check-3 ri-lg fw-normal"></i>
-                        <span>Gérer mes prolongations de PASS IAE</span>
+                        <span>Gérer mes prolongations de PASS IAE</span>
                     </a>
                     {% if pending_prolongation_requests %}
                         <span class="badge rounded-pill badge-xs bg-info-lighter text-info">{{ pending_prolongation_requests }}</span>
@@ -20,9 +20,9 @@
                 </li>
                 {% if request.current_organization.kind == PrescriberOrganizationKind.PE %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="https://tally.so/r/w2Ex0M" aria-label="Suspendre un PASS IAE (ouverture dans un nouvel onglet)" target="_blank" class="btn-link btn-ico has-external-link">
+                        <a href="https://tally.so/r/w2Ex0M" aria-label="Suspendre un PASS IAE (ouverture dans un nouvel onglet)" target="_blank" class="btn-link btn-ico has-external-link">
                             <i class="ri-pause-circle-line ri-lg fw-normal"></i>
-                            <span>Suspendre un PASS IAE</span>
+                            <span>Suspendre un PASS IAE</span>
                         </a>
                     </li>
                 {% endif %}

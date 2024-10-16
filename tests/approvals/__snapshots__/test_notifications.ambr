@@ -8,7 +8,7 @@
   
   Bonjour,
   
-  John DOE de la structure Acme inc. a besoin de votre accord pour prolonger un PASS IAE.
+  John DOE de la structure Acme inc. a besoin de votre accord pour prolonger un PASS IAE.
   
   L'employeur souhaite vous apporter des explications supplémentaires par téléphone. Vous trouverez ci-dessous ses coordonnées pour le contacter :
   
@@ -24,7 +24,7 @@
   - Motif de prolongation : 50 ans et plus
   - Fiche bilan : http://localhost:8000/approvals/prolongation/request/666/report-file/
   
-  Vous pouvez valider ou refuser cette prolongation en vous connectant à votre espace prescripteur Pres. Org. sur les emplois de l'inclusion, à la rubrique "Gérer mes prolongations de PASS IAE".
+  Vous pouvez valider ou refuser cette prolongation en vous connectant à votre espace prescripteur Pres. Org. sur les emplois de l'inclusion, à la rubrique "Gérer mes prolongations de PASS IAE".
   
   Précisions en cas de refus :
   
@@ -56,7 +56,7 @@
   '''
   Bonjour,
   
-  Une demande de prolongation du PASS IAE a été transmise à un membre de votre organisation, cette demande est toujours en attente de réponse. Si des démarches sont en cours, veuillez ne pas tenir compte de ce message.
+  Une demande de prolongation du PASS IAE a été transmise à un membre de votre organisation, cette demande est toujours en attente de réponse. Si des démarches sont en cours, veuillez ne pas tenir compte de ce message.
   
   Rappel du message initial :
   
@@ -67,7 +67,7 @@
   
   Bonjour,
   
-  John DOE de la structure Acme inc. a besoin de votre accord pour prolonger un PASS IAE.
+  John DOE de la structure Acme inc. a besoin de votre accord pour prolonger un PASS IAE.
   
   L'employeur souhaite vous apporter des explications supplémentaires par téléphone. Vous trouverez ci-dessous ses coordonnées pour le contacter :
   
@@ -83,7 +83,7 @@
   - Motif de prolongation : 50 ans et plus
   - Fiche bilan : http://localhost:8000/approvals/prolongation/request/666/report-file/
   
-  Vous pouvez valider ou refuser cette prolongation en vous connectant à votre espace prescripteur Pres. Org. sur les emplois de l'inclusion, à la rubrique "Gérer mes prolongations de PASS IAE".
+  Vous pouvez valider ou refuser cette prolongation en vous connectant à votre espace prescripteur Pres. Org. sur les emplois de l'inclusion, à la rubrique "Gérer mes prolongations de PASS IAE".
   
   Précisions en cas de refus :
   
@@ -115,7 +115,7 @@
   '''
   Bonjour,
   
-  L’organisation Pres. Org. a refusé votre demande de prolongation du PASS IAE.
+  L’organisation Pres. Org. a refusé votre demande de prolongation du PASS IAE.
   
   Références :
   Numéro : 99999 99 99999
@@ -135,7 +135,7 @@
   
   - Précisions : [proposed_actions_explanation]
   
-  Vous pouvez consulter la date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
+  Vous pouvez consulter la date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
   
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
@@ -150,9 +150,9 @@
   '''
   Bonjour,
   
-  L’employeur Acme inc. a sollicité un prescripteur habilité de l’organisation Pres. Org.  pour demander une prolongation de votre PASS IAE.
+  L’employeur Acme inc. a sollicité un prescripteur habilité de l’organisation Pres. Org.  pour demander une prolongation de votre PASS IAE.
   
-  L’organisation Pres. Org. a refusé la prolongation du PASS IAE.
+  L’organisation Pres. Org. a refusé la prolongation du PASS IAE.
   
   Motif de refus :
   - L’IAE ne correspond plus aux besoins / à la situation de la personne.
@@ -168,7 +168,7 @@
   
   - Précisions : [proposed_actions_explanation]
   
-  Vous pouvez consulter la date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur les emplois de l’inclusion.
+  Vous pouvez consulter la date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur les emplois de l’inclusion.
   
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
@@ -183,13 +183,13 @@
   '''
   Bonjour,
   
-  L’organisation Pres. Org. a accepté votre demande de prolongation du PASS IAE.
+  L’organisation Pres. Org. a accepté votre demande de prolongation du PASS IAE.
   
   Références :
   Numéro : 99999 99 99999
   Bénéficiaire : Jane DOE
   
-  Vous pouvez consulter la nouvelle date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
+  Vous pouvez consulter la nouvelle date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
   
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
@@ -204,11 +204,11 @@
   '''
   Bonjour,
   
-  L’employeur Acme inc. a sollicité un prescripteur habilité de l’organisation Pres. Org.  pour demander une prolongation de votre PASS IAE.
+  L’employeur Acme inc. a sollicité un prescripteur habilité de l’organisation Pres. Org.  pour demander une prolongation de votre PASS IAE.
   
-  L’organisation Pres. Org. a accepté la prolongation du PASS IAE.
+  L’organisation Pres. Org. a accepté la prolongation du PASS IAE.
   
-  Vous pouvez consulter la nouvelle date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur les emplois de l’inclusion.
+  Vous pouvez consulter la nouvelle date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur les emplois de l’inclusion.
   
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]

@@ -92,7 +92,7 @@ class IsValidFilter(admin.SimpleListFilter):
 
 
 class HasApprovalFilter(admin.SimpleListFilter):
-    title = "PASS IAE en cours"
+    title = "PASS IAE en cours"
     parameter_name = "has_approval"
 
     def lookups(self, request, model_admin):
@@ -155,7 +155,7 @@ class EligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
         PkSupportRemarkInline,
     )
 
-    @admin.display(boolean=True, description="valide ou PASS IAE en cours")
+    @admin.display(boolean=True, description="valide ou PASS IAE en cours")
     def is_considered_valid(self, obj):
         """
         This uses a property of the model and is intended to be used on the
@@ -163,7 +163,7 @@ class EligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
         """
         return obj.is_considered_valid
 
-    @admin.display(boolean=True, description="PASS IAE en cours")
+    @admin.display(boolean=True, description="PASS IAE en cours")
     def has_approval(self, obj):
         """
         This uses an annotated attribute and is intended to be used on the list view.

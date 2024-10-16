@@ -200,8 +200,8 @@ class TestTransferUserData:
                         "</a>: Candidature liée au diagnostic d&#x27;un autre candidat</li>"
                         '<li class="warning">'
                         f'<a href="/admin/approvals/approval/{job_application.approval.pk}/change/">'
-                        f"PASS IAE - {job_application.approval.pk}"
-                        "</a>: PASS IAE lié au diagnostic d&#x27;un autre candidat</li>"
+                        f"PASS IAE - {job_application.approval.pk}"
+                        "</a>: PASS IAE lié au diagnostic d&#x27;un autre candidat</li>"
                         "</ul>"
                     ),
                 ),
@@ -216,7 +216,7 @@ class TestTransferUserData:
         remark = to_user_remark.remark
         assert "Transfert du 2023-08-31 12:34:56 effectué par" in remark
         assert "- CANDIDATURES" in remark
-        assert "- PASS IAE" in remark
+        assert "- PASS IAE" in remark
 
 
 def test_app_model_change_url(admin_client):
@@ -344,7 +344,7 @@ def test_check_inconsistency_check(admin_client):
                     '1 objet incohérent: <ul><li class="warning">'
                     f'<a href="/admin/job_applications/jobapplication/{inconsistent_job_app.pk}/change/">'
                     f"candidature - {inconsistent_job_app.pk}"
-                    "</a>: Candidature liée au PASS IAE d&#x27;un autre candidat"
+                    "</a>: Candidature liée au PASS IAE d&#x27;un autre candidat"
                     "</li></ul>"
                 ),
             )

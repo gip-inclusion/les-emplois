@@ -182,7 +182,7 @@ class JobApplicationQuerySet(models.QuerySet):
 
     def manual_approval_delivery_required(self):
         """
-        Returns objects that require a manual PASS IAE delivery.
+        Returns objects that require a manual PASS IAE delivery.
         """
         return self.filter(
             state=JobApplicationState.ACCEPTED,
@@ -210,7 +210,7 @@ class JobApplicationQuerySet(models.QuerySet):
         )
         return self.annotate(
             accepted_at=Case(
-                # Mega Super duper special case to handle job applications created to generate AI's PASS IAE
+                # Mega Super duper special case to handle job applications created to generate AI's PASS IAE
                 When(
                     origin=Origin.AI_STOCK,
                     then=F("hiring_start_at"),
@@ -489,7 +489,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
     ERROR_END_IS_BEFORE_START = "La date de fin du contrat doit être postérieure à la date de début."
     ERROR_START_AFTER_APPROVAL_END = (
-        "Attention, le PASS IAE sera expiré lors du début du contrat. Veuillez modifier la date de début."
+        "Attention, le PASS IAE sera expiré lors du début du contrat. Veuillez modifier la date de début."
     )
     ERROR_POSTPONE_TOO_FAR = (
         f"La date de début du contrat ne peut être repoussée de plus de {MAX_CONTRACT_POSTPONE_IN_DAYS} jours."
@@ -619,7 +619,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     hiring_end_at = models.DateField(verbose_name="date prévisionnelle de fin du contrat", blank=True, null=True)
 
     hiring_without_approval = models.BooleanField(
-        default=False, verbose_name="l'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche"
+        default=False, verbose_name="l'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche"
     )
 
     origin = models.CharField(
@@ -629,23 +629,23 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # Job applications sent to SIAEs subject to eligibility rules can obtain an
     # Approval after being accepted.
     approval = models.ForeignKey(
-        "approvals.Approval", verbose_name="PASS IAE", null=True, blank=True, on_delete=models.RESTRICT
+        "approvals.Approval", verbose_name="PASS IAE", null=True, blank=True, on_delete=models.RESTRICT
     )
     approval_delivery_mode = models.CharField(
-        verbose_name="mode d'attribution du PASS IAE",
+        verbose_name="mode d'attribution du PASS IAE",
         max_length=30,
         choices=APPROVAL_DELIVERY_MODE_CHOICES,
         blank=True,
     )
     # Fields used for approvals processed both manually or automatically.
-    approval_number_sent_by_email = models.BooleanField(verbose_name="PASS IAE envoyé par email", default=False)
+    approval_number_sent_by_email = models.BooleanField(verbose_name="PASS IAE envoyé par email", default=False)
     approval_number_sent_at = models.DateTimeField(
-        verbose_name="date d'envoi du PASS IAE", blank=True, null=True, db_index=True
+        verbose_name="date d'envoi du PASS IAE", blank=True, null=True, db_index=True
     )
     # Fields used only for manual processing.
     approval_manually_delivered_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="PASS IAE délivré manuellement par",
+        verbose_name="PASS IAE délivré manuellement par",
         on_delete=models.RESTRICT,  # For traceability and accountability
         null=True,
         blank=True,
@@ -653,14 +653,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
     approval_manually_refused_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="PASS IAE refusé manuellement par",
+        verbose_name="PASS IAE refusé manuellement par",
         on_delete=models.RESTRICT,  # For traceability and accountability
         null=True,
         blank=True,
         related_name="approval_manually_refused",
     )
     approval_manually_refused_at = models.DateTimeField(
-        verbose_name="date de refus manuel du PASS IAE", blank=True, null=True
+        verbose_name="date de refus manuel du PASS IAE", blank=True, null=True
     )
 
     transferred_at = models.DateTimeField(verbose_name="date de transfert", null=True, blank=True)
@@ -861,7 +861,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def manual_approval_delivery_required(self):
         """
-        Returns True if the current instance require a manual PASS IAE delivery, False otherwise.
+        Returns True if the current instance require a manual PASS IAE delivery, False otherwise.
         """
         return (
             self.state.is_accepted

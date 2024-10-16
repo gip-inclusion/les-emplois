@@ -69,7 +69,7 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
         if since := params.get("since"):
             result = _annotate_convert_created_at(result).filter(creation_date__gte=since)
 
-        # => Add as many params as necessary here (PASS IAE number, SIRET, fuzzy name ...)
+        # => Add as many params as necessary here (PASS IAE number, SIRET, fuzzy name ...)
         return result.order_by("-created_at")
 
     def get_queryset(self):

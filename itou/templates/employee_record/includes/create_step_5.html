@@ -19,7 +19,7 @@
                     de la fiche salarié sur la liste récapitulative accessible depuis le tableau de bord.
                 </p>
                 <p class="mb-0">
-                    <i class="ri-error-warning-line ri-lg me-1"></i><strong>Après validation de la fiche salarié, la modification de la date de début du PASS IAE n'est plus possible.</strong>
+                    <i class="ri-error-warning-line ri-lg me-1"></i><strong>Après validation de la fiche salarié, la modification de la date de début du PASS IAE n'est plus possible.</strong>
                 </p>
             </div>
 
@@ -41,7 +41,7 @@
         <div class="c-box">
             {% with job_application=employee_record.job_application %}
                 <p>
-                    <b>PASS IAE :</b>
+                    <b>PASS IAE :</b>
                     <br>
                     {{ job_application.approval.number|format_approval_number }}
                 </p>
@@ -49,7 +49,7 @@
                 <a class="btn btn-outline-primary btn-block"
                    {% matomo_event "telechargement-pdf" "agrement" "detail-agrement" %}
                    href="{% url 'approvals:display_printable_approval' approval_id=job_application.approval.id %}"
-                   target="_blank">Afficher le PASS IAE</a>
+                   target="_blank">Afficher le PASS IAE</a>
             {% endwith %}
         </div>
     </div>

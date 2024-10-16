@@ -5,7 +5,7 @@
 {% load str_filters %}
 
 {% block title %}
-    PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+    PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
 {% endblock %}
 
 {% block title_prevstep %}
@@ -14,17 +14,17 @@
 
 {% block title_content %}
     <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-        <h1 class="m-0">PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}</h1>
-        <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le PASS IAE">
+        <h1 class="m-0">PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}</h1>
+        <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le PASS IAE">
             {% if approval_deletion_form_url %}
                 <a href="{{ approval_deletion_form_url }}"
                    id="approval-deletion-link"
                    class="btn btn-lg btn-outline-warning btn-ico"
                    target="_blank"
                    rel="noopener"
-                   aria-label="Mettre fin au PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}">
+                   aria-label="Mettre fin au PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}">
                     <i class="ri-pass-expired-line fw-medium" aria-hidden="true"></i>
-                    <span>Clôturer ce PASS IAE</span>
+                    <span>Clôturer ce PASS IAE</span>
                 </a>
             {% endif %}
             {% if is_employer_with_accepted_application %}
@@ -49,11 +49,11 @@
                         <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
                             <h2>Suspensions</h2>
                             {% if is_employer_with_accepted_application %}
-                                <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le PASS IAE">
+                                <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le PASS IAE">
                                     {% if can_be_suspended_by_current_user %}
                                         <a href="{% url 'approvals:suspend' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
                                            class="btn btn-block btn-outline-primary btn-ico mt-3"
-                                           aria-label="Suspendre le PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}">
+                                           aria-label="Suspendre le PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}">
                                             <i class="ri-pause-circle-line fw-medium" aria-hidden="true"></i>
                                             <span>Suspendre</span>
                                         </a>
@@ -63,7 +63,7 @@
                                                 disabled
                                                 data-bs-toggle="tooltip"
                                                 data-bs-placement="top"
-                                                {% if approval.is_suspended %}title="La suspension n’est pas possible car une suspension est déjà en cours."{% elif not approval.is_valid %}title="Il est impossible de faire une suspension de PASS IAE expiré."{% elif not approval.is_in_progress %}title="La suspension n’est pas possible car le PASS IAE n’a pas encore démarré."{% else %}title="La suspension n’est pas possible car un autre employeur a embauché le candidat."{% endif %}>
+                                                {% if approval.is_suspended %}title="La suspension n’est pas possible car une suspension est déjà en cours."{% elif not approval.is_valid %}title="Il est impossible de faire une suspension de PASS IAE expiré."{% elif not approval.is_in_progress %}title="La suspension n’est pas possible car le PASS IAE n’a pas encore démarré."{% else %}title="La suspension n’est pas possible car un autre employeur a embauché le candidat."{% endif %}>
                                             <i class="ri-pause-circle-line fw-medium" aria-hidden="true"></i>
                                             <span>Suspendre</span>
                                         </button>
@@ -157,11 +157,11 @@
                         <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
                             <h2>Prolongations</h2>
                             {% if is_employer_with_accepted_application %}
-                                <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le PASS IAE">
+                                <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le PASS IAE">
                                     {% if can_be_prolonged_by_current_user %}
                                         <a href="{% url 'approvals:declare_prolongation' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
                                            class="btn btn-block btn-outline-primary btn-ico mt-3"
-                                           aria-label="Prolonger le PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}">
+                                           aria-label="Prolonger le PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}">
                                             <i class="ri-refresh-line fw-medium" aria-hidden="true"></i>
                                             <span>Prolonger</span>
                                         </a>
@@ -171,7 +171,7 @@
                                                 disabled
                                                 data-bs-toggle="tooltip"
                                                 data-bs-placement="top"
-                                                {% if not approval.is_valid %} title="Il est impossible de faire une prolongation de PASS IAE expiré." {% elif prolongation_request_pending %} title="Il ne peut y avoir qu’une seule demande de prolongation en attente à la fois." {% else %} title="Les prolongations ne sont possibles qu’entre le {{ approval.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_BEFORE_END }}ème mois avant la fin d’un PASS IAE et jusqu’à son dernier jour de validité." {% endif %}>
+                                                {% if not approval.is_valid %} title="Il est impossible de faire une prolongation de PASS IAE expiré." {% elif prolongation_request_pending %} title="Il ne peut y avoir qu’une seule demande de prolongation en attente à la fois." {% else %} title="Les prolongations ne sont possibles qu’entre le {{ approval.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_BEFORE_END }}ème mois avant la fin d’un PASS IAE et jusqu’à son dernier jour de validité." {% endif %}>
                                             <i class="ri-refresh-line fw-medium" aria-hidden="true"></i>
                                             <span>Prolonger</span>
                                         </button>

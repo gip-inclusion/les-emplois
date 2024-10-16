@@ -21,7 +21,7 @@ from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_
 
 
 class TestEmployeeDetailView:
-    APPROVAL_NUMBER_LABEL = "Numéro de PASS IAE"
+    APPROVAL_NUMBER_LABEL = "Numéro de PASS IAE"
 
     def test_anonymous_user(self, client):
         approval = ApprovalFactory()

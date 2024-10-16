@@ -251,7 +251,7 @@ class CompanyAdmin(ItouGISMixin, OrganizationAdmin):
             return False
         return super().has_change_permission(request, obj)
 
-    @admin.display(description="Liste des PASS IAE pour cette entreprise")
+    @admin.display(description="Liste des PASS IAE pour cette entreprise")
     def approvals_list(self, obj):
         if obj.pk is None:
             return self.get_empty_value_display()

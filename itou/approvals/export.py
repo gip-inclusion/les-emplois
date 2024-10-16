@@ -63,7 +63,7 @@ def _format_pass_worksheet(wb):
 
     ws = wb.active
     current_dt = datetime.datetime.now()
-    ws.title = "Export PASS IAE " + current_dt.strftime(DATE_FMT)
+    ws.title = "Export PASS IAE " + current_dt.strftime(DATE_FMT)
 
     # Start timer
     start_counter = time.perf_counter()
@@ -115,7 +115,7 @@ def _format_suspended_pass_worksheet(wb):
     Suspended approvals
     """
     logger.info("Loading suspension data...")
-    ws = wb.create_sheet("Suspensions PASS IAE")
+    ws = wb.create_sheet("Suspensions PASS IAE")
 
     # Start timer
     start_counter = time.perf_counter()

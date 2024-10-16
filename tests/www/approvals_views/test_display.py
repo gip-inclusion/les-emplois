@@ -25,7 +25,7 @@ class TestDisplayApproval:
         assert response.context["siae"] == job_application.to_company
         assertContains(response, "le 26 avril 2023")
         assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
-        assertContains(response, "Imprimer ce PASS IAE")
+        assertContains(response, "Imprimer ce PASS IAE")
         assertContains(response, job_application.approval.start_at.strftime("%d/%m/%Y"))
         assertContains(response, job_application.approval.get_remainder_display())
         assertContains(response, self.WITH_DIAGNOSIS_STR)
@@ -50,7 +50,7 @@ class TestDisplayApproval:
         assert response.context["approval"] == job_application.approval
         assert response.context["siae"] == job_application.to_company
         assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
-        assertContains(response, "Imprimer ce PASS IAE")
+        assertContains(response, "Imprimer ce PASS IAE")
         assertContains(response, self.WITH_DIAGNOSIS_STR)
 
     def test_display_approval_even_if_diagnosis_is_missing(self, client):
@@ -70,5 +70,5 @@ class TestDisplayApproval:
         assert response.context["approval"] == job_application.approval
         assert response.context["siae"] == job_application.to_company
         assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
-        assertContains(response, "Imprimer ce PASS IAE")
+        assertContains(response, "Imprimer ce PASS IAE")
         assertNotContains(response, self.WITH_DIAGNOSIS_STR)

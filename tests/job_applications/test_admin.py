@@ -121,7 +121,7 @@ def test_check_inconsistency_check(admin_client):
                     '<li class="warning">'
                     f'<a href="/admin/job_applications/jobapplication/{inconsistent_application_1.pk}/change/">'
                     f"candidature - {inconsistent_application_1.pk}"
-                    "</a>: Candidature liée au PASS IAE d&#x27;un autre candidat</li>"
+                    "</a>: Candidature liée au PASS IAE d&#x27;un autre candidat</li>"
                     '<li class="warning">'
                     f'<a href="/admin/job_applications/jobapplication/{inconsistent_application_2.pk}/change/">'
                     f"candidature - {inconsistent_application_2.pk}"
@@ -237,7 +237,7 @@ def test_create_then_accept_job_application(admin_client):
             messages.Message(
                 messages.ERROR,
                 "Un diagnostic d'éligibilité valide pour ce candidat "
-                "et cette SIAE est obligatoire pour pouvoir créer un PASS IAE.",
+                "et cette SIAE est obligatoire pour pouvoir créer un PASS IAE.",
             )
         ],
     )
@@ -450,7 +450,7 @@ def test_create_inconsistent_job_application(admin_client):
                     '<li class="warning">'
                     f'<a href="/admin/job_applications/jobapplication/{job_app.pk}/change/">'
                     f"candidature - {job_app.pk}"
-                    "</a>: Candidature liée au PASS IAE d&#x27;un autre candidat</li>"
+                    "</a>: Candidature liée au PASS IAE d&#x27;un autre candidat</li>"
                     "</ul>"
                 ),
             ),

@@ -1,4 +1,4 @@
--- Demande : Extraction de l'ensemble des PASS IAE délivré en auto-diagnostic en 2022.
+-- Demande : Extraction de l'ensemble des PASS IAE délivré en auto-diagnostic en 2022.
 -- (diagnostic réalisé par la SIAE destinataire)
 --
 CREATE TEMP VIEW tmp AS (

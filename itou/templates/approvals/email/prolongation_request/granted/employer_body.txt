@@ -3,11 +3,11 @@
 {% block body %}
 Bonjour,
 
-L’organisation {{ prolongation_request.prescriber_organization.display_name }} a accepté votre demande de prolongation du PASS IAE.
+L’organisation {{ prolongation_request.prescriber_organization.display_name }} a accepté votre demande de prolongation du PASS IAE.
 
 Références :
 Numéro : {{ prolongation_request.approval.number_with_spaces }}
 Bénéficiaire : {{ prolongation_request.approval.user.get_full_name }}
 
-Vous pouvez consulter la nouvelle date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
+Vous pouvez consulter la nouvelle date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
 {% endblock body %}

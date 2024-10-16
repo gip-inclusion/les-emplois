@@ -89,7 +89,7 @@ class ASPExchangeInformationAdminMixin:
         id_itou = obj.archived_json["personnePhysique"]["idItou"]
         return f"{firstname}, {lastname} ({id_itou})"
 
-    @admin.display(description="données PASS IAE envoyées")
+    @admin.display(description="données PASS IAE envoyées")
     def approval_data_sent(self, obj):
         if not obj.archived_json:
             return self.get_empty_value_display()
@@ -108,7 +108,7 @@ class ASPExchangeInformationAdminMixin:
 class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
     form = EmployeeRecordAdminForm
 
-    @admin.action(description="Planifier une notification de changement 'PASS IAE' pour ces fiches salarié")
+    @admin.action(description="Planifier une notification de changement 'PASS IAE' pour ces fiches salarié")
     def schedule_approval_update_notification(self, request, queryset):
         total_created = 0
         for employee_record in queryset:
@@ -253,7 +253,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
     @admin.display(description="type de traitement")
     def asp_processing_type(self, obj):
         if obj.processed_as_duplicate:
-            return "Intégrée par les emplois suite à une erreur 3436 (doublon PASS IAE/SIRET)"
+            return "Intégrée par les emplois suite à une erreur 3436 (doublon PASS IAE/SIRET)"
         if obj.asp_processing_code == obj.ASP_PROCESSING_SUCCESS_CODE:
             return "Intégrée par l'ASP"
         return self.get_empty_value_display()

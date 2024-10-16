@@ -107,11 +107,11 @@
                                     {% elif job_application.job_seeker.has_valid_common_approval %}
                                         {% include "approvals/includes/status.html" with common_approval=job_application.job_seeker.latest_common_approval hiring_pending=job_application.is_pending %}
                                     {% elif job_application.hiring_without_approval %}
-                                        Vous n'avez pas demandé de PASS IAE (agrément).
+                                        Vous n'avez pas demandé de PASS IAE (agrément).
                                     {% elif job_application.approval_manually_refused_at %}
-                                        PASS IAE refusé (délai de carence non respecté).
+                                        PASS IAE refusé (délai de carence non respecté).
                                     {% elif job_application.manual_approval_delivery_required %}
-                                        PASS IAE (agrément) en cours de délivrance.
+                                        PASS IAE (agrément) en cours de délivrance.
                                     {% endif %}
                                 </div>
                             {% endif %}

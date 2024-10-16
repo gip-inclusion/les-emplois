@@ -43,7 +43,7 @@
               </button>
               <div class="c-info__detail collapse" id="maxEndAtCollapseInfo">
                   <p>
-                      Il n’est pas possible de sélectionner 12 mois (365 jours) pour cette demande car ce PASS IAE aura atteint la limite des renouvellements possibles.
+                      Il n’est pas possible de sélectionner 12 mois (365 jours) pour cette demande car ce PASS IAE aura atteint la limite des renouvellements possibles.
                       Retrouvez le détail des conditions dans <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738994643217--Prolonger-un-PASS-IAE" rel="noopener" target="_blank">notre documentation</a>.
                   </p>
               </div>
@@ -159,7 +159,7 @@
               </button>
               <div class="c-info__detail collapse" id="disabledChoicesCollapseInfo">
                   <p>
-                      Les prolongations de PASS IAE doivent respecter certaines conditions réglementaires pour être délivrées.
+                      Les prolongations de PASS IAE doivent respecter certaines conditions réglementaires pour être délivrées.
                       Retrouvez le détail des conditions dans <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738994643217--Prolonger-un-PASS-IAE" rel="noopener" target="_blank">notre documentation</a>.
                   </p>
               </div>

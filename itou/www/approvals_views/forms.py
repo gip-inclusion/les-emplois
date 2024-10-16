@@ -51,10 +51,10 @@ class ApprovalForm(forms.Form):
             }
         ),
     )
-    status_valid = forms.BooleanField(label="PASS IAE valide", required=False)
-    status_suspended = forms.BooleanField(label="PASS IAE valide (suspendu)", required=False)
-    status_future = forms.BooleanField(label="PASS IAE valide (non démarré)", required=False)
-    status_expired = forms.BooleanField(label="PASS IAE expiré", required=False)
+    status_valid = forms.BooleanField(label="PASS IAE valide", required=False)
+    status_suspended = forms.BooleanField(label="PASS IAE valide (suspendu)", required=False)
+    status_future = forms.BooleanField(label="PASS IAE valide (non démarré)", required=False)
+    status_expired = forms.BooleanField(label="PASS IAE expiré", required=False)
 
     expiry = forms.ChoiceField(
         label="Fin du parcours en IAE",

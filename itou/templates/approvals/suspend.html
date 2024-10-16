@@ -43,14 +43,14 @@
                                             <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
                                         </div>
                                         <div class="col">
-                                            <p class="mb-0">La suspension du PASS IAE pourra être levée en cas d’embauche par un autre employeur.</p>
+                                            <p class="mb-0">La suspension du PASS IAE pourra être levée en cas d’embauche par un autre employeur.</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 {% bootstrap_field form.reason_explanation %}
 
-                                {% itou_buttons_form primary_label="Valider la suspension" primary_aria_label="Valider la suspension du PASS IAE de "|add:approval.user.get_full_name primary_name="preview" primary_value=1 reset_url=back_url %}
+                                {% itou_buttons_form primary_label="Valider la suspension" primary_aria_label="Valider la suspension du PASS IAE de "|add:approval.user.get_full_name primary_name="preview" primary_value=1 reset_url=back_url %}
 
                             </form>
                         </div>
@@ -67,7 +67,7 @@
                                 {% for field in form %}<input type="hidden" name="{{ field.name }}" value="{{ field.value }}">{% endfor %}
 
                                 {# Show the user a summary of the info. #}
-                                <h5 class="h4 mb-3 card-title">Vous êtes sur le point de suspendre ce PASS IAE pour la raison suivante :</h5>
+                                <h5 class="h4 mb-3 card-title">Vous êtes sur le point de suspendre ce PASS IAE pour la raison suivante :</h5>
                                 <p class="card-text">{{ form.instance.get_reason_display }}</p>
                                 <p class="card-text text-success">
                                     À partir du
@@ -78,7 +78,7 @@
                                 <p>
                                     En confirmant cette demande je certifie sur l'honneur que le motif de suspension choisi correspond à la situation du salarié.
                                 </p>
-                                {% itou_buttons_form primary_label="Confirmer la suspension" primary_aria_label="Confirmer la suspension du PASS IAE de "|add:approval.user.get_full_name primary_name="save" primary_value=1 secondary_name="edit" secondary_value="1" reset_url=back_url show_mandatory_fields_mention=False %}
+                                {% itou_buttons_form primary_label="Confirmer la suspension" primary_aria_label="Confirmer la suspension du PASS IAE de "|add:approval.user.get_full_name primary_name="save" primary_value=1 secondary_name="edit" secondary_value="1" reset_url=back_url show_mandatory_fields_mention=False %}
 
                             </form>
                         </div>

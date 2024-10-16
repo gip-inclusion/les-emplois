@@ -283,7 +283,7 @@ TABLE.add_columns(
         {
             "name": "mode_attribution_pass_iae",
             "type": "varchar",
-            "comment": "Mode d''attribution du PASS IAE",
+            "comment": "Mode d''attribution du PASS IAE",
             "fn": lambda o: o.get_approval_delivery_mode_display(),
         },
         {

@@ -129,7 +129,7 @@ class Migration(migrations.Migration):
                             ("no_position", "Pas de recrutement en cours"),
                             ("duplicate", "Candidature en doublon"),
                             ("other", "Autre"),
-                            ("approval_expiration_too_close", "La date de fin du PASS IAE / agrément est trop proche"),
+                            ("approval_expiration_too_close", "La date de fin du PASS IAE / agrément est trop proche"),
                             ("unavailable", "Candidat indisponible ou non intéressé par le poste"),
                             (
                                 "eligibility_doubt",
@@ -158,12 +158,12 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to="approvals.approval",
-                        verbose_name="PASS IAE",
+                        verbose_name="PASS IAE",
                     ),
                 ),
                 (
                     "approval_number_sent_by_email",
-                    models.BooleanField(default=False, verbose_name="PASS IAE envoyé par email"),
+                    models.BooleanField(default=False, verbose_name="PASS IAE envoyé par email"),
                 ),
                 (
                     "approval_delivery_mode",
@@ -171,13 +171,13 @@ class Migration(migrations.Migration):
                         blank=True,
                         choices=[("automatic", "Automatique"), ("manual", "Manuel")],
                         max_length=30,
-                        verbose_name="mode d'attribution du PASS IAE",
+                        verbose_name="mode d'attribution du PASS IAE",
                     ),
                 ),
                 (
                     "approval_number_sent_at",
                     models.DateTimeField(
-                        blank=True, db_index=True, null=True, verbose_name="date d'envoi du PASS IAE"
+                        blank=True, db_index=True, null=True, verbose_name="date d'envoi du PASS IAE"
                     ),
                 ),
                 (
@@ -188,18 +188,18 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="approval_manually_delivered",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="PASS IAE délivré manuellement par",
+                        verbose_name="PASS IAE délivré manuellement par",
                     ),
                 ),
                 (
                     "hiring_without_approval",
                     models.BooleanField(
-                        default=False, verbose_name="l'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche"
+                        default=False, verbose_name="l'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche"
                     ),
                 ),
                 (
                     "approval_manually_refused_at",
-                    models.DateTimeField(blank=True, null=True, verbose_name="date de refus manuel du PASS IAE"),
+                    models.DateTimeField(blank=True, null=True, verbose_name="date de refus manuel du PASS IAE"),
                 ),
                 (
                     "approval_manually_refused_by",
@@ -209,7 +209,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="approval_manually_refused",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="PASS IAE refusé manuellement par",
+                        verbose_name="PASS IAE refusé manuellement par",
                     ),
                 ),
                 ("hidden_for_company", models.BooleanField(default=False, verbose_name="masqué coté employeur")),

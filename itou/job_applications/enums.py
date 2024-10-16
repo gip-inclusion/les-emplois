@@ -69,7 +69,7 @@ class RefusalReason(models.TextChoices):
     # Hidden reasons kept for history.
     APPROVAL_EXPIRATION_TOO_CLOSE = (
         "approval_expiration_too_close",
-        "La date de fin du PASS IAE / agrément est trop proche",
+        "La date de fin du PASS IAE / agrément est trop proche",
     )
     UNAVAILABLE = "unavailable", "Candidat indisponible ou non intéressé par le poste"
     ELIGIBILITY_DOUBT = (

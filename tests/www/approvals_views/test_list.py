@@ -206,7 +206,7 @@ class TestApprovalsListView:
             response,
             """<span class="badge badge-sm rounded-pill text-wrap bg-success-lighter text-success">
                 <i class="ri-pass-valid-line ri-xl" aria-hidden="true"></i>
-                PASS IAE valide
+                PASS IAE valide
             </span>""",
             html=True,
         )
@@ -215,7 +215,7 @@ class TestApprovalsListView:
             response,
             """<span class="badge badge-sm rounded-pill text-wrap bg-success-lighter text-success">
                 <i class="ri-pass-valid-line ri-xl" aria-hidden="true"></i>
-                PASS IAE valide (non démarré)
+                PASS IAE valide (non démarré)
             </span>""",
             html=True,
         )
@@ -223,7 +223,7 @@ class TestApprovalsListView:
             response,
             """<span class="badge badge-sm rounded-pill text-wrap bg-success-lighter text-success">
                 <i class="ri-pass-pending-line ri-xl" aria-hidden="true"></i>
-                PASS IAE valide (suspendu)
+                PASS IAE valide (suspendu)
             </span>""",
             html=True,
         )
@@ -231,7 +231,7 @@ class TestApprovalsListView:
             response,
             """<span class="badge badge-sm rounded-pill text-wrap bg-emploi-light text-primary">
                 <i class="ri-pass-expired-line ri-xl" aria-hidden="true"></i>
-                PASS IAE expiré
+                PASS IAE expiré
             </span>""",
             html=True,
         )

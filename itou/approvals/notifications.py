@@ -103,7 +103,7 @@ class ProlongationRequestDeniedJobSeeker(BaseNotification):
 
 @notifications_registry.register
 class PassAcceptedEmployerNotification(EmployerNotification, EmailNotification):
-    name = "PASS IAE accepté"
+    name = "PASS IAE accepté"
     category = NotificationCategory.IAE_PASS
     subject_template = "approvals/email/deliver_subject.txt"
     body_template = "approvals/email/deliver_body.txt"

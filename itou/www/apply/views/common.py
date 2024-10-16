@@ -141,7 +141,7 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
                     "Ce candidat semble avoir plusieurs comptes sur Les emplois de l'inclusion "
                     "(même identifiant France Travail mais adresse e-mail différente). "
                     "<br>"
-                    "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. "
+                    "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. "
                     "<br>"
                     f"Pour que nous régularisions la situation, merci de remplir {link_to_form} en nous indiquant : "
                     "<ul>"
@@ -149,7 +149,7 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
                     "<li> numéro de sécurité sociale"
                     "<li> sa date de naissance"
                     "<li> son identifiant Pôle Emploi"
-                    "<li> la référence d’un agrément Pôle Emploi ou d’un PASS IAE lui appartenant (si vous l’avez) "
+                    "<li> la référence d’un agrément Pôle Emploi ou d’un PASS IAE lui appartenant (si vous l’avez) "
                     "</ul>"
                 ),
             )
@@ -174,7 +174,7 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
                 messages.success(
                     request,
                     mark_safe(
-                        "Votre demande de PASS IAE est en cours de vérification auprès de nos équipes.<br>"
+                        "Votre demande de PASS IAE est en cours de vérification auprès de nos équipes.<br>"
                         "Si vous souhaitez en savoir plus sur le processus de vérification, n’hésitez pas à "
                         f"{external_link}."
                     ),

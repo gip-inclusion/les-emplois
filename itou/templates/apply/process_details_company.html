@@ -120,9 +120,9 @@
                                 {% endif %}
                                 {% if job_application.to_company.is_subject_to_eligibility_rules and request.user.is_employer and job_application.state.is_accepted and job_application.approval %}
                                     <div class="c-box mb-4">
-                                        <h4>PASS IAE</h4>
+                                        <h4>PASS IAE</h4>
                                         <p>
-                                            La consultation et la gestion du PASS IAE (exemple : « suspendre » ou « prolonger » un PASS IAE) se fait depuis le profil salarié.
+                                            La consultation et la gestion du PASS IAE (exemple : « suspendre » ou « prolonger » un PASS IAE) se fait depuis le profil salarié.
                                         </p>
                                         <a class="btn btn-block btn-primary"
                                            href="{% url 'employees:detail' public_id=job_application.job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"

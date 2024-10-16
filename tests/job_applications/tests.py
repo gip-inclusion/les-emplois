@@ -1015,7 +1015,7 @@ class TestJobApplicationNotifications:
             f"[DEV] PASS IAE pour {job_application.job_seeker.get_full_name()} et avis sur les emplois de l'inclusion"
             == email.subject
         )
-        assert "PASS IAE" in email.body
+        assert "PASS IAE" in email.body
 
     def test_notifications_deliver_approval_when_not_subject_to_eligibility_rules(self):
         job_application = JobApplicationFactory(with_approval=True, to_company__not_subject_to_eligibility=True)
@@ -1023,7 +1023,7 @@ class TestJobApplicationNotifications:
         email = job_application.notifications_deliver_approval(job_application.to_company.members.first()).build()
 
         assert "[DEV] Confirmation de l'embauche" == email.subject
-        assert "PASS IAE" not in email.body
+        assert "PASS IAE" not in email.body
         assert global_constants.ITOU_HELP_CENTER_URL in email.body
 
     def test_manually_deliver_approval(self, django_capture_on_commit_callbacks):

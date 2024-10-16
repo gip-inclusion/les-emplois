@@ -96,7 +96,7 @@ def test_filter_assigned_company(admin_client):
         state=JobApplicationState.ACCEPTED,
     )
     response = admin_client.get(reverse("admin:approvals_approval_changelist"), {"assigned_company": company.pk})
-    assertContains(response, "1 PASS IAE")
+    assertContains(response, "1 PASS IAE")
     assertContains(
         response,
         f"""
@@ -119,15 +119,15 @@ def test_send_approvals_to_pe_stats(admin_client):
     response = admin_client.get(reverse("admin:approvals_approval_changelist"))
     assertContains(response, approval_stats_url)
     response = admin_client.get(approval_stats_url)
-    assertContains(response, "<h2>PASS IAE : 1</h2>")
-    assertContains(response, "<h2>PASS IAE annulés : 1</h2>")
+    assertContains(response, "<h2>PASS IAE : 1</h2>")
+    assertContains(response, "<h2>PASS IAE annulés : 1</h2>")
 
     cancelledapproval_stats_url = reverse("admin:approvals_cancelledapproval_sent_to_pe_stats")
     response = admin_client.get(reverse("admin:approvals_cancelledapproval_changelist"))
     assertContains(response, cancelledapproval_stats_url)
     response = admin_client.get(cancelledapproval_stats_url)
-    assertContains(response, "<h2>PASS IAE : 1</h2>")
-    assertContains(response, "<h2>PASS IAE annulés : 1</h2>")
+    assertContains(response, "<h2>PASS IAE : 1</h2>")
+    assertContains(response, "<h2>PASS IAE annulés : 1</h2>")
 
 
 def test_check_inconsistency_check(admin_client):
@@ -163,8 +163,8 @@ def test_check_inconsistency_check(admin_client):
                 (
                     '1 objet incohérent: <ul><li class="warning">'
                     f'<a href="/admin/approvals/approval/{inconsistent_approval.pk}/change/">'
-                    f"PASS IAE - {inconsistent_approval.pk}"
-                    "</a>: PASS IAE lié au diagnostic d&#x27;un autre candidat"
+                    f"PASS IAE - {inconsistent_approval.pk}"
+                    "</a>: PASS IAE lié au diagnostic d&#x27;un autre candidat"
                     "</li></ul>"
                 ),
             )

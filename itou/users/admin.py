@@ -357,7 +357,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
 
     INCONSISTENCY_CHECKS = [
         (
-            "Candidature liée au PASS IAE d'un autre candidat",
+            "Candidature liée au PASS IAE d'un autre candidat",
             lambda q: JobApplication.objects.filter(job_seeker__in=q).inconsistent_approval_user(),
         ),
         (
@@ -371,7 +371,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
             ).inconsistent_geiq_eligibility_diagnosis_job_seeker(),
         ),
         (
-            "PASS IAE lié au diagnostic d'un autre candidat",
+            "PASS IAE lié au diagnostic d'un autre candidat",
             lambda q: Approval.objects.filter(user__in=q).inconsistent_eligibility_diagnosis_job_seeker(),
         ),
     ]

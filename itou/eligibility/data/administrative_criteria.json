@@ -8,7 +8,7 @@
       "desc": "Revenu de solidarité active",
       "written_proof": "Attestation RSA",
       "written_proof_url": "",
-      "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+      "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 1,
       "created_at": "2020-03-23T20:00:00.000Z",
       "kind": "RSA"
@@ -23,7 +23,7 @@
       "desc": "Allocation de solidarité spécifique",
       "written_proof": "Attestation ASS",
       "written_proof_url": "",
-      "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+      "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 2,
       "created_at": "2020-03-23T20:00:00.000Z",
       "kind": "ASS"
@@ -38,7 +38,7 @@
       "desc": "Allocation aux adultes handicapés",
       "written_proof": "Attestation AAH",
       "written_proof_url": "",
-      "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+      "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 3,
       "created_at": "2020-03-23T20:00:00.000Z",
       "kind": "AAH"
@@ -53,7 +53,7 @@
       "desc": "Demandeur d'emploi de très longue durée (inscrit à France Travail)",
       "written_proof": "Attestation France Travail",
       "written_proof_url": "",
-      "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+      "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 4,
       "created_at": "2020-03-23T20:00:00.000Z",
       "kind": "DETLD"
@@ -68,7 +68,7 @@
       "desc": "",
       "written_proof": "Diplôme et/ou attestation sur l'honneur",
       "written_proof_url": "https://www.service-public.fr/particuliers/vosdroits/F199",
-      "written_proof_validity": "Attestation sur l'honneur datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+      "written_proof_validity": "Attestation sur l'honneur datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 1,
       "created_at": "2020-03-23T20:00:00.000Z",
       "kind": "CAP_BEP"
@@ -113,7 +113,7 @@
       "desc": "Aide sociale à l'enfance",
       "written_proof": "Attestation ASE",
       "written_proof_url": "",
-      "written_proof_validity": "Datant de moins de 12 mois avant la date de délivrance du PASS IAE",
+      "written_proof_validity": "Datant de moins de 12 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 4,
       "created_at": "2020-03-23T20:00:00.000Z",
       "kind": "ASE"
@@ -128,7 +128,7 @@
       "desc": "Demandeur d'emploi de longue durée (inscrit à France Travail)",
       "written_proof": "Attestation France Travail",
       "written_proof_url": "",
-      "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+      "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 5,
       "created_at": "2020-03-23T20:00:00.000Z",
       "kind": "DELD"
@@ -158,7 +158,7 @@
       "desc": "",
       "written_proof": "Attestation CAF",
       "written_proof_url": "",
-      "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+      "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 7,
       "created_at": "2020-03-23T20:00:00.000Z",
       "kind": "PI"
@@ -173,7 +173,7 @@
       "desc": "",
       "written_proof": "Certificat de domiciliation. À défaut : déclaration sur l'honneur d'un travailleur social ou d'une association",
       "written_proof_url": "",
-      "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+      "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 8,
       "created_at": "2020-03-23T20:00:00.000Z",
       "kind": "PSH_PR"
@@ -188,7 +188,7 @@
       "desc": "",
       "written_proof": "Titre de séjour valide ou demande de renouvellement du titre de séjour. Pour les demandeurs d'asile : autorisation temporaire de travail. Pour les bénéficiaires d'une protection temporaire : autorisation provisoire de séjour.",
       "written_proof_url": "",
-      "written_proof_validity": "Titre valide au moment de la délivrance du PASS IAE",
+      "written_proof_validity": "Titre valide au moment de la délivrance du PASS IAE",
       "ui_rank": 9,
       "created_at": "2020-03-23T20:00:00.000Z",
       "kind": "REF_DA"
@@ -203,7 +203,7 @@
       "desc": "Zone de revitalisation rurale",
       "written_proof": "Justificatif de domicile (facture eau, électricité, internet, téléphone)",
       "written_proof_url": "https://www.data.gouv.fr/fr/datasets/zones-de-revitalisation-rurale-zrr",
-      "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
+      "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 10,
       "created_at": "2020-03-23T20:00:00.000Z",
       "kind": "ZRR"
@@ -218,7 +218,7 @@
       "desc": "Quartier prioritaire de la politique de la ville",
       "written_proof": "Justificatif de domicile (facture eau, électricité, internet, téléphone)",
       "written_proof_url": "https://sig.ville.gouv.fr",
-      "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
+      "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 11,
       "created_at": "2020-03-23T20:00:00.000Z",
       "kind": "QPV"
@@ -233,7 +233,7 @@
       "desc": "",
       "written_proof": "Billet de sortie ou attestation du juge d'application des peines",
       "written_proof_url": "",
-      "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
+      "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 12,
       "created_at": "2021-09-03T20:00:00.000Z",
       "kind": "DETENTION_MJ"
@@ -248,7 +248,7 @@
       "desc": "",
       "written_proof": "Evaluation FLE inférieure au niveau A1",
       "written_proof_url": "",
-      "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
+      "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 13,
       "created_at": "2021-09-03T20:00:00.000Z",
       "kind": "FLE"
@@ -263,7 +263,7 @@
       "desc": "",
       "written_proof": "Diagnostic mobilité délivré par un prescripteur habilité",
       "written_proof_url": "",
-      "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
+      "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 14,
       "created_at": "2021-09-03T20:00:00.000Z",
       "kind": "PM"

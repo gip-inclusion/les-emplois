@@ -1017,7 +1017,7 @@ class ApplicationEligibilityView(RequireApplySessionMixin, ApplicationBaseView):
                     and request.current_organization
                     and request.current_organization.is_authorized
                 ),
-                # No need for eligibility diagnosis if the job seeker already have a PASS IAE
+                # No need for eligibility diagnosis if the job seeker already have a PASS IAE
                 self.job_seeker.has_valid_common_approval,
             ]
             if any(bypass_eligibility_conditions):
@@ -1249,7 +1249,7 @@ class ApplicationResumeView(RequireApplySessionMixin, ApplicationBaseView):
                     and self.request.current_organization
                     and self.request.current_organization.is_authorized
                 ),
-                # No need for eligibility diagnosis if the job seeker already have a PASS IAE
+                # No need for eligibility diagnosis if the job seeker already have a PASS IAE
                 self.job_seeker.has_valid_common_approval,
             ]
             if not any(bypass_eligibility_conditions):
@@ -1643,7 +1643,7 @@ def eligibility_for_hire(
     bypass_eligibility_conditions = [
         # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
         not company.is_subject_to_eligibility_rules,
-        # No need for eligibility diagnosis if the job seeker already has a PASS IAE
+        # No need for eligibility diagnosis if the job seeker already has a PASS IAE
         job_seeker.has_valid_common_approval,
     ]
     if any(bypass_eligibility_conditions) or job_seeker.has_valid_diagnosis(for_siae=company):

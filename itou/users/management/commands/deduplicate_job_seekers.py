@@ -62,7 +62,7 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
 
     def handle_easy_duplicates(self, duplicates, target, nirs):
         """
-        Easy duplicates: there is 0 or 1 PASS IAE in the duplicates group.
+        Easy duplicates: there is 0 or 1 PASS IAE in the duplicates group.
 
         We can merge duplicates.
         """
@@ -109,7 +109,7 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
 
     def handle_hard_duplicates(self, duplicates):
         """
-        Hard duplicates: there are several PASS IAE in the group of duplicates.
+        Hard duplicates: there are several PASS IAE in the group of duplicates.
 
         These cases will not be merged because they may have already been used
         (ASP, FSE etc.).
@@ -199,17 +199,17 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
                 continue
 
             # Easy cases.
-            # None or 1 PASS IAE was issued for the same person with multiple accounts.
+            # None or 1 PASS IAE was issued for the same person with multiple accounts.
             if len(users_with_approval) <= 1:
                 self.EASY_DUPLICATES_COUNT += 1
                 target = None
 
-                # Give priority to the user with a PASS IAE.
+                # Give priority to the user with a PASS IAE.
                 user_with_approval = next((u for u in duplicates if u.approvals.exists()), None)
                 if user_with_approval:
                     target = user_with_approval
 
-                # Handle duplicates without any PASS IAE.
+                # Handle duplicates without any PASS IAE.
                 else:
                     # Give priority to the first user who already logged in…
                     first_autonomous_user = next((u for u in duplicates if u.last_login), None)
@@ -222,7 +222,7 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
                 self.handle_easy_duplicates(duplicates, target=target, nirs=nirs)
 
             # Hard cases.
-            # More than one PASS IAE was issued for the same person.
+            # More than one PASS IAE was issued for the same person.
             elif len(users_with_approval) > 1:
                 self.HARD_DUPLICATES_COUNT += 1
                 self.handle_hard_duplicates(duplicates)
@@ -246,10 +246,10 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
                     "Email",
                     "NIR",
                     "Date de naissance",
-                    "Numéro PASS IAE",
-                    "Début PASS IAE",
-                    "Fin PASS IAE",
-                    "Lien admin PASS IAE",
+                    "Numéro PASS IAE",
+                    "Début PASS IAE",
+                    "Fin PASS IAE",
+                    "Lien admin PASS IAE",
                     "Candidatures récentes (< 3 mois)",
                 ],
                 self.HARD_DUPLICATES_LOGS,

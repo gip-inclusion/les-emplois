@@ -743,7 +743,7 @@
                               </p>
                               <p>
                                   <i>
-                                      Lorsqu'un employeur vous demandera de prolonger un PASS IAE,
+                                      Lorsqu'un employeur vous demandera de prolonger un PASS IAE,
                                       <br class="d-none d-lg-inline"/>
                                       vous la retrouverez sur cette page.
                                   </i>
@@ -784,11 +784,11 @@
                       
                           <div class="table-responsive mt-3 mt-md-4">
                               <table class="table">
-                                  <caption class="visually-hidden">Liste des prolongations de PASS IAE</caption>
+                                  <caption class="visually-hidden">Liste des prolongations de PASS IAE</caption>
                                   <thead>
                                       <tr>
                                           <th scope="col">Salarié</th>
-                                          <th scope="col">Numéro de PASS IAE</th>
+                                          <th scope="col">Numéro de PASS IAE</th>
                                           <th scope="col">Organisation</th>
                                           <th scope="col">Demandée le</th>
                                           <th scope="col">
@@ -860,11 +860,11 @@
                       
                           <div class="table-responsive mt-3 mt-md-4">
                               <table class="table">
-                                  <caption class="visually-hidden">Liste des prolongations de PASS IAE</caption>
+                                  <caption class="visually-hidden">Liste des prolongations de PASS IAE</caption>
                                   <thead>
                                       <tr>
                                           <th scope="col">Salarié</th>
-                                          <th scope="col">Numéro de PASS IAE</th>
+                                          <th scope="col">Numéro de PASS IAE</th>
                                           <th scope="col">Organisation</th>
                                           <th scope="col">Demandée le</th>
                                           <th scope="col">
@@ -923,7 +923,7 @@
                               <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
                           </h3>
                           <p>Pierre DUPONT a été sollicité pour cette demande.</p>
-                          <h3>Date de fin de PASS IAE demandée : 31/01/2000</h3>
+                          <h3>Date de fin de PASS IAE demandée : 31/01/2000</h3>
                           <p>
                               La prolongation est demandée pour une durée de 30 jours.
                           </p>
@@ -935,7 +935,7 @@
                                   Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
                               </p>
                               <p>
-                                  <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
+                                  <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
                                       <i class="ri-download-line ri-lg fw-normal"></i>
                                       <span>Télécharger le bilan</span>
                                   </a>
@@ -967,7 +967,7 @@
   '''
   
       <div class="c-box mb-3 mb-lg-5 border-danger bg-danger-lightest">
-          <h4>Pas de prolongation du PASS IAE</h4>
+          <h4>Pas de prolongation du PASS IAE</h4>
           <p class="mb-2">
               Demande refusée le 01 janvier 2000 par Pierre DUPONT
           </p>
@@ -980,7 +980,7 @@
   '''
   
       <div class="c-box mb-3 mb-lg-5 border-success bg-success-lightest">
-          <h4>Prolongation du PASS IAE jusqu’au 31/01/2000</h4>
+          <h4>Prolongation du PASS IAE jusqu’au 31/01/2000</h4>
           <p class="mb-2">
               Demande acceptée le 01 janvier 2000 par Pierre DUPONT
           </p>
@@ -993,7 +993,7 @@
   '''
   
       <div class="c-box mb-3 mb-lg-5">
-          <h4>Prolonger le PASS IAE jusqu’au 31/01/2000</h4>
+          <h4>Prolonger le PASS IAE jusqu’au 31/01/2000</h4>
           <form method="post" action="/approvals/prolongation/request/666/grant">
               
               <button class="btn btn-primary btn-block btn-ico justify-content-center">
