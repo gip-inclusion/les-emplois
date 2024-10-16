@@ -62,14 +62,16 @@ class TestEmployeeRecordModel:
             state.name for state in list(JobApplicationWorkflow.states) if state.name != JobApplicationState.ACCEPTED
         ]:
             with subtests.test(state):
-                with assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED):
+                with pytest.raises(ValidationError) as exc:
                     job_application = JobApplicationFactory(with_approval=True, state=state)
                     EmployeeRecord.from_job_application(job_application)
+                assert exc.value.message == EmployeeRecord.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED
 
     def test_creation_without_approval(self):
-        with assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_APPLICATION_WITHOUT_APPROVAL):
+        with pytest.raises(ValidationError) as exc:
             job_application = JobApplicationWithoutApprovalFactory()
             EmployeeRecord.from_job_application(job_application)
+        assert exc.value.message == EmployeeRecord.ERROR_JOB_APPLICATION_WITHOUT_APPROVAL
 
     def test_creation_with_same_job_application(self):
         # Job application is duplicated (already existing with same approval and SIAE)
@@ -78,9 +80,10 @@ class TestEmployeeRecordModel:
         # Must be ok
         EmployeeRecord.from_job_application(job_application).save()
 
-        with assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE):
+        with pytest.raises(ValidationError) as exc:
             # Must not
             EmployeeRecord.from_job_application(job_application)
+        assert exc.value.message == EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE
 
     def test_creation_from_job_application(self):
         """
