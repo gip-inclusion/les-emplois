@@ -54,39 +54,43 @@ def resolve_insee_city(city_name, post_code):
     return None
 
 
-def geolocate_qs(qs, is_verbose=False):
+def geolocate_qs(qs, is_verbose=False, reliance_score=BAN_API_RELIANCE_SCORE):
     now = timezone.now()
 
     non_geolocated_qs = qs.filter(
-        Q(coords__isnull=True) | Q(geocoding_score__isnull=True) | Q(geocoding_score__lt=BAN_API_RELIANCE_SCORE)
+        Q(coords__isnull=True) | Q(geocoding_score__isnull=True) | Q(geocoding_score__lt=reliance_score)
     )
 
     if is_verbose:
         print(
             f"> about to geolocate count={non_geolocated_qs.count()} objects "
-            "without geolocation or with a low score."
+            f"without geolocation or with a lower score than {reliance_score}."
         )
 
     # Note : we could also order by latest geolocalization attempt. An order is necessary though
     # for the zip() to work correctly later.
-    localizable_qs = non_geolocated_qs.exclude(Q(address_line_1="") | Q(post_code="")).order_by("pk")
+    localizable_qs = non_geolocated_qs.exclude(Q(address_line_1="") | Q(post_code="") | Q(city="")).order_by("pk")
 
     if is_verbose:
-        print(f"> count={localizable_qs.count()} of these have an address and a post code.")
+        print(f"> count={localizable_qs.count()} of these have an address, a post code, and a city.")
 
     for obj, geo_result in zip(
-        localizable_qs, batch_geocode(localizable_qs.values("pk", "address_line_1", "post_code"))
+        localizable_qs, batch_geocode(localizable_qs.values("pk", "address_line_1", "post_code", "city"))
     ):
         score = float(geo_result["result_score"] or 0.0)
         if is_verbose:
             print(
                 f"API result score={geo_result['result_score'] or 0.0} "
                 f"label='{geo_result['result_label'] or 'unknown'}' "
-                f"searched_address='{obj.address_line_1} {obj.post_code}' object_pk={obj.pk}"
+                f"searched_address='{obj.address_line_1} {obj.post_code} {obj.city}' object_pk={obj.pk}"
             )
-        if score >= BAN_API_RELIANCE_SCORE:
+        if score >= reliance_score:
             if obj.geocoding_score and obj.geocoding_score > score:  # do not yield lower scores than the current
+                if is_verbose:
+                    print(f" > Ignore API result: {obj.geocoding_score=} > {score=}")
                 continue
+            if is_verbose:
+                print(f" > Update {obj.coords=!s} {obj.geocoding_score=} with API result")
             obj.coords = lat_lon_to_coords(geo_result["latitude"], geo_result["longitude"])
             obj.geocoding_score = score
             obj.ban_api_resolved_address = geo_result["result_label"]

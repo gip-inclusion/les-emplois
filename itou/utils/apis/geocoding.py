@@ -18,6 +18,7 @@ BATCH_GEOCODE_API_PARAMS = {
     "columns": [
         "address_line_1",
         "post_code",
+        "city",
     ],
     "result_columns": [
         "id",
