@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, Exists, OuterRef, Q
+from django.db.models import Count, Exists, F, OuterRef, Q
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
@@ -87,7 +87,17 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
     Detail of an application for a JOBSEEKER
     """
     job_application = get_object_or_404(
-        JobApplication.objects.select_related(
+        JobApplication.objects.annotate(
+            upcoming_participations_count=Count(
+                "job_seeker__rdvi_participations",
+                filter=Q(
+                    job_seeker__rdvi_participations__appointment__company=F("to_company"),
+                    job_seeker__rdvi_participations__status=Participation.Status.UNKNOWN,
+                    job_seeker__rdvi_participations__appointment__start_at__gt=timezone.now(),
+                ),
+            ),
+        )
+        .select_related(
             "job_seeker__jobseeker_profile",
             "sender",
             "to_company",
@@ -95,13 +105,19 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
             "eligibility_diagnosis__author_siae",
             "eligibility_diagnosis__author_prescriber_organization",
             "eligibility_diagnosis__job_seeker__jobseeker_profile",
-        ).prefetch_related(
+        )
+        .prefetch_related(
             "selected_jobs",
             "eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
             "geiq_eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
         ),
         id=job_application_id,
         job_seeker=request.user,
+    )
+    participations = (
+        job_application.job_seeker.rdvi_participations.filter(appointment__company=job_application.to_company)
+        .select_related("appointment", "appointment__location")
+        .order_by("-appointment__start_at")
     )
 
     transition_logs = job_application.logs.select_related("user").all()
@@ -134,6 +150,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "job_application": job_application,
+        "participations": participations,
         "transition_logs": transition_logs,
         "back_url": back_url,
         "matomo_custom_title": "Candidature",
@@ -328,6 +345,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "expired_eligibility_diagnosis": None,  # XXX: should we search for an expired diagnosis here ?
         "job_application": job_application,
+        "participations": [],
         "transition_logs": transition_logs,
         "back_url": back_url,
         "matomo_custom_title": "Candidature",
