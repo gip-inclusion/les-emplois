@@ -17,6 +17,7 @@
   "0 */6 * * * $ROOT/clevercloud/run_management_command.sh sync_s3_files",
 
   "1 0 * * * $ROOT/clevercloud/run_management_command.sh update_prescriber_organization_with_api_entreprise --verbosity 2",
+  "15 0 * * * $ROOT/clevercloud/run_management_command.sh certify_selected_administrative_criteria --wet-run",
   "30 0 * * * $ROOT/clevercloud/run_management_command.sh collect_analytics_data --save",
   "45 0 * * * $ROOT/clevercloud/run_management_command.sh import_advisor_information shared_bucket/imports-gps/export_gps.xlsx --wet-run",
   "30 1 * * * $ROOT/clevercloud/run_management_command.sh new_users_to_brevo --wet-run",
