@@ -76,7 +76,7 @@ class TestEligibilityDiagnosisManager:
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=self.job_seeker)
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=self.job_seeker)
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=self.job_seeker)
-        assert has_considered_valid
+        assert not has_considered_valid  # Valid PoleEmploiApproval are now ignored
         assert last_considered_valid is None
         assert last_expired is None
 

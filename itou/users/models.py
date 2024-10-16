@@ -511,10 +511,8 @@ class User(AbstractUser, AddressMixin):
         return self.latest_approval or self.latest_pe_approval
 
     @property
-    def has_valid_common_approval(self):
-        return (self.latest_approval and self.latest_approval.is_valid()) or (
-            self.latest_pe_approval and self.latest_pe_approval.is_valid()
-        )
+    def has_valid_approval(self):
+        return self.latest_approval and self.latest_approval.is_valid()
 
     @property
     def has_common_approval_in_waiting_period(self):

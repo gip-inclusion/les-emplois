@@ -1037,7 +1037,7 @@ class TestLatestApproval:
     def test_status_without_approval(self):
         user = JobSeekerFactory()
         assert user.has_no_common_approval
-        assert not user.has_valid_common_approval
+        assert not user.has_valid_approval
         assert not user.has_common_approval_in_waiting_period
         assert user.latest_approval is None
 
@@ -1045,14 +1045,14 @@ class TestLatestApproval:
         user = JobSeekerFactory()
         approval = ApprovalFactory(user=user, start_at=timezone.localdate() - relativedelta(days=1))
         assert not user.has_no_common_approval
-        assert user.has_valid_common_approval
+        assert user.has_valid_approval
         assert not user.has_common_approval_in_waiting_period
         assert user.latest_approval == approval
 
     def test_status_approval_in_waiting_period(self):
         user = user_with_approval_in_waiting_period()
         assert not user.has_no_common_approval
-        assert not user.has_valid_common_approval
+        assert not user.has_valid_approval
         assert user.has_common_approval_in_waiting_period
         assert user.latest_approval == user.latest_approval
 
@@ -1062,7 +1062,7 @@ class TestLatestApproval:
         start_at = end_at - relativedelta(years=2)
         ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         assert user.has_no_common_approval
-        assert not user.has_valid_common_approval
+        assert not user.has_valid_approval
         assert not user.has_common_approval_in_waiting_period
         assert user.latest_approval is None
 
@@ -1072,7 +1072,7 @@ class TestLatestApproval:
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.jobseeker_profile.birthdate
         )
         assert not user.has_no_common_approval
-        assert user.has_valid_common_approval
+        assert not user.has_valid_approval  # PoleEmploiFactory aren't checked anymore
         assert not user.has_common_approval_in_waiting_period
         assert user.latest_approval is None
         assert user.latest_pe_approval == pe_approval

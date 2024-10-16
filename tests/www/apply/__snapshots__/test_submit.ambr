@@ -292,7 +292,7 @@
       dict({
         'origin': list([
           'User.latest_approval[users/models.py]',
-          'User.has_valid_common_approval[users/models.py]',
+          'User.has_valid_approval[users/models.py]',
           'RelatedManager.has_considered_valid[eligibility/models/iae.py]',
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
@@ -321,50 +321,6 @@
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
           ORDER BY "approvals_approval"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
-          'User.latest_pe_approval[users/models.py]',
-          'User.has_valid_common_approval[users/models.py]',
-          'RelatedManager.has_considered_valid[eligibility/models/iae.py]',
-          'User.has_valid_diagnosis[users/models.py]',
-          'User.new_approval_blocked_by_waiting_period[users/models.py]',
-          '_check_job_seeker_approval[www/apply/views/submit_views.py]',
-          'hire_confirmation[www/apply/views/submit_views.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_poleemploiapproval"."id",
-                 "approvals_poleemploiapproval"."start_at",
-                 "approvals_poleemploiapproval"."end_at",
-                 "approvals_poleemploiapproval"."created_at",
-                 "approvals_poleemploiapproval"."pe_notification_status",
-                 "approvals_poleemploiapproval"."pe_notification_time",
-                 "approvals_poleemploiapproval"."pe_notification_endpoint",
-                 "approvals_poleemploiapproval"."pe_notification_exit_code",
-                 "approvals_poleemploiapproval"."pe_structure_code",
-                 "approvals_poleemploiapproval"."number",
-                 "approvals_poleemploiapproval"."pole_emploi_id",
-                 "approvals_poleemploiapproval"."first_name",
-                 "approvals_poleemploiapproval"."last_name",
-                 "approvals_poleemploiapproval"."birth_name",
-                 "approvals_poleemploiapproval"."birthdate",
-                 "approvals_poleemploiapproval"."nir",
-                 "approvals_poleemploiapproval"."ntt_nia",
-                 "approvals_poleemploiapproval"."siae_siret",
-                 "approvals_poleemploiapproval"."siae_kind"
-          FROM "approvals_poleemploiapproval"
-          WHERE (("approvals_poleemploiapproval"."nir" = %s
-                  OR ("approvals_poleemploiapproval"."birthdate" = %s
-                      AND "approvals_poleemploiapproval"."pole_emploi_id" = %s))
-                 AND NOT ("approvals_poleemploiapproval"."number" IN
-                            (SELECT U0."number"
-                             FROM "approvals_approval" U0
-                             WHERE U0."user_id" = %s)))
-          ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
-                   "approvals_poleemploiapproval"."start_at" ASC
-          LIMIT 1
         ''',
       }),
       dict({
@@ -496,6 +452,48 @@
                  AND "eligibility_eligibilitydiagnosis"."expires_at" > %s)
           ORDER BY 10 DESC,
                    "eligibility_eligibilitydiagnosis"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'User.latest_pe_approval[users/models.py]',
+          'User.has_common_approval_in_waiting_period[users/models.py]',
+          'User.new_approval_blocked_by_waiting_period[users/models.py]',
+          '_check_job_seeker_approval[www/apply/views/submit_views.py]',
+          'hire_confirmation[www/apply/views/submit_views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_poleemploiapproval"."id",
+                 "approvals_poleemploiapproval"."start_at",
+                 "approvals_poleemploiapproval"."end_at",
+                 "approvals_poleemploiapproval"."created_at",
+                 "approvals_poleemploiapproval"."pe_notification_status",
+                 "approvals_poleemploiapproval"."pe_notification_time",
+                 "approvals_poleemploiapproval"."pe_notification_endpoint",
+                 "approvals_poleemploiapproval"."pe_notification_exit_code",
+                 "approvals_poleemploiapproval"."pe_structure_code",
+                 "approvals_poleemploiapproval"."number",
+                 "approvals_poleemploiapproval"."pole_emploi_id",
+                 "approvals_poleemploiapproval"."first_name",
+                 "approvals_poleemploiapproval"."last_name",
+                 "approvals_poleemploiapproval"."birth_name",
+                 "approvals_poleemploiapproval"."birthdate",
+                 "approvals_poleemploiapproval"."nir",
+                 "approvals_poleemploiapproval"."ntt_nia",
+                 "approvals_poleemploiapproval"."siae_siret",
+                 "approvals_poleemploiapproval"."siae_kind"
+          FROM "approvals_poleemploiapproval"
+          WHERE (("approvals_poleemploiapproval"."nir" = %s
+                  OR ("approvals_poleemploiapproval"."birthdate" = %s
+                      AND "approvals_poleemploiapproval"."pole_emploi_id" = %s))
+                 AND NOT ("approvals_poleemploiapproval"."number" IN
+                            (SELECT U0."number"
+                             FROM "approvals_approval" U0
+                             WHERE U0."user_id" = %s)))
+          ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
+                   "approvals_poleemploiapproval"."start_at" ASC
           LIMIT 1
         ''',
       }),
