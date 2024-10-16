@@ -8,7 +8,12 @@ from itou.companies.enums import CompanyKind
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.companies.factories import CompanyFactory
 from tests.users.factories import EmployerFactory, ItouStaffFactory
-from tests.utils.test import BASE_NUM_QUERIES, get_rows_from_streaming_response, parse_response_to_soup
+from tests.utils.test import (
+    BASE_NUM_QUERIES,
+    assertSnapshotQueries,
+    get_rows_from_streaming_response,
+    parse_response_to_soup,
+)
 
 
 class TestCompanyAdmin:
@@ -16,19 +21,10 @@ class TestCompanyAdmin:
     @pytest.mark.ignore_unknown_variable_template_error("show_change_form_export")
     def test_display_for_new_company(self, admin_client, snapshot):
         """Does not search approvals with company IS NULL"""
-        with assertNumQueries(9):
-            # 1. SELECT django session
-            # 2. SELECT user
-            # 3. SAVEPOINT
-            # 4. SAVEPOINT
-            # 5. RELEASE SAVEPOINT
-            # 6. RELEASE SAVEPOINT
-            # 7. SAVEPOINT
-            # 8. UPDATE django session
-            # 9. RELEASE SAVEPOINT
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
             response = admin_client.get(reverse("admin:companies_company_add"))
         response = parse_response_to_soup(response, selector=".field-approvals_list")
-        assert str(response) == snapshot
+        assert str(response) == snapshot(name="approvals list")
 
     def test_deactivate_last_admin(self, admin_client):
         company = CompanyFactory(with_membership=True)

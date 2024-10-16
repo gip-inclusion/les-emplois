@@ -9,7 +9,7 @@ from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils import dateformat, timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertNumQueries, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.siae_evaluations import enums as evaluation_enums
@@ -35,7 +35,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import BASE_NUM_QUERIES, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 from tests.www.siae_evaluations_views.test_siaes_views import TestSiaeEvaluatedJobApplicationView
 
 
@@ -632,7 +632,7 @@ class TestInstitutionEvaluatedSiaeListView:
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
         assert str(state_div) == snapshot(name="to process state")
 
-    def test_num_queries(self, client):
+    def test_num_queries(self, client, snapshot):
         client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
@@ -644,14 +644,7 @@ class TestInstitutionEvaluatedSiaeListView:
             kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
         )
 
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # django session
-            + 2  # fetch user & its memberships (middleware)
-            + 1  # fetch evaluation campaign
-            + 3  # fetch evaluated_siae and its prefetch_related eval_job_app & eval_admin_crit
-            + 3  # savepoint, update session, release savepoint
-        ):
+        with assertSnapshotQueries(snapshot):
             response = client.get(url)
         assert response.status_code == 200
 
@@ -1728,7 +1721,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
         assertContains(response, "Phase contradictoire - En attente", html=True)
         assertNotContains(response, self.forced_negative_text, html=True)
 
-    def test_num_queries_in_view(self, client):
+    def test_num_queries_in_view(self, client, snapshot):
         client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
@@ -1741,14 +1734,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
 
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # django session
-            + 2  # fetch user & its memberships (middleware)
-            + 3  # fetch evaluated_siae, evaluated_jobapp & criteria
-            + 3  # fetch jobapplication, approvals & users
-            + 3  # savepoint, update session, release savepoint
-        ):
+        with assertSnapshotQueries(snapshot):
             response = client.get(url)
         assert response.status_code == 200
 
@@ -1957,7 +1943,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         assertContains(response, self.not_submitted, count=1)
 
     @freeze_time("2023-06-24 11:11:00")
-    def test_data_card_statistics_multiple_previous_campaigns_check_sanctions(self, client):
+    def test_data_card_statistics_multiple_previous_campaigns_check_sanctions(self, client, snapshot):
         company = CompanyFactory()
         previous_campaign_1 = EvaluationCampaignFactory(
             institution=self.institution,
@@ -1998,15 +1984,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         )
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae=company)
         self.login(client, evaluated_siae)
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # Load session
-            + 2  # Check user & its memberships
-            + 1  # Load evaluated siae infos
-            + 1  # Load evaluated job applications
-            + 3  # Load evaluated siae infos + job application + criteria for previous campaigns
-            + 3  # Update session
-        ):
+        with assertSnapshotQueries(snapshot):
             response = client.get(
                 reverse(
                     self.urlname,
@@ -3673,7 +3651,7 @@ class TestInstitutionEvaluatedJobApplicationView:
         # New explanation ignored.
         assert job_app.labor_inspector_explanation == ""
 
-    def test_num_queries_in_view(self, client):
+    def test_num_queries_in_view(self, client, snapshot):
         client.force_login(self.user)
         # fixme vincentporte : use EvaluatedAdministrativeCriteria instead
         evaluated_administrative_criteria = get_evaluated_administrative_criteria(self.institution)
@@ -3690,15 +3668,7 @@ class TestInstitutionEvaluatedJobApplicationView:
             "siae_evaluations_views:evaluated_job_application",
             kwargs={"evaluated_job_application_pk": evaluated_administrative_criteria.evaluated_job_application.pk},
         )
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # django session
-            + 2  # fetch user & its memberships (middleware)
-            + 3  # fetch evaluated_jobapp & criteria
-            + 3  # jobapp, approvals & users
-            + 2  # evaljobapp & its evalcriteria
-            + 3  # savepoint, update session, release savepoint
-        ):
+        with assertSnapshotQueries(snapshot):
             response = client.get(url)
         assert response.status_code == 200
 

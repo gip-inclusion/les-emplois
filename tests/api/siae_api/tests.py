@@ -4,14 +4,13 @@ from unittest.mock import patch
 
 import pytest
 from django.urls import reverse
-from pytest_django.asserts import assertNumQueries
 from rest_framework.test import APIClient
 
 from itou.api.models import DepartmentToken
 from itou.companies.enums import CompanyKind, ContractType
 from tests.cities.factories import create_city_guerande, create_city_saint_andre
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
-from tests.utils.test import BASE_NUM_QUERIES
+from tests.utils.test import assertSnapshotQueries
 
 from ..utils import _str_with_tz
 
@@ -32,13 +31,8 @@ class TestSiaeAPIFetchList:
             with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"), department="44", coords=self.saint_andre.coords
         )
 
-    def test_performances(self, api_client):
-        num_queries = BASE_NUM_QUERIES
-        num_queries += 1  # Get city with insee_code
-        num_queries += 1  # Count siaes
-        num_queries += 1  # Select sias
-        num_queries += 1  # prefetch job_description_through
-        with assertNumQueries(num_queries):
+    def test_performances(self, api_client, snapshot):
+        with assertSnapshotQueries(snapshot):
             query_params = {"code_insee": self.saint_andre.code_insee, "distance_max_km": 100}
             api_client.get(ENDPOINT_URL, query_params, format="json")
 

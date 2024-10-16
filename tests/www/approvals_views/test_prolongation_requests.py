@@ -7,7 +7,7 @@ from django.core.files.storage import default_storage
 from django.template import loader
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertMessages, assertNumQueries, assertRedirects
+from pytest_django.asserts import assertMessages, assertRedirects
 
 from itou.approvals.enums import (
     ProlongationReason,
@@ -20,7 +20,7 @@ from tests.approvals import factories as approvals_factories
 from tests.prescribers import factories as prescribers_factories
 from tests.users import factories as users_factories
 from tests.users.factories import EmployerFactory
-from tests.utils.test import BASE_NUM_QUERIES, assert_previous_step, parse_response_to_soup
+from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup
 
 
 @pytest.mark.parametrize(
@@ -41,18 +41,9 @@ def test_empty_list_view(snapshot, client):
     prescriber = prescribers_factories.PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
     client.force_login(prescriber)
 
-    num_queries = (
-        BASE_NUM_QUERIES
-        + 1  # fetch django session
-        + 1  # fetch user
-        + 1  # check user memberships
-        + 1  # count prolongation requests rows (from pager)
-        + 1  # `is_prescriber_with_authorized_org()` in nav
-        + 3  # savepoint, update session, release savepoint
-    )
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot(name="SQL queries")):
         response = client.get(reverse("approvals:prolongation_requests_list"))
-    assert str(parse_response_to_soup(response, ".s-section")) == snapshot
+    assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="prolongation requests list")
 
     assert_previous_step(response, reverse("dashboard:index"))
 
@@ -61,17 +52,7 @@ def test_list_view(snapshot, client):
     prolongation_request = approvals_factories.ProlongationRequestFactory(for_snapshot=True)
     client.force_login(prolongation_request.validated_by)
 
-    num_queries = (
-        BASE_NUM_QUERIES
-        + 1  # fetch django session
-        + 1  # fetch user
-        + 1  # check user memberships
-        + 1  # fetch prolongation requests rows
-        + 1  # count prolongation requests rows (from pager)
-        + 1  # `is_prescriber_with_authorized_org()` in nav
-        + 3  # savepoint, update session, release savepoint
-    )
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot(name="SQL queries")):
         response = client.get(reverse("approvals:prolongation_requests_list"))
     assert str(parse_response_to_soup(response, ".s-section")) == snapshot
 
@@ -83,7 +64,7 @@ def test_list_view_no_siae(snapshot, client):
     client.force_login(prolongation_request.validated_by)
 
     response = client.get(reverse("approvals:prolongation_requests_list"))
-    assert str(parse_response_to_soup(response, ".s-section")) == snapshot
+    assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="prolongation requests list")
 
 
 def test_list_view_only_pending_filter(client):

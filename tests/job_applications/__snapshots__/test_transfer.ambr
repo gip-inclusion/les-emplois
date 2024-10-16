@@ -1,0 +1,297 @@
+# serializer version: 1
+# name: test_model_fields
+  dict({
+    'num_queries': 14,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Company.has_member[common_apps/organizations/models.py]',
+          'JobApplication.can_be_transferred[job_applications/models.py]',
+          'JobApplication.transfer[job_applications/models.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+                    WHERE (U0."company_id" = %s
+                           AND U2."is_active"
+                           AND U0."is_active"))
+                 AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_member[common_apps/organizations/models.py]',
+          'JobApplication.can_be_transferred[job_applications/models.py]',
+          'JobApplication.transfer[job_applications/models.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+                    WHERE (U0."company_id" = %s
+                           AND U2."is_active"
+                           AND U0."is_active"))
+                 AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplication.save[<site-packages>/django/db/models/base.py]',
+          'JobApplication.transfer[job_applications/models.py]',
+        ]),
+        'sql': '''
+          UPDATE "job_applications_jobapplication"
+          SET "eligibility_diagnosis_id" = NULL
+          WHERE "job_applications_jobapplication"."id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplication.transfer[job_applications/models.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id"
+          FROM "job_applications_jobapplication"
+          WHERE "job_applications_jobapplication"."eligibility_diagnosis_id" IN (%s)
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplication.transfer[job_applications/models.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."eligibility_diagnosis_id" IN (%s)
+          ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplication.transfer[job_applications/models.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "eligibility_selectedadministrativecriteria"
+          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplication.transfer[job_applications/models.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "eligibility_eligibilitydiagnosis"
+          WHERE "eligibility_eligibilitydiagnosis"."id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplication.transfer[job_applications/models.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE "companies_companymembership"."id" IN
+              (SELECT U0."id"
+               FROM "companies_companymembership" U0
+               INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+               WHERE (U0."company_id" = %s
+                      AND U2."is_active"
+                      AND U0."is_active"))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplicationTransferredForEmployerNotification.should_send[communications/dispatch/base.py]',
+          'JobApplicationTransferredForEmployerNotification.send[communications/dispatch/email.py]',
+          'JobApplication.transfer[job_applications/models.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "communications_notificationsettings"
+          INNER JOIN "communications_disablednotification" ON ("communications_notificationsettings"."id" = "communications_disablednotification"."settings_id")
+          INNER JOIN "communications_notificationrecord" ON ("communications_disablednotification"."notification_record_id" = "communications_notificationrecord"."id")
+          WHERE ("communications_notificationsettings"."user_id" = %s
+                 AND "communications_notificationsettings"."structure_pk" = %s
+                 AND "communications_notificationsettings"."structure_type_id" = %s
+                 AND "communications_notificationrecord"."notification_class" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'JobApplicationTransferredForEmployerNotification.send[communications/dispatch/email.py]',
+          'JobApplication.transfer[job_applications/models.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplicationTransferredForJobSeekerNotification.should_send[communications/dispatch/base.py]',
+          'JobApplicationTransferredForJobSeekerNotification.send[communications/dispatch/email.py]',
+          'JobApplication.transfer[job_applications/models.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "communications_notificationsettings"
+          INNER JOIN "communications_disablednotification" ON ("communications_notificationsettings"."id" = "communications_disablednotification"."settings_id")
+          INNER JOIN "communications_notificationrecord" ON ("communications_disablednotification"."notification_record_id" = "communications_notificationrecord"."id")
+          WHERE ("communications_notificationsettings"."user_id" = %s
+                 AND "communications_notificationsettings"."structure_pk" IS NULL
+                 AND "communications_notificationsettings"."structure_type_id" IS NULL
+                 AND "communications_notificationrecord"."notification_class" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'JobApplicationTransferredForJobSeekerNotification.send[communications/dispatch/email.py]',
+          'JobApplication.transfer[job_applications/models.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplication.save[<site-packages>/django/db/models/base.py]',
+        ]),
+        'sql': '''
+          UPDATE "job_applications_jobapplication"
+          SET "job_seeker_id" = %s,
+              "eligibility_diagnosis_id" = NULL,
+              "geiq_eligibility_diagnosis_id" = NULL,
+              "create_employee_record" = %s,
+              "resume_link" = %s,
+              "sender_id" = %s,
+              "sender_kind" = %s,
+              "sender_company_id" = %s,
+              "sender_prescriber_organization_id" = NULL,
+              "to_company_id" = %s,
+              "state" = %s,
+              "archived_at" = NULL,
+              "archived_by_id" = NULL,
+              "hired_job_id" = NULL,
+              "message" = %s,
+              "answer" = %s,
+              "answer_to_prescriber" = %s,
+              "refusal_reason" = %s,
+              "refusal_reason_shared_with_job_seeker" = %s,
+              "hiring_start_at" = %s,
+              "hiring_end_at" = %s,
+              "hiring_without_approval" = %s,
+              "origin" = %s,
+              "approval_id" = NULL,
+              "approval_delivery_mode" = %s,
+              "approval_number_sent_by_email" = %s,
+              "approval_number_sent_at" = NULL,
+              "approval_manually_delivered_by_id" = NULL,
+              "approval_manually_refused_by_id" = NULL,
+              "approval_manually_refused_at" = NULL,
+              "transferred_at" = %s,
+              "transferred_by_id" = %s,
+              "transferred_from_id" = %s,
+              "created_at" = %s,
+              "updated_at" = %s,
+              "processed_at" = NULL,
+              "prehiring_guidance_days" = NULL,
+              "contract_type" = %s,
+              "nb_hours_per_week" = NULL,
+              "contract_type_details" = %s,
+              "qualification_type" = %s,
+              "qualification_level" = %s,
+              "planned_training_hours" = NULL,
+              "inverted_vae_contract" = NULL,
+              "diagoriente_invite_sent_at" = NULL
+          WHERE "job_applications_jobapplication"."id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplicationTransitionLog.save[<site-packages>/django/db/models/base.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "job_applications_jobapplicationtransitionlog" ("transition",
+                                                                      "from_state",
+                                                                      "to_state",
+                                                                      "timestamp",
+                                                                      "job_application_id",
+                                                                      "user_id",
+                                                                      "target_company_id")
+          VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING "job_applications_jobapplicationtransitionlog"."id"
+        ''',
+      }),
+    ]),
+  })
+# ---

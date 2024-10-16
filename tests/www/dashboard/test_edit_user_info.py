@@ -6,7 +6,7 @@ from django.contrib.gis.geos import Point
 from django.test import override_settings
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertFormError, assertNotContains, assertNumQueries, assertRedirects
+from pytest_django.asserts import assertContains, assertFormError, assertNotContains, assertRedirects
 
 from itou.cities.models import City
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title
@@ -17,7 +17,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     PrescriberFactory,
 )
-from tests.utils.test import BASE_NUM_QUERIES, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 from tests.www.dashboard.test_edit_job_seeker_info import DISABLED_NIR
 
 
@@ -69,18 +69,11 @@ class TestEditUserInfoView:
 
     @override_settings(TALLY_URL="https://tally.so")
     @freeze_time("2023-03-10")
-    def test_edit_with_nir(self, client, mocker):
+    def test_edit_with_nir(self, client, mocker, snapshot):
         user = JobSeekerFactory(jobseeker_profile__nir="178122978200508")
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # session
-            + 1  # user
-            + 1  # jobseeker_profile
-            + 1  # external_data_externaldataimport (extra_data)
-            + 3  # update session with savepoint & release
-        ):
+        with assertSnapshotQueries(snapshot):
             response = client.get(url)
         # There's a specific view to edit the email so we don't show it here
         assertNotContains(response, self.EMAIL_LABEL)

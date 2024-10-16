@@ -1,5 +1,254 @@
 # serializer version: 1
-# name: TestExportCTA.test_export
+# name: TestExportCTA.test_export.1
+  dict({
+    'num_queries': 6,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'content[www/itou_staff_views/views.py]',
+          '<genexpr>[www/itou_staff_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id",
+                 "companies_companymembership"."notifications",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."rdv_solidarites_id"
+          FROM "companies_companymembership"
+          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+          INNER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
+          WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active")
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'content[www/itou_staff_views/views.py]',
+          '<genexpr>[www/itou_staff_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."is_head_office",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."is_authorized",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active")
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+    ]),
+  })
+# ---
+# name: TestExportCTA.test_export[streaming content]
   '''
   Utilisateur - type,Structure - type,Structure - nom,Structure - SIRET,Structure - adresse ligne 1,Structure - adresse ligne 2,Structure - code postal,Structure - ville,Structure - département,Structure - région,Utilisateur - prénom,Utilisateur - nom,Utilisateur - e-mail,Administrateur ?,Utilisateur - date d'inscription
   Employeur,EI,ACME Inc.,012345678910,112 rue de la Croix-Nivert,,75015,Paris,75,Île-de-France,John,Doe,john.doe@test.local,Oui,17-05-2024
@@ -7,26 +256,2154 @@
   
   '''
 # ---
-# name: TestExportJobApplications.test_export[after]
+# name: TestExportJobApplications.test_export[after].1
+  dict({
+    'num_queries': 5,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'content[www/itou_staff_views/views.py]',
+          '<genexpr>[www/itou_staff_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id",
+                 "job_applications_jobapplication"."job_seeker_id",
+                 "job_applications_jobapplication"."eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."create_employee_record",
+                 "job_applications_jobapplication"."resume_link",
+                 "job_applications_jobapplication"."sender_id",
+                 "job_applications_jobapplication"."sender_kind",
+                 "job_applications_jobapplication"."sender_company_id",
+                 "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."to_company_id",
+                 "job_applications_jobapplication"."state",
+                 "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."archived_by_id",
+                 "job_applications_jobapplication"."hired_job_id",
+                 "job_applications_jobapplication"."message",
+                 "job_applications_jobapplication"."answer",
+                 "job_applications_jobapplication"."answer_to_prescriber",
+                 "job_applications_jobapplication"."refusal_reason",
+                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
+                 "job_applications_jobapplication"."hiring_start_at",
+                 "job_applications_jobapplication"."hiring_end_at",
+                 "job_applications_jobapplication"."hiring_without_approval",
+                 "job_applications_jobapplication"."origin",
+                 "job_applications_jobapplication"."approval_id",
+                 "job_applications_jobapplication"."approval_delivery_mode",
+                 "job_applications_jobapplication"."approval_number_sent_by_email",
+                 "job_applications_jobapplication"."approval_number_sent_at",
+                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_at",
+                 "job_applications_jobapplication"."transferred_at",
+                 "job_applications_jobapplication"."transferred_by_id",
+                 "job_applications_jobapplication"."transferred_from_id",
+                 "job_applications_jobapplication"."created_at",
+                 "job_applications_jobapplication"."updated_at",
+                 "job_applications_jobapplication"."processed_at",
+                 "job_applications_jobapplication"."prehiring_guidance_days",
+                 "job_applications_jobapplication"."contract_type",
+                 "job_applications_jobapplication"."nb_hours_per_week",
+                 "job_applications_jobapplication"."contract_type_details",
+                 "job_applications_jobapplication"."qualification_type",
+                 "job_applications_jobapplication"."qualification_level",
+                 "job_applications_jobapplication"."planned_training_hours",
+                 "job_applications_jobapplication"."inverted_vae_contract",
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "cities_city"."id",
+                 "cities_city"."name",
+                 "cities_city"."slug",
+                 "cities_city"."department",
+                 "cities_city"."post_codes",
+                 "cities_city"."code_insee",
+                 "cities_city"."coords",
+                 "cities_city"."edition_mode",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."ata_allocation_since",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id",
+                 T6."id",
+                 T6."password",
+                 T6."last_login",
+                 T6."is_superuser",
+                 T6."username",
+                 T6."first_name",
+                 T6."last_name",
+                 T6."is_staff",
+                 T6."is_active",
+                 T6."date_joined",
+                 T6."address_line_1",
+                 T6."address_line_2",
+                 T6."post_code",
+                 T6."city",
+                 T6."department",
+                 T6."coords",
+                 T6."geocoding_score",
+                 T6."geocoding_updated_at",
+                 T6."ban_api_resolved_address",
+                 T6."insee_city_id",
+                 T6."title",
+                 T6."email",
+                 T6."phone",
+                 T6."kind",
+                 T6."identity_provider",
+                 T6."has_completed_welcoming_tour",
+                 T6."created_by_id",
+                 T6."external_data_source_history",
+                 T6."last_checked_at",
+                 T6."public_id",
+                 T6."address_filled_at",
+                 T6."first_login",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."rdv_solidarites_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."is_head_office",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."is_authorized",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 T9."id",
+                 T9."address_line_1",
+                 T9."address_line_2",
+                 T9."post_code",
+                 T9."city",
+                 T9."department",
+                 T9."coords",
+                 T9."geocoding_score",
+                 T9."geocoding_updated_at",
+                 T9."ban_api_resolved_address",
+                 T9."insee_city_id",
+                 T9."name",
+                 T9."created_at",
+                 T9."updated_at",
+                 T9."uid",
+                 T9."active_members_email_reminder_last_sent_at",
+                 T9."siret",
+                 T9."naf",
+                 T9."kind",
+                 T9."brand",
+                 T9."phone",
+                 T9."email",
+                 T9."auth_email",
+                 T9."website",
+                 T9."description",
+                 T9."provided_support",
+                 T9."source",
+                 T9."created_by_id",
+                 T9."block_job_applications",
+                 T9."job_applications_blocked_at",
+                 T9."convention_id",
+                 T9."job_app_score",
+                 T9."rdv_solidarites_id",
+                 "companies_jobdescription"."id",
+                 "companies_jobdescription"."appellation_id",
+                 "companies_jobdescription"."company_id",
+                 "companies_jobdescription"."created_at",
+                 "companies_jobdescription"."updated_at",
+                 "companies_jobdescription"."is_active",
+                 "companies_jobdescription"."custom_name",
+                 "companies_jobdescription"."description",
+                 "companies_jobdescription"."ui_rank",
+                 "companies_jobdescription"."contract_type",
+                 "companies_jobdescription"."other_contract_type",
+                 "companies_jobdescription"."contract_nature",
+                 "companies_jobdescription"."location_id",
+                 "companies_jobdescription"."hours_per_week",
+                 "companies_jobdescription"."open_positions",
+                 "companies_jobdescription"."profile_description",
+                 "companies_jobdescription"."is_resume_mandatory",
+                 "companies_jobdescription"."is_qpv_mandatory",
+                 "companies_jobdescription"."market_context_description",
+                 "companies_jobdescription"."source_id",
+                 "companies_jobdescription"."source_kind",
+                 "companies_jobdescription"."source_url",
+                 "companies_jobdescription"."field_history",
+                 "companies_jobdescription"."creation_source",
+                 "jobs_appellation"."updated_at",
+                 "jobs_appellation"."code",
+                 "jobs_appellation"."name",
+                 "jobs_appellation"."rome_id",
+                 "jobs_appellation"."full_text",
+                 "jobs_rome"."updated_at",
+                 "jobs_rome"."code",
+                 "jobs_rome"."name",
+                 T13."id",
+                 T13."name",
+                 T13."slug",
+                 T13."department",
+                 T13."post_codes",
+                 T13."code_insee",
+                 T13."coords",
+                 T13."edition_mode",
+                 "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind"
+          FROM "job_applications_jobapplication"
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
+          INNER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+          LEFT OUTER JOIN "cities_city" ON ("users_user"."insee_city_id" = "cities_city"."id")
+          LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
+          LEFT OUTER JOIN "users_user" T6 ON ("job_applications_jobapplication"."sender_id" = T6."id")
+          LEFT OUTER JOIN "companies_company" ON ("job_applications_jobapplication"."sender_company_id" = "companies_company"."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          INNER JOIN "companies_company" T9 ON ("job_applications_jobapplication"."to_company_id" = T9."id")
+          LEFT OUTER JOIN "companies_jobdescription" ON ("job_applications_jobapplication"."hired_job_id" = "companies_jobdescription"."id")
+          LEFT OUTER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
+          LEFT OUTER JOIN "jobs_rome" ON ("jobs_appellation"."rome_id" = "jobs_rome"."code")
+          LEFT OUTER JOIN "cities_city" T13 ON ("companies_jobdescription"."location_id" = T13."id")
+          LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
+          WHERE (("users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s)
+                 AND "users_user"."date_joined" >= %s
+                 AND "users_user"."date_joined" < %s
+                 AND "users_jobseekerprofile"."pe_last_certification_attempt_at" IS NOT NULL
+                 AND "users_jobseekerprofile"."pe_obfuscated_nir" IS NULL)
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+    ]),
+  })
+# ---
+# name: TestExportJobApplications.test_export[after][streaming content]
   '''
   job_seeker_title,job_seeker_first_name,job_seeker_last_name,job_seeker_nir,job_seeker_france_travail_id,job_seeker_ft_obfuscated_nir,job_seeker_date_joined,job_seeker_birth_date,job_seeker_birth_municipality,job_seeker_birth_country,job_seeker_email,job_seeker_phone,job_seeker_identity_provider,job_seeker_created_by,job_seeker_address1_line_1,job_seeker_address1_line_2,job_seeker_address1_post_code,job_seeker_address1_city,job_seeker_address1_city_code_insee,job_seeker_address1_coords,job_seeker_address1_geocoding_score,job_seeker_address1_BAN_API_address,job_seeker_address2_lane_number,job_seeker_address2_non_std_extension,job_seeker_address2_lane_type,job_seeker_address2_lane_name,job_seeker_address2_additional_address,job_seeker_address2_post_code,job_seeker_address2_municipality,job_seeker_education_level,job_seeker_resourceless,job_seeker_rqth,job_seeker_oeth,job_seeker_france_travail_since,job_seeker_unemployed_since,job_seeker_has_rsa_allocation,job_seeker_rsa_allocation_since,job_seeker_has_ass_allocation,job_seeker_ass_allocation_since,job_seeker_has_aah_allocation,job_seeker_aah_allocation_since,job_seeker_ata_allocation_since,application_eligibility_diagnosis_author_kind,application_eligibility_diagnosis_author_siae_kind,application_eligibility_diagnosis_author_siae_siret,application_eligibility_diagnosis_author_siae_naf,application_eligibility_diagnosis_author_siae_name,application_eligibility_diagnosis_author_prescriber_organization_siret,application_eligibility_diagnosis_author_prescriber_organization_kind,application_eligibility_diagnosis_author_prescriber_organization_is_habilitated,application_eligibility_diagnosis_author_prescriber_organization_code_safir,application_eligibility_diagnosis_expires_at,application_eligibility_diagnosis_administrative_criteria,application_to_company_kind,application_to_company_siret,application_to_company_naf,application_to_company_name,sender,sender_company_kind,sender_company_siret,sender_company_naf,sender_company_name,sender_prescriber_organization_siret,sender_prescriber_organization_kind,sender_prescriber_organization_is_habilitated,sender_prescriber_organization_code_safir,selected_jobs,hired_for_job_name,hired_for_job_appellation_code,hired_for_job_appellation_name,hired_for_job_ROME_code,hired_for_job_ROME_name,hired_for_job_contract_type,hired_for_job_contract_nature,hired_for_job_location,hired_for_job_location_hours_per_week,hiring_start_at,hiring_end_at,contract_type,contract_type_details,nb_hours_per_week,qualification_type,qualification_level,planned_training_hours,inverted_vae_contract,PASS_IAE_number,PASS_IAE_start_at,PASS_IAE_end_at,PASS_IAE_prolongations,PASS_IAE_suspensions
   
   '''
 # ---
-# name: TestExportJobApplications.test_export[before]
+# name: TestExportJobApplications.test_export[before].1
+  dict({
+    'num_queries': 5,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'content[www/itou_staff_views/views.py]',
+          '<genexpr>[www/itou_staff_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id",
+                 "job_applications_jobapplication"."job_seeker_id",
+                 "job_applications_jobapplication"."eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."create_employee_record",
+                 "job_applications_jobapplication"."resume_link",
+                 "job_applications_jobapplication"."sender_id",
+                 "job_applications_jobapplication"."sender_kind",
+                 "job_applications_jobapplication"."sender_company_id",
+                 "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."to_company_id",
+                 "job_applications_jobapplication"."state",
+                 "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."archived_by_id",
+                 "job_applications_jobapplication"."hired_job_id",
+                 "job_applications_jobapplication"."message",
+                 "job_applications_jobapplication"."answer",
+                 "job_applications_jobapplication"."answer_to_prescriber",
+                 "job_applications_jobapplication"."refusal_reason",
+                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
+                 "job_applications_jobapplication"."hiring_start_at",
+                 "job_applications_jobapplication"."hiring_end_at",
+                 "job_applications_jobapplication"."hiring_without_approval",
+                 "job_applications_jobapplication"."origin",
+                 "job_applications_jobapplication"."approval_id",
+                 "job_applications_jobapplication"."approval_delivery_mode",
+                 "job_applications_jobapplication"."approval_number_sent_by_email",
+                 "job_applications_jobapplication"."approval_number_sent_at",
+                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_at",
+                 "job_applications_jobapplication"."transferred_at",
+                 "job_applications_jobapplication"."transferred_by_id",
+                 "job_applications_jobapplication"."transferred_from_id",
+                 "job_applications_jobapplication"."created_at",
+                 "job_applications_jobapplication"."updated_at",
+                 "job_applications_jobapplication"."processed_at",
+                 "job_applications_jobapplication"."prehiring_guidance_days",
+                 "job_applications_jobapplication"."contract_type",
+                 "job_applications_jobapplication"."nb_hours_per_week",
+                 "job_applications_jobapplication"."contract_type_details",
+                 "job_applications_jobapplication"."qualification_type",
+                 "job_applications_jobapplication"."qualification_level",
+                 "job_applications_jobapplication"."planned_training_hours",
+                 "job_applications_jobapplication"."inverted_vae_contract",
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "cities_city"."id",
+                 "cities_city"."name",
+                 "cities_city"."slug",
+                 "cities_city"."department",
+                 "cities_city"."post_codes",
+                 "cities_city"."code_insee",
+                 "cities_city"."coords",
+                 "cities_city"."edition_mode",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."ata_allocation_since",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id",
+                 T6."id",
+                 T6."password",
+                 T6."last_login",
+                 T6."is_superuser",
+                 T6."username",
+                 T6."first_name",
+                 T6."last_name",
+                 T6."is_staff",
+                 T6."is_active",
+                 T6."date_joined",
+                 T6."address_line_1",
+                 T6."address_line_2",
+                 T6."post_code",
+                 T6."city",
+                 T6."department",
+                 T6."coords",
+                 T6."geocoding_score",
+                 T6."geocoding_updated_at",
+                 T6."ban_api_resolved_address",
+                 T6."insee_city_id",
+                 T6."title",
+                 T6."email",
+                 T6."phone",
+                 T6."kind",
+                 T6."identity_provider",
+                 T6."has_completed_welcoming_tour",
+                 T6."created_by_id",
+                 T6."external_data_source_history",
+                 T6."last_checked_at",
+                 T6."public_id",
+                 T6."address_filled_at",
+                 T6."first_login",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."rdv_solidarites_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."is_head_office",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."is_authorized",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 T9."id",
+                 T9."address_line_1",
+                 T9."address_line_2",
+                 T9."post_code",
+                 T9."city",
+                 T9."department",
+                 T9."coords",
+                 T9."geocoding_score",
+                 T9."geocoding_updated_at",
+                 T9."ban_api_resolved_address",
+                 T9."insee_city_id",
+                 T9."name",
+                 T9."created_at",
+                 T9."updated_at",
+                 T9."uid",
+                 T9."active_members_email_reminder_last_sent_at",
+                 T9."siret",
+                 T9."naf",
+                 T9."kind",
+                 T9."brand",
+                 T9."phone",
+                 T9."email",
+                 T9."auth_email",
+                 T9."website",
+                 T9."description",
+                 T9."provided_support",
+                 T9."source",
+                 T9."created_by_id",
+                 T9."block_job_applications",
+                 T9."job_applications_blocked_at",
+                 T9."convention_id",
+                 T9."job_app_score",
+                 T9."rdv_solidarites_id",
+                 "companies_jobdescription"."id",
+                 "companies_jobdescription"."appellation_id",
+                 "companies_jobdescription"."company_id",
+                 "companies_jobdescription"."created_at",
+                 "companies_jobdescription"."updated_at",
+                 "companies_jobdescription"."is_active",
+                 "companies_jobdescription"."custom_name",
+                 "companies_jobdescription"."description",
+                 "companies_jobdescription"."ui_rank",
+                 "companies_jobdescription"."contract_type",
+                 "companies_jobdescription"."other_contract_type",
+                 "companies_jobdescription"."contract_nature",
+                 "companies_jobdescription"."location_id",
+                 "companies_jobdescription"."hours_per_week",
+                 "companies_jobdescription"."open_positions",
+                 "companies_jobdescription"."profile_description",
+                 "companies_jobdescription"."is_resume_mandatory",
+                 "companies_jobdescription"."is_qpv_mandatory",
+                 "companies_jobdescription"."market_context_description",
+                 "companies_jobdescription"."source_id",
+                 "companies_jobdescription"."source_kind",
+                 "companies_jobdescription"."source_url",
+                 "companies_jobdescription"."field_history",
+                 "companies_jobdescription"."creation_source",
+                 "jobs_appellation"."updated_at",
+                 "jobs_appellation"."code",
+                 "jobs_appellation"."name",
+                 "jobs_appellation"."rome_id",
+                 "jobs_appellation"."full_text",
+                 "jobs_rome"."updated_at",
+                 "jobs_rome"."code",
+                 "jobs_rome"."name",
+                 T13."id",
+                 T13."name",
+                 T13."slug",
+                 T13."department",
+                 T13."post_codes",
+                 T13."code_insee",
+                 T13."coords",
+                 T13."edition_mode",
+                 "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind"
+          FROM "job_applications_jobapplication"
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
+          INNER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+          LEFT OUTER JOIN "cities_city" ON ("users_user"."insee_city_id" = "cities_city"."id")
+          LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
+          LEFT OUTER JOIN "users_user" T6 ON ("job_applications_jobapplication"."sender_id" = T6."id")
+          LEFT OUTER JOIN "companies_company" ON ("job_applications_jobapplication"."sender_company_id" = "companies_company"."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          INNER JOIN "companies_company" T9 ON ("job_applications_jobapplication"."to_company_id" = T9."id")
+          LEFT OUTER JOIN "companies_jobdescription" ON ("job_applications_jobapplication"."hired_job_id" = "companies_jobdescription"."id")
+          LEFT OUTER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
+          LEFT OUTER JOIN "jobs_rome" ON ("jobs_appellation"."rome_id" = "jobs_rome"."code")
+          LEFT OUTER JOIN "cities_city" T13 ON ("companies_jobdescription"."location_id" = T13."id")
+          LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
+          WHERE (("users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s)
+                 AND "users_user"."date_joined" >= %s
+                 AND "users_user"."date_joined" < %s
+                 AND "users_jobseekerprofile"."pe_last_certification_attempt_at" IS NOT NULL
+                 AND "users_jobseekerprofile"."pe_obfuscated_nir" IS NULL)
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+    ]),
+  })
+# ---
+# name: TestExportJobApplications.test_export[before][streaming content]
   '''
   job_seeker_title,job_seeker_first_name,job_seeker_last_name,job_seeker_nir,job_seeker_france_travail_id,job_seeker_ft_obfuscated_nir,job_seeker_date_joined,job_seeker_birth_date,job_seeker_birth_municipality,job_seeker_birth_country,job_seeker_email,job_seeker_phone,job_seeker_identity_provider,job_seeker_created_by,job_seeker_address1_line_1,job_seeker_address1_line_2,job_seeker_address1_post_code,job_seeker_address1_city,job_seeker_address1_city_code_insee,job_seeker_address1_coords,job_seeker_address1_geocoding_score,job_seeker_address1_BAN_API_address,job_seeker_address2_lane_number,job_seeker_address2_non_std_extension,job_seeker_address2_lane_type,job_seeker_address2_lane_name,job_seeker_address2_additional_address,job_seeker_address2_post_code,job_seeker_address2_municipality,job_seeker_education_level,job_seeker_resourceless,job_seeker_rqth,job_seeker_oeth,job_seeker_france_travail_since,job_seeker_unemployed_since,job_seeker_has_rsa_allocation,job_seeker_rsa_allocation_since,job_seeker_has_ass_allocation,job_seeker_ass_allocation_since,job_seeker_has_aah_allocation,job_seeker_aah_allocation_since,job_seeker_ata_allocation_since,application_eligibility_diagnosis_author_kind,application_eligibility_diagnosis_author_siae_kind,application_eligibility_diagnosis_author_siae_siret,application_eligibility_diagnosis_author_siae_naf,application_eligibility_diagnosis_author_siae_name,application_eligibility_diagnosis_author_prescriber_organization_siret,application_eligibility_diagnosis_author_prescriber_organization_kind,application_eligibility_diagnosis_author_prescriber_organization_is_habilitated,application_eligibility_diagnosis_author_prescriber_organization_code_safir,application_eligibility_diagnosis_expires_at,application_eligibility_diagnosis_administrative_criteria,application_to_company_kind,application_to_company_siret,application_to_company_naf,application_to_company_name,sender,sender_company_kind,sender_company_siret,sender_company_naf,sender_company_name,sender_prescriber_organization_siret,sender_prescriber_organization_kind,sender_prescriber_organization_is_habilitated,sender_prescriber_organization_code_safir,selected_jobs,hired_for_job_name,hired_for_job_appellation_code,hired_for_job_appellation_name,hired_for_job_ROME_code,hired_for_job_ROME_name,hired_for_job_contract_type,hired_for_job_contract_nature,hired_for_job_location,hired_for_job_location_hours_per_week,hiring_start_at,hiring_end_at,contract_type,contract_type_details,nb_hours_per_week,qualification_type,qualification_level,planned_training_hours,inverted_vae_contract,PASS_IAE_number,PASS_IAE_start_at,PASS_IAE_end_at,PASS_IAE_prolongations,PASS_IAE_suspensions
   
   '''
 # ---
-# name: TestExportJobApplications.test_export[contains]
+# name: TestExportJobApplications.test_export[contains].1
+  dict({
+    'num_queries': 10,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'content[www/itou_staff_views/views.py]',
+          '<genexpr>[www/itou_staff_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id",
+                 "job_applications_jobapplication"."job_seeker_id",
+                 "job_applications_jobapplication"."eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."create_employee_record",
+                 "job_applications_jobapplication"."resume_link",
+                 "job_applications_jobapplication"."sender_id",
+                 "job_applications_jobapplication"."sender_kind",
+                 "job_applications_jobapplication"."sender_company_id",
+                 "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."to_company_id",
+                 "job_applications_jobapplication"."state",
+                 "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."archived_by_id",
+                 "job_applications_jobapplication"."hired_job_id",
+                 "job_applications_jobapplication"."message",
+                 "job_applications_jobapplication"."answer",
+                 "job_applications_jobapplication"."answer_to_prescriber",
+                 "job_applications_jobapplication"."refusal_reason",
+                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
+                 "job_applications_jobapplication"."hiring_start_at",
+                 "job_applications_jobapplication"."hiring_end_at",
+                 "job_applications_jobapplication"."hiring_without_approval",
+                 "job_applications_jobapplication"."origin",
+                 "job_applications_jobapplication"."approval_id",
+                 "job_applications_jobapplication"."approval_delivery_mode",
+                 "job_applications_jobapplication"."approval_number_sent_by_email",
+                 "job_applications_jobapplication"."approval_number_sent_at",
+                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_at",
+                 "job_applications_jobapplication"."transferred_at",
+                 "job_applications_jobapplication"."transferred_by_id",
+                 "job_applications_jobapplication"."transferred_from_id",
+                 "job_applications_jobapplication"."created_at",
+                 "job_applications_jobapplication"."updated_at",
+                 "job_applications_jobapplication"."processed_at",
+                 "job_applications_jobapplication"."prehiring_guidance_days",
+                 "job_applications_jobapplication"."contract_type",
+                 "job_applications_jobapplication"."nb_hours_per_week",
+                 "job_applications_jobapplication"."contract_type_details",
+                 "job_applications_jobapplication"."qualification_type",
+                 "job_applications_jobapplication"."qualification_level",
+                 "job_applications_jobapplication"."planned_training_hours",
+                 "job_applications_jobapplication"."inverted_vae_contract",
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "cities_city"."id",
+                 "cities_city"."name",
+                 "cities_city"."slug",
+                 "cities_city"."department",
+                 "cities_city"."post_codes",
+                 "cities_city"."code_insee",
+                 "cities_city"."coords",
+                 "cities_city"."edition_mode",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."ata_allocation_since",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id",
+                 T6."id",
+                 T6."password",
+                 T6."last_login",
+                 T6."is_superuser",
+                 T6."username",
+                 T6."first_name",
+                 T6."last_name",
+                 T6."is_staff",
+                 T6."is_active",
+                 T6."date_joined",
+                 T6."address_line_1",
+                 T6."address_line_2",
+                 T6."post_code",
+                 T6."city",
+                 T6."department",
+                 T6."coords",
+                 T6."geocoding_score",
+                 T6."geocoding_updated_at",
+                 T6."ban_api_resolved_address",
+                 T6."insee_city_id",
+                 T6."title",
+                 T6."email",
+                 T6."phone",
+                 T6."kind",
+                 T6."identity_provider",
+                 T6."has_completed_welcoming_tour",
+                 T6."created_by_id",
+                 T6."external_data_source_history",
+                 T6."last_checked_at",
+                 T6."public_id",
+                 T6."address_filled_at",
+                 T6."first_login",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."rdv_solidarites_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."is_head_office",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."is_authorized",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 T9."id",
+                 T9."address_line_1",
+                 T9."address_line_2",
+                 T9."post_code",
+                 T9."city",
+                 T9."department",
+                 T9."coords",
+                 T9."geocoding_score",
+                 T9."geocoding_updated_at",
+                 T9."ban_api_resolved_address",
+                 T9."insee_city_id",
+                 T9."name",
+                 T9."created_at",
+                 T9."updated_at",
+                 T9."uid",
+                 T9."active_members_email_reminder_last_sent_at",
+                 T9."siret",
+                 T9."naf",
+                 T9."kind",
+                 T9."brand",
+                 T9."phone",
+                 T9."email",
+                 T9."auth_email",
+                 T9."website",
+                 T9."description",
+                 T9."provided_support",
+                 T9."source",
+                 T9."created_by_id",
+                 T9."block_job_applications",
+                 T9."job_applications_blocked_at",
+                 T9."convention_id",
+                 T9."job_app_score",
+                 T9."rdv_solidarites_id",
+                 "companies_jobdescription"."id",
+                 "companies_jobdescription"."appellation_id",
+                 "companies_jobdescription"."company_id",
+                 "companies_jobdescription"."created_at",
+                 "companies_jobdescription"."updated_at",
+                 "companies_jobdescription"."is_active",
+                 "companies_jobdescription"."custom_name",
+                 "companies_jobdescription"."description",
+                 "companies_jobdescription"."ui_rank",
+                 "companies_jobdescription"."contract_type",
+                 "companies_jobdescription"."other_contract_type",
+                 "companies_jobdescription"."contract_nature",
+                 "companies_jobdescription"."location_id",
+                 "companies_jobdescription"."hours_per_week",
+                 "companies_jobdescription"."open_positions",
+                 "companies_jobdescription"."profile_description",
+                 "companies_jobdescription"."is_resume_mandatory",
+                 "companies_jobdescription"."is_qpv_mandatory",
+                 "companies_jobdescription"."market_context_description",
+                 "companies_jobdescription"."source_id",
+                 "companies_jobdescription"."source_kind",
+                 "companies_jobdescription"."source_url",
+                 "companies_jobdescription"."field_history",
+                 "companies_jobdescription"."creation_source",
+                 "jobs_appellation"."updated_at",
+                 "jobs_appellation"."code",
+                 "jobs_appellation"."name",
+                 "jobs_appellation"."rome_id",
+                 "jobs_appellation"."full_text",
+                 "jobs_rome"."updated_at",
+                 "jobs_rome"."code",
+                 "jobs_rome"."name",
+                 T13."id",
+                 T13."name",
+                 T13."slug",
+                 T13."department",
+                 T13."post_codes",
+                 T13."code_insee",
+                 T13."coords",
+                 T13."edition_mode",
+                 "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind"
+          FROM "job_applications_jobapplication"
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
+          INNER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+          LEFT OUTER JOIN "cities_city" ON ("users_user"."insee_city_id" = "cities_city"."id")
+          LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
+          LEFT OUTER JOIN "users_user" T6 ON ("job_applications_jobapplication"."sender_id" = T6."id")
+          LEFT OUTER JOIN "companies_company" ON ("job_applications_jobapplication"."sender_company_id" = "companies_company"."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          INNER JOIN "companies_company" T9 ON ("job_applications_jobapplication"."to_company_id" = T9."id")
+          LEFT OUTER JOIN "companies_jobdescription" ON ("job_applications_jobapplication"."hired_job_id" = "companies_jobdescription"."id")
+          LEFT OUTER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
+          LEFT OUTER JOIN "jobs_rome" ON ("jobs_appellation"."rome_id" = "jobs_rome"."code")
+          LEFT OUTER JOIN "cities_city" T13 ON ("companies_jobdescription"."location_id" = T13."id")
+          LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
+          WHERE (("users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s
+                  OR "users_user"."department" = %s
+                  OR "users_jobseekerprofile"."hexa_post_code"::text LIKE %s)
+                 AND "users_user"."date_joined" >= %s
+                 AND "users_user"."date_joined" < %s
+                 AND "users_jobseekerprofile"."pe_last_certification_attempt_at" IS NOT NULL
+                 AND "users_jobseekerprofile"."pe_obfuscated_nir" IS NULL)
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'content[www/itou_staff_views/views.py]',
+          '<genexpr>[www/itou_staff_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
+                 "companies_jobdescription"."id",
+                 "companies_jobdescription"."appellation_id",
+                 "companies_jobdescription"."company_id",
+                 "companies_jobdescription"."created_at",
+                 "companies_jobdescription"."updated_at",
+                 "companies_jobdescription"."is_active",
+                 "companies_jobdescription"."custom_name",
+                 "companies_jobdescription"."description",
+                 "companies_jobdescription"."ui_rank",
+                 "companies_jobdescription"."contract_type",
+                 "companies_jobdescription"."other_contract_type",
+                 "companies_jobdescription"."contract_nature",
+                 "companies_jobdescription"."location_id",
+                 "companies_jobdescription"."hours_per_week",
+                 "companies_jobdescription"."open_positions",
+                 "companies_jobdescription"."profile_description",
+                 "companies_jobdescription"."is_resume_mandatory",
+                 "companies_jobdescription"."is_qpv_mandatory",
+                 "companies_jobdescription"."market_context_description",
+                 "companies_jobdescription"."source_id",
+                 "companies_jobdescription"."source_kind",
+                 "companies_jobdescription"."source_url",
+                 "companies_jobdescription"."field_history",
+                 "companies_jobdescription"."creation_source"
+          FROM "companies_jobdescription"
+          INNER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
+          INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
+          WHERE "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s)
+          ORDER BY "jobs_appellation"."name" ASC,
+                   "companies_jobdescription"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'content[www/itou_staff_views/views.py]',
+          '<genexpr>[www/itou_staff_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id") AS "_prefetch_related_val_eligibility_diagnosis_id",
+                 "eligibility_administrativecriteria"."id",
+                 "eligibility_administrativecriteria"."kind",
+                 "eligibility_administrativecriteria"."level",
+                 "eligibility_administrativecriteria"."name",
+                 "eligibility_administrativecriteria"."desc",
+                 "eligibility_administrativecriteria"."written_proof",
+                 "eligibility_administrativecriteria"."written_proof_url",
+                 "eligibility_administrativecriteria"."written_proof_validity",
+                 "eligibility_administrativecriteria"."ui_rank",
+                 "eligibility_administrativecriteria"."created_at",
+                 "eligibility_administrativecriteria"."created_by_id"
+          FROM "eligibility_administrativecriteria"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
+          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s)
+          ORDER BY "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'content[www/itou_staff_views/views.py]',
+          '<genexpr>[www/itou_staff_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."is_head_office",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."is_authorized",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+          FROM "prescribers_prescriberorganization"
+          WHERE "prescribers_prescriberorganization"."id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'content[www/itou_staff_views/views.py]',
+          '<genexpr>[www/itou_staff_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongation"."id",
+                 "approvals_prolongation"."approval_id",
+                 "approvals_prolongation"."start_at",
+                 "approvals_prolongation"."end_at",
+                 "approvals_prolongation"."reason",
+                 "approvals_prolongation"."reason_explanation",
+                 "approvals_prolongation"."declared_by_id",
+                 "approvals_prolongation"."declared_by_siae_id",
+                 "approvals_prolongation"."validated_by_id",
+                 "approvals_prolongation"."prescriber_organization_id",
+                 "approvals_prolongation"."created_at",
+                 "approvals_prolongation"."created_by_id",
+                 "approvals_prolongation"."updated_at",
+                 "approvals_prolongation"."updated_by_id",
+                 "approvals_prolongation"."report_file_id",
+                 "approvals_prolongation"."require_phone_interview",
+                 "approvals_prolongation"."contact_email",
+                 "approvals_prolongation"."contact_phone",
+                 "approvals_prolongation"."request_id"
+          FROM "approvals_prolongation"
+          WHERE "approvals_prolongation"."approval_id" IN (%s)
+          ORDER BY "approvals_prolongation"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'content[www/itou_staff_views/views.py]',
+          '<genexpr>[www/itou_staff_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE "approvals_suspension"."approval_id" IN (%s)
+          ORDER BY "approvals_suspension"."start_at" DESC
+        ''',
+      }),
+    ]),
+  })
+# ---
+# name: TestExportJobApplications.test_export[contains][streaming content]
   '''
   job_seeker_title,job_seeker_first_name,job_seeker_last_name,job_seeker_nir,job_seeker_france_travail_id,job_seeker_ft_obfuscated_nir,job_seeker_date_joined,job_seeker_birth_date,job_seeker_birth_municipality,job_seeker_birth_country,job_seeker_email,job_seeker_phone,job_seeker_identity_provider,job_seeker_created_by,job_seeker_address1_line_1,job_seeker_address1_line_2,job_seeker_address1_post_code,job_seeker_address1_city,job_seeker_address1_city_code_insee,job_seeker_address1_coords,job_seeker_address1_geocoding_score,job_seeker_address1_BAN_API_address,job_seeker_address2_lane_number,job_seeker_address2_non_std_extension,job_seeker_address2_lane_type,job_seeker_address2_lane_name,job_seeker_address2_additional_address,job_seeker_address2_post_code,job_seeker_address2_municipality,job_seeker_education_level,job_seeker_resourceless,job_seeker_rqth,job_seeker_oeth,job_seeker_france_travail_since,job_seeker_unemployed_since,job_seeker_has_rsa_allocation,job_seeker_rsa_allocation_since,job_seeker_has_ass_allocation,job_seeker_ass_allocation_since,job_seeker_has_aah_allocation,job_seeker_aah_allocation_since,job_seeker_ata_allocation_since,application_eligibility_diagnosis_author_kind,application_eligibility_diagnosis_author_siae_kind,application_eligibility_diagnosis_author_siae_siret,application_eligibility_diagnosis_author_siae_naf,application_eligibility_diagnosis_author_siae_name,application_eligibility_diagnosis_author_prescriber_organization_siret,application_eligibility_diagnosis_author_prescriber_organization_kind,application_eligibility_diagnosis_author_prescriber_organization_is_habilitated,application_eligibility_diagnosis_author_prescriber_organization_code_safir,application_eligibility_diagnosis_expires_at,application_eligibility_diagnosis_administrative_criteria,application_to_company_kind,application_to_company_siret,application_to_company_naf,application_to_company_name,sender,sender_company_kind,sender_company_siret,sender_company_naf,sender_company_name,sender_prescriber_organization_siret,sender_prescriber_organization_kind,sender_prescriber_organization_is_habilitated,sender_prescriber_organization_code_safir,selected_jobs,hired_for_job_name,hired_for_job_appellation_code,hired_for_job_appellation_name,hired_for_job_ROME_code,hired_for_job_ROME_name,hired_for_job_contract_type,hired_for_job_contract_nature,hired_for_job_location,hired_for_job_location_hours_per_week,hiring_start_at,hiring_end_at,contract_type,contract_type_details,nb_hours_per_week,qualification_type,qualification_level,planned_training_hours,inverted_vae_contract,PASS_IAE_number,PASS_IAE_start_at,PASS_IAE_end_at,PASS_IAE_prolongations,PASS_IAE_suspensions
   MME,Jane,Doe,290010101010125,,,2024-05-10T09:11:11+00:00,1990-01-01,,,jane.doe@test.local,0612345678,DJANGO,,12 rue Georges Bizet,,35000,Rennes,,,,,12,,RUE,Georges Bizet,,35000,,40,False,False,False,,,NON,,False,,False,,,prescriber,,,,,12345678900012,PE,True,,2024-11-10 09:11:11+00:00,,EI,32112345600020,1234Z,Acme inc.,Pierre DUPONT — pierre.dupont@test.local,,,,,,,,,Candidature spontanée,,,,,,,,,,2024-05-10,2026-05-10,,,,,,,,XXXXX1234567,2024-05-10,2026-06-08,[2024-05-10;2024-06-09] (SENIOR),
   
   '''
 # ---
-# name: TestExportPEApiRejections.test_export
+# name: TestExportPEApiRejections.test_export.1
+  dict({
+    'num_queries': 5,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'export_ft_api_rejections[www/itou_staff_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."ata_allocation_since",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at"
+          FROM "approvals_approval"
+          INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+          WHERE ("approvals_approval"."pe_notification_status" = %s
+                 AND "approvals_approval"."pe_notification_time" BETWEEN %s AND %s)
+          ORDER BY "approvals_approval"."pe_notification_time" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestExportPEApiRejections.test_export[workbook values]
   list([
     tuple(
       'numero',

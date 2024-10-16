@@ -6,7 +6,6 @@ from unittest.mock import patch
 import pytest
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertNumQueries
 from rest_framework.test import APIClient
 
 from itou.api.geiq import serializers
@@ -19,6 +18,7 @@ from itou.users.enums import UserKind
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory, PriorActionFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
+from tests.utils.test import assertSnapshotQueries
 
 
 def _api_client():
@@ -154,27 +154,17 @@ def test_candidatures_geiq_nominal(snapshot):
     crit = GEIQAdministrativeCriteria.objects.get(name="Jeune (-26 ans)")
     job_seeker.geiq_eligibility_diagnoses.first().administrative_criteria.add(crit)
 
-    num_queries = (
-        2  # SAVEPOINT and RELEASE SAVEPOINT
-        + 1  # count job applications for the pagination
-        + 1  # select job applications, with the necessary joins
-        + 1  # prefetch PriorActions
-        + 1  # prefetch GEIQEligibilityDiagnosis
-        + 1  # prefetch GEIQAdministrativeCriteria
-    )
-
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot(name="SQL queries without filter")):
         response = client.get(reverse("v1:geiq_jobapplication_list"))
     assert response.status_code == 200
     assert response.json() == snapshot(name="with_results")
 
-    filtered_num_queries = 2 + 1  # SAVEPOINT, RELEASE SAVEPOINT, and COUNT job applications for the pagination.
-    with assertNumQueries(filtered_num_queries):
+    with assertSnapshotQueries(snapshot(name="SQL queries without result")):
         response = client.get(f"{reverse('v1:geiq_jobapplication_list')}?siren=foobar")
     assert response.status_code == 400
     assert response.json() == {"detail": "Invalid SIREN."}
 
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot(name="SQL queries with result")):
         response = client.get(f"{reverse('v1:geiq_jobapplication_list')}?siren={job_application.to_company.siren}")
     assert response.status_code == 200
     assert response.json()["count"] == 2  # returns the antenna as well

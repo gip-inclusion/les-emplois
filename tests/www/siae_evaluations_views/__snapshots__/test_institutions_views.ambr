@@ -1,4 +1,828 @@
 # serializer version: 1
+# name: TestInstitutionEvaluatedJobApplicationView.test_num_queries_in_view
+  dict({
+    'num_queries': 16,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'extract_membership_infos_and_update_session[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."user_id" = %s
+                 AND "institutions_institutionmembership"."is_active")
+          ORDER BY "institutions_institutionmembership"."created_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'evaluated_job_application[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplication"."id",
+                 "siae_evaluations_evaluatedjobapplication"."job_application_id",
+                 "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
+                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation",
+                 "siae_evaluations_evaluatedsiae"."id",
+                 "siae_evaluations_evaluatedsiae"."evaluation_campaign_id",
+                 "siae_evaluations_evaluatedsiae"."siae_id",
+                 "siae_evaluations_evaluatedsiae"."reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."final_reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."submission_freezed_at",
+                 "siae_evaluations_evaluatedsiae"."notified_at",
+                 "siae_evaluations_evaluatedsiae"."notification_reason",
+                 "siae_evaluations_evaluatedsiae"."notification_text",
+                 "siae_evaluations_evaluatedsiae"."reminder_sent_at",
+                 "siae_evaluations_evaluationcampaign"."id",
+                 "siae_evaluations_evaluationcampaign"."name",
+                 "siae_evaluations_evaluationcampaign"."created_at",
+                 "siae_evaluations_evaluationcampaign"."percent_set_at",
+                 "siae_evaluations_evaluationcampaign"."evaluations_asked_at",
+                 "siae_evaluations_evaluationcampaign"."ended_at",
+                 "siae_evaluations_evaluationcampaign"."submission_freeze_notified_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_start_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_end_at",
+                 "siae_evaluations_evaluationcampaign"."institution_id",
+                 "siae_evaluations_evaluationcampaign"."chosen_percent",
+                 "siae_evaluations_evaluationcampaign"."calendar_id"
+          FROM "siae_evaluations_evaluatedjobapplication"
+          INNER JOIN "siae_evaluations_evaluatedsiae" ON ("siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" = "siae_evaluations_evaluatedsiae"."id")
+          INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
+          WHERE ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" IN
+                   (SELECT U0."id"
+                    FROM "siae_evaluations_evaluationcampaign" U0
+                    WHERE ((U0."ended_at" IS NULL
+                            OR U0."ended_at" >= %s)
+                           AND NOT (U0."evaluated_period_end_at" < %s)))
+                 AND "siae_evaluations_evaluationcampaign"."evaluations_asked_at" IS NOT NULL
+                 AND "siae_evaluations_evaluationcampaign"."institution_id" = %s
+                 AND "siae_evaluations_evaluatedjobapplication"."id" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'evaluated_job_application[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."proof_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."uploaded_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."submitted_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."review_state"
+          FROM "siae_evaluations_evaluatedadministrativecriteria"
+          INNER JOIN "eligibility_administrativecriteria" ON ("siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
+          WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" IN (%s)
+          ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
+                   "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'evaluated_job_application[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_administrativecriteria"."id",
+                 "eligibility_administrativecriteria"."kind",
+                 "eligibility_administrativecriteria"."level",
+                 "eligibility_administrativecriteria"."name",
+                 "eligibility_administrativecriteria"."desc",
+                 "eligibility_administrativecriteria"."written_proof",
+                 "eligibility_administrativecriteria"."written_proof_url",
+                 "eligibility_administrativecriteria"."written_proof_validity",
+                 "eligibility_administrativecriteria"."ui_rank",
+                 "eligibility_administrativecriteria"."created_at",
+                 "eligibility_administrativecriteria"."created_by_id"
+          FROM "eligibility_administrativecriteria"
+          WHERE "eligibility_administrativecriteria"."id" IN (%s,
+                                                              %s,
+                                                              %s)
+          ORDER BY "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'evaluated_job_application[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id",
+                 "job_applications_jobapplication"."job_seeker_id",
+                 "job_applications_jobapplication"."eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."create_employee_record",
+                 "job_applications_jobapplication"."resume_link",
+                 "job_applications_jobapplication"."sender_id",
+                 "job_applications_jobapplication"."sender_kind",
+                 "job_applications_jobapplication"."sender_company_id",
+                 "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."to_company_id",
+                 "job_applications_jobapplication"."state",
+                 "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."archived_by_id",
+                 "job_applications_jobapplication"."hired_job_id",
+                 "job_applications_jobapplication"."message",
+                 "job_applications_jobapplication"."answer",
+                 "job_applications_jobapplication"."answer_to_prescriber",
+                 "job_applications_jobapplication"."refusal_reason",
+                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
+                 "job_applications_jobapplication"."hiring_start_at",
+                 "job_applications_jobapplication"."hiring_end_at",
+                 "job_applications_jobapplication"."hiring_without_approval",
+                 "job_applications_jobapplication"."origin",
+                 "job_applications_jobapplication"."approval_id",
+                 "job_applications_jobapplication"."approval_delivery_mode",
+                 "job_applications_jobapplication"."approval_number_sent_by_email",
+                 "job_applications_jobapplication"."approval_number_sent_at",
+                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_at",
+                 "job_applications_jobapplication"."transferred_at",
+                 "job_applications_jobapplication"."transferred_by_id",
+                 "job_applications_jobapplication"."transferred_from_id",
+                 "job_applications_jobapplication"."created_at",
+                 "job_applications_jobapplication"."updated_at",
+                 "job_applications_jobapplication"."processed_at",
+                 "job_applications_jobapplication"."prehiring_guidance_days",
+                 "job_applications_jobapplication"."contract_type",
+                 "job_applications_jobapplication"."nb_hours_per_week",
+                 "job_applications_jobapplication"."contract_type_details",
+                 "job_applications_jobapplication"."qualification_type",
+                 "job_applications_jobapplication"."qualification_level",
+                 "job_applications_jobapplication"."planned_training_hours",
+                 "job_applications_jobapplication"."inverted_vae_contract",
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at"
+          FROM "job_applications_jobapplication"
+          WHERE "job_applications_jobapplication"."id" IN (%s)
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'evaluated_job_application[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."id" IN (%s)
+          ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'evaluated_job_application[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          WHERE "users_user"."id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EvaluatedSiae.state_from_applications[siae_evaluations/models.py]',
+          'EvaluatedSiae.state[siae_evaluations/models.py]',
+          'IfNode[siae_evaluations/includes/criterion_validation.html]',
+          'IncludeNode[siae_evaluations/evaluated_job_application.html]',
+          'IfNode[siae_evaluations/evaluated_job_application.html]',
+          'ForNode[siae_evaluations/evaluated_job_application.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/evaluated_job_application.html]',
+          'evaluated_job_application[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplication"."id",
+                 "siae_evaluations_evaluatedjobapplication"."job_application_id",
+                 "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
+                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
+          FROM "siae_evaluations_evaluatedjobapplication"
+          WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" = %s
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EvaluatedJobApplication.compute_state[siae_evaluations/models.py]',
+          'state_from[siae_evaluations/models.py]',
+          '<genexpr>[siae_evaluations/models.py]',
+          'EvaluatedSiae.state_from_applications[siae_evaluations/models.py]',
+          'EvaluatedSiae.state[siae_evaluations/models.py]',
+          'IfNode[siae_evaluations/includes/criterion_validation.html]',
+          'IncludeNode[siae_evaluations/evaluated_job_application.html]',
+          'IfNode[siae_evaluations/evaluated_job_application.html]',
+          'ForNode[siae_evaluations/evaluated_job_application.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/evaluated_job_application.html]',
+          'evaluated_job_application[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."proof_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."uploaded_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."submitted_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."review_state"
+          FROM "siae_evaluations_evaluatedadministrativecriteria"
+          INNER JOIN "eligibility_administrativecriteria" ON ("siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
+          WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" = %s
+          ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
+                   "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          UPDATE "django_session"
+          SET "session_data" = %s,
+              "expire_date" = %s
+          WHERE "django_session"."session_key" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestInstitutionEvaluatedSiaeDetailView.test_num_queries_in_view
+  dict({
+    'num_queries': 14,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'extract_membership_infos_and_update_session[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."user_id" = %s
+                 AND "institutions_institutionmembership"."is_active")
+          ORDER BY "institutions_institutionmembership"."created_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'evaluated_siae_detail[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedsiae"."id",
+                 "siae_evaluations_evaluatedsiae"."evaluation_campaign_id",
+                 "siae_evaluations_evaluatedsiae"."siae_id",
+                 "siae_evaluations_evaluatedsiae"."reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."final_reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."submission_freezed_at",
+                 "siae_evaluations_evaluatedsiae"."notified_at",
+                 "siae_evaluations_evaluatedsiae"."notification_reason",
+                 "siae_evaluations_evaluatedsiae"."notification_text",
+                 "siae_evaluations_evaluatedsiae"."reminder_sent_at",
+                 "siae_evaluations_evaluationcampaign"."id",
+                 "siae_evaluations_evaluationcampaign"."name",
+                 "siae_evaluations_evaluationcampaign"."created_at",
+                 "siae_evaluations_evaluationcampaign"."percent_set_at",
+                 "siae_evaluations_evaluationcampaign"."evaluations_asked_at",
+                 "siae_evaluations_evaluationcampaign"."ended_at",
+                 "siae_evaluations_evaluationcampaign"."submission_freeze_notified_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_start_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_end_at",
+                 "siae_evaluations_evaluationcampaign"."institution_id",
+                 "siae_evaluations_evaluationcampaign"."chosen_percent",
+                 "siae_evaluations_evaluationcampaign"."calendar_id",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."rdv_solidarites_id"
+          FROM "siae_evaluations_evaluatedsiae"
+          INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
+          INNER JOIN "companies_company" ON ("siae_evaluations_evaluatedsiae"."siae_id" = "companies_company"."id")
+          WHERE ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" IN
+                   (SELECT U0."id"
+                    FROM "siae_evaluations_evaluationcampaign" U0
+                    WHERE ((U0."ended_at" IS NULL
+                            OR U0."ended_at" >= %s)
+                           AND NOT (U0."evaluated_period_end_at" < %s)))
+                 AND "siae_evaluations_evaluationcampaign"."evaluations_asked_at" IS NOT NULL
+                 AND "siae_evaluations_evaluationcampaign"."institution_id" = %s
+                 AND "siae_evaluations_evaluatedsiae"."id" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'evaluated_siae_detail[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplication"."id",
+                 "siae_evaluations_evaluatedjobapplication"."job_application_id",
+                 "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
+                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
+          FROM "siae_evaluations_evaluatedjobapplication"
+          WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'evaluated_siae_detail[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."proof_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."uploaded_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."submitted_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."review_state"
+          FROM "siae_evaluations_evaluatedadministrativecriteria"
+          INNER JOIN "eligibility_administrativecriteria" ON ("siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
+          WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" IN (%s,
+                                                                                                      %s,
+                                                                                                      %s,
+                                                                                                      %s,
+                                                                                                      %s,
+                                                                                                      %s,
+                                                                                                      %s,
+                                                                                                      %s,
+                                                                                                      %s,
+                                                                                                      %s,
+                                                                                                      %s)
+          ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
+                   "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'evaluated_siae_detail[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id",
+                 "job_applications_jobapplication"."job_seeker_id",
+                 "job_applications_jobapplication"."eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."create_employee_record",
+                 "job_applications_jobapplication"."resume_link",
+                 "job_applications_jobapplication"."sender_id",
+                 "job_applications_jobapplication"."sender_kind",
+                 "job_applications_jobapplication"."sender_company_id",
+                 "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."to_company_id",
+                 "job_applications_jobapplication"."state",
+                 "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."archived_by_id",
+                 "job_applications_jobapplication"."hired_job_id",
+                 "job_applications_jobapplication"."message",
+                 "job_applications_jobapplication"."answer",
+                 "job_applications_jobapplication"."answer_to_prescriber",
+                 "job_applications_jobapplication"."refusal_reason",
+                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
+                 "job_applications_jobapplication"."hiring_start_at",
+                 "job_applications_jobapplication"."hiring_end_at",
+                 "job_applications_jobapplication"."hiring_without_approval",
+                 "job_applications_jobapplication"."origin",
+                 "job_applications_jobapplication"."approval_id",
+                 "job_applications_jobapplication"."approval_delivery_mode",
+                 "job_applications_jobapplication"."approval_number_sent_by_email",
+                 "job_applications_jobapplication"."approval_number_sent_at",
+                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_at",
+                 "job_applications_jobapplication"."transferred_at",
+                 "job_applications_jobapplication"."transferred_by_id",
+                 "job_applications_jobapplication"."transferred_from_id",
+                 "job_applications_jobapplication"."created_at",
+                 "job_applications_jobapplication"."updated_at",
+                 "job_applications_jobapplication"."processed_at",
+                 "job_applications_jobapplication"."prehiring_guidance_days",
+                 "job_applications_jobapplication"."contract_type",
+                 "job_applications_jobapplication"."nb_hours_per_week",
+                 "job_applications_jobapplication"."contract_type_details",
+                 "job_applications_jobapplication"."qualification_type",
+                 "job_applications_jobapplication"."qualification_level",
+                 "job_applications_jobapplication"."planned_training_hours",
+                 "job_applications_jobapplication"."inverted_vae_contract",
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at"
+          FROM "job_applications_jobapplication"
+          WHERE "job_applications_jobapplication"."id" IN (%s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s)
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'evaluated_siae_detail[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."id" IN (%s,
+                                              %s,
+                                              %s,
+                                              %s,
+                                              %s,
+                                              %s,
+                                              %s,
+                                              %s,
+                                              %s,
+                                              %s,
+                                              %s)
+          ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'evaluated_siae_detail[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          WHERE "users_user"."id" IN (%s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          UPDATE "django_session"
+          SET "session_data" = %s,
+              "expire_date" = %s
+          WHERE "django_session"."session_key" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
 # name: TestInstitutionEvaluatedSiaeListView.test_access[notification pending state]
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
@@ -67,6 +891,287 @@
       </div>
   </div>
   '''
+# ---
+# name: TestInstitutionEvaluatedSiaeListView.test_num_queries
+  dict({
+    'num_queries': 12,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'extract_membership_infos_and_update_session[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."user_id" = %s
+                 AND "institutions_institutionmembership"."is_active")
+          ORDER BY "institutions_institutionmembership"."created_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'institution_evaluated_siae_list[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluationcampaign"."id",
+                 "siae_evaluations_evaluationcampaign"."name",
+                 "siae_evaluations_evaluationcampaign"."created_at",
+                 "siae_evaluations_evaluationcampaign"."percent_set_at",
+                 "siae_evaluations_evaluationcampaign"."evaluations_asked_at",
+                 "siae_evaluations_evaluationcampaign"."ended_at",
+                 "siae_evaluations_evaluationcampaign"."submission_freeze_notified_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_start_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_end_at",
+                 "siae_evaluations_evaluationcampaign"."institution_id",
+                 "siae_evaluations_evaluationcampaign"."chosen_percent",
+                 "siae_evaluations_evaluationcampaign"."calendar_id"
+          FROM "siae_evaluations_evaluationcampaign"
+          WHERE ("siae_evaluations_evaluationcampaign"."evaluations_asked_at" IS NOT NULL
+                 AND "siae_evaluations_evaluationcampaign"."institution_id" = %s
+                 AND "siae_evaluations_evaluationcampaign"."id" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'institution_evaluated_siae_list[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedsiae"."id",
+                 "siae_evaluations_evaluatedsiae"."evaluation_campaign_id",
+                 "siae_evaluations_evaluatedsiae"."siae_id",
+                 "siae_evaluations_evaluatedsiae"."reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."final_reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."submission_freezed_at",
+                 "siae_evaluations_evaluatedsiae"."notified_at",
+                 "siae_evaluations_evaluatedsiae"."notification_reason",
+                 "siae_evaluations_evaluatedsiae"."notification_text",
+                 "siae_evaluations_evaluatedsiae"."reminder_sent_at",
+                 "siae_evaluations_evaluationcampaign"."id",
+                 "siae_evaluations_evaluationcampaign"."name",
+                 "siae_evaluations_evaluationcampaign"."created_at",
+                 "siae_evaluations_evaluationcampaign"."percent_set_at",
+                 "siae_evaluations_evaluationcampaign"."evaluations_asked_at",
+                 "siae_evaluations_evaluationcampaign"."ended_at",
+                 "siae_evaluations_evaluationcampaign"."submission_freeze_notified_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_start_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_end_at",
+                 "siae_evaluations_evaluationcampaign"."institution_id",
+                 "siae_evaluations_evaluationcampaign"."chosen_percent",
+                 "siae_evaluations_evaluationcampaign"."calendar_id",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."rdv_solidarites_id"
+          FROM "siae_evaluations_evaluatedsiae"
+          INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
+          INNER JOIN "companies_company" ON ("siae_evaluations_evaluatedsiae"."siae_id" = "companies_company"."id")
+          WHERE ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" IN
+                   (SELECT U0."id"
+                    FROM "siae_evaluations_evaluationcampaign" U0
+                    WHERE ((U0."ended_at" IS NULL
+                            OR U0."ended_at" >= %s)
+                           AND NOT (U0."evaluated_period_end_at" < %s)))
+                 AND "siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = %s)
+          ORDER BY "companies_company"."name" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'institution_evaluated_siae_list[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplication"."id",
+                 "siae_evaluations_evaluatedjobapplication"."job_application_id",
+                 "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
+                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
+          FROM "siae_evaluations_evaluatedjobapplication"
+          WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" IN (%s,
+                                                                                   %s,
+                                                                                   %s,
+                                                                                   %s,
+                                                                                   %s,
+                                                                                   %s,
+                                                                                   %s,
+                                                                                   %s,
+                                                                                   %s,
+                                                                                   %s,
+                                                                                   %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'institution_evaluated_siae_list[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."proof_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."uploaded_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."submitted_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."review_state"
+          FROM "siae_evaluations_evaluatedadministrativecriteria"
+          INNER JOIN "eligibility_administrativecriteria" ON ("siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
+          WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" IN (%s)
+          ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
+                   "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          UPDATE "django_session"
+          SET "session_data" = %s,
+              "expire_date" = %s
+          WHERE "django_session"."session_key" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_recently_closed_campaign[final accepted state]
   '''
@@ -371,4 +1476,992 @@
       </div>
   </div>
   '''
+# ---
+# name: TestInstitutionEvaluatedSiaeNotifyViewStep1.test_data_card_statistics_multiple_previous_campaigns_check_sanctions
+  dict({
+    'num_queries': 13,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'extract_membership_infos_and_update_session[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."user_id" = %s
+                 AND "institutions_institutionmembership"."is_active")
+          ORDER BY "institutions_institutionmembership"."created_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'InstitutionEvaluatedSiaeNotifyStep1View.get_object[<site-packages>/django/views/generic/detail.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedsiae"."id",
+                 "siae_evaluations_evaluatedsiae"."evaluation_campaign_id",
+                 "siae_evaluations_evaluatedsiae"."siae_id",
+                 "siae_evaluations_evaluatedsiae"."reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."final_reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."submission_freezed_at",
+                 "siae_evaluations_evaluatedsiae"."notified_at",
+                 "siae_evaluations_evaluatedsiae"."notification_reason",
+                 "siae_evaluations_evaluatedsiae"."notification_text",
+                 "siae_evaluations_evaluatedsiae"."reminder_sent_at",
+                 "siae_evaluations_evaluationcampaign"."id",
+                 "siae_evaluations_evaluationcampaign"."name",
+                 "siae_evaluations_evaluationcampaign"."created_at",
+                 "siae_evaluations_evaluationcampaign"."percent_set_at",
+                 "siae_evaluations_evaluationcampaign"."evaluations_asked_at",
+                 "siae_evaluations_evaluationcampaign"."ended_at",
+                 "siae_evaluations_evaluationcampaign"."submission_freeze_notified_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_start_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_end_at",
+                 "siae_evaluations_evaluationcampaign"."institution_id",
+                 "siae_evaluations_evaluationcampaign"."chosen_percent",
+                 "siae_evaluations_evaluationcampaign"."calendar_id",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."rdv_solidarites_id"
+          FROM "siae_evaluations_evaluatedsiae"
+          INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
+          INNER JOIN "companies_company" ON ("siae_evaluations_evaluatedsiae"."siae_id" = "companies_company"."id")
+          WHERE ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" IN
+                   (SELECT U0."id"
+                    FROM "siae_evaluations_evaluationcampaign" U0
+                    WHERE ((U0."ended_at" IS NULL
+                            OR U0."ended_at" >= %s)
+                           AND NOT (U0."evaluated_period_end_at" < %s)))
+                 AND ("siae_evaluations_evaluationcampaign"."ended_at" IS NOT NULL
+                      OR "siae_evaluations_evaluatedsiae"."final_reviewed_at" IS NOT NULL)
+                 AND "siae_evaluations_evaluationcampaign"."institution_id" = %s
+                 AND "siae_evaluations_evaluatedsiae"."notified_at" IS NULL
+                 AND "siae_evaluations_evaluatedsiae"."id" = %s
+                 AND "siae_evaluations_evaluatedsiae"."id" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'InstitutionEvaluatedSiaeNotifyStep1View.get_object[<site-packages>/django/views/generic/detail.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplication"."id",
+                 "siae_evaluations_evaluatedjobapplication"."job_application_id",
+                 "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
+                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
+          FROM "siae_evaluations_evaluatedjobapplication"
+          WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/institution_evaluated_siae_notify_step1.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/institution_evaluated_siae_notify_step1.html]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedsiae"."id",
+                 "siae_evaluations_evaluatedsiae"."evaluation_campaign_id",
+                 "siae_evaluations_evaluatedsiae"."siae_id",
+                 "siae_evaluations_evaluatedsiae"."reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."final_reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."submission_freezed_at",
+                 "siae_evaluations_evaluatedsiae"."notified_at",
+                 "siae_evaluations_evaluatedsiae"."notification_reason",
+                 "siae_evaluations_evaluatedsiae"."notification_text",
+                 "siae_evaluations_evaluatedsiae"."reminder_sent_at",
+                 "siae_evaluations_evaluationcampaign"."id",
+                 "siae_evaluations_evaluationcampaign"."name",
+                 "siae_evaluations_evaluationcampaign"."created_at",
+                 "siae_evaluations_evaluationcampaign"."percent_set_at",
+                 "siae_evaluations_evaluationcampaign"."evaluations_asked_at",
+                 "siae_evaluations_evaluationcampaign"."ended_at",
+                 "siae_evaluations_evaluationcampaign"."submission_freeze_notified_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_start_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_end_at",
+                 "siae_evaluations_evaluationcampaign"."institution_id",
+                 "siae_evaluations_evaluationcampaign"."chosen_percent",
+                 "siae_evaluations_evaluationcampaign"."calendar_id",
+                 "siae_evaluations_sanctions"."id",
+                 "siae_evaluations_sanctions"."evaluated_siae_id",
+                 "siae_evaluations_sanctions"."training_session",
+                 "siae_evaluations_sanctions"."suspension_dates",
+                 "siae_evaluations_sanctions"."subsidy_cut_percent",
+                 "siae_evaluations_sanctions"."subsidy_cut_dates",
+                 "siae_evaluations_sanctions"."deactivation_reason",
+                 "siae_evaluations_sanctions"."no_sanction_reason"
+          FROM "siae_evaluations_evaluatedsiae"
+          INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
+          LEFT OUTER JOIN "siae_evaluations_sanctions" ON ("siae_evaluations_evaluatedsiae"."id" = "siae_evaluations_sanctions"."evaluated_siae_id")
+          WHERE ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" IN
+                   (SELECT U0."id"
+                    FROM "siae_evaluations_evaluationcampaign" U0
+                    WHERE ((U0."ended_at" IS NULL
+                            OR U0."ended_at" >= %s)
+                           AND NOT (U0."evaluated_period_end_at" < %s)))
+                 AND "siae_evaluations_evaluatedsiae"."siae_id" = %s
+                 AND NOT ("siae_evaluations_evaluatedsiae"."id" = %s))
+          ORDER BY "siae_evaluations_evaluationcampaign"."evaluated_period_start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/institution_evaluated_siae_notify_step1.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/institution_evaluated_siae_notify_step1.html]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplication"."id",
+                 "siae_evaluations_evaluatedjobapplication"."job_application_id",
+                 "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
+                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
+          FROM "siae_evaluations_evaluatedjobapplication"
+          WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" IN (%s,
+                                                                                   %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/institution_evaluated_siae_notify_step1.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/institution_evaluated_siae_notify_step1.html]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."proof_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."uploaded_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."submitted_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."review_state"
+          FROM "siae_evaluations_evaluatedadministrativecriteria"
+          INNER JOIN "eligibility_administrativecriteria" ON ("siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
+          WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" IN (%s,
+                                                                                                      %s,
+                                                                                                      %s,
+                                                                                                      %s)
+          ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
+                   "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          UPDATE "django_session"
+          SET "session_data" = %s,
+              "expire_date" = %s
+          WHERE "django_session"."session_key" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestInstitutionEvaluatedSiaeNotifyViewStep2.test_data_card_statistics_multiple_previous_campaigns_check_sanctions
+  dict({
+    'num_queries': 13,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'extract_membership_infos_and_update_session[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."user_id" = %s
+                 AND "institutions_institutionmembership"."is_active")
+          ORDER BY "institutions_institutionmembership"."created_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'InstitutionEvaluatedSiaeNotifyStep2View.get_object[<site-packages>/django/views/generic/detail.py]',
+          'InstitutionEvaluatedSiaeNotifyStep2View.get[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedsiae"."id",
+                 "siae_evaluations_evaluatedsiae"."evaluation_campaign_id",
+                 "siae_evaluations_evaluatedsiae"."siae_id",
+                 "siae_evaluations_evaluatedsiae"."reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."final_reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."submission_freezed_at",
+                 "siae_evaluations_evaluatedsiae"."notified_at",
+                 "siae_evaluations_evaluatedsiae"."notification_reason",
+                 "siae_evaluations_evaluatedsiae"."notification_text",
+                 "siae_evaluations_evaluatedsiae"."reminder_sent_at",
+                 "siae_evaluations_evaluationcampaign"."id",
+                 "siae_evaluations_evaluationcampaign"."name",
+                 "siae_evaluations_evaluationcampaign"."created_at",
+                 "siae_evaluations_evaluationcampaign"."percent_set_at",
+                 "siae_evaluations_evaluationcampaign"."evaluations_asked_at",
+                 "siae_evaluations_evaluationcampaign"."ended_at",
+                 "siae_evaluations_evaluationcampaign"."submission_freeze_notified_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_start_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_end_at",
+                 "siae_evaluations_evaluationcampaign"."institution_id",
+                 "siae_evaluations_evaluationcampaign"."chosen_percent",
+                 "siae_evaluations_evaluationcampaign"."calendar_id",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."rdv_solidarites_id"
+          FROM "siae_evaluations_evaluatedsiae"
+          INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
+          INNER JOIN "companies_company" ON ("siae_evaluations_evaluatedsiae"."siae_id" = "companies_company"."id")
+          WHERE ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" IN
+                   (SELECT U0."id"
+                    FROM "siae_evaluations_evaluationcampaign" U0
+                    WHERE ((U0."ended_at" IS NULL
+                            OR U0."ended_at" >= %s)
+                           AND NOT (U0."evaluated_period_end_at" < %s)))
+                 AND ("siae_evaluations_evaluationcampaign"."ended_at" IS NOT NULL
+                      OR "siae_evaluations_evaluatedsiae"."final_reviewed_at" IS NOT NULL)
+                 AND "siae_evaluations_evaluationcampaign"."institution_id" = %s
+                 AND "siae_evaluations_evaluatedsiae"."notified_at" IS NULL
+                 AND "siae_evaluations_evaluatedsiae"."id" = %s
+                 AND "siae_evaluations_evaluatedsiae"."id" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'InstitutionEvaluatedSiaeNotifyStep2View.get_object[<site-packages>/django/views/generic/detail.py]',
+          'InstitutionEvaluatedSiaeNotifyStep2View.get[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplication"."id",
+                 "siae_evaluations_evaluatedjobapplication"."job_application_id",
+                 "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
+                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
+          FROM "siae_evaluations_evaluatedjobapplication"
+          WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/institution_evaluated_siae_notify_step2.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/institution_evaluated_siae_notify_step2.html]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedsiae"."id",
+                 "siae_evaluations_evaluatedsiae"."evaluation_campaign_id",
+                 "siae_evaluations_evaluatedsiae"."siae_id",
+                 "siae_evaluations_evaluatedsiae"."reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."final_reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."submission_freezed_at",
+                 "siae_evaluations_evaluatedsiae"."notified_at",
+                 "siae_evaluations_evaluatedsiae"."notification_reason",
+                 "siae_evaluations_evaluatedsiae"."notification_text",
+                 "siae_evaluations_evaluatedsiae"."reminder_sent_at",
+                 "siae_evaluations_evaluationcampaign"."id",
+                 "siae_evaluations_evaluationcampaign"."name",
+                 "siae_evaluations_evaluationcampaign"."created_at",
+                 "siae_evaluations_evaluationcampaign"."percent_set_at",
+                 "siae_evaluations_evaluationcampaign"."evaluations_asked_at",
+                 "siae_evaluations_evaluationcampaign"."ended_at",
+                 "siae_evaluations_evaluationcampaign"."submission_freeze_notified_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_start_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_end_at",
+                 "siae_evaluations_evaluationcampaign"."institution_id",
+                 "siae_evaluations_evaluationcampaign"."chosen_percent",
+                 "siae_evaluations_evaluationcampaign"."calendar_id",
+                 "siae_evaluations_sanctions"."id",
+                 "siae_evaluations_sanctions"."evaluated_siae_id",
+                 "siae_evaluations_sanctions"."training_session",
+                 "siae_evaluations_sanctions"."suspension_dates",
+                 "siae_evaluations_sanctions"."subsidy_cut_percent",
+                 "siae_evaluations_sanctions"."subsidy_cut_dates",
+                 "siae_evaluations_sanctions"."deactivation_reason",
+                 "siae_evaluations_sanctions"."no_sanction_reason"
+          FROM "siae_evaluations_evaluatedsiae"
+          INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
+          LEFT OUTER JOIN "siae_evaluations_sanctions" ON ("siae_evaluations_evaluatedsiae"."id" = "siae_evaluations_sanctions"."evaluated_siae_id")
+          WHERE ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" IN
+                   (SELECT U0."id"
+                    FROM "siae_evaluations_evaluationcampaign" U0
+                    WHERE ((U0."ended_at" IS NULL
+                            OR U0."ended_at" >= %s)
+                           AND NOT (U0."evaluated_period_end_at" < %s)))
+                 AND "siae_evaluations_evaluatedsiae"."siae_id" = %s
+                 AND NOT ("siae_evaluations_evaluatedsiae"."id" = %s))
+          ORDER BY "siae_evaluations_evaluationcampaign"."evaluated_period_start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/institution_evaluated_siae_notify_step2.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/institution_evaluated_siae_notify_step2.html]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplication"."id",
+                 "siae_evaluations_evaluatedjobapplication"."job_application_id",
+                 "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
+                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
+          FROM "siae_evaluations_evaluatedjobapplication"
+          WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" IN (%s,
+                                                                                   %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/institution_evaluated_siae_notify_step2.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/institution_evaluated_siae_notify_step2.html]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."proof_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."uploaded_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."submitted_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."review_state"
+          FROM "siae_evaluations_evaluatedadministrativecriteria"
+          INNER JOIN "eligibility_administrativecriteria" ON ("siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
+          WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" IN (%s,
+                                                                                                      %s,
+                                                                                                      %s,
+                                                                                                      %s)
+          ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
+                   "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          UPDATE "django_session"
+          SET "session_data" = %s,
+              "expire_date" = %s
+          WHERE "django_session"."session_key" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestInstitutionEvaluatedSiaeNotifyViewStep3.test_data_card_statistics_multiple_previous_campaigns_check_sanctions
+  dict({
+    'num_queries': 13,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'extract_membership_infos_and_update_session[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."user_id" = %s
+                 AND "institutions_institutionmembership"."is_active")
+          ORDER BY "institutions_institutionmembership"."created_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'InstitutionEvaluatedSiaeNotifyStep3View.get_object[<site-packages>/django/views/generic/detail.py]',
+          'InstitutionEvaluatedSiaeNotifyStep3View.get[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedsiae"."id",
+                 "siae_evaluations_evaluatedsiae"."evaluation_campaign_id",
+                 "siae_evaluations_evaluatedsiae"."siae_id",
+                 "siae_evaluations_evaluatedsiae"."reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."final_reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."submission_freezed_at",
+                 "siae_evaluations_evaluatedsiae"."notified_at",
+                 "siae_evaluations_evaluatedsiae"."notification_reason",
+                 "siae_evaluations_evaluatedsiae"."notification_text",
+                 "siae_evaluations_evaluatedsiae"."reminder_sent_at",
+                 "siae_evaluations_evaluationcampaign"."id",
+                 "siae_evaluations_evaluationcampaign"."name",
+                 "siae_evaluations_evaluationcampaign"."created_at",
+                 "siae_evaluations_evaluationcampaign"."percent_set_at",
+                 "siae_evaluations_evaluationcampaign"."evaluations_asked_at",
+                 "siae_evaluations_evaluationcampaign"."ended_at",
+                 "siae_evaluations_evaluationcampaign"."submission_freeze_notified_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_start_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_end_at",
+                 "siae_evaluations_evaluationcampaign"."institution_id",
+                 "siae_evaluations_evaluationcampaign"."chosen_percent",
+                 "siae_evaluations_evaluationcampaign"."calendar_id",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."rdv_solidarites_id"
+          FROM "siae_evaluations_evaluatedsiae"
+          INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
+          INNER JOIN "companies_company" ON ("siae_evaluations_evaluatedsiae"."siae_id" = "companies_company"."id")
+          WHERE ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" IN
+                   (SELECT U0."id"
+                    FROM "siae_evaluations_evaluationcampaign" U0
+                    WHERE ((U0."ended_at" IS NULL
+                            OR U0."ended_at" >= %s)
+                           AND NOT (U0."evaluated_period_end_at" < %s)))
+                 AND ("siae_evaluations_evaluationcampaign"."ended_at" IS NOT NULL
+                      OR "siae_evaluations_evaluatedsiae"."final_reviewed_at" IS NOT NULL)
+                 AND "siae_evaluations_evaluationcampaign"."institution_id" = %s
+                 AND "siae_evaluations_evaluatedsiae"."notified_at" IS NULL
+                 AND "siae_evaluations_evaluatedsiae"."id" = %s
+                 AND "siae_evaluations_evaluatedsiae"."id" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'InstitutionEvaluatedSiaeNotifyStep3View.get_object[<site-packages>/django/views/generic/detail.py]',
+          'InstitutionEvaluatedSiaeNotifyStep3View.get[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplication"."id",
+                 "siae_evaluations_evaluatedjobapplication"."job_application_id",
+                 "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
+                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
+          FROM "siae_evaluations_evaluatedjobapplication"
+          WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/institution_evaluated_siae_notify_step3.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/institution_evaluated_siae_notify_step3.html]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedsiae"."id",
+                 "siae_evaluations_evaluatedsiae"."evaluation_campaign_id",
+                 "siae_evaluations_evaluatedsiae"."siae_id",
+                 "siae_evaluations_evaluatedsiae"."reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."final_reviewed_at",
+                 "siae_evaluations_evaluatedsiae"."submission_freezed_at",
+                 "siae_evaluations_evaluatedsiae"."notified_at",
+                 "siae_evaluations_evaluatedsiae"."notification_reason",
+                 "siae_evaluations_evaluatedsiae"."notification_text",
+                 "siae_evaluations_evaluatedsiae"."reminder_sent_at",
+                 "siae_evaluations_evaluationcampaign"."id",
+                 "siae_evaluations_evaluationcampaign"."name",
+                 "siae_evaluations_evaluationcampaign"."created_at",
+                 "siae_evaluations_evaluationcampaign"."percent_set_at",
+                 "siae_evaluations_evaluationcampaign"."evaluations_asked_at",
+                 "siae_evaluations_evaluationcampaign"."ended_at",
+                 "siae_evaluations_evaluationcampaign"."submission_freeze_notified_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_start_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_end_at",
+                 "siae_evaluations_evaluationcampaign"."institution_id",
+                 "siae_evaluations_evaluationcampaign"."chosen_percent",
+                 "siae_evaluations_evaluationcampaign"."calendar_id",
+                 "siae_evaluations_sanctions"."id",
+                 "siae_evaluations_sanctions"."evaluated_siae_id",
+                 "siae_evaluations_sanctions"."training_session",
+                 "siae_evaluations_sanctions"."suspension_dates",
+                 "siae_evaluations_sanctions"."subsidy_cut_percent",
+                 "siae_evaluations_sanctions"."subsidy_cut_dates",
+                 "siae_evaluations_sanctions"."deactivation_reason",
+                 "siae_evaluations_sanctions"."no_sanction_reason"
+          FROM "siae_evaluations_evaluatedsiae"
+          INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
+          LEFT OUTER JOIN "siae_evaluations_sanctions" ON ("siae_evaluations_evaluatedsiae"."id" = "siae_evaluations_sanctions"."evaluated_siae_id")
+          WHERE ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" IN
+                   (SELECT U0."id"
+                    FROM "siae_evaluations_evaluationcampaign" U0
+                    WHERE ((U0."ended_at" IS NULL
+                            OR U0."ended_at" >= %s)
+                           AND NOT (U0."evaluated_period_end_at" < %s)))
+                 AND "siae_evaluations_evaluatedsiae"."siae_id" = %s
+                 AND NOT ("siae_evaluations_evaluatedsiae"."id" = %s))
+          ORDER BY "siae_evaluations_evaluationcampaign"."evaluated_period_start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/institution_evaluated_siae_notify_step3.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/institution_evaluated_siae_notify_step3.html]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplication"."id",
+                 "siae_evaluations_evaluatedjobapplication"."job_application_id",
+                 "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
+                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
+          FROM "siae_evaluations_evaluatedjobapplication"
+          WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" IN (%s,
+                                                                                   %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/institution_evaluated_siae_notify_step3.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/institution_evaluated_siae_notify_step3.html]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."proof_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."uploaded_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."submitted_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."review_state"
+          FROM "siae_evaluations_evaluatedadministrativecriteria"
+          INNER JOIN "eligibility_administrativecriteria" ON ("siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
+          WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" IN (%s,
+                                                                                                      %s,
+                                                                                                      %s,
+                                                                                                      %s)
+          ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
+                   "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          UPDATE "django_session"
+          SET "session_data" = %s,
+              "expire_date" = %s
+          WHERE "django_session"."session_key" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
 # ---

@@ -2,7 +2,7 @@ import pytest
 from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils.html import escape
-from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.companies.enums import ContractType
 from itou.jobs.models import Appellation
@@ -15,7 +15,7 @@ from tests.companies.factories import (
 )
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import BASE_NUM_QUERIES, assert_previous_step, parse_response_to_soup
+from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup
 
 
 class TestCardView:
@@ -255,18 +255,14 @@ class TestJobDescriptionCardView:
     def setup_method(self, client):
         create_test_romes_and_appellations(["N1101"])
 
-    def test_job_description_card(self, client):
+    def test_job_description_card(self, client, snapshot):
         company = CompanyWithMembershipAndJobsFactory()
         job_description = company.job_description_through.first()
         job_description.description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         job_description.open_positions = 1234
         job_description.save()
         url = reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # select jobdescription (get_object_or_404)
-            + 1  # select other jobdescription (others_active_jobs)
-        ):
+        with assertSnapshotQueries(snapshot):
             response = client.get(url)
         assert response.context["job"] == job_description
         assert response.context["siae"] == company
