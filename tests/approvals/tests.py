@@ -323,41 +323,6 @@ class TestApprovalModel:
         )
         assert not approval.is_open_to_prolongation
 
-    def test_get_or_create_from_valid(self):
-        # FIXME(vperron): This test should be moved to users.tests or jobseekerprofile.tests.
-
-        # With an existing valid `PoleEmploiApproval`.
-
-        user = JobSeekerFactory(with_pole_emploi_id=True)
-        job_application = JobApplicationFactory(job_seeker=user)
-        valid_pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.jobseeker_profile.birthdate,
-            number="625741810182",
-        )
-        approval = user.get_or_create_approval(origin_job_application=job_application)
-
-        assert isinstance(approval, Approval)
-        assert approval.start_at == valid_pe_approval.start_at
-        assert approval.end_at == valid_pe_approval.end_at
-        assert approval.number == valid_pe_approval.number[:12]
-        assert approval.user == user
-        assert approval.created_by is None
-        assert approval.origin == Origin.PE_APPROVAL
-        assert approval.origin_siae_kind == job_application.to_company.kind
-        assert approval.origin_siae_siret == job_application.to_company.siret
-        assert approval.origin_sender_kind == job_application.sender_kind
-        assert approval.origin_prescriber_organization_kind == ""
-
-        # With an existing valid `Approval`.
-
-        user = JobSeekerFactory()
-        job_application = JobApplicationFactory(job_seeker=user, sent_by_authorized_prescriber_organisation=True)
-        valid_approval = ApprovalFactory(user=user, start_at=timezone.localdate() - relativedelta(days=1))
-        approval = user.get_or_create_approval(origin_job_application=job_application)
-        assert isinstance(approval, Approval)
-        assert approval == valid_approval
-
     def test_can_be_unsuspended_without_suspension(self):
         today = timezone.localdate()
         approval_start_at = today - relativedelta(months=3)

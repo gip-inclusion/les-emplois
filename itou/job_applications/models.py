@@ -1082,9 +1082,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     # Security check: it's supposed to be blocked upstream.
                     raise xwf_models.AbortTransition("Job seeker has an approval in waiting period.")
 
-            if self.job_seeker.has_valid_common_approval:
-                # Automatically reuse an existing valid Itou or PE approval.
-                self.approval = self.job_seeker.get_or_create_approval(origin_job_application=self)
+            latest_approval = self.job_seeker.latest_approval
+            if latest_approval and latest_approval.is_valid():
+                # Automatically reuse an existing valid approval.
+                self.approval = latest_approval
                 if self.approval.start_at > self.hiring_start_at:
                     # As a job seeker can have multiple contracts at the same time,
                     # the approval should start at the same time as most recent contract.

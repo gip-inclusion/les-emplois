@@ -1216,27 +1216,19 @@ class TestJobApplicationWorkflow:
         self, django_capture_on_commit_callbacks, mailoutbox
     ):
         """
-        When a Pôle emploi approval already exists, it is reused.
+        When an approval already exists, it is reused.
         """
         job_seeker = JobSeekerFactory(with_pole_emploi_id=True)
-        pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
-            birthdate=job_seeker.jobseeker_profile.birthdate,
-        )
+        approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationState.PROCESSING
         )
         with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
-        assert job_application.approval.number == pe_approval.number
+        assert job_application.approval == approval
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
-        assert job_application.approval.origin == Origin.PE_APPROVAL
-        assert job_application.approval.origin_siae_kind == job_application.to_company.kind
-        assert job_application.approval.origin_siae_siret == job_application.to_company.siret
-        assert job_application.approval.origin_sender_kind == job_application.sender_kind
-        assert job_application.approval.origin_prescriber_organization_kind == ""
         # Check sent emails.
         assert len(mailoutbox) == 2
         # Email sent to the employer.
@@ -1248,21 +1240,16 @@ class TestJobApplicationWorkflow:
         self, django_capture_on_commit_callbacks, mailoutbox
     ):
         job_seeker = JobSeekerFactory(jobseeker_profile__pole_emploi_id="", jobseeker_profile__birthdate=None)
-        pe_approval = PoleEmploiApprovalFactory(nir=job_seeker.jobseeker_profile.nir)
+        approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationState.PROCESSING
         )
         with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
-        assert job_application.approval.number == pe_approval.number
+        assert job_application.approval == approval
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
-        assert job_application.approval.origin == Origin.PE_APPROVAL
-        assert job_application.approval.origin_siae_kind == job_application.to_company.kind
-        assert job_application.approval.origin_siae_siret == job_application.to_company.siret
-        assert job_application.approval.origin_sender_kind == job_application.sender_kind
-        assert job_application.approval.origin_prescriber_organization_kind == ""
         # Check sent emails.
         assert len(mailoutbox) == 2
         # Email sent to the employer.
