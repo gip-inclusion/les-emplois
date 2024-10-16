@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertNumQueries, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType
@@ -16,7 +16,7 @@ from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import BASE_NUM_QUERIES, assert_previous_step, assertSnapshotQueries
+from tests.utils.test import assert_previous_step, assertSnapshotQueries
 
 
 class JobDescriptionAbstract:
@@ -586,20 +586,11 @@ class TestJobDescriptionCard(JobDescriptionAbstract):
         assertContains(response, reverse("companies_views:job_description_list"))
         assertNotContains(response, self.apply_start_url(self.company))
 
-    def test_prescriber_card_actions(self, client):
+    def test_prescriber_card_actions(self, client, snapshot):
         # Checks if non-employers can apply to opened job descriptions
         client.force_login(PrescriberOrganizationWithMembershipFactory().members.first())
 
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # fetch django session
-            + 1  # fetch user
-            + 1  # fetch user memberships
-            + 1  # fetch companies_jobdescription (get_object_or_404)
-            + 1  # `is_prescriber_with_authorized_org()` in nav
-            + 1  # fetch companies_jobdescription (others_active_jobs)
-            + 3  # update session
-        ):
+        with assertSnapshotQueries(snapshot):
             response = client.get(self.url)
 
         assertContains(response, "Postuler auprès de l'employeur inclusif")
@@ -609,17 +600,10 @@ class TestJobDescriptionCard(JobDescriptionAbstract):
             self.update_job_description_url(self.job_description),
         )
 
-    def test_job_seeker_card_actions(self, client):
+    def test_job_seeker_card_actions(self, client, snapshot):
         client.force_login(JobSeekerFactory())
 
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # fetch django session
-            + 1  # fetch user
-            + 1  # fetch companies_jobdescription (get_object_or_404)
-            + 1  # fetch companies_jobdescription (others_active_jobs)
-            + 3  # update session
-        ):
+        with assertSnapshotQueries(snapshot):
             response = client.get(self.url)
 
         assertContains(response, "Postuler auprès de l'employeur inclusif")

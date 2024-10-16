@@ -6,7 +6,7 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNumQueries
+from pytest_django.asserts import assertContains
 
 from itou.job_applications.enums import JobApplicationState
 from itou.www.itou_staff_views.forms import DEPARTMENTS_CHOICES
@@ -22,7 +22,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.test import BASE_NUM_QUERIES
+from tests.utils.test import assertSnapshotQueries
 
 
 class TestExportJobApplications:
@@ -87,17 +87,7 @@ class TestExportJobApplications:
             )
         with (
             freeze_time("2024-05-17T11:11:11+02:00"),
-            # 1. django session
-            # 2. active user
-            # 3. SAVEPOINT (enter view)
-            # 4. RELEASE (exit view)
-            # 5. SELECT job apps
-            # 6. prefetch selected jobs
-            # 7. prefetch administrative criteria
-            # 8. prefetch eligibility diagnosis author prescriber organization
-            # 9. prefetch prolongation
-            # 10. prefetch suspension
-            assertNumQueries(expected_queries),
+            assertSnapshotQueries(snapshot(name="SQL queries")),
         ):
             response = client.post(
                 reverse("itou_staff_views:export_job_applications_unknown_to_ft"),
@@ -112,7 +102,7 @@ class TestExportJobApplications:
                 "attachment; "
                 'filename="candidats_emplois_inclusion_multiple_departements_non_certifies_2024-05-17_11-11-11.csv"'
             )
-            assert b"".join(response.streaming_content).decode() == snapshot
+            assert b"".join(response.streaming_content).decode() == snapshot(name="streaming content")
 
     def test_export_today(self, client):
         client.force_login(ItouStaffFactory(is_superuser=True))
@@ -170,12 +160,7 @@ class TestExportPEApiRejections:
         )
         client.force_login(ItouStaffFactory(is_superuser=True))
 
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # Load Django session
-            + 1  # Load user
-            + 1  # approvals
-        ):
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
             response = client.get(
                 reverse("itou_staff_views:export_ft_api_rejections"),
             )
@@ -186,7 +171,7 @@ class TestExportPEApiRejections:
             assert response["Content-Type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
             workbook = openpyxl.load_workbook(filename=io.BytesIO(b"".join(response.streaming_content)))
-            assert list(workbook.active.values) == snapshot
+            assert list(workbook.active.values) == snapshot(name="workbook values")
 
 
 class TestExportCTA:
@@ -214,16 +199,10 @@ class TestExportCTA:
         PrescriberMembershipFactory(organization__for_snapshot=True, user__for_snapshot=True)
         CompanyFactory(with_membership=True, for_snapshot=True)
 
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # Load Django session
-            + 1  # Load user
-            + 1  # employers
-            + 1  # prescribers
-        ):
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
             response = client.get(
                 reverse("itou_staff_views:export_cta"),
             )
             assert response.status_code == 200
             assert response["Content-Disposition"] == ("attachment; " 'filename="export_cta_2024-05-17_11-11-11.csv"')
-            assert b"".join(response.streaming_content).decode() == snapshot
+            assert b"".join(response.streaming_content).decode() == snapshot(name="streaming content")

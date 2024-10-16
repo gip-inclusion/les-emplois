@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertMessages, assertNumQueries, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
@@ -20,7 +20,7 @@ from itou.utils.urls import get_tally_form_url
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWithMembershipAndJobsFactory
 from tests.openid_connect.test import sso_parametrize
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, PrescriberFactory
-from tests.utils.test import BASE_NUM_QUERIES, ItouClient
+from tests.utils.test import ItouClient, assertSnapshotQueries
 
 
 class TestCompanySignup:
@@ -332,7 +332,7 @@ class TestCompanySignup:
         assertContains(response, get_tally_form_url("wA799W"))
         assertContains(response, reverse("signup:facilitator_search"))
 
-    def test_company_select_does_not_die_under_requests(self, client):
+    def test_company_select_does_not_die_under_requests(self, client, snapshot):
         companies = (
             CompanyWithMembershipAndJobsFactory(siret="40219166200001"),
             CompanyWithMembershipAndJobsFactory(siret="40219166200002"),
@@ -349,13 +349,7 @@ class TestCompanySignup:
         # ensure we only perform 4 requests, whatever the number of companies sharing the
         # same SIREN. Before, this request was issuing 3*N slow requests, N being the
         # number of companies.
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # SELECT companies with active admins
-            + 1  # SELECT the conventions for those companies
-            + 1  # prefetch memberships
-            + 1  # prefetch users associated with those memberships
-        ):
+        with assertSnapshotQueries(snapshot):
             response = client.get(url, {"siren": "402191662"})
         assert response.status_code == 200
         assertContains(response, "402191662", count=7)  # 1 input + 6 results

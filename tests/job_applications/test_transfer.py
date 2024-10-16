@@ -3,7 +3,6 @@ import xworkflows
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from pytest_django.asserts import assertNumQueries
 
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.enums import JobApplicationState
@@ -17,6 +16,7 @@ from tests.job_applications.factories import (
     JobApplicationSentByPrescriberFactory,
 )
 from tests.users.factories import JobSeekerFactory
+from tests.utils.test import assertSnapshotQueries
 
 
 def test_is_in_transferable_state(subtests):
@@ -147,7 +147,7 @@ def test_transfer_to_without_sender():
     assert job_application.state == JobApplicationState.NEW
 
 
-def test_model_fields():
+def test_model_fields(snapshot):
     # Check new fields in model
     origin_company = CompanyFactory(with_membership=True)
     target_company = CompanyFactory(with_membership=True)
@@ -171,18 +171,7 @@ def test_model_fields():
     assert job_application.transferred_from is None
     assert job_application.transferred_at is None
 
-    with assertNumQueries(
-        2  # Check user is in both origin and dest siae
-        + 1  # Update job application to dereference eligibility diagnosis
-        + 4  # Delete (+ SET_NULL) diagnosis and criteria made by the SIAE
-        + 1  # Select user for email
-        + 1  # Select employer notification settings
-        + 1  # Insert employer email in emails table
-        + 1  # Select job seeker notification settings
-        + 1  # Insert job seeker email in emails table
-        + 1  # Update job application
-        + 1  # Add job application transition log
-    ):
+    with assertSnapshotQueries(snapshot):
         job_application.transfer(user=origin_user, target_company=target_company)
 
     job_application.refresh_from_db()
