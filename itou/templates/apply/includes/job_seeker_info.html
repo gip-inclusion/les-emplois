@@ -27,7 +27,7 @@
 <ul class="list-data list-data__two-column-md mb-3">
     <li>
         <small>Prénom</small>
-        <strong>{{ job_seeker.first_name|mask_unless:can_view_personal_information }}</strong>
+        <strong>{{ job_seeker.first_name|title|mask_unless:can_view_personal_information }}</strong>
     </li>
     {% if can_view_personal_information %}
         <li>
