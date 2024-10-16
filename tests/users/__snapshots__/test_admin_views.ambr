@@ -582,6 +582,7 @@
       }),
       dict({
         'origin': list([
+          'NotificationSettings.save[<site-packages>/django/db/models/base.py]',
           'get_or_create[communications/models.py]',
           'ItouUserAdmin.disabled_notifications[users/admin.py]',
           'VariableNode[admin/includes/fieldset.html]',
@@ -660,6 +661,7 @@
       }),
       dict({
         'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''

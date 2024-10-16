@@ -448,6 +448,7 @@
       }),
       dict({
         'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''
@@ -674,6 +675,7 @@
       }),
       dict({
         'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''
@@ -970,6 +972,7 @@
       }),
       dict({
         'origin': list([
+          'EvaluatedSiae.save[<site-packages>/django/db/models/base.py]',
           'siae_submit_proofs[www/siae_evaluations_views/views.py]',
         ]),
         'sql': '''
@@ -1072,6 +1075,7 @@
       }),
       dict({
         'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
           'AsyncEmailBackend.send_messages[emails/tasks.py]',
           'send_email_messages[utils/emails.py]',
           'siae_submit_proofs[www/siae_evaluations_views/views.py]',
@@ -1104,6 +1108,7 @@
       }),
       dict({
         'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''
@@ -1151,6 +1156,7 @@
       }),
       dict({
         'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
           '_async_send_message[emails/tasks.py]',
         ]),
         'sql': '''

@@ -242,7 +242,7 @@ OTHER_PACKAGES_ALLOWLIST = {
     "__exit__": ("django/db/transaction.py",),
     "initial_form_count": "django/forms/models.py",
     "list": "rest_framework/mixins.py",
-    "save": ("django/contrib/sessions/backends/db.py",),
+    "save": ("django/contrib/sessions/backends/db.py", "django/db/models/base.py"),
     "serialize_queryset_by_batch": "xlsx_streaming/streaming.py",
 }
 

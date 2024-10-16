@@ -1754,6 +1754,7 @@
       }),
       dict({
         'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''

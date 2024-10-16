@@ -102,6 +102,7 @@
       }),
       dict({
         'origin': list([
+          'EvaluationCampaign.save[<site-packages>/django/db/models/base.py]',
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
         'sql': '''
@@ -514,6 +515,7 @@
       }),
       dict({
         'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
           'AsyncEmailBackend.send_messages[emails/tasks.py]',
           'send_email_messages[utils/emails.py]',
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
@@ -533,6 +535,7 @@
       }),
       dict({
         'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
           'AsyncEmailBackend.send_messages[emails/tasks.py]',
           'send_email_messages[utils/emails.py]',
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
