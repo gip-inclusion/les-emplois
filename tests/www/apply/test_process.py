@@ -47,7 +47,6 @@ from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
 from tests.approvals.factories import (
-    PoleEmploiApprovalFactory,
     ProlongationFactory,
     ProlongationRequestFactory,
     SuspensionFactory,
@@ -2256,45 +2255,6 @@ class TestProcessAcceptViews:
         # The job seeker has now three part-time jobs at the same time.
         assert job_app_starting_later.state.is_accepted
         assert job_app_starting_later.approval.start_at == job_app_starting_earlier.hiring_start_at
-
-    def test_with_double_user(self, client):
-        job_application = self.create_job_application()
-        job_seeker = job_application.job_seeker
-
-        # Create a "PE Approval" that will be converted to a PASS IAE when accepting the process
-        pole_emploi_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
-            birthdate=job_seeker.jobseeker_profile.birthdate,
-        )
-
-        # Accept the job application for the first job seeker.
-        employer = self.company.members.first()
-        client.force_login(employer)
-        _, next_url = self.accept_job_application(client, job_application)
-        response = client.get(next_url)
-        assert "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. " not in str(
-            list(response.context["messages"])[0]
-        )
-
-        # This approval is found thanks to the PE Approval number
-        approval = Approval.objects.get(number=pole_emploi_approval.number)
-        assert approval.user == job_seeker
-
-        # Now generate a job seeker that is "almost the same"
-        almost_same_job_seeker = JobSeekerFactory(
-            with_pole_emploi_id=True,
-            with_ban_api_mocked_address=True,
-            jobseeker_profile__pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
-            jobseeker_profile__birthdate=job_seeker.jobseeker_profile.birthdate,
-        )
-        another_job_application = self.create_job_application(job_seeker=almost_same_job_seeker)
-
-        # Gracefully display a message instead of just plain crashing
-        _, next_url = self.accept_job_application(client, another_job_application)
-        response = client.get(next_url)
-        assert "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. " in str(
-            list(response.context["messages"])[0]
-        )
 
     def test_nir_readonly(self, client):
         job_application = self.create_job_application()

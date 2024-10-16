@@ -18,7 +18,6 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.utils import geiq_allowance_amount
 from itou.users.enums import UserKind
-from itou.users.models import ApprovalAlreadyExistsError
 from itou.utils import constants as global_constants
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.urls import add_url_params, get_external_link_markup, get_safe_url
@@ -129,31 +128,6 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
                 # Mark job seeker's infos as up-to-date
                 job_application.job_seeker.last_checked_at = timezone.now()
                 job_application.job_seeker.save(update_fields=["last_checked_at"])
-        except ApprovalAlreadyExistsError:
-            link_to_form = get_external_link_markup(
-                url=f"{global_constants.ITOU_HELP_CENTER_URL }/requests/new",
-                text="ce formulaire",
-            )
-            messages.error(
-                request,
-                # NOTE(vperron): maybe a small template would be better if this gets more complex.
-                mark_safe(
-                    "Ce candidat semble avoir plusieurs comptes sur Les emplois de l'inclusion "
-                    "(même identifiant France Travail mais adresse e-mail différente). "
-                    "<br>"
-                    "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. "
-                    "<br>"
-                    f"Pour que nous régularisions la situation, merci de remplir {link_to_form} en nous indiquant : "
-                    "<ul>"
-                    "<li> nom et prénom du salarié"
-                    "<li> numéro de sécurité sociale"
-                    "<li> sa date de naissance"
-                    "<li> son identifiant Pôle Emploi"
-                    "<li> la référence d’un agrément Pôle Emploi ou d’un PASS IAE lui appartenant (si vous l’avez) "
-                    "</ul>"
-                ),
-            )
-            return HttpResponseClientRedirect(error_url)
         except xwf_models.InvalidTransitionError:
             messages.error(request, "Action déjà effectuée.")
             return HttpResponseClientRedirect(error_url)

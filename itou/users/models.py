@@ -20,8 +20,7 @@ from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 
-from itou.approvals.enums import Origin
-from itou.approvals.models import Approval, PoleEmploiApproval
+from itou.approvals.models import PoleEmploiApproval
 from itou.asp.models import (
     AllocationDuration,
     Commune,
@@ -42,10 +41,6 @@ from itou.utils.validators import validate_birth_location, validate_birthdate, v
 
 from .enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 from .notifications import JobSeekerCreatedByProxyNotification
-
-
-class ApprovalAlreadyExistsError(Exception):
-    pass
 
 
 class ItouUserManager(UserManager):
@@ -547,30 +542,6 @@ class User(AbstractUser, AddressMixin):
             and siae.is_subject_to_eligibility_rules
             and not (is_sent_by_authorized_prescriber or has_valid_diagnosis)
         )
-
-    def get_or_create_approval(self, origin_job_application):
-        """
-        Returns an existing valid Approval or create a new entry from
-        a pre-existing valid PoleEmploiApproval by copying its data.
-        """
-        # FIXME(vperron): move this method and all the other approval-related code to JobSeekerProfile.
-        if not self.has_valid_common_approval:
-            raise RuntimeError("Invalid approval.")
-        if self.latest_approval and self.latest_approval.is_valid():
-            return self.latest_approval
-        pe_approval = self.latest_pe_approval
-        if Approval.objects.filter(number=pe_approval.number).exists():
-            raise ApprovalAlreadyExistsError()
-        approval_from_pe = Approval(
-            start_at=pe_approval.start_at,
-            end_at=pe_approval.end_at,
-            user=self,
-            number=pe_approval.number,
-            origin=Origin.PE_APPROVAL,
-            **Approval.get_origin_kwargs(origin_job_application),
-        )
-        approval_from_pe.save()
-        return approval_from_pe
 
     @property
     def is_handled_by_proxy(self):
