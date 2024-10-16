@@ -1,6 +1,6 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
-{% if job_application.sender.title %}Bonjour {{ job_application.sender.get_title_display }} {{ job_application.sender.last_name }},{% else %}Bonjour {{ job_application.sender.get_full_name }},{% endif %}
+{% if job_application.sender.title %}Bonjour {{ job_application.sender.get_title_display }} {{ job_application.sender.last_name|upper }},{% else %}Bonjour {{ job_application.sender.get_full_name }},{% endif %}
 
 {% block header %}L’entreprise {{ job_application.to_company.display_name }} vous propose d’utiliser Diagoriente pour valoriser les expériences de votre candidat : {{ job_application.job_seeker.get_full_name }}.
 Vous pourrez lui créer un compte en cliquant sur ce lien : https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-employeur{% endblock header %}
