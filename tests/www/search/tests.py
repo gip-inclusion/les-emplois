@@ -379,6 +379,24 @@ class TestSearchCompany:
         assertContains(response, guerande_opt, html=True, count=1)
         assertContains(response, vannes_opt, html=True, count=1)
 
+    def test_is_searchable(self, client):
+        city = create_city_saint_andre()
+        searchable_company = CompanyFactory(department="44", coords=city.coords, post_code="44117")
+        unsearchable_company = CompanyFactory(
+            department="44", coords=city.coords, post_code="44117", is_searchable=False
+        )
+
+        # A searchable company (default) should appear in the results
+        response = client.get(self.URL, {"city": city.slug})
+        assertContains(
+            response,
+            '<span>Employeur</span><span class="badge badge-sm rounded-pill ms-2">1</span>',
+            html=True,
+            count=1,
+        )
+        assertContains(response, searchable_company.display_name)
+        assertNotContains(response, unsearchable_company.display_name)
+
 
 class TestSearchPrescriber:
     def test_home(self, client):
@@ -1117,3 +1135,37 @@ class TestJobDescriptionSearchView:
         response = client.get(self.URL, {"city": guerande.slug, "distance": 100})
         fresh_page = parse_response_to_soup(response)
         assertSoupEqual(simulated_page, fresh_page)
+
+    def test_is_searchable(self, client):
+        city = create_city_saint_andre()
+        searchable_company = CompanyFactory(
+            department="44", coords=city.coords, post_code="44117", with_jobs=True, romes=["N1101"]
+        )
+        unsearchable_company = CompanyFactory(
+            department="44",
+            coords=city.coords,
+            post_code="44117",
+            with_jobs=True,
+            romes=["N1105", "N1103"],
+            is_searchable=False,
+        )
+
+        # A searchable company (default) should appear in the results
+        response = client.get(self.URL, {"city": city.slug})
+        assertContains(
+            response,
+            '<span>Employeur</span><span class="badge badge-sm rounded-pill ms-2">1</span>',
+            html=True,
+            count=1,
+        )
+        assertContains(
+            response,
+            """
+                <span>Poste <span class="d-none d-md-inline">ouvert au recrutement</span></span>
+                <span class="badge badge-sm rounded-pill ms-2">1</span>
+            """,
+            html=True,
+            count=1,
+        )
+        assertContains(response, searchable_company.display_name)
+        assertNotContains(response, unsearchable_company.display_name)

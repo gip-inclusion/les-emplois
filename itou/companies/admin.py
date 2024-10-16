@@ -157,6 +157,7 @@ class CompanyAdmin(ItouGISMixin, OrganizationAdmin):
                     "created_by",
                     "created_at",
                     "updated_at",
+                    "is_searchable",
                     "block_job_applications",
                     "job_applications_blocked_at",
                     "approvals_list",
