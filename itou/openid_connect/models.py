@@ -105,8 +105,11 @@ class OIDConnectUserData:
     username: str
     identity_provider: IdentityProvider
     kind: UserKind
-    login_allowed_user_kinds: ClassVar[tuple[UserKind]] = ()
     allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = ()
+
+    @property
+    def login_allowed_user_kinds(self) -> tuple[UserKind]:
+        return IdentityProvider.supported_user_kinds[self.identity_provider]
 
     def check_valid_kind(self, user, user_data_dict, is_login):
         if user.kind not in self.login_allowed_user_kinds or (user.kind != user_data_dict["kind"] and not is_login):

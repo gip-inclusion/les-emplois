@@ -11,12 +11,6 @@
             </h3>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
-        <div class="row modal-body">
-            <p>{{ message }}</p>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn" data-bs-dismiss="modal">Retour</button>
-            <a href="{% url 'signup:job_seeker' %}" class="btn btn-primary">Inscription</a>
-        </div>
+        {{ message }}
     </div>
 </div>

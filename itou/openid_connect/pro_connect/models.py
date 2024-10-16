@@ -45,7 +45,6 @@ class ProConnectUserData(OIDConnectUserData):
 class ProConnectPrescriberData(ProConnectUserData):
     kind: UserKind = UserKind.PRESCRIBER
     identity_provider: IdentityProvider = IdentityProvider.PRO_CONNECT
-    login_allowed_user_kinds: ClassVar[tuple[UserKind]] = (UserKind.PRESCRIBER, UserKind.EMPLOYER)
     allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = (
         IdentityProvider.DJANGO,
         IdentityProvider.INCLUSION_CONNECT,
@@ -56,7 +55,6 @@ class ProConnectPrescriberData(ProConnectUserData):
 class ProConnectEmployerData(ProConnectUserData):
     kind: UserKind = UserKind.EMPLOYER
     identity_provider: IdentityProvider = IdentityProvider.PRO_CONNECT
-    login_allowed_user_kinds: ClassVar[tuple[UserKind]] = (UserKind.PRESCRIBER, UserKind.EMPLOYER)
     allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = (
         IdentityProvider.DJANGO,
         IdentityProvider.INCLUSION_CONNECT,

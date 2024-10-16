@@ -1,0 +1,24 @@
+{% load static %}
+{% load theme_inclusion %}
+{% load matomo %}
+
+{% if pro_connect_url %}
+    <div class="text-center">
+        <a href="{{ pro_connect_url }}" class="proconnect-button" {% matomo_event "connexion "|add:matomo_account_type "clic" "se-connecter-avec-pro-connect" %}>
+        </a>
+        <p>
+            <a href="https://proconnect.gouv.fr/" target="_blank" rel="noopener noreferrer" title="Qu’est-ce que AgentConnect ? - nouvelle fenêtre">
+                Qu’est-ce que ProConnect ?
+            </a>
+        </p>
+    </div>
+{% else %}
+    <div class="alert alert-info" role="status">
+        <p class="mb-2">
+            <strong>ProConnect est momentanément désactivé.</strong>
+        </p>
+        <p class="mb-0">
+            Afin de demander un PASS IAE en urgence, <a href="https://tally.so/r/nrj0V5" target="_blank" class="has-external-link">remplissez ce formulaire.</a>
+        </p>
+    </div>
+{% endif %}

@@ -14,10 +14,11 @@ from django.utils.http import urlencode
 
 from itou.external_data.models import ExternalDataImport
 from itou.external_data.tasks import huey_import_user_pe_data
-from itou.users.enums import UserKind
+from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.urls import add_url_params, get_absolute_url
 
+from ..errors import redirect_with_error_sso_email_conflict_on_registration
 from ..models import EmailInUseException, InvalidKindException, MultipleUsersFoundException
 from . import constants
 from .models import PoleEmploiConnectState, PoleEmploiConnectUserData
@@ -129,15 +130,7 @@ def pe_connect_callback(request):
         user, _ = pe_user_data.create_or_update_user()
     except InvalidKindException as e:
         messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
-        url = {
-            UserKind.PRESCRIBER: reverse("login:prescriber"),
-            UserKind.EMPLOYER: reverse("login:employer"),
-            UserKind.LABOR_INSPECTOR: reverse("login:labor_inspector"),
-            # Staff members may have created a job seeker account with the same email
-            # as their staff email on the platform for troubleshooting.
-            UserKind.ITOU_STAFF: reverse("login:job_seeker"),
-        }[e.user.kind]
-        return HttpResponseRedirect(url)
+        return HttpResponseRedirect(UserKind.get_login_url(e.user.kind))
     except MultipleUsersFoundException as e:
         return _redirect_to_job_seeker_login_on_error(
             format_html(
@@ -152,26 +145,8 @@ def pe_connect_callback(request):
             request=request,
         )
     except EmailInUseException as e:
-        redacted_name = e.user.get_redacted_full_name()
-        msg_who = (
-            format_html(
-                " au nom de <strong>{}</strong>",
-                redacted_name,
-            )
-            if redacted_name
-            else ""
-        )
-
-        return _redirect_to_job_seeker_login_on_error(
-            format_html(
-                "Vous avez essayé de vous connecter avec un compte France Travail, mais un compte"
-                "{} a déjà été créé avec cette adresse e-mail. Vous pouvez néanmoins"
-                " vous inscrire en utilisant une autre adresse e-mail et un mot de passe"
-                ' en cliquant sur <strong>"Inscription"</strong>.',
-                msg_who,
-            ),
-            request=request,
-            extra_tags="modal sso_email_conflict_registration_failure",
+        return redirect_with_error_sso_email_conflict_on_registration(
+            request, e.user, IdentityProvider.PE_CONNECT.label
         )
 
     nir = request.session.get(global_constants.ITOU_SESSION_NIR_KEY)
