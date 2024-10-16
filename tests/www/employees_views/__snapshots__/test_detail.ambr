@@ -924,7 +924,7 @@
       dict({
         'origin': list([
           'User.latest_approval[users/models.py]',
-          'User.has_valid_common_approval[users/models.py]',
+          'User.has_valid_approval[users/models.py]',
           'EligibilityDiagnosis.considered_to_expire_at[eligibility/models/iae.py]',
           'VariableNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',

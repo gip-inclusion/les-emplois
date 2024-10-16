@@ -104,8 +104,8 @@
                                     {# Approval status. #}
                                     {% if job_application.approval %}
                                         {% include "approvals/includes/status.html" with common_approval=job_application.approval hiring_pending=job_application.is_pending %}
-                                    {% elif job_application.job_seeker.has_valid_common_approval %}
-                                        {% include "approvals/includes/status.html" with common_approval=job_application.job_seeker.latest_common_approval hiring_pending=job_application.is_pending %}
+                                    {% elif job_application.job_seeker.has_valid_approval %}
+                                        {% include "approvals/includes/status.html" with common_approval=job_application.job_seeker.latest_approval hiring_pending=job_application.is_pending %}
                                     {% elif job_application.hiring_without_approval %}
                                         Vous n'avez pas demandé de PASS IAE (agrément).
                                     {% elif job_application.approval_manually_refused_at %}

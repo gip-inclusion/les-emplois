@@ -954,7 +954,7 @@
 # ---
 # name: test_job_application_tab[job seeker details view with sent job applications]
   dict({
-    'num_queries': 18,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -1298,7 +1298,7 @@
       dict({
         'origin': list([
           'User.latest_approval[users/models.py]',
-          'User.has_valid_common_approval[users/models.py]',
+          'User.has_valid_approval[users/models.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
           'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
         ]),
@@ -1324,45 +1324,6 @@
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
           ORDER BY "approvals_approval"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
-          'User.latest_pe_approval[users/models.py]',
-          'User.has_valid_common_approval[users/models.py]',
-          'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
-          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_poleemploiapproval"."id",
-                 "approvals_poleemploiapproval"."start_at",
-                 "approvals_poleemploiapproval"."end_at",
-                 "approvals_poleemploiapproval"."created_at",
-                 "approvals_poleemploiapproval"."pe_notification_status",
-                 "approvals_poleemploiapproval"."pe_notification_time",
-                 "approvals_poleemploiapproval"."pe_notification_endpoint",
-                 "approvals_poleemploiapproval"."pe_notification_exit_code",
-                 "approvals_poleemploiapproval"."pe_structure_code",
-                 "approvals_poleemploiapproval"."number",
-                 "approvals_poleemploiapproval"."pole_emploi_id",
-                 "approvals_poleemploiapproval"."first_name",
-                 "approvals_poleemploiapproval"."last_name",
-                 "approvals_poleemploiapproval"."birth_name",
-                 "approvals_poleemploiapproval"."birthdate",
-                 "approvals_poleemploiapproval"."nir",
-                 "approvals_poleemploiapproval"."ntt_nia",
-                 "approvals_poleemploiapproval"."siae_siret",
-                 "approvals_poleemploiapproval"."siae_kind"
-          FROM "approvals_poleemploiapproval"
-          WHERE ("approvals_poleemploiapproval"."nir" = %s
-                 AND NOT ("approvals_poleemploiapproval"."number" IN
-                            (SELECT U0."number"
-                             FROM "approvals_approval" U0
-                             WHERE U0."user_id" = %s)))
-          ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
-                   "approvals_poleemploiapproval"."start_at" ASC
-          LIMIT 1
         ''',
       }),
       dict({
@@ -3310,7 +3271,7 @@
       dict({
         'origin': list([
           'User.latest_approval[users/models.py]',
-          'User.has_valid_common_approval[users/models.py]',
+          'User.has_valid_approval[users/models.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
           'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
         ]),
