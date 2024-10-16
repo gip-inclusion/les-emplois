@@ -6,7 +6,7 @@ import pytest
 import respx
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains, assertTemplateUsed
+from pytest_django.asserts import assertContains, assertNotContains, assertRaisesMessage, assertTemplateUsed
 
 from itou.rdv_insertion.models import Appointment, InvitationRequest, Participation
 from itou.utils.mocks.rdv_insertion import (
@@ -41,6 +41,7 @@ def mock_rdvs_api(settings):
     )
 
 
+@pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
 @freeze_time("2024-08-01")
 class TestRdvInsertionAppointmentsList:
     APPOINTMENTS_TAB_TITLE = "Rendez-vous"
@@ -67,68 +68,118 @@ class TestRdvInsertionAppointmentsList:
             for_snapshot=True,
         )
 
-    def test_details_should_not_include_appointments_tab_is_not_configured(self, client):
+    @pytest.mark.parametrize(
+        "profile,view_name,template_name",
+        [
+            ("employer", "apply:details_for_company", "process_details_company"),
+            ("job_seeker", "apply:details_for_jobseeker", "process_details"),
+        ],
+    )
+    def test_details_should_not_include_appointments_tab_if_not_configured_and_without_upcoming_appointments(
+        self, profile_login, client, profile, view_name, template_name
+    ):
         self.job_application.to_company.rdv_solidarites_id = None
         self.job_application.to_company.save()
         self.participation.appointment.delete()
 
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-        )
-        assertTemplateUsed(response, "apply/process_details_company.html")
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
+        assertTemplateUsed(response, f"apply/{template_name}.html")
         assertNotContains(response, self.APPOINTMENTS_TAB_TITLE)
 
-    def test_details_should_include_appointments_tab_is_not_configured_and_has_upcoming_appointments(self, client):
+    @pytest.mark.parametrize(
+        "profile,view_name,template_name",
+        [
+            ("employer", "apply:details_for_company", "process_details_company"),
+            ("job_seeker", "apply:details_for_jobseeker", "process_details"),
+        ],
+    )
+    def test_details_should_include_appointments_tab_if_not_configured_and_has_upcoming_appointments(
+        self, profile_login, client, profile, view_name, template_name
+    ):
         self.job_application.to_company.rdv_solidarites_id = None
         self.job_application.to_company.save()
 
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-        )
-        assertTemplateUsed(response, "apply/process_details_company.html")
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
+        assertTemplateUsed(response, f"apply/{template_name}.html")
         assertContains(response, self.APPOINTMENTS_TAB_TITLE)
 
-    def test_details_should_include_appointments_tab_is_configured_and_without_upcoming_appointments(self, client):
+    @pytest.mark.parametrize(
+        "profile,view_name,template_name,contains_tab",
+        [
+            ("employer", "apply:details_for_company", "process_details_company", True),
+            ("job_seeker", "apply:details_for_jobseeker", "process_details", False),
+        ],
+    )
+    def test_details_should_include_appointments_tab_if_configured_and_without_upcoming_appointments(
+        self, profile_login, client, profile, view_name, template_name, contains_tab
+    ):
         self.participation.appointment.delete()
 
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-        )
-        assertTemplateUsed(response, "apply/process_details_company.html")
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
+        assertTemplateUsed(response, f"apply/{template_name}.html")
+        if contains_tab:
+            assertContains(response, self.APPOINTMENTS_TAB_TITLE)
+        else:
+            assertNotContains(response, self.APPOINTMENTS_TAB_TITLE)
+
+    @pytest.mark.parametrize(
+        "profile,view_name,template_name",
+        [
+            ("employer", "apply:details_for_company", "process_details_company"),
+            ("job_seeker", "apply:details_for_jobseeker", "process_details"),
+        ],
+    )
+    def test_details_should_include_appointments_tab_if_configured_and_with_upcoming_appointments(
+        self, profile_login, client, profile, view_name, template_name
+    ):
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
+        assertTemplateUsed(response, f"apply/{template_name}.html")
         assertContains(response, self.APPOINTMENTS_TAB_TITLE)
 
-    def test_details_should_include_appointments_tab_is_configured_and_with_upcoming_appointments(self, client):
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-        )
-        assertTemplateUsed(response, "apply/process_details_company.html")
-        assertContains(response, self.APPOINTMENTS_TAB_TITLE)
-
-    def test_appointments_tab_should_not_display_appointments_table_when_no_appointments_exist(self, client):
+    @pytest.mark.parametrize(
+        "profile,view_name",
+        [
+            ("employer", "apply:details_for_company"),
+            ("job_seeker", "apply:details_for_jobseeker"),
+        ],
+    )
+    def test_appointments_tab_should_not_display_appointments_table_when_no_appointments_exist(
+        self, profile_login, client, profile, view_name
+    ):
         self.participation.appointment.delete()
 
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-        )
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
         assertNotContains(response, self.APPOINTMENTS_TABLE_ID)
 
-    def test_appointments_tab_should_display_appointments_table_when_appointments_exist(self, client):
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-        )
+    @pytest.mark.parametrize(
+        "profile,view_name",
+        [
+            ("employer", "apply:details_for_company"),
+            ("job_seeker", "apply:details_for_jobseeker"),
+        ],
+    )
+    def test_appointments_tab_should_display_appointments_table_when_appointments_exist(
+        self, profile_login, client, profile, view_name
+    ):
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
         assertContains(response, self.APPOINTMENTS_TABLE_ID)
 
-    def test_appointments_tab_should_display_upcoming_appointments(self, client):
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-        )
+    @pytest.mark.parametrize(
+        "profile,view_name",
+        [
+            ("employer", "apply:details_for_company"),
+            ("job_seeker", "apply:details_for_jobseeker"),
+        ],
+    )
+    def test_appointments_tab_should_display_upcoming_appointments(self, profile_login, client, profile, view_name):
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
         assertContains(response, f'{self.APPOINTMENTS_TAB_COUNTER} class="badge badge-sm rounded-pill ms-2">1</span>')
 
         # Past participation
@@ -148,27 +199,37 @@ class TestRdvInsertionAppointmentsList:
             status=Participation.Status.UNKNOWN,
         )
 
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-        )
+        response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
         assertContains(response, f'{self.APPOINTMENTS_TAB_COUNTER} class="badge badge-sm rounded-pill ms-2">2</span>')
 
         # Delete appointments
         self.job_application.job_seeker.rdvi_appointments.all().delete()
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-        )
+        response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
         assertNotContains(response, self.APPOINTMENTS_TAB_COUNTER)
 
-    def test_appointments_listing_display(self, client, snapshot):
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-        )
+    @pytest.mark.parametrize(
+        "profile,view_name",
+        [
+            ("employer", "apply:details_for_company"),
+            ("job_seeker", "apply:details_for_jobseeker"),
+        ],
+    )
+    def test_appointments_listing_display(self, profile_login, client, snapshot, profile, view_name):
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
         table = parse_response_to_soup(response, selector="#rdvi-appointments")
         assert str(table) == snapshot()
 
-    def test_appointments_listing_display_previous_appointments(self, client, snapshot):
+    @pytest.mark.parametrize(
+        "profile,view_name",
+        [
+            ("employer", "apply:details_for_company"),
+            ("job_seeker", "apply:details_for_jobseeker"),
+        ],
+    )
+    def test_appointments_listing_display_previous_appointments(
+        self, profile_login, client, snapshot, profile, view_name
+    ):
         ParticipationFactory(
             id="22222222-2222-2222-2222-222222222222",
             for_snapshot=True,
@@ -182,14 +243,19 @@ class TestRdvInsertionAppointmentsList:
             rdv_insertion_id=4321,
         )
 
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-        )
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
         table = parse_response_to_soup(response, selector="#rdvi-appointments")
         assert str(table) == snapshot()
 
-    def test_appointments_listing_status_badges(self, client, snapshot):
+    @pytest.mark.parametrize(
+        "profile,view_name",
+        [
+            ("employer", "apply:details_for_company"),
+            ("job_seeker", "apply:details_for_jobseeker"),
+        ],
+    )
+    def test_appointments_listing_status_badges(self, profile_login, client, snapshot, profile, view_name):
         ParticipationFactory(
             id="22222222-2222-2222-2222-222222222222",
             for_snapshot=True,
@@ -239,19 +305,22 @@ class TestRdvInsertionAppointmentsList:
             appointment__location__rdv_solidarites_id=7654,
         )
 
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-        )
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
 
         table = parse_response_to_soup(response, selector="#rdvi-appointments")
         assert str(table) == snapshot()
 
-    def test_appointments_tooltips(self, client, snapshot):
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-        )
+    @pytest.mark.parametrize(
+        "profile,view_name",
+        [
+            ("employer", "apply:details_for_company"),
+            ("job_seeker", "apply:details_for_jobseeker"),
+        ],
+    )
+    def test_appointments_tooltips(self, profile_login, client, snapshot, profile, view_name):
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
 
         details_button = parse_response_to_soup(
             response, selector="#participation-11111111-1111-1111-1111-111111111111-row"
@@ -281,26 +350,50 @@ class TestRdvInsertionInvitationRequestsList:
             for_snapshot=True,
         )
 
-    def test_invitations_requests_listing(self, client, snapshot):
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-        )
-        table = parse_response_to_soup(response, selector="#rdvi-invitation-requests")
-        assert str(table) == snapshot()
+    @pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
+    @pytest.mark.parametrize(
+        "profile,view_name,invitations_presence",
+        [
+            ("employer", "apply:details_for_company", True),
+            ("job_seeker", "apply:details_for_jobseeker", False),
+        ],
+    )
+    def test_invitations_requests_listing(
+        self, profile_login, client, snapshot, profile, view_name, invitations_presence
+    ):
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
+        if invitations_presence:
+            table = parse_response_to_soup(response, selector="#rdvi-invitation-requests")
+            assert str(table) == snapshot()
+        else:
+            # Selector not found
+            with assertRaisesMessage(ValueError, "not enough values to unpack (expected 1, got 0)"):
+                parse_response_to_soup(response, selector="#rdvi-invitation-requests")
 
-    def test_invite_button_uses_for_detail_endpoint(self, client):
-        client.force_login(self.job_application.to_company.members.get())
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
+    @pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
+    @pytest.mark.parametrize(
+        "profile,view_name,contains_invite_button",
+        [
+            ("employer", "apply:details_for_company", True),
+            ("job_seeker", "apply:details_for_jobseeker", False),
+        ],
+    )
+    def test_invite_button_uses_for_detail_endpoint(
+        self, profile_login, client, profile, view_name, contains_invite_button
+    ):
+        profile_login(profile, self.job_application)
+        response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
+        invite_button_url = reverse(
+            "apply:rdv_insertion_invite_for_detail", kwargs={"job_application_id": self.job_application.pk}
         )
-        assertContains(
-            response,
-            reverse("apply:rdv_insertion_invite_for_detail", kwargs={"job_application_id": self.job_application.pk}),
-        )
+        if contains_invite_button:
+            assertContains(response, invite_button_url)
+        else:
+            assertNotContains(response, invite_button_url)
 
     @respx.mock
-    def test_invite_response_includes_updated_invitation_requests_listing(self, client, snapshot, mocker):
+    def test_invite_response_includes_updated_invitation_requests_listing_for_employer(self, client, snapshot, mocker):
         mocker.patch(
             "itou.www.apply.views.process_views.get_api_credentials", return_value=RDV_INSERTION_AUTH_SUCCESS_HEADERS
         )
@@ -320,3 +413,19 @@ class TestRdvInsertionInvitationRequestsList:
         assert InvitationRequest.objects.count() == 2
         invitation_requests_table = parse_response_to_soup(response, selector="#rdvi-invitation-requests")
         assert str(invitation_requests_table) == snapshot(name="updated_invitation_requests")
+
+    @respx.mock
+    def test_invite_fails_for_job_seeker(self, client, snapshot, mocker):
+        mocker.patch(
+            "itou.www.apply.views.process_views.get_api_credentials", return_value=RDV_INSERTION_AUTH_SUCCESS_HEADERS
+        )
+        assert InvitationRequest.objects.count() == 1
+        client.force_login(self.job_application.job_seeker)
+
+        # Call the invite endpoint
+        response = client.post(
+            reverse("apply:rdv_insertion_invite_for_detail", kwargs={"job_application_id": self.job_application.pk}),
+            follow=True,
+        )
+        assert response.status_code == 404
+        assert InvitationRequest.objects.count() == 1

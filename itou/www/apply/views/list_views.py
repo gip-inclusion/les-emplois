@@ -4,7 +4,7 @@ from collections import defaultdict
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import models
-from django.db.models import Count, Exists, OuterRef, Q, Subquery
+from django.db.models import Count, Exists, F, OuterRef, Q, Subquery
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -92,6 +92,29 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     filters_form = FilterJobApplicationsForm(request.GET or None)
     job_applications = request.user.job_applications
     job_applications = job_applications.with_list_related_data()
+
+    job_applications = job_applications.annotate(
+        next_appointment_start_at=Subquery(
+            Participation.objects.filter(
+                appointment__company=OuterRef("to_company"),
+                job_seeker=OuterRef("job_seeker"),
+                status=Participation.Status.UNKNOWN,
+                appointment__start_at__gt=timezone.now(),
+            )
+            .order_by("appointment__start_at")
+            .values("appointment__start_at")[:1],
+            output_field=models.DateTimeField(),
+        ),
+        other_appointments_count=Count(
+            "job_seeker__rdvi_participations",
+            filter=Q(
+                job_seeker__rdvi_participations__appointment__company=F("to_company"),
+                job_seeker__rdvi_participations__status=Participation.Status.UNKNOWN,
+                job_seeker__rdvi_participations__appointment__start_at__gt=timezone.now(),
+            ),
+        )
+        - 1,  # Exclude the next appointment
+    )
 
     filters_counter = 0
     if filters_form.is_valid():
