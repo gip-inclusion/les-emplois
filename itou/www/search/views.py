@@ -76,12 +76,14 @@ class EmployerSearchBaseView(FormView):
         siaes = (
             Company.objects.active()
             .within(city.coords, distance)
+            .filter(is_searchable=True)
             .annotate(distance=Distance("coords", city.coords) / 1000)
         )
         job_descriptions = (
             JobDescription.objects.active()
             .within(city.coords, distance)
             .select_related("company", "location", "appellation")
+            .filter(company__is_searchable=True)
             .exclude(company__block_job_applications=True)
             .annotate(
                 distance=Case(

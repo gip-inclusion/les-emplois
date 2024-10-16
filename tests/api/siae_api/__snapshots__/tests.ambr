@@ -80,6 +80,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)

@@ -1251,6 +1251,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "eligibility_geiqeligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_geiqeligibilitydiagnosis"."author_geiq_id" = "companies_company"."id")
@@ -1479,6 +1480,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
           INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
@@ -1661,6 +1663,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "users_user" T3 ON ("job_applications_jobapplication"."sender_id" = T3."id")
@@ -3241,6 +3244,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "eligibility_geiqeligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_geiqeligibilitydiagnosis"."author_geiq_id" = "companies_company"."id")
@@ -3452,6 +3456,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "eligibility_eligibilitydiagnosis"
           INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
@@ -3648,6 +3653,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "users_user" T3 ON ("job_applications_jobapplication"."sender_id" = T3."id")

@@ -210,6 +210,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
@@ -355,6 +356,7 @@
                  T5."job_applications_blocked_at",
                  T5."convention_id",
                  T5."job_app_score",
+                 T5."is_searchable",
                  T5."rdv_solidarites_id",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
@@ -388,6 +390,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  "approvals_approval"."id",
                  "approvals_approval"."start_at",

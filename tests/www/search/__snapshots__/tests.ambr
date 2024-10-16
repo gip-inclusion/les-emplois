@@ -59,6 +59,7 @@
                       OR (ST_DWithin("companies_company"."coords", %s, %s)
                           AND "companies_company"."coords" IS NOT NULL
                           AND "companies_jobdescription"."location_id" IS NULL))
+                 AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
         ''',
       }),
@@ -148,6 +149,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  "cities_city"."id",
                  "cities_city"."name",
@@ -180,6 +182,7 @@
                       OR (ST_DWithin("companies_company"."coords", %s, %s)
                           AND "companies_company"."coords" IS NOT NULL
                           AND "companies_jobdescription"."location_id" IS NULL))
+                 AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
           ORDER BY "companies_jobdescription"."source_kind" ASC NULLS FIRST,
                    "companies_jobdescription"."updated_at" DESC,
@@ -272,7 +275,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s))
+                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND "companies_company"."is_searchable")
         ''',
       }),
       dict({
@@ -368,6 +372,7 @@
                       OR (ST_DWithin("companies_company"."coords", %s, %s)
                           AND "companies_company"."coords" IS NOT NULL
                           AND "companies_jobdescription"."location_id" IS NULL))
+                 AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
         ''',
       }),
@@ -457,6 +462,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  "cities_city"."id",
                  "cities_city"."name",
@@ -489,6 +495,7 @@
                       OR (ST_DWithin("companies_company"."coords", %s, %s)
                           AND "companies_company"."coords" IS NOT NULL
                           AND "companies_jobdescription"."location_id" IS NULL))
+                 AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
           ORDER BY "companies_jobdescription"."source_kind" ASC NULLS FIRST,
                    "companies_jobdescription"."updated_at" DESC,
@@ -581,7 +588,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s))
+                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND "companies_company"."is_searchable")
         ''',
       }),
       dict({
@@ -684,6 +692,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
@@ -700,7 +709,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s))
+                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND "companies_company"."is_searchable")
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -729,6 +739,7 @@
                                 AND U0."is_active")
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND "companies_company"."is_searchable"
                  AND "companies_company"."id" = %s)
         ''',
       }),
@@ -762,6 +773,7 @@
                       OR (ST_DWithin("companies_company"."coords", %s, %s)
                           AND "companies_company"."coords" IS NOT NULL
                           AND "companies_jobdescription"."location_id" IS NULL))
+                 AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
         ''',
       }),
@@ -832,6 +844,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
                  EXISTS
@@ -855,8 +868,9 @@
                                 AND U0."is_active")
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND "companies_company"."is_searchable"
                  AND "companies_company"."id" = %s)
-          ORDER BY 35 DESC,
+          ORDER BY 36 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -942,6 +956,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  "cities_city"."id",
                  "cities_city"."name",
@@ -974,6 +989,7 @@
                                           AND U0."is_active")
                                    LIMIT 1))
                            AND ST_DWithin(V0."coords", %s, %s)
+                           AND V0."is_searchable"
                            AND V0."id" = %s))
                  AND "companies_jobdescription"."is_active"
                  AND "companies_jobdescription"."company_id" IN (%s))
@@ -1059,6 +1075,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
@@ -1075,7 +1092,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s))
+                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND "companies_company"."is_searchable")
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -1103,7 +1121,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s))
+                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND "companies_company"."is_searchable")
         ''',
       }),
       dict({
@@ -1136,6 +1155,7 @@
                       OR (ST_DWithin("companies_company"."coords", %s, %s)
                           AND "companies_company"."coords" IS NOT NULL
                           AND "companies_jobdescription"."location_id" IS NULL))
+                 AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
         ''',
       }),
@@ -1206,6 +1226,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
                  EXISTS
@@ -1228,8 +1249,9 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s))
-          ORDER BY 35 DESC,
+                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND "companies_company"."is_searchable")
+          ORDER BY 36 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -1315,6 +1337,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  "cities_city"."id",
                  "cities_city"."name",
@@ -1346,7 +1369,8 @@
                                    WHERE (U0."id" = (V0."convention_id")
                                           AND U0."is_active")
                                    LIMIT 1))
-                           AND ST_DWithin(V0."coords", %s, %s)))
+                           AND ST_DWithin(V0."coords", %s, %s)
+                           AND V0."is_searchable"))
                  AND "companies_jobdescription"."is_active"
                  AND "companies_jobdescription"."company_id" IN (%s,
                                                                  %s,
@@ -1433,6 +1457,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
@@ -1449,7 +1474,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s))
+                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND "companies_company"."is_searchable")
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -1477,7 +1503,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s))
+                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND "companies_company"."is_searchable")
         ''',
       }),
       dict({
@@ -1510,6 +1537,7 @@
                       OR (ST_DWithin("companies_company"."coords", %s, %s)
                           AND "companies_company"."coords" IS NOT NULL
                           AND "companies_jobdescription"."location_id" IS NULL))
+                 AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
         ''',
       }),
@@ -1580,6 +1608,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
                  EXISTS
@@ -1602,8 +1631,9 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s))
-          ORDER BY 35 DESC,
+                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND "companies_company"."is_searchable")
+          ORDER BY 36 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -1689,6 +1719,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  "cities_city"."id",
                  "cities_city"."name",
@@ -1720,7 +1751,8 @@
                                    WHERE (U0."id" = (V0."convention_id")
                                           AND U0."is_active")
                                    LIMIT 1))
-                           AND ST_DWithin(V0."coords", %s, %s)))
+                           AND ST_DWithin(V0."coords", %s, %s)
+                           AND V0."is_searchable"))
                  AND "companies_jobdescription"."is_active"
                  AND "companies_jobdescription"."company_id" IN (%s,
                                                                  %s))
@@ -1806,6 +1838,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
@@ -1822,7 +1855,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s))
+                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND "companies_company"."is_searchable")
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -1850,7 +1884,8 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s))
+                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND "companies_company"."is_searchable")
         ''',
       }),
       dict({
@@ -1883,6 +1918,7 @@
                       OR (ST_DWithin("companies_company"."coords", %s, %s)
                           AND "companies_company"."coords" IS NOT NULL
                           AND "companies_jobdescription"."location_id" IS NULL))
+                 AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
         ''',
       }),
@@ -1953,6 +1989,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
                  EXISTS
@@ -1975,8 +2012,9 @@
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
                          LIMIT 1))
-                 AND ST_DWithin("companies_company"."coords", %s, %s))
-          ORDER BY 35 DESC,
+                 AND ST_DWithin("companies_company"."coords", %s, %s)
+                 AND "companies_company"."is_searchable")
+          ORDER BY 36 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -2062,6 +2100,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  "cities_city"."id",
                  "cities_city"."name",
@@ -2093,7 +2132,8 @@
                                    WHERE (U0."id" = (V0."convention_id")
                                           AND U0."is_active")
                                    LIMIT 1))
-                           AND ST_DWithin(V0."coords", %s, %s)))
+                           AND ST_DWithin(V0."coords", %s, %s)
+                           AND V0."is_searchable"))
                  AND "companies_jobdescription"."is_active"
                  AND "companies_jobdescription"."company_id" IN (%s,
                                                                  %s,

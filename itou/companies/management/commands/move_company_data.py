@@ -217,13 +217,12 @@ class Command(BaseCommand):
                         brand=from_company.display_name,
                         description=from_company.description,
                         phone=from_company.phone,
+                        is_searchable=True,  # Make sure the new company appears in results
                     )
                 from_company_qs.update(
                     block_job_applications=True,
                     job_applications_blocked_at=timezone.now(),
-                    # Make sure the old company no longer appears in results
-                    coords=None,
-                    geocoding_score=None,
+                    is_searchable=False,  # Make sure the old company no longer appears in results
                 )
 
         self.stdout.write(
