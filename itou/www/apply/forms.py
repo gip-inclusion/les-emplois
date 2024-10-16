@@ -623,7 +623,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         elif company.kind in SIAE_WITH_CONVENTION_KINDS:
             # Add specific details to help texts for IAE
             self.fields["hiring_start_at"].help_text += (
-                " La date est modifiable jusqu'à la veille de la date saisie. En cas de premier PASS IAE pour "
+                " La date est modifiable jusqu'à la veille de la date saisie. En cas de premier PASS IAE pour "
                 "la personne, cette date déclenche le début de son parcours."
             )
             self.fields["hiring_end_at"].help_text += (
@@ -813,7 +813,7 @@ class EditHiringDateForm(forms.ModelForm):
                 "Il n'est pas possible d'antidater un contrat. "
                 "Indiquez une date dans le futur. "
                 "Cette date peut-être repoussée de 30 jours au plus, "
-                "et avant la fin du PASS IAE éventuellement émis pour cette candidature."
+                "et avant la fin du PASS IAE éventuellement émis pour cette candidature."
             ),
             "hiring_end_at": (
                 "Cette date sert uniquement à des fins d'informations et est sans conséquence"

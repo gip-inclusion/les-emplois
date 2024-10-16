@@ -35,9 +35,9 @@ class AddEmployeeRecordChooseEmployeeForm(forms.Form):
 
 class AddEmployeeRecordChooseApprovalForm(forms.Form):
     approval = forms.ChoiceField(
-        label="PASS IAE",
+        label="PASS IAE",
         required=True,
-        help_text="Le PASS IAE concerné par le transfert de données vers l'Extranet IAE 2.0 de l'ASP",
+        help_text="Le PASS IAE concerné par le transfert de données vers l'Extranet IAE 2.0 de l'ASP",
     )
 
     def __init__(self, *args, employee, approvals, **kwargs):
@@ -47,7 +47,7 @@ class AddEmployeeRecordChooseApprovalForm(forms.Form):
             (approval.pk, f"{approval.number} — Du {approval.start_at:%d/%m/%Y} au {approval.end_at:%d/%m/%Y}")
             for approval in approvals
         ]
-        self.fields["approval"].label = f"PASS IAE de {employee.get_full_name()}"
+        self.fields["approval"].label = f"PASS IAE de {employee.get_full_name()}"
 
 
 class SelectEmployeeRecordStatusForm(forms.Form):

@@ -4,7 +4,7 @@
 {% load matomo %}
 {% load str_filters %}
 
-{% block title %}Salariés et PASS IAE {{ block.super }}{% endblock %}
+{% block title %}Salariés et PASS IAE {{ block.super }}{% endblock %}
 
 {% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
@@ -17,7 +17,7 @@
         <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true">
             <li class="nav-item active">
                 <a class="nav-link active" href="{% url 'approvals:list' %}" {% matomo_event "employeurs" "clic" "onglet-salaries-pass-iae" %}>
-                    Salariés et PASS IAE
+                    Salariés et PASS IAE
                 </a>
             </li>
             <li class="nav-item">
@@ -38,7 +38,7 @@
             <div class="s-section__row row">
                 <div class="col-12">
                     <div class="tab-content">
-                        <h2 class="mb-3 mb-md-4">Salariés et PASS IAE</h2>
+                        <h2 class="mb-3 mb-md-4">Salariés et PASS IAE</h2>
                         <form hx-get="{% url 'approvals:list' %}"
                               hx-trigger="change delay:.5s, change from:#id_job_seeker"
                               hx-indicator="#approvals-list"

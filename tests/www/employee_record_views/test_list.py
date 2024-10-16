@@ -324,8 +324,8 @@ class TestListEmployeeRecords:
             ),
             (
                 "3436",
-                "Un PASS IAE doit être unique pour un même SIRET",
-                "La fiche salarié associée à ce PASS IAE et à votre SIRET a déjà été intégrée à l’ASP.",
+                "Un PASS IAE doit être unique pour un même SIRET",
+                "La fiche salarié associée à ce PASS IAE et à votre SIRET a déjà été intégrée à l’ASP.",
             ),
         ]
         for err_code, err_message, custom_err_message in tests_specs:

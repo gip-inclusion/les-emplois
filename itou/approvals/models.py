@@ -230,7 +230,7 @@ class ApprovalQuerySet(CommonApprovalQuerySet):
         # create a CancelledApproval object for each deleted Approval. Let's disallow it for now
         # and trace the errors to see it happens frequently enough to warrant the implementation
         # of a proper handling method, through `post_delete` for example?
-        raise NotImplementedError("Supprimer des PASS IAE en masse est interdit, veuillez les annuler un par un.")
+        raise NotImplementedError("Supprimer des PASS IAE en masse est interdit, veuillez les annuler un par un.")
 
     def with_assigned_company(self):
         job_application_model = self.model._meta.get_field("jobapplication").related_model
@@ -401,8 +401,8 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
     )
 
     class Meta:
-        verbose_name = "PASS IAE annulé"
-        verbose_name_plural = "PASS IAE annulés"
+        verbose_name = "PASS IAE annulé"
+        verbose_name_plural = "PASS IAE annulés"
         ordering = ["-created_at"]
         constraints = CommonApprovalMixin.Meta.constraints
 
@@ -481,27 +481,27 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
 
 class Approval(PENotificationMixin, CommonApprovalMixin):
     """
-    Store "PASS IAE" whose former name was "approval" ("agréments" in French)
+    Store "PASS IAE" whose former name was "approval" ("agréments" in French)
     issued by Itou.
 
     A number starting with `ASP_ITOU_PREFIX` means it has been created by Itou.
 
     Otherwise, it was previously created by Pôle emploi (and initially found
-    in `PoleEmploiApproval`) and re-issued by Itou as a PASS IAE.
+    in `PoleEmploiApproval`) and re-issued by Itou as a PASS IAE.
     """
 
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
     ASP_ITOU_PREFIX = settings.ASP_ITOU_PREFIX
 
-    # The period of time during which it is possible to prolong a PASS IAE.
+    # The period of time during which it is possible to prolong a PASS IAE.
     IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_BEFORE_END = 7
 
     # Error messages.
     ERROR_PASS_IAE_SUSPENDED_FOR_USER = (
-        "Votre PASS IAE est suspendu. Vous ne pouvez pas postuler pendant la période de suspension."
+        "Votre PASS IAE est suspendu. Vous ne pouvez pas postuler pendant la période de suspension."
     )
     ERROR_PASS_IAE_SUSPENDED_FOR_PROXY = (
-        "Le PASS IAE du candidat est suspendu. Vous ne pouvez pas postuler "
+        "Le PASS IAE du candidat est suspendu. Vous ne pouvez pas postuler "
         "pour lui pendant la période de suspension."
     )
 
@@ -540,32 +540,32 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     # performance improvements, nor huge readability boons. https://github.com/betagouv/itou/pull/2746
 
     # Origin fields stored to enable
-    origin_siae_siret = models.CharField(verbose_name="siret siae à l'origine du PASS IAE", max_length=14, null=True)
+    origin_siae_siret = models.CharField(verbose_name="siret siae à l'origine du PASS IAE", max_length=14, null=True)
     origin_siae_kind = models.CharField(
-        verbose_name="type siae à l'origine du PASS IAE", choices=companies_enums.CompanyKind.choices, null=True
+        verbose_name="type siae à l'origine du PASS IAE", choices=companies_enums.CompanyKind.choices, null=True
     )
     origin_sender_kind = models.CharField(
-        verbose_name="origine de la candidature à l'origine du PASS IAE",
+        verbose_name="origine de la candidature à l'origine du PASS IAE",
         choices=job_application_enums.SenderKind.choices,
         null=True,
     )
     origin_prescriber_organization_kind = models.CharField(
-        verbose_name="typologie prescripteur à l'origine du PASS IAE",
+        verbose_name="typologie prescripteur à l'origine du PASS IAE",
         choices=prescribers_enums.PrescriberOrganizationKind.choices,
     )
 
     objects = ApprovalQuerySet.as_manager()
 
     class Meta:
-        verbose_name = "PASS IAE"
-        verbose_name_plural = "PASS IAE"
+        verbose_name = "PASS IAE"
+        verbose_name_plural = "PASS IAE"
         ordering = ["-created_at"]
         constraints = CommonApprovalMixin.Meta.constraints + [
             models.CheckConstraint(
                 name="approval_eligibility_diagnosis",
                 check=models.Q(origin__in=[Origin.ADMIN, Origin.DEFAULT], eligibility_diagnosis__isnull=False)
                 | models.Q(origin__in=[Origin.PE_APPROVAL, Origin.AI_STOCK], eligibility_diagnosis=None),
-                violation_error_message="Incohérence entre l'origine du PASS IAE "
+                violation_error_message="Incohérence entre l'origine du PASS IAE "
                 "et la présence d'un diagnostic d'éligibilité",
             )
         ]
@@ -752,7 +752,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         return self.is_in_progress and not self.is_suspended
 
     def can_be_suspended_by_siae(self, siae):
-        # Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
+        # Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
         return self.can_be_suspended and last_hire_was_made_by_siae(self.user, siae)
 
     @cached_property
@@ -869,12 +869,12 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     @staticmethod
     def get_next_number():
         """
-        Find next "PASS IAE" number.
+        Find next "PASS IAE" number.
 
-        Numbering scheme for a 12 chars "PASS IAE" number:
+        Numbering scheme for a 12 chars "PASS IAE" number:
             - ASP_ITOU_PREFIX (5 chars) + NUMBER (7 chars)
 
-        Old numbering scheme for PASS IAE <= `99999.21.35866`:
+        Old numbering scheme for PASS IAE <= `99999.21.35866`:
             - ASP_ITOU_PREFIX (5 chars) + YEAR WITHOUT CENTURY (2 chars) + NUMBER (5 chars)
             - YEAR WITHOUT CENTURY is equal to the start year of the `JobApplication.hiring_start_at`
             - A max of 99999 approvals could be issued by year
@@ -903,7 +903,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         """
         next_number = max(Approval.last_number(), CancelledApproval.last_number()) + 1
         if next_number > 9999999:
-            raise RuntimeError("The maximum number of PASS IAE has been reached.")
+            raise RuntimeError("The maximum number of PASS IAE has been reached.")
         return f"{Approval.ASP_ITOU_PREFIX}{next_number:07d}"
 
     @staticmethod
@@ -1019,7 +1019,7 @@ class SuspensionQuerySet(models.QuerySet):
 
 class Suspension(models.Model):
     """
-    A PASS IAE (or approval) issued by Itou can be directly suspended by an SIAE,
+    A PASS IAE (or approval) issued by Itou can be directly suspended by an SIAE,
     without intervention of a prescriber or a posteriori control.
 
     When a suspension is saved/edited/deleted, the end date of its approval is
@@ -1095,7 +1095,7 @@ class Suspension(models.Model):
         Reason.SUSPENDED_CONTRACT.value,
     ]
 
-    approval = models.ForeignKey(Approval, verbose_name="PASS IAE", on_delete=models.CASCADE)
+    approval = models.ForeignKey(Approval, verbose_name="PASS IAE", on_delete=models.CASCADE)
     start_at = models.DateField(verbose_name="date de début", default=timezone.localdate, db_index=True)
     end_at = models.DateField(verbose_name="date de fin", default=timezone.localdate, db_index=True)
     siae = models.ForeignKey(
@@ -1236,7 +1236,7 @@ class Suspension(models.Model):
                 raise ValidationError(
                     {
                         "start_at": (
-                            "La suspension ne peut pas commencer en dehors des limites du PASS IAE "
+                            "La suspension ne peut pas commencer en dehors des limites du PASS IAE "
                             f"{self.approval.start_at:%d/%m/%Y} - {self.approval.end_at:%d/%m/%Y}."
                         )
                     }
@@ -1315,7 +1315,7 @@ class Suspension(models.Model):
 
 class CommonProlongation(models.Model):
     """
-    Stores a prolongation made by an SIAE for a PASS IAE.
+    Stores a prolongation made by an SIAE for a PASS IAE.
 
     When a prolongation is saved/edited/deleted, the end date of its approval
     is automatically pushed back or forth with a PostgreSQL trigger:
@@ -1387,7 +1387,7 @@ class CommonProlongation(models.Model):
         enums.ProlongationReason.COMPLETE_TRAINING,
     )
 
-    approval = models.ForeignKey(Approval, verbose_name="PASS IAE", on_delete=models.CASCADE)
+    approval = models.ForeignKey(Approval, verbose_name="PASS IAE", on_delete=models.CASCADE)
     start_at = models.DateField(verbose_name="date de début", default=timezone.localdate, db_index=True)
     end_at = models.DateField(verbose_name="date de fin", default=timezone.localdate, db_index=True)
     reason = models.CharField(
@@ -1597,7 +1597,7 @@ class ProlongationRequest(CommonProlongation):
                 name="unique_%(class)s_approval_for_pending",
                 fields=["approval"],
                 condition=Q(status=enums.ProlongationRequestStatus.PENDING),
-                violation_error_message="Une demande de prolongation à traiter existe déjà pour ce PASS IAE",
+                violation_error_message="Une demande de prolongation à traiter existe déjà pour ce PASS IAE",
             ),
         ]
 

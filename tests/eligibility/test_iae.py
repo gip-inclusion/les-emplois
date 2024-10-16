@@ -383,7 +383,7 @@ class TestEligibilityDiagnosisModel:
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
         assert not diagnosis.is_considered_valid
 
-        # Expired diagnosis but ongoing PASS IAE.
+        # Expired diagnosis but ongoing PASS IAE.
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
         ApprovalFactory(user=diagnosis.job_seeker)
         assert diagnosis.is_considered_valid

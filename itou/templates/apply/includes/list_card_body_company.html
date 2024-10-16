@@ -26,7 +26,7 @@
                         {% if approval %}
                             <span class="badge badge-xs rounded-pill {% if approval.state == 'EXPIRED' %} bg-emploi-light text-primary{% else %} bg-success-lighter text-success{% endif %}">
                                 <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %}" aria-hidden="true"></i>
-                                PASS IAE {{ approval.get_state_display|lower }}
+                                PASS IAE {{ approval.get_state_display|lower }}
                             </span>
                         {% else %}
                             {% if not job_application.jobseeker_valid_eligibility_diagnosis %}

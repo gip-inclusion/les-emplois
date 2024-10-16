@@ -281,7 +281,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
 
     INCONSISTENCY_CHECKS = [
         (
-            "PASS IAE lié au diagnostic d'un autre candidat",
+            "PASS IAE lié au diagnostic d'un autre candidat",
             lambda q: q.inconsistent_eligibility_diagnosis_job_seeker(),
         ),
     ]
@@ -350,7 +350,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                 request,
                 mark_safe(
                     f"Il existe une ou plusieurs fiches salarié bloquantes ({employee_record_links}) "
-                    f"pour la modification de ce PASS IAE ({obj.number})."
+                    f"pour la modification de ce PASS IAE ({obj.number})."
                 ),
             )
             return

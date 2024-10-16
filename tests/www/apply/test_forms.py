@@ -370,7 +370,7 @@ class TestJobApplicationAcceptFormWithGEIQFields:
 
     HELP_START_AT = (
         "La date est modifiable jusqu'à la veille de la date saisie. "
-        "En cas de premier PASS IAE pour la personne, cette date déclenche le début de son parcours."
+        "En cas de premier PASS IAE pour la personne, cette date déclenche le début de son parcours."
     )
     HELP_END_AT = (
         "Elle sert uniquement à des fins d'informations et est sans conséquence sur les déclarations "

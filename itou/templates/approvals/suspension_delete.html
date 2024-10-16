@@ -3,11 +3,11 @@
 {% load str_filters %}
 {% load buttons_form %}
 
-{% block title %}Supprimer la suspension du PASS IAE {{ block.super }}{% endblock %}
+{% block title %}Supprimer la suspension du PASS IAE {{ block.super }}{% endblock %}
 
 {% block title_content %}
     <h1>
-        Supprimer la suspension du PASS IAE de
+        Supprimer la suspension du PASS IAE de
         <br>
         <span class="text-muted">{{ suspension.approval.user.get_full_name }}</span>
     </h1>
@@ -38,7 +38,7 @@
                                     <p class="mb-2">Attention : la suppression définitive de cette suspension aura pour conséquence de :</p>
                                     <ul class="mb-0">
                                         <li>
-                                            <strong>Réduire la durée restante de ce PASS IAE de {{ lost_days }} jour{{ lost_days|pluralizefr }}.</strong>
+                                            <strong>Réduire la durée restante de ce PASS IAE de {{ lost_days }} jour{{ lost_days|pluralizefr }}.</strong>
                                         </li>
                                     </ul>
                                 </div>

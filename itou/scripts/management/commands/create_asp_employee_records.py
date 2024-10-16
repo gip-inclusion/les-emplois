@@ -88,7 +88,7 @@ class Command(BaseCommand):
             try:
                 er.clean()
             except ValidationError:  # Some information is missing
-                # This will lead to "Un PASS IAE doit être unique pour un même SIRET" (3436) errors, but this will
+                # This will lead to "Un PASS IAE doit être unique pour un même SIRET" (3436) errors, but this will
                 # avoid future notifications to return with error, better handling this when everyone expect it.
                 er.status = Status.NEW
             else:  # Everything is fine

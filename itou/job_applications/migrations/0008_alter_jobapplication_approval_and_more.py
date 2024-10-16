@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.RESTRICT,
                 to="approvals.approval",
-                verbose_name="PASS IAE",
+                verbose_name="PASS IAE",
             ),
         ),
         migrations.AlterField(
@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.RESTRICT,
                 related_name="approval_manually_delivered",
                 to=settings.AUTH_USER_MODEL,
-                verbose_name="PASS IAE délivré manuellement par",
+                verbose_name="PASS IAE délivré manuellement par",
             ),
         ),
         migrations.AlterField(
@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.RESTRICT,
                 related_name="approval_manually_refused",
                 to=settings.AUTH_USER_MODEL,
-                verbose_name="PASS IAE refusé manuellement par",
+                verbose_name="PASS IAE refusé manuellement par",
             ),
         ),
         migrations.AlterField(

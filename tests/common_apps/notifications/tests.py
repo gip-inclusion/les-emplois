@@ -85,7 +85,7 @@ class TestNewSpontaneousJobAppEmployersNotification:
             job_application=JobApplicationFactory(to_company=company),
         )
 
-        assert "PASS IAE" in notification.email.body
+        assert "PASS IAE" in notification.email.body
 
     def test_mail_content_when_not_subject_to_eligibility_rules(self):
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True)
@@ -93,4 +93,4 @@ class TestNewSpontaneousJobAppEmployersNotification:
             job_application=JobApplicationFactory(to_company=company),
         )
 
-        assert "PASS IAE" not in notification.email.body
+        assert "PASS IAE" not in notification.email.body

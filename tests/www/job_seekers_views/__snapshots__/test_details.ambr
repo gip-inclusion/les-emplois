@@ -2880,12 +2880,12 @@
       <div class="mb-3 mb-md-4">
           <span class="badge badge-base rounded-pill bg-success text-white">
               <i aria-hidden="true" class="ri-pass-valid-line"></i>
-              PASS IAE valide
+              PASS IAE valide
           </span>
       </div>
       <ul class="list-data">
           <li class="order-1">
-              <small>Numéro de PASS IAE</small>
+              <small>Numéro de PASS IAE</small>
               <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
           </li>
           
@@ -2894,11 +2894,11 @@
                   <strong>01/01/2000</strong>
               </li>
               <li class="order-3">
-                  <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip"></i></small>
+                  <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip"></i></small>
                   <strong>01/01/3000</strong>
               </li>
               <li class="order-4">
-                  <small>Durée de validité <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i></small>
+                  <small>Durée de validité <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i></small>
                   <strong class="text-success">356252 jours (Environ 975 ans et 4 mois)</strong>
               </li>
           
@@ -2912,7 +2912,7 @@
           
               <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[PK of Approval]?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                   <i aria-hidden="true" class="ri-eye-line font-weight-medium"></i>
-                  <span>Afficher le PASS IAE</span>
+                  <span>Afficher le PASS IAE</span>
               </a>
           
       

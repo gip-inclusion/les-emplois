@@ -5,7 +5,7 @@ Bonjour,
 
 Le compte de votre {{siae.kind}} SIRET {{siae.siret}} vient d’être créé sur les emplois de l’inclusion !
 
-Pour activer le compte de l’entreprise, pouvoir embaucher, obtenir des PASS IAE et créer vos fiches salarié, activez votre compte en cliquant ici {{ itou_protocol }}://{{ itou_fqdn }}{{ signup_url }}
+Pour activer le compte de l’entreprise, pouvoir embaucher, obtenir des PASS IAE et créer vos fiches salarié, activez votre compte en cliquant ici {{ itou_protocol }}://{{ itou_fqdn }}{{ signup_url }}
 
 Vous avez déjà un compte employeur sur les emplois de l’inclusion ?
 - demandez à un de vos collègues qui n’en a pas encore d’activer le compte

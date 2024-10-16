@@ -13,12 +13,12 @@ Arguments:
     <div class="mb-3 mb-md-4">
         <span class="badge badge-base rounded-pill {% if approval.state == 'EXPIRED' %}bg-danger{% elif approval.state == 'SUSPENDED' %}bg-info{% else %}bg-success{% endif %} text-white">
             <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %}" aria-hidden="true"></i>
-            PASS IAE {{ approval.get_state_display.lower }}
+            PASS IAE {{ approval.get_state_display.lower }}
         </span>
     </div>
     <ul class="list-data{% if detail_view_version|default:False %} list-data__two-column-lg{% endif %}">
         <li class="order-1">
-            <small>Numéro de PASS IAE</small>
+            <small>Numéro de PASS IAE</small>
             <strong>{{ approval.number|format_approval_number }}</strong>
         </li>
         {% if approval.state == "EXPIRED" %}
@@ -32,20 +32,20 @@ Arguments:
                 <strong>{{ approval.start_at|date:"d/m/Y" }}</strong>
             </li>
             <li class="order-3{% if detail_view_version|default:False %} order-lg-4{% endif %}">
-                <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i></small>
+                <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i></small>
                 <strong>{{ approval.remainder_as_date|date:"d/m/Y" }}</strong>
             </li>
             <li class="order-4{% if detail_view_version|default:False %} order-lg-3{% endif %}">
                 <small>Durée de validité <i class="ri-information-line ri-xl text-info"
     data-bs-toggle="tooltip"
-    data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
+    data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
                 <strong {% if approval.state == "VALID" or approval.state == "FUTURE" %}class="text-success"{% endif %}>{{ approval.get_remainder_display }}</strong>
             </li>
         {% endif %}
     </ul>
     {% if detail_view_version|default:False %}
         {% if approval.origin == ApprovalOrigin.PE_APPROVAL %}
-            <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
+            <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
         {% endif %}
     {% else %}
         {% if approval.state == "VALID" %}
@@ -78,7 +78,7 @@ Arguments:
         {% if link_from_current_url|default:None %}
             <a href="{% url 'approvals:details' pk=approval.pk %}?back_url={{ link_from_current_url|urlencode }}" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
                 <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
-                <span>Afficher le PASS IAE</span>
+                <span>Afficher le PASS IAE</span>
             </a>
         {% endif %}
     {% endif %}

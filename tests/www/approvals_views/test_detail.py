@@ -292,10 +292,10 @@ class TestApprovalDetailView:
     def test_prolongation_button(self, client):
         TOO_SOON = (
             "Les prolongations ne sont possibles qu’entre le 7ème mois avant la "
-            "fin d’un PASS IAE et jusqu’à son dernier jour de validité."
+            "fin d’un PASS IAE et jusqu’à son dernier jour de validité."
         )
         REQUEST_PENDING = "Il ne peut y avoir qu’une seule demande de prolongation en attente à la fois."
-        TOO_LATE = "Il est impossible de faire une prolongation de PASS IAE expiré."
+        TOO_LATE = "Il est impossible de faire une prolongation de PASS IAE expiré."
 
         job_application = JobApplicationFactory(
             state=JobApplicationState.ACCEPTED,
@@ -374,7 +374,7 @@ class TestApprovalDetailView:
         response = client.get(url)
 
         delete_button = parse_response_to_soup(response, selector=f"#{REMOVAL_BUTTON_ID}")
-        assert str(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
+        assert str(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
 
         # suspension now is inactive
         suspension.end_at = datetime.date(2023, 4, 10)  # more than 12 months but ended
@@ -382,7 +382,7 @@ class TestApprovalDetailView:
         response = client.get(url)
 
         delete_button = parse_response_to_soup(response, selector=f"#{REMOVAL_BUTTON_ID}")
-        assert str(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
+        assert str(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
 
         # An accepted job application exists after suspension end
         JobApplicationFactory(
@@ -396,9 +396,9 @@ class TestApprovalDetailView:
 
     def test_suspend_button(self, client):
         ALREADY_SUSPENDED = "La suspension n’est pas possible car une suspension est déjà en cours."
-        NOT_STARTED = "La suspension n’est pas possible car le PASS IAE n’a pas encore démarré."
+        NOT_STARTED = "La suspension n’est pas possible car le PASS IAE n’a pas encore démarré."
         HANDLED_BY_OTHER_SIAE = "La suspension n’est pas possible car un autre employeur a embauché le candidat."
-        EXPIRED = "Il est impossible de faire une suspension de PASS IAE expiré."
+        EXPIRED = "Il est impossible de faire une suspension de PASS IAE expiré."
 
         job_application = JobApplicationFactory(
             state=JobApplicationState.ACCEPTED,

@@ -59,7 +59,7 @@ def manually_add_approval(
 
     if job_application.eligibility_diagnosis is None:
         messages.error(
-            request, "Impossible de créer un PASS IAE car la candidature n'a pas de diagnostique d'éligibilité."
+            request, "Impossible de créer un PASS IAE car la candidature n'a pas de diagnostique d'éligibilité."
         )
         return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
 
@@ -81,7 +81,7 @@ def manually_add_approval(
         approval = form.save()
         job_application.approval = approval
         job_application.manually_deliver_approval(delivered_by=request.user)
-        messages.success(request, f"Le PASS IAE {approval.number_with_spaces} a bien été créé et envoyé par e-mail.")
+        messages.success(request, f"Le PASS IAE {approval.number_with_spaces} a bien été créé et envoyé par e-mail.")
         return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
 
     context = {
@@ -130,7 +130,7 @@ def manually_refuse_approval(
 
     if request.method == "POST" and request.POST.get("confirm") == "yes":
         job_application.manually_refuse_approval(refused_by=request.user)
-        messages.success(request, "Délivrance du PASS IAE refusée.")
+        messages.success(request, "Délivrance du PASS IAE refusée.")
         return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
 
     # Display a preview of the email that will be send.

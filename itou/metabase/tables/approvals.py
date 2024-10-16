@@ -59,7 +59,7 @@ def get_approval_type(approval):
     """
     if isinstance(approval, Approval):
         if approval.number.startswith(settings.ASP_ITOU_PREFIX):
-            return f"PASS IAE ({settings.ASP_ITOU_PREFIX})"
+            return f"PASS IAE ({settings.ASP_ITOU_PREFIX})"
 
         return f"Agrément PE via ITOU (non {settings.ASP_ITOU_PREFIX})"
     elif isinstance(approval, PoleEmploiApproval):
@@ -91,25 +91,25 @@ TABLE.add_columns(
         {
             "name": "id_structure",
             "type": "integer",
-            "comment": "ID structure qui a embauché si PASS IAE",
+            "comment": "ID structure qui a embauché si PASS IAE",
             "fn": lambda o: getattr(get_company_from_approval(o), "id", None),
         },
         {
             "name": "type_structure",
             "type": "varchar",
-            "comment": "Type de la structure qui a embauché si PASS IAE",
+            "comment": "Type de la structure qui a embauché si PASS IAE",
             "fn": lambda o: getattr(get_company_from_approval(o), "kind", None),
         },
         {
             "name": "siret_structure",
             "type": "varchar",
-            "comment": "SIRET de la structure qui a embauché si PASS IAE",
+            "comment": "SIRET de la structure qui a embauché si PASS IAE",
             "fn": lambda o: getattr(get_company_from_approval(o), "siret", None),
         },
         {
             "name": "nom_structure",
             "type": "varchar",
-            "comment": "Nom de la structure qui a embauché si PASS IAE",
+            "comment": "Nom de la structure qui a embauché si PASS IAE",
             "fn": lambda o: getattr(get_company_from_approval(o), "display_name", None),
         },
     ]
@@ -119,7 +119,7 @@ TABLE.add_columns(
     get_department_and_region_columns(
         name_suffix="_structure_ou_org_pe",
         comment_suffix=(
-            " de la structure qui a embauché si PASS IAE ou du PE qui a délivré l agrément si Agrément PE"
+            " de la structure qui a embauché si PASS IAE ou du PE qui a délivré l agrément si Agrément PE"
         ),
         custom_fn=get_company_or_pe_org_from_approval,
     )
@@ -136,7 +136,7 @@ TABLE.add_columns(
         {
             "name": "hash_numéro_pass_iae",
             "type": "varchar",
-            "comment": "Version obfusquée du PASS IAE ou d'agrément",
+            "comment": "Version obfusquée du PASS IAE ou d'agrément",
             "fn": lambda o: hash_content(o.number),
         },
     ]

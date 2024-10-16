@@ -25,7 +25,7 @@ API_MAJPASS_RESULT_OK = {
 API_MAJPASS_RESULT_ERROR = {
     "codeSortie": "S022",
     "idNational": "some_id_national",
-    "message": "SD non installé : : Refus du PASS IAE",
+    "message": "SD non installé : : Refus du PASS IAE",
 }
 
 API_REFERENTIEL_NATURE_CONTRATS = [

@@ -30,10 +30,10 @@ JOB_APPLICATION_CSV_HEADERS = [
     "Motifs de refus",
     "Éligibilité IAE validée",
     "Eligible au contrôle",
-    "Numéro PASS IAE",
-    "Début PASS IAE",
-    "Fin PASS IAE",
-    "Statut PASS IAE",
+    "Numéro PASS IAE",
+    "Début PASS IAE",
+    "Fin PASS IAE",
+    "Statut PASS IAE",
 ]
 
 DATE_FMT = "%d/%m/%Y"

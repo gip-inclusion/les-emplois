@@ -48,7 +48,7 @@ class TestDeduplicateJobSeekersManagementCommands:
 
     def test_deduplicate_job_seekers(self):
         """
-        Easy case : among all the duplicates, only one has a PASS IAE.
+        Easy case : among all the duplicates, only one has a PASS IAE.
         """
 
         # Attributes shared by all users.
@@ -109,7 +109,7 @@ class TestDeduplicateJobSeekersManagementCommands:
 
     def test_deduplicate_job_seekers_without_empty_sender_field(self):
         """
-        Easy case: among all the duplicates, only one has a PASS IAE.
+        Easy case: among all the duplicates, only one has a PASS IAE.
         Ensure that the `sender` field is never left empty.
         """
 
@@ -141,7 +141,7 @@ class TestDeduplicateJobSeekersManagementCommands:
         job_app3_sender = job_app3.sender  # The sender is a prescriber.
 
         # Ensure that `user1` will always be the target into which duplicates will be merged
-        # by attaching a PASS IAE to him.
+        # by attaching a PASS IAE to him.
         assert 0 == user1.approvals.count()
         assert 0 == user2.approvals.count()
         assert 0 == user3.approvals.count()

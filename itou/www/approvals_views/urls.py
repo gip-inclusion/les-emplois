@@ -7,7 +7,7 @@ from itou.www.approvals_views import views
 app_name = "approvals"
 
 urlpatterns = [
-    # PASS IAE
+    # PASS IAE
     path("detail/<int:pk>", views.approval_detail_redirect_to_employee_view, name="redirect_to_employee"),
     path("details/<int:pk>", views.ApprovalDetailView.as_view(), name="details"),
     path("display/<int:approval_id>", views.ApprovalPrintableDisplay.as_view(), name="display_printable_approval"),

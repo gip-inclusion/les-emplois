@@ -35,7 +35,7 @@
                             <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
                         </h3>
                         <p>{{ prolongation_request.validated_by.get_full_name }} a été sollicité pour cette demande.</p>
-                        <h3>Date de fin de PASS IAE demandée : {{ prolongation_request.end_at|date:"d/m/Y" }}</h3>
+                        <h3>Date de fin de PASS IAE demandée : {{ prolongation_request.end_at|date:"d/m/Y" }}</h3>
                         <p>
                             La prolongation est demandée pour une durée de {{ prolongation_request.duration.days }} jour{{ prolongation_request.duration.days|pluralizefr }}.
                         </p>
@@ -49,7 +49,7 @@
                             <p>
                                 <a class="btn btn-secondary btn-ico"
                                    href="{% url "approvals:prolongation_request_report_file" prolongation_request_id=prolongation_request.pk %}"
-                                   download="Bilan prolongation PASS IAE {{ prolongation_request.approval.number }} {{ prolongation_request.approval.user.get_full_name }}.xlsx">
+                                   download="Bilan prolongation PASS IAE {{ prolongation_request.approval.number }} {{ prolongation_request.approval.user.get_full_name }}.xlsx">
                                     <i class="ri-download-line ri-lg fw-normal"></i>
                                     <span>Télécharger le bilan</span>
                                 </a>

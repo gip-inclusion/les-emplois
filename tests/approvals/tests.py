@@ -970,7 +970,7 @@ class TestAutomaticApprovalAdminViews:
         assert (
             f"Il existe une ou plusieurs fiches salarié bloquantes "
             f'(<a href="/admin/employee_record/employeerecord/{employee_record.pk}/change/">{employee_record.pk}</a>) '
-            f"pour la modification de ce PASS IAE ({approval.number})." == str(list(response.context["messages"])[0])
+            f"pour la modification de ce PASS IAE ({approval.number})." == str(list(response.context["messages"])[0])
         )
 
     def test_create_approval(self, client):
@@ -1085,7 +1085,7 @@ class TestCustomApprovalAdminViews:
             [
                 messages.Message(
                     messages.ERROR,
-                    "Impossible de créer un PASS IAE car la candidature n'a pas de diagnostique d'éligibilité.",
+                    "Impossible de créer un PASS IAE car la candidature n'a pas de diagnostique d'éligibilité.",
                 )
             ],
         )
@@ -1309,7 +1309,7 @@ class TestSuspensionModel:
         min_start_at = Suspension.next_min_start_at(job_application_1.approval)
         assert min_start_at == today
 
-        # Same rules apply for PE approval and PASS IAE
+        # Same rules apply for PE approval and PASS IAE
         min_start_at = Suspension.next_min_start_at(job_application_2.approval)
         assert min_start_at == start_at
         min_start_at = Suspension.next_min_start_at(job_application_3.approval)

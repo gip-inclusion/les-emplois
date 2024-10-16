@@ -1010,7 +1010,7 @@ class TestLatestApproval:
         start_at = timezone.now() - relativedelta(months=2)
         end_at = start_at + datetime.timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)
 
-        # PASS IAE
+        # PASS IAE
         pass_iae = ApprovalFactory(
             user=user,
             start_at=start_at,

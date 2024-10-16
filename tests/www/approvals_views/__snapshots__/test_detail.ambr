@@ -5,12 +5,12 @@
       <div class="mb-3 mb-md-4">
           <span class="badge badge-base rounded-pill bg-danger text-white">
               <i aria-hidden="true" class="ri-pass-expired-line"></i>
-              PASS IAE expiré
+              PASS IAE expiré
           </span>
       </div>
       <ul class="list-data list-data__two-column-lg">
           <li class="order-1">
-              <small>Numéro de PASS IAE</small>
+              <small>Numéro de PASS IAE</small>
               <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
           </li>
           
@@ -22,7 +22,7 @@
       </ul>
       
           
-              <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
+              <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
           
       
   </div>
@@ -34,12 +34,12 @@
       <div class="mb-3 mb-md-4">
           <span class="badge badge-base rounded-pill bg-success text-white">
               <i aria-hidden="true" class="ri-pass-valid-line"></i>
-              PASS IAE valide (non démarré)
+              PASS IAE valide (non démarré)
           </span>
       </div>
       <ul class="list-data list-data__two-column-lg">
           <li class="order-1">
-              <small>Numéro de PASS IAE</small>
+              <small>Numéro de PASS IAE</small>
               <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
           </li>
           
@@ -48,18 +48,18 @@
                   <strong>01/01/2025</strong>
               </li>
               <li class="order-3 order-lg-4">
-                  <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip"></i></small>
+                  <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip"></i></small>
                   <strong>26/09/2024</strong>
               </li>
               <li class="order-4 order-lg-3">
-                  <small>Durée de validité <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i></small>
+                  <small>Durée de validité <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i></small>
                   <strong class="text-success">2 jours (1 jour)</strong>
               </li>
           
       </ul>
       
           
-              <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
+              <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
           
       
   </div>
@@ -71,12 +71,12 @@
       <div class="mb-3 mb-md-4">
           <span class="badge badge-base rounded-pill bg-success text-white">
               <i aria-hidden="true" class="ri-pass-valid-line"></i>
-              PASS IAE valide
+              PASS IAE valide
           </span>
       </div>
       <ul class="list-data list-data__two-column-lg">
           <li class="order-1">
-              <small>Numéro de PASS IAE</small>
+              <small>Numéro de PASS IAE</small>
               <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
           </li>
           
@@ -85,18 +85,18 @@
                   <strong>01/01/2000</strong>
               </li>
               <li class="order-3 order-lg-4">
-                  <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip"></i></small>
+                  <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip"></i></small>
                   <strong>01/01/3000</strong>
               </li>
               <li class="order-4 order-lg-3">
-                  <small>Durée de validité <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i></small>
+                  <small>Durée de validité <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i></small>
                   <strong class="text-success">356210 jours (Environ 975 ans et 3 mois)</strong>
               </li>
           
       </ul>
       
           
-              <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
+              <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
           
       
   </div>
@@ -108,12 +108,12 @@
       <div class="mb-3 mb-md-4">
           <span class="badge badge-base rounded-pill bg-info text-white">
               <i aria-hidden="true" class="ri-pass-pending-line"></i>
-              PASS IAE valide (suspendu)
+              PASS IAE valide (suspendu)
           </span>
       </div>
       <ul class="list-data list-data__two-column-lg">
           <li class="order-1">
-              <small>Numéro de PASS IAE</small>
+              <small>Numéro de PASS IAE</small>
               <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
           </li>
           
@@ -122,18 +122,18 @@
                   <strong>01/01/2000</strong>
               </li>
               <li class="order-3 order-lg-4">
-                  <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip"></i></small>
+                  <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip"></i></small>
                   <strong>07/01/3000</strong>
               </li>
               <li class="order-4 order-lg-3">
-                  <small>Durée de validité <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i></small>
+                  <small>Durée de validité <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i></small>
                   <strong>356216 jours (Environ 975 ans et 3 mois)</strong>
               </li>
           
       </ul>
       
           
-              <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
+              <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
           
       
   </div>
@@ -1574,7 +1574,7 @@
                           <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
                               <h2>Prolongations</h2>
                               
-                                  <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
+                                  <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
                                       
                                           <button class="btn btn-block btn-outline-primary btn-ico" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="Il ne peut y avoir qu’une seule demande de prolongation en attente à la fois." type="button">
                                               <i aria-hidden="true" class="ri-refresh-line fw-medium"></i>
@@ -3267,7 +3267,7 @@
                           <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
                               <h2>Suspensions</h2>
                               
-                                  <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
+                                  <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
                                       
                                           <button class="btn btn-block btn-outline-primary btn-ico" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="La suspension n’est pas possible car une suspension est déjà en cours." type="button">
                                               <i aria-hidden="true" class="ri-pause-circle-line fw-medium"></i>
@@ -3371,7 +3371,7 @@
                           <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
                               <h2>Suspensions</h2>
                               
-                                  <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
+                                  <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
                                       
                                           <button class="btn btn-block btn-outline-primary btn-ico" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="La suspension n’est pas possible car une suspension est déjà en cours." type="button">
                                               <i aria-hidden="true" class="ri-pause-circle-line fw-medium"></i>
@@ -3524,11 +3524,11 @@
                       </div>
   '''
 # ---
-# name: TestApprovalDetailView.test_remove_approval_button[bouton de suppression d'un PASS IAE]
+# name: TestApprovalDetailView.test_remove_approval_button[bouton de suppression d'un PASS IAE]
   '''
-  <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-lg btn-outline-warning btn-ico" href="https://tally.so/r/3je84Q?siaeID=999999&amp;nomSIAE=Aci+de+la+rochelle&amp;prenomemployeur=Milady&amp;nomemployeur=de+Winter&amp;emailemployeur=oph%40dewinter.com&amp;userID=123456&amp;numPASS=XXXXX+12+34568&amp;prenomsalarie=Doe&amp;nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
+  <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-lg btn-outline-warning btn-ico" href="https://tally.so/r/3je84Q?siaeID=999999&amp;nomSIAE=Aci+de+la+rochelle&amp;prenomemployeur=Milady&amp;nomemployeur=de+Winter&amp;emailemployeur=oph%40dewinter.com&amp;userID=123456&amp;numPASS=XXXXX+12+34568&amp;prenomsalarie=Doe&amp;nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
                       <i aria-hidden="true" class="ri-pass-expired-line fw-medium"></i>
-                      <span>Clôturer ce PASS IAE</span>
+                      <span>Clôturer ce PASS IAE</span>
                   </a>
   '''
 # ---

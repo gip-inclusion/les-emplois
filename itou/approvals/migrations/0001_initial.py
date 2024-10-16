@@ -150,12 +150,12 @@ class Migration(migrations.Migration):
                             ("S019", "SD non installé : Type de SIAE erroné"),
                             ("S020", "SD non installé : Statut de la réponse obligatoire"),
                             ("S021", "SD non installé : Statut de la réponse erroné"),
-                            ("S022", "SD non installé : Refus du PASS IAE"),
-                            ("S023", "SD non installé : Date de début du PASS IAE obligatoire"),
-                            ("S024", "SD non installé : Date de début du PASS IAE dans le futur"),
-                            ("S025", "SD non installé : Date de fin du PASS IAE obligatoire"),
-                            ("S026", "SD non installé : Date fin PASS IAE non strictement sup à date début"),
-                            ("S027", "SD non installé : Numéro du PASS IAE obligatoire"),
+                            ("S022", "SD non installé : Refus du PASS IAE"),
+                            ("S023", "SD non installé : Date de début du PASS IAE obligatoire"),
+                            ("S024", "SD non installé : Date de début du PASS IAE dans le futur"),
+                            ("S025", "SD non installé : Date de fin du PASS IAE obligatoire"),
+                            ("S026", "SD non installé : Date fin PASS IAE non strictement sup à date début"),
+                            ("S027", "SD non installé : Numéro du PASS IAE obligatoire"),
                             ("S028", "SD non installé : Origine de la candidature obligatoire"),
                             ("S029", "SD non installé : Origine de la candidature erronée"),
                             ("S031", "SD non installé : Numéro SIRET SIAE obligatoire"),
@@ -260,7 +260,7 @@ class Migration(migrations.Migration):
                             ("SPIP", "SPIP - Service pénitentiaire d'insertion et de probation"),
                             ("Autre", "Autre"),
                         ],
-                        verbose_name="typologie prescripteur à l'origine du PASS IAE",
+                        verbose_name="typologie prescripteur à l'origine du PASS IAE",
                     ),
                 ),
                 (
@@ -272,7 +272,7 @@ class Migration(migrations.Migration):
                             ("employer", "Employeur"),
                         ],
                         null=True,
-                        verbose_name="origine de la candidature à l'origine du PASS IAE",
+                        verbose_name="origine de la candidature à l'origine du PASS IAE",
                     ),
                 ),
                 (
@@ -290,12 +290,12 @@ class Migration(migrations.Migration):
                             ("OPCS", "Organisation porteuse de la clause sociale"),
                         ],
                         null=True,
-                        verbose_name="type siae à l'origine du PASS IAE",
+                        verbose_name="type siae à l'origine du PASS IAE",
                     ),
                 ),
                 (
                     "origin_siae_siret",
-                    models.CharField(max_length=14, null=True, verbose_name="siret siae à l'origine du PASS IAE"),
+                    models.CharField(max_length=14, null=True, verbose_name="siret siae à l'origine du PASS IAE"),
                 ),
                 (
                     "updated_at",
@@ -303,8 +303,8 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "verbose_name": "PASS IAE",
-                "verbose_name_plural": "PASS IAE",
+                "verbose_name": "PASS IAE",
+                "verbose_name_plural": "PASS IAE",
                 "ordering": ["-created_at"],
             },
         ),
@@ -407,12 +407,12 @@ class Migration(migrations.Migration):
                             ("S019", "SD non installé : Type de SIAE erroné"),
                             ("S020", "SD non installé : Statut de la réponse obligatoire"),
                             ("S021", "SD non installé : Statut de la réponse erroné"),
-                            ("S022", "SD non installé : Refus du PASS IAE"),
-                            ("S023", "SD non installé : Date de début du PASS IAE obligatoire"),
-                            ("S024", "SD non installé : Date de début du PASS IAE dans le futur"),
-                            ("S025", "SD non installé : Date de fin du PASS IAE obligatoire"),
-                            ("S026", "SD non installé : Date fin PASS IAE non strictement sup à date début"),
-                            ("S027", "SD non installé : Numéro du PASS IAE obligatoire"),
+                            ("S022", "SD non installé : Refus du PASS IAE"),
+                            ("S023", "SD non installé : Date de début du PASS IAE obligatoire"),
+                            ("S024", "SD non installé : Date de début du PASS IAE dans le futur"),
+                            ("S025", "SD non installé : Date de fin du PASS IAE obligatoire"),
+                            ("S026", "SD non installé : Date fin PASS IAE non strictement sup à date début"),
+                            ("S027", "SD non installé : Numéro du PASS IAE obligatoire"),
                             ("S028", "SD non installé : Origine de la candidature obligatoire"),
                             ("S029", "SD non installé : Origine de la candidature erronée"),
                             ("S031", "SD non installé : Numéro SIRET SIAE obligatoire"),
@@ -536,7 +536,7 @@ class Migration(migrations.Migration):
                 (
                     "approval",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="approvals.approval", verbose_name="PASS IAE"
+                        on_delete=django.db.models.deletion.CASCADE, to="approvals.approval", verbose_name="PASS IAE"
                     ),
                 ),
                 (
@@ -659,7 +659,7 @@ class Migration(migrations.Migration):
                 (
                     "approval",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="approvals.approval", verbose_name="PASS IAE"
+                        on_delete=django.db.models.deletion.CASCADE, to="approvals.approval", verbose_name="PASS IAE"
                     ),
                 ),
                 (
@@ -798,7 +798,7 @@ class Migration(migrations.Migration):
                 (
                     "approval",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="approvals.approval", verbose_name="PASS IAE"
+                        on_delete=django.db.models.deletion.CASCADE, to="approvals.approval", verbose_name="PASS IAE"
                     ),
                 ),
                 (
@@ -969,7 +969,7 @@ class Migration(migrations.Migration):
                     _connector="OR",
                 ),
                 name="approval_eligibility_diagnosis",
-                violation_error_message="Incohérence entre l'origine du PASS IAE et la présence d'un diagnostic "
+                violation_error_message="Incohérence entre l'origine du PASS IAE et la présence d'un diagnostic "
                 "d'éligibilité",
             ),
         ),
@@ -1040,7 +1040,7 @@ class Migration(migrations.Migration):
                 condition=models.Q(("status", "PENDING")),
                 fields=("approval",),
                 name="unique_prolongationrequest_approval_for_pending",
-                violation_error_message="Une demande de prolongation à traiter existe déjà pour ce PASS IAE",
+                violation_error_message="Une demande de prolongation à traiter existe déjà pour ce PASS IAE",
             ),
         ),
         pgtrigger.migrations.AddTrigger(
@@ -1271,12 +1271,12 @@ class Migration(migrations.Migration):
                             ("S019", "SD non installé : Type de SIAE erroné"),
                             ("S020", "SD non installé : Statut de la réponse obligatoire"),
                             ("S021", "SD non installé : Statut de la réponse erroné"),
-                            ("S022", "SD non installé : Refus du PASS IAE"),
-                            ("S023", "SD non installé : Date de début du PASS IAE obligatoire"),
-                            ("S024", "SD non installé : Date de début du PASS IAE dans le futur"),
-                            ("S025", "SD non installé : Date de fin du PASS IAE obligatoire"),
-                            ("S026", "SD non installé : Date fin PASS IAE non strictement sup à date début"),
-                            ("S027", "SD non installé : Numéro du PASS IAE obligatoire"),
+                            ("S022", "SD non installé : Refus du PASS IAE"),
+                            ("S023", "SD non installé : Date de début du PASS IAE obligatoire"),
+                            ("S024", "SD non installé : Date de début du PASS IAE dans le futur"),
+                            ("S025", "SD non installé : Date de fin du PASS IAE obligatoire"),
+                            ("S026", "SD non installé : Date fin PASS IAE non strictement sup à date début"),
+                            ("S027", "SD non installé : Numéro du PASS IAE obligatoire"),
                             ("S028", "SD non installé : Origine de la candidature obligatoire"),
                             ("S029", "SD non installé : Origine de la candidature erronée"),
                             ("S031", "SD non installé : Numéro SIRET SIAE obligatoire"),
@@ -1417,8 +1417,8 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "verbose_name": "PASS IAE annulé",
-                "verbose_name_plural": "PASS IAE annulés",
+                "verbose_name": "PASS IAE annulé",
+                "verbose_name_plural": "PASS IAE annulés",
                 "ordering": ["-created_at"],
             },
         ),

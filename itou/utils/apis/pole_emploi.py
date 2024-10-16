@@ -184,8 +184,8 @@ class PoleEmploiApiClient:
             "numPassIAE": approval.number,
             # we force this field to be "A" for "Approved". The origin of this field is lost with
             # the first iterations of this client, but our guess is that it makes their server happy.
-            # this has no impact on our side since a PASS IAE is always "approved", even though it might be suspended.
-            # Maybe some day we will support this case and send them our suspended PASS IAE if needed.
+            # this has no impact on our side since a PASS IAE is always "approved", even though it might be suspended.
+            # Maybe some day we will support this case and send them our suspended PASS IAE if needed.
             "statutReponsePassIAE": "A",
             "numSIRETsiae": siae_siret,
             "typeSIAE": siae_type,

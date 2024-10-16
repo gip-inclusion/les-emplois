@@ -40,7 +40,7 @@ class Command(BaseCommand):
                 except JobApplication.DoesNotExist:
                     siret_used = "+".join(siret)
                     if not Approval.objects.filter(number=approval_number).exists():
-                        info = "PASS IAE inconnu"
+                        info = "PASS IAE inconnu"
                     else:
                         info = "Pas de candidature"
                 except JobApplication.MultipleObjectsReturned:

@@ -16,7 +16,7 @@
                 <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                     <span class="badge badge-sm rounded-pill text-wrap {% if approval.state == 'EXPIRED' %} bg-emploi-light text-primary{% else %} bg-success-lighter text-success{% endif %}">
                         <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %} ri-xl" aria-hidden="true"></i>
-                        PASS IAE {{ approval.get_state_display|lower }}
+                        PASS IAE {{ approval.get_state_display|lower }}
                     </span>
 
                 </div>
@@ -34,7 +34,7 @@
         <ul class="list-data list-data__two-column-md">
 
             <li>
-                <small>Numéro de PASS IAE</small>
+                <small>Numéro de PASS IAE</small>
                 <strong>{{ approval|format_approval_number }}</strong>
                 {% include 'includes/copy_to_clipboard.html' with content=approval.number css_classes="btn-link" only_icon=True %}
 
@@ -45,7 +45,7 @@
                     Durée de validité
                     <i class="ri-information-line text-info"
                        data-bs-toggle="tooltip"
-                       title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
+                       title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
                 <strong class="text-success">{{ approval.get_remainder_display }}</strong>
 
             </li>

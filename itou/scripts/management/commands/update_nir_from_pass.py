@@ -112,7 +112,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
             "Nom ASP": None,
             "Date de naissance plateforme": None,
             "Date de naissance ASP": None,
-            "PASS IAE": None,
+            "PASS IAE": None,
             "NIR": None,
         }
 
@@ -132,7 +132,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                     | {
                         "Prénom plateforme": self.format_name(job_seeker.first_name),
                         "Prénom ASP": row[FIRST_NAME_COL],
-                        "PASS IAE": row[APPROVAL_COL],
+                        "PASS IAE": row[APPROVAL_COL],
                         "NIR": row[NIR_COL],
                     }
                 )
@@ -144,7 +144,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                     | {
                         "Nom plateforme": self.format_name(job_seeker.last_name),
                         "Nom ASP": row[LAST_NAME_COL],
-                        "PASS IAE": row[APPROVAL_COL],
+                        "PASS IAE": row[APPROVAL_COL],
                         "NIR": row[NIR_COL],
                     }
                 )
@@ -158,7 +158,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                     | {
                         "Date de naissance plateforme": job_seeker.jobseeker_profile.birthdate,
                         "Date de naissance ASP": row[BIRTHDATE_COL].date(),
-                        "PASS IAE": row[APPROVAL_COL],
+                        "PASS IAE": row[APPROVAL_COL],
                         "NIR": row[NIR_COL],
                     }
                 )
@@ -260,26 +260,26 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         self.logger.info(f"🎯 STEP 2: hunt duplicates!")
 
         # Step 2: treat duplicates.
-        # Duplicated NIR means PASS IAE have been delivered for the same person.
+        # Duplicated NIR means PASS IAE have been delivered for the same person.
         # Add a new column to know whether it's a NIR duplicate or not.
         df["nir_is_duplicated"] = df[NIR_COL].duplicated(keep=False)
 
-        # Add a new column to know whether it's a PASS IAE duplicate or not.
+        # Add a new column to know whether it's a PASS IAE duplicate or not.
         df["approval_is_duplicated"] = df[APPROVAL_COL].duplicated(keep=False)
         # Then remove wrong PAsS IAE numbers, merge duplicates and mark complicated cases as untreated.
         result_df = self.clean_and_merge_duplicated_approval(df[df["approval_is_duplicated"]])
         df.update(result_df)
-        self.logger.info(f"{self.get_ratio(len(df[df.approval_is_duplicated]), total_rows)}% of duplicated PASS IAE.")
+        self.logger.info(f"{self.get_ratio(len(df[df.approval_is_duplicated]), total_rows)}% of duplicated PASS IAE.")
 
         duplicated_nirs = df[df.nir_is_duplicated & df.nir_is_valid & (df.is_treated == False)]
         if not duplicated_nirs.empty:
             unique_duplicated_nirs = duplicated_nirs[NIR_COL].unique()
             self.logger.info(
-                f"{len(duplicated_nirs)} different PASS IAE for {len(unique_duplicated_nirs)} unique NIR."
+                f"{len(duplicated_nirs)} different PASS IAE for {len(unique_duplicated_nirs)} unique NIR."
             )
             self.logger.info(f"{self.get_ratio(len(duplicated_nirs), total_rows)}% cases of duplicated NIRs.")
             self.logger.info(
-                f"{round(len(duplicated_nirs) / len(unique_duplicated_nirs), 2)} different PASS IAE per NIR as average."
+                f"{round(len(duplicated_nirs) / len(unique_duplicated_nirs), 2)} different PASS IAE per NIR as average."
             )
 
         # Mark easy cases as treated automatically:
@@ -295,7 +295,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         self.logger.info(f"💪 STEP 4: list what's left.")
 
         # Complicated cases have an invalid NIR or a duplicated NIR.
-        # They also include PASS IAE duplicates impossible to merge automatically.
+        # They also include PASS IAE duplicates impossible to merge automatically.
         # Ignore untreated cases for the moment.
         treated_cases = df[df.is_treated]
         untreated_cases = df[df.is_treated == False]  # Using ~ would return an error if no result found.

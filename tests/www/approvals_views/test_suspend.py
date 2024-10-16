@@ -243,7 +243,7 @@ class TestApprovalSuspendView:
         assert response.context["reset_url"] == back_url
 
         lost_days = (timezone.localdate() - start_at).days + 1  # including start and end dates
-        assertContains(response, f"Réduire la durée restante de ce PASS IAE de {lost_days} jour")
+        assertContains(response, f"Réduire la durée restante de ce PASS IAE de {lost_days} jour")
 
         post_data = {"confirm": "true"}
 

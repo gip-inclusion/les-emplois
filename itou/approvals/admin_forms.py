@@ -24,7 +24,7 @@ class ApprovalFormMixin:
         if is_new and number and number.startswith(Approval.ASP_ITOU_PREFIX):
             raise forms.ValidationError(self.ERROR_NUMBER)
 
-        # Allow to modify an existing PASS IAE to change its dates, but its number can only be changed if the new
+        # Allow to modify an existing PASS IAE to change its dates, but its number can only be changed if the new
         # number doesn't start with `ASP_ITOU_PREFIX`.
         if not is_new and number != self.instance.number and number.startswith(Approval.ASP_ITOU_PREFIX):
             raise forms.ValidationError(self.ERROR_NUMBER_CANNOT_BE_CHANGED % self.instance.number)

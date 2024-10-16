@@ -38,7 +38,7 @@ def edit_contract_start_date(request, job_application_id, template_name="apply/e
         messages.success(request, "La période du contrat de travail a bien été mise à jour.", extra_tags="toast")
 
         if job_application.approval and job_application.approval.update_start_date(job_application.hiring_start_at):
-            messages.success(request, "La date de début du PASS IAE a été fixée à la date de début de contrat.")
+            messages.success(request, "La date de début du PASS IAE a été fixée à la date de début de contrat.")
 
         return HttpResponseRedirect(url)
 

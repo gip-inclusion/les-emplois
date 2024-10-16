@@ -62,7 +62,7 @@ class TestDashboardView:
         "Votre compte utilisateur n’est rattaché à aucune agence France Travail, "
         "par conséquent vous ne pouvez pas bénéficier du statut de prescripteur habilité."
     )
-    SUSPEND_TEXT = "Suspendre un PASS IAE"
+    SUSPEND_TEXT = "Suspendre un PASS IAE"
     HIRE_LINK_LABEL = "Déclarer une embauche"
     DORA_LABEL = "DORA"
     DORA_CARD_MSG = "Consultez l’offre de service de vos partenaires"
@@ -735,7 +735,7 @@ class TestDashboardView:
         assertContains(response, "Numéro de PASS IAE")
         assertContains(response, format_approval_number(approval))
         assertContains(response, "Date de début : 21/06/2022")
-        assertContains(response, "Nombre de jours restants sur le PASS IAE : 83 jours")
+        assertContains(response, "Nombre de jours restants sur le PASS IAE : 83 jours")
         assertContains(response, "Date de fin prévisionnelle : 06/12/2022")
 
     @override_settings(TALLY_URL="http://tally.fake")
@@ -890,7 +890,7 @@ class TestDashboardView:
 def test_prolongation_requests_access(client, factory, expected):
     client.force_login(factory())
     response = client.get(reverse("dashboard:index"))
-    expected(response, "Gérer mes prolongations de PASS IAE")
+    expected(response, "Gérer mes prolongations de PASS IAE")
     expected(response, reverse("approvals:prolongation_requests_list"))
 
 

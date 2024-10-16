@@ -127,7 +127,7 @@ def export_ft_api_rejections(request):
     )
 
     if len(rejected_approvals) == 0:
-        messages.add_message(request, messages.WARNING, "Pas de rejets de PASS IAE sur le dernier mois")
+        messages.add_message(request, messages.WARNING, "Pas de rejets de PASS IAE sur le dernier mois")
         return HttpResponseRedirect(reverse("dashboard:index"))
 
     data = []

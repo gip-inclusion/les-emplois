@@ -548,7 +548,7 @@ def test_populate_approvals():
         assert rows == [
             (
                 approval.pk,
-                "PASS IAE (XXXXX)",
+                "PASS IAE (XXXXX)",
                 datetime.date(2023, 2, 2),
                 datetime.date(2025, 1, 31),
                 datetime.timedelta(days=729),
@@ -1013,7 +1013,7 @@ def test_populate_enums():
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM c1_ref_motif_de_refus ORDER BY code")
         rows = cursor.fetchall()
-        assert rows[0] == ("approval_expiration_too_close", "La date de fin du PASS IAE / agrément est trop proche")
+        assert rows[0] == ("approval_expiration_too_close", "La date de fin du PASS IAE / agrément est trop proche")
 
 
 def test_data_inconsistencies(capsys):

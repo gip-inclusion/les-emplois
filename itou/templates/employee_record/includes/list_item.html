@@ -65,10 +65,10 @@
                             </p>
                             <small>(Erreur {{ employee_record.asp_processing_code }})</small>
                         {% elif employee_record.asp_processing_code == "3436" %}
-                            <p class="mb-0">La fiche salarié associée à ce PASS IAE et à votre SIRET a déjà été intégrée à l’ASP.</p>
+                            <p class="mb-0">La fiche salarié associée à ce PASS IAE et à votre SIRET a déjà été intégrée à l’ASP.</p>
                             <p class="mb-0">Connectez-vous à l’ASP pour la retrouver et déclarer les contrats associés.</p>
                             <p class="mb-0">
-                                Si vos SIAE ont un SIRET commun pour 2 mesures, que vous avez déjà créé cette fiche salarié pour l’une des 2 mesures, vous devez vous rendre dans l’ASP pour gérer les autres contrats associés à ce PASS IAE.
+                                Si vos SIAE ont un SIRET commun pour 2 mesures, que vous avez déjà créé cette fiche salarié pour l’une des 2 mesures, vous devez vous rendre dans l’ASP pour gérer les autres contrats associés à ce PASS IAE.
                             </p>
                             <p class="mb-0">
                                 Pour changer de mesure, créez directement un nouveau contrat dans l’ASP et sélectionnez la bonne mesure.
@@ -110,7 +110,7 @@
                                 <strong>Une action de votre part est nécessaire</strong>
                             </p>
                             <p class="mb-0">
-                                La nouvelle date de fin du PASS IAE n’a pas pu être transmise automatiquement à l’Extranet IAE 2.0 de l’ASP.
+                                La nouvelle date de fin du PASS IAE n’a pas pu être transmise automatiquement à l’Extranet IAE 2.0 de l’ASP.
                                 Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure.
                             </p>
                         </div>
@@ -120,7 +120,7 @@
         {% endif %}
         <ul class="list-data list-data__two-column-md">
             <li>
-                <small>Numéro de PASS IAE</small>
+                <small>Numéro de PASS IAE</small>
                 <strong>{{ item.approval.number|format_approval_number }}</strong>
                 {% include 'includes/copy_to_clipboard.html' with content=item.approval.number css_classes="btn-link" only_icon=True %}
             </li>

@@ -2,7 +2,7 @@
 {% block body %}
 Nouvelle embauche sur Itou.
 
-Informations pour l'obtention d'un PASS IAE suite à l'embauche de votre candidat via les emplois de l'inclusion :
+Informations pour l'obtention d'un PASS IAE suite à l'embauche de votre candidat via les emplois de l'inclusion :
 
 *Candidat* :
 

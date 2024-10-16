@@ -2261,7 +2261,7 @@ class TestProcessAcceptViews:
         job_application = self.create_job_application()
         job_seeker = job_application.job_seeker
 
-        # Create a "PE Approval" that will be converted to a PASS IAE when accepting the process
+        # Create a "PE Approval" that will be converted to a PASS IAE when accepting the process
         pole_emploi_approval = PoleEmploiApprovalFactory(
             pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
             birthdate=job_seeker.jobseeker_profile.birthdate,
@@ -2272,7 +2272,7 @@ class TestProcessAcceptViews:
         client.force_login(employer)
         _, next_url = self.accept_job_application(client, job_application)
         response = client.get(next_url)
-        assert "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. " not in str(
+        assert "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. " not in str(
             list(response.context["messages"])[0]
         )
 
@@ -2292,7 +2292,7 @@ class TestProcessAcceptViews:
         # Gracefully display a message instead of just plain crashing
         _, next_url = self.accept_job_application(client, another_job_application)
         response = client.get(next_url)
-        assert "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. " in str(
+        assert "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. " in str(
             list(response.context["messages"])[0]
         )
 
@@ -3867,7 +3867,7 @@ def test_approval_status_includes(client, snapshot):
     response = client.get(url)
     assertContains(
         response,
-        "PASS IAE valide jusqu’au 24/04/2025, si le contrat démarre aujourd’hui.",
+        "PASS IAE valide jusqu’au 24/04/2025, si le contrat démarre aujourd’hui.",
     )
 
     ## Display suspensions
