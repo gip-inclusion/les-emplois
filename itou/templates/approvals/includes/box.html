@@ -13,12 +13,12 @@ Arguments:
     <div class="mb-3 mb-md-4">
         <span class="badge badge-base rounded-pill {% if approval.state == 'EXPIRED' %}bg-danger{% elif approval.state == 'SUSPENDED' %}bg-info{% else %}bg-success{% endif %} text-white">
             <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %}" aria-hidden="true"></i>
-            PASS IAE {{ approval.get_state_display.lower }}
+            {{ approval.is_pass_iae|yesno:"PASS IAE,Agrément" }} {{ approval.get_state_display.lower }}
         </span>
     </div>
     <ul class="list-data{% if detail_view_version|default:False %} list-data__two-column-lg{% endif %}">
         <li class="order-1">
-            <small>Numéro de PASS IAE</small>
+            <small>Numéro {{ approval.is_pass_iae|yesno:"de PASS IAE,d’agrément" }}</small>
             <strong>{{ approval.number|format_approval_number }}</strong>
         </li>
         {% if approval.state == "EXPIRED" %}
@@ -47,7 +47,8 @@ Arguments:
         {% if approval.origin == ApprovalOrigin.PE_APPROVAL %}
             <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
         {% endif %}
-    {% else %}
+    {% elif approval.is_pass_iae %}
+        {# PoleEmploiApprovals have no prolongation, no suspension and no detail page #}
         {% if approval.state == "VALID" %}
             {% with approval.pending_prolongation_request as pending_prolongation_request %}
                 {% if pending_prolongation_request %}
