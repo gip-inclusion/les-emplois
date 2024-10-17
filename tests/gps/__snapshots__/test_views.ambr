@@ -84,7 +84,7 @@
                                       </li>
                                       <li>
                                           <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
-                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-ailleurs">
+                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-ailleurs" type="button">
                                                   <span>Voir les coordonnées du
                                                       <br class="d-none d-md-inline"/>
                                                   conseiller emploi France Travail</span>
@@ -169,7 +169,7 @@
 # name: test_contact_information_display[info_displayed]
   '''
   <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
-                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-30">
+                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-30" type="button">
                                                   <span>Voir les coordonnées du
                                                       <br class="d-none d-md-inline"/>
                                                   conseiller emploi France Travail</span>
@@ -198,7 +198,7 @@
 # name: test_contact_information_display[info_not_available]
   '''
   <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
-                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-30">
+                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-30" type="button">
                                                   <span>Voir les coordonnées du
                                                       <br class="d-none d-md-inline"/>
                                                   conseiller emploi France Travail</span>
@@ -214,7 +214,7 @@
 # name: test_contact_information_display_not_live[preview_displayed]
   '''
   <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
-                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-ailleurs">
+                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-ailleurs" type="button">
                                                   <span>Voir les coordonnées du
                                                       <br class="d-none d-md-inline"/>
                                                   conseiller emploi France Travail</span>
