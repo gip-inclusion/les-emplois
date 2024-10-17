@@ -27,6 +27,7 @@ urlpatterns = [
     path("cd/hiring", views.stats_cd_hiring, name="stats_cd_hiring"),
     path("cd/brsa", views.stats_cd_brsa, name="stats_cd_brsa"),
     path("cd/aci", views.stats_cd_aci, name="stats_cd_aci"),
+    path("cd/orga_etp", views.stats_cd_orga_etp, name="stats_cd_orga_etp"),
     # Prescriber stats - FT.
     # Legacy `pe` term is used in URLs for retroactivity in Matomo stats but in fact it means `ft`.
     path("pe/delay/main", views.stats_ft_delay_main, name="stats_ft_delay_main"),
@@ -70,6 +71,7 @@ urlpatterns = [
     path("ddets/hiring", views.stats_ddets_iae_hiring, name="stats_ddets_iae_hiring"),
     path("ddets/state", views.stats_ddets_iae_state, name="stats_ddets_iae_state"),
     path("ddets/aci", views.stats_ddets_iae_aci, name="stats_ddets_iae_aci"),
+    path("ddets/orga_etp", views.stats_ddets_iae_orga_etp, name="stats_ddets_iae_orga_etp"),
     # Institution stats - DDETS LOG - department level.
     path("ddets_log/state", views.stats_ddets_log_state, name="stats_ddets_log_state"),
     # Institution stats - DREETS IAE - region level.
@@ -101,6 +103,7 @@ urlpatterns = [
     path("dreets/iae", views.stats_dreets_iae_iae, name="stats_dreets_iae_iae"),
     path("dreets/hiring", views.stats_dreets_iae_hiring, name="stats_dreets_iae_hiring"),
     path("dreets/state", views.stats_dreets_iae_hiring, name="stats_dreets_iae_state"),
+    path("dreets/orga_etp", views.stats_dreets_iae_orga_etp, name="stats_dreets_iae_orga_etp"),
     # Institution stats - DGEFP - nation level.
     path("dgefp/auto_prescription", views.stats_dgefp_iae_auto_prescription, name="stats_dgefp_iae_auto_prescription"),
     path(

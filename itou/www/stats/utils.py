@@ -65,7 +65,10 @@ def can_view_stats_siae_orga_etp(request):
     """
     Non official stats with very specific access rights.
     """
-    return can_view_stats_siae(request) and request.current_organization.pk in settings.STATS_SIAE_PK_WHITELIST
+    return can_view_stats_siae(request) and (
+        request.current_organization.pk in settings.STATS_SIAE_PK_WHITELIST
+        or request.current_organization.region in ["Bretagne", "Occitanie"]
+    )
 
 
 def can_view_stats_cd(request):
@@ -97,6 +100,10 @@ def can_view_stats_cd_aci(request):
         can_view_stats_cd(request)
         and request.current_organization.department in settings.STATS_ACI_DEPARTMENT_WHITELIST
     )
+
+
+def can_view_stats_cd_orga_etp(request):
+    return can_view_stats_cd(request) and request.current_organization.region in ["Bretagne", "Occitanie"]
 
 
 def can_view_stats_ft(request):
@@ -157,6 +164,10 @@ def can_view_stats_ddets_iae_aci(request):
     )
 
 
+def can_view_stats_ddets_iae_orga_etp(request):
+    return can_view_stats_ddets_iae(request) and request.current_organization.region in ["Bretagne", "Occitanie"]
+
+
 def can_view_stats_ddets_log(request):
     return (
         request.user.is_labor_inspector
@@ -174,6 +185,10 @@ def can_view_stats_dreets_iae(request):
         and isinstance(request.current_organization, Institution)
         and request.current_organization.kind == InstitutionKind.DREETS_IAE
     )
+
+
+def can_view_stats_dreets_iae_orga_etp(request):
+    return can_view_stats_dreets_iae(request) and request.current_organization.region in ["Bretagne", "Occitanie"]
 
 
 def can_view_stats_dgefp_iae(request):
