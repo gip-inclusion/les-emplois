@@ -16,36 +16,46 @@ from itou.communications.dispatch.utils import (
 from itou.communications.models import NotificationRecord, NotificationSettings
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 
-from .utils import FakeNotificationClassesMixin
 
-
-class TestBaseNotification(FakeNotificationClassesMixin):
-    def setup_method(self):
-        super().setup_method()
-        self.user = PrescriberFactory(email="testuser@beta.gouv.fr", membership=True)
-        self.organization = self.user.prescriberorganization_set.first()
-
+class TestBaseNotification:
+    @pytest.fixture
+    def manageable_notification(self):
         @notifications_registry.register
-        class ManageableNotification(self.TestNotification):
+        class ManageableNotification(BaseNotification):
             name = "Manageable"
             category = "Manageable"
 
+        yield ManageableNotification
+        notifications_registry.unregister(ManageableNotification)
+
+    @pytest.fixture
+    def manageable_non_applicable_notification(self):
         @notifications_registry.register
-        class ManageableNonApplicableNotification(self.TestNotification):
+        class ManageableNonApplicableNotification(BaseNotification):
             name = "Manageable, non-applicable"
             category = "Manageable, non-applicable"
 
             def is_applicable(self):
                 return False
 
+        yield ManageableNonApplicableNotification
+        notifications_registry.unregister(ManageableNonApplicableNotification)
+
+    @pytest.fixture
+    def non_manageable_notification(self):
         @notifications_registry.register
-        class NonManageableNotification(self.TestNotification):
+        class NonManageableNotification(BaseNotification):
             name = "NonManageable"
             category = "NonManageable"
             can_be_disabled = False
 
+        yield NonManageableNotification
+        notifications_registry.unregister(NonManageableNotification)
+
+    @pytest.fixture
+    def non_manageable_non_applicable_notification(self):
         @notifications_registry.register
-        class NonManageableNonApplicableNotification(self.TestNotification):
+        class NonManageableNonApplicableNotification(BaseNotification):
             name = "NonManageable, non-applicable"
             category = "NonManageable, non-applicable"
             can_be_disabled = False
@@ -53,151 +63,148 @@ class TestBaseNotification(FakeNotificationClassesMixin):
             def is_applicable(self):
                 return False
 
-        self.ManageableNotification = ManageableNotification
-        self.ManageableNonApplicableNotification = ManageableNonApplicableNotification
-        self.NonManageableNotification = NonManageableNotification
-        self.NonManageableNonApplicableNotification = NonManageableNonApplicableNotification
+        yield NonManageableNonApplicableNotification
+        notifications_registry.unregister(NonManageableNonApplicableNotification)
 
-        sync_notifications(NotificationRecord)
-
-    def teardown_method(self):
-        notifications_registry.unregister(self.ManageableNotification)
-        notifications_registry.unregister(self.ManageableNonApplicableNotification)
-        notifications_registry.unregister(self.NonManageableNotification)
-        notifications_registry.unregister(self.NonManageableNonApplicableNotification)
+    def setup_method(self):
+        self.user = PrescriberFactory(email="testuser@beta.gouv.fr", membership=True)
+        self.organization = self.user.prescriberorganization_set.first()
 
     def test_method_init(self):
         with pytest.raises(
             TypeError, match=re.escape("BaseNotification.__init__() missing 1 required positional argument: 'user")
         ):
-            self.TestNotification()
+            BaseNotification()
 
-        notification = self.TestNotification(self.user)
+        notification = BaseNotification(self.user)
         assert notification.user == self.user
         assert notification.structure is None
         assert notification.context == {}
 
-        notification = self.TestNotification(self.user, "structure")
+        notification = BaseNotification(self.user, "structure")
         assert notification.user == self.user
         assert notification.structure == "structure"
         assert notification.context == {}
 
-        notification = self.TestNotification(self.user, "structure", kw1=1, kw2=2)
+        notification = BaseNotification(self.user, "structure", kw1=1, kw2=2)
         assert notification.user == self.user
         assert notification.structure == "structure"
         assert notification.context == {"kw1": 1, "kw2": 2}
 
-    def test_method_repr(self):
-        assert (
-            repr(self.ManageableNotification(self.user))
-            == "<ManageableNotification testuser@beta.gouv.fr: Manageable>"
-        )
+    def test_method_repr(self, manageable_notification):
+        assert repr(manageable_notification(self.user)) == "<ManageableNotification testuser@beta.gouv.fr: Manageable>"
 
-    def test_method_is_manageable_by_user(self):
-        assert self.ManageableNotification(self.user, self.organization).is_manageable_by_user()
-        assert not self.ManageableNonApplicableNotification(self.user, self.organization).is_manageable_by_user()
-        assert not self.NonManageableNotification(self.user, self.organization).is_manageable_by_user()
-        assert not self.NonManageableNonApplicableNotification(self.user, self.organization).is_manageable_by_user()
+    def test_method_is_manageable_by_user(
+        self,
+        manageable_notification,
+        manageable_non_applicable_notification,
+        non_manageable_notification,
+        non_manageable_non_applicable_notification,
+    ):
+        assert manageable_notification(self.user, self.organization).is_manageable_by_user()
+        assert not manageable_non_applicable_notification(self.user, self.organization).is_manageable_by_user()
+        assert not non_manageable_notification(self.user, self.organization).is_manageable_by_user()
+        assert not non_manageable_non_applicable_notification(self.user, self.organization).is_manageable_by_user()
 
-    def test_method_is_applicable(self):
-        assert self.ManageableNotification(self.user, self.organization).is_applicable()
-        assert not self.ManageableNonApplicableNotification(self.user, self.organization).is_applicable()
-        assert self.NonManageableNotification(self.user, self.organization).is_applicable()
-        assert not self.NonManageableNonApplicableNotification(self.user, self.organization).is_applicable()
+    def test_method_is_applicable(
+        self,
+        manageable_notification,
+        manageable_non_applicable_notification,
+        non_manageable_notification,
+        non_manageable_non_applicable_notification,
+    ):
+        assert manageable_notification(self.user, self.organization).is_applicable()
+        assert not manageable_non_applicable_notification(self.user, self.organization).is_applicable()
+        assert non_manageable_notification(self.user, self.organization).is_applicable()
+        assert not non_manageable_non_applicable_notification(self.user, self.organization).is_applicable()
 
-    def test_method_should_send(self):
+    def test_method_should_send(
+        self,
+        manageable_notification,
+        manageable_non_applicable_notification,
+        non_manageable_notification,
+        non_manageable_non_applicable_notification,
+    ):
+        sync_notifications(NotificationRecord)
+
         # Notifications follow an opt-out logic. So non-manageable can't be disabled by the user
         # and should always be sent unless they're non-applicable
-        assert self.NonManageableNotification(self.user, self.organization).should_send()
-        assert not self.NonManageableNonApplicableNotification(self.user, self.organization).should_send()
+        assert non_manageable_notification(self.user, self.organization).should_send()
+        assert not non_manageable_non_applicable_notification(self.user, self.organization).should_send()
 
         # Even if disabled in db
         settings, _ = NotificationSettings.get_or_create(self.user, self.organization)
         settings.disabled_notifications.set(
             [
                 NotificationRecord.objects.get(
-                    notification_class=self.NonManageableNotification(self.user).__class__.__name__
+                    notification_class=non_manageable_notification(self.user).__class__.__name__
                 ),
                 NotificationRecord.objects.get(
-                    notification_class=self.NonManageableNonApplicableNotification(self.user).__class__.__name__
+                    notification_class=non_manageable_non_applicable_notification(self.user).__class__.__name__
                 ),
             ]
         )
-        assert self.NonManageableNotification(self.user, self.organization).should_send()
-        assert not self.NonManageableNonApplicableNotification(self.user, self.organization).should_send()
+        assert non_manageable_notification(self.user, self.organization).should_send()
+        assert not non_manageable_non_applicable_notification(self.user, self.organization).should_send()
 
         # For manageable notifications, they should be sent unless they're non-applicable
-        assert self.ManageableNotification(self.user, self.organization).should_send()
-        assert not self.ManageableNonApplicableNotification(self.user, self.organization).should_send()
+        assert manageable_notification(self.user, self.organization).should_send()
+        assert not manageable_non_applicable_notification(self.user, self.organization).should_send()
 
         # But should not be sent if disabled
         settings.disabled_notifications.set(
             [
                 NotificationRecord.objects.get(
-                    notification_class=self.ManageableNotification(self.user).__class__.__name__
+                    notification_class=manageable_notification(self.user).__class__.__name__
                 ),
                 NotificationRecord.objects.get(
-                    notification_class=self.ManageableNonApplicableNotification(self.user).__class__.__name__
+                    notification_class=manageable_non_applicable_notification(self.user).__class__.__name__
                 ),
             ]
         )
-        assert not self.ManageableNotification(self.user, self.organization).should_send()
-        assert not self.ManageableNonApplicableNotification(self.user, self.organization).should_send()
+        assert not manageable_notification(self.user, self.organization).should_send()
+        assert not manageable_non_applicable_notification(self.user, self.organization).should_send()
 
     def test_method_get_context(self):
-        assert self.ManageableNotification(self.user, self.organization).get_context() == {}
-        assert self.ManageableNotification(self.user, self.organization, kw1=1, kw2=2).get_context() == {
+        assert BaseNotification(self.user, self.organization).get_context() == {}
+        assert BaseNotification(self.user, self.organization, kw1=1, kw2=2).get_context() == {
             "kw1": 1,
             "kw2": 2,
         }
 
     def test_method_validate_context(self):
-        assert self.ManageableNotification(self.user, self.organization).validate_context() == {}
-        assert self.ManageableNotification(self.user, self.organization, kw1=1, kw2=2).validate_context() == {
+        assert BaseNotification(self.user, self.organization).validate_context() == {}
+        assert BaseNotification(self.user, self.organization, kw1=1, kw2=2).validate_context() == {
             "kw1": 1,
             "kw2": 2,
         }
 
 
-class TestEmailNotification(FakeNotificationClassesMixin):
-    def setup_method(self):
-        super().setup_method()
-
-        self.user = PrescriberFactory(email="testuser@beta.gouv.fr", membership=True)
-        self.organization = self.user.prescriberorganization_set.first()
-
+class TestEmailNotification:
+    @pytest.fixture
+    def email_notification(self):
         @notifications_registry.register
-        class ManageableNotification(EmailNotification):
+        class FakeEmailNotification(EmailNotification):
             name = "Manageable"
             category = "Manageable"
             subject_template = "layout/base_email_text_subject.txt"
             body_template = "layout/base_email_text_body.txt"
 
-        @notifications_registry.register
-        class NonManageableNotification(EmailNotification):
-            name = "NonManageable"
-            category = "NonManageable"
-            subject_template = "layout/base_email_text_subject.txt"
-            body_template = "layout/base_email_text_body.txt"
-            can_be_disabled = False
+        yield FakeEmailNotification
+        notifications_registry.unregister(FakeEmailNotification)
 
-        self.ManageableNotification = ManageableNotification
-        self.NonManageableNotification = NonManageableNotification
+    def setup_method(self):
+        self.user = PrescriberFactory(email="testuser@beta.gouv.fr", membership=True)
+        self.organization = self.user.prescriberorganization_set.first()
 
-        sync_notifications(NotificationRecord)
-
-    def teardown_method(self):
-        notifications_registry.unregister(self.ManageableNotification)
-        notifications_registry.unregister(self.NonManageableNotification)
-
-    def test_method_build(self):
-        email = self.ManageableNotification(self.user, self.organization).build()
+    def test_method_build(self, email_notification):
+        email = email_notification(self.user, self.organization).build()
         assert email.to == [self.user.email]
         assert "Cet email est envoyé depuis un environnement de démonstration" in email.body
 
-    def test_method_send(self, django_capture_on_commit_callbacks, mailoutbox):
+    def test_method_send(self, email_notification, django_capture_on_commit_callbacks, mailoutbox):
         with django_capture_on_commit_callbacks(execute=True):
-            self.ManageableNotification(self.user, self.organization).send()
+            email_notification(self.user, self.organization).send()
         assert len(mailoutbox) == 1
         assert mailoutbox[0].to == [self.user.email]
         assert "Cet email est envoyé depuis un environnement de démonstration" in mailoutbox[0].body
