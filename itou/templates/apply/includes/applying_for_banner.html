@@ -6,9 +6,7 @@
             <i class="ri-arrow-right-line fw-bold pe-2" aria-hidden="true"></i>
             <strong>Vous postulez actuellement pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</strong>
         </p>
-        <a href="{% if request.user.is_prescriber %}{% url "job_seekers_views:list" %}{% else %}{% url "apply:list_prescriptions" %}{% endif %}"
-           class="btn-link-white btn-ico align-items-center"
-           aria-label="Quitter la procédure">
+        <a href="{{ exit_url }}" class="btn-link-white btn-ico align-items-center" aria-label="Quitter la procédure">
             <i class="ri-close-line ri-xl fw-medium me-1" aria-hidden="true"></i>
             <span class="fs-sm fw-medium">Quitter</span>
         </a>
