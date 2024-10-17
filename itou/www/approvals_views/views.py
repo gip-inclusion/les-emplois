@@ -140,7 +140,7 @@ class ApprovalDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     def test_func(self):
         return self.request.user.is_authenticated and (
             # More checks are performed in get_context_data method
-            self.request.user.is_prescriber or self.request.user.is_employer
+            self.request.user.is_prescriber or self.request.user.is_employer or self.request.user.is_job_seeker
         )
 
     def get_prolongation_and_requests(self, approval):
@@ -203,6 +203,9 @@ class ApprovalDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
             if not self.object.user.job_applications.prescriptions_of(
                 self.request.user, self.request.current_organization
             ).exists():
+                raise PermissionDenied
+        elif self.request.user.is_job_seeker:
+            if self.object.user != self.request.user:
                 raise PermissionDenied
         else:
             # test_func should prevent this case from happening but let's be safe

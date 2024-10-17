@@ -57,10 +57,23 @@ class TestApprovalDetailView:
     def test_wrong_user_type(self, client):
         approval = JobApplicationFactory(with_approval=True).approval
         url = reverse("approvals:details", kwargs={"pk": approval.pk})
-        for user in [JobSeekerFactory(), LaborInspectorFactory(membership=True)]:
-            client.force_login(user)
-            response = client.get(url)
-            assert response.status_code == 403
+        user = LaborInspectorFactory(membership=True)
+        client.force_login(user)
+        response = client.get(url)
+        assert response.status_code == 403
+
+    def test_job_seeker_access(self, client):
+        approval = JobApplicationFactory(with_approval=True).approval
+        url = reverse("approvals:details", kwargs={"pk": approval.pk})
+
+        user = JobSeekerFactory()
+        client.force_login(user)
+        response = client.get(url)
+        assert response.status_code == 403
+
+        client.force_login(approval.user)
+        response = client.get(url)
+        assert response.status_code == 200
 
     @freeze_time("2024-09-25")
     def test_approval_detail_box(self, client, snapshot):
@@ -75,9 +88,10 @@ class TestApprovalDetailView:
         employer = job_application.to_company.members.first()
         prescriber = job_application.sender
         assert prescriber.is_prescriber
+        job_seeker = approval.user
 
         # In progress
-        for user in (employer, prescriber):
+        for user in (job_seeker, employer, prescriber):
             client.force_login(user)
             response = client.get(url)
             approval_box = parse_response_to_soup(response, selector=".c-box--pass")
@@ -95,7 +109,7 @@ class TestApprovalDetailView:
             end_at=timezone.localdate() + relativedelta(days=3),
             siae__name="Une SIAE",
         )
-        for user in (employer, prescriber):
+        for user in (job_seeker, employer, prescriber):
             client.force_login(user)
             response = client.get(url)
             approval_box = parse_response_to_soup(response, selector=".c-box--pass")
@@ -105,7 +119,7 @@ class TestApprovalDetailView:
         # Expired
         approval.end_at = approval.start_at + datetime.timedelta(days=1)
         approval.save(update_fields=("end_at",))
-        for user in (employer, prescriber):
+        for user in (job_seeker, employer, prescriber):
             client.force_login(user)
             response = client.get(url)
             approval_box = parse_response_to_soup(response, selector=".c-box--pass")
@@ -115,7 +129,7 @@ class TestApprovalDetailView:
         approval.start_at = datetime.date(2025, 1, 1)
         approval.end_at = datetime.date(2025, 1, 2)
         approval.save(update_fields=("start_at", "end_at"))
-        for user in (employer, prescriber):
+        for user in (job_seeker, employer, prescriber):
             client.force_login(user)
             response = client.get(url)
             approval_box = parse_response_to_soup(response, selector=".c-box--pass")
@@ -199,7 +213,18 @@ class TestApprovalDetailView:
         assertNotContains(response, suspension_delete_url)
 
         assert str(get_suspensions_section(response)) == snapshot(
-            name="Approval suspensions list as prescriber without modification buttons"
+            name="Approval suspensions list as job_seeker/prescriber without modification buttons"
+        )
+
+        # As job_seeker
+        client.force_login(approval.user)
+        with assertSnapshotQueries(snapshot(name="Approval detail view with suspensions as job_seeker")):
+            response = client.get(url)
+        assertNotContains(response, suspension_update_url)
+        assertNotContains(response, suspension_delete_url)
+
+        assert str(get_suspensions_section(response)) == snapshot(
+            name="Approval suspensions list as job_seeker/prescriber without modification buttons"
         )
 
     @freeze_time("2024-09-25", tick=True)  # tick is important for job applications' created_by
@@ -287,7 +312,18 @@ class TestApprovalDetailView:
         with assertSnapshotQueries(snapshot(name="Approval detail view with prolongations as prescriber")):
             response = client.get(url)
 
-        assert str(get_prolongations_section(response)) == snapshot(name="Approval prolongations list as prescriber")
+        assert str(get_prolongations_section(response)) == snapshot(
+            name="Approval prolongations list as job_seeker/prescriber"
+        )
+
+        # As job_seeker
+        client.force_login(approval.user)
+        with assertSnapshotQueries(snapshot(name="Approval detail view with prolongations as job_seeker")):
+            response = client.get(url)
+
+        assert str(get_prolongations_section(response)) == snapshot(
+            name="Approval prolongations list as job_seeker/prescriber"
+        )
 
     def test_prolongation_button(self, client):
         TOO_SOON = (
@@ -306,6 +342,7 @@ class TestApprovalDetailView:
         employer = siae.members.first()
         prescriber = job_application.sender
         assert prescriber.is_prescriber
+        job_seeker = approval.user
 
         url = reverse("approvals:details", kwargs={"pk": approval.pk})
         prolongation_url = reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id})
@@ -321,6 +358,7 @@ class TestApprovalDetailView:
 
         # Too soon: impossible to prolong
         assert not approval.can_be_prolonged
+        check_prolongation_url_and_reason(job_seeker, with_url=False, expected_reason=None)
         check_prolongation_url_and_reason(employer, with_url=False, expected_reason=TOO_SOON)
         check_prolongation_url_and_reason(prescriber, with_url=False, expected_reason=None)
 
@@ -328,6 +366,7 @@ class TestApprovalDetailView:
         with freeze_time(approval.end_at - datetime.timedelta(days=1)):
             approval = Approval.objects.get(pk=approval.pk)  # Reset cached properties
             assert approval.can_be_prolonged
+            check_prolongation_url_and_reason(job_seeker, with_url=False, expected_reason=None)
             check_prolongation_url_and_reason(employer, with_url=True, expected_reason=None)
             check_prolongation_url_and_reason(prescriber, with_url=False, expected_reason=None)
 
@@ -335,6 +374,7 @@ class TestApprovalDetailView:
             ProlongationRequestFactory(approval=approval)
             approval = Approval.objects.get(pk=approval.pk)  # Reset cached properties
             assert not approval.can_be_prolonged
+            check_prolongation_url_and_reason(job_seeker, with_url=False, expected_reason=None)
             check_prolongation_url_and_reason(employer, with_url=False, expected_reason=REQUEST_PENDING)
             check_prolongation_url_and_reason(prescriber, with_url=False, expected_reason=None)
 
@@ -342,6 +382,7 @@ class TestApprovalDetailView:
         with freeze_time(approval.end_at + datetime.timedelta(days=1)):
             approval = Approval.objects.get(pk=approval.pk)  # Reset cached properties
             assert not approval.can_be_prolonged
+            check_prolongation_url_and_reason(job_seeker, with_url=False, expected_reason=None)
             check_prolongation_url_and_reason(employer, with_url=False, expected_reason=TOO_LATE)
             check_prolongation_url_and_reason(prescriber, with_url=False, expected_reason=None)
 
@@ -409,6 +450,7 @@ class TestApprovalDetailView:
         employer = siae.members.first()
         prescriber = job_application.sender
         assert prescriber.is_prescriber
+        job_seeker = approval.user
 
         url = reverse("approvals:details", kwargs={"pk": approval.pk})
         suspend_url = reverse("approvals:suspend", kwargs={"approval_id": approval.id})
@@ -426,12 +468,14 @@ class TestApprovalDetailView:
         with freeze_time(timezone.now() - datetime.timedelta(days=1)):
             assert not approval.is_in_progress
             assert not approval.can_be_suspended_by_siae(siae)
+            check_suspend_url_and_reason(job_seeker, with_url=False, expected_reason=None)
             check_suspend_url_and_reason(employer, with_url=False, expected_reason=NOT_STARTED)
             check_suspend_url_and_reason(prescriber, with_url=False, expected_reason=None)
 
         # Back to an approval starting today that can be suspended
         approval = Approval.objects.get(pk=approval.pk)  # Reset cached properties
         assert approval.can_be_suspended_by_siae(siae)
+        check_suspend_url_and_reason(job_seeker, with_url=False, expected_reason=None)
         check_suspend_url_and_reason(employer, with_url=True, expected_reason=None)
         check_suspend_url_and_reason(prescriber, with_url=False, expected_reason=None)
 
@@ -443,6 +487,7 @@ class TestApprovalDetailView:
         )
         approval = Approval.objects.get(pk=approval.pk)  # Reset cached properties
         assert not approval.can_be_suspended_by_siae(siae)
+        check_suspend_url_and_reason(job_seeker, with_url=False, expected_reason=None)
         check_suspend_url_and_reason(employer, with_url=False, expected_reason=ALREADY_SUSPENDED)
         check_suspend_url_and_reason(prescriber, with_url=False, expected_reason=None)
 
@@ -456,6 +501,7 @@ class TestApprovalDetailView:
             job_seeker=job_application.job_seeker,
         )
         assert not approval.can_be_suspended_by_siae(siae)
+        check_suspend_url_and_reason(job_seeker, with_url=False, expected_reason=None)
         check_suspend_url_and_reason(employer, with_url=False, expected_reason=HANDLED_BY_OTHER_SIAE)
         check_suspend_url_and_reason(prescriber, with_url=False, expected_reason=None)
 
@@ -464,6 +510,7 @@ class TestApprovalDetailView:
             approval = Approval.objects.get(pk=approval.pk)  # Reset cached properties
             assert not approval.is_in_progress
             assert not approval.can_be_suspended_by_siae(siae)
+            check_suspend_url_and_reason(job_seeker, with_url=False, expected_reason=None)
             check_suspend_url_and_reason(employer, with_url=False, expected_reason=EXPIRED)
             check_suspend_url_and_reason(prescriber, with_url=False, expected_reason=None)
 
