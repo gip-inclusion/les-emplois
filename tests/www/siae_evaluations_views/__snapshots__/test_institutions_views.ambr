@@ -90,6 +90,7 @@
                  "institutions_institution"."updated_at",
                  "institutions_institution"."uid",
                  "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
                  "institutions_institution"."kind"
           FROM "institutions_institutionmembership"
           INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
@@ -499,6 +500,7 @@
                  "institutions_institution"."updated_at",
                  "institutions_institution"."uid",
                  "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
                  "institutions_institution"."kind"
           FROM "institutions_institutionmembership"
           INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
@@ -556,6 +558,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -983,6 +986,7 @@
                  "institutions_institution"."updated_at",
                  "institutions_institution"."uid",
                  "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
                  "institutions_institution"."kind"
           FROM "institutions_institutionmembership"
           INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
@@ -1064,6 +1068,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -1568,6 +1573,7 @@
                  "institutions_institution"."updated_at",
                  "institutions_institution"."uid",
                  "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
                  "institutions_institution"."kind"
           FROM "institutions_institutionmembership"
           INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
@@ -1625,6 +1631,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -1896,6 +1903,7 @@
                  "institutions_institution"."updated_at",
                  "institutions_institution"."uid",
                  "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
                  "institutions_institution"."kind"
           FROM "institutions_institutionmembership"
           INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
@@ -1954,6 +1962,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -2226,6 +2235,7 @@
                  "institutions_institution"."updated_at",
                  "institutions_institution"."uid",
                  "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
                  "institutions_institution"."kind"
           FROM "institutions_institutionmembership"
           INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
@@ -2284,6 +2294,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
