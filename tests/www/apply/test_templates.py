@@ -8,7 +8,8 @@ from itou.job_applications.enums import Origin
 from itou.jobs.models import Appellation
 from itou.utils.context_processors import expose_enums
 from itou.www.apply.views.list_views import JobApplicationsListKind
-from tests.job_applications.factories import JobApplicationSentByCompanyFactory, JobApplicationSentByJobSeekerFactory
+from tests.job_applications.factories import (
+    JobApplicationSentByCompanyFactory, JobApplicationSentByJobSeekerFactory)
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerFactory
 from tests.utils.test import load_template
@@ -53,6 +54,7 @@ def test_job_application_multiple_jobs():
                 data-bs-toggle="collapse"
                 data-bs-target="#collapse-job-application-{job_application.pk}"
                 aria-expanded="false"
+                type="button"
                 aria-controls="collapse-job-application-{job_application.pk}">
             <span>3 postes recherchés</span>
         </button>

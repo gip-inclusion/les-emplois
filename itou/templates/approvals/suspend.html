@@ -36,10 +36,21 @@
 
                                 <div class="form-group">
                                     <div class="form-check d-inline-block">
-                                        <input class="form-check-input" type="checkbox" data-bs-toggle="collapse" data-bs-target="#collapse_end_at" aria-controls="collapse_end_at" id="{{ form.set_default_end_date.id_for_label }}" name="{{ form.set_default_end_date.name }}" aria-describedby="{{ form.set_default_end_date.id_for_label }}_helptext">
-                                        <label class="form-check-label" for="{{ form.set_default_end_date.id_for_label }}">{{ form.set_default_end_date.label }}</label>
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               data-bs-toggle="collapse"
+                                               data-bs-target="#collapse_end_at"
+                                               aria-controls="collapse_end_at"
+                                               id="{{ form.set_default_end_date.id_for_label }}"
+                                               name="{{ form.set_default_end_date.name }}"
+                                               aria-describedby="{{ form.set_default_end_date.id_for_label }}_helptext">
+                                        <label class="form-check-label" for="{{ form.set_default_end_date.id_for_label }}">
+                                            {{ form.set_default_end_date.label }}
+                                        </label>
                                     </div>
-                                    <div class="form-text" id="{{ form.set_default_end_date.id_for_label }}_helptext">{{ form.set_default_end_date.help_text }}</div>
+                                    <div class="form-text" id="{{ form.set_default_end_date.id_for_label }}_helptext">
+                                        {{ form.set_default_end_date.help_text }}
+                                    </div>
                                 </div>
 
                                 {% bootstrap_field form.reason %}
