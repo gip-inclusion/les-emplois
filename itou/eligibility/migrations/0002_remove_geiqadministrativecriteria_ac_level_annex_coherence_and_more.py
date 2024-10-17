@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="geiqadministrativecriteria",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     models.Q(("annex__in", ("0", "1")), ("level__isnull", True)),
                     models.Q(("annex__in", ("2", "1+2")), ("level__in", ("1", "2")), ("level__isnull", False)),
                     _connector="OR",

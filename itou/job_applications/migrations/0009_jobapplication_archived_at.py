@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="jobapplication",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     ("archived_at__isnull", False), ("state__in", ["accepted", "prior_to_hire"]), _negated=True
                 ),
                 name="archived_status",
@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="jobapplication",
             constraint=models.CheckConstraint(
-                check=models.Q(("archived_at", None), ("archived_by__isnull", False), _negated=True),
+                condition=models.Q(("archived_at", None), ("archived_by__isnull", False), _negated=True),
                 name="archived_by__no_archived_at",
                 violation_error_message="Une candidature active ne peut pas avoir été archivée par un utilisateur.",
             ),

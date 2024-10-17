@@ -40,7 +40,7 @@ class NotificationRecord(models.Model):
         constraints = [
             models.CheckConstraint(
                 name="notificationrecord_category_and_name_required",
-                check=~(models.Q(category="") | models.Q(name="")),
+                condition=~(models.Q(category="") | models.Q(name="")),
             ),
         ]
 
@@ -146,8 +146,8 @@ class AnnouncementCampaign(models.Model):
         verbose_name = "campagne d'annonce"
         ordering = ["-start_date"]
         constraints = [
-            models.CheckConstraint(name="max_items_range", check=Q(max_items__gte=1, max_items__lte=10)),
-            models.CheckConstraint(name="start_on_month", check=Q(start_date__day=1)),
+            models.CheckConstraint(name="max_items_range", condition=Q(max_items__gte=1, max_items__lte=10)),
+            models.CheckConstraint(name="start_on_month", condition=Q(start_date__day=1)),
         ]
 
     @property

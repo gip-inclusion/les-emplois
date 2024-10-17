@@ -949,7 +949,6 @@
                                               %s,
                                               %s,
                                               %s)
-          ORDER BY "jobs_appellation"."name" ASC
         ''',
       }),
       dict({
@@ -968,7 +967,6 @@
                                        %s,
                                        %s,
                                        %s)
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

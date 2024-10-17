@@ -404,7 +404,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="prescriberorganization",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     ("authorization_status", "VALIDATED"), ("is_brsa", False), ("kind", "ODC"), _negated=True
                 ),
                 name="validated_odc_is_brsa",

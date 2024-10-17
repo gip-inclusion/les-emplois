@@ -750,7 +750,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             models.CheckConstraint(
                 name="geiq_fields_coherence",
                 violation_error_message="Incohérence dans les champs concernant le contrat GEIQ",
-                check=models.Q(
+                condition=models.Q(
                     contract_type__in=[ContractType.PROFESSIONAL_TRAINING, ContractType.APPRENTICESHIP],
                     contract_type_details="",
                     nb_hours_per_week__gt=0,
@@ -768,12 +768,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             models.CheckConstraint(
                 name="diagnoses_coherence",
                 violation_error_message="Une candidature ne peut avoir les deux types de diagnostics (IAE et GEIQ)",
-                check=~models.Q(eligibility_diagnosis__isnull=False, geiq_eligibility_diagnosis__isnull=False),
+                condition=~models.Q(eligibility_diagnosis__isnull=False, geiq_eligibility_diagnosis__isnull=False),
             ),
             models.CheckConstraint(
                 name="qualification_coherence",
                 violation_error_message="Incohérence dans les champs concernant la qualification pour le contrat GEIQ",
-                check=~models.Q(
+                condition=~models.Q(
                     qualification_level=QualificationLevel.NOT_RELEVANT,
                     qualification_type=QualificationType.STATE_DIPLOMA,
                 ),
@@ -781,7 +781,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             models.CheckConstraint(
                 name="processed_coherence",
                 violation_error_message="Incohérence du champ date de traitement",
-                check=models.Q(
+                condition=models.Q(
                     state__in=JobApplicationWorkflow.JOB_APPLICATION_PROCESSED_STATES, processed_at__isnull=False
                 )
                 | (
@@ -794,7 +794,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 violation_error_message=(
                     "Impossible d’archiver une candidature acceptée ou en action préalable à l’embauche."
                 ),
-                check=~models.Q(
+                condition=~models.Q(
                     state__in=[JobApplicationState.ACCEPTED, JobApplicationState.PRIOR_TO_HIRE],
                     archived_at__isnull=False,
                 ),
@@ -802,7 +802,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             models.CheckConstraint(
                 name="archived_by__no_archived_at",
                 violation_error_message="Une candidature active ne peut pas avoir été archivée par un utilisateur.",
-                check=~models.Q(archived_at=None, archived_by__isnull=False),
+                condition=~models.Q(archived_at=None, archived_by__isnull=False),
             ),
         ]
 

@@ -303,7 +303,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="sanctions",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     models.Q(("subsidy_cut_dates__isnull", True), ("subsidy_cut_percent__isnull", True)),
                     models.Q(("subsidy_cut_dates__isnull", False), ("subsidy_cut_percent__isnull", False)),
                     _connector="OR",
@@ -316,7 +316,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="evaluatedsiae",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     ("final_reviewed_at__isnull", True),
                     models.Q(("final_reviewed_at__gte", models.F("reviewed_at")), ("reviewed_at__isnull", False)),
                     _connector="OR",

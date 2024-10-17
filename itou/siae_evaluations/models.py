@@ -514,7 +514,7 @@ class EvaluatedSiae(models.Model):
                 violation_error_message=(
                     "Impossible d'avoir une date de contrôle définitif sans une date de premier contrôle antérieure"
                 ),
-                check=models.Q(final_reviewed_at__isnull=True)
+                condition=models.Q(final_reviewed_at__isnull=True)
                 | models.Q(reviewed_at__isnull=False, final_reviewed_at__gte=F("reviewed_at")),
             ),
         ]
@@ -876,7 +876,7 @@ class Sanctions(models.Model):
                 violation_error_message=(
                     "Le pourcentage et la date de début de retrait de l’aide au poste doivent être renseignés."
                 ),
-                check=models.Q(subsidy_cut_percent__isnull=True, subsidy_cut_dates__isnull=True)
+                condition=models.Q(subsidy_cut_percent__isnull=True, subsidy_cut_dates__isnull=True)
                 | models.Q(subsidy_cut_percent__isnull=False, subsidy_cut_dates__isnull=False),
             ),
         ]

@@ -73,12 +73,12 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="announcementcampaign",
             constraint=models.CheckConstraint(
-                check=models.Q(("max_items__gte", 1), ("max_items__lte", 10)), name="max_items_range"
+                condition=models.Q(("max_items__gte", 1), ("max_items__lte", 10)), name="max_items_range"
             ),
         ),
         migrations.AddConstraint(
             model_name="announcementcampaign",
-            constraint=models.CheckConstraint(check=models.Q(("start_date__day", 1)), name="start_on_month"),
+            constraint=models.CheckConstraint(condition=models.Q(("start_date__day", 1)), name="start_on_month"),
         ),
         migrations.AddField(
             model_name="announcementitem",

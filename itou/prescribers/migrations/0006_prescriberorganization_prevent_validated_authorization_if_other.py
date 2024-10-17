@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="prescriberorganization",
             constraint=models.CheckConstraint(
-                check=models.Q(("authorization_status", "VALIDATED"), ("kind", "Autre"), _negated=True),
+                condition=models.Q(("authorization_status", "VALIDATED"), ("kind", "Autre"), _negated=True),
                 name="prevent_validated_authorization_if_other",
                 violation_error_message='Une organisation habilitée ne peut pas être de type "Autre".',
             ),
