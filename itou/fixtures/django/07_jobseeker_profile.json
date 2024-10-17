@@ -313,5 +313,40 @@
     },
     "model": "users.jobseekerprofile",
     "pk": 26
+  },
+  {
+    "fields": {
+      "aah_allocation_since": "",
+      "asp_uid": "f403018e1423501927500c8bdf79bb",
+      "ass_allocation_since": "",
+      "ata_allocation_since": "",
+      "birth_country": 91,
+      "birth_place": 26973,
+      "birthdate": "2005-05-03",
+      "education_level": "40",
+      "has_rsa_allocation": "NON",
+      "hexa_additional_address": "",
+      "hexa_commune": null,
+      "hexa_lane_name": "",
+      "hexa_lane_number": "",
+      "hexa_lane_type": "",
+      "hexa_non_std_extension": "",
+      "hexa_post_code": "",
+      "hexa_std_extension": "",
+      "lack_of_nir_reason": "",
+      "lack_of_pole_emploi_id_reason": "NOT_REGISTERED",
+      "nir": "205056929022109",
+      "oeth_employee": false,
+      "pe_last_certification_attempt_at": null,
+      "pe_obfuscated_nir": null,
+      "pole_emploi_id": "",
+      "pole_emploi_since": "",
+      "resourceless": false,
+      "rqth_employee": false,
+      "rsa_allocation_since": "",
+      "unemployed_since": "04"
+    },
+    "model": "users.jobseekerprofile",
+    "pk": 47
   }
 ]
