@@ -1,6 +1,21 @@
 {% load format_filters %}
 {% load matomo %}
 
+{% if job_application_sender_left_org %}
+    <div class="alert alert-warning alert-dismissible fade show" role="status">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        <div class="row">
+            <div class="col-auto pe-0">
+                <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
+            </div>
+            <div class="col">
+                <p class="mb-0">L’émetteur de cette candidature ne fait plus partie de l’organisation émettrice</p>
+            </div>
+        </div>
+    </div>
+
+
+{% endif %}
 <ul class="list-data list-data__two-column-md mb-3">
     <li>
         <small>Émetteur</small>
@@ -14,6 +29,8 @@
         <small>Adresse e-mail</small>
         {% if request.user.is_job_seeker and job_application.sender_kind != SenderKind.JOB_SEEKER %}
             <strong>Non communiquée</strong>
+        {% elif job_application_sender_left_org %}
+            <div class="text-warning fst-italic">Les réponses seront transmises aux administrateurs de l’organisation</div>
         {% else %}
             <strong>{{ job_application.sender.email }}</strong>
             {% matomo_event "candidature" "clic" "copied_sender_email" as matomo_event_attrs %}

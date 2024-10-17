@@ -46,6 +46,7 @@ from itou.utils.templatetags.format_filters import format_approval_number, forma
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
+from itou.www.apply.views.process_views import job_application_sender_left_org
 from tests.approvals.factories import (
     PoleEmploiApprovalFactory,
     ProlongationFactory,
@@ -64,7 +65,7 @@ from tests.job_applications.factories import (
     PriorActionFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.prescribers.factories import PrescriberOrganizationFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
@@ -80,6 +81,8 @@ REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY = (
     "Si les détails apportés dans le message de réponse ne vous ont pas permis d’en savoir plus,"
     " vous pouvez contacter l’employeur."
 )
+SENDER_LEFT_ORG = "Les réponses seront transmises aux administrateurs de l’organisation"
+SENDER_LEFT_ORG_ALERT = "L’émetteur de cette candidature ne fait plus partie de l’organisation émettrice"
 
 
 @pytest.mark.ignore_unknown_variable_template_error("has_form_error", "with_matomo_event")
@@ -252,6 +255,20 @@ class TestProcessViews:
         assertContains(response, resume_link)
         assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
 
+    def test_details_when_sender_left_org(self, client):
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        company = job_application.to_company
+        employer = company.members.first()
+        sender = job_application.sender
+        sender.prescribermembership_set.update(is_active=False)
+        client.force_login(employer)
+
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+        assertNotContains(response, sender.email)
+        assertContains(response, SENDER_LEFT_ORG)
+        assertContains(response, SENDER_LEFT_ORG_ALERT)
+
     def test_details_archived(self, client):
         UNARCHIVE = "Désarchiver"
         job_application = JobApplicationFactory(
@@ -396,6 +413,19 @@ class TestProcessViews:
         response = client.get(url)
         assertContains(response, LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER.label, html=True)
 
+    def test_details_for_prescriber_when_sender_left_org(self, client):
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        prescriber = PrescriberMembershipFactory(organization=job_application.sender_prescriber_organization).user
+        sender = job_application.sender
+        sender.prescribermembership_set.update(is_active=False)
+        client.force_login(prescriber)
+
+        url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+        assertNotContains(response, sender.email)
+        assertContains(response, SENDER_LEFT_ORG)
+        assertContains(response, SENDER_LEFT_ORG_ALERT)
+
     def test_details_for_prescriber_as_company_when_i_am_not_the_sender(self, client):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         employer = job_application.to_company.members.first()
@@ -473,6 +503,19 @@ class TestProcessViews:
         assertNotContains(response, format_phone(job_application.sender.phone))
 
         assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
+
+    def test_details_for_job_seeker_when_sender_left_org(self, client):
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        sender = job_application.sender
+        sender.prescribermembership_set.update(is_active=False)
+
+        client.force_login(job_application.job_seeker)
+
+        url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+        assertNotContains(response, sender.email)
+        assertNotContains(response, SENDER_LEFT_ORG)  # A job seeker never sees the email of the sender
+        assertContains(response, SENDER_LEFT_ORG_ALERT)
 
     def test_details_for_job_seeker_as_other_user(self, client, subtests):
         job_application = JobApplicationFactory()
@@ -3965,3 +4008,57 @@ def test_approval_status_includes(client, snapshot):
         response,
         "Date de fin prévisionnelle : 29/05/2025",
     )
+
+
+class TestJobApplicationSenderLeftOrg:
+    def test_sender_left_org_prescriber(self):
+        prescriber_membership = PrescriberMembershipFactory()
+        job_app = JobApplicationFactory(
+            sender=prescriber_membership.user, sender_prescriber_organization=prescriber_membership.organization
+        )
+        assert job_application_sender_left_org(job_app) is False
+
+        # membership is inactive
+        prescriber_membership.is_active = False
+        prescriber_membership.save(update_fields=["is_active"])
+        assert job_application_sender_left_org(job_app) is True
+
+        # prescriber is inactive
+        prescriber_membership.is_active = True
+        prescriber_membership.save(update_fields=["is_active"])
+        prescriber_membership.user.is_active = False
+        prescriber_membership.user.save(update_fields=["is_active"])
+        assert job_application_sender_left_org(job_app) is True
+
+        # membership was removed
+        prescriber_membership.user.is_active = True
+        prescriber_membership.user.save(update_fields=["is_active"])
+        prescriber_membership.delete()
+        assert job_application_sender_left_org(job_app) is True
+
+    def test_sender_left_org_employer(self):
+        company_membership = CompanyMembershipFactory()
+        job_app = JobApplicationFactory(sender=company_membership.user, sender_company=company_membership.company)
+        assert job_application_sender_left_org(job_app) is False
+
+        # membership is inactive
+        company_membership.is_active = False
+        company_membership.save(update_fields=["is_active"])
+        assert job_application_sender_left_org(job_app) is True
+
+        # prescriber is inactive
+        company_membership.is_active = True
+        company_membership.save(update_fields=["is_active"])
+        company_membership.user.is_active = False
+        company_membership.user.save(update_fields=["is_active"])
+        assert job_application_sender_left_org(job_app) is True
+
+        # membership was removed
+        company_membership.user.is_active = True
+        company_membership.user.save(update_fields=["is_active"])
+        company_membership.delete()
+        assert job_application_sender_left_org(job_app) is True
+
+    def test_sender_left_org_job_seeker(self):
+        job_app = JobApplicationSentByJobSeekerFactory()
+        assert job_application_sender_left_org(job_app) is False
