@@ -14,30 +14,28 @@ from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberF
 
 
 class TestNotificationModel:
-    def setup_method(self):
-        class TestNotification(BaseNotification):
-            pass
-
+    @pytest.fixture
+    def first_notification(self):
         @notifications_registry.register
-        class FirstNotification(TestNotification):
+        class FirstNotification(BaseNotification):
             name = "First"
             category = "First"
 
+        yield
+        notifications_registry.unregister(FirstNotification)
+
+    @pytest.fixture
+    def second_notification(self):
         @notifications_registry.register
-        class SecondNotification(TestNotification):
+        class SecondNotification(BaseNotification):
             name = "Second"
             category = "Second"
 
-        self.FirstNotification = FirstNotification
-        self.SecondNotification = SecondNotification
+        yield
+        notifications_registry.unregister(SecondNotification)
 
+    def test_managers(self, first_notification, second_notification):
         sync_notifications(NotificationRecord)
-
-    def teardown_method(self):
-        notifications_registry.unregister(self.FirstNotification)
-        notifications_registry.unregister(self.SecondNotification)
-
-    def test_managers(self):
         assert NotificationRecord.objects.filter(category__in=["First", "Second"]).count() == 2
         assert NotificationRecord.include_obsolete.filter(category__in=["First", "Second"]).count() == 2
 
@@ -46,7 +44,8 @@ class TestNotificationModel:
         assert NotificationRecord.objects.filter(category__in=["First", "Second"]).count() == 1
         assert NotificationRecord.include_obsolete.filter(category__in=["First", "Second"]).count() == 2
 
-    def test_str(self):
+    def test_str(self, first_notification, second_notification):
+        sync_notifications(NotificationRecord)
         notifications = NotificationRecord.objects.filter(category__in=["First", "Second"])
         assert str(notifications[0]) == "First"
         assert str(notifications[1]) == "Second"

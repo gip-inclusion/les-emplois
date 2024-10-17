@@ -1,26 +1,19 @@
+from functools import partial
+
 import pytest
 from django.core.exceptions import ImproperlyConfigured
 
 from itou.communications import registry as notifications_registry
+from itou.communications.dispatch.base import BaseNotification
 
-from .utils import FakeNotificationClassesMixin
 
-
-class TestNotificationRegistry(FakeNotificationClassesMixin):
-    def setup_method(self):
-        super().setup_method()
-        self.registries = []
-
-    def teardown_method(self):
-        for registry in self.registries:
-            notifications_registry.unregister(registry)
-
+class TestNotificationRegistry:
     def test_required_attributes_validation_one(self):
         expected_message = "ErrorNotification must define the following attrs: 'category'."
         with pytest.raises(ImproperlyConfigured, match=expected_message):
 
             @notifications_registry.register
-            class ErrorNotification(self.TestNotification):
+            class ErrorNotification(BaseNotification):
                 name = "Test"
 
     def test_required_attributes_validation_many(self):
@@ -28,7 +21,7 @@ class TestNotificationRegistry(FakeNotificationClassesMixin):
         with pytest.raises(ImproperlyConfigured, match=expected_message):
 
             @notifications_registry.register
-            class ErrorNotification(self.TestNotification):
+            class ErrorNotification(BaseNotification):
                 pass
 
     def test_required_attributes_validation_others(self):
@@ -36,21 +29,22 @@ class TestNotificationRegistry(FakeNotificationClassesMixin):
         with pytest.raises(ImproperlyConfigured, match=expected_message):
 
             @notifications_registry.register
-            class ErrorNotification(self.TestOtherNotification):
+            class ErrorNotification(BaseNotification):
+                REQUIRED = BaseNotification.REQUIRED + ["required_attribute"]
                 category = "Test"
 
-    def test_name_conflict(self):
+    def test_name_conflict(self, request):
         @notifications_registry.register
-        class ConflictNotification(self.TestNotification):
+        class ConflictNotification(BaseNotification):
             name = "Test"
             category = "Test"
 
-        self.registries.append(ConflictNotification)
+        request.addfinalizer(partial(notifications_registry.unregister, ConflictNotification))
 
         expected_message = "'ConflictNotification' is already registered"
         with pytest.raises(NameError, match=expected_message):
 
             @notifications_registry.register
-            class ConflictNotification(self.TestNotification):  # noqa: F811
+            class ConflictNotification(BaseNotification):  # noqa: F811
                 name = "Test"
                 category = "Test"
