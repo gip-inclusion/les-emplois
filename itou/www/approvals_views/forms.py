@@ -437,13 +437,6 @@ class SuspensionForm(forms.ModelForm):
         required=False,
         label="Je ne connais pas la date de fin de la suspension.",
         help_text=f"La Plateforme indiquera {Suspension.MAX_DURATION_MONTHS} mois par défaut.",
-        widget=forms.CheckboxInput(
-            attrs={
-                "data-bs-toggle": "collapse",
-                "data-bs-target": "#collapse_end_at",
-                "aria-controls": "collapse_end_at",
-            }
-        ),
     )
 
     class Meta:
