@@ -217,7 +217,7 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
                         <form method="post" action="{% url 'apply:cancel' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
                             {% csrf_token %}
-                            <button class="btn btn-sm btn-primary">Confirmer l’annulation de l’embauche</button>
+                            <button class="btn btn-sm btn-danger">Confirmer l’annulation de l’embauche</button>
                         </form>
                     </div>
                 </div>
