@@ -32,29 +32,27 @@
                         <td>{{ member.joined_at|date:"d F Y à H:i" }}</td>
                         {% if user in active_admin_members %}
                             <td class="text-end w-50px">
-                                <div>
-                                    {% if member.user != user %}
-                                        <button id="dropdown_{{ forloop.counter }}_action_menu" class="btn btn-sm btn-link btn-ico-only" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d'actions">
-                                            <i class="ri-more-2-fill" aria-hidden="true"></i>
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
-                                            <a href="{% url base_url|add:":deactivate_member" member.user.pk %}" class="dropdown-item">Retirer de la structure</a>
-                                            {% if not member.user in active_admin_members %}
-                                                <a href="{% url base_url|add:":update_admin_role" "add" member.user.pk %}" class="dropdown-item">
-                                                    Ajouter en tant qu'administrateur
-                                                </a>
-                                            {% else %}
-                                                <a href="{% url base_url|add:":update_admin_role" "remove" member.user.pk %}" class="dropdown-item">
-                                                    Retirer les droits d'administrateur
-                                                </a>
-                                            {% endif %}
-                                        </div>
-                                    {% else %}
-                                        <div class="btn btn-sm btn-link btn-ico-only disabled">
-                                            <i class="ri-forbid-line" aria-hidden="true"></i>
-                                        </div>
-                                    {% endif %}
-                                </div>
+                                {% if member.user != user %}
+                                    <button id="dropdown_{{ forloop.counter }}_action_menu" class="btn btn-sm btn-link btn-ico-only" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d'actions">
+                                        <i class="ri-more-2-fill" aria-hidden="true"></i>
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
+                                        <a href="{% url base_url|add:":deactivate_member" member.user.pk %}" class="dropdown-item">Retirer de la structure</a>
+                                        {% if not member.user in active_admin_members %}
+                                            <a href="{% url base_url|add:":update_admin_role" "add" member.user.pk %}" class="dropdown-item">
+                                                Ajouter en tant qu'administrateur
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url base_url|add:":update_admin_role" "remove" member.user.pk %}" class="dropdown-item">
+                                                Retirer les droits d'administrateur
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <div class="btn btn-sm btn-link btn-ico-only disabled" data-bs-toggle="tooltip" data-bs-title="Aucune action possible">
+                                        <i class="ri-more-2-fill" aria-hidden="true"></i>
+                                    </div>
+                                {% endif %}
                             </td>
                         {% endif %}
                     </tr>
