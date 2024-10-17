@@ -65,7 +65,7 @@
 {% if add_prior_action_form %}
     {# A new prior action has been added and is being swapped to replace the add form: we now need a new one #}
     {% url 'apply:add_prior_action' job_application_id=job_application.id as add_prior_action_url %}
-    {% include "apply/includes/job_application_prior_action_form.html" with job_application=job_application form=add_prior_action_form main_div_id="add_prior_action" form_url=add_prior_action_url %}
+    {% include "apply/includes/job_application_prior_action_form.html" with job_application=job_application form=add_prior_action_form main_div_id="add_prior_action" form_url=add_prior_action_url final_hr=False %}
 {% endif %}
 {% if with_oob_state_update %}
     {# If state has changed, we need to update a bunch of places #}
