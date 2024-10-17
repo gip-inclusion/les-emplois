@@ -11,24 +11,28 @@
 {% endblock %}
 
 {% block title_content %}
-    <div class="d-md-flex align-items-center">
-        <h1 class="mb-1 mb-md-0 me-3">
-            Candidature de
-            {% if with_job_seeker_detail_url|default:False %}
-                <a href="{% url "job_seekers_views:details" public_id=job_application.job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link">{{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}</a>
-            {% else %}
-                {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
-            {% endif %}
-        </h1>
-        {% state_badge job_application extra_class="badge-base" %}
-        <button class="btn btn-lg btn-ico-only btn-link"
-                type="button"
-                data-it-action="print"
-                {% matomo_event "candidature" "click" "impression-fiche-candidature" %}
-                aria-label="Imprimer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}">
-            <i class="ri-printer-line fw-normal" aria-hidden="true"></i>
-        </button>
-        {% block title_inline_actions %}{% endblock %}
+    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+        <div class="d-xl-flex align-items-xl-center">
+            <h1 class="mb-0 me-3 text-md-nowrap">
+                Candidature de
+                {% if with_job_seeker_detail_url|default:False %}
+                    <a href="{% url "job_seekers_views:details" public_id=job_application.job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link">{{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}</a>
+                {% else %}
+                    {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+                {% endif %}
+            </h1>
+            {% state_badge job_application extra_class="badge-base" %}
+            <button class="btn btn-lg btn-ico-only btn-link"
+                    type="button"
+                    data-it-action="print"
+                    {% matomo_event "candidature" "click" "impression-fiche-candidature" %}
+                    aria-label="Imprimer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}">
+                <i class="ri-printer-line fw-normal" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div>
+            {% block title_inline_actions %}{% endblock %}
+        </div>
     </div>
     {% block actions %}{% endblock %}
 {% endblock %}
