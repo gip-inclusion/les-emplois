@@ -2170,7 +2170,6 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id"
           FROM "prescribers_prescriberorganization"
           WHERE "prescribers_prescriberorganization"."id" IN (%s)
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

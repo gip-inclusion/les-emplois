@@ -225,7 +225,6 @@
                                       %s,
                                       %s,
                                       %s)
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
