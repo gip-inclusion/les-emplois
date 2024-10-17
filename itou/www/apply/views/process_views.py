@@ -230,7 +230,10 @@ def details_for_company(request, job_application_id, template_name="apply/proces
             hiring_start_at=job_application.hiring_start_at
         )
 
+    can_be_cancelled = job_application.state.is_accepted and job_application.can_be_cancelled
+
     context = {
+        "can_be_cancelled": can_be_cancelled,
         "can_view_personal_information": True,  # SIAE members have access to personal info
         "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
         "display_refusal_info": False,
