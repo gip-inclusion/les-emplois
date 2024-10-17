@@ -1025,6 +1025,8 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
                 "prior_action": prior_action,
                 # GEIQ cannot require IAE eligibility diagnosis, but shared templates need this variable.
                 "eligibility_diagnosis_by_siae_required": False,
+                "add_prior_action_form": None,
+                "with_oob_state_update": False,
             },
         )
 
