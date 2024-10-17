@@ -3106,7 +3106,7 @@ def test_details_for_prescriber_geiq_without_prior_actions(client):
     assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
 
 
-@pytest.mark.ignore_unknown_variable_template_error("with_matomo_event", "with_oob_state_update")
+@pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
 def test_details_for_prescriber_geiq_with_prior_actions(client):
     job_application = JobApplicationFactory(
         sent_by_authorized_prescriber_organisation=True,
@@ -3131,7 +3131,7 @@ def test_details_for_prescriber_geiq_with_prior_actions(client):
     assertNotContains(response, delete_button)
 
 
-@pytest.mark.ignore_unknown_variable_template_error("with_matomo_event", "with_oob_state_update")
+@pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
 def test_details_for_jobseeker_geiq_with_prior_actions(client):
     job_application = JobApplicationFactory(
         sent_by_authorized_prescriber_organisation=True,
@@ -3196,7 +3196,6 @@ def test_details_sender_email_display_for_job_seeker(client):
     assertNotContains(response, SENDER_EMAIL_HIDDEN, html=True)
 
 
-@pytest.mark.ignore_unknown_variable_template_error("final_hr")
 def test_accept_button(client):
     job_application = JobApplicationFactory(
         state=job_applications_enums.JobApplicationState.PROCESSING,
@@ -3240,7 +3239,6 @@ def test_add_prior_action_new(client):
     assert not job_application.prior_actions.exists()
 
 
-@pytest.mark.ignore_unknown_variable_template_error("final_hr")
 @freeze_time("2023-12-12 13:37:00", tz_offset=-1)
 def test_add_prior_action_processing(client, snapshot):
     job_application = JobApplicationFactory(
@@ -3364,7 +3362,6 @@ def test_delete_prior_action_accepted(client):
     prior_action.refresh_from_db()
 
 
-@pytest.mark.ignore_unknown_variable_template_error("final_hr", "with_oob_state_update")
 @pytest.mark.parametrize("with_geiq_diagnosis", [True, False])
 @freeze_time("2023-12-12 13:37:00", tz_offset=-1)
 def test_delete_prior_action(client, snapshot, with_geiq_diagnosis):
@@ -3439,7 +3436,6 @@ def test_delete_prior_action(client, snapshot, with_geiq_diagnosis):
     assertSoupEqual(parse_response_to_soup(response, selector="#main"), simulated_page)
 
 
-@pytest.mark.ignore_unknown_variable_template_error("final_hr")
 def test_htmx_add_prior_action_and_cancel(client):
     job_application = JobApplicationFactory(
         to_company__kind=CompanyKind.GEIQ, state=job_applications_enums.JobApplicationState.PROCESSING
@@ -3470,7 +3466,6 @@ def test_htmx_add_prior_action_and_cancel(client):
     assertSoupEqual(parse_response_to_soup(response, selector="#main"), simulated_page)
 
 
-@pytest.mark.ignore_unknown_variable_template_error("add_prior_action_form", "final_hr", "with_oob_state_update")
 def test_htmx_modify_prior_action_and_cancel(client):
     job_application = JobApplicationFactory(
         to_company__kind=CompanyKind.GEIQ, state=job_applications_enums.JobApplicationState.PROCESSING
@@ -3500,7 +3495,6 @@ def test_htmx_modify_prior_action_and_cancel(client):
     assertSoupEqual(parse_response_to_soup(response, selector="#main"), simulated_page)
 
 
-@pytest.mark.ignore_unknown_variable_template_error("final_hr", "with_oob_state_update")
 @pytest.mark.parametrize("with_geiq_diagnosis", [True, False])
 def test_details_for_company_with_prior_action(client, with_geiq_diagnosis):
     job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
