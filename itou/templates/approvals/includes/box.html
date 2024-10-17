@@ -5,6 +5,7 @@ Arguments:
 
     approval
     detail_view_version (defaults to False)
+    job_seeker_dashboard_version (defaults to False)
     link_from_current_url (defauts to None - hence no link to detail view)
 
 {% endcomment %}
@@ -47,9 +48,9 @@ Arguments:
         {% if approval.origin == ApprovalOrigin.PE_APPROVAL %}
             <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
         {% endif %}
-    {% elif approval.is_pass_iae %}
+    {% else %}
         {# PoleEmploiApprovals have no prolongation, no suspension and no detail page #}
-        {% if approval.state == "VALID" %}
+        {% if approval.is_pass_iae and approval.state == "VALID" %}
             {% with approval.pending_prolongation_request as pending_prolongation_request %}
                 {% if pending_prolongation_request %}
                     <hr class="my-3 my-md-4">
@@ -63,7 +64,7 @@ Arguments:
                     </ul>
                 {% endif %}
             {% endwith %}
-        {% elif approval.state == "SUSPENDED" %}
+        {% elif approval.is_pass_iae and approval.state == "SUSPENDED" %}
             {% with approval.ongoing_suspension as suspension %}
                 {% if suspension %}
                     <hr class="my-3 my-md-4">
@@ -76,7 +77,29 @@ Arguments:
                 {% endif %}
             {% endwith %}
         {% endif %}
-        {% if link_from_current_url|default:None %}
+        {% if job_seeker_dashboard_version|default:False %}
+            {% if approval.user.has_latest_common_approval_in_waiting_period %}
+                <hr class="my-3 my-md-4">
+                {% if approval.user.has_valid_diagnosis %}
+                    <p class="fs-sm mb-0">
+                        Votre PASS IAE a expiré depuis moins de 2 ans mais un prescripteur habilité a réalisé un nouveau diagnostic d’éligibilité IAE.
+                    </p>
+                    <p class="fs-sm my-0">
+                        <a href="{% url 'search:employers_results' %}{% if approval.user.jobseeker_profile.hexa_commune.city %}?city={{ approval.user.jobseeker_profile.hexa_commune.city.slug }}{% endif %}">Vous pouvez désormais travailler dans une structure d’insertion.</a>
+                    </p>
+                {% else %}
+                    <p class="fs-sm mb-0">Votre PASS IAE a expiré depuis moins de 2 ans.</p>
+                    <p class="fs-sm my-0">
+                        Pour en avoir un nouveau et pouvoir retravailler dans une structure d’insertion un prescripteur habilité doit réaliser un nouveau diagnostic d’éligibilité IAE :
+                        France Travail, Mission Locale, Cap emploi par exemple.
+                    </p>
+                    <p class="fs-sm my-0">
+                        <a href="{% url 'search:prescribers_results' %}{% if approval.user.jobseeker_profile.hexa_commune.city %}?city={{ approval.user.jobseeker_profile.hexa_commune.city.slug }}{% endif %}">Trouvez-en à côté de chez vous en faisant une recherche.</a>
+                    </p>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+        {% if approval.is_pass_iae and link_from_current_url|default:None %}
             <a href="{% url 'approvals:details' pk=approval.pk %}?back_url={{ link_from_current_url|urlencode }}" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
                 <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
                 <span>Afficher le PASS IAE</span>
