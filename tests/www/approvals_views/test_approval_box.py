@@ -73,3 +73,41 @@ def test_valid_pe_approval(snapshot):
 
     template = load_template("approvals/includes/box.html")
     assert template.render(Context({"approval": pe_approval})) == snapshot
+
+
+@freeze_time("2024-08-06")
+def test_expired_approval_in_waiting_period_with_valid_diagnosis(snapshot):
+    approval = ApprovalFactory(pk=1, start_at=datetime.date(2022, 1, 1), number="XXXXX1234567")
+
+    template = load_template("approvals/includes/box.html")
+    assert (
+        template.render(
+            Context(
+                {
+                    "approval": approval,
+                    "link_from_current_url": "/",
+                    "job_seeker_help_text": "waiting_period_with_valid_diagnosis",
+                }
+            )
+        )
+        == snapshot
+    )
+
+
+@freeze_time("2024-08-06")
+def test_expired_approval_in_waiting_period_without_diagnosis(snapshot):
+    approval = ApprovalFactory(pk=1, start_at=datetime.date(2022, 1, 1), number="XXXXX1234567")
+
+    template = load_template("approvals/includes/box.html")
+    assert (
+        template.render(
+            Context(
+                {
+                    "approval": approval,
+                    "link_from_current_url": "/",
+                    "job_seeker_help_text": "waiting_period_without_diagnosis",
+                }
+            )
+        )
+        == snapshot
+    )

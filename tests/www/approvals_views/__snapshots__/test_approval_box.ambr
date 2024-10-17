@@ -26,6 +26,100 @@
       
           
           
+  
+          
+          
+              <a href="/approvals/details/1?back_url=/" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
+                  <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
+                  <span>Afficher le PASS IAE</span>
+              </a>
+          
+      
+  </div>
+  
+  '''
+# ---
+# name: test_expired_approval_in_waiting_period_with_valid_diagnosis
+  '''
+  
+  
+  
+  <div class="c-box c-box--pass bg-danger-lightest border-danger mb-3 mb-md-4">
+      <div class="mb-3 mb-md-4">
+          <span class="badge badge-base rounded-pill bg-danger text-white">
+              <i class="ri-pass-expired-line" aria-hidden="true"></i>
+              PASS IAE expiré
+          </span>
+      </div>
+      <ul class="list-data">
+          <li class="order-1">
+              <small>Numéro de PASS IAE</small>
+              <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
+          </li>
+          
+              <li class="order-2">
+                  <small>A expiré le</small>
+                  <strong class="text-danger">31/12/2023</strong>
+              </li>
+          
+      </ul>
+      
+          
+          
+  
+          
+              <hr class="my-3 my-md-4">
+              <p class="fs-sm mb-0">
+                  Un prescripteur habilité a réalisé un diagnostic d'éligibilité. <strong>Vous pouvez commencer un nouveau parcours.</strong>
+              </p>
+          
+          
+              <a href="/approvals/details/1?back_url=/" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
+                  <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
+                  <span>Afficher le PASS IAE</span>
+              </a>
+          
+      
+  </div>
+  
+  '''
+# ---
+# name: test_expired_approval_in_waiting_period_without_diagnosis
+  '''
+  
+  
+  
+  <div class="c-box c-box--pass bg-danger-lightest border-danger mb-3 mb-md-4">
+      <div class="mb-3 mb-md-4">
+          <span class="badge badge-base rounded-pill bg-danger text-white">
+              <i class="ri-pass-expired-line" aria-hidden="true"></i>
+              PASS IAE expiré
+          </span>
+      </div>
+      <ul class="list-data">
+          <li class="order-1">
+              <small>Numéro de PASS IAE</small>
+              <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
+          </li>
+          
+              <li class="order-2">
+                  <small>A expiré le</small>
+                  <strong class="text-danger">31/12/2023</strong>
+              </li>
+          
+      </ul>
+      
+          
+          
+  
+          
+              <hr class="my-3 my-md-4">
+              <p class="fs-sm mb-0">Vous avez terminé un parcours il y a moins de deux ans.</p>
+              <p class="fs-sm my-0">
+                  Pour prétendre à nouveau à un parcours en structure d'insertion par l'activité économique vous devez rencontrer un prescripteur
+                  habilité : France Travail, Mission Locale, Cap emploi, etc.
+              </p>
+          
           
               <a href="/approvals/details/1?back_url=/" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
                   <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
@@ -61,6 +155,12 @@
               </li>
           
       </ul>
+      
+          
+          
+  
+          
+          
       
   </div>
   
@@ -102,6 +202,8 @@
       </ul>
       
           
+          
+  
           
           
               <a href="/approvals/details/1?back_url=/" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
@@ -163,6 +265,8 @@
                   
               
           
+  
+          
           
               <a href="/approvals/details/1?back_url=/" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
                   <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
@@ -214,6 +318,8 @@
               
                   
               
+          
+  
           
           
       
@@ -272,6 +378,8 @@
                   
               
           
+  
+          
           
               <a href="/approvals/details/1?back_url=/" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
                   <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
@@ -317,6 +425,12 @@
               </li>
           
       </ul>
+      
+          
+          
+  
+          
+          
       
   </div>
   

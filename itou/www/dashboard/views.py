@@ -179,6 +179,13 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         for attr in required_attributes:
             if not getattr(request.user, attr):
                 return HttpResponseRedirect(reverse("dashboard:edit_user_info"))
+        if request.user.has_common_approval_in_waiting_period:
+            if request.user.has_valid_diagnosis():
+                context["job_seeker_help_text"] = "waiting_period_with_valid_diagnosis"
+            else:
+                context["job_seeker_help_text"] = "waiting_period_without_diagnosis"
+        else:
+            context["job_seeker_help_text"] = ""
 
     return render(request, template_name, context)
 
