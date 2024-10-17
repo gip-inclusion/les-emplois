@@ -190,8 +190,6 @@
           WHERE "eligibility_administrativecriteria"."id" IN (%s,
                                                               %s,
                                                               %s)
-          ORDER BY "eligibility_administrativecriteria"."level" ASC,
-                   "eligibility_administrativecriteria"."ui_rank" ASC
         ''',
       }),
       dict({
@@ -247,7 +245,6 @@
                  "job_applications_jobapplication"."diagoriente_invite_sent_at"
           FROM "job_applications_jobapplication"
           WHERE "job_applications_jobapplication"."id" IN (%s)
-          ORDER BY "job_applications_jobapplication"."created_at" DESC
         ''',
       }),
       dict({
@@ -275,7 +272,6 @@
                  "approvals_approval"."origin_prescriber_organization_kind"
           FROM "approvals_approval"
           WHERE "approvals_approval"."id" IN (%s)
-          ORDER BY "approvals_approval"."created_at" DESC
         ''',
       }),
       dict({
@@ -317,7 +313,6 @@
                  "users_user"."first_login"
           FROM "users_user"
           WHERE "users_user"."id" IN (%s)
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -695,7 +690,6 @@
                                                            %s,
                                                            %s,
                                                            %s)
-          ORDER BY "job_applications_jobapplication"."created_at" DESC
         ''',
       }),
       dict({
@@ -733,7 +727,6 @@
                                               %s,
                                               %s,
                                               %s)
-          ORDER BY "approvals_approval"."created_at" DESC
         ''',
       }),
       dict({
@@ -785,7 +778,6 @@
                                       %s,
                                       %s,
                                       %s)
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

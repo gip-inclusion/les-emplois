@@ -951,7 +951,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="suspension",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     (
                         "start_at__lte",
                         django.db.models.functions.datetime.TruncDate(django.db.models.functions.datetime.Now()),
@@ -963,7 +963,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="approval",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     models.Q(("eligibility_diagnosis__isnull", False), ("origin__in", ["admin", "default"])),
                     models.Q(("eligibility_diagnosis", None), ("origin__in", ["pe_approval", "ai_stock"])),
                     _connector="OR",
@@ -996,7 +996,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="prolongation",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     ("report_file", None),
                     models.Q(
                         ("reason__in", ("RQTH", "SENIOR", "PARTICULAR_DIFFICULTIES")), ("report_file__isnull", False)
@@ -1010,7 +1010,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="prolongationrequest",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     ("report_file", None),
                     models.Q(
                         ("reason__in", ("RQTH", "SENIOR", "PARTICULAR_DIFFICULTIES")), ("report_file__isnull", False)
@@ -1024,7 +1024,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="prolongationrequest",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     ("require_phone_interview", False),
                     models.Q(
                         models.Q(("contact_email", ""), _negated=True), models.Q(("contact_phone", ""), _negated=True)
@@ -1178,7 +1178,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="prolongationrequestdenyinformation",
             constraint=models.CheckConstraint(
-                check=models.Q(("proposed_actions__len", 0), _negated=True),
+                condition=models.Q(("proposed_actions__len", 0), _negated=True),
                 name="non_empty_proposed_actions",
                 violation_error_message="Les actions envisagées ne peuvent pas être vide",
             ),
@@ -1448,14 +1448,14 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="cancelledapproval",
             constraint=models.CheckConstraint(
-                check=models.Q(("start_at__lt", models.F("end_at"))),
+                condition=models.Q(("start_at__lt", models.F("end_at"))),
                 name="approvals_cancelledapproval_start_before_end",
             ),
         ),
         migrations.AddConstraint(
             model_name="approval",
             constraint=models.CheckConstraint(
-                check=models.Q(("start_at__lt", models.F("end_at"))), name="approvals_approval_start_before_end"
+                condition=models.Q(("start_at__lt", models.F("end_at"))), name="approvals_approval_start_before_end"
             ),
         ),
     ]

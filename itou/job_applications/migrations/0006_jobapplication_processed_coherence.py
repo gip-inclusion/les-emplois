@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="jobapplication",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     models.Q(
                         ("processed_at__isnull", False),
                         ("state__in", ["accepted", "refused", "cancelled", "obsolete"]),

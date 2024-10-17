@@ -481,7 +481,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="jobapplication",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     models.Q(
                         ("contract_type__in", ["PROFESSIONAL_TRAINING", "APPRENTICESHIP"]),
                         ("contract_type_details", ""),
@@ -502,7 +502,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="jobapplication",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     ("eligibility_diagnosis__isnull", False),
                     ("geiq_eligibility_diagnosis__isnull", False),
                     _negated=True,
@@ -514,7 +514,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="jobapplication",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     ("qualification_level", "NOT_RELEVANT"), ("qualification_type", "STATE_DIPLOMA"), _negated=True
                 ),
                 name="qualification_coherence",

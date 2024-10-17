@@ -283,7 +283,7 @@
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_sanctions" ON ("siae_evaluations_evaluatedsiae"."id" = "siae_evaluations_sanctions"."evaluated_siae_id")
           WHERE ("siae_evaluations_evaluatedsiae"."siae_id" = %s
-                 AND "siae_evaluations_sanctions"."suspension_dates" @> (%s)::date)
+                 AND "siae_evaluations_sanctions"."suspension_dates" @> %s::date)
           ORDER BY UPPER("siae_evaluations_sanctions"."suspension_dates") DESC NULLS FIRST
           LIMIT 1
         ''',

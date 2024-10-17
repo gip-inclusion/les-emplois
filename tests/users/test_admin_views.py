@@ -447,12 +447,14 @@ def test_profile_check_inconsistency_check(admin_client):
 
 
 group_permissions_markup = (
-    '<select name="groups" aria-describedby="id_groups_helptext" id="id_groups" '
+    '<select name="groups" data-context="available-source" aria-describedby="id_groups_helptext" id="id_groups" '
     'multiple class="selectfilter" data-field-name="groupes" data-is-stacked="0">'
 )
+
 user_permissions_markup = (
-    '<select name="user_permissions" aria-describedby="id_user_permissions_helptext" id="id_user_permissions" '
-    'multiple class="selectfilter" data-field-name="permissions de l’utilisateur" data-is-stacked="0">'
+    '<select name="user_permissions" data-context="available-source" aria-describedby="id_user_permissions_helptext" '
+    'id="id_user_permissions" multiple class="selectfilter" data-field-name="permissions de l’utilisateur" '
+    'data-is-stacked="0">'
 )
 
 

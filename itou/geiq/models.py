@@ -23,7 +23,7 @@ class ImplementationAssessmentCampaign(models.Model):
                 violation_error_message=(
                     "Impossible d'avoir une date de contrôle antérieure à la date de transmission"
                 ),
-                check=(models.Q(review_deadline__gte=models.F("submission_deadline"))),
+                condition=(models.Q(review_deadline__gte=models.F("submission_deadline"))),
             ),
         ]
 
@@ -98,7 +98,7 @@ class ImplementationAssessment(models.Model):
             models.CheckConstraint(
                 name="full_submission_or_no_submission",
                 violation_error_message="Impossible d'avoir un envoi partiel",
-                check=(
+                condition=(
                     models.Q(submitted_at__isnull=True)
                     | models.Q(
                         submitted_at__isnull=False, last_synced_at__isnull=False, activity_report_file__isnull=False
@@ -110,7 +110,7 @@ class ImplementationAssessment(models.Model):
                 violation_error_message=(
                     "Impossible d'avoir une date de contrôle sans une date de soumission antérieure"
                 ),
-                check=(
+                condition=(
                     models.Q(reviewed_at__isnull=True)
                     | models.Q(submitted_at__isnull=False, reviewed_at__gte=models.F("submitted_at"))
                 ),
@@ -118,7 +118,7 @@ class ImplementationAssessment(models.Model):
             models.CheckConstraint(
                 name="full_review_or_no_review",
                 violation_error_message="Impossible d'avoir un contrôle partiel",
-                check=(
+                condition=(
                     models.Q(
                         reviewed_at__isnull=True,
                         review_state__isnull=True,
