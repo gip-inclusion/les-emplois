@@ -62,6 +62,8 @@
                       
   
   
+  
+  
   <section aria-labelledby="job-seekers-list-count" id="job-seekers-section">
       
           <div class="text-center my-3 my-md-4">
@@ -452,6 +454,12 @@
                               </td>
                               <td>2</td>
                               <td>29/08/2024</td>
+                              <td class="text-end w-50px">
+                                  
+                                  <a aria-label="Postuler pour ce candidat" class="btn btn-sm btn-link btn-ico-only" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=11111111-1111-1111-1111-111111111111">
+                                      <i aria-hidden="true" class="ri-draft-line" data-bs-toggle="tooltip" title="Postuler pour ce candidat"></i>
+                                  </a>
+                              </td>
                           </tr>
                       
                           <tr>
@@ -471,6 +479,12 @@
                               </td>
                               <td>1</td>
                               <td>30/08/2024</td>
+                              <td class="text-end w-50px">
+                                  
+                                  <a aria-label="Postuler pour ce candidat" class="btn btn-sm btn-link btn-ico-only" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=22222222-2222-2222-2222-222222222222">
+                                      <i aria-hidden="true" class="ri-draft-line" data-bs-toggle="tooltip" title="Postuler pour ce candidat"></i>
+                                  </a>
+                              </td>
                           </tr>
                       
                           <tr>
@@ -490,6 +504,12 @@
                               </td>
                               <td>1</td>
                               <td>30/08/2024</td>
+                              <td class="text-end w-50px">
+                                  
+                                  <a aria-label="Postuler pour ce candidat" class="btn btn-sm btn-link btn-ico-only" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=33333333-3333-3333-3333-333333333333">
+                                      <i aria-hidden="true" class="ri-draft-line" data-bs-toggle="tooltip" title="Postuler pour ce candidat"></i>
+                                  </a>
+                              </td>
                           </tr>
                       
                   </tbody>
