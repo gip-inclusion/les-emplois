@@ -47,11 +47,17 @@ class TestApplyAsPrescriber:
         next_url = f"{reverse('search:employers_results')}?job_seeker={job_seeker.public_id}"
         assertContains(
             response,
-            (
-                '<a class="btn btn-sm btn-link btn-ico-only" '
-                'aria-label="Postuler pour ce candidat" '
-                f'href="{next_url}">'
-            ),
+            f"""
+            <a class="btn btn-sm btn-link btn-ico-only"
+                aria-label="Postuler pour ce candidat"
+                data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
+                data-matomo-option="postuler-pour-ce-candidat"
+                href="{next_url}">
+                <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip" title="Postuler pour ce candidat">
+                </i>
+            </a>
+            """,
+            html=True,
         )
 
         # Alternative entry point: job seeker details
@@ -63,10 +69,16 @@ class TestApplyAsPrescriber:
         assertContains(
             response,
             (
-                f'<a href="{next_url}"'
-                'class="btn btn-lg btn-primary btn-ico">'
-                '<i class="ri-draft-line fw-medium" aria-hidden="true"></i>'
-                "<span>Postuler pour ce candidat</span>"
+                f"""
+                <a href="{next_url}"
+                    class="btn btn-lg btn-primary btn-ico"
+                    data-matomo-event="true" data-matomo-category="candidature"
+                    data-matomo-action="clic"
+                    data-matomo-option="postuler-pour-ce-candidat">
+                    <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
+                    <span>Postuler pour ce candidat</span>
+                </a>
+                """
             ),
             html=True,
         )
@@ -201,11 +213,17 @@ class TestApplyAsPrescriber:
         assertContains(response, "A… Z…")
         assertContains(
             response,
-            (
-                '<a class="btn btn-sm btn-link btn-ico-only" '
-                'aria-label="Postuler pour ce candidat" '
-                f'href="{next_url}">'
-            ),
+            f"""
+            <a class="btn btn-sm btn-link btn-ico-only"
+                aria-label="Postuler pour ce candidat"
+                data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
+                data-matomo-option="postuler-pour-ce-candidat"
+                href="{next_url}">
+                <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip" title="Postuler pour ce candidat">
+                </i>
+            </a>
+            """,
+            html=True,
         )
 
         # Alternative entry point: job seeker details
@@ -218,10 +236,15 @@ class TestApplyAsPrescriber:
         assertContains(
             response,
             (
-                f'<a href="{next_url}"'
-                'class="btn btn-lg btn-primary btn-ico">'
-                '<i class="ri-draft-line fw-medium" aria-hidden="true"></i>'
-                "<span>Postuler pour ce candidat</span>"
+                f"""
+                <a href="{next_url}"
+                    class="btn btn-lg btn-primary btn-ico"
+                    data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
+                    data-matomo-option="postuler-pour-ce-candidat">
+                    <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
+                    <span>Postuler pour ce candidat</span>
+                </a>
+                """
             ),
             html=True,
         )
@@ -390,10 +413,15 @@ class TestApplyAsCompany:
         assertContains(
             response,
             (
-                f'<a href="{next_url}"'
-                'class="btn btn-lg btn-primary btn-ico">'
-                '<i class="ri-draft-line fw-medium" aria-hidden="true"></i>'
-                "<span>Postuler pour ce candidat</span>"
+                f"""
+                <a href="{next_url}"
+                    class="btn btn-lg btn-primary btn-ico"
+                    data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
+                    data-matomo-option="postuler-pour-ce-candidat">
+                    <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
+                    <span>Postuler pour ce candidat</span>
+                </a>
+                """
             ),
             html=True,
         )
