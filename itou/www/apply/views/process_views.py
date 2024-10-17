@@ -230,7 +230,10 @@ def details_for_company(request, job_application_id, template_name="apply/proces
             hiring_start_at=job_application.hiring_start_at
         )
 
+    can_be_cancelled = job_application.state.is_accepted and job_application.can_be_cancelled
+
     context = {
+        "can_be_cancelled": can_be_cancelled,
         "can_view_personal_information": True,  # SIAE members have access to personal info
         "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
         "display_refusal_info": False,
@@ -578,7 +581,8 @@ class ReloadJobDescriptionFields(AcceptHTMXFragmentView):
 
 
 @login_required
-def cancel(request, job_application_id, template_name="apply/process_cancel.html"):
+@require_POST
+def cancel(request, job_application_id):
     """
     Trigger the `cancel` transition.
     """
@@ -591,21 +595,13 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
         messages.error(request, "Vous ne pouvez pas annuler cette embauche.")
         return HttpResponseRedirect(next_url)
 
-    if request.method == "POST" and request.POST.get("confirm") == "true":
-        try:
-            # After each successful transition, a save() is performed by django-xworkflows.
-            job_application.cancel(user=request.user)
-            messages.success(request, "L'embauche a bien été annulée.", extra_tags="toast")
-        except xwf_models.InvalidTransitionError:
-            messages.error(request, "Action déjà effectuée.", extra_tags="toast")
-        return HttpResponseRedirect(next_url)
-
-    context = {
-        "can_view_personal_information": True,  # SIAE members have access to personal info
-        "job_application": job_application,
-        "matomo_custom_title": "Candidature annulée",
-    }
-    return render(request, template_name, context)
+    try:
+        # After each successful transition, a save() is performed by django-xworkflows.
+        job_application.cancel(user=request.user)
+        messages.success(request, "L'embauche a bien été annulée.", extra_tags="toast")
+    except xwf_models.InvalidTransitionError:
+        messages.error(request, "Action déjà effectuée.", extra_tags="toast")
+    return HttpResponseRedirect(next_url)
 
 
 @login_required
