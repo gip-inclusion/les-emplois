@@ -25,7 +25,6 @@ DISTRICTS = "Arrondissements de Paris"
 
 class TestSearchCompany:
     URL = reverse_lazy("search:employers_results")
-    URL_JOBS = reverse_lazy("search:job_descriptions_results")
 
     def test_not_existing(self, client):
         response = client.get(self.URL, {"city": "foo-44"})
