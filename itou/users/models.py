@@ -266,13 +266,13 @@ class User(AbstractUser, AddressMixin):
             models.CheckConstraint(
                 name="staff_and_superusers",
                 violation_error_message="Seul un utilisateur ITOU_STAFF peut avoir is_staff ou is_superuser de vrai.",
-                check=models.Q(~models.Q(kind=UserKind.ITOU_STAFF) & models.Q(is_staff=False, is_superuser=False))
+                condition=models.Q(~models.Q(kind=UserKind.ITOU_STAFF) & models.Q(is_staff=False, is_superuser=False))
                 | models.Q(kind=UserKind.ITOU_STAFF, is_staff=True),
             ),
             models.CheckConstraint(
                 name="has_kind",
                 violation_error_message="Le type d’utilisateur est incorrect.",
-                check=(
+                condition=(
                     models.Q(kind=UserKind.ITOU_STAFF)
                     | models.Q(kind=UserKind.JOB_SEEKER)
                     | models.Q(kind=UserKind.PRESCRIBER)
@@ -997,7 +997,7 @@ class JobSeekerProfile(models.Model):
             # Make sure that if you have a lack_of_nir_reason value, you cannot have a nir value
             # (but we'll have a lot of users lacking both nir & lack_of_nir_reason values)
             models.CheckConstraint(
-                check=Q(lack_of_nir_reason="") | Q(nir=""),
+                condition=Q(lack_of_nir_reason="") | Q(nir=""),
                 name="jobseekerprofile_lack_of_nir_reason_or_nir",
                 violation_error_message=(
                     "Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de son NIR."

@@ -197,7 +197,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         constraints = [
             models.CheckConstraint(
                 name="validated_odc_is_brsa",
-                check=~models.Q(
+                condition=~models.Q(
                     authorization_status=PrescriberAuthorizationStatus.VALIDATED,
                     kind=PrescriberOrganizationKind.ODC,
                     is_brsa=False,
@@ -209,7 +209,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
             ),
             models.CheckConstraint(
                 name="prevent_validated_authorization_if_other",
-                check=~models.Q(
+                condition=~models.Q(
                     authorization_status=PrescriberAuthorizationStatus.VALIDATED,
                     kind=PrescriberOrganizationKind.OTHER,
                 ),

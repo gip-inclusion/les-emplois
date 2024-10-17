@@ -357,7 +357,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="geiqadministrativecriteria",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     models.Q(("annex", "1"), ("level__isnull", True)),
                     models.Q(("annex", "2"), ("level__isnull", False)),
                     models.Q(("annex", "0"), ("level__isnull", True)),
@@ -371,7 +371,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="geiqeligibilitydiagnosis",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     models.Q(
                         ("author_geiq__isnull", False),
                         ("author_kind", "geiq"),

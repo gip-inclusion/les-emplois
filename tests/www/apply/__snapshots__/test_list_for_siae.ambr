@@ -506,7 +506,6 @@
           FROM "jobs_appellation"
           WHERE "jobs_appellation"."code" IN (%s,
                                               %s)
-          ORDER BY "jobs_appellation"."name" ASC
         ''',
       }),
       dict({
@@ -1142,7 +1141,6 @@
           FROM "jobs_appellation"
           WHERE "jobs_appellation"."code" IN (%s,
                                               %s)
-          ORDER BY "jobs_appellation"."name" ASC
         ''',
       }),
       dict({
@@ -1161,7 +1159,6 @@
                  "cities_city"."edition_mode"
           FROM "cities_city"
           WHERE "cities_city"."id" IN (%s)
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -1205,7 +1202,6 @@
                  "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE "companies_company"."id" IN (%s)
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

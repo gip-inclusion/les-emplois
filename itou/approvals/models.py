@@ -72,7 +72,7 @@ class CommonApprovalMixin(models.Model):
             # - when sent to pole emploi, start == end is interpreted as a cancelled approval
             models.CheckConstraint(
                 name="%(app_label)s_%(class)s_start_before_end",
-                check=models.Q(start_at__lt=models.F("end_at")),
+                condition=models.Q(start_at__lt=models.F("end_at")),
             ),
         ]
 
@@ -563,7 +563,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         constraints = CommonApprovalMixin.Meta.constraints + [
             models.CheckConstraint(
                 name="approval_eligibility_diagnosis",
-                check=models.Q(origin__in=[Origin.ADMIN, Origin.DEFAULT], eligibility_diagnosis__isnull=False)
+                condition=models.Q(origin__in=[Origin.ADMIN, Origin.DEFAULT], eligibility_diagnosis__isnull=False)
                 | models.Q(origin__in=[Origin.PE_APPROVAL, Origin.AI_STOCK], eligibility_diagnosis=None),
                 violation_error_message="Incohérence entre l'origine du PASS IAE "
                 "et la présence d'un diagnostic d'éligibilité",
@@ -1155,7 +1155,7 @@ class Suspension(models.Model):
                 violation_error_message="La période chevauche une suspension existante pour ce PASS IAE.",
             ),
             models.CheckConstraint(
-                check=Q(start_at__lte=TruncDate(Now())),
+                condition=Q(start_at__lte=TruncDate(Now())),
                 name="%(class)s_cannot_start_in_the_future",
             ),
         ]
@@ -1482,7 +1482,8 @@ class CommonProlongation(models.Model):
                 name="check_%(class)s_reason_and_report_file_coherence",
                 violation_error_message="Incohérence entre le fichier de bilan et la raison de prolongation",
                 # Must keep compatibility with old prolongations without report file
-                check=Q(report_file=None) | Q(report_file__isnull=False, reason__in=PROLONGATION_REPORT_FILE_REASONS),
+                condition=Q(report_file=None)
+                | Q(report_file__isnull=False, reason__in=PROLONGATION_REPORT_FILE_REASONS),
             ),
         ]
 
@@ -1590,7 +1591,7 @@ class ProlongationRequest(CommonProlongation):
             # Phone and email are mandatory when the interview is required
             models.CheckConstraint(
                 name="check_%(class)s_require_phone_interview",
-                check=Q(require_phone_interview=False) | Q(~Q(contact_email=""), ~Q(contact_phone="")),
+                condition=Q(require_phone_interview=False) | Q(~Q(contact_email=""), ~Q(contact_phone="")),
             ),
             # Approvals can only have 1 PENDING request
             models.UniqueConstraint(
@@ -1668,7 +1669,7 @@ class ProlongationRequestDenyInformation(models.Model):
         constraints = [
             models.CheckConstraint(
                 name="non_empty_proposed_actions",
-                check=~models.Q(proposed_actions__len=0),
+                condition=~models.Q(proposed_actions__len=0),
                 violation_error_message="Les actions envisagées ne peuvent pas être vide",
             ),
         ]

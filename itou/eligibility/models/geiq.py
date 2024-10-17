@@ -93,7 +93,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
             models.CheckConstraint(
                 name="author_kind_coherence",
                 violation_error_message="Le diagnostic d'éligibilité GEIQ ne peut avoir 2 structures pour auteur",
-                check=models.Q(
+                condition=models.Q(
                     author_kind=AuthorKind.GEIQ,
                     author_geiq__isnull=False,
                     author_prescriber_organization__isnull=True,
@@ -265,7 +265,7 @@ class GEIQAdministrativeCriteria(AbstractAdministrativeCriteria):
                 name="administrativecriteria_level_annex_consistency",
                 violation_error_message="Incohérence entre l'annexe du critère administratif et son niveau",
                 # Only criteria in Annex 2 (and hence those in both annexes) have a level
-                check=(
+                condition=(
                     models.Q(
                         level__isnull=True,
                         annex__in=(AdministrativeCriteriaAnnex.NO_ANNEX, AdministrativeCriteriaAnnex.ANNEX_1),

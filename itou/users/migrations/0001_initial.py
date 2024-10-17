@@ -793,7 +793,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="user",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     models.Q(
                         models.Q(("kind", "itou_staff"), _negated=True), ("is_staff", False), ("is_superuser", False)
                     ),
@@ -807,7 +807,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="user",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     ("kind", "itou_staff"),
                     ("kind", "job_seeker"),
                     ("kind", "prescriber"),
@@ -822,7 +822,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="jobseekerprofile",
             constraint=models.CheckConstraint(
-                check=models.Q(("lack_of_nir_reason", ""), ("nir", ""), _connector="OR"),
+                condition=models.Q(("lack_of_nir_reason", ""), ("nir", ""), _connector="OR"),
                 name="jobseekerprofile_lack_of_nir_reason_or_nir",
                 violation_error_message="Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de "
                 "son NIR.",

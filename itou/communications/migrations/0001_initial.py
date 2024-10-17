@@ -87,7 +87,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="notificationrecord",
             constraint=models.CheckConstraint(
-                check=models.Q(("category", ""), ("name", ""), _connector="OR", _negated=True),
+                condition=models.Q(("category", ""), ("name", ""), _connector="OR", _negated=True),
                 name="notificationrecord_category_and_name_required",
             ),
         ),
