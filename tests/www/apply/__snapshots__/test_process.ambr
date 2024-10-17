@@ -945,7 +945,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_approval[job application detail for company]
   dict({
-    'num_queries': 18,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -1731,6 +1731,22 @@
           SELECT %s AS "a"
           FROM "employee_record_employeerecord"
           WHERE "employee_record_employeerecord"."job_application_id" = %s
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'job_application_sender_left_org[www/apply/views/process_views.py]',
+          'details_for_company[www/apply/views/process_views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("prescribers_prescribermembership"."user_id" = %s
+                 AND "users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s)
           LIMIT 1
         ''',
       }),
@@ -1925,7 +1941,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_list[job application detail for company]
   dict({
-    'num_queries': 18,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -2711,6 +2727,22 @@
           SELECT %s AS "a"
           FROM "employee_record_employeerecord"
           WHERE "employee_record_employeerecord"."job_application_id" = %s
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'job_application_sender_left_org[www/apply/views/process_views.py]',
+          'details_for_company[www/apply/views/process_views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("prescribers_prescribermembership"."user_id" = %s
+                 AND "users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s)
           LIMIT 1
         ''',
       }),
