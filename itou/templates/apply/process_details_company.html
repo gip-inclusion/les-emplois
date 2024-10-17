@@ -43,6 +43,15 @@
     </ul>
 {% endblock %}
 
+{% block title_inline_actions %}
+    {% if can_be_cancelled %}
+        <button class="btn btn-danger btn-lg btn-ico ms-auto" data-bs-toggle="modal" data-bs-target="#cancel_hire_modal">
+            <i class="ri-arrow-go-back-line fw-medium" aria-hidden="true"></i>
+            <span>Annuler l’embauche</span>
+        </button>
+    {% endif %}
+{% endblock %}
+
 {% block actions %}
     {% include "apply/includes/siae_hiring_actions.html" with job_application=job_application %}
 {% endblock %}
@@ -100,24 +109,6 @@
                         <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
                             {% block sidebar %}
                                 {{ block.super }}
-                                {# Job application accepted: cancel --------------------------------------------------------------------- #}
-                                {% if job_application.state.is_accepted and job_application.can_be_cancelled %}
-                                    <div class="c-box mb-4">
-                                        {% if job_application.to_company.is_subject_to_eligibility_rules %}
-                                            <h4>Rétractation</h4>
-                                            <p>
-                                                Si vous annulez cette embauche, vous ne pourrez pas prétendre à l'aide au poste pour les jours éventuellement travaillés.
-                                            </p>
-                                            <p>
-                                                {{ job_application.job_seeker.get_full_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
-                                            </p>
-                                        {% endif %}
-                                        <a href="{% url 'apply:cancel' job_application_id=job_application.id %}" class="btn btn-danger btn-block btn-ico text-decoration-none">
-                                            <i class="ri-arrow-go-back-line fw-medium" aria-hidden="true"></i>
-                                            <span>Annuler l'embauche</span>
-                                        </a>
-                                    </div>
-                                {% endif %}
                                 {% if job_application.to_company.is_subject_to_eligibility_rules and request.user.is_employer and job_application.state.is_accepted and job_application.approval %}
                                     <div class="c-box mb-4">
                                         <h4>PASS IAE</h4>
@@ -198,6 +189,40 @@
                 </div>
             {% endif %}
         {% endfor %}
+    {% endif %}
+    {% if can_be_cancelled %}
+        <div id="cancel_hire_modal" class="modal" tabindex="-1" aria-labelledby="cancel_hire_modal_title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cancel_hire_modal_title">
+                            Annuler l’embauche de {{ job_application.job_seeker.get_full_name }}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        {% if job_application.to_company.is_subject_to_eligibility_rules %}
+                            <p>
+                                En validant, <strong>vous renoncez aux aides au poste</strong> liées à cette candidature pour tous les jours travaillés de ce salarié.
+                                Si ce salarié a travaillé dans votre structure, il est préférable de suspendre son PASS IAE.
+                            </p>
+                            <p>
+                                {{ job_application.job_seeker.get_full_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
+                            </p>
+                        {% else %}
+                            <p>En validant, vous confirmez que le salarié n’avait pas encore commencé à travailler dans votre structure.</p>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <form method="post" action="{% url 'apply:cancel' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-danger">Confirmer l’annulation de l’embauche</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% endif %}
 
     {# GEIQ SIAE without valid geiq_eligibility_diagnosis. Modal triggered by apply/includes/buttons/accept.html #}
