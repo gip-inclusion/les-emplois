@@ -572,6 +572,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
@@ -1080,6 +1081,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
@@ -1641,6 +1643,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
@@ -1970,6 +1973,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
@@ -2300,6 +2304,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")

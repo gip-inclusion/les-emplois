@@ -52,6 +52,7 @@ class TestMoveCompanyData:
             phone="0000000001",
             coords=Point(-2.3140436, 47.3618584),
             geocoding_score=0.1,
+            is_searchable=True,
         )
         company_2 = companies_factories.CompanyFactory.create(
             brand="COMPANY 2",
@@ -59,6 +60,7 @@ class TestMoveCompanyData:
             phone="0000000002",
             coords=Point(-2.8186843, 47.657641),
             geocoding_score=0.2,
+            is_searchable=False,
         )
 
         management.call_command(
@@ -69,13 +71,12 @@ class TestMoveCompanyData:
             wet_run=True,
         )
         company_2.refresh_from_db()
-        for field in ["brand", "description", "phone"]:
+        for field in ["brand", "description", "phone", "is_searchable"]:
             assert predicate(getattr(company_2, field), getattr(company_1, field))
         # In move_all_data, the from_company should not appear in search results anymore
         # and its coords are erased
         company_1.refresh_from_db()
-        assert company_1.coords is None
-        assert company_1.geocoding_score is None
+        assert company_1.is_searchable is False
 
     def test_prevent_move_with_siae_evaluations(self, capsys):
         company1 = EvaluatedSiaeFactory().siae
