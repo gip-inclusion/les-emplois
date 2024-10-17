@@ -13,7 +13,7 @@
     <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
         <h1 class="mb-0">Candidat : {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</h1>
         {% url 'search:employers_results' as search_url %}
-        <a href="{% url_add_query search_url job_seeker=job_seeker.public_id %}" class="btn btn-lg btn-primary btn-ico">
+        <a href="{% url_add_query search_url job_seeker=job_seeker.public_id %}" {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %} class="btn btn-lg btn-primary btn-ico">
             <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
             <span>Postuler pour ce candidat</span>
         </a>

@@ -81,11 +81,18 @@ def test_multiple(client, snapshot):
         ):
             assertContains(
                 response,
-                (
-                    '<a class="btn btn-sm btn-link btn-ico-only" '
-                    'aria-label="Postuler pour ce candidat" '
-                    f'href="{reverse("search:employers_results")}?job_seeker={public_id}">'
-                ),
+                f"""
+                <a class="btn btn-sm btn-link btn-ico-only"
+                    aria-label="Postuler pour ce candidat"
+                    data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
+                    data-matomo-option="postuler-pour-ce-candidat"
+                    href="{reverse("search:employers_results")}?job_seeker={public_id}">
+                    <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip"
+                    title="Postuler pour ce candidat">
+                    </i>
+                </a>
+                """,
+                html=True,
             )
 
 
