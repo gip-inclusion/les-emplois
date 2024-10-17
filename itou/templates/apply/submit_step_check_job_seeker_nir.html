@@ -76,7 +76,7 @@
                 </div>
             {% endif %}
             {# Reload this page and show a modal containing more information about the job seeker. #}
-            {% itou_buttons_form primary_label="Suivant" primary_name="preview" primary_value="1" %}
+            {% itou_buttons_form primary_label="Suivant" primary_name="preview" primary_value="1" reset_url=reset_url %}
         </div>
         {% if preview_mode %}
             <!-- Modal -->
