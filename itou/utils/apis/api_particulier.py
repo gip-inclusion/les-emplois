@@ -62,15 +62,17 @@ class APIParticulierClient:
     def _request(self, endpoint, params=None):
         params = self._build_params_from(job_seeker=self.job_seeker)
         response = self.client.get(endpoint, params=params)
-        if response.status_code == 504:
+        # Too Many Requests, Server error
+        if response.status_code in (429, 504):
             reason = response.json().get("reason")
-            logger.error(f"{response.url=} {reason=}")
+            logger.warning(f"{response.url=} {reason=}")
             raise httpx.RequestError(message=reason)
+        # Service unavailable
         elif response.status_code == 503:
             errors = response.json()["errors"]
             reason = errors[0].get("title")
             for error in errors:
-                logger.error(f"{response.url=} {error['title']}")
+                logger.warning(f"{response.url=} {error['title']}")
             raise httpx.RequestError(message=reason)
         else:
             response.raise_for_status()
@@ -86,9 +88,9 @@ class APIParticulierClient:
         try:
             data = self._request("/v2/revenu-solidarite-active")
         except httpx.HTTPStatusError as exc:  # not 5XX.
-            logger.info(f"Beneficiary not found. {self.job_seeker.public_id=}")
+            logger.debug(f"Beneficiary not found. {self.job_seeker.public_id=}")
             data["raw_response"] = exc.response.json()
-        except tenacity.RetryError as retry_err:  # 503 or 504
+        except tenacity.RetryError as retry_err:  # 429, 503 or 504
             exc = retry_err.last_attempt._exception
             data["raw_response"] = str(exc)
         except KeyError as exc:
