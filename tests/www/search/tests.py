@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from django.contrib.gis.geos import Point
 from django.template.defaultfilters import capfirst, urlencode as urlencode_filter
 from django.templatetags.static import static
@@ -415,7 +417,7 @@ class TestSearchCompany:
         # Has link to company card with job_seeker public_id
         company_url_with_job_seeker_id = (
             f"{guerande_company.get_card_url()}?job_seeker={job_seeker_public_id}"
-            f"&back_url={urlencode_filter(response.wsgi_request.get_full_path())}"
+            f"&amp;back_url={quote(response.wsgi_request.get_full_path())}"
         )
         assertContains(
             response,
@@ -425,7 +427,7 @@ class TestSearchCompany:
         # Has link to job description with job_seeker public_id
         job_description_url_with_job_seeker_id = (
             f"{job_description.get_absolute_url()}?job_seeker={job_seeker_public_id}"
-            f"&back_url={urlencode_filter(response.wsgi_request.get_full_path())}"
+            f"&back_url={quote(response.wsgi_request.get_full_path())}"
         )
         assertContains(response, job_description_url_with_job_seeker_id)
 
@@ -1218,7 +1220,7 @@ class TestJobDescriptionSearchView:
         # Has link to company card with job_seeker public_id
         company_url_with_job_seeker_id = (
             f"{guerande_company.get_card_url()}?job_seeker={job_seeker_public_id}"
-            f"&back_url={urlencode_filter(response.wsgi_request.get_full_path())}"
+            f"&amp;back_url={quote(response.wsgi_request.get_full_path())}"
         )
         assertContains(
             response,
@@ -1228,7 +1230,7 @@ class TestJobDescriptionSearchView:
         # Has link to job description with job_seeker public_id
         job_description_url_with_job_seeker_id = (
             f"{job_description.get_absolute_url()}?job_seeker={job_seeker_public_id}"
-            f"&back_url={urlencode_filter(response.wsgi_request.get_full_path())}"
+            f"&amp;back_url={quote(response.wsgi_request.get_full_path())}"
         )
         assertContains(response, job_description_url_with_job_seeker_id)
 

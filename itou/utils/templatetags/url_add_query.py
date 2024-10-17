@@ -24,8 +24,10 @@ def url_add_query(url, **kwargs):
     """
     parsed = urlsplit(url)
     querystring = QueryDict(parsed.query, mutable=True)
-    for item in kwargs:
+    # Remove params with None or "" values
+    cleaned_kwargs = {k: v for k, v in kwargs.items() if v is not None and v != ""}
+    for item in cleaned_kwargs:
         if item in querystring:
             querystring.pop(item)
-    querystring.update(kwargs)
-    return urlunsplit(parsed._replace(query=querystring.urlencode()))
+    querystring.update(cleaned_kwargs)
+    return urlunsplit(parsed._replace(query=querystring.urlencode("/")))

@@ -944,7 +944,9 @@
                               </div>
                           
                       
-                      <div class="c-box c-box--structure">
+                      
+  
+  <div class="c-box c-box--structure">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse">
           <i class="ri-community-line"></i>
           <div>
@@ -997,7 +999,11 @@
               
           </ul>
           
-              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card?">Voir la fiche de l'entreprise</a>
+              
+              
+                  
+              
+              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
           
       </div>
   </div>
@@ -1282,7 +1288,9 @@
                               </div>
                           
                       
-                      <div class="c-box c-box--structure">
+                      
+  
+  <div class="c-box c-box--structure">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse">
           <i class="ri-community-line"></i>
           <div>
@@ -1335,7 +1343,11 @@
               
           </ul>
           
-              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card?">Voir la fiche de l'entreprise</a>
+              
+              
+                  
+              
+              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
           
       </div>
   </div>
@@ -1618,7 +1630,9 @@
                               </div>
                           
                       
-                      <div class="c-box c-box--structure">
+                      
+  
+  <div class="c-box c-box--structure">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse">
           <i class="ri-community-line"></i>
           <div>
@@ -1671,7 +1685,11 @@
               
           </ul>
           
-              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card?">Voir la fiche de l'entreprise</a>
+              
+              
+                  
+              
+              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
           
       </div>
   </div>
@@ -1956,7 +1974,9 @@
                               </div>
                           
                       
-                      <div class="c-box c-box--structure">
+                      
+  
+  <div class="c-box c-box--structure">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse">
           <i class="ri-community-line"></i>
           <div>
@@ -2009,7 +2029,11 @@
               
           </ul>
           
-              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card?">Voir la fiche de l'entreprise</a>
+              
+              
+                  
+              
+              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
           
       </div>
   </div>
@@ -2294,7 +2318,9 @@
                               </div>
                           
                       
-                      <div class="c-box c-box--structure">
+                      
+  
+  <div class="c-box c-box--structure">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse">
           <i class="ri-community-line"></i>
           <div>
@@ -2347,7 +2373,11 @@
               
           </ul>
           
-              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card?">Voir la fiche de l'entreprise</a>
+              
+              
+                  
+              
+              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
           
       </div>
   </div>
@@ -2626,7 +2656,9 @@
                               <a class="btn btn-primary btn-block" href="/geiq/assessment/[PK of ImplementationAssessment]/review">Valider le bilan</a>
                           </div>
                       
-                      <div class="c-box c-box--structure">
+                      
+  
+  <div class="c-box c-box--structure">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse">
           <i class="ri-community-line"></i>
           <div>
@@ -2679,7 +2711,11 @@
               
           </ul>
           
-              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card?">Voir la fiche de l'entreprise</a>
+              
+              
+                  
+              
+              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
           
       </div>
   </div>
@@ -2937,7 +2973,9 @@
                               </p>
                           </div>
                       
-                      <div class="c-box c-box--structure">
+                      
+  
+  <div class="c-box c-box--structure">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse">
           <i class="ri-community-line"></i>
           <div>
@@ -2990,7 +3028,11 @@
               
           </ul>
           
-              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card?">Voir la fiche de l'entreprise</a>
+              
+              
+                  
+              
+              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
           
       </div>
   </div>

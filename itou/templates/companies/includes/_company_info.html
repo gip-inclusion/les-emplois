@@ -1,3 +1,5 @@
+{% load url_add_query %}
+
 <div class="c-box c-box--structure {{ extra_box_class|default:'' }}">
     <div class="c-box--structure__summary" data-bs-toggle="collapse" data-bs-target="#collapseBoxStructure" aria-expanded="{{ show|default:False|yesno:'true,false' }}" aria-controls="collapseBoxStructure">
         <i class="ri-community-line"></i>
@@ -22,9 +24,13 @@
             <a href="{% url 'apply:job_application_external_transfer_step_1_company_card' job_application_id=job_app_to_transfer company_pk=company.pk %}{% if back_url|default:"" %}?back_url={{ back_url|urlencode }}{% endif %}"
                class="btn btn-secondary btn-block mt-4">Voir la fiche de l'entreprise</a>
         {% else %}
-            <a href="{% url 'companies_views:card' siae_id=company.pk %}?{% if job_seeker|default:None %}job_seeker={{ job_seeker.public_id }}&{% endif %}{% if back_url|default:"" and not open_in_tab|default:False %}back_url={{ back_url|urlencode }}{% endif %}"
-               class="btn btn-secondary btn-block mt-4"
-               {% if open_in_tab|default:False %}target="_blank"{% endif %}>Voir la fiche de l'entreprise</a>
+            {% url 'companies_views:card' siae_id=company.pk as company_url %}
+            {% if back_url|default:'' and not open_in_tab|default:False %}
+                {% url_add_query company_url job_seeker=job_seeker.public_id|default:'' back_url=back_url as company_url_params %}
+            {% else %}
+                {% url_add_query company_url job_seeker=job_seeker.public_id|default:''  as company_url_params %}
+            {% endif %}
+            <a href="{{ company_url_params }}" class="btn btn-secondary btn-block mt-4" {% if open_in_tab|default:False %}target="_blank"{% endif %}>Voir la fiche de l'entreprise</a>
         {% endif %}
     </div>
 </div>
