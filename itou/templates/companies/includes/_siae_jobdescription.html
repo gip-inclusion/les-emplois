@@ -9,7 +9,7 @@
                        class="fw-bold stretched-link order-2 order-md-1">{{ job.display_name }}</a>
 
                 {% else %}
-                    <a href="{{ job.get_absolute_url }}?back_url={% if back_url %}{{ back_url|urlencode }}{% else %}{{ request.get_full_path|urlencode }}{% endif %}"
+                    <a href="{{ job.get_absolute_url }}?{% if job_seeker %}job_seeker={{ job_seeker.public_id }}&{% endif %}back_url={% if back_url %}{{ back_url|urlencode }}{% else %}{{ request.get_full_path|urlencode }}{% endif %}"
                        class="fw-bold stretched-link order-2 order-md-1"
                        {% matomo_event "candidature" "clic" "clic-metiers" %}>{{ job.display_name }}</a>
                 {% endif %}

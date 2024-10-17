@@ -51,7 +51,7 @@
                 </div>
             {% else %}
                 <div>
-                    <a href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}"
+                    <a href="{{ siae.get_card_url }}?{% if job_seeker %}job_seeker={{ job_seeker.public_id }}&{% endif %}back_url={{ request.get_full_path|urlencode }}"
                        class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap"
                        {% matomo_event "candidature" "clic" "clic-structure" %}>Voir la fiche de l'entreprise</a>
                 </div>
@@ -78,7 +78,7 @@
                 <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
                     <p class="mb-3 mb-md-0">Cette structure vous intéresse ?</p>
                     <a class="btn btn-ico btn-primary"
-                       href="{% url 'apply:start' company_pk=siae.pk %}"
+                       href="{% url 'apply:start' company_pk=siae.pk %}{% if job_seeker %}?job_seeker={{ job_seeker.public_id }}{% endif %}"
                        {% matomo_event "candidature" "clic" "start_application" %}
                        aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
                         <i class="ri ri-draft-line" aria-hidden="true"></i>
@@ -154,7 +154,7 @@
                 <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
                     <p class="mb-3 mb-md-0">Cette structure vous intéresse ?</p>
                     <a class="btn btn-ico btn-primary"
-                       href="{% url 'apply:start' company_pk=siae.pk %}"
+                       href="{% url 'apply:start' company_pk=siae.pk %}{% if job_seeker %}?job_seeker={{ job_seeker.public_id }}{% endif %}"
                        {% matomo_event "candidature" "clic" "start_application" %}
                        aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
                         <i class="ri ri-draft-line" aria-hidden="true"></i>
