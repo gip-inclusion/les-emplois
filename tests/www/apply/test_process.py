@@ -3073,7 +3073,7 @@ def test_refuse_jobapplication_geiq_reasons(client, reason):
     }
 
 
-@pytest.mark.ignore_unknown_variable_template_error("expired_eligibility_diagnosis", "with_matomo_event")
+@pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
 def test_details_for_prescriber_not_can_have_prior_actions(client):
     kind = random.choice(list(set(CompanyKind) - {CompanyKind.GEIQ}))
     job_application = JobApplicationFactory(
