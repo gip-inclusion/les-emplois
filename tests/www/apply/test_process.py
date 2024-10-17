@@ -80,6 +80,14 @@ REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY = (
     " vous pouvez contacter l’employeur."
 )
 
+IAE_CANCELLATION_CONFIRMATION = (
+    "En validant, <strong>vous renoncez aux aides au poste</strong> liées à cette candidature "
+    "pour tous les jours travaillés de ce salarié."
+)
+NON_IAE_CANCELLATION_CONFIRMATION = (
+    "En validant, vous confirmez que le salarié n’avait pas encore commencé à travailler dans votre structure."
+)
+
 
 @pytest.mark.ignore_unknown_variable_template_error("has_form_error", "with_matomo_event")
 class TestProcessViews:
@@ -1365,50 +1373,35 @@ class TestProcessViews:
         assert response.status_code == 404
         client.logout()
 
-    def test_cancel(self, client):
+    @pytest.mark.parametrize(
+        "eligibility_trait,expected_msg",
+        [
+            ("subject_to_eligibility", IAE_CANCELLATION_CONFIRMATION),
+            ("not_subject_to_eligibility", NON_IAE_CANCELLATION_CONFIRMATION),
+        ],
+    )
+    def test_cancel(self, client, eligibility_trait, expected_msg):
         # Hiring date is today: cancellation should be possible.
-        job_application = JobApplicationFactory(with_approval=True, to_company__subject_to_eligibility=True)
+        job_application = JobApplicationFactory(with_approval=True, **{f"to_company__{eligibility_trait}": True})
         employer = job_application.to_company.members.first()
         client.force_login(employer)
-        url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
-        response = client.get(url)
-        assertContains(response, "Confirmer l'annulation de l'embauche")
-        assertContains(
-            response, "En validant, <b>vous renoncez aux aides au poste</b> liées à cette candidature pour tous"
-        )
-        assertNotContains(
-            response,
-            "En annulant cette embauche, vous confirmez que le salarié n’avait pas encore commencé à "
-            "travailler dans votre structure.",
-        )
+        detail_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        cancel_url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
+        response = client.get(detail_url)
+        assertContains(response, "Confirmer l’annulation de l’embauche")
+        for msg in [IAE_CANCELLATION_CONFIRMATION, NON_IAE_CANCELLATION_CONFIRMATION]:
+            if msg == expected_msg:
+                assertContains(response, msg)
+            else:
+                assertNotContains(response, msg)
 
-        post_data = {
-            "confirm": "true",
-        }
-        response = client.post(url, data=post_data)
+        response = client.post(cancel_url)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         assertRedirects(response, next_url)
 
         job_application.refresh_from_db()
         assert job_application.state.is_cancelled
-
-    def test_cancel_saie_not_subject_to_eligibility(self, client):
-        # Hiring date is today: cancellation should be possible.
-        job_application = JobApplicationFactory(with_approval=True, to_company__not_subject_to_eligibility=True)
-        employer = job_application.to_company.members.first()
-        client.force_login(employer)
-        url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
-        response = client.get(url)
-        assertContains(response, "Confirmer l'annulation de l'embauche")
-        assertNotContains(
-            response, "En validant, <b>vous renoncez aux aides au poste</b> liées à cette candidature pour tous"
-        )
-        assertContains(
-            response,
-            "En annulant cette embauche, vous confirmez que le salarié n’avait pas encore commencé à "
-            "travailler dans votre structure.",
-        )
-        # Not need to the form POST, only the warning above changes
+        assertMessages(response, [messages.Message(messages.SUCCESS, "L'embauche a bien été annulée.")])
 
     def test_cannot_cancel(self, client):
         job_application = JobApplicationFactory(
@@ -1420,13 +1413,20 @@ class TestProcessViews:
         EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED)
 
         client.force_login(employer)
-        url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
-        response = client.get(url)
+        detail_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        cancel_url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
+        response = client.get(detail_url)
+        assertNotContains(response, "Confirmer l’annulation de l’embauche")
+        assertNotContains(response, IAE_CANCELLATION_CONFIRMATION)
+        assertNotContains(response, NON_IAE_CANCELLATION_CONFIRMATION)
+
+        response = client.post(cancel_url)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         assertRedirects(response, next_url)
 
         job_application.refresh_from_db()
         assert not job_application.state.is_cancelled
+        assertMessages(response, [messages.Message(messages.ERROR, "Vous ne pouvez pas annuler cette embauche.")])
 
     def test_diagoriente_section_as_job_seeker(self, client):
         job_application = JobApplicationFactory(with_approval=True, resume_link="")

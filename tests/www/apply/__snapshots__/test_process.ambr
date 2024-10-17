@@ -1714,6 +1714,18 @@
       }),
       dict({
         'origin': list([
+          'JobApplication.can_be_cancelled[job_applications/models.py]',
+          'details_for_company[www/apply/views/process_views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "employee_record_employeerecord"
+          WHERE "employee_record_employeerecord"."job_application_id" = %s
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -1807,23 +1819,6 @@
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
           ORDER BY "approvals_approval"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplication.can_be_cancelled[job_applications/models.py]',
-          'IfNode[apply/process_details_company.html]',
-          'BlockNode[apply/process_details_company.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "employee_record_employeerecord"
-          WHERE "employee_record_employeerecord"."job_application_id" = %s
-          LIMIT 1
         ''',
       }),
       dict({
@@ -2695,6 +2690,18 @@
       }),
       dict({
         'origin': list([
+          'JobApplication.can_be_cancelled[job_applications/models.py]',
+          'details_for_company[www/apply/views/process_views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "employee_record_employeerecord"
+          WHERE "employee_record_employeerecord"."job_application_id" = %s
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -2788,23 +2795,6 @@
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
           ORDER BY "approvals_approval"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplication.can_be_cancelled[job_applications/models.py]',
-          'IfNode[apply/process_details_company.html]',
-          'BlockNode[apply/process_details_company.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "employee_record_employeerecord"
-          WHERE "employee_record_employeerecord"."job_application_id" = %s
-          LIMIT 1
         ''',
       }),
       dict({
