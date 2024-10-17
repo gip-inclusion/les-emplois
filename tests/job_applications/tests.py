@@ -14,7 +14,6 @@ from freezegun import freeze_time
 
 from itou.approvals.models import Approval, CancelledApproval
 from itou.companies.enums import CompanyKind, ContractType
-from itou.companies.models import Company
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -37,8 +36,6 @@ from itou.utils.templatetags import format_filters
 from tests.approvals.factories import (
     ApprovalFactory,
     PoleEmploiApprovalFactory,
-    ProlongationFactory,
-    SuspensionFactory,
 )
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
@@ -508,152 +505,6 @@ class TestJobApplicationQuerySet:
         assert hasattr(qs, f"eligibility_diagnosis_criterion_{level1_criterion.pk}")
         assert hasattr(qs, f"eligibility_diagnosis_criterion_{level2_criterion.pk}")
         assert hasattr(qs, f"eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
-
-    def test_eligible_as_employee_record(self):
-        # Results must be a list of job applications:
-        # Accepted
-        job_app = JobApplicationFactory(state=JobApplicationState.NEW)
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-
-        # With an approval
-        job_app = JobApplicationWithoutApprovalFactory(state=JobApplicationState.ACCEPTED)
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-
-        # Approval `create_employee_record` is False.
-        job_app = JobApplicationWithApprovalNotCancellableFactory(create_employee_record=False)
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-
-        # Must be accepted and only after CANCELLATION_DAYS_AFTER_HIRING_STARTED
-        job_app = JobApplicationFactory(state=JobApplicationState.ACCEPTED)
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-
-        # Approval start date is also checked (must be older then CANCELLATION_DAY_AFTER_HIRING STARTED).
-        job_app = JobApplicationWithApprovalNotCancellableFactory()
-        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-
-        # After employee record creation
-        job_app = JobApplicationWithApprovalNotCancellableFactory()
-        employee_record = EmployeeRecordFactory(
-            job_application=job_app,
-            asp_id=job_app.to_company.convention.asp_id,
-            approval_number=job_app.approval.number,
-            status=Status.NEW,
-        )
-        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-        employee_record.status = Status.PROCESSED
-        employee_record.save()
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-
-        # After employee record is disabled
-        employee_record.update_as_disabled()
-        assert employee_record.status == Status.DISABLED
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-
-        # Create a second job application to the same SIAE and for the same approval
-        second_job_app = JobApplicationFactory(
-            state=JobApplicationState.ACCEPTED,
-            to_company=job_app.to_company,
-            approval=job_app.approval,
-        )
-        assert second_job_app not in JobApplication.objects.eligible_as_employee_record(second_job_app.to_company)
-        # Create a third job application to an antenna SIAE
-        third_job_app = JobApplicationFactory(
-            state=JobApplicationState.ACCEPTED,
-            to_company__convention=job_app.to_company.convention,
-            to_company__source=Company.SOURCE_USER_CREATED,
-            approval=job_app.approval,
-        )
-        assert third_job_app not in JobApplication.objects.eligible_as_employee_record(third_job_app.to_company)
-
-        # No employee record, but with a suspension
-        job_app = JobApplicationFactory(
-            with_approval=True,
-            hiring_start_at=None,
-        )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-        SuspensionFactory(
-            siae=job_app.to_company,
-            approval=job_app.approval,
-        )
-        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-        # No employee record, but with a suspension, and `create_employee_record` is False
-        job_app = JobApplicationFactory(
-            with_approval=True,
-            hiring_start_at=None,
-            create_employee_record=False,
-        )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-        SuspensionFactory(
-            siae=job_app.to_company,
-            approval=job_app.approval,
-        )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-        # No employee record, but with a prolongation
-        job_app = JobApplicationFactory(
-            with_approval=True,
-            state=JobApplicationState.ACCEPTED,
-            hiring_start_at=None,
-        )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-        ProlongationFactory(
-            declared_by_siae=job_app.to_company,
-            approval=job_app.approval,
-        )
-        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-        # No employee record, but with a prolongation, and `create_employee_record` is False
-        job_app = JobApplicationFactory(
-            with_approval=True,
-            hiring_start_at=None,
-            create_employee_record=False,
-        )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-        ProlongationFactory(
-            declared_by_siae=job_app.to_company,
-            approval=job_app.approval,
-        )
-        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-        # No employee record, but with a prolongation and a suspension
-        job_app = JobApplicationFactory(
-            with_approval=True,
-            state=JobApplicationState.ACCEPTED,
-            hiring_start_at=None,
-        )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-        SuspensionFactory(
-            siae=job_app.to_company,
-            approval=job_app.approval,
-        )
-        ProlongationFactory(
-            declared_by_siae=job_app.to_company,
-            approval=job_app.approval,
-        )
-        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-        # ...and with an employee record already existing for that employee
-        EmployeeRecordFactory(
-            status=Status.READY,
-            job_application__to_company=job_app.to_company,
-            approval_number=job_app.approval.number,
-        )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-
-    def test_eligible_job_applications_with_a_suspended_or_extended_approval_older_than_cutoff(self):
-        job_app = JobApplicationFactory(
-            with_approval=True,
-            state=JobApplicationState.ACCEPTED,
-            hiring_start_at=None,
-        )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
-        SuspensionFactory(
-            siae=job_app.to_company,
-            approval=job_app.approval,
-            created_at=timezone.make_aware(datetime.datetime(2001, 1, 1)),
-        )
-        ProlongationFactory(
-            declared_by_siae=job_app.to_company,
-            approval=job_app.approval,
-            created_at=timezone.make_aware(datetime.datetime(2001, 1, 1)),
-        )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
 
     def test_with_accepted_at_for_created_from_pe_approval(self):
         JobApplicationFactory(

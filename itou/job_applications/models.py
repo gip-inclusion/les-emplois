@@ -11,15 +11,11 @@ from django.utils import timezone
 from django_xworkflows import models as xwf_models
 from xworkflows import before_transition
 
-from itou.approvals.models import Approval, Prolongation, Suspension
+from itou.approvals.models import Approval, Suspension
 from itou.approvals.notifications import PassAcceptedEmployerNotification
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType
-from itou.companies.models import Company
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
-from itou.employee_record import enums as employeerecord_enums
-from itou.employee_record.constants import get_availability_date_for_kind
-from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.enums import (
     ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL,
     GEIQ_MAX_HOURS_PER_WEEK,
@@ -323,122 +319,6 @@ class JobApplicationQuerySet(models.QuerySet):
             .annotate(c=Count("id"))
             .values("month", "c")
             .order_by("-month")
-        )
-
-    # Employee record querysets
-
-    def _eligible_job_applications_with_employee_record(self, siae):
-        """
-        Eligible job applications with a `NEW` employee record,
-
-        Not a public API: use `eligible_as_employee_record`.
-        """
-        return self.filter(
-            to_company=siae,
-            employee_record__status=employeerecord_enums.Status.NEW,
-        )
-
-    def _eligible_job_applications_without_employee_record(self, siae):
-        """
-        Eligible job applications without any employee records linked.
-
-        Not a public API: use `eligible_as_employee_record`.
-        """
-        return self.accepted().filter(
-            # Must be linked to an approval
-            approval__isnull=False,
-            # Only for that SIAE
-            to_company=siae,
-            # Admin control: can prevent creation of employee record
-            create_employee_record=True,
-            # There must be **NO** employee record linked in this part
-            employee_record__isnull=True,
-            # No employee record is available before this date
-            hiring_start_at__gte=get_availability_date_for_kind(siae.kind),
-        )
-
-    def _eligible_job_applications_with_a_suspended_or_extended_approval(self, siae):
-        return (
-            self.accepted()
-            .annotate(
-                has_recent_suspension=Exists(
-                    Suspension.objects.filter(
-                        siae=OuterRef("to_company"),
-                        approval=OuterRef("approval"),
-                        created_at__gte=get_availability_date_for_kind(siae.kind),
-                    )
-                ),
-                has_recent_prolongation=Exists(
-                    Prolongation.objects.filter(
-                        declared_by_siae=OuterRef("to_company"),
-                        approval=OuterRef("approval"),
-                        created_at__gte=get_availability_date_for_kind(siae.kind),
-                    )
-                ),
-            )
-            .filter(
-                # Must be linked to an approval with a Suspension or a Prolongation
-                # Bypass the `create_employee_record` flag for Prolongation because:
-                # - Job applications created for the AI stock all have the flag, but we need to send the new end date.
-                # - Enabling it for Suspension will create *a lot* of "FS actualisation" which will create a lot of
-                #   messages to the support, like when we introduced them the first time.
-                # - Prolongation will always block the employer, it's a much rarer case for Suspension.
-                Q(has_recent_suspension=True, create_employee_record=True) | Q(has_recent_prolongation=True),
-                # Only for that SIAE
-                to_company=siae,
-                # There must be **NO** employee record linked in this part
-                employee_record__isnull=True,
-            )
-        )
-
-    def eligible_as_employee_record(self, siae):
-        """
-        Get a list of job applications potentially "updatable" as an employee record.
-        For display concerns (list of employee records for a given SIAE).
-
-        Rules of eligibility for a job application:
-            - be in 'ACCEPTED' state (valid hiring)
-            - to be linked to an approval
-            - hiring SIAE must be one of : ACI, AI, EI, EITI, ETTI.
-            - the hiring date must be greater than 2021.09.27 (feature production date)
-            - employee record is not blocked via admin (`create_employee_record` field)
-
-        Enabling / disabling an employee record has no impact on job application eligibility concerns.
-
-        Getting a correct list of eligible job applications for employee records:
-            - is not achievable in one single request (opposite conditions)
-            - is consuming a lot of resources (200-800ms per round)
-        Splitting in multiple queries, reunited by a UNION:
-            - lowers SQL query time under 30ms
-            - adds correctness to result
-        Each query is commented according to the newest Whimsical schemas.
-        """
-        if siae.kind not in Company.ASP_EMPLOYEE_RECORD_KINDS:
-            return self.none()
-
-        eligible_job_applications = JobApplicationQuerySet.union(
-            self._eligible_job_applications_with_employee_record(siae),
-            self._eligible_job_applications_without_employee_record(siae),
-            self._eligible_job_applications_with_a_suspended_or_extended_approval(siae),
-        )
-
-        # Return the approvals already used by any SIAE of the convention
-        approvals_to_exclude = (
-            EmployeeRecord.objects.for_asp_company(siae)
-            # We need to exclude NEW employee records otherwise we are shooting ourselves in the foot by excluding
-            # job applications selected in `._eligible_job_applications_with_employee_record()`
-            .exclude(status__in=[employeerecord_enums.Status.NEW])
-            .values("approval_number")
-        )
-
-        # TIP: you can't filter on a UNION of querysets,
-        # but you can convert it as a subquery and then order and filter it
-        return (
-            self.filter(pk__in=eligible_job_applications.values("id"))
-            .exclude(approval__number__in=approvals_to_exclude)
-            .select_related("approval", "job_seeker__jobseeker_profile")
-            .prefetch_related("employee_record")
-            .order_by("-hiring_start_at")
         )
 
     def inconsistent_approval_user(self):

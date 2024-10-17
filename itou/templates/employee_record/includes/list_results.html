@@ -2,26 +2,17 @@
 {% load str_filters %}
 
 <div id="employee-records-container">
-    {# "Real" employee records objects #}
     <div class="employee-records-list">
-        {% if employee_records_list %}
-            {% for employee_record in navigation_pages %}
-                {% include "employee_record/includes/list_item.html" with employee_record=employee_record item=employee_record.job_application current_url=request.get_full_path only %}
-            {% endfor %}
-            {# New employee records i.e. job applications #}
-        {% else %}
-            {% for job_application in navigation_pages %}
-                {% include "employee_record/includes/list_item.html" with employee_record=None item=job_application only %}
-            {% endfor %}
-        {% endif %}
-    </div>
-    {% if not navigation_pages %}
-        <div class="c-box c-box--results my-3 my-md-4">
-            <div class="c-box--results__body">
-                <p class="mb-0">Aucune fiche salarié avec le statut selectionné.</p>
+        {% for employee_record in navigation_pages %}
+            {% include "employee_record/includes/list_item.html" with employee_record=employee_record current_url=request.get_full_path only %}
+        {% empty %}
+            <div class="c-box c-box--results my-3 my-md-4">
+                <div class="c-box--results__body">
+                    <p class="mb-0">Aucune fiche salarié avec le statut selectionné.</p>
+                </div>
             </div>
-        </div>
-    {% endif %}
+        {% endfor %}
+    </div>
     {% include "includes/pagination.html" with page=navigation_pages boost=True boost_target="#employee-records-container" boost_indicator="#employee-records-container" %}
 </div>
 

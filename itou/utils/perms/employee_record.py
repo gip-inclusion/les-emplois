@@ -1,5 +1,7 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
+from django.template import loader
+from django.utils.html import format_html
 
 from itou.employee_record.enums import Status
 from itou.job_applications.models import JobApplication
@@ -58,8 +60,15 @@ def can_create_employee_record(request, job_application_id) -> JobApplication:
 
     if job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER:
         raise PermissionDenied(
-            "Cette fiche salarié ne peut pas être modifiée. "
-            "Veuillez d'abord régulariser le numéro de sécurité sociale."
+            format_html(
+                """<p>Cette fiche salarié ne peut pas être modifiée.
+                Veuillez d'abord régulariser le numéro de sécurité sociale.</p>
+                {}""",
+                loader.render_to_string(
+                    "employee_record/includes/_regularize_nir_button.html",
+                    context={"job_application": job_application},
+                ),
+            )
         )
 
     if not tunnel_step_is_allowed(job_application):
