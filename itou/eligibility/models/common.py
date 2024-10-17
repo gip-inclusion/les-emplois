@@ -206,7 +206,7 @@ class SelectedAdministrativeCriteriaQuerySet(models.QuerySet):
 
 
 class AbstractSelectedAdministrativeCriteria(models.Model):
-    CERTIFICATION_GRACE_PERIOD_DAYS = 90
+    CERTIFICATION_GRACE_PERIOD_DAYS = 92
 
     certified = models.BooleanField(blank=True, null=True, verbose_name="certifié par l'API Particulier")
     certified_at = models.DateTimeField(blank=True, null=True, verbose_name="certifié le")
