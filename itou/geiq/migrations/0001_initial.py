@@ -211,7 +211,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="implementationassessmentcampaign",
             constraint=models.CheckConstraint(
-                check=models.Q(("review_deadline__gte", models.F("submission_deadline"))),
+                condition=models.Q(("review_deadline__gte", models.F("submission_deadline"))),
                 name="review_after_submission",
                 violation_error_message="Impossible d'avoir une date de contrôle antérieure à la date de transmission",
             ),
@@ -232,7 +232,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="implementationassessment",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     ("submitted_at__isnull", True),
                     models.Q(
                         ("activity_report_file__isnull", False),
@@ -248,7 +248,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="implementationassessment",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     ("reviewed_at__isnull", True),
                     models.Q(("reviewed_at__gte", models.F("submitted_at")), ("submitted_at__isnull", False)),
                     _connector="OR",
@@ -262,7 +262,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="implementationassessment",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     models.Q(
                         ("review_comment", ""),
                         ("review_institution__isnull", True),
