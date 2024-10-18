@@ -515,7 +515,7 @@ class User(AbstractUser, AddressMixin):
         return self.latest_approval and self.latest_approval.is_valid()
 
     @property
-    def has_common_approval_in_waiting_period(self):
+    def has_latest_common_approval_in_waiting_period(self):
         return self.latest_common_approval and not self.latest_common_approval.is_valid()
 
     @property
@@ -534,7 +534,7 @@ class User(AbstractUser, AddressMixin):
         # Only diagnoses made by authorized prescribers are taken into account.
         has_valid_diagnosis = self.has_valid_diagnosis()
         return (
-            self.has_common_approval_in_waiting_period
+            self.has_latest_common_approval_in_waiting_period
             and siae.is_subject_to_eligibility_rules
             and not (is_sent_by_authorized_prescriber or has_valid_diagnosis)
         )
