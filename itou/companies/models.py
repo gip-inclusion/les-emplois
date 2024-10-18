@@ -267,6 +267,7 @@ class Company(AddressMixin, OrganizationAbstract):
     job_app_score = models.FloatField(
         verbose_name="score de recommandation (ratio de candidatures récentes vs nombre d'offres d'emploi)", null=True
     )
+    is_searchable = models.BooleanField(verbose_name="peut apparaître dans la recherche", default=True)
 
     rdv_solidarites_id = models.IntegerField(
         verbose_name="identifiant d'organisation RDV-Solidarités",
