@@ -1,10 +1,10 @@
 import concurrent
+import datetime
 import logging
 from math import ceil
 
-from dateutil.relativedelta import relativedelta
-from django.db.models import Q
-from django.utils import timezone
+from django.db.models import Exists, OuterRef, Q
+from django.utils.timezone import make_aware
 
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria, GEIQSelectedAdministrativeCriteria
 from itou.eligibility.models.iae import AdministrativeCriteria, SelectedAdministrativeCriteria
@@ -49,11 +49,12 @@ class Command(BaseCommand):
         server_errors = 0  # 429, 503, 504
 
         criteria = AdministrativeCriteriaModel.objects.certifiable()
-        six_months = timezone.now() - relativedelta(months=6)
-        criteria_pks_qs = (
+        # TODO: add test.
+        period = (make_aware(datetime.datetime(2024, 1, 1)), make_aware(datetime.datetime(2024, 10, 1)))
+        criteria_pks = (
             SelectedAdministrativeCriteriaModel.objects.filter(
                 administrative_criteria__in=criteria,
-                eligibility_diagnosis__created_at__gte=six_months,
+                eligibility_diagnosis__created_at__range=period,
                 eligibility_diagnosis__job_seeker__jobseeker_profile__birth_country__isnull=False,
                 eligibility_diagnosis__job_seeker__jobseeker_profile__birthdate__isnull=False,
                 eligibility_diagnosis__job_seeker__first_name__isnull=False,
@@ -61,20 +62,31 @@ class Command(BaseCommand):
                 eligibility_diagnosis__job_seeker__title__isnull=False,
             )
             .exclude(Q(certified__isnull=False) | Q(data_returned_by_api__error__contains="not_found"))  # exclude 404
-            .values("pk", "eligibility_diagnosis__job_seeker__pk")
+            .values_list("pk", flat=True)
         )
         if limit:
-            criteria_pks_qs = criteria_pks_qs[:limit]
-        criteria_pks = list([val["pk"] for val in criteria_pks_qs])
+            criteria_pks = criteria_pks[:limit]
 
         total_criteria += len(criteria_pks)
+        if total_criteria == 0:
+            logger.info("No criteria to certify. Stop now and enjoy your day! ")
+            return
 
-        # It should be better to get the User from criteria_pks but I didn't manage to make it work.
-        # I tried the following:
-        # User.objects.filter(eligibility_diagnoses__administrativecriteria_set__in=criteria_pks)
-        users_pks = set([val["eligibility_diagnosis__job_seeker__pk"] for val in criteria_pks_qs])
-        users_count = User.objects.filter(pk__in=users_pks).count()
-        logger.info(f"Candidats à certifier pour le modèle {SelectedAdministrativeCriteriaModel}: {users_count}")
+        users_count = (
+            User.objects.filter(
+                Exists(
+                    SelectedAdministrativeCriteria.objects.filter(
+                        eligibility_diagnosis__job_seeker_id=OuterRef("pk"),
+                        id__in=criteria_pks,
+                    )
+                )
+            )
+            .distinct()
+            .count()
+        )
+        logger.info(
+            f"Candidats à certifier pour le modèle {SelectedAdministrativeCriteriaModel.__name__}: {users_count}"
+        )
 
         chunks_total = ceil(total_criteria / 1000)
         chunks_count = 0
@@ -98,10 +110,8 @@ class Command(BaseCommand):
                     criterion.certify(save=False)
             else:
                 with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-                    batch_futures = []
-                    for criterion in criteria:
-                        batch_futures.append(executor.submit(criterion.certify, False))
-                    _done, _not_done = concurrent.futures.wait(batch_futures, timeout=3600)
+                    batch_futures = [executor.submit(criterion.certify, False) for criterion in criteria]
+                    concurrent.futures.wait(batch_futures, timeout=3600)
 
             for criterion in criteria:
                 data_returned_by_api = criterion.data_returned_by_api
