@@ -1077,6 +1077,23 @@ class TestLatestApproval:
         assert user.latest_approval is None
         assert user.latest_pe_approval == pe_approval
 
+    def test_status_with_expired_pole_emploi_approval_and_valid_approval(self):
+        user = JobSeekerFactory(with_pole_emploi_id=True)
+        pe_approval = PoleEmploiApprovalFactory(
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
+            birthdate=user.jobseeker_profile.birthdate,
+            start_at=timezone.localdate() - datetime.timedelta(3 * 365),
+        )
+        assert not pe_approval.is_valid()
+        approval = ApprovalFactory(user=user)
+        assert approval.is_valid()
+
+        assert not user.has_no_common_approval
+        assert user.has_valid_approval  # PoleEmploiFactory aren't checked anymore
+        assert not user.has_common_approval_in_waiting_period
+        assert user.latest_approval == approval
+        assert user.latest_pe_approval == pe_approval
+
     def test_new_approval_blocked_by_waiting_period(self):
         user = user_with_approval_in_waiting_period()
 
