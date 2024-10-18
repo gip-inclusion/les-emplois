@@ -29,7 +29,9 @@
                                         avec les employeurs inclusifs et facilite tous vos recrutements.
                                     </p>
                                     <p class="my-3">
-                                        <a class="btn btn-sm btn-primary" href="#welcoming_tour" role="button" data-bs-slide="next">Suivant</a>
+                                        <button type="button" data-bs-target="#welcoming_tour" class="btn btn-sm btn-primary" data-bs-slide="next">
+                                            Suivant
+                                        </button>
                                     </p>
                                 </div>
                             </div>
@@ -47,8 +49,12 @@
                                         Gagnez en visibilité pour vous faire connaître des prescripteurs locaux.
                                     </p>
                                     <p class="my-3">
-                                        <a class="btn btn-sm btn-secondary" href="#welcoming_tour" role="button" data-bs-slide="prev">Précédent</a>
-                                        <a class="btn btn-sm btn-primary" href="#welcoming_tour" role="button" data-bs-slide="next">Suivant</a>
+                                        <button type="button" data-bs-target="#welcoming_tour" class="btn btn-sm btn-secondary" data-bs-slide="prev">
+                                            Précédent
+                                        </button>
+                                        <button type="button" data-bs-target="#welcoming_tour" class="btn btn-sm btn-primary" data-bs-slide="next">
+                                            Suivant
+                                        </button>
                                     </p>
                                 </div>
                             </div>
@@ -69,8 +75,10 @@
                                         Bonne découverte et bons recrutements.
                                     </p>
                                     <p class="my-3">
-                                        <a class="btn btn-sm btn-secondary" href="#welcoming_tour" role="button" data-bs-slide="prev">Précédent</a>
-                                        <a class="btn btn-sm btn-primary" href="{% url 'dashboard:index' %}" role="button" data-bs-slide="next">Terminer</a>
+                                        <button type="button" data-bs-target="#welcoming_tour" class="btn btn-sm btn-secondary" data-bs-slide="prev">
+                                            Précédent
+                                        </button>
+                                        <a href="{% url 'dashboard:index' %}" class="btn btn-sm btn-primary">Terminer</a>
                                     </p>
                                 </div>
                             </div>
