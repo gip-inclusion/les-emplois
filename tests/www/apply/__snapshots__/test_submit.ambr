@@ -462,6 +462,7 @@
         'origin': list([
           'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
           'User.latest_pe_approval[users/models.py]',
+          'User.latest_common_approval[users/models.py]',
           'User.has_common_approval_in_waiting_period[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           '_check_job_seeker_approval[www/apply/views/submit_views.py]',

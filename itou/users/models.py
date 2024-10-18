@@ -516,9 +516,7 @@ class User(AbstractUser, AddressMixin):
 
     @property
     def has_common_approval_in_waiting_period(self):
-        return (self.latest_approval and not self.latest_approval.is_valid()) or (
-            self.latest_pe_approval and not self.latest_pe_approval.is_valid()
-        )
+        return self.latest_common_approval and not self.latest_common_approval.is_valid()
 
     @property
     def has_no_common_approval(self):
