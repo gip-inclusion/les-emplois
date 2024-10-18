@@ -54,10 +54,10 @@
   
                   
                   <div class="c-box--results__footer">
-                      <div class="d-flex justify-content-end">
+                      <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
                           
-                              <a class="btn btn-outline-primary" href="/apply/11111111-1111-1111-1111-111111111111/jobseeker/details?back_url=/apply/job_seeker/list">
+                              <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/apply/11111111-1111-1111-1111-111111111111/jobseeker/details?back_url=/apply/job_seeker/list">
                                   Voir ma candidature
                               </a>
                           
@@ -115,9 +115,9 @@
   
                   
                   <div class="c-box--results__footer">
-                      <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                      <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
-                              <p class="text-warning fs-sm mb-3 mb-md-0">
+                              <p class="text-warning fs-sm mb-0 flex-grow-1">
                                   <i aria-hidden="true" class="ri-time-line ri-lg me-1"></i>
                                   En attente de réponse depuis 3 semaines.
                               </p>
@@ -181,9 +181,9 @@
   
                   
                   <div class="c-box--results__footer">
-                      <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                      <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
-                              <p class="text-warning fs-sm mb-3 mb-md-0">
+                              <p class="text-warning fs-sm mb-0 flex-grow-1">
                                   <i aria-hidden="true" class="ri-time-line ri-lg me-1"></i>
                                   En attente de réponse depuis 8 semaines.
                               </p>
@@ -281,10 +281,10 @@
   
                   
                   <div class="c-box--results__footer">
-                      <div class="d-flex justify-content-end">
+                      <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
                           
-                              <a aria-label="Gérer la candidature de J… H…" class="btn btn-outline-primary" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/apply/prescriptions/list">
+                              <a aria-label="Gérer la candidature de J… H…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/apply/prescriptions/list">
                                   Voir sa candidature
                               </a>
                           
@@ -363,9 +363,9 @@
   
                   
                   <div class="c-box--results__footer">
-                      <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                      <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
-                              <p class="text-warning fs-sm mb-3 mb-md-0">
+                              <p class="text-warning fs-sm mb-0 flex-grow-1">
                                   <i aria-hidden="true" class="ri-time-line ri-lg me-1"></i>
                                   En attente de réponse depuis 3 semaines.
                               </p>
@@ -450,9 +450,9 @@
   
                   
                   <div class="c-box--results__footer">
-                      <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                      <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
-                              <p class="text-warning fs-sm mb-3 mb-md-0">
+                              <p class="text-warning fs-sm mb-0 flex-grow-1">
                                   <i aria-hidden="true" class="ri-time-line ri-lg me-1"></i>
                                   En attente de réponse depuis 8 semaines.
                               </p>
@@ -549,13 +549,11 @@
   
                   
                   <div class="c-box--results__footer">
-                      <div class="d-flex justify-content-end">
+                      <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
                           
-                              <span>
-                                  
-                                  <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-outline-primary" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/11111111-1111-1111-1111-111111111111/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
-                              </span>
+                              
+                              <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/11111111-1111-1111-1111-111111111111/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
                           
                       </div>
                   </div>
@@ -631,18 +629,16 @@
   
                   
                   <div class="c-box--results__footer">
-                      <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                      <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
-                              <p class="text-warning fs-sm mb-3 mb-md-0">
+                              <p class="text-warning fs-sm mb-0 flex-grow-1">
                                   <i aria-hidden="true" class="ri-time-line ri-lg me-1"></i>
                                   En attente de réponse depuis 3 semaines.
                               </p>
                           
                           
-                              <span>
-                                  
-                                  <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/22222222-2222-2222-2222-222222222222/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
-                              </span>
+                              
+                              <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/22222222-2222-2222-2222-222222222222/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
                           
                       </div>
                   </div>
@@ -718,18 +714,16 @@
   
                   
                   <div class="c-box--results__footer">
-                      <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                      <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
-                              <p class="text-warning fs-sm mb-3 mb-md-0">
+                              <p class="text-warning fs-sm mb-0 flex-grow-1">
                                   <i aria-hidden="true" class="ri-time-line ri-lg me-1"></i>
                                   En attente de réponse depuis 8 semaines.
                               </p>
                           
                           
-                              <span>
-                                  
-                                  <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/33333333-3333-3333-3333-333333333333/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
-                              </span>
+                              
+                              <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/33333333-3333-3333-3333-333333333333/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
                           
                       </div>
                   </div>
