@@ -67,7 +67,7 @@ def test_not_found(respx_mock):
     job_seeker = JobSeekerFactory(born_in_france=True)
     client = APIParticulierClient(job_seeker=job_seeker)
     response = client.revenu_solidarite_active()
-    assert response["raw_response"] == rsa_not_found_mocker()
+    assert response["raw_response"].startswith(f"404: {rsa_not_found_mocker()}")
     assert response["is_certified"] == ""
     assert response["start_at"] == ""
     assert response["end_at"] == ""
@@ -76,20 +76,21 @@ def test_not_found(respx_mock):
 def test_service_unavailable(settings, respx_mock, mocker, caplog):
     mocker.patch("tenacity.nap.time.sleep")
     reason = "Erreur inconnue du fournisseur de données"
+    json = {
+        "errors": [
+            {
+                "code": "37999",
+                "title": reason,
+                "detail": "La réponse retournée par le fournisseur de données est invalide et inconnue de "
+                "notre service. L'équipe technique a été notifiée de cette erreur pour investigation.",
+                "source": None,
+                "meta": {"provider": "CNAV"},
+            }
+        ]
+    }
     respx_mock.get(RSA_ENDPOINT).respond(
         503,
-        json={
-            "errors": [
-                {
-                    "code": "37999",
-                    "title": reason,
-                    "detail": "La réponse retournée par le fournisseur de données est invalide et inconnue de notre"
-                    "service. L'équipe technique a été notifiée de cette erreur pour investigation.",
-                    "source": "null",
-                    "meta": {"provider": "CNAV"},
-                }
-            ]
-        },
+        json=json,
     )
     job_seeker = JobSeekerFactory(born_in_france=True)
     client = APIParticulierClient(job_seeker=job_seeker)
@@ -97,7 +98,94 @@ def test_service_unavailable(settings, respx_mock, mocker, caplog):
 
     assert reason in caplog.text
     assert RSA_ENDPOINT in caplog.text
-    assert response["raw_response"] == reason
+    assert response["raw_response"].startswith(f"503: {json}")
+    assert response["is_certified"] == ""
+    assert response["start_at"] == ""
+    assert response["end_at"] == ""
+
+
+def test_provider_unknown(settings, respx_mock, mocker, caplog):
+    mocker.patch("tenacity.nap.time.sleep")
+    reason = (
+        "La réponse retournée par le fournisseur de données est invalide et inconnue de notre service. L'équipe "
+        "technique a été notifiée de cette erreur pour investigation."
+    )
+    json = {
+        "error": "provider_unknown_error",
+        "reason": reason,
+        "message": reason,
+    }
+    respx_mock.get(RSA_ENDPOINT).respond(
+        503,
+        json=json,
+    )
+    job_seeker = JobSeekerFactory(born_in_france=True)
+    client = APIParticulierClient(job_seeker=job_seeker)
+    response = client.revenu_solidarite_active()
+
+    assert reason in caplog.text
+    assert RSA_ENDPOINT in caplog.text
+    assert response["raw_response"].startswith(f"503: {json}")
+    assert response["is_certified"] == ""
+    assert response["start_at"] == ""
+    assert response["end_at"] == ""
+
+
+def test_bad_params(settings, respx_mock, mocker, caplog):
+    mocker.patch("tenacity.nap.time.sleep")
+    reason = "Entité non traitable"
+    json = {
+        "errors": [
+            {
+                "code": "00364",
+                "title": reason,
+                "detail": "Le sexe n'est pas correctement formaté (m ou f)",
+                "source": None,
+                "meta": {},
+            }
+        ]
+    }
+    respx_mock.get(RSA_ENDPOINT).respond(
+        400,
+        json=json,
+    )
+    job_seeker = JobSeekerFactory(born_in_france=True)
+    client = APIParticulierClient(job_seeker=job_seeker)
+    response = client.revenu_solidarite_active()
+
+    assert reason in caplog.text
+    assert RSA_ENDPOINT in caplog.text
+    assert response["raw_response"].startswith(f"400: {json}")
+    assert response["is_certified"] == ""
+    assert response["start_at"] == ""
+    assert response["end_at"] == ""
+
+
+def test_forbidden(settings, respx_mock, mocker, caplog):
+    mocker.patch("tenacity.nap.time.sleep")
+    reason = "Accès non autorisé"
+    json = {
+        "errors": [
+            {
+                "code": "50002",
+                "title": reason,
+                "detail": "Le jeton d'accès n'a pas été trouvé ou est expiré.",
+                "source": None,
+                "meta": {},
+            }
+        ]
+    }
+    respx_mock.get(RSA_ENDPOINT).respond(
+        401,
+        json=json,
+    )
+    job_seeker = JobSeekerFactory(born_in_france=True)
+    client = APIParticulierClient(job_seeker=job_seeker)
+    response = client.revenu_solidarite_active()
+
+    assert reason in caplog.text
+    assert RSA_ENDPOINT in caplog.text
+    assert response["raw_response"].startswith(f"401: {json}")
     assert response["is_certified"] == ""
     assert response["start_at"] == ""
     assert response["end_at"] == ""
@@ -106,7 +194,8 @@ def test_service_unavailable(settings, respx_mock, mocker, caplog):
 def test_gateway_timeout(respx_mock, mocker, caplog):
     mocker.patch("tenacity.nap.time.sleep", mocker.MagicMock())
     reason = "The read operation timed out"
-    respx_mock.get(RSA_ENDPOINT).respond(504, json={"error": "null", "reason": reason, "message": "null"})
+    json = {"error": None, "reason": reason, "message": "null"}
+    respx_mock.get(RSA_ENDPOINT).respond(504, json=json)
 
     job_seeker = JobSeekerFactory(born_in_france=True)
     client = APIParticulierClient(job_seeker=job_seeker)
@@ -114,7 +203,25 @@ def test_gateway_timeout(respx_mock, mocker, caplog):
 
     assert reason in caplog.text
     assert RSA_ENDPOINT in caplog.text
-    assert response["raw_response"] == reason
+    assert response["raw_response"].startswith(f"504: {json}")
+    assert response["is_certified"] == ""
+    assert response["start_at"] == ""
+    assert response["end_at"] == ""
+
+
+def test_too_many_requests(respx_mock, mocker, caplog):
+    mocker.patch("tenacity.nap.time.sleep", mocker.MagicMock())
+    reason = "Vous avez effectué trop de requêtes"
+    json = {"errors": ["Vous avez effectué trop de requêtes"]}
+    respx_mock.get(RSA_ENDPOINT).respond(429, json=json)
+
+    job_seeker = JobSeekerFactory(born_in_france=True)
+    client = APIParticulierClient(job_seeker=job_seeker)
+    response = client.revenu_solidarite_active()
+
+    assert reason in caplog.text
+    assert RSA_ENDPOINT in caplog.text
+    assert response["raw_response"].startswith(f"429: {json}")
     assert response["is_certified"] == ""
     assert response["start_at"] == ""
     assert response["end_at"] == ""
