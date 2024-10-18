@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from functools import partial
 
 import pytest
@@ -727,6 +727,12 @@ class TestDashboardView:
 
     @freeze_time("2022-09-15")
     def test_dashboard_access_by_a_jobseeker(self, client):
+        WAITING_PERIOD_WITH_VALID_DIAGNOSIS = (
+            "Un prescripteur habilité a réalisé un diagnostic d'éligibilité. "
+            "<strong>Vous pouvez commencer un nouveau parcours.</strong>"
+        )
+        WAITING_PERIOD_WITHOUT_DIAGNOSIS = "Vous avez terminé un parcours il y a moins de deux ans."
+
         user = JobSeekerFactory(with_address=True)
         approval = ApprovalFactory(user=user, start_at=datetime(2022, 6, 21), end_at=datetime(2022, 12, 6))
         client.force_login(user)
@@ -734,9 +740,33 @@ class TestDashboardView:
         response = client.get(url)
         assertContains(response, "Numéro de PASS IAE")
         assertContains(response, format_approval_number(approval))
-        assertContains(response, "Date de début : 21/06/2022")
-        assertContains(response, "Nombre de jours restants sur le PASS IAE : 83 jours")
-        assertContains(response, "Date de fin prévisionnelle : 06/12/2022")
+        assertContains(response, "<small>Date de début</small><strong>21/06/2022</strong>", html=True)
+        assertContains(response, "<strong>06/12/2022</strong>")  # Date de fin prévisionnelle
+        assertContains(response, '<strong class="text-success">83 jours')  # Durée de validité
+        assertNotContains(response, WAITING_PERIOD_WITHOUT_DIAGNOSIS)
+        assertNotContains(response, WAITING_PERIOD_WITH_VALID_DIAGNOSIS)
+
+        with freeze_time(approval.end_at + timedelta(days=400)):
+            client.force_login(user)
+            # The approval is now in the waiting period
+            # Make sure the diag is expired
+            [diag] = user.eligibility_diagnoses.all()
+            assert not diag.is_valid
+            response = client.get(url)
+            assertContains(response, "Numéro de PASS IAE")
+            assertContains(response, format_approval_number(approval))
+            assertContains(response, WAITING_PERIOD_WITHOUT_DIAGNOSIS)
+            assertNotContains(response, WAITING_PERIOD_WITH_VALID_DIAGNOSIS)
+
+            # Make sure the diag is still valid
+            diag.expires_at = timezone.now() + timedelta(days=1)
+            diag.save(update_fields=("expires_at",))
+            assert diag.is_valid
+            response = client.get(url)
+            assertContains(response, "Numéro de PASS IAE")
+            assertContains(response, format_approval_number(approval))
+            assertNotContains(response, WAITING_PERIOD_WITHOUT_DIAGNOSIS)
+            assertContains(response, WAITING_PERIOD_WITH_VALID_DIAGNOSIS)
 
     @override_settings(TALLY_URL="http://tally.fake")
     def test_prescriber_with_authorization_pending_dashboard_must_contain_tally_link(self, client):
