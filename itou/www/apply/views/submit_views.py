@@ -1763,6 +1763,7 @@ def hire_confirmation(
             "is_subject_to_eligibility_rules": company.is_subject_to_eligibility_rules,
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "eligibility_diagnosis": eligibility_diagnosis,
+            "expired_eligibility_diagnosis": None,  # XXX: should we search for an expired diagnosis here ?
             "is_subject_to_geiq_eligibility_rules": company.kind == CompanyKind.GEIQ,
         },
     )
