@@ -11,6 +11,15 @@ from itou.asp.models import Country
 logger = logging.getLogger("APIParticulierClient")
 
 
+class ShouldRetryException(httpx.HTTPStatusError):
+    """
+    This exception can be used to ask Tenacity to retry
+    while attaching a response and a request to it.
+    """
+
+    pass
+
+
 class APIParticulierClient:
     def __init__(self, job_seeker=None):
         self.client = httpx.Client(
@@ -57,42 +66,52 @@ class APIParticulierClient:
     @tenacity.retry(
         wait=tenacity.wait_fixed(2),
         stop=tenacity.stop_after_attempt(4),
-        retry=tenacity.retry_if_exception_type(httpx.RequestError),
+        retry=tenacity.retry_if_exception_type(ShouldRetryException),
     )
     def _request(self, endpoint, params=None):
         params = self._build_params_from(job_seeker=self.job_seeker)
         response = self.client.get(endpoint, params=params)
-        if response.status_code == 504:
-            reason = response.json().get("reason")
-            logger.error(f"{response.url=} {reason=}")
-            raise httpx.RequestError(message=reason)
-        elif response.status_code == 503:
+        error_message = None
+        # Too Many Requests
+        if response.status_code == 429:
+            errors = response.json().get("errors")
+            if errors:
+                error_message = errors[0]
+            raise ShouldRetryException(message=error_message, request=response.request, response=response)
+        # Bad params.
+        # Same as 503 except we don't retry.
+        elif response.status_code in (400, 401):
             errors = response.json()["errors"]
-            reason = errors[0].get("title")
-            for error in errors:
-                logger.error(f"{response.url=} {error['title']}")
-            raise httpx.RequestError(message=reason)
+            raise httpx.HTTPStatusError(message=error_message, request=response.request, response=response)
+        # Service unavailable
+        elif response.status_code == 503:
+            error_message = response.json().get("error")
+            if error_message:
+                error_message = response.json().get("reason")
+            else:
+                errors = response.json().get("errors")
+                error_message = errors[0].get("title")
+            raise ShouldRetryException(message=error_message, request=response.request, response=response)
+        #  Server error
+        elif response.status_code == 504:
+            error_message = response.json().get("reason")
+            raise ShouldRetryException(message=error_message, request=response.request, response=response)
         else:
             response.raise_for_status()
         return response.json()
 
     def revenu_solidarite_active(self):
-        data = {
-            "start_at": "",
-            "end_at": "",
-            "is_certified": "",
-            "raw_response": "",
-        }
+        data = {"start_at": "", "end_at": "", "is_certified": "", "raw_response": ""}
+        error_message = None
         try:
             data = self._request("/v2/revenu-solidarite-active")
         except httpx.HTTPStatusError as exc:  # not 5XX.
-            logger.info(f"Beneficiary not found. {self.job_seeker.public_id=}")
-            data["raw_response"] = exc.response.json()
-        except tenacity.RetryError as retry_err:  # 503 or 504
+            error_message = f"{exc.response.status_code}: {exc.response.json()} {exc.response.url=}"
+        except tenacity.RetryError as retry_err:  # 429, 503 or 504
             exc = retry_err.last_attempt._exception
-            data["raw_response"] = str(exc)
+            error_message = f"{exc.response.status_code}: {exc.response.json()} {exc.response.url=}"
         except KeyError as exc:
-            data["raw_response"] = str(exc)
+            error_message = f"KeyError: {exc=}"
         else:
             data = {
                 "start_at": self.format_date(data["dateDebut"]),
@@ -101,4 +120,7 @@ class APIParticulierClient:
                 "raw_response": data,
             }
         finally:
+            if error_message:
+                data["raw_response"] = error_message
+                logger.warning(error_message)
             return data
