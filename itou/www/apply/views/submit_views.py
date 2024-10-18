@@ -165,13 +165,15 @@ class ApplicationBaseView(ApplyStepBaseView):
             User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=kwargs["job_seeker_public_id"]
         )
         _check_job_seeker_approval(request, self.job_seeker, self.company)
+        # Prescribers do not see employer diagnosis.
+        for_company = self.company if self.request.user.is_employer else None
         if self.company.kind == CompanyKind.GEIQ:
             self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
-                self.job_seeker, self.company if self.request.user.is_employer else None
+                self.job_seeker, for_company
             ).first()
         elif self.company.is_subject_to_eligibility_rules:
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-                self.job_seeker, for_siae=self.company
+                self.job_seeker, for_company
             )
 
     def get_context_data(self, **kwargs):
