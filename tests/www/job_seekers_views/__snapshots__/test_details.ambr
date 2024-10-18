@@ -1251,7 +1251,8 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "eligibility_geiqeligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_geiqeligibilitydiagnosis"."author_geiq_id" = "companies_company"."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
@@ -1440,7 +1441,8 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "eligibility_eligibilitydiagnosis"
           INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
@@ -1642,7 +1644,8 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "users_user" T3 ON ("job_applications_jobapplication"."sender_id" = T3."id")
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
@@ -3222,7 +3225,8 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "eligibility_geiqeligibilitydiagnosis"
           LEFT OUTER JOIN "companies_company" ON ("eligibility_geiqeligibilitydiagnosis"."author_geiq_id" = "companies_company"."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
@@ -3433,7 +3437,8 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "eligibility_eligibilitydiagnosis"
           INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
@@ -3629,7 +3634,8 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "users_user" T3 ON ("job_applications_jobapplication"."sender_id" = T3."id")
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
