@@ -1038,7 +1038,7 @@ class TestLatestApproval:
         user = JobSeekerFactory()
         assert user.has_no_common_approval
         assert not user.has_valid_approval
-        assert not user.has_common_approval_in_waiting_period
+        assert not user.has_latest_common_approval_in_waiting_period
         assert user.latest_approval is None
 
     def test_status_with_valid_approval(self):
@@ -1046,14 +1046,14 @@ class TestLatestApproval:
         approval = ApprovalFactory(user=user, start_at=timezone.localdate() - relativedelta(days=1))
         assert not user.has_no_common_approval
         assert user.has_valid_approval
-        assert not user.has_common_approval_in_waiting_period
+        assert not user.has_latest_common_approval_in_waiting_period
         assert user.latest_approval == approval
 
     def test_status_approval_in_waiting_period(self):
         user = user_with_approval_in_waiting_period()
         assert not user.has_no_common_approval
         assert not user.has_valid_approval
-        assert user.has_common_approval_in_waiting_period
+        assert user.has_latest_common_approval_in_waiting_period
         assert user.latest_approval == user.latest_approval
 
     def test_status_approval_with_elapsed_waiting_period(self):
@@ -1063,7 +1063,7 @@ class TestLatestApproval:
         ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         assert user.has_no_common_approval
         assert not user.has_valid_approval
-        assert not user.has_common_approval_in_waiting_period
+        assert not user.has_latest_common_approval_in_waiting_period
         assert user.latest_approval is None
 
     def test_status_with_valid_pole_emploi_approval(self):
@@ -1073,7 +1073,7 @@ class TestLatestApproval:
         )
         assert not user.has_no_common_approval
         assert not user.has_valid_approval  # PoleEmploiFactory aren't checked anymore
-        assert not user.has_common_approval_in_waiting_period
+        assert not user.has_latest_common_approval_in_waiting_period
         assert user.latest_approval is None
         assert user.latest_pe_approval == pe_approval
 
@@ -1090,7 +1090,7 @@ class TestLatestApproval:
 
         assert not user.has_no_common_approval
         assert user.has_valid_approval  # PoleEmploiFactory aren't checked anymore
-        assert not user.has_common_approval_in_waiting_period
+        assert not user.has_latest_common_approval_in_waiting_period
         assert user.latest_approval == approval
         assert user.latest_pe_approval == pe_approval
 
