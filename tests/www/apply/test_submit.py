@@ -1376,6 +1376,28 @@ class TestApplyAsAuthorizedPrescriber:
         assert response.status_code == 200
         assertContains(response, "Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
 
+    def test_apply_step_eligibility_does_not_show_employer_diagnosis(self, client):
+        company = CompanyFactory(name="Les petits pains", with_membership=True, subject_to_eligibility=True)
+        job_seeker = JobSeekerFactory()
+        IAEEligibilityDiagnosisFactory(from_employer=True, author_siae=company, job_seeker=job_seeker)
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        prescriber = prescriber_organization.members.get()
+        client.force_login(prescriber)
+        apply_session = SessionNamespace(client.session, f"job_application-{company.pk}")
+        apply_session.init({"selected_jobs": []})
+        apply_session.save()
+        response = client.get(
+            reverse(
+                "apply:application_eligibility",
+                kwargs={
+                    "company_pk": company.pk,
+                    "job_seeker_public_id": str(job_seeker.public_id),
+                },
+            )
+        )
+        assert response.status_code == 200
+        assert response.context["eligibility_diagnosis"] is None
+
 
 class TestApplyAsPrescriber:
     @pytest.fixture(autouse=True)
