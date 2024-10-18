@@ -326,6 +326,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
         "eligibility_diagnosis": eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
+        "expired_eligibility_diagnosis": None,  # XXX: should we search for an expired diagnosis here ?
         "job_application": job_application,
         "transition_logs": transition_logs,
         "back_url": back_url,
