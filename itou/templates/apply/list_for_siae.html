@@ -35,6 +35,27 @@
     {% include "apply/includes/job_applications_filters/offcanvas.html" %}
     <section class="s-section">
         <div class="s-section__container container">
+            <div id="applicant-space-banner" class="alert alert-important alert-dismissible-once d-none my-5" role="status">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                <div class="row">
+                    <div class="d-none d-md-inline col-md-auto">
+                        <img src="{% static_theme_images 'ico-bicro-important.svg' %}" alt="" height="80">
+                    </div>
+                    <div class="col-12 col-md px-md-0">
+                        <p class="mb-2">
+                            <strong>Amélioration de votre gestion des candidatures</strong>
+                        </p>
+                        <p class="mb-0">
+                            Exprimez-vous sur 5 propositions pour nous aider à identifier celles qui simplifieront votre gestion des candidatures. (Temps estimé : 5 minutes)
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                        <a href="https://t.maze.co/291897337" rel="noopener" target="_blank" aria-label="Accéder au test de l'espace mes candidats" class="btn btn-sm btn-ico btn-primary">
+                            <span>Donnez votre avis</span><i class="ri-external-link-line font-weight-medium" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
             {% include "apply/includes/job_applications_filters/top_filters.html" %}
             <div class="s-section__row row">
                 <div class="col-12">
