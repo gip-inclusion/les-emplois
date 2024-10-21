@@ -1,5 +1,6 @@
 {% load matomo %}
 {% load str_filters %}
+{% load url_add_query %}
 
 {% comment %} takes argument siae <Siae>{% endcomment %}
 <div class="c-box c-box--results has-links-inside mb-3 mb-md-4">
@@ -51,7 +52,7 @@
                 </div>
             {% else %}
                 <div>
-                    <a href="{{ siae.get_card_url }}?{% if job_seeker %}job_seeker={{ job_seeker.public_id }}&{% endif %}back_url={{ request.get_full_path|urlencode }}"
+                    <a href="{% url_add_query siae.get_card_url job_seeker=job_seeker.public_id|default:'' back_url=request.get_full_path %}"
                        class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap"
                        {% matomo_event "candidature" "clic" "clic-structure" %}>Voir la fiche de l'entreprise</a>
                 </div>
@@ -77,8 +78,9 @@
             <div class="c-box--results__body">
                 <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
                     <p class="mb-3 mb-md-0">Cette structure vous intéresse ?</p>
+                    {% url 'apply:start' company_pk=siae.pk as apply_url %}
                     <a class="btn btn-ico btn-primary"
-                       href="{% url 'apply:start' company_pk=siae.pk %}{% if job_seeker %}?job_seeker={{ job_seeker.public_id }}{% endif %}"
+                       href="{% url_add_query apply_url job_seeker=job_seeker.public_id|default:'' %}"
                        {% matomo_event "candidature" "clic" "start_application" %}
                        aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
                         <i class="ri ri-draft-line" aria-hidden="true"></i>
@@ -153,8 +155,9 @@
             <div class="c-box--results__footer">
                 <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
                     <p class="mb-3 mb-md-0">Cette structure vous intéresse ?</p>
+                    {% url 'apply:start' company_pk=siae.pk as apply_url %}
                     <a class="btn btn-ico btn-primary"
-                       href="{% url 'apply:start' company_pk=siae.pk %}{% if job_seeker %}?job_seeker={{ job_seeker.public_id }}{% endif %}"
+                       href="{% url_add_query apply_url job_seeker=job_seeker.public_id|default:'' %}"
                        {% matomo_event "candidature" "clic" "start_application" %}
                        aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
                         <i class="ri ri-draft-line" aria-hidden="true"></i>

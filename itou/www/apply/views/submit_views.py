@@ -30,6 +30,7 @@ from itou.users.models import JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.emails import redact_email_address
 from itou.utils.session import SessionNamespace, SessionNamespaceRequiredMixin
+from itou.utils.urls import add_url_params
 from itou.www.apply.forms import (
     ApplicationJobsForm,
     CheckJobSeekerInfoForm,
@@ -73,6 +74,20 @@ def _check_job_seeker_approval(request, job_seeker, siae):
             if request.user == job_seeker:
                 error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_USER
             raise PermissionDenied(error)
+
+
+def _get_job_seeker_to_apply_for(request):
+    job_seeker = None
+
+    if job_seeker_public_id := request.GET.get("job_seeker"):
+        try:
+            job_seeker = User.objects.filter(kind=UserKind.JOB_SEEKER, public_id=job_seeker_public_id).get()
+        except (
+            ValidationError,
+            User.DoesNotExist,
+        ):
+            raise Http404("Aucun candidat n'a été trouvé.")
+    return job_seeker
 
 
 class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
@@ -262,6 +277,18 @@ class StartView(ApplyStepBaseView):
                 pass
             else:
                 self.apply_session.init({"selected_jobs": [job_description.pk]})
+
+        # Go directly to step ApplicationJobsView if we're carrying the job seeker public id with us.
+        if tunnel == "sender" and (job_seeker := _get_job_seeker_to_apply_for(self.request)):
+            return HttpResponseRedirect(
+                add_url_params(
+                    reverse(
+                        "apply:application_jobs",
+                        kwargs={"company_pk": self.company.pk, "job_seeker_public_id": job_seeker.public_id},
+                    ),
+                    {"job_description_id": job_description_id},
+                )
+            )
 
         # Warn message if prescriber's authorization is pending
         if (
@@ -922,7 +949,6 @@ class ApplicationJobsView(ApplicationBaseView):
 
     def __init__(self):
         super().__init__()
-
         self.form = None
 
     def get_initial(self):
@@ -1776,29 +1802,38 @@ def hire_confirmation(
 
 
 class ApplyForJobSeekerMixin:
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Create an empty variable to avoid unknown variable template errors in tests
-        context["job_seeker"] = None
-        if job_seeker_public_id := self.request.GET.get("job_seeker"):
-            try:
-                job_seeker = (
-                    User.objects.filter(kind=UserKind.JOB_SEEKER, public_id=job_seeker_public_id)
-                    .select_related("jobseeker_profile")
-                    .first()
-                )
-            except ValidationError:
-                return context
-            if (
-                self.request.user.is_authenticated
-                and job_seeker
-                and self.request.user.can_view_personal_information(job_seeker)
-            ):
-                context["job_seeker"] = job_seeker
-            return context
+    def __init__(self):
+        super().__init__()
+        self.job_seeker = None
+        self.exit_url = None
+        self.can_view_personal_information = False
 
-        else:
-            return context
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.job_seeker = None
+        self.exit_url = reverse("home:hp")
+        self.can_view_personal_information = False
+
+        if request.user.is_authenticated and request.user.kind in (
+            UserKind.PRESCRIBER,
+            UserKind.EMPLOYER,
+        ):
+            if request.user.is_prescriber:
+                self.exit_url = reverse("job_seekers_views:list")
+            elif request.user.is_employer:
+                self.exit_url = reverse("apply:list_prescriptions")
+
+            self.job_seeker = _get_job_seeker_to_apply_for(request)
+            if self.job_seeker:
+                self.can_view_personal_information = request.user.can_view_personal_information(self.job_seeker)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "job_seeker": self.job_seeker,
+            "exit_url": self.exit_url,
+            "can_view_personal_information": self.can_view_personal_information,
+        }
 
     def get_job_seeker_query_string(self):
         return {"job_seeker": self.request.GET.get("job_seeker")} if self.request.GET.get("job_seeker", None) else {}
