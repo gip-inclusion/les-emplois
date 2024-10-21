@@ -4,13 +4,13 @@ import httpx
 import pytest
 import respx
 from django.conf import settings
-from django.contrib import auth
+from django.contrib import auth, messages
 from django.core.exceptions import ValidationError
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
 from itou.external_data.apis import pe_connect
 from itou.external_data.models import ExternalDataImport
@@ -268,6 +268,18 @@ class TestPoleEmploiConnect:
             user = UserFactory(username=peamu_user_data.username, email=peamu_user_data.email, kind=kind)
             mock_oauth_dance(client, expected_route=f"login:{kind}")
             user.delete()
+
+    @respx.mock
+    def test_callback_redirect_on_email_in_use_exception(self, client, snapshot):
+        # EmailInUseException raised by the email conflict
+        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+        JobSeekerFactory(
+            email=peamu_user_data.email, identity_provider=IdentityProvider.FRANCE_CONNECT, for_snapshot=True
+        )
+
+        # Test redirection and modal content
+        response = mock_oauth_dance(client, expected_route="signup:choose_user_kind")
+        assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
 
     def test_logout_no_id_token(self, client):
         url = reverse("pe_connect:logout")

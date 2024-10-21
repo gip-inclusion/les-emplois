@@ -14,12 +14,13 @@ from django.utils.html import format_html
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, UserKind
+from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.constants import ITOU_HELP_CENTER_URL
 from itou.utils.urls import add_url_params, get_absolute_url
 
+from ..errors import redirect_with_error_sso_email_conflict_on_registration
 from ..models import EmailInUseException, InvalidKindException, MultipleUsersFoundException
 from . import constants
 from .enums import ProConnectChannel
@@ -238,26 +239,9 @@ def pro_connect_callback(request):
         _add_user_kind_error_message(request, existing_user, user_kind)
         is_successful = False
     except EmailInUseException as e:
-        redacted_name = e.user.get_redacted_full_name()
-        msg_who = (
-            format_html(
-                " au nom de <strong>{}</strong>",
-                redacted_name,
-            )
-            if redacted_name
-            else ""
+        return redirect_with_error_sso_email_conflict_on_registration(
+            request, e.user, IdentityProvider.PRO_CONNECT.label
         )
-
-        error = format_html(
-            "Vous avez essayé de vous connecter avec un compte ProConnect, mais un compte"
-            "{} a déjà été créé avec cette adresse e-mail. "
-            "Veuillez vous rapprocher du support pour débloquer la situation en suivant "
-            "<a href='{}'>ce lien</a>.",
-            msg_who,
-            global_constants.ITOU_HELP_CENTER_URL,
-        )
-        messages.error(request, error)
-        is_successful = False
     except MultipleUsersFoundException as e:
         # Here we have a user trying to update his email, but with an already existing email
         # let him login, but display a message because we didn't update his email
