@@ -5,6 +5,7 @@ Arguments:
 
     approval
     detail_view_version (defaults to False)
+    job_seeker_help_text (defaults to "")
     link_from_current_url (defauts to None - hence no link to detail view)
 
 {% endcomment %}
@@ -13,12 +14,12 @@ Arguments:
     <div class="mb-3 mb-md-4">
         <span class="badge badge-base rounded-pill {% if approval.state == 'EXPIRED' %}bg-danger{% elif approval.state == 'SUSPENDED' %}bg-info{% else %}bg-success{% endif %} text-white">
             <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %}" aria-hidden="true"></i>
-            PASS IAE {{ approval.get_state_display.lower }}
+            {{ approval.is_pass_iae|yesno:"PASS IAE,Agrément" }} {{ approval.get_state_display.lower }}
         </span>
     </div>
     <ul class="list-data{% if detail_view_version|default:False %} list-data__two-column-lg{% endif %}">
         <li class="order-1">
-            <small>Numéro de PASS IAE</small>
+            <small>Numéro {{ approval.is_pass_iae|yesno:"de PASS IAE,d’agrément" }}</small>
             <strong>{{ approval.number|format_approval_number }}</strong>
         </li>
         {% if approval.state == "EXPIRED" %}
@@ -48,7 +49,8 @@ Arguments:
             <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
         {% endif %}
     {% else %}
-        {% if approval.state == "VALID" %}
+        {# PoleEmploiApprovals have no prolongation, no suspension and no detail page #}
+        {% if approval.is_pass_iae and approval.state == "VALID" %}
             {% with approval.pending_prolongation_request as pending_prolongation_request %}
                 {% if pending_prolongation_request %}
                     <hr class="my-3 my-md-4">
@@ -62,7 +64,7 @@ Arguments:
                     </ul>
                 {% endif %}
             {% endwith %}
-        {% elif approval.state == "SUSPENDED" %}
+        {% elif approval.is_pass_iae and approval.state == "SUSPENDED" %}
             {% with approval.ongoing_suspension as suspension %}
                 {% if suspension %}
                     <hr class="my-3 my-md-4">
@@ -75,7 +77,21 @@ Arguments:
                 {% endif %}
             {% endwith %}
         {% endif %}
-        {% if link_from_current_url|default:None %}
+
+        {% if job_seeker_help_text|default:"" == "waiting_period_with_valid_diagnosis" %}
+            <hr class="my-3 my-md-4">
+            <p class="fs-sm mb-0">
+                Un prescripteur habilité a réalisé un diagnostic d'éligibilité. <strong>Vous pouvez commencer un nouveau parcours.</strong>
+            </p>
+        {% elif job_seeker_help_text|default:"" == "waiting_period_without_diagnosis" %}
+            <hr class="my-3 my-md-4">
+            <p class="fs-sm mb-0">Vous avez terminé un parcours il y a moins de deux ans.</p>
+            <p class="fs-sm my-0">
+                Pour prétendre à nouveau à un parcours en structure d'insertion par l'activité économique vous devez rencontrer un prescripteur
+                habilité : France Travail, Mission Locale, Cap emploi, etc.
+            </p>
+        {% endif %}
+        {% if approval.is_pass_iae and link_from_current_url|default:None %}
             <a href="{% url 'approvals:details' pk=approval.pk %}?back_url={{ link_from_current_url|urlencode }}" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
                 <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
                 <span>Afficher le PASS IAE</span>
