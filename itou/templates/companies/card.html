@@ -6,6 +6,13 @@
 
 {% block title %}{{ siae.display_name }} {{ block.super }}{% endblock %}
 
+{% block global_messages %}
+    {{ block.super }}
+    {% if job_seeker %}
+        {% include "apply/includes/applying_for_banner.html" with job_seeker=job_seeker %}
+    {% endif %}
+{% endblock %}
+
 {% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
@@ -32,7 +39,7 @@
                     </div>
                 {% else %}
                     <div class="form-group col-12 col-lg-auto">
-                        <a href="{% url 'apply:start' company_pk=siae.pk %}"
+                        <a href="{% url 'apply:start' company_pk=siae.pk %}{% if job_seeker %}?job_seeker={{ job_seeker.public_id }}{% endif %}"
                            class="btn btn-lg btn-white btn-block btn-ico"
                            {% matomo_event "candidature" "clic" "start_application" %}
                            aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
@@ -192,7 +199,7 @@
                             {% else %}
                                 <div class="d-flex justify-content-end mt-3">
                                     <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
-                                       href="{% url 'apply:start' company_pk=siae.pk %}"
+                                       href="{% url 'apply:start' company_pk=siae.pk %}{% if job_seeker %}?job_seeker={{ job_seeker.public_id }}{% endif %}"
                                        {% matomo_event "candidature" "clic" "start_application" %}
                                        aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
                                         <i class="ri-draft-line"></i>

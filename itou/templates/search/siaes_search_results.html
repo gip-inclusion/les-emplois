@@ -7,11 +7,20 @@
     {{ block.super }}
 {% endblock %}
 
+{% block global_messages %}
+    {{ block.super }}
+    {% if job_seeker %}
+        {% include "apply/includes/applying_for_banner.html" with job_seeker=job_seeker %}
+    {% endif %}
+{% endblock %}
+
+
 {% block title_content %}<h1>Rechercher un emploi inclusif</h1>{% endblock %}
 
 {% block title_extra %}
     <form class="mt-md-4">
         {% include "search/includes/siaes_search_form.html" with form=form is_home=False only %}
+        {% if job_seeker %}<input type="hidden" name="job_seeker" value="{{ job_seeker.public_id }}">{% endif %}
     </form>
     {% include "search/includes/siaes_search_tabs.html" %}
 {% endblock %}

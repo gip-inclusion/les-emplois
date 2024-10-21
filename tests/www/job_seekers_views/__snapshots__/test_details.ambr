@@ -17,7 +17,13 @@
   
   
                               
-      <h1>Candidat : Jane DOE</h1>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <h1 class="mb-0">Candidat : Jane DOE</h1>
+          <a class="btn btn-lg btn-primary btn-ico" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a">
+              <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+              <span>Postuler pour ce candidat</span>
+          </a>
+      </div>
   
                               
                                   
@@ -246,7 +252,13 @@
   
   
                               
-      <h1>Candidat : Jane DOE</h1>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <h1 class="mb-0">Candidat : Jane DOE</h1>
+          <a class="btn btn-lg btn-primary btn-ico" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a">
+              <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+              <span>Postuler pour ce candidat</span>
+          </a>
+      </div>
   
                               
                                   
@@ -453,7 +465,13 @@
   
   
                               
-      <h1>Candidat : Jane DOE</h1>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <h1 class="mb-0">Candidat : Jane DOE</h1>
+          <a class="btn btn-lg btn-primary btn-ico" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a">
+              <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+              <span>Postuler pour ce candidat</span>
+          </a>
+      </div>
   
                               
                                   
@@ -620,7 +638,13 @@
   
   
                               
-      <h1>Candidat : Jane DOE</h1>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <h1 class="mb-0">Candidat : Jane DOE</h1>
+          <a class="btn btn-lg btn-primary btn-ico" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a">
+              <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+              <span>Postuler pour ce candidat</span>
+          </a>
+      </div>
   
                               
                                   
@@ -1744,7 +1768,13 @@
   
   
                               
-      <h1>Candidat : Jane DOE</h1>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <h1 class="mb-0">Candidat : Jane DOE</h1>
+          <a class="btn btn-lg btn-primary btn-ico" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a">
+              <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+              <span>Postuler pour ce candidat</span>
+          </a>
+      </div>
   
                               
                                   
@@ -1975,7 +2005,13 @@
   
   
                               
-      <h1>Candidat : Jane DOE</h1>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <h1 class="mb-0">Candidat : Jane DOE</h1>
+          <a class="btn btn-lg btn-primary btn-ico" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a">
+              <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+              <span>Postuler pour ce candidat</span>
+          </a>
+      </div>
   
                               
                                   
@@ -2186,7 +2222,13 @@
   
   
                               
-      <h1>Candidat : Jane DOE</h1>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <h1 class="mb-0">Candidat : Jane DOE</h1>
+          <a class="btn btn-lg btn-primary btn-ico" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a">
+              <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+              <span>Postuler pour ce candidat</span>
+          </a>
+      </div>
   
                               
                                   
@@ -2353,7 +2395,13 @@
   
   
                               
-      <h1>Candidat : Jane DOE</h1>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <h1 class="mb-0">Candidat : Jane DOE</h1>
+          <a class="btn btn-lg btn-primary btn-ico" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a">
+              <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+              <span>Postuler pour ce candidat</span>
+          </a>
+      </div>
   
                               
                                   
@@ -2562,7 +2610,13 @@
   
   
                               
-      <h1>Candidat : Jane DOE</h1>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <h1 class="mb-0">Candidat : Jane DOE</h1>
+          <a class="btn btn-lg btn-primary btn-ico" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a">
+              <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+              <span>Postuler pour ce candidat</span>
+          </a>
+      </div>
   
                               
                                   
@@ -2729,7 +2783,13 @@
   
   
                               
-      <h1>Candidat : Jane DOE</h1>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <h1 class="mb-0">Candidat : Jane DOE</h1>
+          <a class="btn btn-lg btn-primary btn-ico" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a">
+              <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+              <span>Postuler pour ce candidat</span>
+          </a>
+      </div>
   
                               
                                   

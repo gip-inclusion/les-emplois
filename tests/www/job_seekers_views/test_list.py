@@ -74,6 +74,19 @@ def test_multiple(client, snapshot):
     with assertSnapshotQueries(snapshot(name="job seekers list SQL")):
         response = client.get(url)
         assert str(parse_response_to_soup(response, selector="tbody")) == snapshot(name="job seekers list tbody")
+        for public_id in (
+            "11111111-1111-1111-1111-111111111111",
+            "22222222-2222-2222-2222-222222222222",
+            "33333333-3333-3333-3333-333333333333",
+        ):
+            assertContains(
+                response,
+                (
+                    '<a class="btn btn-sm btn-link btn-ico-only" '
+                    'aria-label="Postuler pour ce candidat" '
+                    f'href="{reverse("search:employers_results")}?job_seeker={public_id}">'
+                ),
+            )
 
 
 def test_htmx_job_seeker_filter(client):

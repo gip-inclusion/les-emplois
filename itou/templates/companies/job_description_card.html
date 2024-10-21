@@ -6,6 +6,14 @@
 
 {% block title %}{{ job.display_name }} - {{ siae.display_name }} {{ block.super }}{% endblock %}
 
+{% block global_messages %}
+    {{ block.super }}
+    {% if job_seeker %}
+        {% include "apply/includes/applying_for_banner.html" with job_seeker=job_seeker %}
+    {% endif %}
+{% endblock %}
+
+
 {% block nb_columns %}8{% endblock %}
 
 {% block title_prevstep %}
@@ -57,7 +65,7 @@
                         </div>
                     {% else %}
                         <div class="form-group col-12 col-lg-auto">
-                            <a href="{% url "apply:start" company_pk=siae.pk %}?job_description_id={{ job.pk }}"
+                            <a href="{% url "apply:start" company_pk=siae.pk %}?job_description_id={{ job.pk }}{% if job_seeker %}&job_seeker={{ job_seeker.public_id }}{% endif %}"
                                class="btn btn-lg btn-white btn-block btn-ico"
                                {% matomo_event "candidature" "clic" "start_application" %}
                                aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
@@ -106,7 +114,7 @@
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2 d-flex flex-column">
                     {% if can_update_job_description != True %}
-                        {% include "companies/includes/_company_info.html" with company=siae extra_box_class="" back_url=back_url|default:request.get_full_path show=True job_app_to_transfer=job_app_to_transfer only %}
+                        {% include "companies/includes/_company_info.html" with company=siae extra_box_class="" back_url=back_url|default:request.get_full_path show=True job_app_to_transfer=job_app_to_transfer job_seeker=job_seeker|default:None only %}
                     {% endif %}
                 </div>
             </div>
