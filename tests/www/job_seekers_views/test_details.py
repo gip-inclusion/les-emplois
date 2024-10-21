@@ -4,7 +4,7 @@ import uuid
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
 from tests.approvals.factories import ApprovalFactory
@@ -231,3 +231,86 @@ def test_job_application_tab(client, snapshot):
         ],
     )
     assert str(soup) == snapshot
+
+
+@freeze_time("2024-08-14")
+def test_apply_for_button_as_authorized_prescriber(client):
+    authorized_prescriber = PrescriberMembershipFactory(organization__authorized=True).user
+
+    job_application = JobApplicationFactory(
+        sender=authorized_prescriber,
+        job_seeker_with_address=True,
+        created_at=timezone.now() + datetime.timedelta(seconds=10),  # Most recent, stabilize ordering.
+    )
+    job_application_without_address = JobApplicationFactory(
+        sender=authorized_prescriber,
+        created_at=timezone.now() + datetime.timedelta(seconds=10),  # Most recent, stabilize ordering.
+    )
+    client.force_login(authorized_prescriber)
+    url = reverse("job_seekers_views:details", kwargs={"public_id": job_application.job_seeker.public_id})
+
+    response = client.get(url)
+    assertContains(
+        response,
+        (
+            f'<a href="{reverse("search:employers_results")}'
+            f'?job_seeker={job_application.job_seeker.public_id}&city={job_application.job_seeker.city_slug}"'
+            'data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"'
+            'data-matomo-option="postuler-pour-ce-candidat" class="btn btn-lg btn-primary btn-ico">'
+            '<i class="ri-draft-line fw-medium" aria-hidden="true"></i>'
+            "<span>Postuler pour ce candidat</span>"
+            "</a>"
+        ),
+        html=True,
+    )
+
+    # No address
+    url = reverse(
+        "job_seekers_views:details", kwargs={"public_id": job_application_without_address.job_seeker.public_id}
+    )
+    response = client.get(url)
+    assertContains(
+        response,
+        (
+            f'<a href="{reverse("search:employers_results")}'
+            f'?job_seeker={job_application_without_address.job_seeker.public_id}" '
+            'data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"'
+            'data-matomo-option="postuler-pour-ce-candidat" class="btn btn-lg btn-primary btn-ico">'
+            '<i class="ri-draft-line fw-medium" aria-hidden="true"></i>'
+            "<span>Postuler pour ce candidat</span>"
+            "</a>"
+        ),
+        html=True,
+    )
+
+
+@freeze_time("2024-08-14")
+def test_apply_for_button_as_unauthorized_prescriber(client):
+    unauthorized_prescriber = PrescriberMembershipFactory(organization__authorized=False).user
+
+    job_application = JobApplicationFactory(
+        sender=unauthorized_prescriber,
+        job_seeker_with_address=True,
+        created_at=timezone.now() + datetime.timedelta(seconds=10),  # Most recent, stabilize ordering.
+    )
+    client.force_login(unauthorized_prescriber)
+    url = reverse("job_seekers_views:details", kwargs={"public_id": job_application.job_seeker.public_id})
+
+    # User cannot view personal information
+    url = reverse("job_seekers_views:details", kwargs={"public_id": job_application.job_seeker.public_id})
+    client.force_login(unauthorized_prescriber)
+
+    response = client.get(url)
+    assertContains(
+        response,
+        (
+            f'<a href="{reverse("search:employers_results")}'
+            f'?job_seeker={job_application.job_seeker.public_id}"'
+            'data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"'
+            'data-matomo-option="postuler-pour-ce-candidat" class="btn btn-lg btn-primary btn-ico">'
+            '<i class="ri-draft-line fw-medium" aria-hidden="true"></i>'
+            "<span>Postuler pour ce candidat</span>"
+            "</a>"
+        ),
+        html=True,
+    )

@@ -231,6 +231,8 @@ class AddressMixin(models.Model):
     @property
     def city_slug(self):
         """For cities.city matching / search"""
+        if not self.city or not self.department:
+            return ""
         return slugify(f"{self.city}-{self.department}")
 
     @cached_property
