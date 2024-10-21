@@ -14,6 +14,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.pagination import pager
 from itou.utils.urls import add_url_params
+from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
 from itou.www.search.forms import JobDescriptionSearchForm, PrescriberSearchForm, SiaeSearchForm
 
 
@@ -29,13 +30,17 @@ def employer_search_home(request, template_name="search/siaes_search_home.html")
     return render(request, template_name, context)
 
 
-class EmployerSearchBaseView(FormView):
+class EmployerSearchBaseView(ApplyForJobSeekerMixin, FormView):
     form_class = SiaeSearchForm
     initial = {"distance": SiaeSearchForm.DISTANCE_DEFAULT}
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["data"] = self.request.GET or None
+        # An extra GET parameter is used: job_seeker.
+        # It is not part of the form so we pop it.
+        params_get = self.request.GET.copy()
+        params_get.pop("job_seeker", None)
+        kwargs["data"] = params_get or None
         return kwargs
 
     def get(self, request, *args, **kwargs):
@@ -47,10 +52,9 @@ class EmployerSearchBaseView(FormView):
         context = {
             "back_url": reverse("search:employers_home"),
             "clear_filters_url": add_url_params(
-                self.request.path,
-                {"city": kwargs["form"].data.get("city")},
+                self.request.path, {"city": kwargs["form"].data.get("city")} | self.get_job_seeker_query_string()
             ),
-            "filters_query_string": "",
+            "filters_query_string": urlencode(self.get_job_seeker_query_string()),
             "job_descriptions_count": 0,
             "siaes_count": 0,
             "results_page": [],
@@ -155,7 +159,8 @@ class EmployerSearchBaseView(FormView):
                     "contract_types": contract_types,
                     "departments": departments,
                     "domains": domains,
-                },
+                }
+                | self.get_job_seeker_query_string(),
                 doseq=True,
             ),
             "results_page": results_and_counts.results_page,

@@ -26,6 +26,7 @@ from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
+from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
 from itou.www.companies_views import forms as companies_forms
 
 
@@ -108,7 +109,7 @@ def report_tally_url(user, company, job_description=None):
 ### Job description views
 
 
-class JobDescriptionCardView(TemplateView):
+class JobDescriptionCardView(ApplyForJobSeekerMixin, TemplateView):
     template_name = "companies/job_description_card.html"
 
     def setup(self, request, job_description_id, *args, **kwargs):
@@ -441,7 +442,7 @@ def select_financial_annex(request, template_name="companies/select_financial_an
 ### Company CRUD views
 
 
-class CompanyCardView(TemplateView):
+class CompanyCardView(ApplyForJobSeekerMixin, TemplateView):
     template_name = "companies/card.html"
 
     def setup(self, request, siae_id, *args, **kwargs):

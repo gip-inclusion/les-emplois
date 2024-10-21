@@ -19,6 +19,7 @@
                         <th scope="col">Statut du PASS IAE</th>
                         <th scope="col">Nombre de candidatures</th>
                         <th scope="col">Dernière mise à jour de candidature</th>
+                        <th scope="col" class="text-end w-50px"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,6 +33,11 @@
                             </td>
                             <td>{{ job_seeker.job_applications_nb }}</td>
                             <td>{{ job_seeker.last_updated_at|date:"d/m/Y" }}</td>
+                            <td class="text-end w-50px">
+                                <a class="btn btn-sm btn-link btn-ico-only" aria-label="Postuler pour ce candidat" href="{% url "search:employers_results" %}?job_seeker={{ job_seeker.public_id }}">
+                                    <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip" title="Postuler"></i>
+                                </a>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

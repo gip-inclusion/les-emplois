@@ -1,4 +1,5 @@
 {% load matomo %}
+{% load url_add_query %}
 
 <li class="list-group-item list-group-item-action">
     <div>
@@ -6,9 +7,12 @@
             <a href="{% if job.pk %}{% url 'apply:job_application_external_transfer_step_1_job_description_card' job_application_id=job_app_to_transfer.pk job_description_id=job.pk %}{% else %}#{% endif %}?back_url={{ request.get_full_path|urlencode }}"
                class="fw-bold text-decoration-none stretched-link">{{ job.display_name }}</a>
         {% else %}
-            <a href="{% if job.pk %}{{ job.get_absolute_url }}{% else %}#{% endif %}?back_url={{ request.get_full_path|urlencode }}"
-               class="fw-bold text-decoration-none stretched-link"
-               {% matomo_event "candidature" "clic" "clic-metiers" %}>{{ job.display_name }}</a>
+            {% if job.pk %}
+                {% url_add_query job.get_absolute_url job_seeker=job_seeker.public_id|default:'' back_url=request.get_full_path as job_url %}
+            {% else %}
+                {% url_add_query "#" job_seeker=job_seeker.public_id|default:'' back_url=request.get_full_path as job_url %}
+            {% endif %}
+            <a href="{{ job_url }}" class="fw-bold text-decoration-none stretched-link" {% matomo_event "candidature" "clic" "clic-metiers" %}>{{ job.display_name }}</a>
         {% endif %}
         {% if job.is_popular %}
             <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">

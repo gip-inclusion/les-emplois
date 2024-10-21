@@ -1773,3 +1773,32 @@ def hire_confirmation(
             "is_subject_to_geiq_eligibility_rules": company.kind == CompanyKind.GEIQ,
         },
     )
+
+
+class ApplyForJobSeekerMixin:
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Create an empty variable to avoid unknown variable template errors in tests
+        context["job_seeker"] = None
+        if job_seeker_public_id := self.request.GET.get("job_seeker"):
+            try:
+                job_seeker = (
+                    User.objects.filter(kind=UserKind.JOB_SEEKER, public_id=job_seeker_public_id)
+                    .select_related("jobseeker_profile")
+                    .first()
+                )
+            except ValidationError:
+                return context
+            if (
+                self.request.user.is_authenticated
+                and job_seeker
+                and self.request.user.can_view_personal_information(job_seeker)
+            ):
+                context["job_seeker"] = job_seeker
+            return context
+
+        else:
+            return context
+
+    def get_job_seeker_query_string(self):
+        return {"job_seeker": self.request.GET.get("job_seeker")} if self.request.GET.get("job_seeker", None) else {}

@@ -16,6 +16,7 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, 
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
+from tests.users.factories import PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
@@ -395,6 +396,70 @@ class TestSearchCompany:
         )
         assertContains(response, searchable_company.display_name)
         assertNotContains(response, unsearchable_company.display_name)
+
+    def test_results_links_from_job_seeker_list(self, client):
+        """
+        When applying from "Mes candidats"
+        """
+        job_application = JobApplicationFactory(
+            job_seeker__first_name="Alain",
+            job_seeker__last_name="Zorro",
+            job_seeker__public_id="11111111-2222-3333-4444-555566667777",
+        )
+        job_seeker_public_id = job_application.job_seeker.public_id
+        prescriber = PrescriberFactory(membership__organization__authorized=True)
+
+        create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)
+        guerande = create_city_guerande()
+        COMPANY_GUERANDE = "Entreprise Guérande"
+        guerande_company = CompanyFactory(
+            name=COMPANY_GUERANDE,
+            department="44",
+            coords=guerande.coords,
+            post_code="44350",
+            kind=CompanyKind.AI,
+            with_membership=True,
+        )
+
+        job_description = JobDescriptionFactory(company=guerande_company, location=guerande)
+        client.force_login(prescriber)
+
+        response = client.get(
+            self.URL, {"city": guerande.slug, "distance": 100, "job_seeker": job_application.job_seeker.public_id}
+        )
+        assertContains(response, f"Vous postulez actuellement pour {job_application.job_seeker.get_full_name()}")
+
+        # Has link to company card with job_seeker public_id
+        company_url_with_job_seeker_id = (
+            f"{guerande_company.get_card_url()}?job_seeker={job_seeker_public_id}"
+            f"&back_url={urlencode_filter(response.wsgi_request.get_full_path())}"
+        )
+        assertContains(
+            response,
+            company_url_with_job_seeker_id,
+        )
+
+        # Has link to job description with job_seeker public_id
+        job_description_url_with_job_seeker_id = (
+            f"{job_description.get_absolute_url()}?job_seeker={job_seeker_public_id}"
+            f"&amp;back_url={quote(response.wsgi_request.get_full_path())}"
+        )
+        assertContains(response, job_description_url_with_job_seeker_id)
+
+        # Has link to apply to company with job_seeker public_id
+        apply_url_with_job_seeker_id = (
+            f"{reverse('apply:start', kwargs={'company_pk':guerande_company.pk})}?job_seeker={job_seeker_public_id}"
+        )
+        assertContains(response, apply_url_with_job_seeker_id)
+
+        # Has button to reset filters with job_seeker public_id
+        reset_button = (
+            f'<a href="{reverse("search:employers_results")}?city={guerande.slug}&job_seeker={job_seeker_public_id}" '
+            'class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser les filtres actifs">'
+            '<i class="ri-eraser-line fw-bold" aria-hidden="true"></i>'
+            '<span>Effacer tout</span></a>'
+        )
+        assertContains(response, reset_button, html=True)
 
 
 class TestSearchPrescriber:
@@ -1134,37 +1199,3 @@ class TestJobDescriptionSearchView:
         response = client.get(self.URL, {"city": guerande.slug, "distance": 100})
         fresh_page = parse_response_to_soup(response)
         assertSoupEqual(simulated_page, fresh_page)
-
-    def test_is_searchable(self, client):
-        city = create_city_saint_andre()
-        searchable_company = CompanyFactory(
-            department="44", coords=city.coords, post_code="44117", with_jobs=True, romes=["N1101"]
-        )
-        unsearchable_company = CompanyFactory(
-            department="44",
-            coords=city.coords,
-            post_code="44117",
-            with_jobs=True,
-            romes=["N1105", "N1103"],
-            is_searchable=False,
-        )
-
-        # A searchable company (default) should appear in the results
-        response = client.get(self.URL, {"city": city.slug})
-        assertContains(
-            response,
-            '<span>Employeur</span><span class="badge badge-sm rounded-pill ms-2">1</span>',
-            html=True,
-            count=1,
-        )
-        assertContains(
-            response,
-            """
-                <span>Poste <span class="d-none d-md-inline">ouvert au recrutement</span></span>
-                <span class="badge badge-sm rounded-pill ms-2">1</span>
-            """,
-            html=True,
-            count=1,
-        )
-        assertContains(response, searchable_company.display_name)
-        assertNotContains(response, unsearchable_company.display_name)
