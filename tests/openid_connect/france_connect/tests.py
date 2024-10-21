@@ -3,12 +3,12 @@ import datetime
 import httpx
 import pytest
 import respx
-from django.contrib import auth
+from django.contrib import auth, messages
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.openid_connect.france_connect import constants
@@ -263,6 +263,16 @@ class TestFranceConnect:
             user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, kind=kind)
             mock_oauth_dance(client, expected_route=f"login:{kind}")
             user.delete()
+
+    @respx.mock
+    def test_callback_redirect_on_email_in_use_exception(self, client, snapshot):
+        # EmailInUseException raised by the email conflict
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
+        JobSeekerFactory(email=fc_user_data.email, identity_provider=IdentityProvider.PE_CONNECT, for_snapshot=True)
+
+        # Test redirection and modal content
+        response = mock_oauth_dance(client, expected_route="signup:choose_user_kind")
+        assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
 
     def test_logout_no_id_token(self, client):
         url = reverse("france_connect:logout")

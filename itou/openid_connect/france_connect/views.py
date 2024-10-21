@@ -8,13 +8,13 @@ from django.contrib.auth import login
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.utils import crypto
-from django.utils.html import format_html
 from django.utils.http import urlencode
 
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.urls import get_absolute_url
 
+from ..errors import redirect_with_error_sso_email_conflict_on_registration
 from ..models import EmailInUseException, InvalidKindException, MultipleUsersFoundException
 from . import constants
 from .models import FranceConnectState, FranceConnectUserData
@@ -121,26 +121,8 @@ def france_connect_callback(request):
         messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
         return HttpResponseRedirect(UserKind.get_login_url(e.user.kind))
     except EmailInUseException as e:
-        redacted_name = e.user.get_redacted_full_name()
-        msg_who = (
-            format_html(
-                " au nom de <strong>{}</strong>",
-                redacted_name,
-            )
-            if redacted_name
-            else ""
-        )
-
-        return _redirect_to_job_seeker_login_on_error(
-            format_html(
-                "Vous avez essayé de vous connecter avec un compte France Connect, mais un compte"
-                "{} a déjà été créé avec cette adresse e-mail. Vous pouvez néanmoins"
-                " vous inscrire en utilisant une autre adresse e-mail et un mot de passe"
-                ' en cliquant sur <strong>"Inscription"</strong>.',
-                msg_who,
-            ),
-            request=request,
-            extra_tags="modal sso_email_conflict_registration_failure",
+        return redirect_with_error_sso_email_conflict_on_registration(
+            request, e.user, IdentityProvider.FRANCE_CONNECT.label
         )
     except MultipleUsersFoundException as e:
         return _redirect_to_job_seeker_login_on_error(

@@ -499,6 +499,18 @@ class TestProConnectCallbackView:
             user.delete()
 
     @respx.mock
+    def test_callback_redirect_on_email_in_use_exception(self, client, snapshot):
+        # EmailInUseException raised by the email conflict
+        oidc_user_data = ProConnectPrescriberData.from_user_info(OIDC_USERINFO)
+        PrescriberFactory(
+            email=oidc_user_data.email, identity_provider=IdentityProvider.PRO_CONNECT, for_snapshot=True
+        )
+
+        # Test redirection and modal content
+        response = mock_oauth_dance(client, UserKind.PRESCRIBER, next_url=reverse("signup:choose_user_kind"))
+        assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
+
+    @respx.mock
     def test_callback_updating_email_collision(self, client):
         PrescriberFactory(
             first_name="Bernard",
