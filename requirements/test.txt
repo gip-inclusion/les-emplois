@@ -62,9 +62,9 @@ bleach[css]==6.1.0 \
     # via
     #   -r requirements/base.txt
     #   django-markdownify
-boto3==1.35.34 \
-    --hash=sha256:291e7b97a34967ed93297e6171f1bebb8529e64633dd48426760e3fdef1cdea8 \
-    --hash=sha256:57e6ee8504e7929bc094bb2afc879943906064179a1e88c23b4812e2c6f61532
+boto3==1.35.39 \
+    --hash=sha256:5970b62c1ec8177501e02520f0d41839ca5fc549b30bac4e8c0c0882ae776217 \
+    --hash=sha256:670f811c65e3c5fe4ed8c8d69be0b44b1d649e992c0fc16de43816d1188f88f1
     # via -r requirements/base.txt
 botocore==1.35.39 \
     --hash=sha256:781c547eb6a79c0e4b0bedd87b81fbfed957816b4841d33e20c8f1989c7c19ce \
