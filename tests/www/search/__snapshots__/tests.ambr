@@ -149,6 +149,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."slug",
@@ -458,6 +459,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."slug",
@@ -685,6 +687,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
@@ -833,6 +836,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
                  EXISTS
             (SELECT %s AS "a"
@@ -856,7 +860,7 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."id" = %s)
-          ORDER BY 35 DESC,
+          ORDER BY 36 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -943,6 +947,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."slug",
@@ -1060,6 +1065,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
@@ -1207,6 +1213,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
                  EXISTS
             (SELECT %s AS "a"
@@ -1229,7 +1236,7 @@
                                 AND U0."is_active")
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s))
-          ORDER BY 35 DESC,
+          ORDER BY 36 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -1316,6 +1323,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."slug",
@@ -1434,6 +1442,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
@@ -1581,6 +1590,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
                  EXISTS
             (SELECT %s AS "a"
@@ -1603,7 +1613,7 @@
                                 AND U0."is_active")
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s))
-          ORDER BY 35 DESC,
+          ORDER BY 36 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -1690,6 +1700,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."slug",
@@ -1807,6 +1818,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
@@ -1954,6 +1966,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
                  EXISTS
             (SELECT %s AS "a"
@@ -1976,7 +1989,7 @@
                                 AND U0."is_active")
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s))
-          ORDER BY 35 DESC,
+          ORDER BY 36 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -2063,6 +2076,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."slug",

@@ -118,6 +118,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -587,6 +588,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -814,6 +816,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -1047,7 +1050,8 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "companies_company"
           WHERE "companies_company"."id" = %s
           LIMIT 21
