@@ -1,16 +1,19 @@
 import uuid
 
+import pytest
 import respx
 from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
+from django.contrib import messages
 from django.test import override_settings
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertFormError, assertRedirects
+from pytest_django.asserts import assertContains, assertFormError, assertMessages, assertRedirects
 
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.signup.forms import JobSeekerSituationForm
 from tests.cities.factories import create_test_cities
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
@@ -48,7 +51,7 @@ class TestJobSeekerSignup:
         assertFormError(response.context["form"], "situation", [JobSeekerSituationForm.ERROR_NOTHING_CHECKED])
 
         # Check if one of eligibility criterion is checked.
-        next_url = reverse("signup:job_seeker_nir")
+        next_url = reverse("signup:job_seeker")
         for choice in JobSeekerSituationForm.ELIGIBLE_SITUATION:
             post_data = {"situation": [choice]}
             response = client.post(url, data=post_data)
@@ -78,160 +81,62 @@ class TestJobSeekerSignup:
         response = client.get(url)
         assert response.status_code == 200
 
-    def test_job_seeker_nir(self, client):
-        nir = "141068078200557"
-
-        # Get the NIR.
-        # It will be saved in the next view.
-        url = reverse("signup:job_seeker_nir")
-        response = client.get(url)
-        assert response.status_code == 200
-
-        post_data = {"nir": nir}
-        response = client.post(url, post_data)
-        assertRedirects(response, reverse("signup:job_seeker"))
-        assert global_constants.ITOU_SESSION_NIR_KEY in list(client.session.keys())
-        assert client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
-
-        # NIR is stored with user information.
+    def _test_job_seeker_signup_forms(self, client, nir, **extra_signup_kwargs):
+        # auxiliary function tests the forms flow for JobSeeker creation with parameterized NIR
         url = reverse("signup:job_seeker")
         response = client.get(url)
         assert response.status_code == 200
-        # Since provided NIR starts with a 1, suggest Monsieur title
-        assert response.context["form"]["title"].initial == "M"
 
-        address_line_1 = "Test adresse"
-        address_line_2 = "Test adresse complémentaire"
-        post_code = self.city.post_codes[0]
-
+        job_seeker_data = JobSeekerFactory.build()
         post_data = {
-            "title": "M",
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe+1@company.com",
-            "password1": DEFAULT_PASSWORD,
-            "password2": DEFAULT_PASSWORD,
-            "address_line_1": address_line_1,
-            "address_line_2": address_line_2,
-            "post_code": post_code,
-            "city_name": self.city.name,
-            "city": self.city.slug,
+            "nir": nir,
+            "title": job_seeker_data.title,
+            "first_name": job_seeker_data.first_name,
+            "last_name": job_seeker_data.last_name,
+            "email": job_seeker_data.email,
+            "birthdate": job_seeker_data.jobseeker_profile.birthdate,
+            **extra_signup_kwargs,
         }
 
         response = client.post(url, data=post_data)
-        assert response.status_code == 302
-        assertRedirects(response, reverse("account_email_verification_sent"))
+        assertRedirects(response, reverse("signup:job_seeker_credentials"))
+        assert client.session.get(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY)
 
-        job_seeker = User.objects.get(email=post_data["email"])
-        assert nir == job_seeker.jobseeker_profile.nir
-        assert job_seeker.title == "M"
-        assert job_seeker.has_jobseeker_profile
-
-    def test_job_seeker_temporary_nir(self, client):
-        """
-        For the moment, we don't handle temporary social numbers.
-        Skipping NIR verification is allowed if a temporary one should be used instead.
-        """
-
-        # Temporary numbers don't have a consistent format.
-        nir = "1234567895GHTUI"
-
-        url = reverse("signup:job_seeker_nir")
-        post_data = {"nir": nir}
-        response = client.post(url, post_data)
-        assertContains(
-            response,
-            f"""
-            <a href="{reverse('signup:job_seeker')}"
-                class="btn btn-link p-0"
-                data-matomo-event="true"
-                data-matomo-category="nir-temporaire"
-                data-matomo-action="etape-suivante"
-                data-matomo-option="inscription">
-               Cliquez ici pour accéder à l'étape suivante.
-            </a>""",
-            html=True,
-        )
-        assert not response.context.get("form").is_valid()
-        assert global_constants.ITOU_SESSION_NIR_KEY not in list(client.session.keys())
-        assert not client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
-
-        # Temporary NIR is not stored with user information.
-        url = reverse("signup:job_seeker")
+        url = reverse("signup:job_seeker_credentials")
         response = client.get(url)
         assert response.status_code == 200
-        # Since no NIR was provided (or it was a temporary number), suggest nothing
-        assert response.context["form"]["title"].initial is None
-
-        address_line_1 = "Test adresse"
-        address_line_2 = "Test adresse complémentaire"
-        post_code = self.city.post_codes[0]
 
         post_data = {
-            "title": "M",
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe+2@company.com",
             "password1": DEFAULT_PASSWORD,
             "password2": DEFAULT_PASSWORD,
-            "address_line_1": address_line_1,
-            "address_line_2": address_line_2,
-            "post_code": post_code,
-            "city_name": self.city.name,
-            "city": self.city.slug,
         }
-
         response = client.post(url, data=post_data)
-        assert response.status_code == 302
         assertRedirects(response, reverse("account_email_verification_sent"))
 
-        job_seeker = User.objects.get(email=post_data["email"])
-        assert job_seeker.jobseeker_profile.nir == ""
-        assert job_seeker.title == "M"
-        assert job_seeker.has_jobseeker_profile
+        # Test session cleanup
+        assert client.session.get(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY) is None
+
+        user = User.objects.get(email=job_seeker_data.email)
+        assert job_seeker_data.title == user.title
+        assert user.has_jobseeker_profile
+
+        return user
 
     def test_job_seeker_signup(self, client, snapshot, mailoutbox):
-        """Job-seeker signup."""
-        # NIR is set on a previous step and tested separately.
-        # See self.test_job_seeker_nir
-        nir = "141068078200557"
-        client.post(reverse("signup:job_seeker_nir"), {"nir": nir})
-
         url = reverse("signup:job_seeker")
         response = client.get(url)
         assert response.status_code == 200
-        form = parse_response_to_soup(response, selector="form.js-prevent-multiple-submit")
+        replace_in_attr = [("max", str(DuetDatePickerWidget.max_birthdate()), "2008-10-23")]
+        form = parse_response_to_soup(response, selector="form.js-format-nir", replace_in_attr=replace_in_attr)
         assert str(form) == snapshot(name="job_seeker_signup_form")
 
-        address_line_1 = "Test adresse"
-        address_line_2 = "Test adresse complémentaire"
-        post_code = self.city.post_codes[0]
+        nir = "141068078200557"
+        user = self._test_job_seeker_signup_forms(client, nir)
+        assert user.jobseeker_profile.nir == nir
 
-        post_data = {
-            "title": "M",
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe+3@company.com",
-            "password1": DEFAULT_PASSWORD,
-            "password2": DEFAULT_PASSWORD,
-            "address_line_1": address_line_1,
-            "address_line_2": address_line_2,
-            "post_code": post_code,
-            "city_name": self.city.name,
-            "city": self.city.slug,
-        }
-
-        response = client.post(url, data=post_data)
-        assert response.status_code == 302
-        assertRedirects(response, reverse("account_email_verification_sent"))
-
-        # Check `User` state.
-        user = User.objects.get(email=post_data["email"])
         # `username` should be a valid UUID, see `User.generate_unique_username()`.
         assert user.username == uuid.UUID(user.username, version=4).hex
         assert user.kind == UserKind.JOB_SEEKER
-        assert user.title == "M"
-        assert user.has_jobseeker_profile
 
         # Check `EmailAddress` state.
         assert user.emailaddress_set.count() == 1
@@ -279,8 +184,93 @@ class TestJobSeekerSignup:
             count=1,
         )
 
+    def test_job_seeker_signup_temporary_nir(self, client):
+        """
+        For the moment, we don't handle temporary social numbers.
+        Skipping NIR verification is allowed if a temporary one should be used instead.
+        """
+
+        # Temporary numbers don't have a consistent format.
+        nir = "1234567895GHTUI"
+
+        job_seeker_data = JobSeekerFactory.build()
+        post_data = {
+            "nir": nir,
+            "title": job_seeker_data.title,
+            "first_name": job_seeker_data.first_name,
+            "last_name": job_seeker_data.last_name,
+            "email": job_seeker_data.email,
+            "birthdate": job_seeker_data.jobseeker_profile.birthdate,
+        }
+
+        # Temporary NIR not considered valid.
+        url = reverse("signup:job_seeker")
+        response = client.post(url, post_data)
+        assert response.status_code == 200
+        assert not response.context.get("form").is_valid()
+
+        # Possible to submit the form without the NIR.
+        user = self._test_job_seeker_signup_forms(client, nir, skip=1)
+
+        # Temporary NIR is not stored with user information.
+        assert user.jobseeker_profile.nir == ""
+
+    def test_job_seeker_signup_temporary_nir_resubmission(self, client):
+        # Temporary numbers don't have a consistent format.
+        nir = "1234567895GHTUI"
+
+        job_seeker_data = JobSeekerFactory.build()
+        post_data = {
+            "nir": nir,
+            "title": job_seeker_data.title,
+            "first_name": job_seeker_data.first_name,
+            "last_name": job_seeker_data.last_name,
+            "email": job_seeker_data.email,
+            "birthdate": job_seeker_data.jobseeker_profile.birthdate,
+        }
+
+        # Temporary NIR not considered valid.
+        url = reverse("signup:job_seeker")
+        response = client.post(url, post_data)
+        assert response.status_code == 200
+        assert not response.context.get("form").is_valid()
+
+        # Possible to submit a valid NIR and thus effect the changes
+        valid_nir = "141068078200557"
+        user = self._test_job_seeker_signup_forms(client, valid_nir)
+        assert user.jobseeker_profile.nir == valid_nir
+
+    def test_job_seeker_signup_temporary_nir_invalid_birthdate(self, client):
+        nir = "1234567895GHTUI"
+
+        job_seeker_data = JobSeekerFactory.build()
+        post_data = {
+            "nir": nir,
+            "title": job_seeker_data.title,
+            "first_name": job_seeker_data.first_name,
+            "last_name": job_seeker_data.last_name,
+            "email": job_seeker_data.email,
+            "birthdate": "Invalid birthdate",
+        }
+
+        url = reverse("signup:job_seeker")
+        response = client.post(url, post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "nir": ["Ce numéro n'est pas valide."],
+            "birthdate": ["Saisissez une date valide."],
+        }
+
+        # Cannot skip the form by passing skip
+        post_data["skip"] = 1
+        response = client.post(url, post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "birthdate": ["Saisissez une date valide."],
+        }
+
     def test_job_seeker_signup_with_existing_email(self, client):
-        JobSeekerFactory(email="alice@evil.com")
+        alice = JobSeekerFactory(email="alice@evil.com")
         url = reverse("signup:job_seeker")
         response = client.post(
             url,
@@ -289,19 +279,20 @@ class TestJobSeekerSignup:
                 "first_name": "Alice",
                 "last_name": "Evil",
                 "email": "alice@evil.com",
-                "password1": "Véry_S3C®3T!",
-                "password2": "Véry_S3C®3T!",
-                "address_line_1": "Test address_line_1",
-                "address_line_2": "Test address_line_2",
-                "post_code": "87000",
-                "city_name": "Limoges",
-                "city": "limoges",
+                "birthdate": alice.jobseeker_profile.birthdate,
+                "nir": "141068078200557",
             },
         )
         assert response.status_code == 200
         assert response.context["form"].errors == {
             "email": ["Un autre utilisateur utilise déjà cette adresse e-mail."]
         }
+
+    def test_job_seeker_visit_credentials_without_session(self, client):
+        assert client.session.get(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY) is None
+
+        response = client.get(reverse("signup:job_seeker_credentials"))
+        assertRedirects(response, reverse("signup:job_seeker"))
 
     @respx.mock
     @override_settings(
@@ -312,13 +303,23 @@ class TestJobSeekerSignup:
     @reload_module(fc_constants)
     def test_job_seeker_nir_with_france_connect(self, client):
         # NIR is set on a previous step and tested separately.
-        # See self.test_job_seeker_nir
+        # See self.test_job_seeker_signup
         nir = "141068078200557"
-        client.post(reverse("signup:job_seeker_nir"), {"nir": nir})
-        assert global_constants.ITOU_SESSION_NIR_KEY in list(client.session.keys())
-        assert client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
+        job_seeker_data = JobSeekerFactory.build()
+        post_data = {
+            "nir": nir,
+            "title": job_seeker_data.title,
+            "first_name": job_seeker_data.first_name,
+            "last_name": job_seeker_data.last_name,
+            "email": job_seeker_data.email,
+            "birthdate": job_seeker_data.jobseeker_profile.birthdate,
+        }
+        response = client.post(reverse("signup:job_seeker"), data=post_data)
+        assertRedirects(response, reverse("signup:job_seeker_credentials"))
 
-        url = reverse("signup:job_seeker")
+        assert client.session.get(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY)
+
+        url = reverse("signup:job_seeker_credentials")
         response = client.get(url)
         fc_url = reverse("france_connect:authorize")
         assertContains(response, fc_url)
@@ -328,6 +329,9 @@ class TestJobSeekerSignup:
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
         assert nir == job_seeker.jobseeker_profile.nir
         assert job_seeker.has_jobseeker_profile
+
+        # The session key has been removed
+        assert client.session.get(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY) is None
 
     @respx.mock
     @override_settings(
@@ -340,11 +344,24 @@ class TestJobSeekerSignup:
         # temporary NIR is discarded on a previous step and tested separately.
         # See self.test_job_seeker_temporary_nir
 
-        assert global_constants.ITOU_SESSION_NIR_KEY not in list(client.session.keys())
-        assert not client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
+        nir = ""
+        job_seeker_data = JobSeekerFactory.build()
+        post_data = {
+            "nir": nir,
+            "title": job_seeker_data.title,
+            "first_name": job_seeker_data.first_name,
+            "last_name": job_seeker_data.last_name,
+            "email": job_seeker_data.email,
+            "birthdate": job_seeker_data.jobseeker_profile.birthdate,
+            "skip": 1,
+        }
+        response = client.post(reverse("signup:job_seeker"), data=post_data)
+        assertRedirects(response, reverse("signup:job_seeker_credentials"))
+
+        assert client.session.get(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY)
 
         # Temporary NIR is not stored with user information.
-        url = reverse("signup:job_seeker")
+        url = reverse("signup:job_seeker_credentials")
         response = client.get(url)
         fc_url = reverse("france_connect:authorize")
         assertContains(response, fc_url)
@@ -354,3 +371,205 @@ class TestJobSeekerSignup:
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
         assert not job_seeker.jobseeker_profile.nir
         assert job_seeker.has_jobseeker_profile
+
+    @pytest.mark.parametrize(
+        "erroneous_fields,snapshot_name",
+        [
+            (["email"], "email_conflict"),
+            (["email", "first_name", "last_name"], "email_and_name_conflict"),
+            (["nir"], "nir_conflict"),
+            (["email", "first_name", "last_name", "birthdate"], "missing_only_nir"),
+            (["email", "nir", "first_name", "birthdate"], "missing_only_last_name"),
+            (["email", "nir", "last_name", "birthdate"], "missing_only_first_name"),
+            (["email", "nir", "first_name", "last_name"], "missing_only_birthdate"),
+            (["nir", "first_name", "last_name", "birthdate"], "missing_only_email"),
+            (["email", "nir", "first_name", "last_name", "birthdate"], "complete_match"),
+            (["nir", "birthdate"], "nir_plus_mispelled_name"),
+        ],
+    )
+    def test_job_seeker_signup_with_conflicting_fields(self, erroneous_fields, snapshot_name, client, snapshot):
+        """
+        Test registration error behaviour when key fields (NIR/email) conflict with existing user(s)
+        A modal with detailed error information is displayed to the user
+        """
+        existing_user = JobSeekerFactory(for_snapshot=True)
+
+        job_seeker_data = JobSeekerFactory.build()
+        post_data = {
+            "nir": job_seeker_data.jobseeker_profile.nir,
+            "title": job_seeker_data.title,
+            "first_name": job_seeker_data.first_name,
+            "last_name": job_seeker_data.last_name,
+            "email": job_seeker_data.email,
+            "birthdate": str(job_seeker_data.jobseeker_profile.birthdate),
+        }
+
+        # Prepare conflict state directed by erroneous_fields parameter
+        for erroneous_field in erroneous_fields:
+            try:
+                post_data[erroneous_field] = getattr(existing_user, erroneous_field)
+            except AttributeError:
+                post_data[erroneous_field] = getattr(existing_user.jobseeker_profile, erroneous_field)
+
+        response = client.post(reverse("signup:job_seeker"), post_data)
+        assert response.status_code == 200
+
+        # Modal is rendered with expected error message according to the conflicting fields
+        assertMessages(response, [messages.Message(messages.ERROR, snapshot(name=snapshot_name))])
+        assert str(parse_response_to_soup(response, selector="#message-modal-1-label")) == snapshot(
+            name=f"{snapshot_name}_title"
+        )
+        assertContains(response, reverse("login:existing_user", args=(existing_user.public_id,)))
+
+        # NOTE: error is rendered for the case that the user ignores the modal
+        if "email" in erroneous_fields:
+            assert response.context["form"].errors["email"] == [
+                "Un autre utilisateur utilise déjà cette adresse e-mail."
+            ]
+        if "jobseeker_profile__nir" in erroneous_fields:
+            assert response.context["form"].errors["nir"] == ["Un compte avec ce numéro existe déjà."]
+
+    def test_job_seeker_signup_with_conflicting_email_not_verified(self, client, snapshot):
+        existing_user = JobSeekerFactory(for_snapshot=True)
+        unverified_email_address = existing_user.emailaddress_set.create(email=existing_user.email, verified=False)
+
+        job_seeker_data = JobSeekerFactory.build()
+        post_data = {
+            "nir": job_seeker_data.jobseeker_profile.nir,
+            "title": job_seeker_data.title,
+            "first_name": job_seeker_data.first_name,
+            "last_name": job_seeker_data.last_name,
+            "email": unverified_email_address.email,  # email conflict
+            "birthdate": str(job_seeker_data.jobseeker_profile.birthdate),
+        }
+
+        response = client.post(reverse("signup:job_seeker"), post_data)
+        assert response.status_code == 200
+
+        # Modal is rendered with expected error message according to the conflicting fields
+        assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
+        assert response.context["form"].errors["email"] == ["Un autre utilisateur utilise déjà cette adresse e-mail."]
+        assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
+
+    def test_job_seeker_signup_with_conflicting_email_temporary_nir(self, client, snapshot):
+        existing_user = JobSeekerFactory(for_snapshot=True)
+
+        post_data = {
+            "nir": "1234567895GHTUI",
+            "title": existing_user.title,
+            "first_name": existing_user.first_name,
+            "last_name": existing_user.last_name,
+            "email": existing_user.email,  # email conflict
+            "birthdate": str(existing_user.jobseeker_profile.birthdate),
+            "skip": 1,
+        }
+
+        response = client.post(reverse("signup:job_seeker"), post_data)
+        assert response.status_code == 200
+
+        assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
+        assert response.context["form"].errors["email"] == ["Un autre utilisateur utilise déjà cette adresse e-mail."]
+        assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
+
+    def test_job_seeker_signup_birth_fields_conflict_temporary_nir(self, client, snapshot):
+        existing_user = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="")
+
+        post_data = {
+            "nir": "1234567895GHTUI",
+            "title": existing_user.title,
+            "first_name": existing_user.first_name,
+            "last_name": existing_user.last_name,
+            "email": "afreshemail@adomain.org",  # no email conflict
+            "birthdate": str(existing_user.jobseeker_profile.birthdate),
+            "skip": 1,
+        }
+
+        response = client.post(reverse("signup:job_seeker"), post_data, follow=True)
+
+        # Non-blocking, the user can return to the signup process if it's not them
+        assertRedirects(response, reverse("signup:job_seeker_credentials"))
+        assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
+        assert str(parse_response_to_soup(response, selector="#message-modal-1-label")) == snapshot(
+            name="birth_fields_conflict_title"
+        )
+        assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
+
+    def test_job_seeker_signup_birth_fields_conflict_redefine_nir(self, client, snapshot):
+        existing_user = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="")
+
+        post_data = {
+            "nir": "141068078200557",
+            "title": existing_user.title,
+            "first_name": existing_user.first_name,
+            "last_name": existing_user.last_name,
+            "email": "afreshemail@adomain.org",  # no email conflict
+            "birthdate": str(existing_user.jobseeker_profile.birthdate),
+        }
+
+        response = client.post(reverse("signup:job_seeker"), post_data, follow=True)
+
+        # Non-blocking, the user can return to the signup process if it's not them
+        assertRedirects(response, reverse("signup:job_seeker_credentials"))
+        assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
+        assert str(parse_response_to_soup(response, selector="#message-modal-1-label")) == snapshot(
+            name="birth_fields_conflict_title"
+        )
+        assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
+
+    def test_job_seeker_signup_email_and_nir_priorities(self, client):
+        """
+        The NIR is normally a more reliable source of unicity than email
+        When the NIR is undefined (e.g. temporary), then a matching email is more important
+        """
+        existing_user = JobSeekerFactory(jobseeker_profile__nir="")
+
+        post_data = {
+            "nir": "",
+            "title": existing_user.title,
+            "first_name": existing_user.first_name,
+            "last_name": existing_user.last_name,
+            "email": existing_user.email,
+            "birthdate": existing_user.jobseeker_profile.birthdate,
+            "skip": 1,
+        }
+
+        response = client.post(reverse("signup:job_seeker"), post_data)
+        assert response.status_code == 200
+
+        # Matching all information except the (temporary) NIR
+        assert "Vous possédez déjà un compte" in str(
+            parse_response_to_soup(response, selector="#message-modal-1-label")
+        )
+        assertContains(response, reverse("login:existing_user", args=(existing_user.public_id,)))
+
+    # TODO(calum): temporary test relating to code migration, remove in the week following deployment
+    def test_job_seeker_signup_temporary_redirects(self, client):
+        response = client.get(reverse("signup:job_seeker_nir"))
+        assertRedirects(response, reverse("signup:job_seeker_situation"))
+
+        session = client.session
+        session["job_seeker_nir"] = "141068078200557"
+        session.save()
+
+        response = client.get(reverse("signup:job_seeker"))
+        assertRedirects(response, reverse("signup:job_seeker_situation"))
+
+        session["job_seeker_nir"] = "141068078200557"
+        session.save()
+        response = client.get(reverse("signup:job_seeker_credentials"))
+        assertRedirects(response, reverse("signup:job_seeker"))
+
+        # Can continue with the process on the redirected page
+        job_seeker_data = JobSeekerFactory.build()
+        post_data = {
+            "nir": "141068078200557",
+            "title": job_seeker_data.title,
+            "first_name": job_seeker_data.first_name,
+            "last_name": job_seeker_data.last_name,
+            "email": job_seeker_data.email,
+            "birthdate": job_seeker_data.jobseeker_profile.birthdate,
+        }
+
+        response = client.post(response.url, data=post_data)
+        assert client.session.get(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY)
+        assertRedirects(response, reverse("signup:job_seeker_credentials"))

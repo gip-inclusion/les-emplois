@@ -250,15 +250,33 @@ class TestPoleEmploiConnect:
     def test_callback_with_nir(self, client):
         # Complete signup with NIR is tested in JobSeekerSignupTest.test_job_seeker_nir
         nir = "141068078200557"
-        client.post(reverse("signup:job_seeker_nir"), {"nir": nir})
-        assert global_constants.ITOU_SESSION_NIR_KEY in list(client.session.keys())
-        assert client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
+        job_seeker_data = JobSeekerFactory.build()
+        post_data = {
+            "nir": nir,
+            "title": job_seeker_data.title,
+            "first_name": job_seeker_data.first_name,
+            "last_name": job_seeker_data.last_name,
+            "email": job_seeker_data.email,
+            "birthdate": job_seeker_data.jobseeker_profile.birthdate,
+        }
+        response = client.post(reverse("signup:job_seeker"), data=post_data)
+        assertRedirects(response, reverse("signup:job_seeker_credentials"))
+
+        assert client.session.get(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY)
+
+        url = reverse("signup:job_seeker_credentials")
+        response = client.get(url)
+        auth_url = reverse("pe_connect:authorize")
+        assertContains(response, auth_url)
 
         # New created job seeker has no title and is redirected to complete its infos
         mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
         user = User.objects.get()
         assert user.email == PEAMU_USERINFO["email"]
         assert user.jobseeker_profile.nir == nir
+
+        # The session key has been removed
+        assert client.session.get(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY) is None
 
     @respx.mock
     def test_callback_redirect_on_invalid_kind_exception(self, client):

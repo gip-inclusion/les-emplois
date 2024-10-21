@@ -1,0 +1,35 @@
+{% load static %}
+{% load theme_inclusion %}
+{% load django_bootstrap5 %}
+
+<div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="message-modal-{{ forloop.counter }}-label">
+                {% if "email_conflict" in message.extra_tags %}
+                    Un compte existe déjà avec cette adresse mail
+                {% elif "nir_conflict" in message.extra_tags %}
+                    Un compte existe déjà avec ce NIR
+                {% elif "user_exists_without_birthdate" in message.extra_tags %}
+                    Un compte existe déjà avec une date de naissance différente
+                {% elif "user_exists_without_email" in message.extra_tags %}
+                    Un compte existe déjà avec une adresse e-mail différente
+                {% elif "user_exists_without_first_name" in message.extra_tags %}
+                    Un compte existe déjà avec un prénom différent
+                {% elif "user_exists_without_last_name" in message.extra_tags %}
+                    Un compte existe déjà avec un nom différent
+                {% elif "user_exists_without_nir" in message.extra_tags %}
+                    Un compte existe déjà avec un NIR différent
+                {% elif "user_exists_with_birth_fields" in message.extra_tags %}
+                    Un compte existe avec ce nom et date de naissance
+                {% elif "user_exists" in message.extra_tags %}
+                    Vous possédez déjà un compte
+                {% else %}
+                    L’inscription a échoué
+                {% endif %}
+            </h3>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        {{ message }}
+    </div>
+</div>

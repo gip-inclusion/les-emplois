@@ -256,11 +256,6 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
 }
 
 @media (min-width: 992px) {
-    .s-section-lg-with-background {
-        background-color: #fff;
-        background: linear-gradient(to left, #fbfbfb 50%, #f2f8fd 50%);
-    }
-
     .s-section-twocolumns .w-md-auto {
         width: auto !important;
     }
@@ -405,6 +400,10 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
 table.table td > .modal .modal-content {
     text-align: left;
     font-size: var(--bs-body-font-size);
+}
+
+.form-checkbox-greater-spacing > .form-check {
+    margin-bottom: .75rem;
 }
 
 /* Pro Connect button theme */

@@ -1,38 +1,35 @@
 {% load static %}
 {% load matomo %}
 
-<a href="#" data-bs-toggle="modal" data-bs-target="#no-email-modal">{{ link_text }}</a>
+{% if not exclude_button|default:False %}
+    <a href="#" data-bs-toggle="modal" data-bs-target="#no-email-modal">{{ link_text }}</a>
+{% endif %}
 
-<div class="modal fade text-start" id="no-email-modal" tabindex="-1" role="dialog" aria-labelledby="no-email-modal-label" aria-modal="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+<div class="modal fade" id="no-email-modal" tabindex="-1" role="dialog" aria-labelledby="no-email-modal-label" aria-modal="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" id="no-email-modal-label">Créer une adresse e-mail</h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
-                <div class="container">
-                    <div class="row">
-                        <div class="col text-center">
-                            <img src="{% static 'img/no_email.svg' %}" alt="">
-                        </div>
-                        <div class="col">
-                            <p class="pt-3">Nous vous conseillons de créer une adresse e-mail avec le service de laposte.net.</p>
-                            <p>Une fois l'adresse e-mail créée, vous pourrez l'utiliser ici.</p>
-                        </div>
+                <div class="row">
+                    <div class="d-none d-md-inline-flex col-md-3">
+                        <img src="{% static 'img/no_email.svg' %}" class="img-fluid" alt="">
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <p>Nous vous conseillons de créer une adresse e-mail avec le service de laposte.net.</p>
+                        <p>Une fois l'adresse e-mail créée, vous pourrez l'utiliser ici.</p>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <a aria-label="Ouverture dans un nouvel onglet"
                    href="https://compte.laposte.net/inscription/index.do?srv_gestion=POLEEMPLOI"
-                   class="btn btn-sm btn-primary btn-ico"
+                   class="btn btn-sm btn-primary has-external-link"
                    {% matomo_event "inscription-candidat" "clic" "je-n-ai-pas-d-adresse-email" %}
                    rel="noopener"
-                   target="_blank">
-                    <span>Créer une adresse e-mail</span>
-                    <i class="ri-external-link-line"></i>
-                </a>
+                   target="_blank">Créer une adresse e-mail</a>
             </div>
         </div>
     </div>

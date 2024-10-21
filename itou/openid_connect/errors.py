@@ -8,16 +8,17 @@ from django.utils.html import format_html
 from itou.utils.emails import redact_email_address
 
 
-def format_error_modal_content(message_body, action_url, action_text):
+def format_error_modal_content(message_body, action_url, action_text, dismiss_text="Retour"):
     return format_html(
         '<div class="modal-body">'
         "{}"
         "</div>"
         '<div class="modal-footer">'
-        '<button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button>'
+        '<button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">{}</button>'
         '<a href="{}" class="btn btn-sm btn-primary">{}</a>'
         "</div>",
         message_body,
+        dismiss_text,
         action_url,
         action_text,
     )
