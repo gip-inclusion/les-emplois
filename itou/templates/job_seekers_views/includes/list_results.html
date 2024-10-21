@@ -1,5 +1,6 @@
 {% load static %}
 {% load str_filters %}
+{% load url_add_query %}
 
 <section aria-labelledby="job-seekers-list-count" id="job-seekers-section">
     {% if not page_obj %}
@@ -34,8 +35,9 @@
                             <td>{{ job_seeker.job_applications_nb }}</td>
                             <td>{{ job_seeker.last_updated_at|date:"d/m/Y" }}</td>
                             <td class="text-end w-50px">
-                                <a class="btn btn-sm btn-link btn-ico-only" aria-label="Postuler pour ce candidat" href="{% url "search:employers_results" %}?job_seeker={{ job_seeker.public_id }}">
-                                    <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip" title="Postuler"></i>
+                                {% url "search:employers_results" as search_url %}
+                                <a class="btn btn-sm btn-link btn-ico-only" aria-label="Postuler pour ce candidat" href="{% url_add_query search_url job_seeker=job_seeker.public_id %}">
+                                    <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip" title="Postuler pour ce candidat"></i>
                                 </a>
                             </td>
                         </tr>

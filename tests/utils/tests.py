@@ -659,6 +659,16 @@ class TestUtilsTemplateTags:
         expected = "?page=1"
         assert out == expected
 
+        # Empty or None parameters
+        context = {"url": "/company/10/card"}
+        template_empty = Template("{% load url_add_query %}{% url_add_query url job_seeker=job_seeker|default:'' %}")
+        out_empty = template_empty.render(Context(context))
+        template_none = Template("{% load url_add_query %}{% url_add_query url job_seeker=job_seeker|default:None %}")
+        out_none = template_none.render(Context(context))
+        expected = "/company/10/card"
+        assert out_empty == expected
+        assert out_none == expected
+
     def test_redirection_url(self):
         base_url = reverse("dashboard:index")
         redirect_field_value = reverse("search:employers_home")

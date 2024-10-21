@@ -1,3 +1,4 @@
+{% load url_add_query %}
 <section class="s-section">
     <div class="s-section__container container">
         <div class="s-section__row row">
@@ -7,7 +8,7 @@
                         <div class="col-12">
                             {% include "search/includes/siaes_search_subtitle.html" %}
                             <div class="d-block w-100">
-                                <form hx-get="{{ request.path }}{% if job_seeker %}?job_seeker={{ job_seeker.public_id }}{% endif %}"
+                                <form hx-get="{% url_add_query request.path job_seeker=job_seeker.public_id|default:'' %}"
                                       hx-trigger="change delay:.5s"
                                       hx-include="#id_city"
                                       hx-indicator="#job-search-results"

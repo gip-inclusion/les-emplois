@@ -3,13 +3,14 @@
 {% load format_filters %}
 {% load str_filters %}
 {% load matomo %}
+{% load url_add_query %}
 
 {% block title %}{{ job.display_name }} - {{ siae.display_name }} {{ block.super }}{% endblock %}
 
 {% block global_messages %}
     {{ block.super }}
     {% if job_seeker %}
-        {% include "apply/includes/applying_for_banner.html" with job_seeker=job_seeker %}
+        {% include "apply/includes/applying_for_banner.html" with job_seeker=job_seeker can_view_personal_information=can_view_personal_information %}
     {% endif %}
 {% endblock %}
 
@@ -65,7 +66,8 @@
                         </div>
                     {% else %}
                         <div class="form-group col-12 col-lg-auto">
-                            <a href="{% url "apply:start" company_pk=siae.pk %}?job_description_id={{ job.pk }}{% if job_seeker %}&job_seeker={{ job_seeker.public_id }}{% endif %}"
+                            {% url "apply:start" company_pk=siae.pk as apply_url %}
+                            <a href="{% url_add_query apply_url job_description_id=job.pk job_seeker=job_seeker.public_id|default:'' %}"
                                class="btn btn-lg btn-white btn-block btn-ico"
                                {% matomo_event "candidature" "clic" "start_application" %}
                                aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
