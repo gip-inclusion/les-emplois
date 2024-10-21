@@ -9,11 +9,11 @@ jobs:
     # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-pull_request-workflow-when-a-pull-request-merges
     if: >
       github.event.pull_request.merged == true
-      && !contains(github.event.pull_request.labels.*.name, 'no-changelog')
       && !contains(github.event.pull_request.labels.*.name, 'dependencies')
     runs-on: ubuntu-latest
     steps:
       - name: "📢 Notify the #mep-c1 channel"
+        if: !contains(github.event.pull_request.labels.*.name, 'no-changelog')
         uses: slackapi/slack-github-action@v1.27.0
         with:
           payload: |
