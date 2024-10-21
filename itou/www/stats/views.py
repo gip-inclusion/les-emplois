@@ -833,6 +833,15 @@ def stats_dgefp_iae_af(request):
 
 
 @login_required
+def stats_dgefp_iae_orga_etp(request):
+    return render_stats_dgefp_iae(
+        request=request,
+        page_title="Suivi des effectifs annuels et mensuels en ETP",
+        extra_params=get_params_for_whole_country(),
+    )
+
+
+@login_required
 def stats_dihal_state(request):
     get_current_institution_or_404(request)
     if not utils.can_view_stats_dihal(request):

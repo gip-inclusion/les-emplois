@@ -271,6 +271,9 @@ METABASE_DASHBOARDS = {
     "stats_dgefp_iae_af": {
         "dashboard_id": 142,
     },
+    "stats_dgefp_iae_orga_etp": {
+        "dashboard_id": 485,
+    },
     #
     # Institution stats - DIHAL - nation level.
     #
