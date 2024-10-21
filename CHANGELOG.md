@@ -1,5 +1,25 @@
 # Journal des modifications
 
+## 2024-10-21
+
+### Ajouté
+
+- [Candidature : API Particulier -> interface](https://github.com/gip-inclusion/les-emplois/pull/4786)
+- [Inscription : Parcours initialisation de mot de passe pour les candidats créés par un tiers](https://github.com/gip-inclusion/les-emplois/pull/4807)
+- [PASS IAE: création d’une page de détails](https://github.com/gip-inclusion/les-emplois/pull/4719)
+
+### Modifié
+
+- [admin: amélioration de la recherche de PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/4905)
+- [Candidature: déplacer le bouton “annuler l’embauche”](https://github.com/gip-inclusion/les-emplois/pull/4942)
+- [Candidature: normalisation de l'affichage des noms et prénoms](https://github.com/gip-inclusion/les-emplois/pull/4937)
+- [Candidature: uniformisation de l'affichage des noms de candidat et d'utilisateur dans les filtres de recherche](https://github.com/gip-inclusion/les-emplois/pull/4932) 🖼
+- [Contrôle a posteriori: amélioration de l'admin pour afficher l'état d'une auto-prescription au sein d'une entreprise contrôlée](https://github.com/gip-inclusion/les-emplois/pull/4917)
+- [Stabilité:  Correction du fonctionnement des "copy to clipboard" apres htmx:load](https://github.com/gip-inclusion/les-emplois/pull/4934)
+- [UX/UI: Ajouter un hover au choix de structure](https://github.com/gip-inclusion/les-emplois/pull/4911) 🖼
+- [UX/UI: N'afficher les infos PASS que dans l'onglet "Informations générales"](https://github.com/gip-inclusion/les-emplois/pull/4914)
+- [UX/UI: Utiliser des espaces insécables entre PASS et IAE](https://github.com/gip-inclusion/les-emplois/pull/4939)
+
 ## 2024-10-14
 
 ### Ajouté
