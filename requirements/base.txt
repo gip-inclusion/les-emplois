@@ -49,9 +49,9 @@ bleach[css]==6.1.0 \
     --hash=sha256:0a31f1837963c41d46bbf1331b8778e1308ea0791db03cc4e7357b97cf42a8fe \
     --hash=sha256:3225f354cfc436b9789c66c4ee030194bee0568fbf9cbdad3bc8b5c26c5f12b6
     # via django-markdownify
-boto3==1.35.34 \
-    --hash=sha256:291e7b97a34967ed93297e6171f1bebb8529e64633dd48426760e3fdef1cdea8 \
-    --hash=sha256:57e6ee8504e7929bc094bb2afc879943906064179a1e88c23b4812e2c6f61532
+boto3==1.35.44 \
+    --hash=sha256:18416d07b41e6094101a44f8b881047dcec6b846dad0b9f83b9bbf2f0cd93d07 \
+    --hash=sha256:7f8e8a252458d584d8cf7877c372c4f74ec103356eedf43d2dd9e479f47f3639
     # via -r requirements/base.in
 botocore==1.35.44 \
     --hash=sha256:1fcd97b966ad8a88de4106fe1bd3bbd6d8dadabe99bbd4a6aadcf11cb6c66b39 \
