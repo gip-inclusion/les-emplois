@@ -1,94 +1,73 @@
-{% extends "layout/base.html" %}
+{% extends "signup/job_seeker_signup_base.html" %}
 {% load django_bootstrap5 %}
 {% load redirection_fields %}
 {% load static %}
+{% load matomo %}
+{% load buttons_form %}
 
-{% block title %}Demandeur d'emploi - Inscription {{ block.super }}{% endblock %}
+{% block job_seeker_signup_content %}
+    <form method="post" action="" role="form" class="js-format-nir" data-matomo-name="signup-job-seeker-identity">
 
-{% block title_content %}
-    <h1>
-        Inscription <span class="text-muted">candidat</span>
-    </h1>
-{% endblock %}
+        {% csrf_token %}
 
-{% block content %}
-    <section class="s-section s-section-lg-with-background">
-        <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12 order-md-2 ps-lg-5 col-lg-6">
-                    <div class="py-5 py-lg-7">
-                        <b class="mb-4">Inscrivez-vous avec un service tiers</b>
-                        {% if show_france_connect %}
-                            <div>{% include "signup/includes/france_connect_button.html" %}</div>
-                            <div class="mt-4 mb-3">
-                                <p class="text-center">
-                                    <b>Ou</b>
-                                </p>
-                            </div>
-                        {% else %}
-                            <p class="fst-italic text-center mt-3">FranceConnect est désactivé.</p>
-                        {% endif %}
+        {% bootstrap_form_errors form type="all" %}
+        {% redirection_input_field value=redirect_field_value %}
 
-                        {% if show_peamu %}
-                            <div class="row mt-3">
-                                <div class="col-sm">
-                                    <div class="text-center">{% include "signup/includes/peamu_button.html" %}</div>
-                                </div>
-                            </div>
-                        {% else %}
-                            <p class="fst-italic text-center">Pôle emploi Connect est désactivé.</p>
-                        {% endif %}
+        {% bootstrap_field form.title %}
+        {% bootstrap_field form.last_name %}
+        {% bootstrap_field form.first_name %}
+        {% bootstrap_field form.birthdate %}
 
-                        <div class="mt-4 mb-3">
-                            <b>Ou utilisez votre adresse e-mail</b>
-                        </div>
-
-                        <form method="post" action="{% url 'signup:job_seeker' %}" role="form" class="js-prevent-multiple-submit" data-matomo-name="signup-job-seeker-identity">
-
-                            {% csrf_token %}
-
-                            {% redirection_input_field value=redirect_field_value %}
-
-                            {# bootstrap_form_errors form alert_error_type="all" #}
-
-                            {% bootstrap_field form.email wrapper_class="form-group mb-1" %}
-                            <div class="text-end small fst-italic mb-0">
-                                {% include "signup/includes/no_email_link.html" with link_text="Pas d'adresse e-mail ?" only %}
-                            </div>
-
-                            {% bootstrap_field form.title wrapper_class="form-group mt-1" %}
-                            {% bootstrap_field form.first_name %}
-                            {% bootstrap_field form.last_name %}
-                            {% bootstrap_field form.password1 %}
-                            {% bootstrap_field form.password2 %}
-
-                            {% if form.nir %}
-                                {% bootstrap_field form.nir wrapper_class="form-group mt-1" %}
-                            {% endif %}
-
-                            <div class="small pb-4 text-secondary">
-                                Vous pourrez créer et modifier des informations telles que votre adresse ou un lien vers un CV après votre inscription, à partir de votre tableau de bord.
-                            </div>
-
-                            {% include "signup/includes/submit_rgpd.html" %}
-
-                        </form>
-
-                        <div class="mt-5 mb-5 text-end">
-                            <p>
-                                Vous avez déjà un compte ? <a href="{% url 'login:job_seeker' %}">Connexion</a>
-                            </p>
-                        </div>
-                    </div>
+        <div class="form-group mb-1 form-group-required">
+            {% bootstrap_label "Adresse e-mail" label_for="id_email" %}
+            <div class="form-text mt-0 mb-2">
+                Si vous avez un compte <strong>France Travail</strong> ou <strong>FranceConnect</strong> et que vous souhaitez vous connecter avec ce compte,
+                merci de renseigner dans ce champ l’adresse e-mail qui y est associée.
+            </div>
+            {% bootstrap_field form.email wrapper_class="form-group mb-0" show_label=False %}
+            <div class="form-text mb-3">
+                <div class="text-end mt-1">
+                    <a href="#" class="fs-sm text-secondary" data-bs-toggle="modal" data-bs-target="#no-email-modal">Pas d'adresse e-mail ?</a>
                 </div>
-                <div class="col-12 order-md-1 pe-lg-5 col-lg-6 bg-emploi-lightest">
-                    <!-- Hide left column on small devices. -->
-                    <div class="d-none d-md-block py-md-5 py-lg-7 text-center">
-                        <p class="display-1 ff-extra-01 mb-5">Vos informations de connexion</p>
-                        <img class="img-fluid img-fitcover w-50 w-md-auto" src="{% static 'img/job_seeker_signup.svg' %}" alt="">
+                {% include "signup/includes/no_email_link.html" with exclude_button=True only %}
+            </div>
+        </div>
+
+        {% bootstrap_field form.nir wrapper_class="form-group mt-1" %}
+
+        {% if "nir" in form.errors or form.skip %}
+            <div class="alert alert-info">
+                <div class="row">
+                    <div class="col-auto pe-0">
+                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
+                    </div>
+                    <div class="col">
+                        <p class="mb-0">Vous possédez un numéro de sécurité sociale temporaire ?</p>
+                        <button name="skip" value="1" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "inscription" %}>
+                            Cliquez ici pour accéder à l'étape suivante.
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        {% endif %}
+
+        <p class="mt-5 text-primary">
+            Vous n'avez pas de numéro de sécurité sociale ?
+            <a href="https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale"
+               aria-label="Article concernant le numéro de sécurité sociale (ouverture dans un nouvel onglet)"
+               rel="noopener"
+               class="has-external-link"
+               target="_blank">ameli.fr</a>, le site de l'assurance maladie vous explique comment l'obtenir.
+        </p>
+
+        {% itou_buttons_form primary_label="Continuer" %}
+
+        {% include "signup/includes/login_reminder.html" only %}
+    </form>
+{% endblock job_seeker_signup_content %}
+
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/split_nir.js' %}"></script>
 {% endblock %}

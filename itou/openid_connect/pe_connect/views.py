@@ -25,6 +25,7 @@ from ..models import (
     MultipleSubSameEmailException,
     MultipleUsersFoundException,
 )
+from ..utils import init_user_nir_from_session
 from . import constants
 from .models import PoleEmploiConnectState, PoleEmploiConnectUserData
 
@@ -158,11 +159,7 @@ def pe_connect_callback(request):
             request, e.user, IdentityProvider.PE_CONNECT.label
         )
 
-    nir = request.session.get(global_constants.ITOU_SESSION_NIR_KEY)
-    if nir:
-        user.jobseeker_profile.nir = nir
-        user.jobseeker_profile.lack_of_nir_reason = ""
-        user.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
+    init_user_nir_from_session(request, user)
 
     # Fetch external data if never done
     latest_pe_data_import = user.externaldataimport_set.pe_sources().first()

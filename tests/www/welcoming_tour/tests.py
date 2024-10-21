@@ -30,17 +30,21 @@ class TestWelcomingTour:
     def test_new_job_seeker_sees_welcoming_tour_test(self, client):
         job_seeker = JobSeekerFactory.build()
 
-        # First signup step: job seeker NIR.
-        url = reverse("signup:job_seeker_nir")
-        client.post(url, {"nir": job_seeker.jobseeker_profile.nir, "confirm": 1})
-
-        # Second signup step: job seeker credentials.
+        # First signup step: job seeker personal info.
         url = reverse("signup:job_seeker")
         post_data = {
+            "nir": job_seeker.jobseeker_profile.nir,
             "title": job_seeker.title,
             "first_name": job_seeker.first_name,
             "last_name": job_seeker.last_name,
+            "birthdate": job_seeker.jobseeker_profile.birthdate,
             "email": job_seeker.email,
+        }
+        client.post(url, data=post_data)
+
+        # Second signup step: job seeker credentials.
+        url = reverse("signup:job_seeker_credentials")
+        post_data = {
             "password1": DEFAULT_PASSWORD,
             "password2": DEFAULT_PASSWORD,
         }
@@ -90,18 +94,24 @@ class TestWelcomingTourExceptions:
         company = CompanyFactory(with_membership=True)
         job_seeker = JobSeekerFactory.build()
 
-        # First signup step: job seeker NIR.
+        # First signup step: job seeker personal info.
         next_to = reverse("apply:start", kwargs={"company_pk": company.pk})
-        url = f"{reverse('signup:job_seeker_nir')}?next={next_to}"
-        client.post(url, {"nir": job_seeker.jobseeker_profile.nir, "confirm": 1})
-
-        # Second signup step: job seeker credentials.
         url = f"{reverse('signup:job_seeker')}?next={next_to}"
         post_data = {
+            "nir": job_seeker.jobseeker_profile.nir,
             "title": job_seeker.title,
             "first_name": job_seeker.first_name,
             "last_name": job_seeker.last_name,
             "email": job_seeker.email,
+            "birthdate": job_seeker.jobseeker_profile.birthdate,
+        }
+        response = client.post(url, data=post_data)
+        assert response.status_code == 302  # Destination verified in signup tests
+        assert client.session.get(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY)
+
+        # Second signup step: job seeker credentials.
+        url = f"{reverse('signup:job_seeker_credentials')}?next={next_to}"
+        post_data = {
             "password1": DEFAULT_PASSWORD,
             "password2": DEFAULT_PASSWORD,
         }

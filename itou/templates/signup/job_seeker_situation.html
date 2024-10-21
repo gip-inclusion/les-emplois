@@ -1,43 +1,19 @@
-{% extends "layout/base.html" %}
+{% extends "signup/job_seeker_signup_base.html" %}
 {% load django_bootstrap5 %}
 {% load redirection_fields %}
 {% load static %}
 {% load buttons_form %}
 
-{% block title %}Inscription candidat {{ block.super }}{% endblock %}
+{% block job_seeker_signup_content %}
+    <form method="post" action="" role="form" class="js-prevent-multiple-submit">
+        {% csrf_token %}
 
-{% block title_content %}
-    <h1>
-        Inscription <span class="text-muted">candidat</span>
-    </h1>
-{% endblock %}
+        {% redirection_input_field value=redirect_field_value %}
 
-{% block content %}
-    <section class="s-section s-section-lg-with-background m-0">
-        <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12 order-md-2 ps-lg-5 col-lg-6">
-                    <div class="py-5 py-lg-7">
-                        <form method="post" action="{% url 'signup:job_seeker_situation' %}" role="form" class="js-prevent-multiple-submit">
+        {% bootstrap_form form alert_error_type="all" %}
 
-                            {% csrf_token %}
+        {% itou_buttons_form primary_label="Continuer" %}
 
-                            {% redirection_input_field value=redirect_field_value %}
-
-                            {% bootstrap_form form alert_error_type="all" %}
-
-                            {% itou_buttons_form primary_label="Continuer" %}
-
-                        </form>
-                    </div>
-                </div>
-                <div class="col-12 order-md-1 pe-lg-5 col-lg-6 bg-emploi-lightest">
-                    <!-- Hide left column on small devices. -->
-                    <div class="d-none d-md-block py-md-5 py-lg-7 text-center">
-                        <img class="img-fluid img-fitcover w-50 w-md-auto" src="{% static 'img/job_seeker_signup_situation.svg' %}" alt="">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+        {% include "signup/includes/login_reminder.html" only %}
+    </form>
 {% endblock %}

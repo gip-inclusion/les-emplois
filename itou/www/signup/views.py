@@ -32,6 +32,7 @@ from itou.utils.nav_history import get_prev_url_from_history, push_url_in_histor
 from itou.utils.tokens import company_signup_token_generator
 from itou.utils.urls import get_safe_url
 from itou.www.signup import forms
+from itou.www.signup.errors import JobSeekerSignupConflictModalResolver
 
 
 logger = logging.getLogger(__name__)
@@ -106,22 +107,6 @@ class ChooseUserKindSignupView(FormView):
         return HttpResponseRedirect(urls[form.cleaned_data["kind"]])
 
 
-class JobSeekerSignupView(SignupView):
-    form_class = forms.JobSeekerSignupForm
-    template_name = "signup/job_seeker_signup.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["show_france_connect"] = bool(settings.FRANCE_CONNECT_BASE_URL)
-        context["show_peamu"] = bool(settings.PEAMU_AUTH_BASE_URL)
-        return context
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["nir"] = self.request.session.get(global_constants.ITOU_SESSION_NIR_KEY)
-        return kwargs
-
-
 def job_seeker_situation(request, template_name="signup/job_seeker_situation.html"):
     """
     Second step of the signup process for jobseeker.
@@ -136,7 +121,7 @@ def job_seeker_situation(request, template_name="signup/job_seeker_situation.htm
 
         # If at least one of the eligibility choices is selected, go to the signup form.
         if any(choice in forms.JobSeekerSituationForm.ELIGIBLE_SITUATION for choice in form.cleaned_data["situation"]):
-            next_url = reverse("signup:job_seeker_nir")
+            next_url = reverse("signup:job_seeker")
 
         # forward next page
         if REDIRECT_FIELD_NAME in form.data:
@@ -151,24 +136,76 @@ def job_seeker_situation(request, template_name="signup/job_seeker_situation.htm
     return render(request, template_name, context)
 
 
-def job_seeker_nir(request, template_name="signup/job_seeker_nir.html"):
-    form = forms.JobSeekerNirForm(data=request.POST or None)
+def job_seeker_signup_info(request, template_name="signup/job_seeker_signup.html"):
+    # TODO(calum): temporary code for aiding the migration, remove in the week following deployment
+    # Restart the signup process if we encounter one ongoing with outdated code
+    if "job_seeker_nir" in request.session:
+        del request.session["job_seeker_nir"]
+        return HttpResponseRedirect(reverse("signup:job_seeker_situation"))
 
-    if request.method == "POST" and form.is_valid():
-        next_url = reverse("signup:job_seeker")
-        request.session[global_constants.ITOU_SESSION_NIR_KEY] = form.cleaned_data["nir"]
+    form_class = forms.JobSeekerSignupWithOptionalNirForm if "skip" in request.POST else forms.JobSeekerSignupForm
+    form = form_class(data=request.POST or None)
 
-        # forward next page
-        if REDIRECT_FIELD_NAME in form.data:
-            next_url = f"{next_url}?{REDIRECT_FIELD_NAME}={form.data[REDIRECT_FIELD_NAME]}"
+    if request.method == "POST":
+        next_url = reverse("signup:job_seeker_credentials")
 
-        return HttpResponseRedirect(next_url)
+        form_is_valid = form.is_valid()
+
+        # Regardless of whether there are form errors.
+        # If there is a conflict with email or NIR, this class will present an error modal.
+        JobSeekerSignupConflictModalResolver(
+            form.cleaned_data, form.errors, form._nir_submitted, form._email_submitted
+        ).evaluate(request)
+
+        if form_is_valid:
+            request.session[global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY] = form.cleaned_data
+
+            # forward next page
+            if REDIRECT_FIELD_NAME in form.data:
+                next_url = f"{next_url}?{REDIRECT_FIELD_NAME}={form.data[REDIRECT_FIELD_NAME]}"
+
+            return HttpResponseRedirect(next_url)
+    elif request.method == "GET" and global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY in request.session:
+        form = form_class(data=request.session.get(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY))
 
     context = {
         "form": form,
         "redirect_field_value": get_safe_url(request, REDIRECT_FIELD_NAME),
     }
     return render(request, template_name, context)
+
+
+class JobSeekerCredentialsSignupView(SignupView):
+    form_class = forms.JobSeekerCredentialsSignupForm
+    template_name = "signup/job_seeker_signup_credentials.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        # TODO(calum): temporary code for aiding the migration, remove in the week following deployment
+        # Restart the signup process if we encounter one ongoing with outdated code
+        if "job_seeker_nir" in request.session:
+            del request.session["job_seeker_nir"]
+            return HttpResponseRedirect(reverse("signup:job_seeker"))
+
+        if global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY not in request.session:
+            return HttpResponseRedirect(reverse("signup:job_seeker"))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["show_france_connect"] = bool(settings.FRANCE_CONNECT_BASE_URL)
+        context["show_peamu"] = bool(settings.PEAMU_AUTH_BASE_URL)
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["prior_cleaned_data"] = self.request.session.get(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY)
+        return kwargs
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        # Signup successful. Clear session
+        self.request.session.pop(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY)
+        return response
 
 
 # SIAEs signup.

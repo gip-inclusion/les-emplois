@@ -1,4 +1,4 @@
-from allauth.account.forms import SignupForm
+from allauth.account.forms import BaseSignupForm, SignupForm
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models.fields import BLANK_CHOICE_DASH
@@ -16,7 +16,8 @@ from itou.utils import constants as global_constants
 from itou.utils.apis import api_entreprise, geocoding as api_geocoding
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.password_validation import CnilCompositionPasswordValidator
-from itou.utils.validators import validate_code_safir, validate_nir, validate_siren, validate_siret
+from itou.utils.validators import validate_birthdate, validate_code_safir, validate_nir, validate_siren, validate_siret
+from itou.utils.widgets import DuetDatePickerWidget
 
 
 def _get_organization_data_from_api(siret):
@@ -76,27 +77,6 @@ class ChooseUserKindSignupForm(forms.Form):
     )
 
 
-class JobSeekerNirForm(forms.Form):
-    nir = forms.CharField(
-        label="Numéro de sécurité sociale",
-        required=True,
-        max_length=21,  # 15 + 6 white spaces
-        strip=True,
-        validators=[validate_nir],
-        widget=forms.TextInput(
-            attrs={
-                "placeholder": "2 69 05 49 588 157 80",
-            }
-        ),
-    )
-
-    def clean_nir(self):
-        nir = self.cleaned_data["nir"].replace(" ", "")
-        if User.objects.filter(jobseeker_profile__nir=nir).exists():
-            raise ValidationError("Un compte avec ce numéro existe déjà.")
-        return nir
-
-
 class JobSeekerSituationForm(forms.Form):
     ERROR_NOTHING_CHECKED = (
         "Si vous êtes dans l’une des situations ci-dessous, vous devez cocher au moins une case  avant de continuer"
@@ -113,32 +93,48 @@ class JobSeekerSituationForm(forms.Form):
     ELIGIBLE_SITUATION = ["rsa", "ass", "aah", "pe"]
 
     situation = forms.MultipleChoiceField(
-        label="Quelle est votre situation ? ",
+        label="",
         choices=SITUATIONS_CHOICES,
-        widget=forms.CheckboxSelectMultiple,
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "form-checkbox-greater-spacing"}),
         error_messages={"required": ERROR_NOTHING_CHECKED},
     )
 
 
-class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
-    nir = forms.CharField(disabled=True, required=False, label="Numéro de sécurité sociale")
+class JobSeekerSignupForm(FullnameFormMixin, BaseSignupForm):
+    birthdate = forms.DateField(
+        label="Date de naissance",
+        required=True,
+        validators=[validate_birthdate],
+        widget=DuetDatePickerWidget(
+            {
+                "min": DuetDatePickerWidget.min_birthdate(),
+                "max": DuetDatePickerWidget.max_birthdate(),
+            }
+        ),
+    )
+    nir = forms.CharField(
+        label="Numéro de sécurité sociale",
+        required=True,
+        max_length=21,  # 15 + 6 white spaces
+        strip=True,
+        validators=[validate_nir],
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "2 69 05 49 588 157 80",
+            }
+        ),
+    )
     title = forms.ChoiceField(required=True, label="Civilité", choices=BLANK_CHOICE_DASH + Title.choices)
 
-    def __init__(self, nir, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    _nir_submitted = None
+    _email_submitted = None
 
-        self.nir = nir
-        self.fields["nir"].initial = self.nir
-        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
-        for password_field in [self.fields["password1"], self.fields["password2"]]:
-            password_field.widget.attrs["placeholder"] = "**********"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.fields["email"].widget.attrs["placeholder"] = "adresse@email.fr"
-        self.fields["email"].label = "Adresse e-mail"
         self.fields["first_name"].widget.attrs["placeholder"] = "Dominique"
         self.fields["last_name"].widget.attrs["placeholder"] = "Durand"
-        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
-        if self.nir:
-            self.fields["title"].initial = {"1": Title.M, "2": Title.MME}.get(self.nir[0], "")
+        self.fields["last_name"].label = "Nom de famille"
 
     def clean_email(self):
         email = super().clean_email()
@@ -147,8 +143,63 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         if email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
             raise ValidationError("Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
         if User.objects.filter(email=email).exists():
+            self._email_submitted = email
             raise ValidationError("Un autre utilisateur utilise déjà cette adresse e-mail.")
         return email
+
+    def clean_nir(self):
+        nir = self.cleaned_data["nir"].replace(" ", "")
+        if User.objects.filter(jobseeker_profile__nir=nir).exists():
+            self._nir_submitted = nir
+            raise ValidationError("Un compte avec ce numéro existe déjà.")
+        return nir
+
+
+class JobSeekerSignupWithOptionalNirForm(JobSeekerSignupForm):
+    """We allow users with a temporary NIR to skip NIR submission"""
+
+    skip = forms.BooleanField(widget=forms.HiddenInput(), initial=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["nir"].required = False
+        self.fields["nir"].widget.attrs["placeholder"] = ""
+        self.data = self.data.dict() | {"nir": ""}
+
+    def clean_nir(self):
+        nir = self.cleaned_data["nir"].replace(" ", "")
+        if nir == "":
+            return ""
+        return super().clean_nir()
+
+
+class JobSeekerCredentialsSignupForm(SignupForm):
+    first_name = forms.CharField(disabled=True, required=False, label="Prénom")
+    last_name = forms.CharField(disabled=True, required=False, label="Nom")
+    birthdate = forms.DateField(disabled=True, required=False, label="Date de naissance")
+    nir = forms.CharField(disabled=True, required=False, label="Numéro de sécurité sociale")
+    email = forms.EmailField(disabled=True, required=False, label="Adresse e-mail")
+
+    prior_cleaned_data = None
+
+    def __init__(self, prior_cleaned_data, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # data cleaned by earlier forms in the process - saved at the end
+        self.prior_cleaned_data = prior_cleaned_data
+        # NOTE: have to re-assert these values because they are overridden by allauth SignupForm.init
+        self.fields["email"].required = False
+        self.fields["email"].label = "Adresse e-mail"
+        self.fields["email"].initial = prior_cleaned_data.get("email")
+        self.fields["first_name"].initial = prior_cleaned_data.get("first_name")
+        self.fields["last_name"].initial = prior_cleaned_data.get("last_name")
+        self.fields["birthdate"].initial = prior_cleaned_data.get("birthdate")
+        self.fields["nir"].initial = prior_cleaned_data.get("nir")
+
+        # self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
+        for password_field in [self.fields["password1"], self.fields["password2"]]:
+            password_field.widget.attrs["placeholder"] = "**********"
+        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
 
     def save(self, request):
         # Avoid django-allauth to call its own often failing `generate_unique_username`
@@ -157,16 +208,13 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         # Create the user.
         self.user_kind = UserKind.JOB_SEEKER
         user = super().save(request)
-        user.title = self.cleaned_data["title"]
-        user.first_name = self.cleaned_data["first_name"]
-        user.last_name = self.cleaned_data["last_name"]
+        user.title = self.prior_cleaned_data["title"]
+        user.first_name = self.prior_cleaned_data["first_name"]
+        user.last_name = self.prior_cleaned_data["last_name"]
         user.save()
-        if self.nir:
-            user.jobseeker_profile.nir = self.nir
-            user.jobseeker_profile.save()
-
-        if self.nir:
-            del request.session[global_constants.ITOU_SESSION_NIR_KEY]
+        user.jobseeker_profile.nir = self.prior_cleaned_data["nir"]
+        user.jobseeker_profile.birthdate = self.prior_cleaned_data["birthdate"]
+        user.jobseeker_profile.save()
 
         return user
 
