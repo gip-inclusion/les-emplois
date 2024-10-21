@@ -1,0 +1,32 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Demandeur d'emploi - Inscription {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    <h1>
+        Inscription <span class="text-muted">candidat</span>
+    </h1>
+{% endblock %}
+
+{% block content %}
+
+    <section class="s-section m-0">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 ps-lg-5 col-lg-6">
+                    <div class="py-3 py-lg-5 mb-2 mb-lg-4 c-box">
+                        {% block job_seeker_signup_content %}{% endblock %}
+                    </div>
+                </div>
+                <div class="col-12 pe-lg-5 col-lg-6">
+                    <!-- Hide left column on small devices. -->
+                    <div class="d-none d-md-block py-md-3 py-lg-5 text-center">
+                        <img class="img-fluid img-fitcover w-50" src="{% static 'img/job_seeker_signup.svg' %}" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock content %}

@@ -256,11 +256,6 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
 }
 
 @media (min-width: 992px) {
-    .s-section-lg-with-background {
-        background-color: #fff;
-        background: linear-gradient(to left, #fbfbfb 50%, #f2f8fd 50%);
-    }
-
     .s-section-twocolumns .w-md-auto {
         width: auto !important;
     }
@@ -415,6 +410,11 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
 /* Fix for form.company and form.job_seeker width */
 .w-lg-400px .select2-selection__rendered {
     white-space: nowrap !important;
+}
+
+/* Override itou-theme on some forms */
+.form-checkbox-greater-spacing > .form-check {
+    margin-bottom: .75rem;
 }
 
 

@@ -1,5 +1,5 @@
-from django.urls import path, re_path
-from django.views.generic import TemplateView
+from django.urls import path, re_path, reverse_lazy
+from django.views.generic import RedirectView, TemplateView
 
 from itou.www.signup import views
 
@@ -10,9 +10,21 @@ app_name = "signup"
 urlpatterns = [
     path("", views.ChooseUserKindSignupView.as_view(), name="choose_user_kind"),
     # Job seeker.
-    path("job_seeker", views.JobSeekerSignupView.as_view(), name="job_seeker"),
-    path("job_seeker/nir", views.job_seeker_nir, name="job_seeker_nir"),
-    path("job_seeker/situation", views.job_seeker_situation, name="job_seeker_situation"),
+    # TODO(calum): temporary code for managing deployment, remove me in a few days
+    path(
+        "job_seeker/nir", RedirectView.as_view(url=reverse_lazy("signup:job_seeker_situation")), name="job_seeker_nir"
+    ),
+    path(
+        "job_seeker/situation",
+        views.job_seeker_situation,
+        name="job_seeker_situation",
+    ),
+    path("job_seeker", views.job_seeker_signup_info, name="job_seeker"),
+    path(
+        "job_seeker/credentials",
+        views.JobSeekerCredentialsSignupView.as_view(),
+        name="job_seeker_credentials",
+    ),
     path(
         "job_seeker/situation_not_eligible",
         TemplateView.as_view(template_name="signup/job_seeker_situation_not_eligible.html"),
