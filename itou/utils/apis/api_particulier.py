@@ -18,8 +18,10 @@ def client():
     )
 
 
-def _format_date(date: str) -> datetime.datetime:
-    return datetime.datetime.strptime(date, "%Y-%m-%d") if date else ""
+def _parse_date(date: str) -> datetime.date | None:
+    if date:
+        return datetime.date.fromisoformat(date)
+    return None
 
 
 def _build_params_from(job_seeker):
@@ -77,8 +79,8 @@ def _request(client, endpoint, job_seeker):
 
 def revenu_solidarite_active(client, job_seeker):
     data = {
-        "start_at": "",
-        "end_at": "",
+        "start_at": None,
+        "end_at": None,
         "is_certified": "",
         "raw_response": "",
     }
@@ -94,8 +96,8 @@ def revenu_solidarite_active(client, job_seeker):
         data["raw_response"] = str(exc)
     else:
         data = {
-            "start_at": _format_date(data["dateDebut"]),
-            "end_at": _format_date(data["dateFin"]),
+            "start_at": _parse_date(data["dateDebut"]),
+            "end_at": _parse_date(data["dateFin"]),
             "is_certified": data["status"] == "beneficiaire",
             "raw_response": data,
         }
