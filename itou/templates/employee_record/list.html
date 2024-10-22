@@ -46,24 +46,14 @@
                                 </a>
                             </div>
                         </div>
-                        {% include "employee_record/includes/list_status_help.html" with request=request status=form.status.value only %}
-                        <div class="c-info mb-3 mb-md-4">
-                            <button class="c-info__summary collapsed" data-bs-toggle="collapse" data-bs-target="#collapseInfoASP" aria-expanded="false" aria-controls="collapseInfoASP">
-                                <span>Nous transférons vos fiches salarié à l'ASP afin de vous faire gagner du temps</span>
-                            </button>
-                            <div class="c-info__detail collapse" id="collapseInfoASP">
-                                <p>Une fois envoyées et validées, vous retrouverez directement vos données sur l'extranet de l'ASP.</p>
-                                <ul>
-                                    <li>
-                                        Ne sont présentes dans cette liste que les candidatures acceptées (embauches) à partir du <b>{{ feature_availability_date|date }}</b>.
-                                    </li>
-                                    <li>
-                                        Vous devez avoir une annexe financière valide dans l'extranet de l'ASP pour pouvoir déclarer une fiche salarié dans les emplois.
-                                    </li>
-                                    <li>La visualisation dans l’Extranet IAE 2.0 interviendra dans les 2 heures suivant l’envoi.</li>
-                                </ul>
-                            </div>
-                        </div>
+                        <p>
+                            Cette interface vous permet de créer et transmettre vos fiches salariés à l'Extranet IAE 2.0 de l'ASP.
+                            <a href="{{ ITOU_HELP_CENTER_URL }}/articles/29251628906257--Fonctionnement-des-fiches-salarié"
+                               rel="noopener"
+                               target="_blank"
+                               aria-label="En savoir plus sur le fonctionnement des fiches salarié (ouverture dans un nouvel onglet)"
+                               class="has-external-link fw-bold">En savoir plus</a>.
+                        </p>
                         <form hx-get="{% url 'employee_record_views:list' %}"
                               hx-trigger="change delay:.5s, change from:#id_job_seeker"
                               hx-indicator="#employee-records-container"
