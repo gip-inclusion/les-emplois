@@ -34,6 +34,7 @@ from itou.common_apps.address.departments import (
 )
 from itou.companies import models as companies_models
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
 from itou.utils.apis import metabase as mb
@@ -416,7 +417,7 @@ def stats_ft_delay_main(request):
         request=request,
         page_title="Délai d'entrée en IAE",
         extra_params={
-            mb.JOB_APPLICATION_ORIGIN_FILTER_KEY: mb.PE_PRESCRIBER_FILTER_VALUE,
+            mb.JOB_APPLICATION_ORIGIN_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
         },
     )
 
@@ -436,7 +437,7 @@ def stats_ft_conversion_main(request):
         request=request,
         page_title="Taux de transformation",
         extra_params={
-            mb.PRESCRIBER_FILTER_KEY: mb.PE_FILTER_VALUE,
+            mb.PRESCRIBER_FILTER_KEY: mb.FT_FILTER_VALUE,
         },
     )
 
@@ -447,18 +448,25 @@ def stats_ft_conversion_raw(request):
         request=request,
         page_title="Données brutes du taux de transformation",
         extra_params={
-            mb.PRESCRIBER_FILTER_KEY: mb.PE_FILTER_VALUE,
+            mb.PRESCRIBER_FILTER_KEY: mb.FT_FILTER_VALUE,
         },
     )
 
 
 @login_required
 def stats_ft_state_main(request):
+    allowed_org_pks = list(
+        PrescriberOrganization.objects.filter(
+            kind=request.current_organization.kind,
+            department=request.current_organization.department,
+        ).values_list("pk", flat=True)
+    )
     return render_stats_ft(
         request=request,
         page_title="Etat des candidatures orientées",
         extra_params={
-            mb.PRESCRIBER_FILTER_KEY: mb.PE_PRESCRIBER_FILTER_VALUE,
+            mb.PRESCRIBER_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
+            mb.C1_PRESCRIBER_ORG_FILTER_KEY: allowed_org_pks,
         },
     )
 
@@ -469,7 +477,7 @@ def stats_ft_state_raw(request):
         request=request,
         page_title="Données brutes de l’état des candidatures orientées",
         extra_params={
-            mb.PRESCRIBER_FILTER_KEY: mb.PE_PRESCRIBER_FILTER_VALUE,
+            mb.PRESCRIBER_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
         },
     )
 
@@ -509,11 +517,21 @@ def stats_ph_state_main(request):
     if not utils.can_view_stats_ph(request):
         raise PermissionDenied
 
+    allowed_org_pks = [request.current_organization.pk]
+    if request.current_organization.kind in utils.STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST:
+        allowed_org_pks = list(
+            PrescriberOrganization.objects.filter(
+                kind=request.current_organization.kind,
+                department=request.current_organization.department,
+            ).values_list("pk", flat=True)
+        )
+
     return render_stats_ph(
         request=request,
         page_title="Etat des candidatures orientées",
         extra_params={
             mb.PRESCRIBER_FILTER_KEY: PrescriberOrganizationKind(request.current_organization.kind).label,
+            mb.C1_PRESCRIBER_ORG_FILTER_KEY: allowed_org_pks,
         },
     )
 
