@@ -81,7 +81,7 @@ def revenu_solidarite_active(client, job_seeker):
     data = {
         "start_at": None,
         "end_at": None,
-        "is_certified": "",
+        "is_certified": None,
         "raw_response": "",
     }
     try:
