@@ -2,7 +2,6 @@ import datetime
 import logging
 
 import httpx
-import tenacity
 from django.conf import settings
 
 
@@ -38,26 +37,10 @@ def _build_params_from(job_seeker):
     return params
 
 
-@tenacity.retry(
-    wait=tenacity.wait_fixed(2),
-    stop=tenacity.stop_after_attempt(4),
-    retry=tenacity.retry_if_exception_type(httpx.RequestError),
-)
 def _request(client, endpoint, job_seeker):
     params = _build_params_from(job_seeker=job_seeker)
     response = client.get(endpoint, params=params)
-    if response.status_code == 504:
-        reason = response.json().get("reason")
-        logger.error(f"{response.url=} {reason=}")
-        raise httpx.RequestError(message=reason)
-    elif response.status_code == 503:
-        errors = response.json()["errors"]
-        reason = errors[0].get("title")
-        for error in errors:
-            logger.error(f"{response.url=} {error['title']}")
-        raise httpx.RequestError(message=reason)
-    else:
-        response.raise_for_status()
+    response.raise_for_status()
     return response.json()
 
 
@@ -76,25 +59,10 @@ def has_required_info(job_seeker):
 
 
 def revenu_solidarite_active(client, job_seeker):
-    data = {
-        "start_at": None,
-        "end_at": None,
-        "is_certified": None,
-        "raw_response": "",
+    response = _request(client, "/v2/revenu-solidarite-active", job_seeker)
+    return {
+        "start_at": _parse_date(response["dateDebut"]),
+        "end_at": _parse_date(response["dateFin"]),
+        "is_certified": response["status"] == "beneficiaire",
+        "raw_response": response,
     }
-    try:
-        data = _request(client, "/v2/revenu-solidarite-active", job_seeker)
-    except httpx.HTTPStatusError as exc:  # not 5XX.
-        logger.info(f"Beneficiary not found. {job_seeker.public_id=}")
-        data["raw_response"] = exc.response.json()
-    except tenacity.RetryError as retry_err:  # 503 or 504
-        exc = retry_err.last_attempt._exception
-        data["raw_response"] = str(exc)
-    else:
-        data = {
-            "start_at": _parse_date(data["dateDebut"]),
-            "end_at": _parse_date(data["dateFin"]),
-            "is_certified": data["status"] == "beneficiaire",
-            "raw_response": data,
-        }
-    return data

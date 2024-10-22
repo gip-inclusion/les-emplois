@@ -1,22 +1,18 @@
-import datetime
-
 from django.conf import settings
 
+from itou.eligibility.tasks import certify_criteria
 from itou.users.models import User
 from itou.utils.apis import api_particulier
-from itou.utils.mocks.api_particulier import (
-    rsa_certified_mocker,
-    rsa_not_certified_mocker,
-    rsa_not_found_mocker,
-)
+from itou.utils.mocks.api_particulier import rsa_data_provider_error, rsa_not_found_mocker
 from tests.asp.factories import CommuneFactory, CountryFranceFactory, CountryOutsideEuropeFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.users.factories import JobSeekerFactory
 
 
 RSA_ENDPOINT = f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active"
 
 
-def test_build_params_from(snapshot, caplog):
+def test_build_params_from(snapshot):
     birth_place = CommuneFactory(code="07141")
     job_seeker = JobSeekerFactory(born_in_france=True, for_snapshot=True, jobseeker_profile__birth_place=birth_place)
     job_seeker = User.objects.select_related(
@@ -47,86 +43,26 @@ def test_build_params_from(snapshot, caplog):
 
 def test_not_found(respx_mock):
     respx_mock.get(RSA_ENDPOINT).respond(404, json=rsa_not_found_mocker())
-    job_seeker = JobSeekerFactory(born_in_france=True)
-    with api_particulier.client() as client:
-        response = api_particulier.revenu_solidarite_active(client, job_seeker)
-    assert response["raw_response"] == rsa_not_found_mocker()
-    assert response["is_certified"] is None
-    assert response["start_at"] is None
-    assert response["end_at"] is None
-
-
-def test_service_unavailable(settings, respx_mock, mocker, caplog):
-    mocker.patch("tenacity.nap.time.sleep")
-    reason = "Erreur inconnue du fournisseur de données"
-    respx_mock.get(RSA_ENDPOINT).respond(
-        503,
-        json={
-            "errors": [
-                {
-                    "code": "37999",
-                    "title": reason,
-                    "detail": "La réponse retournée par le fournisseur de données est invalide et inconnue de notre"
-                    "service. L'équipe technique a été notifiée de cette erreur pour investigation.",
-                    "source": "null",
-                    "meta": {"provider": "CNAV"},
-                }
-            ]
-        },
+    diag = IAEEligibilityDiagnosisFactory(
+        job_seeker__born_in_france=True,
+        from_employer=True,
+        with_certifiable_criteria=True,
     )
-    job_seeker = JobSeekerFactory(born_in_france=True)
-    with api_particulier.client() as client:
-        response = api_particulier.revenu_solidarite_active(client, job_seeker)
+    certify_criteria(diag)
+    crit = diag.selected_administrative_criteria.get()
+    assert crit.data_returned_by_api == rsa_not_found_mocker()
+    assert crit.certified is None
+    assert crit.certification_period is None
 
+
+def test_service_unavailable(respx_mock, caplog):
+    reason = "La réponse retournée par le fournisseur de données est invalide et inconnue de notre service."
+    respx_mock.get(RSA_ENDPOINT).respond(503, json=rsa_data_provider_error())
+    diag = IAEEligibilityDiagnosisFactory(
+        job_seeker__born_in_france=True,
+        from_employer=True,
+        with_certifiable_criteria=True,
+    )
+    certify_criteria(diag)
     assert reason in caplog.text
     assert RSA_ENDPOINT in caplog.text
-    assert response["raw_response"] == reason
-    assert response["is_certified"] is None
-    assert response["start_at"] is None
-    assert response["end_at"] is None
-
-
-def test_gateway_timeout(respx_mock, mocker, caplog):
-    mocker.patch("tenacity.nap.time.sleep", mocker.MagicMock())
-    reason = "The read operation timed out"
-    respx_mock.get(RSA_ENDPOINT).respond(504, json={"error": "null", "reason": reason, "message": "null"})
-
-    job_seeker = JobSeekerFactory(born_in_france=True)
-    with api_particulier.client() as client:
-        response = api_particulier.revenu_solidarite_active(client, job_seeker)
-
-    assert reason in caplog.text
-    assert RSA_ENDPOINT in caplog.text
-    assert response["raw_response"] == reason
-    assert response["is_certified"] is None
-    assert response["start_at"] is None
-    assert response["end_at"] is None
-
-
-# BRSA
-def test_certify_brsa(respx_mock):
-    # Certified
-    respx_mock.get(RSA_ENDPOINT).respond(
-        200,
-        json=rsa_certified_mocker(),
-    )
-
-    birth_place = CommuneFactory(code="07141")
-    job_seeker = JobSeekerFactory(born_in_france=True, for_snapshot=True, jobseeker_profile__birth_place=birth_place)
-    with api_particulier.client() as client:
-        response = api_particulier.revenu_solidarite_active(client, job_seeker)
-        assert response["raw_response"] == rsa_certified_mocker()
-        assert response["is_certified"] is True
-        assert response["start_at"] == datetime.date(2024, 8, 1)
-        assert response["end_at"] == datetime.date(2024, 10, 31)
-
-        # Not certified
-        respx_mock.get(RSA_ENDPOINT).respond(
-            200,
-            json=rsa_not_certified_mocker(),
-        )
-        response = api_particulier.revenu_solidarite_active(client, job_seeker)
-        assert response["raw_response"] == rsa_not_certified_mocker()
-        assert response["is_certified"] is False
-        assert response["start_at"] is None
-        assert response["end_at"] is None

@@ -14,3 +14,15 @@ def rsa_not_found_mocker():
         "reason": "Dossier allocataire inexistant. Le document ne peut être édité.",
         "message": "Dossier allocataire inexistant. Le document ne peut être édité.",
     }
+
+
+def rsa_data_provider_error():
+    reason = (
+        "La réponse retournée par le fournisseur de données est invalide et inconnue de notre service. L'équipe "
+        "technique a été notifiée de cette erreur pour investigation."
+    )
+    return {
+        "error": "provider_unknown_error",
+        "reason": reason,
+        "message": reason,
+    }
