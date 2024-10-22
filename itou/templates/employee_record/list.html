@@ -21,7 +21,7 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link active" href="{% url 'employee_record_views:list' %}?status=NEW" {% matomo_event "employeurs" "clic" "onglet-fiches-salaries" %}>
-                    <span>Fiches salariés ASP</span>
+                    <span>Fiches salarié ASP</span>
                     {% if num_rejected_employee_records %}
                         <span class="badge badge-sm rounded-pill bg-warning text-white ms-2">{{ num_rejected_employee_records }}</span>
                     {% endif %}
