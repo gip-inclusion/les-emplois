@@ -14,6 +14,7 @@ from itou.eligibility.models.common import (
     AdministrativeCriteriaQuerySet,
 )
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
+from itou.utils.apis import api_particulier
 from itou.utils.mocks.api_particulier import (
     rsa_certified_mocker,
     rsa_not_certified_mocker,
@@ -506,7 +507,10 @@ def test_certifiable(AdministrativeCriteriaClass):
 )
 @freeze_time("2024-09-12")
 def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFactory):
-    mocker.patch("itou.utils.apis.api_particulier.APIParticulierClient._request", return_value=rsa_certified_mocker())
+    mocker.patch(
+        "itou.utils.apis.api_particulier._request",
+        return_value=rsa_certified_mocker(),
+    )
     job_seeker = JobSeekerFactory(with_address=True, born_in_france=True)
     eligibility_diagnosis = EligibilityDiagnosisFactory(
         with_certifiable_criteria=True, job_seeker=job_seeker, from_prescriber=True
@@ -548,10 +552,11 @@ def test_selected_administrative_criteria_certify(respx_mock, EligibilityDiagnos
 
     # Is certified.
     certified_mocker = mocker.patch(
-        "itou.utils.apis.api_particulier.APIParticulierClient._request",
+        "itou.utils.apis.api_particulier._request",
         return_value=rsa_certified_mocker(),
     )
-    criterion.certify(save=True)
+    with api_particulier.client() as client:
+        criterion.certify(client, save=True)
     criterion.refresh_from_db()
     assert criterion.data_returned_by_api == rsa_certified_mocker()
     assert criterion.certified
@@ -562,10 +567,11 @@ def test_selected_administrative_criteria_certify(respx_mock, EligibilityDiagnos
 
     # Is not certified.
     not_certified_mocker = mocker.patch(
-        "itou.utils.apis.api_particulier.APIParticulierClient._request",
+        "itou.utils.apis.api_particulier._request",
         return_value=rsa_not_certified_mocker(),
     )
-    criterion.certify(save=True)
+    with api_particulier.client() as client:
+        criterion.certify(client, save=True)
     criterion.refresh_from_db()
     assert criterion.data_returned_by_api == rsa_not_certified_mocker()
     assert criterion.certified is False
@@ -578,7 +584,8 @@ def test_selected_administrative_criteria_certify(respx_mock, EligibilityDiagnos
     respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
         404, json=rsa_not_found_mocker()
     )
-    criterion.certify(save=True)
+    with api_particulier.client() as client:
+        criterion.certify(client, save=True)
     criterion.refresh_from_db()
     assert criterion.data_returned_by_api == rsa_not_found_mocker()
     assert criterion.certified is None

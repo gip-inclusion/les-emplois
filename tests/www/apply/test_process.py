@@ -1913,7 +1913,7 @@ class TestProcessAcceptViews:
     @freeze_time("2024-09-11")
     def test_select_other_job_description_for_job_application(self, client, mocker):
         rsa_certified_mock = mocker.patch(
-            "itou.utils.apis.api_particulier.APIParticulierClient._request",
+            "itou.utils.apis.api_particulier._request",
             return_value=rsa_certified_mocker(),
         )
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
@@ -2459,7 +2459,7 @@ class TestProcessAcceptViews:
     @freeze_time("2024-09-11")
     def test_accept_iae__criteria_can_be_certified(self, client, mocker):
         certify_rsa_mocker = mocker.patch(
-            "itou.utils.apis.api_particulier.APIParticulierClient._request",
+            "itou.utils.apis.api_particulier._request",
             return_value=rsa_certified_mocker(),
         )
         ######### Case 1: if BRSA is one the diagnosis criteria,
@@ -2539,7 +2539,7 @@ class TestProcessAcceptViews:
     @freeze_time("2024-09-11")
     def test_accept_geiq__criteria_can_be_certified(self, client, mocker):
         certify_rsa_mocker = mocker.patch(
-            "itou.utils.apis.api_particulier.APIParticulierClient._request",
+            "itou.utils.apis.api_particulier._request",
             return_value=rsa_certified_mocker(),
         )
         birthdate = datetime.date(1995, 12, 27)
@@ -2604,7 +2604,7 @@ class TestProcessAcceptViews:
     @freeze_time("2024-09-11")
     def test_accept_no_siae__criteria_can_be_certified(self, client, mocker):
         mocker.patch(
-            "itou.utils.apis.api_particulier.APIParticulierClient._request",
+            "itou.utils.apis.api_particulier._request",
             return_value=rsa_certified_mocker(),
         )
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True, with_jobs=True)
@@ -2656,7 +2656,7 @@ class TestProcessAcceptViews:
     @freeze_time("2024-09-11")
     def test_accept_updated_birthdate_invalidating_birth_place(self, client, mocker):
         mocker.patch(
-            "itou.utils.apis.api_particulier.APIParticulierClient._request",
+            "itou.utils.apis.api_particulier._request",
             return_value=rsa_certified_mocker(),
         )
         # tests for a rare case where the birthdate will be cleaned for sharing between forms during the accept process

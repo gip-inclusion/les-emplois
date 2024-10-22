@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel, AuthorKind
 from itou.job_applications.enums import SenderKind
-from itou.utils.apis.api_particulier import APIParticulierClient
+from itou.utils.apis import api_particulier
 from itou.utils.models import InclusiveDateRangeField
 from itou.utils.types import InclusiveDateRange
 
@@ -97,8 +97,9 @@ class AbstractEligibilityDiagnosisModel(models.Model):
                 eligibility_diagnosis=self,
             )
         )
-        for criterion in criteria:
-            criterion.certify()
+        with api_particulier.client() as client:
+            for criterion in criteria:
+                criterion.certify(client)
         SelectedAdministrativeCriteria.objects.bulk_update(
             criteria,
             fields=[
@@ -220,15 +221,13 @@ class AbstractSelectedAdministrativeCriteria(models.Model):
 
     objects = SelectedAdministrativeCriteriaQuerySet.as_manager()
 
-    def certify(self, save=False):
-        client = APIParticulierClient(job_seeker=self.eligibility_diagnosis.job_seeker)
-
+    def certify(self, client, save=False):
         # Call only if self.certified is None?
         if self.administrative_criteria.is_certifiable:
             # Only the RSA criterion is certifiable at the moment,
             # but this may change soon with the addition of `parent isolé` and `allocation adulte handicapé`.
             if self.administrative_criteria.kind == AdministrativeCriteriaKind.RSA:
-                data = client.revenu_solidarite_active()
+                data = api_particulier.revenu_solidarite_active(client, self.eligibility_diagnosis.job_seeker)
 
             self.certified_at = timezone.now()
             self.data_returned_by_api = data["raw_response"]
