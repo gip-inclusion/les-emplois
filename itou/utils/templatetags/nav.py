@@ -142,7 +142,7 @@ NAV_ENTRIES = {
         matomo_event_option="salaries-pass-iae",
     ),
     "employer-employee-records": NavItem(
-        label="Fiches salariés ASP",
+        label="Fiches salarié ASP",
         target=f"{reverse('employee_record_views:list')}?status=NEW",
         active_view_names=["employee_record_views:list"],
         matomo_event_category="offcanvasNav",

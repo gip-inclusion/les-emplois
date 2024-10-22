@@ -15,7 +15,7 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'employee_record_views:list' %}?status=NEW" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-liste-fiches-salaries" %}>
                             <i class="ri-article-line ri-lg fw-normal"></i>
-                            <span>Fiches salariés ASP</span>
+                            <span>Fiches salarié ASP</span>
                         </a>
                         {% if num_rejected_employee_records %}
                             <span class="badge rounded-pill badge-xs bg-warning">{{ num_rejected_employee_records }}</span>

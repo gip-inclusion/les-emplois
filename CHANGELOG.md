@@ -122,7 +122,7 @@
 - [UX/UI : Ajout d'un bouton de retour à la page d'accès aux APIs](https://github.com/gip-inclusion/les-emplois/pull/4678)
 - [UX/UI : Conversion d’une alerte en toast lorsque j’enregistre mes préférences de notifications](https://github.com/gip-inclusion/les-emplois/pull/4670)
 - [UX/UI : Déplacer le texte d’intro dans les 3 onglets “organisation”](https://github.com/gip-inclusion/les-emplois/pull/4683)
-- [UX/UI : Passer « Salariés et PASS IAE » et « Fiches salariés ASP » en onglets](https://github.com/gip-inclusion/les-emplois/pull/4715) 🖼
+- [UX/UI : Passer « Salariés et PASS IAE » et « Fiches salarié ASP » en onglets](https://github.com/gip-inclusion/les-emplois/pull/4715) 🖼
 - [UX/UI : Remplacer les derniers fils d’Ariane par des liens retours](https://github.com/gip-inclusion/les-emplois/pull/4679)
 - [UX/UI : Renommer « organisation » en « structure » pour les employeurs](https://github.com/gip-inclusion/les-emplois/pull/4711)
 - [UX/UI : Retirer l’élément « tableau de bord » du menu « Mon espace »](https://github.com/gip-inclusion/les-emplois/pull/4667)
@@ -149,7 +149,7 @@
 ### Ajouté
 
 - [Candidat: Création d'un espace candidats](https://github.com/gip-inclusion/les-emplois/pull/4535)
-- [Fiches salariés : Préciser comment la liste des salariés est construite à la création](https://github.com/gip-inclusion/les-emplois/pull/4609) 🖼
+- [Fiches salarié : Préciser comment la liste des salariés est construite à la création](https://github.com/gip-inclusion/les-emplois/pull/4609) 🖼
 - [Pilotage : Ajouter des encarts pour les prochains webinaires](https://github.com/gip-inclusion/les-emplois/pull/4592)
 - [Pilotage : Création de l'institution "Convergence France" et ouverture des TB446 et TB469 pour celle-ci](https://github.com/gip-inclusion/les-emplois/pull/4588) 🖼
 - [UX/UI : Refonte des layouts](https://github.com/gip-inclusion/les-emplois/pull/4483)
@@ -523,7 +523,7 @@
 - [Remplacer le fil d'ariane par des boutons retour](https://github.com/gip-inclusion/les-emplois/pull/3884)
 - [UX/UI : Amélioration du dropdown structure](https://github.com/gip-inclusion/les-emplois/pull/3968) 🖼
 - [UX/UI : Filtrer les employeurs et postes de manière plus dynamique](https://github.com/gip-inclusion/les-emplois/pull/3949)
-- [UX/UI : Filtrer les fiches salariés de manière plus dynamique](https://github.com/gip-inclusion/les-emplois/pull/3993)
+- [UX/UI : Filtrer les fiches salarié de manière plus dynamique](https://github.com/gip-inclusion/les-emplois/pull/3993)
 - [UX/UI : Filtrer les salariés et PASS IAE de manière plus dynamique](https://github.com/gip-inclusion/les-emplois/pull/3997)
 - [[DataInclusion] Ne pas appeler l'API quand l'URL n'est pas définie](https://github.com/gip-inclusion/les-emplois/pull/4005)
 
@@ -587,7 +587,7 @@
 
 ### Ajouté
 
-- Fiches Salarié : Ajout d'une commande afin de renvoyer les fiches salariés pour une SIAE
+- Fiches Salarié : Ajout d'une commande afin de renvoyer les fiches salarié pour une SIAE
 - Fiches Salarié : Ouverture du module pour les EITI
 - PASS IAE : Ajout d'un champ "dernière modification"
 - Stats : Publication du TB394 "Déclaration d'embauche" pour les SIAE sur la région Occitanie
@@ -660,7 +660,7 @@
 - PASS IAE : Utiliser une durée fixe (730 jours) lors de sa délivrance
 - Message de promotion temporaire sur le tableau de bord des EITI
 - Refonte UX/UI : Message pour prévenir les utilisateurs des changements d'interface
-- Refonte UX/UI : Cartes fiches salariés
+- Refonte UX/UI : Cartes fiches salarié
 - Refonte UX/UI : Cartes de postes ouverts au recrutement
 - Refonte UX/UI : Cartes salariés et PASS IAE
 - Refonte UX/UI : Cartes prescripteurs

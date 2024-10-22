@@ -149,7 +149,7 @@ class TestDashboardView:
 
         url = reverse("dashboard:index")
         response = client.get(url)
-        assertContains(response, "Fiches salariés ASP")
+        assertContains(response, "Fiches salarié ASP")
         assertNotContains(response, WARNING_CLASS)
         assert response.context["num_rejected_employee_records"] == 0
 

@@ -309,7 +309,7 @@
                           
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="fiches-salaries-asp" href="/employee_record/list?status=NEW">
-                                  Fiches salariés ASP</a>
+                                  Fiches salarié ASP</a>
                               </li>
                           
                       </ul>

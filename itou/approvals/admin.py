@@ -69,7 +69,7 @@ class JobApplicationInline(ItouStackedInline):
     # Custom read-only fields as workaround :
     # there is no direct relation between approvals and employee records
     # (YET...)
-    @admin.display(description="situation fiches salariés")
+    @admin.display(description="situation fiches salarié")
     def employee_record_status(self, obj):
         if obj.employee_record.exists():
             return mark_safe(
