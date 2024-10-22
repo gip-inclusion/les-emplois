@@ -18,7 +18,6 @@
 
 {% if request.htmx %}
     {% include "employee_record/includes/list_order.html" %}
-    {% include "employee_record/includes/list_status_help.html" with request=request status=form.status.value only %}
     {% include "employee_record/includes/list_counter.html" %}
     {% include "employee_record/includes/employee_record_filters/status.html" %}
 {% endif %}
