@@ -57,7 +57,7 @@ def test_certify_brsa__missing_information(respx_mock, caplog):
     with api_particulier.client() as client:
         response = api_particulier.revenu_solidarite_active(client, job_seeker)
     assert "Missing parameters" in response["raw_response"]
-    assert response["is_certified"] == ""
+    assert response["is_certified"] is None
     assert response["start_at"] is None
     assert response["end_at"] is None
 
@@ -68,7 +68,7 @@ def test_not_found(respx_mock):
     with api_particulier.client() as client:
         response = api_particulier.revenu_solidarite_active(client, job_seeker)
     assert response["raw_response"] == rsa_not_found_mocker()
-    assert response["is_certified"] == ""
+    assert response["is_certified"] is None
     assert response["start_at"] is None
     assert response["end_at"] is None
 
@@ -98,7 +98,7 @@ def test_service_unavailable(settings, respx_mock, mocker, caplog):
     assert reason in caplog.text
     assert RSA_ENDPOINT in caplog.text
     assert response["raw_response"] == reason
-    assert response["is_certified"] == ""
+    assert response["is_certified"] is None
     assert response["start_at"] is None
     assert response["end_at"] is None
 
@@ -115,7 +115,7 @@ def test_gateway_timeout(respx_mock, mocker, caplog):
     assert reason in caplog.text
     assert RSA_ENDPOINT in caplog.text
     assert response["raw_response"] == reason
-    assert response["is_certified"] == ""
+    assert response["is_certified"] is None
     assert response["start_at"] is None
     assert response["end_at"] is None
 
@@ -133,7 +133,7 @@ def test_certify_brsa(respx_mock):
     with api_particulier.client() as client:
         response = api_particulier.revenu_solidarite_active(client, job_seeker)
         assert response["raw_response"] == rsa_certified_mocker()
-        assert response["is_certified"]
+        assert response["is_certified"] is True
         assert response["start_at"] == datetime.date(2024, 8, 1)
         assert response["end_at"] == datetime.date(2024, 10, 31)
 
@@ -144,6 +144,6 @@ def test_certify_brsa(respx_mock):
         )
         response = api_particulier.revenu_solidarite_active(client, job_seeker)
         assert response["raw_response"] == rsa_not_certified_mocker()
-        assert not response["is_certified"]
+        assert response["is_certified"] is False
         assert response["start_at"] is None
         assert response["end_at"] is None
