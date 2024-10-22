@@ -99,5 +99,4 @@ def revenu_solidarite_active(client, job_seeker):
             "is_certified": data["status"] == "beneficiaire",
             "raw_response": data,
         }
-    finally:
-        return data
+    return data
