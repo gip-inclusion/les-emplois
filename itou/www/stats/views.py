@@ -509,23 +509,12 @@ def stats_ph_state_main(request):
     if not utils.can_view_stats_ph(request):
         raise PermissionDenied
 
-    context = {}
-    if request.current_organization.kind in [PrescriberOrganizationKind.ML, PrescriberOrganizationKind.CAP_EMPLOI]:
-        context["pilotage_webinar_banners"] = [
-            {
-                "title": "Besoin d’être accompagné dans la prise en main de ce tableau de bord ?",
-                "description": "Participez à l’une de nos deux sessions de présentation de vos statistiques dédiées le jeudi 12 septembre ou le mardi 24 septembre.",  # noqa: E501
-                "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-missions-locales-et-cap-emploi-decouvrez-votre-nouveau-tableau-de-bord-personnalise-et-faites-le-point-sur-vos-prescriptions-vers-liae?type=detailed",  # noqa: E501
-                "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 9, 24),
-            }
-        ]
     return render_stats_ph(
         request=request,
         page_title="Etat des candidatures orientées",
         extra_params={
             mb.PRESCRIBER_FILTER_KEY: PrescriberOrganizationKind(request.current_organization.kind).label,
         },
-        extra_context=context,
     )
 
 
@@ -573,19 +562,7 @@ def stats_ddets_iae_auto_prescription(request):
 
 @login_required
 def stats_ddets_iae_ph_prescription(request):
-    context = {
-        "pilotage_webinar_banners": [
-            {
-                "title": "Découvrez votre nouveau tableau de bord",
-                "description": "Inscrivez-vous au webinaire de présentation de ce nouveau tableau de bord qui vous permet de suivre les réalisations de chaque organisation prescriptrice habilitée sur votre territoire",  # noqa: E501
-                "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-services-de-letat-decouvrez-votre-nouveau-tableau-de-bord-personnalise-et-faites-le-point-sur-les-prescriptions-realisees-sur-votre-territoire?s=55c2160a-b91f-4f2b-b30c-45d6939c5922",  # noqa: E501
-                "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 9, 26),
-            },
-        ]
-    }
-    return render_stats_ddets_iae(
-        request=request, page_title="Suivi des prescriptions des prescripteurs habilités", extra_context=context
-    )
+    return render_stats_ddets_iae(request=request, page_title="Suivi des prescriptions des prescripteurs habilités")
 
 
 @login_required
@@ -689,19 +666,7 @@ def stats_dreets_iae_auto_prescription(request):
 
 @login_required
 def stats_dreets_iae_ph_prescription(request):
-    context = {
-        "pilotage_webinar_banners": [
-            {
-                "title": "Découvrez votre nouveau tableau de bord",
-                "description": "Inscrivez-vous au webinaire de présentation de ce nouveau tableau de bord qui vous permet de suivre les réalisations de chaque organisation prescriptrice habilitée sur votre territoire",  # noqa: E501
-                "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-services-de-letat-decouvrez-votre-nouveau-tableau-de-bord-personnalise-et-faites-le-point-sur-les-prescriptions-realisees-sur-votre-territoire?s=55c2160a-b91f-4f2b-b30c-45d6939c5922",  # noqa: E501
-                "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 9, 26),
-            },
-        ]
-    }
-    return render_stats_dreets_iae(
-        request=request, extra_context=context, page_title="Suivi des prescriptions des prescripteurs habilités"
-    )
+    return render_stats_dreets_iae(request=request, page_title="Suivi des prescriptions des prescripteurs habilités")
 
 
 @login_required
@@ -811,21 +776,10 @@ def stats_dgefp_iae_iae(request):
 
 @login_required
 def stats_dgefp_iae_ph_prescription(request):
-    context = {
-        "pilotage_webinar_banners": [
-            {
-                "title": "Découvrez votre nouveau tableau de bord",
-                "description": "Inscrivez-vous au webinaire de présentation de ce nouveau tableau de bord qui vous permet de suivre les réalisations de chaque organisation prescriptrice habilitée sur votre territoire",  # noqa: E501
-                "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-services-de-letat-decouvrez-votre-nouveau-tableau-de-bord-personnalise-et-faites-le-point-sur-les-prescriptions-realisees-sur-votre-territoire?s=55c2160a-b91f-4f2b-b30c-45d6939c5922",  # noqa: E501
-                "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 9, 26),
-            },
-        ]
-    }
     return render_stats_dgefp_iae(
         request=request,
         page_title="Suivi des prescriptions des prescripteurs habilités",
         extra_params=get_params_for_whole_country(),
-        extra_context=context,
     )
 
 
