@@ -135,11 +135,11 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
     if "pilotage_webinar_banners" not in base_context:
         base_context["pilotage_webinar_banners"] = [
             {
-                "title": "Enquête utilisateur : votre avis est précieux pour nous aider à améliorer nos tableaux de bord !",  # noqa: E501
-                "description": "Jusqu’au 20 octobre, prenez part à notre enquête sur l'usage des tableaux de bord dans vos missions et partagez vos suggestions d'amélioration.",  # noqa: E501
-                "call_to_action": "Je participe à l’enquête",
-                "url": "https://tally.so/r/nPYGJd",
-                "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 10, 20),
+                "title": "Des questions sur l’utilisation des tableaux de bord ?",
+                "description": "Nous y répondons lors d’un webinaire questions / réponses animé chaque mois.<br /> Dates des prochaines sessions : jeudi 24 octobre ou jeudi 21 novembre de 14h à 14h45.",  # noqa: E501
+                "call_to_action": "Je m’inscris",
+                "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-professionnels-de-liae-questions-reponses-sur-les-tableaux-de-bord-1",
+                "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 11, 21),
             }
         ]
     base_context["pilotage_webinar_banners"] = [
