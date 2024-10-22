@@ -175,7 +175,16 @@ class TestListEmployeeRecords:
             parse_response_to_soup(
                 response,
                 selector=".employee-records-list .c-box--results__footer",
-                replace_in_attr=[self.employee_record, self.job_application],
+                replace_in_attr=[
+                    (
+                        "href",
+                        f"https://tally.so/r/wzxQlg?employeerecord={self.employee_record.pk}&jobapplication={self.job_application.pk}",
+                        (
+                            "https://tally.so/r/wzxQlg"
+                            "?employeerecord=[PK of EmployeeRecord]&jobapplication=[PK of JobApplication]"
+                        ),
+                    )
+                ],
             )
         ) == snapshot(name="action")
 
