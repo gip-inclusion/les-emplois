@@ -1,7 +1,12 @@
 import datetime
+import time
 
+import pytest
 from django.conf import settings
+from freezegun import freeze_time
+from huey.exceptions import RetryTask
 
+from itou.eligibility.tasks import certify_criteria
 from itou.users.models import User
 from itou.utils.apis import api_particulier
 from itou.utils.mocks.api_particulier import (
@@ -10,6 +15,7 @@ from itou.utils.mocks.api_particulier import (
     rsa_not_found_mocker,
 )
 from tests.asp.factories import CommuneFactory, CountryFranceFactory, CountryOutsideEuropeFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.users.factories import JobSeekerFactory
 
 
@@ -47,60 +53,100 @@ def test_build_params_from(snapshot, caplog):
 
 def test_not_found(respx_mock):
     respx_mock.get(RSA_ENDPOINT).respond(404, json=rsa_not_found_mocker())
-    job_seeker = JobSeekerFactory(born_in_france=True)
-    with api_particulier.client() as client:
-        response = api_particulier.revenu_solidarite_active(client, job_seeker)
-    assert response["raw_response"] == rsa_not_found_mocker()
-    assert response["is_certified"] is None
-    assert response["start_at"] is None
-    assert response["end_at"] is None
+    diag = IAEEligibilityDiagnosisFactory(
+        job_seeker__born_in_france=True,
+        from_employer=True,
+        with_certifiable_criteria=True,
+    )
+    certify_criteria(diag)
+    crit = diag.selected_administrative_criteria.get()
+    assert crit.data_returned_by_api == rsa_not_found_mocker()
+    assert crit.certified is None
+    assert crit.certification_period is None
 
 
-def test_service_unavailable(settings, respx_mock, mocker, caplog):
-    mocker.patch("tenacity.nap.time.sleep")
+@freeze_time(datetime.datetime(2024, 1, 1, 11, 11, 11, tzinfo=datetime.UTC))
+@pytest.mark.parametrize(
+    "has_retry_after,expected",
+    [
+        (True, {"delay": 1}),
+        (False, {"eta": datetime.datetime(2024, 1, 1, 11, 11, 12, tzinfo=datetime.UTC)}),
+    ],
+)
+def test_too_many_requests(expected, has_retry_after, respx_mock):
+    delay_s = 1
+    reset_ts = int(time.time() + delay_s)
+    headers = {
+        "ratelimit-limit": "20",
+        "ratelimit-remaining": "0",
+        "ratelimit-reset": f"{reset_ts}",
+    }
+    if has_retry_after:
+        headers["retry-after"] = f"{delay_s}"
+    respx_mock.get(RSA_ENDPOINT).respond(503, headers=headers, json={})
+    diag = IAEEligibilityDiagnosisFactory(
+        job_seeker__born_in_france=True,
+        from_employer=True,
+        with_certifiable_criteria=True,
+    )
+    with pytest.raises(RetryTask) as exc_info:
+        certify_criteria(diag)
+    for attrname, value in expected.items():
+        assert getattr(exc_info.value, attrname) == value
+
+
+def test_service_unavailable(respx_mock, caplog):
     reason = "Erreur inconnue du fournisseur de données"
+    response = {
+        "errors": [
+            {
+                "code": "37999",
+                "title": reason,
+                "detail": "La réponse retournée par le fournisseur de données est invalide et inconnue de notre"
+                "service. L'équipe technique a été notifiée de cette erreur pour investigation.",
+                "source": "null",
+                "meta": {"provider": "CNAV"},
+            }
+        ]
+    }
     respx_mock.get(RSA_ENDPOINT).respond(
         503,
-        json={
-            "errors": [
-                {
-                    "code": "37999",
-                    "title": reason,
-                    "detail": "La réponse retournée par le fournisseur de données est invalide et inconnue de notre"
-                    "service. L'équipe technique a été notifiée de cette erreur pour investigation.",
-                    "source": "null",
-                    "meta": {"provider": "CNAV"},
-                }
-            ]
+        headers={
+            "ratelimit-limit": "20",
+            "ratelimit-remaining": "14",
+            "ratelimit-reset": "1729587616",
         },
+        json=response,
     )
-    job_seeker = JobSeekerFactory(born_in_france=True)
-    with api_particulier.client() as client:
-        response = api_particulier.revenu_solidarite_active(client, job_seeker)
-
+    diag = IAEEligibilityDiagnosisFactory(
+        job_seeker__born_in_france=True,
+        from_employer=True,
+        with_certifiable_criteria=True,
+    )
+    with pytest.raises(RetryTask) as exc_info:
+        certify_criteria(diag)
+    assert exc_info.value.delay is None
+    assert exc_info.value.eta == datetime.datetime(2024, 10, 22, 9, 0, 16, tzinfo=datetime.UTC)
     assert reason in caplog.text
     assert RSA_ENDPOINT in caplog.text
-    assert response["raw_response"] == reason
-    assert response["is_certified"] is None
-    assert response["start_at"] is None
-    assert response["end_at"] is None
 
 
 def test_gateway_timeout(respx_mock, mocker, caplog):
-    mocker.patch("tenacity.nap.time.sleep", mocker.MagicMock())
     reason = "The read operation timed out"
-    respx_mock.get(RSA_ENDPOINT).respond(504, json={"error": "null", "reason": reason, "message": "null"})
+    response = {"error": "null", "reason": reason, "message": "null"}
+    respx_mock.get(RSA_ENDPOINT).respond(504, json=response)
 
-    job_seeker = JobSeekerFactory(born_in_france=True)
-    with api_particulier.client() as client:
-        response = api_particulier.revenu_solidarite_active(client, job_seeker)
-
+    diag = IAEEligibilityDiagnosisFactory(
+        job_seeker__born_in_france=True,
+        from_employer=True,
+        with_certifiable_criteria=True,
+    )
+    with pytest.raises(RetryTask) as exc_info:
+        certify_criteria(diag)
+    assert exc_info.value.delay == 600
+    assert exc_info.value.eta is None
     assert reason in caplog.text
     assert RSA_ENDPOINT in caplog.text
-    assert response["raw_response"] == reason
-    assert response["is_certified"] is None
-    assert response["start_at"] is None
-    assert response["end_at"] is None
 
 
 # BRSA

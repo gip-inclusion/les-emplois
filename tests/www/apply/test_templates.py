@@ -8,9 +8,9 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertInHTML
 
 from itou.eligibility.enums import AdministrativeCriteriaLevel
+from itou.eligibility.tasks import certify_criteria
 from itou.job_applications.enums import Origin
 from itou.jobs.models import Appellation
-from itou.utils.apis import api_particulier
 from itou.utils.context_processors import expose_enums
 from itou.utils.mocks.api_particulier import rsa_certified_mocker
 from itou.www.apply.views.list_views import JobApplicationsListKind
@@ -221,10 +221,7 @@ class TestCertifiedBadgeIae:
             with_certifiable_criteria=True,
             from_employer=True,
         )
-        criterion = diagnosis.selected_administrative_criteria.first()
-        with api_particulier.client() as client:
-            criterion.certify(client)
-        criterion.save()
+        certify_criteria(diagnosis)
         rendered = self.template.render(
             Context(self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": False})
         )
@@ -254,10 +251,7 @@ class TestCertifiedBadgeIae:
             with_certifiable_criteria=True,
             from_prescriber=True,
         )
-        criterion = diagnosis.selected_administrative_criteria.first()
-        with api_particulier.client() as client:
-            criterion.certify(client)
-        criterion.save()
+        certify_criteria(diagnosis)
         rendered = self.template.render(
             Context(self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": False})
         )
@@ -336,10 +330,7 @@ class TestCertifiedBadgeIae:
             with_certifiable_criteria=True,
             from_employer=True,
         )
-        criterion = diagnosis.selected_administrative_criteria.first()
-        with api_particulier.client() as client:
-            criterion.certify(client)
-        criterion.save()
+        certify_criteria(diagnosis)
         rendered = self.template.render(Context(self.default_params(diagnosis)))
         assert certified_help_text in rendered
 
@@ -389,10 +380,7 @@ class TestCertifiedBadgeGEIQ:
             from_prescriber=True,
         )
         job_application = self.create_job_application(diagnosis)
-        criterion = diagnosis.selected_administrative_criteria.first()
-        with api_particulier.client() as client:
-            criterion.certify(client)
-        criterion.save()
+        certify_criteria(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
         assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
@@ -414,10 +402,7 @@ class TestCertifiedBadgeGEIQ:
             from_geiq=True,
         )
         job_application_with_certified_criteria = self.create_job_application(diagnosis)
-        criterion = diagnosis.selected_administrative_criteria.first()
-        with api_particulier.client() as client:
-            criterion.certify(client)
-        criterion.save()
+        certify_criteria(diagnosis)
         rendered = self.template.render(
             Context(self.default_params_geiq(diagnosis, job_application_with_certified_criteria))
         )
@@ -438,10 +423,7 @@ class TestCertifiedBadgeGEIQ:
             from_geiq=True,
         )
         job_application = self.create_job_application(diagnosis, hiring_start_at=datetime.date(2024, 11, 30))
-        criterion = diagnosis.selected_administrative_criteria.first()
-        with api_particulier.client() as client:
-            criterion.certify(client)
-        criterion.save()
+        certify_criteria(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
         assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
@@ -459,10 +441,7 @@ class TestCertifiedBadgeGEIQ:
             from_geiq=True,
         )
         job_application = self.create_job_application(diagnosis, hiring_start_at=datetime.date(2025, 2, 28))
-        criterion = diagnosis.selected_administrative_criteria.first()
-        with api_particulier.client() as client:
-            criterion.certify(client)
-        criterion.save()
+        certify_criteria(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
         assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
@@ -507,10 +486,7 @@ class TestCertifiedBadgeGEIQ:
             with_certifiable_criteria=True,
             from_geiq=True,
         )
-        criterion = diagnosis.selected_administrative_criteria.first()
-        with api_particulier.client() as client:
-            criterion.certify(client)
-        criterion.save()
+        certify_criteria(diagnosis)
         job_application = self.create_job_application(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
         assert certified_help_text in rendered

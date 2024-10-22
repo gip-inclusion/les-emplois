@@ -13,7 +13,6 @@ from itou.eligibility.models.common import (
     AdministrativeCriteriaQuerySet,
 )
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
-from itou.utils.apis import api_particulier
 from itou.utils.mocks.api_particulier import (
     rsa_certified_mocker,
     rsa_not_certified_mocker,
@@ -517,7 +516,7 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
     eligibility_diagnosis.certify_criteria()
 
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
-    criteria = SelectedAdministrativeCriteria.objects.filter(
+    criterion = SelectedAdministrativeCriteria.objects.get(
         administrative_criteria__kind__in=AdministrativeCriteriaKind.can_be_certified(),
         eligibility_diagnosis=eligibility_diagnosis,
     )
@@ -612,17 +611,17 @@ def test_selected_administrative_criteria_certified(
     eligibility_diagnosis = EligibilityDiagnosisFactory(
         with_certifiable_criteria=True, job_seeker=job_seeker, from_prescriber=True
     )
+    respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
+        response_status, json=response
+    )
+
+    eligibility_diagnosis.certify_criteria()
+
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
     criterion = SelectedAdministrativeCriteria.objects.filter(
         administrative_criteria__kind=AdministrativeCriteriaKind.RSA,
         eligibility_diagnosis=eligibility_diagnosis,
     ).get()
-
-    respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
-        response_status, json=response
-    )
-    with api_particulier.client() as client:
-        criterion.certify(client)
     for attrname, value in expected.items():
         assert getattr(criterion, attrname) == value
     assert len(respx_mock.calls) == 1

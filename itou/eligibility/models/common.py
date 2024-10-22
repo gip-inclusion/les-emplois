@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -6,10 +7,13 @@ from django.db import models
 from django.utils import timezone
 
 from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel, AuthorKind
+from itou.eligibility.tasks import async_certify_criteria, certify_criteria
 from itou.job_applications.enums import SenderKind
-from itou.utils.apis import api_particulier
 from itou.utils.models import InclusiveDateRangeField
 from itou.utils.types import InclusiveDateRange
+
+
+logger = logging.getLogger(__name__)
 
 
 class CommonEligibilityDiagnosisQuerySet(models.QuerySet):
@@ -90,25 +94,12 @@ class AbstractEligibilityDiagnosisModel(models.Model):
             return SenderKind(self.sender_kind).label
 
     def certify_criteria(self):
-        SelectedAdministrativeCriteria = self.administrative_criteria.through
-        criteria = list(
-            SelectedAdministrativeCriteria.objects.filter(
-                administrative_criteria__kind__in=AdministrativeCriteriaKind.can_be_certified(),
-                eligibility_diagnosis=self,
-            )
-        )
-        with api_particulier.client() as client:
-            for criterion in criteria:
-                criterion.certify(client)
-        SelectedAdministrativeCriteria.objects.bulk_update(
-            criteria,
-            fields=[
-                "data_returned_by_api",
-                "certified",
-                "certification_period",
-                "certified_at",
-            ],
-        )
+        try:
+            # Optimistic call to show certified badge in response immediately.
+            certify_criteria(self)
+        except Exception:
+            logger.info("Could not certify criteria synchronously.", exc_info=True)
+            async_certify_criteria(self._meta.model_name, self.pk)
 
     def get_criteria_display_qs(self, hiring_start_at=None):
         return self.selected_administrative_criteria.with_is_considered_certified(hiring_start_at=hiring_start_at)
@@ -216,20 +207,3 @@ class AbstractSelectedAdministrativeCriteria(models.Model):
         abstract = True
 
     objects = SelectedAdministrativeCriteriaQuerySet.as_manager()
-
-    def certify(self, client):
-        # Call only if self.certified is None?
-        job_seeker = self.eligibility_diagnosis.job_seeker
-        if self.administrative_criteria.is_certifiable and api_particulier.has_required_info(job_seeker):
-            # Only the RSA criterion is certifiable at the moment,
-            # but this may change soon with the addition of `parent isolé` and `allocation adulte handicapé`.
-            if self.administrative_criteria.kind == AdministrativeCriteriaKind.RSA:
-                data = api_particulier.revenu_solidarite_active(client, job_seeker)
-
-            self.certified_at = timezone.now()
-            self.data_returned_by_api = data["raw_response"]
-            self.certified = data["is_certified"]
-            self.certification_period = None
-            start_at, end_at = data["start_at"], data["end_at"]
-            if start_at and end_at:
-                self.certification_period = InclusiveDateRange(start_at, end_at)
