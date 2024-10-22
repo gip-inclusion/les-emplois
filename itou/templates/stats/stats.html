@@ -33,7 +33,7 @@
                     <p class="mb-2">
                         <strong>{{ banner.title }}</strong>
                     </p>
-                    <p class="mb-0">{{ banner.description }}</p>
+                    <p class="mb-0">{{ banner.description|safe }}</p>
                 </div>
                 <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
                     <a class="btn btn-sm btn-primary btn-block btn-ico" href="{{ banner.url }}" target="_blank" rel="noopener"><span>{{ banner.call_to_action|default:"Je m’inscris" }}</span> <i class="ri-external-link-line fw-medium" aria-hidden="true"></i></a>
