@@ -217,7 +217,7 @@ class AbstractSelectedAdministrativeCriteria(models.Model):
 
     objects = SelectedAdministrativeCriteriaQuerySet.as_manager()
 
-    def certify(self, client, save=False):
+    def certify(self, client):
         # Call only if self.certified is None?
         job_seeker = self.eligibility_diagnosis.job_seeker
         if self.administrative_criteria.is_certifiable and api_particulier.has_required_info(job_seeker):
@@ -233,6 +233,3 @@ class AbstractSelectedAdministrativeCriteria(models.Model):
             start_at, end_at = data["start_at"], data["end_at"]
             if start_at and end_at:
                 self.certification_period = InclusiveDateRange(start_at, end_at)
-
-        if save:
-            self.save()
