@@ -216,7 +216,11 @@ class TestCertifiedBadgeIae:
             "itou.utils.apis.api_particulier._request",
             return_value=rsa_certified_mocker(),
         )
-        diagnosis = IAEEligibilityDiagnosisFactory(with_certifiable_criteria=True, from_employer=True)
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker__born_in_france=True,
+            with_certifiable_criteria=True,
+            from_employer=True,
+        )
         criterion = diagnosis.selected_administrative_criteria.first()
         with api_particulier.client() as client:
             criterion.certify(client)
@@ -245,7 +249,11 @@ class TestCertifiedBadgeIae:
             "itou.utils.apis.api_particulier._request",
             return_value=rsa_certified_mocker(),
         )
-        diagnosis = IAEEligibilityDiagnosisFactory(with_certifiable_criteria=True, from_prescriber=True)
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker__born_in_france=True,
+            with_certifiable_criteria=True,
+            from_prescriber=True,
+        )
         criterion = diagnosis.selected_administrative_criteria.first()
         with api_particulier.client() as client:
             criterion.certify(client)
@@ -270,7 +278,11 @@ class TestCertifiedBadgeIae:
 
     def test_no_certifiable_criteria(self):
         # No certifiable criteria
-        diagnosis = IAEEligibilityDiagnosisFactory(with_not_certifiable_criteria=True, from_employer=True)
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker__born_in_france=True,
+            with_not_certifiable_criteria=True,
+            from_employer=True,
+        )
 
         rendered = self.template.render(Context(self.default_params(diagnosis)))
         assert self.ELIGIBILITY_TITLE_FROM_PRESCRIBER in rendered
@@ -301,17 +313,29 @@ class TestCertifiedBadgeIae:
         )
         certified_help_text = "Pourquoi certains de mes critères peuvent-ils être certifiés"
         # No certifiable criteria
-        diagnosis = IAEEligibilityDiagnosisFactory(with_not_certifiable_criteria=True, from_employer=True)
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker__born_in_france=True,
+            with_not_certifiable_criteria=True,
+            from_employer=True,
+        )
         rendered = self.template.render(Context(self.default_params(diagnosis)))
         assert certified_help_text not in rendered
 
         # Certifiable criteria, even if not certified.
-        diagnosis = IAEEligibilityDiagnosisFactory(with_certifiable_criteria=True, from_employer=True)
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker__born_in_france=True,
+            with_certifiable_criteria=True,
+            from_employer=True,
+        )
         rendered = self.template.render(Context(self.default_params(diagnosis)))
         assert certified_help_text in rendered
 
         # Certifiable and certified.
-        diagnosis = IAEEligibilityDiagnosisFactory(with_certifiable_criteria=True, from_employer=True)
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker__born_in_france=True,
+            with_certifiable_criteria=True,
+            from_employer=True,
+        )
         criterion = diagnosis.selected_administrative_criteria.first()
         with api_particulier.client() as client:
             criterion.certify(client)
@@ -385,6 +409,7 @@ class TestCertifiedBadgeGEIQ:
             return_value=rsa_certified_mocker(),
         )
         diagnosis = GEIQEligibilityDiagnosisFactory(
+            job_seeker__born_in_france=True,
             with_certifiable_criteria=True,
             from_geiq=True,
         )
@@ -408,6 +433,7 @@ class TestCertifiedBadgeGEIQ:
             return_value=rsa_certified_mocker(),
         )
         diagnosis = GEIQEligibilityDiagnosisFactory(
+            job_seeker__born_in_france=True,
             with_certifiable_criteria=True,
             from_geiq=True,
         )

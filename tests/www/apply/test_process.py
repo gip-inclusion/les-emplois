@@ -1934,6 +1934,7 @@ class TestProcessAcceptViews:
         # Selecting "Autre" must enable the employer to create a new job description
         # linked to the accepted job application.
         post_data = {
+            "birthdate": "2002-02-20",  # Required to certify the criteria later.
             "hired_job": AcceptForm.OTHER_HIRED_JOB,
         }
         post_data = self._accept_view_post_data(job_application=job_application, post_data=post_data)
@@ -2514,6 +2515,7 @@ class TestProcessAcceptViews:
         # Elements with the disabled attribute are not submitted thus are not part of POST data.
         # See https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#constructing-the-form-data-set
         post_data = {
+            "birthdate": birthdate.isoformat(),
             "birth_country": "",
             "birth_place": birth_place.pk,
         }

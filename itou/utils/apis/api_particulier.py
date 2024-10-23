@@ -26,20 +26,6 @@ def _parse_date(date: str) -> datetime.date | None:
 
 def _build_params_from(job_seeker):
     jobseeker_profile = job_seeker.jobseeker_profile
-    requested_objects = [
-        jobseeker_profile.birth_country,
-        jobseeker_profile.birthdate,
-        job_seeker.first_name,
-        job_seeker.last_name,
-        job_seeker.title,
-    ]
-    # TODO(cms): add JobSeekerProfile.is_born_in_france
-    born_in_france = jobseeker_profile.birth_country and jobseeker_profile.birth_country.group == Country.Group.FRANCE
-    if born_in_france:
-        requested_objects.append(jobseeker_profile.birth_place)
-    if not all(requested_objects):
-        raise KeyError(f"Missing parameters for {job_seeker.public_id=}. Unable to call the API Particulier.")
-
     params = {
         "nomNaissance": job_seeker.last_name.upper(),
         "prenoms[]": job_seeker.first_name.upper().split(" "),
@@ -49,7 +35,8 @@ def _build_params_from(job_seeker):
         "codePaysLieuDeNaissance": f"99{jobseeker_profile.birth_country.code}",
         "sexe": "F" if job_seeker.title == "MME" else job_seeker.title,
     }
-    if born_in_france:
+    # TODO(cms): add JobSeekerProfile.is_born_in_france
+    if jobseeker_profile.birth_country and jobseeker_profile.birth_country.group == Country.Group.FRANCE:
         params["codeInseeLieuDeNaissance"] = jobseeker_profile.birth_place.code
     return params
 
@@ -77,6 +64,21 @@ def _request(client, endpoint, job_seeker):
     return response.json()
 
 
+def has_required_info(job_seeker):
+    profile = job_seeker.jobseeker_profile
+    required = [
+        job_seeker.last_name,
+        job_seeker.first_name,
+        job_seeker.title,
+        profile.birthdate,
+        profile.birth_country,
+    ]
+    # TODO(cms): add JobSeekerProfile.is_born_in_france
+    if profile.birth_country and profile.birth_country.group == Country.Group.FRANCE:
+        required.append(profile.birth_place)
+    return all(required)
+
+
 def revenu_solidarite_active(client, job_seeker):
     data = {
         "start_at": None,
@@ -91,8 +93,6 @@ def revenu_solidarite_active(client, job_seeker):
         data["raw_response"] = exc.response.json()
     except tenacity.RetryError as retry_err:  # 503 or 504
         exc = retry_err.last_attempt._exception
-        data["raw_response"] = str(exc)
-    except KeyError as exc:
         data["raw_response"] = str(exc)
     else:
         data = {

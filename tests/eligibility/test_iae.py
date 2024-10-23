@@ -537,6 +537,28 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
     assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 10, 31))
 
 
+@pytest.mark.parametrize(
+    "EligibilityDiagnosisFactory",
+    [
+        pytest.param(
+            partial(IAEEligibilityDiagnosisFactory, from_employer=True),
+            id="test_selected_administrative_criteria_certify_iae",
+        ),
+        pytest.param(
+            partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            id="test_selected_administrative_criteria_certify_geiq",
+        ),
+    ],
+)
+def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, EligibilityDiagnosisFactory):
+    RSA_ENDPOINT = f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active"
+    respx_mock.get(RSA_ENDPOINT).mock(side_effect=Exception)
+    job_seeker = JobSeekerFactory()  # Missing data.
+    eligibility_diagnosis = EligibilityDiagnosisFactory(with_certifiable_criteria=True, job_seeker=job_seeker)
+    eligibility_diagnosis.certify_criteria()
+    assert len(respx_mock.calls) == 0
+
+
 @freeze_time("2024-09-12T00:00:00Z")
 @pytest.mark.parametrize(
     "EligibilityDiagnosisFactory,expected,response_status,response",
