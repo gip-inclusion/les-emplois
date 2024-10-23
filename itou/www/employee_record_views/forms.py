@@ -51,22 +51,9 @@ class AddEmployeeRecordChooseApprovalForm(forms.Form):
 
 
 class SelectEmployeeRecordStatusForm(forms.Form):
-    # The user is only able to select a subset of the possible
-    # employee record statuses.
-    # The other ones are internal only.
-    STATUSES = [
-        Status.NEW,
-        Status.READY,
-        Status.SENT,
-        Status.REJECTED,
-        Status.PROCESSED,
-        Status.DISABLED,
-    ]
-
-    STATUS_CHOICES = [(choice.name, choice.label) for choice in STATUSES]
     status = forms.MultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
-        choices=STATUS_CHOICES,
+        choices=Status.displayed_choices(),
         initial=Status.NEW,
         required=False,
     )

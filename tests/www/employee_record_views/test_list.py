@@ -120,7 +120,7 @@ class TestListEmployeeRecords:
                 assertNotContains(response, approval_number_for_ready)
 
         # With multiple statuses
-        response = client.get(self.URL, data={"status": [Status.NEW, Status.READY]})
+        response = client.get(self.URL, data={"status": [choice[0] for choice in Status.displayed_choices()]})
         assertContains(response, approval_number_for_new)
         assertContains(response, approval_number_for_ready)
 
