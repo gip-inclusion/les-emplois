@@ -93,7 +93,7 @@ class AbstractEligibilityDiagnosisModel(models.Model):
         SelectedAdministrativeCriteria = self.administrative_criteria.through
         criteria = list(
             SelectedAdministrativeCriteria.objects.filter(
-                administrative_criteria__kind__in=AbstractAdministrativeCriteria.CAN_BE_CERTIFIED_KINDS,
+                administrative_criteria__kind__in=AdministrativeCriteriaKind.can_be_certified(),
                 eligibility_diagnosis=self,
             )
         )
@@ -126,7 +126,7 @@ class AdministrativeCriteriaQuerySet(models.QuerySet):
 
     @property
     def certifiable_lookup(self):
-        return models.Q(kind__in=AbstractAdministrativeCriteria.CAN_BE_CERTIFIED_KINDS)
+        return models.Q(kind__in=AdministrativeCriteriaKind.can_be_certified())
 
     def certifiable(self):
         return self.filter(self.certifiable_lookup)
@@ -137,10 +137,6 @@ class AdministrativeCriteriaQuerySet(models.QuerySet):
 
 class AbstractAdministrativeCriteria(models.Model):
     MAX_UI_RANK = 32767
-    # RSA only for the moment. AAH and PI to come.
-    CAN_BE_CERTIFIED_KINDS = [
-        AdministrativeCriteriaKind.RSA,
-    ]
 
     level = models.CharField(
         verbose_name="niveau",
@@ -187,7 +183,7 @@ class AbstractAdministrativeCriteria(models.Model):
 
     @property
     def is_certifiable(self):
-        return self.kind in self.CAN_BE_CERTIFIED_KINDS
+        return self.kind in AdministrativeCriteriaKind.can_be_certified()
 
 
 class SelectedAdministrativeCriteriaQuerySet(models.QuerySet):

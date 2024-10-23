@@ -61,3 +61,10 @@ class AdministrativeCriteriaKind(models.TextChoices):
     AUTRE_MINIMA = "AUTRE_MINIMA", "Autre minima social"
     FT = "FT", "Personne inscrite à France Travail"
     SANS_TRAVAIL_12 = "SANS_TRAVAIL_12", "Personne éloignée du marché du travail (> 1 an)"
+
+    @classmethod
+    def can_be_certified(cls):
+        # RSA only for the moment. AAH and PI to come.
+        return [
+            AdministrativeCriteriaKind.RSA,
+        ]
