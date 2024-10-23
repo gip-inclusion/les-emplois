@@ -54,13 +54,13 @@
                                aria-label="En savoir plus sur le fonctionnement des fiches salarié (ouverture dans un nouvel onglet)"
                                class="has-external-link fw-bold">En savoir plus</a>.
                         </p>
-                        <form hx-get="{% url 'employee_record_views:list' %}"
-                              hx-trigger="change delay:.5s, change from:#id_job_seeker"
+                        <form id="employee-record-status-form"
+                              hx-get="{% url 'employee_record_views:list' %}"
+                              hx-trigger="change delay:.5s"
                               hx-indicator="#employee-records-container"
                               hx-target="#employee-records-container"
                               hx-swap="outerHTML"
-                              hx-push-url="true"
-                              hx-include="#id_job_seeker">
+                              hx-push-url="true">
                             <div class="btn-dropdown-filter-group mb-3 mb-md-4">
                                 <div class="dropdown">
                                     <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
@@ -78,7 +78,15 @@
                             {% include "employee_record/includes/list_counter.html" %}
                             {% include "employee_record/includes/list_order.html" %}
                             <div class="flex-column flex-md-row mt-3 mt-md-0 ms-md-3">
-                                {% bootstrap_field filters_form.job_seeker layout="inline" %}
+                                <form id="employee-record-job_seeker-form"
+                                      hx-get="{% url 'employee_record_views:list' %}"
+                                      hx-trigger="change delay:.5s"
+                                      hx-indicator="#employee-records-container"
+                                      hx-target="#employee-records-container"
+                                      hx-swap="outerHTML"
+                                      hx-push-url="true">
+                                    {% bootstrap_field filters_form.job_seeker layout="inline" %}
+                                </form>
                             </div>
                         </div>
                         {% include "employee_record/includes/list_results.html" %}
@@ -107,6 +115,13 @@
                         bubbles: true
                     }));
                 });
+            }
+            // Clear the job seeker when using the other form (status and order)
+            const statusForm = target.querySelector("#employee-record-status-form");
+            if (statusForm) {
+                statusForm.addEventListener("change", function(event) {
+                    $("#{{ filters_form.job_seeker.id_for_label }}").val(null).trigger("change")
+                })
             }
         });
     </script>

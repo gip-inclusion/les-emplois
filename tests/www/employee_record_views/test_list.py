@@ -97,12 +97,11 @@ class TestListEmployeeRecords:
 
         response = client.get(
             self.URL,
-            data={"status": "", "job_seeker": self.job_seeker.pk, "order": EmployeeRecordOrder.HIRING_START_AT_ASC},
+            data={"status": "", "order": EmployeeRecordOrder.HIRING_START_AT_ASC},
         )
         assertRedirects(
             response,
-            reverse("employee_record_views:list")
-            + f"?job_seeker={self.job_seeker.pk}&order={EmployeeRecordOrder.HIRING_START_AT_ASC}&status=NEW",
+            reverse("employee_record_views:list") + f"?order={EmployeeRecordOrder.HIRING_START_AT_ASC}&status=NEW",
         )
 
     def test_status_filter(self, client):
@@ -153,27 +152,28 @@ class TestListEmployeeRecords:
         )
         client.force_login(self.user)
 
-        response = client.get(self.URL, data={"status": Status.NEW})
+        response = client.get(self.URL, data={"job_seeker": self.job_seeker.pk})
         assertContains(response, approval_number_formatted)
-        assertContains(response, other_approval_number_formatted)
+        assertNotContains(response, other_approval_number_formatted)
 
+        # The job seeker filter supersede the status filter
         response = client.get(self.URL, data={"status": Status.NEW, "job_seeker": self.job_seeker.pk})
         assertContains(response, approval_number_formatted)
         assertNotContains(response, other_approval_number_formatted)
 
-        response = client.get(self.URL, data={"status": Status.NEW, "job_seeker": 0})
-        assertContains(response, "Sélectionnez un choix valide. 0 n’en fait pas partie.")
-        assertContains(response, approval_number_formatted)
-        assertContains(response, other_approval_number_formatted)
+        # Job seeker without employee record shouldn't be usable
+        response = client.get(self.URL, data={"job_seeker": accepted_job_application.job_seeker.pk})
+        assertRedirects(
+            response,
+            reverse("employee_record_views:list") + "?status=NEW&order=",
+        )
 
-        response = client.get(
-            self.URL, data={"status": Status.NEW, "job_seeker": accepted_job_application.job_seeker.pk}
+        # An invalid job seeker is treated as empty so we fall back on the missing status case
+        response = client.get(self.URL, data={"job_seeker": -1})
+        assertRedirects(
+            response,
+            reverse("employee_record_views:list") + "?status=NEW&order=",
         )
-        assertContains(
-            response, f"Sélectionnez un choix valide. {accepted_job_application.job_seeker.pk} n’en fait pas partie."
-        )
-        assertContains(response, approval_number_formatted)
-        assertContains(response, other_approval_number_formatted)
 
     def test_employee_records_approval_display(self, client):
         client.force_login(self.user)
@@ -448,7 +448,7 @@ class TestListEmployeeRecords:
         response = client.get(self.URL, data={"status": Status.READY})
         assertContains(response, "0 résultat")
 
-    def test_htmx(self, client):
+    def test_htmx_status(self, client):
         client.force_login(self.user)
         response = client.get(self.URL, {"status": "NEW"})
         simulated_page = parse_response_to_soup(response)
@@ -459,7 +459,7 @@ class TestListEmployeeRecords:
         ready_status["checked"] = ""
 
         response = client.get(self.URL, {"status": "READY"}, headers={"HX-Request": "true"})
-        update_page_with_htmx(simulated_page, f"form[hx-get='{self.URL}']", response)
+        update_page_with_htmx(simulated_page, f"form#employee-record-status-form[hx-get='{self.URL}']", response)
 
         response = client.get(self.URL, data={"status": Status.READY})
         fresh_page = parse_response_to_soup(response)
@@ -474,9 +474,25 @@ class TestListEmployeeRecords:
         [order_field] = simulated_page.find_all("input", attrs={"name": "order"})
         order_field["value"] = "name"
         response = client.get(self.URL, {"status": "NEW", "order": "name"}, headers={"HX-Request": "true"})
-        update_page_with_htmx(simulated_page, f"form[hx-get='{self.URL}']", response)
+        update_page_with_htmx(simulated_page, f"form#employee-record-status-form[hx-get='{self.URL}']", response)
 
         response = client.get(self.URL, {"status": "NEW", "order": "name"})
+        fresh_page = parse_response_to_soup(response)
+        assertSoupEqual(simulated_page, fresh_page)
+
+    def test_htmx_job_seeker(self, client):
+        client.force_login(self.user)
+        response = client.get(self.URL, {"job_seeker": self.job_seeker.pk})
+        simulated_page = parse_response_to_soup(response)
+
+        # Page JavaScript does that.
+        [job_seeker_field] = simulated_page.find_all("select", attrs={"name": "job_seeker"})
+        [value_option] = job_seeker_field.find_all("option", attrs={"value": self.job_seeker.pk})
+        value_option["selected"] = ""
+        response = client.get(self.URL, {"job_seeker": self.job_seeker.pk}, headers={"HX-Request": "true"})
+        update_page_with_htmx(simulated_page, f"form#employee-record-job_seeker-form[hx-get='{self.URL}']", response)
+
+        response = client.get(self.URL, {"job_seeker": self.job_seeker.pk})
         fresh_page = parse_response_to_soup(response)
         assertSoupEqual(simulated_page, fresh_page)
 
@@ -493,7 +509,7 @@ class TestListEmployeeRecords:
         ready_status["checked"] = ""
 
         response = client.get(self.URL, {"status": "READY"}, headers={"HX-Request": "true"})
-        update_page_with_htmx(simulated_page, f"form[hx-get='{self.URL}']", response)
+        update_page_with_htmx(simulated_page, f"form#employee-record-status-form[hx-get='{self.URL}']", response)
 
         response = client.get(self.URL, data={"status": Status.READY})
         fresh_page = parse_response_to_soup(response)
