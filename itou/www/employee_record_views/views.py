@@ -154,7 +154,11 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         raise PermissionDenied
 
     filters_form = EmployeeRecordFilterForm(
-        JobApplication.objects.accepted().filter(to_company=siae).get_unique_fk_objects("job_seeker"),
+        User.objects.filter(
+            pk__in=EmployeeRecord.objects.for_company(siae)
+            .exclude(status=Status.ARCHIVED)
+            .values("job_application__job_seeker")
+        ),
         data=request.GET,
     )
     filters_form.full_clean()
