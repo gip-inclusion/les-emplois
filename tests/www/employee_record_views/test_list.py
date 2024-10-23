@@ -86,32 +86,50 @@ class TestListEmployeeRecords:
         response = client.get(self.URL, data={"status": ""})
         assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
 
-    def test_new_employee_records(self, client):
-        """
-        Check if new employee records / job applications are displayed in the list
-        """
-        client.force_login(self.user)
+        response = client.get(self.URL, data={"status": []})
+        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
 
-        response = client.get(self.URL, data={"status": Status.NEW})
-
-        assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
+        response = client.get(self.URL, data={"status": [""]})
+        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
 
     def test_status_filter(self, client):
-        """
-        Check status filter
-        """
-        # No status defined
+        approval_number_for_new = format_filters.format_approval_number(
+            self.employee_record.job_application.approval.number
+        )
+        approval_number_for_ready = format_filters.format_approval_number(
+            EmployeeRecordFactory(
+                ready_for_transfer=True, job_application__to_company=self.company
+            ).job_application.approval.number
+        )
+        no_results_statuses = set(Status) - {Status.NEW, Status.READY}
         client.force_login(self.user)
-        approval_number_formatted = format_filters.format_approval_number(self.job_application.approval.number)
 
-        # For NEW
+        # With a single status
         response = client.get(self.URL, data={"status": Status.NEW})
-        assertContains(response, approval_number_formatted)
+        assertContains(response, approval_number_for_new)
 
-        # More complete tests to come with fixtures files
-        for status in [Status.SENT, Status.REJECTED, Status.PROCESSED]:
-            response = client.get(self.URL, data={"status": status.value})
-            assertNotContains(response, approval_number_formatted)
+        response = client.get(self.URL, data={"status": Status.READY})
+        assertContains(response, approval_number_for_ready)
+
+        for status in no_results_statuses:
+            response = client.get(self.URL, data={"status": status})
+            if status is Status.ARCHIVED:  # ARCHIVED is a reserved status
+                assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
+            else:
+                assertNotContains(response, approval_number_for_new)
+                assertNotContains(response, approval_number_for_ready)
+
+        # With multiple statuses
+        response = client.get(self.URL, data={"status": [Status.NEW, Status.READY]})
+        assertContains(response, approval_number_for_new)
+        assertContains(response, approval_number_for_ready)
+
+        response = client.get(self.URL, data={"status": list(no_results_statuses)})  # ARCHIVED is still reserved
+        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
+
+        response = client.get(self.URL, data={"status": list(no_results_statuses - {Status.ARCHIVED})})
+        assertNotContains(response, approval_number_for_new)
+        assertNotContains(response, approval_number_for_ready)
 
     def test_job_seeker_filter(self, client):
         approval_number_formatted = format_filters.format_approval_number(self.job_application.approval.number)
