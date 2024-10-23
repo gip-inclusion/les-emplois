@@ -1,6 +1,5 @@
 import datetime
 
-import pytest
 from django.conf import settings
 
 from itou.users.models import User
@@ -24,21 +23,16 @@ def test_build_params_from(snapshot, caplog):
         "jobseeker_profile", "jobseeker_profile__birth_place", "jobseeker_profile__birth_country"
     ).get(pk=job_seeker.pk)
     assert api_particulier._build_params_from(job_seeker) == snapshot(name="api_particulier_build_params")
+    assert api_particulier.has_required_info(job_seeker) is True
 
-    api_particulier._build_params_from(job_seeker)
-    # Missing parameters.
     job_seeker = JobSeekerFactory(jobseeker_profile__birthdate=None)
-    with pytest.raises(KeyError):
-        api_particulier._build_params_from(job_seeker)
-        assert "Missing information" in caplog.text
+    assert api_particulier.has_required_info(job_seeker) is False
 
     # Born in France without a birth country.
     job_seeker = JobSeekerFactory(
         jobseeker_profile__birth_country=CountryFranceFactory(),
     )
-    with pytest.raises(KeyError):
-        api_particulier._build_params_from(job_seeker)
-        assert "Missing information" in caplog.text
+    assert api_particulier.has_required_info(job_seeker) is False
 
     # Job seeker born outside of France
     country = CountryOutsideEuropeFactory()
@@ -46,20 +40,9 @@ def test_build_params_from(snapshot, caplog):
         jobseeker_profile__birth_country=country,
     )
     params = api_particulier._build_params_from(job_seeker)
+    assert api_particulier.has_required_info(job_seeker) is True
     assert "codeInseeLieuDeNaissance" not in params.keys()
     assert params["codePaysLieuDeNaissance"][2:] == country.code
-
-
-def test_certify_brsa__missing_information(respx_mock, caplog):
-    # Mocking the request is useless as no request should be done at all.
-    # Plus, respx will raise an error when trying to make an unmocked request.
-    job_seeker = JobSeekerFactory()
-    with api_particulier.client() as client:
-        response = api_particulier.revenu_solidarite_active(client, job_seeker)
-    assert "Missing parameters" in response["raw_response"]
-    assert response["is_certified"] is None
-    assert response["start_at"] is None
-    assert response["end_at"] is None
 
 
 def test_not_found(respx_mock):
