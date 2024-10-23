@@ -315,7 +315,7 @@
           FROM "employee_record_employeerecord"
           INNER JOIN "job_applications_jobapplication" ON ("employee_record_employeerecord"."job_application_id" = "job_applications_jobapplication"."id")
           WHERE ("job_applications_jobapplication"."to_company_id" = %s
-                 AND "employee_record_employeerecord"."status" = %s)
+                 AND "employee_record_employeerecord"."status" IN (%s))
         ''',
       }),
       dict({
@@ -603,7 +603,7 @@
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           LEFT OUTER JOIN "companies_siaefinancialannex" ON ("employee_record_employeerecord"."financial_annex_id" = "companies_siaefinancialannex"."id")
           WHERE ("job_applications_jobapplication"."to_company_id" = %s
-                 AND "employee_record_employeerecord"."status" = %s)
+                 AND "employee_record_employeerecord"."status" IN (%s))
           ORDER BY "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 3
         ''',

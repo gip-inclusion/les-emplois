@@ -163,7 +163,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     form.full_clean()  # We do not use is_valid to validate each field independently
     if not form.cleaned_data.get("status"):  # Redirect if status is missing or empty
         return HttpResponseRedirect(reverse("employee_record_views:list") + f"?status={Status.NEW}")
-    status = Status(form.cleaned_data.get("status"))
+    statuses = [Status(value) for value in form.cleaned_data.get("status")]
     order_by = EmployeeRecordOrder(form.cleaned_data.get("order") or EmployeeRecordOrder.HIRING_START_AT_DESC)
 
     # Construct badges
@@ -194,7 +194,10 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         EmployeeRecordOrder.HIRING_START_AT_DESC: ("-job_application__hiring_start_at",),
     }[order_by]
     data = (
-        EmployeeRecord.objects.full_fetch().for_company(siae).filter(status=status).order_by(*employee_record_order_by)
+        EmployeeRecord.objects.full_fetch()
+        .for_company(siae)
+        .filter(status__in=statuses)
+        .order_by(*employee_record_order_by)
     )
     if job_seeker_id := filters_form.cleaned_data.get("job_seeker"):
         data = data.filter(job_application__job_seeker=job_seeker_id)
