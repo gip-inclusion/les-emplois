@@ -626,8 +626,7 @@ def test_selected_administrative_criteria_certified(
         response_status, json=response
     )
     with api_particulier.client() as client:
-        criterion.certify(client, save=True)
-    criterion.refresh_from_db()
+        criterion.certify(client)
     for attrname, value in expected.items():
         assert getattr(criterion, attrname) == value
     assert len(respx_mock.calls) == 1
