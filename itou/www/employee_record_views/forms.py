@@ -64,8 +64,8 @@ class SelectEmployeeRecordStatusForm(forms.Form):
     ]
 
     STATUS_CHOICES = [(choice.name, choice.label) for choice in STATUSES]
-    status = forms.ChoiceField(
-        widget=forms.RadioSelect(),
+    status = forms.MultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple,
         choices=STATUS_CHOICES,
         initial=Status.NEW,
         required=False,
