@@ -168,6 +168,8 @@ def list_employee_records(request, template_name="employee_record/list.html"):
                 {**filters_form.cleaned_data, **form.cleaned_data, "status": Status.NEW},
             )
         )
+    if filters_form.cleaned_data.get("job_seeker"):  # Bypass selected statuses when searching someone
+        form.cleaned_data["status"] = [choice[0] for choice in Status.displayed_choices()]
     statuses = [Status(value) for value in form.cleaned_data.get("status")]
     order_by = EmployeeRecordOrder(form.cleaned_data.get("order") or EmployeeRecordOrder.HIRING_START_AT_DESC)
 
