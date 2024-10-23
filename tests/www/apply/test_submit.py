@@ -21,14 +21,13 @@ from pytest_django.asserts import (
 
 from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, RSAAllocation
 from itou.companies.enums import CompanyKind, ContractType
-from itou.eligibility.enums import AuthorKind
+from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AuthorKind
 from itou.eligibility.models import (
     AdministrativeCriteria,
     EligibilityDiagnosis,
     GEIQAdministrativeCriteria,
     GEIQEligibilityDiagnosis,
 )
-from itou.eligibility.models.common import AbstractAdministrativeCriteria
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
@@ -2643,12 +2642,10 @@ class TestDirectHireFullProcess:
         assertTemplateNotUsed(response, "approvals/includes/status.html")
 
         criterion1 = (
-            AdministrativeCriteria.objects.level1()
-            .exclude(kind__in=AbstractAdministrativeCriteria.CAN_BE_CERTIFIED_KINDS)
-            .first()
+            AdministrativeCriteria.objects.level1().exclude(kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS).first()
         )
         [criterion2, criterion3] = AdministrativeCriteria.objects.level2().exclude(
-            kind__in=AbstractAdministrativeCriteria.CAN_BE_CERTIFIED_KINDS
+            kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS
         )[:2]
         response = client.post(
             next_url,
