@@ -16,6 +16,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.users.enums import LackOfNIRReason
 from itou.utils.templatetags import format_filters
+from itou.www.employee_record_views.enums import EmployeeRecordOrder
 from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJobsFactory
 from tests.employee_record import factories as employee_record_factories
 from tests.employee_record.factories import EmployeeRecordFactory
@@ -91,6 +92,19 @@ class TestListEmployeeRecords:
 
         response = client.get(self.URL, data={"status": [""]})
         assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
+
+    def test_redirection_with_missing_or_empty_status_keep_other_params(self, client):
+        client.force_login(self.user)
+
+        response = client.get(
+            self.URL,
+            data={"status": "", "job_seeker": self.job_seeker.pk, "order": EmployeeRecordOrder.HIRING_START_AT_ASC},
+        )
+        assertRedirects(
+            response,
+            reverse("employee_record_views:list")
+            + f"?job_seeker={self.job_seeker.pk}&order={EmployeeRecordOrder.HIRING_START_AT_ASC}&status=NEW",
+        )
 
     def test_status_filter(self, client):
         approval_number_for_new = format_filters.format_approval_number(
