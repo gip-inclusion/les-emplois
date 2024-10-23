@@ -224,11 +224,12 @@ class AbstractSelectedAdministrativeCriteria(models.Model):
 
     def certify(self, client):
         # Call only if self.certified is None?
-        if self.administrative_criteria.is_certifiable:
+        job_seeker = self.eligibility_diagnosis.job_seeker
+        if self.administrative_criteria.is_certifiable and api_particulier.has_required_info(job_seeker):
             # Only the RSA criterion is certifiable at the moment,
             # but this may change soon with the addition of `parent isolé` and `allocation adulte handicapé`.
             if self.administrative_criteria.kind == AdministrativeCriteriaKind.RSA:
-                data = api_particulier.revenu_solidarite_active(client, self.eligibility_diagnosis.job_seeker)
+                data = api_particulier.revenu_solidarite_active(client, job_seeker)
 
             self.certified_at = timezone.now()
             self.data_returned_by_api = data["raw_response"]
