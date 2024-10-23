@@ -18,6 +18,14 @@ class Status(models.TextChoices):
     DISABLED = "DISABLED", "Désactivée"
     ARCHIVED = "ARCHIVED", "Archivée"
 
+    @classmethod
+    def displayed_choices(cls):
+        """
+        Hide values in forms but don't override self.choices method to keep hidden enums visible in Django admin.
+        """
+        empty = [(None, cls.__empty__)] if hasattr(cls, "__empty__") else []
+        return empty + [(enum.value, enum.label) for enum in cls if enum is not Status.ARCHIVED]
+
 
 class NotificationStatus(models.TextChoices):
     NEW = "NEW", "Nouvelle"

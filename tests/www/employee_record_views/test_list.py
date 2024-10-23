@@ -16,11 +16,11 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.users.enums import LackOfNIRReason
 from itou.utils.templatetags import format_filters
+from itou.www.employee_record_views.enums import EmployeeRecordOrder
 from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJobsFactory
 from tests.employee_record import factories as employee_record_factories
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import (
-    JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
@@ -86,37 +86,71 @@ class TestListEmployeeRecords:
         response = client.get(self.URL, data={"status": ""})
         assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
 
-    def test_new_employee_records(self, client):
-        """
-        Check if new employee records / job applications are displayed in the list
-        """
+        response = client.get(self.URL, data={"status": []})
+        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
+
+        response = client.get(self.URL, data={"status": [""]})
+        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
+
+    def test_redirection_with_missing_or_empty_status_keep_other_params(self, client):
         client.force_login(self.user)
 
-        response = client.get(self.URL, data={"status": Status.NEW})
-
-        assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
+        response = client.get(
+            self.URL,
+            data={"status": "", "job_seeker": self.job_seeker.pk, "order": EmployeeRecordOrder.HIRING_START_AT_ASC},
+        )
+        assertRedirects(
+            response,
+            reverse("employee_record_views:list")
+            + f"?job_seeker={self.job_seeker.pk}&order={EmployeeRecordOrder.HIRING_START_AT_ASC}&status=NEW",
+        )
 
     def test_status_filter(self, client):
-        """
-        Check status filter
-        """
-        # No status defined
+        approval_number_for_new = format_filters.format_approval_number(
+            self.employee_record.job_application.approval.number
+        )
+        approval_number_for_ready = format_filters.format_approval_number(
+            EmployeeRecordFactory(
+                ready_for_transfer=True, job_application__to_company=self.company
+            ).job_application.approval.number
+        )
+        no_results_statuses = set(Status) - {Status.NEW, Status.READY}
         client.force_login(self.user)
-        approval_number_formatted = format_filters.format_approval_number(self.job_application.approval.number)
 
-        # For NEW
+        # With a single status
         response = client.get(self.URL, data={"status": Status.NEW})
-        assertContains(response, approval_number_formatted)
+        assertContains(response, approval_number_for_new)
 
-        # More complete tests to come with fixtures files
-        for status in [Status.SENT, Status.REJECTED, Status.PROCESSED]:
-            response = client.get(self.URL, data={"status": status.value})
-            assertNotContains(response, approval_number_formatted)
+        response = client.get(self.URL, data={"status": Status.READY})
+        assertContains(response, approval_number_for_ready)
+
+        for status in no_results_statuses:
+            response = client.get(self.URL, data={"status": status})
+            if status is Status.ARCHIVED:  # ARCHIVED is a reserved status
+                assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
+            else:
+                assertNotContains(response, approval_number_for_new)
+                assertNotContains(response, approval_number_for_ready)
+
+        # With multiple statuses
+        response = client.get(self.URL, data={"status": [choice[0] for choice in Status.displayed_choices()]})
+        assertContains(response, approval_number_for_new)
+        assertContains(response, approval_number_for_ready)
+
+        response = client.get(self.URL, data={"status": list(no_results_statuses)})  # ARCHIVED is still reserved
+        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
+
+        response = client.get(self.URL, data={"status": list(no_results_statuses - {Status.ARCHIVED})})
+        assertNotContains(response, approval_number_for_new)
+        assertNotContains(response, approval_number_for_ready)
 
     def test_job_seeker_filter(self, client):
         approval_number_formatted = format_filters.format_approval_number(self.job_application.approval.number)
         other_employee_record = EmployeeRecordFactory(job_application__to_company=self.company)
         other_approval_number_formatted = format_filters.format_approval_number(other_employee_record.approval_number)
+        accepted_job_application = JobApplicationWithCompleteJobSeekerProfileFactory(
+            to_company=self.company, was_hired=True
+        )
         client.force_login(self.user)
 
         response = client.get(self.URL, data={"status": Status.NEW})
@@ -129,6 +163,15 @@ class TestListEmployeeRecords:
 
         response = client.get(self.URL, data={"status": Status.NEW, "job_seeker": 0})
         assertContains(response, "Sélectionnez un choix valide. 0 n’en fait pas partie.")
+        assertContains(response, approval_number_formatted)
+        assertContains(response, other_approval_number_formatted)
+
+        response = client.get(
+            self.URL, data={"status": Status.NEW, "job_seeker": accepted_job_application.job_seeker.pk}
+        )
+        assertContains(
+            response, f"Sélectionnez un choix valide. {accepted_job_application.job_seeker.pk} n’en fait pas partie."
+        )
         assertContains(response, approval_number_formatted)
         assertContains(response, other_approval_number_formatted)
 
@@ -441,8 +484,8 @@ class TestListEmployeeRecords:
         client.force_login(self.user)
         response = client.get(self.URL, {"status": "NEW"})
         simulated_page = parse_response_to_soup(response)
-        # This new application should update the counter badge on NEW.
-        new_job_app = JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
+        # This new employee record should update the counter badge on NEW.
+        new_employee_record = EmployeeRecordFactory(job_application__to_company=self.company)
 
         [new_status] = simulated_page.find_all("input", attrs={"name": "status", "value": "NEW"})
         del new_status["checked"]
@@ -459,7 +502,9 @@ class TestListEmployeeRecords:
         # form to no longer pick up change events from the select2.
         # Given that options aren’t added frequently to that dropdown, wait
         # until the next full page load to get new job seekers.
-        [new_jobseeker_opt] = fresh_page.select(f'#id_job_seeker > option[value="{new_job_app.job_seeker_id}"]')
+        [new_jobseeker_opt] = fresh_page.select(
+            f'#id_job_seeker > option[value="{new_employee_record.job_application.job_seeker_id}"]'
+        )
         new_jobseeker_opt.decompose()
         assertSoupEqual(simulated_page, fresh_page)
 
