@@ -27,9 +27,8 @@ from itou.approvals.models import Approval, Suspension
 from itou.asp.models import Commune
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
-from itou.eligibility.enums import AuthorKind
+from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
-from itou.eligibility.models.common import AbstractAdministrativeCriteria
 from itou.eligibility.models.geiq import GEIQSelectedAdministrativeCriteria
 from itou.eligibility.models.iae import SelectedAdministrativeCriteria
 from itou.employee_record.enums import Status
@@ -2470,7 +2469,7 @@ class TestProcessAcceptViews:
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
         to_be_certified_criteria = SelectedAdministrativeCriteria.objects.filter(
-            administrative_criteria__kind__in=AbstractAdministrativeCriteria.CAN_BE_CERTIFIED_KINDS,
+            administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
             eligibility_diagnosis=job_application.eligibility_diagnosis,
         ).all()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
@@ -2551,7 +2550,7 @@ class TestProcessAcceptViews:
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
         to_be_certified_criteria = GEIQSelectedAdministrativeCriteria.objects.filter(
-            administrative_criteria__kind__in=AbstractAdministrativeCriteria.CAN_BE_CERTIFIED_KINDS,
+            administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
             eligibility_diagnosis=job_application.geiq_eligibility_diagnosis,
         ).all()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})

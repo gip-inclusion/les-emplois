@@ -7,10 +7,14 @@ from django.conf import settings
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel, AuthorKind
+from itou.eligibility.enums import (
+    CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
+    AdministrativeCriteriaKind,
+    AdministrativeCriteriaLevel,
+    AuthorKind,
+)
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.common import (
-    AbstractAdministrativeCriteria,
     AbstractSelectedAdministrativeCriteria,
     AdministrativeCriteriaQuerySet,
 )
@@ -524,7 +528,7 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
 
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
     criterion = SelectedAdministrativeCriteria.objects.get(
-        administrative_criteria__kind__in=AbstractAdministrativeCriteria.CAN_BE_CERTIFIED_KINDS,
+        administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
         eligibility_diagnosis=eligibility_diagnosis,
     )
     assert criterion.certified is True

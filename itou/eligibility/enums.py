@@ -61,3 +61,6 @@ class AdministrativeCriteriaKind(models.TextChoices):
     AUTRE_MINIMA = "AUTRE_MINIMA", "Autre minima social"
     FT = "FT", "Personne inscrite à France Travail"
     SANS_TRAVAIL_12 = "SANS_TRAVAIL_12", "Personne éloignée du marché du travail (> 1 an)"
+
+
+CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS = frozenset([AdministrativeCriteriaKind.RSA])
