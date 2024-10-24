@@ -1,4 +1,5 @@
 import datetime
+from functools import partial
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -501,8 +502,14 @@ def test_certifiable(AdministrativeCriteriaClass):
 @pytest.mark.parametrize(
     "EligibilityDiagnosisFactory",
     [
-        pytest.param(IAEEligibilityDiagnosisFactory, id="test_eligibility_diagnosis_certify_criteria_iae"),
-        pytest.param(GEIQEligibilityDiagnosisFactory, id="test_eligibility_diagnosis_certify_criteria_geiq"),
+        pytest.param(
+            partial(IAEEligibilityDiagnosisFactory, from_employer=True),
+            id="test_eligibility_diagnosis_certify_criteria_iae",
+        ),
+        pytest.param(
+            partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            id="test_eligibility_diagnosis_certify_criteria_geiq",
+        ),
     ],
 )
 @freeze_time("2024-09-12")
@@ -512,9 +519,7 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
         return_value=rsa_certified_mocker(),
     )
     job_seeker = JobSeekerFactory(with_address=True, born_in_france=True)
-    eligibility_diagnosis = EligibilityDiagnosisFactory(
-        with_certifiable_criteria=True, job_seeker=job_seeker, from_prescriber=True
-    )
+    eligibility_diagnosis = EligibilityDiagnosisFactory(with_certifiable_criteria=True, job_seeker=job_seeker)
     eligibility_diagnosis.certify_criteria()
 
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
@@ -534,16 +539,20 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
 @pytest.mark.parametrize(
     "EligibilityDiagnosisFactory",
     [
-        pytest.param(IAEEligibilityDiagnosisFactory, id="test_selected_administrative_criteria_certify_iae"),
-        pytest.param(GEIQEligibilityDiagnosisFactory, id="test_selected_administrative_criteria_certify_geiq"),
+        pytest.param(
+            partial(IAEEligibilityDiagnosisFactory, from_employer=True),
+            id="test_selected_administrative_criteria_certify_iae",
+        ),
+        pytest.param(
+            partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            id="test_selected_administrative_criteria_certify_geiq",
+        ),
     ],
 )
 @freeze_time("2024-09-12")
 def test_selected_administrative_criteria_certify(respx_mock, EligibilityDiagnosisFactory, mocker):
     job_seeker = JobSeekerFactory(with_address=True, born_in_france=True)
-    eligibility_diagnosis = EligibilityDiagnosisFactory(
-        with_certifiable_criteria=True, job_seeker=job_seeker, from_prescriber=True
-    )
+    eligibility_diagnosis = EligibilityDiagnosisFactory(with_certifiable_criteria=True, job_seeker=job_seeker)
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
     criterion = SelectedAdministrativeCriteria.objects.filter(
         administrative_criteria__kind=AdministrativeCriteriaKind.RSA,
