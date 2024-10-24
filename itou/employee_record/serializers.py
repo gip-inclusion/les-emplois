@@ -49,7 +49,11 @@ class _PersonSerializer(serializers.Serializer):
         return unidecode(obj.job_application.job_seeker.last_name).upper()
 
     def get_prenom(self, obj: EmployeeRecord) -> str:
-        return unidecode(obj.job_application.job_seeker.first_name).upper()
+        # ASP limits first names to 30 chars
+        first_names = unidecode(obj.job_application.job_seeker.first_name).upper()
+        if len(first_names) > 30:
+            return first_names[:30].rsplit(" ", 1)[0]
+        return first_names
 
     def get_codeComInsee(self, obj: EmployeeRecord) -> CodeComInsee:
         # Another ASP subtlety, making top-level and children with the same name

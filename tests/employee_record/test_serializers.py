@@ -13,10 +13,32 @@ from itou.employee_record.serializers import (
     EmployeeRecordUpdateNotificationBatchSerializer,
     EmployeeRecordUpdateNotificationSerializer,
     _AddressSerializer,
+    _PersonSerializer,
 )
 from tests.asp.factories import CommuneFactory
 from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
 from tests.users.factories import JobSeekerFactory
+
+
+class TestEmployeeRecordPersonSerializer:
+    def test_get_prenom(self):
+        employee_record = EmployeeRecordWithProfileFactory(job_application__job_seeker__first_name="")
+        job_seeker = employee_record.job_application.job_seeker
+        serializer = _PersonSerializer(employee_record)
+
+        assert serializer.get_prenom(employee_record) == ""
+
+        job_seeker.first_name = "Jean"
+        assert serializer.get_prenom(employee_record) == "JEAN"
+
+        job_seeker.first_name = "Jean-Philippe"
+        assert serializer.get_prenom(employee_record) == "JEAN-PHILIPPE"
+
+        job_seeker.first_name = "Jean-Philippe René"
+        assert serializer.get_prenom(employee_record) == "JEAN-PHILIPPE RENE"
+
+        job_seeker.first_name = "Jean-Philippe René Hippolyte Gilbert Dufaël"
+        assert serializer.get_prenom(employee_record) == "JEAN-PHILIPPE RENE HIPPOLYTE"
 
 
 class TestEmployeeRecordAddressSerializer:
