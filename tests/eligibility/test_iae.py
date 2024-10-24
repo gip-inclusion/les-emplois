@@ -9,7 +9,6 @@ from freezegun import freeze_time
 from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.common import (
-    AbstractAdministrativeCriteria,
     AbstractSelectedAdministrativeCriteria,
     AdministrativeCriteriaQuerySet,
 )
@@ -519,7 +518,7 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
 
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
     criteria = SelectedAdministrativeCriteria.objects.filter(
-        administrative_criteria__kind__in=AbstractAdministrativeCriteria.CAN_BE_CERTIFIED_KINDS,
+        administrative_criteria__kind__in=AdministrativeCriteriaKind.can_be_certified(),
         eligibility_diagnosis=eligibility_diagnosis,
     )
     for criterion in criteria:
