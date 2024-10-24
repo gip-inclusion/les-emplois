@@ -1,11 +1,13 @@
 import uuid
 
+import pytest
 import respx
 from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
+from django.contrib import messages
 from django.test import override_settings
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertFormError, assertRedirects
+from pytest_django.asserts import assertContains, assertFormError, assertMessages, assertRedirects
 
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.users.enums import UserKind
@@ -319,3 +321,81 @@ class TestJobSeekerSignup:
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
         assert not job_seeker.jobseeker_profile.nir
         assert job_seeker.has_jobseeker_profile
+
+    @pytest.mark.parametrize(
+        "erroneous_fields,snapshot_name",
+        [
+            (["email"], "email_conflict"),
+            (["email", "first_name", "last_name"], "email_and_name_conflict"),
+            (["nir"], "nir_conflict"),
+            (["email", "first_name", "last_name", "birthdate"], "missing_only_nir"),
+            (["email", "nir", "first_name", "birthdate"], "missing_only_last_name"),
+            (["email", "nir", "last_name", "birthdate"], "missing_only_first_name"),
+            (["email", "nir", "first_name", "last_name"], "missing_only_birthdate"),
+            (["nir", "first_name", "last_name", "birthdate"], "missing_only_email"),
+            (["email", "nir", "first_name", "last_name", "birthdate"], "complete_match"),
+            (["nir", "birthdate"], "nir_plus_mispelled_name"),
+        ],
+    )
+    def test_job_seeker_signup_with_conflicting_fields(self, erroneous_fields, snapshot_name, client, snapshot):
+        """
+        Test registration error behaviour when key fields (NIR/email) conflict with existing user(s)
+        A modal with detailed error information is displayed to the user
+        """
+        existing_user = JobSeekerFactory(for_snapshot=True)
+
+        job_seeker_data = JobSeekerFactory.build()
+        post_data = {
+            "nir": job_seeker_data.jobseeker_profile.nir,
+            "title": job_seeker_data.title,
+            "first_name": job_seeker_data.first_name,
+            "last_name": job_seeker_data.last_name,
+            "email": job_seeker_data.email,
+            "birthdate": str(job_seeker_data.jobseeker_profile.birthdate),
+        }
+
+        # Prepare conflict state directed by erroneous_fields parameter
+        for erroneous_field in erroneous_fields:
+            try:
+                post_data[erroneous_field] = getattr(existing_user, erroneous_field)
+            except AttributeError:
+                post_data[erroneous_field] = getattr(existing_user.jobseeker_profile, erroneous_field)
+
+        response = client.post(reverse("signup:job_seeker"), post_data)
+        assert response.status_code == 200
+
+        # Modal is rendered with expected error message according to the conflicting fields
+        assertMessages(response, [messages.Message(messages.ERROR, snapshot(name=snapshot_name))])
+
+        # NOTE: error is rendered for the case that the user ignores the modal
+        if "email" in erroneous_fields:
+            assert response.context["form"].errors["email"] == [
+                "Un autre utilisateur utilise déjà cette adresse e-mail."
+            ]
+        if "jobseeker_profile__nir" in erroneous_fields:
+            assert response.context["form"].errors["nir"] == ["Un compte avec ce numéro existe déjà."]
+
+    def test_job_seeker_signup_insufficiently_conflicting_fields(self, client):
+        # similarities between accounts are only sufficient if a unique identifier is included
+        existing_user = JobSeekerFactory(email="apersonalemail@example.com")
+        post_data = {
+            "title": existing_user.title,
+            "first_name": existing_user.first_name,
+            "last_name": existing_user.last_name,
+            "email": "people_share_names@genuinely.com",
+            "birthdate": existing_user.jobseeker_profile.birthdate,
+            "nir": "141068078200557",
+        }
+
+        response = client.post(reverse("signup:job_seeker"), data=post_data)
+        assertMessages(response, [])  # no error messages triggered
+        assertRedirects(response, reverse("signup:job_seeker_credentials"))
+
+        # Re-apply the test with a temporary NIR
+        existing_user.jobseeker_profile.nir = ""
+        existing_user.jobseeker_profile.save()
+        post_data["nir"] = ""
+        post_data["skip"] = 1
+        response = client.post(reverse("signup:job_seeker"), data=post_data)
+        assertMessages(response, [])  # no error messages triggered
+        assertRedirects(response, reverse("signup:job_seeker_credentials"))

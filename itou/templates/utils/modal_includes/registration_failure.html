@@ -1,0 +1,13 @@
+{% load static %}
+{% load theme_inclusion %}
+{% load django_bootstrap5 %}
+
+<div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title text-danger" id="message-modal-{{ forloop.counter }}-label"></h3>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        {{ message }}
+    </div>
+</div>

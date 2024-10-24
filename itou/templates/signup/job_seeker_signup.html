@@ -6,11 +6,11 @@
 {% load buttons_form %}
 
 {% block job_seeker_signup_content %}
-    <form method="post" action="#" role="form" class="js-prevent-multiple-submit js-format-nir" data-matomo-name="signup-job-seeker-identity">
+    <form method="post" action="" role="form" class="js-prevent-multiple-submit js-format-nir" data-matomo-name="signup-job-seeker-identity">
 
         {% csrf_token %}
 
-        <!-- try it wae this: {% bootstrap_form_errors form type="all" %} -->
+        {% bootstrap_form_errors form type="all" %}
         {% redirection_input_field value=redirect_field_value %}
 
         {% bootstrap_field form.title wrapper_class="form-group mt-1" %}

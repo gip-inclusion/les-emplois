@@ -19,6 +19,8 @@ from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.validators import validate_birthdate, validate_code_safir, validate_nir, validate_siren, validate_siret
 from itou.utils.widgets import DuetDatePickerWidget
 
+from .errors import JobSeekerSignupConflictModalResolver
+
 
 def _get_organization_data_from_api(siret):
     # Fetch name and address from API entreprise.
@@ -126,8 +128,13 @@ class JobSeekerSignupForm(FullnameFormMixin, BaseSignupForm):
     )
     title = forms.ChoiceField(required=True, label="Civilité", choices=BLANK_CHOICE_DASH + Title.choices)
 
-    def __init__(self, *args, **kwargs):
+    request = None  # View request optional (used for creating error modals to manage identity conflicts)
+    _nir_submitted = None
+    _email_submitted = None
+
+    def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.request = request
         self.fields["email"].widget.attrs["placeholder"] = "adresse@email.fr"
         self.fields["first_name"].widget.attrs["placeholder"] = "Dominique"
         self.fields["last_name"].widget.attrs["placeholder"] = "Durand"
@@ -139,14 +146,24 @@ class JobSeekerSignupForm(FullnameFormMixin, BaseSignupForm):
         if email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
             raise ValidationError("Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
         if User.objects.filter(email=email).exists():
+            self._email_submitted = email
             raise ValidationError("Un autre utilisateur utilise déjà cette adresse e-mail.")
         return email
 
     def clean_nir(self):
         nir = self.cleaned_data["nir"].replace(" ", "")
         if User.objects.filter(jobseeker_profile__nir=nir).exists():
+            self._nir_submitted = nir
             raise ValidationError("Un compte avec ce numéro existe déjà.")
         return nir
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.request:
+            JobSeekerSignupConflictModalResolver(cleaned_data, self._nir_submitted, self._email_submitted).evaluate(
+                self.request
+            )
+        return cleaned_data
 
 
 class JobSeekerSignupFormNirDisabled(JobSeekerSignupForm):

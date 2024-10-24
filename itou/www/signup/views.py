@@ -136,13 +136,13 @@ def job_seeker_situation(request, template_name="signup/job_seeker_situation.htm
 
 
 def job_seeker_signup_info(request, template_name="signup/job_seeker_signup.html"):
-    form = forms.JobSeekerSignupForm(data=request.POST or None)
+    form = forms.JobSeekerSignupForm(request, data=request.POST or None)
 
     if request.method == "POST":
         next_url = reverse("signup:job_seeker_credentials")
 
         if form.data.get("skip"):
-            form = forms.JobSeekerSignupFormNirDisabled(data=form.data)
+            form = forms.JobSeekerSignupFormNirDisabled(request, data=form.data)
 
         if form.is_valid():
             request.session[global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY] = form.cleaned_data
