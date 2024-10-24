@@ -83,6 +83,9 @@ METABASE_DASHBOARDS = {
     "stats_cd_aci": {
         "dashboard_id": 327,
     },
+    "stats_cd_orga_etp": {
+        "dashboard_id": 485,
+    },
     #
     # Prescriber stats - FT.
     #
@@ -170,6 +173,9 @@ METABASE_DASHBOARDS = {
     "stats_ddets_iae_aci": {
         "dashboard_id": 327,
     },
+    "stats_ddets_iae_orga_etp": {
+        "dashboard_id": 485,
+    },
     #
     # Institution stats - DDETS LOG - department level.
     #
@@ -214,6 +220,9 @@ METABASE_DASHBOARDS = {
         "dashboard_id": 310,
         "tally_popup_form_id": "w2az2j",
         "tally_embed_form_id": "3Nlvzl",
+    },
+    "stats_dreets_iae_orga_etp": {
+        "dashboard_id": 485,
     },
     #
     # Institution stats - DRIHL - region level - IDF only.
@@ -261,6 +270,9 @@ METABASE_DASHBOARDS = {
     },
     "stats_dgefp_iae_af": {
         "dashboard_id": 142,
+    },
+    "stats_dgefp_iae_orga_etp": {
+        "dashboard_id": 485,
     },
     #
     # Institution stats - DIHAL - nation level.

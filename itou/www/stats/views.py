@@ -364,6 +364,18 @@ def stats_cd_aci(request):
     )
 
 
+@login_required()
+def stats_cd_orga_etp(request):
+    get_current_org_or_404(request)
+    if not utils.can_view_stats_cd_orga_etp(request):
+        raise PermissionDenied
+
+    return render_stats_cd(
+        request=request,
+        page_title="Suivi des effectifs annuels et mensuels en ETP",
+    )
+
+
 def render_stats_ft(request, page_title, extra_params=None):
     """
     FT ("France Travail") stats shown to relevant members.
@@ -626,6 +638,17 @@ def stats_ddets_iae_aci(request):
     )
 
 
+@login_required
+def stats_ddets_iae_orga_etp(request):
+    if not utils.can_view_stats_ddets_iae_orga_etp(request):
+        raise PermissionDenied
+
+    return render_stats_ddets_iae(
+        request=request,
+        page_title="Suivi des effectifs annuels et mensuels en ETP",
+    )
+
+
 def render_stats_ddets_log(request, page_title, extend_stats_to_whole_region):
     get_current_institution_or_404(request)
     if not utils.can_view_stats_ddets_log(request):
@@ -705,6 +728,17 @@ def stats_dreets_iae_state(request):
     return render_stats_dreets_iae(
         request=request,
         page_title="Suivi des prescriptions des AHI de ma région",
+    )
+
+
+@login_required
+def stats_dreets_iae_orga_etp(request):
+    if not utils.can_view_stats_dreets_iae_orga_etp(request):
+        raise PermissionDenied
+
+    return render_stats_dreets_iae(
+        request=request,
+        page_title="Suivi des effectifs annuels et mensuels en ETP",
     )
 
 
@@ -796,6 +830,15 @@ def stats_dgefp_iae_siae_evaluation(request):
 @login_required
 def stats_dgefp_iae_af(request):
     return render_stats_dgefp_iae(request=request, page_title="Annexes financières actives")
+
+
+@login_required
+def stats_dgefp_iae_orga_etp(request):
+    return render_stats_dgefp_iae(
+        request=request,
+        page_title="Suivi des effectifs annuels et mensuels en ETP",
+        extra_params=get_params_for_whole_country(),
+    )
 
 
 @login_required
