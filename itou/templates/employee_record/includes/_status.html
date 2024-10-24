@@ -1,6 +1,8 @@
-{% if employee_record.status == "SENT" %}
+{% if employee_record.status == "NEW" %}
+    <span class="badge rounded-pill badge-sm text-nowrap bg-emploi">Nouvelle à complétée</span>
+{% elif employee_record.status == "SENT" %}
     <span class="badge rounded-pill badge-sm text-nowrap bg-warning">
-        Transmise à l'ASP le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
+        Envoyée à l'ASP le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
     </span>
 {% elif employee_record.status == "REJECTED" %}
     <span class="badge rounded-pill badge-sm text-nowrap bg-danger">
