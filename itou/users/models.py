@@ -24,6 +24,7 @@ from itou.approvals.models import PoleEmploiApproval
 from itou.asp.models import (
     AllocationDuration,
     Commune,
+    Country,
     EducationLevel,
     LaneExtension,
     LaneType,
@@ -1213,6 +1214,10 @@ class JobSeekerProfile(models.Model):
     @property
     def is_employed(self):
         return not self.unemployed_since
+
+    @property
+    def is_born_in_france(self):
+        return self.birth_country_id and self.birth_country.group == Country.Group.FRANCE
 
     @property
     def has_ass_allocation(self):
