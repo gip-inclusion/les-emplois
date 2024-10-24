@@ -64,7 +64,7 @@
               </form>
   '''
 # ---
-# name: TestRdvInsertionView.test_rdv_insertion_not_configured
+# name: TestRdvInsertionView.test_rdv_insertion_not_configured_for_employer
   '''
   <button class="btn btn-danger btn-ico" data-bs-placement="left" data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti." data-bs-toggle="tooltip" disabled="" type="button">
                   <i aria-hidden="true" class="ri-alert-line fw-medium"></i>

@@ -20,6 +20,23 @@
                aria-selected="true"
                {% matomo_event "candidature" "clic-onglet" "informations-generales" %}>Informations générales</a>
         </li>
+        {% if participations %}
+            <li class="nav-item" role="presentation">
+                <a class="nav-link"
+                   id="appointments-tab"
+                   data-bs-toggle="tab"
+                   href="#appointments"
+                   role="tab"
+                   aria-controls="appointments"
+                   aria-selected="false"
+                   {% matomo_event "candidature" "clic-onglet" "appointments" %}>
+                    <span>Rendez-vous</span>
+                    {% if job_application.upcoming_participations_count %}
+                        <span id="upcoming-appointments-count" class="badge badge-sm rounded-pill ms-2">{{ job_application.upcoming_participations_count }}</span>
+                    {% endif %}
+                </a>
+            </li>
+        {% endif %}
         <li class="nav-item" role="presentation">
             <a class="nav-link" id="historique-tab" data-bs-toggle="tab" href="#historique" role="tab" aria-controls="historique" aria-selected="false" {% matomo_event "candidature" "clic-onglet" "historique" %}>Historique</a>
         </li>
@@ -72,6 +89,16 @@
                         </div>
                     </div>
                 </div>
+                {% if participations %}
+                    <div class="tab-pane fade" id="appointments" role="tabpanel" aria-labelledby="appointments-tab">
+                        <div class="s-section__row row">
+                            <div class="col-12 col-lg-8 order-2 order-lg-1">
+                                {# Appointments ------------------------------------------------- #}
+                                {% include "apply/includes/appointments.html" with job_application=job_application %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
                 <div class="tab-pane fade" id="historique" role="tabpanel" aria-labelledby="historique-tab">
                     <div class="s-section__row row">
                         <div class="col-12 col-lg-8 order-2 order-lg-1">
