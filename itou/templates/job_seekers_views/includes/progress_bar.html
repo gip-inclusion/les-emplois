@@ -1,0 +1,9 @@
+<div class="mb-4">
+    <div class="progress progress--emploi mb-2">
+        <div class="progress-bar progress-bar-{{ progress }}" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
+        </div>
+    </div>
+    <span>
+        {% block progress_title %}{{ progress_title }}{% endblock %}
+    </span>
+</div>

@@ -1,0 +1,105 @@
+{% extends "job_seekers_views/create_step_base.html" %}
+{% load django_bootstrap5 %}
+{% load format_filters %}
+{% load static %}
+{% load str_filters %}
+{% load buttons_form %}
+
+{% block form_content %}
+    {% if nir %}
+        <div class="form-group form-group-required">
+            <label for="id_nir">Numéro de sécurité sociale du candidat</label>
+            <input id="id_nir" name="nir" class="form-control" disabled value="{{ nir }}">
+        </div>
+    {% endif %}
+
+    <div class="alert alert-info mt-4 mb-4" role="status">
+        <div class="row">
+            <div class="col-auto pe-0">
+                <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
+            </div>
+            <div class="col">
+                <p class="mb-2">
+                    <strong>Créer un compte pour votre candidat</strong>
+                </p>
+                <p class="mb-0">
+                    Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale. Merci de renseigner l'adresse e-mail de votre candidat pour l'inscrire.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {% csrf_token %}
+
+    {% bootstrap_form form alert_error_type="all" %}
+
+    <div class="mb-3">
+        {% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" only %}
+    </div>
+
+    {% if preview_mode %}
+        <!-- Modal -->
+        <div class="modal" id="email-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="email-confirmation-label" aria-modal="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="email-confirmation-label">Email existant</h3>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            L'adresse {{ form.email.value }} est associée au compte de <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>.
+                        </p>
+                        <p>
+                            L'identité du candidat est une information clé pour la structure.
+                            {% if is_gps %}
+                                Si vous ne souhaitez pas suivre <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Suivre un autre bénéficiaire » afin d'enregistrer ses informations personnelles.
+                            {% else %}
+                                Si cette candidature n'est pas pour <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
+                                « Ce n'est pas mon candidat » afin d'enregistrer ses informations
+                                personnelles.
+                            {% endif %}
+                        </p>
+                        {% if can_add_nir %}
+                            <p>
+                                En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale {{ nir|format_nir }} soit associé à ce
+                                {% if is_gps %}
+                                    bénéficiaire
+                                {% else %}
+                                    candidat
+                                {% endif %}
+                            .</b>
+                        </p>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+
+                    {# Reload this page with a new form. #}
+                    {% if is_gps %}
+                        {% bootstrap_button "Suivre un autre bénéficiaire" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                    {% else %}
+                        {% bootstrap_button "Ce n'est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                    {% endif %}
+                    {# Go to the next step. #}
+                    {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/split_nir.js' %}"></script>
+    {% if preview_mode %}
+        {# Show the confirmation modal after submitting the form. #}
+        <script nonce="{{ CSP_NONCE }}">
+            // Adding the "show" CSS class is not enough and not documented.
+            // A JS initialization is recommended.
+            const emailConfirmationModal = new bootstrap.Modal("#email-confirmation-modal");
+            emailConfirmationModal.show();
+        </script>
+    {% endif %}
+{% endblock %}
