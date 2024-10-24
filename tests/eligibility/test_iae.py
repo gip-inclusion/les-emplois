@@ -533,21 +533,87 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
     assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 10, 31))
 
 
+@freeze_time("2024-09-12T00:00:00Z")
 @pytest.mark.parametrize(
-    "EligibilityDiagnosisFactory",
+    "EligibilityDiagnosisFactory,expected,response_status,response",
     [
         pytest.param(
             partial(IAEEligibilityDiagnosisFactory, from_employer=True),
-            id="test_selected_administrative_criteria_certify_iae",
+            {
+                "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 10, 31)),
+                "certified": True,
+                "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
+                "data_returned_by_api": rsa_certified_mocker(),
+            },
+            200,
+            rsa_certified_mocker(),
+            id="iae-certified",
         ),
         pytest.param(
             partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
-            id="test_selected_administrative_criteria_certify_geiq",
+            {
+                "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 10, 31)),
+                "certified": True,
+                "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
+                "data_returned_by_api": rsa_certified_mocker(),
+            },
+            200,
+            rsa_certified_mocker(),
+            id="geiq-certified",
+        ),
+        pytest.param(
+            partial(IAEEligibilityDiagnosisFactory, from_employer=True),
+            {
+                "certification_period": None,
+                "certified": False,
+                "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
+                "data_returned_by_api": rsa_not_certified_mocker(),
+            },
+            200,
+            rsa_not_certified_mocker(),
+            id="iae-not-certified",
+        ),
+        pytest.param(
+            partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            {
+                "certification_period": None,
+                "certified": False,
+                "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
+                "data_returned_by_api": rsa_not_certified_mocker(),
+            },
+            200,
+            rsa_not_certified_mocker(),
+            id="geiq-not-certified",
+        ),
+        pytest.param(
+            partial(IAEEligibilityDiagnosisFactory, from_employer=True),
+            {
+                "certification_period": None,
+                "certified": None,
+                "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
+                "data_returned_by_api": rsa_not_found_mocker(),
+            },
+            404,
+            rsa_not_found_mocker(),
+            id="iae-not-found",
+        ),
+        pytest.param(
+            partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            {
+                "certification_period": None,
+                "certified": None,
+                "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
+                "data_returned_by_api": rsa_not_found_mocker(),
+            },
+            404,
+            rsa_not_found_mocker(),
+            id="geiq-not-found",
         ),
     ],
 )
-@freeze_time("2024-09-12")
-def test_selected_administrative_criteria_certify(respx_mock, EligibilityDiagnosisFactory, mocker):
+def test_selected_administrative_criteria_certified(
+    expected, response, response_status, respx_mock, EligibilityDiagnosisFactory
+):
     job_seeker = JobSeekerFactory(with_address=True, born_in_france=True)
     eligibility_diagnosis = EligibilityDiagnosisFactory(with_certifiable_criteria=True, job_seeker=job_seeker)
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
@@ -556,47 +622,15 @@ def test_selected_administrative_criteria_certify(respx_mock, EligibilityDiagnos
         eligibility_diagnosis=eligibility_diagnosis,
     ).get()
 
-    # Is certified.
-    certified_mocker = mocker.patch(
-        "itou.utils.apis.api_particulier._request",
-        return_value=rsa_certified_mocker(),
-    )
-    with api_particulier.client() as client:
-        criterion.certify(client, save=True)
-    criterion.refresh_from_db()
-    assert criterion.data_returned_by_api == rsa_certified_mocker()
-    assert criterion.certified
-    assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 10, 31))
-    assert criterion.certified_at == timezone.now()
-    certified_mocker.assert_called_once()
-    mocker.stop(certified_mocker)
-
-    # Is not certified.
-    not_certified_mocker = mocker.patch(
-        "itou.utils.apis.api_particulier._request",
-        return_value=rsa_not_certified_mocker(),
-    )
-    with api_particulier.client() as client:
-        criterion.certify(client, save=True)
-    criterion.refresh_from_db()
-    assert criterion.data_returned_by_api == rsa_not_certified_mocker()
-    assert criterion.certified is False
-    assert criterion.certification_period is None
-    assert criterion.certified_at == timezone.now()
-    not_certified_mocker.assert_called_once()
-    mocker.stop(not_certified_mocker)
-
-    # Not found. Save API response only.
     respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
-        404, json=rsa_not_found_mocker()
+        response_status, json=response
     )
     with api_particulier.client() as client:
         criterion.certify(client, save=True)
     criterion.refresh_from_db()
-    assert criterion.data_returned_by_api == rsa_not_found_mocker()
-    assert criterion.certified is None
-    assert criterion.certification_period is None
-    assert criterion.certified_at == timezone.now()
+    for attrname, value in expected.items():
+        assert getattr(criterion, attrname) == value
+    assert len(respx_mock.calls) == 1
 
 
 def test_with_is_considered_certified():
