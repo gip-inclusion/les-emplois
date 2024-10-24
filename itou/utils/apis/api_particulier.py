@@ -11,6 +11,13 @@ from itou.asp.models import Country
 logger = logging.getLogger("APIParticulierClient")
 
 
+class ShouldRetryException(httpx.HTTPStatusError):
+    """
+    This exception can be used to ask Tenacity to retry
+    while attaching a response and a request to it.
+    """
+
+
 def client():
     return httpx.Client(
         base_url=settings.API_PARTICULIER_BASE_URL,
@@ -57,21 +64,40 @@ def _build_params_from(job_seeker):
 @tenacity.retry(
     wait=tenacity.wait_fixed(2),
     stop=tenacity.stop_after_attempt(4),
-    retry=tenacity.retry_if_exception_type(httpx.RequestError),
+    retry=tenacity.retry_if_exception_type(ShouldRetryException),
 )
 def _request(client, endpoint, job_seeker):
     params = _build_params_from(job_seeker=job_seeker)
     response = client.get(endpoint, params=params)
-    if response.status_code == 504:
-        reason = response.json().get("reason")
-        logger.error(f"{response.url=} {reason=}")
-        raise httpx.RequestError(message=reason)
+    error_message = None
+    # Bad Request or Unauthorized
+    # Same as 503 except we don't retry
+    if response.status_code in [400, 401]:
+        error_message = "Bad Request" if response.status_code == 400 else "Unauthorized"
+        logger.error(error_message, extra={"response": response.json()})
+        raise httpx.HTTPStatusError(message=error_message, request=response.request, response=response)
+    # Too Many Requests
+    elif response.status_code == 429:
+        errors = response.json().get("errors")
+        if errors:
+            error_message = errors[0]
+            logger.error(error_message)
+        raise ShouldRetryException(message=error_message, request=response.request, response=response)
+    # Service unavailable
     elif response.status_code == 503:
-        errors = response.json()["errors"]
-        reason = errors[0].get("title")
-        for error in errors:
-            logger.error(f"{response.url=} {error['title']}")
-        raise httpx.RequestError(message=reason)
+        error_message = response.json().get("error")
+        if error_message:
+            error_message = response.json().get("reason")
+        else:
+            errors = response.json().get("errors")
+            error_message = errors[0].get("title")
+        logger.error(error_message)
+        raise ShouldRetryException(message=error_message, request=response.request, response=response)
+    #  Server error
+    elif response.status_code == 504:
+        error_message = response.json().get("reason")
+        logger.error(error_message)
+        raise ShouldRetryException(message=error_message, request=response.request, response=response)
     else:
         response.raise_for_status()
     return response.json()
@@ -82,23 +108,22 @@ def revenu_solidarite_active(client, job_seeker):
         "start_at": None,
         "end_at": None,
         "is_certified": None,
-        "raw_response": "",
+        "raw_response": None,
     }
     try:
-        data = _request(client, "/v2/revenu-solidarite-active", job_seeker)
+        response_data = _request(client, "/v2/revenu-solidarite-active", job_seeker)
     except httpx.HTTPStatusError as exc:  # not 5XX.
-        logger.info(f"Beneficiary not found. {job_seeker.public_id=}")
         data["raw_response"] = exc.response.json()
-    except tenacity.RetryError as retry_err:  # 503 or 504
+    except tenacity.RetryError as retry_err:  # 429, 503 or 504
         exc = retry_err.last_attempt._exception
-        data["raw_response"] = str(exc)
+        data["raw_response"] = exc.response.json()
     except KeyError as exc:
-        data["raw_response"] = str(exc)
+        logger.info(str(exc))  # FIXME: should be removed
     else:
         data = {
-            "start_at": _parse_date(data["dateDebut"]),
-            "end_at": _parse_date(data["dateFin"]),
-            "is_certified": data["status"] == "beneficiaire",
-            "raw_response": data,
+            "start_at": _parse_date(response_data["dateDebut"]),
+            "end_at": _parse_date(response_data["dateFin"]),
+            "is_certified": response_data["status"] == "beneficiaire",
+            "raw_response": response_data,
         }
     return data
