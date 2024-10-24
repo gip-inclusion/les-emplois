@@ -5,8 +5,6 @@ import httpx
 import tenacity
 from django.conf import settings
 
-from itou.asp.models import Country
-
 
 logger = logging.getLogger("APIParticulierClient")
 
@@ -35,8 +33,7 @@ def _build_params_from(job_seeker):
         "codePaysLieuDeNaissance": f"99{jobseeker_profile.birth_country.code}",
         "sexe": "F" if job_seeker.title == "MME" else job_seeker.title,
     }
-    # TODO(cms): add JobSeekerProfile.is_born_in_france
-    if jobseeker_profile.birth_country and jobseeker_profile.birth_country.group == Country.Group.FRANCE:
+    if jobseeker_profile.is_born_in_france:
         params["codeInseeLieuDeNaissance"] = jobseeker_profile.birth_place.code
     return params
 
@@ -73,8 +70,7 @@ def has_required_info(job_seeker):
         profile.birthdate,
         profile.birth_country,
     ]
-    # TODO(cms): add JobSeekerProfile.is_born_in_france
-    if profile.birth_country and profile.birth_country.group == Country.Group.FRANCE:
+    if profile.is_born_in_france:
         required.append(profile.birth_place)
     return all(required)
 
