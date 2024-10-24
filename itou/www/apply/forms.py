@@ -62,7 +62,7 @@ class JobSeekerExistsForm(forms.Form):
                 raise forms.ValidationError(error)
             if not self.user.is_job_seeker:
                 error = (
-                    "Vous ne pouvez pas postuler pour cet utilisateur car"
+                    "Vous ne pouvez pas postuler pour cet utilisateur car "
                     "cet e-mail est déjà rattaché à un prescripteur ou à un employeur."
                 )
                 raise forms.ValidationError(error)
