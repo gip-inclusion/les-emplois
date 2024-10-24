@@ -523,17 +523,14 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
     eligibility_diagnosis.certify_criteria()
 
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
-    criteria = SelectedAdministrativeCriteria.objects.filter(
+    criterion = SelectedAdministrativeCriteria.objects.get(
         administrative_criteria__kind__in=AbstractAdministrativeCriteria.CAN_BE_CERTIFIED_KINDS,
         eligibility_diagnosis=eligibility_diagnosis,
     )
-    for criterion in criteria:
-        assert criterion.certified
-        assert criterion.certified_at == timezone.now()
-        assert criterion.data_returned_by_api == rsa_certified_mocker()
-        assert criterion.certification_period == InclusiveDateRange(
-            datetime.date(2024, 8, 1), datetime.date(2024, 10, 31)
-        )
+    assert criterion.certified is True
+    assert criterion.certified_at == timezone.now()
+    assert criterion.data_returned_by_api == rsa_certified_mocker()
+    assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 10, 31))
 
 
 @pytest.mark.parametrize(
