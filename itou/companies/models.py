@@ -177,8 +177,14 @@ class CompanyQuerySet(OrganizationQuerySet):
 
 
 class CompanyManager(models.Manager.from_queryset(CompanyQuerySet)):
+    use_in_migrations = True
+
     def get_queryset(self):
         return super().get_queryset().exclude(siret=POLE_EMPLOI_SIRET)
+
+
+class CompanyUnfilteredManager(models.Manager.from_queryset(CompanyQuerySet)):
+    use_in_migrations = True
 
 
 class Company(AddressMixin, OrganizationAbstract):
@@ -287,7 +293,7 @@ class Company(AddressMixin, OrganizationAbstract):
     )
 
     objects = CompanyManager()
-    unfiltered_objects = CompanyQuerySet.as_manager()
+    unfiltered_objects = CompanyUnfilteredManager()
 
     class Meta:
         verbose_name = "entreprise"
