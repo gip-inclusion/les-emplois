@@ -551,7 +551,7 @@ class CreateJobSeekerForSenderBaseView(SessionNamespaceRequiredMixin, ApplyStepF
 
 
 class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
-    template_name = "apply/submit/create_or_update_job_seeker/step_1.html"
+    template_name = "job_seekers_views/create_or_update_job_seeker/step_1.html"
 
     previous_apply_url = "apply:search_by_email_for_sender"
     previous_hire_url = "apply:search_by_email_for_hire"
@@ -622,7 +622,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
 
 
 class CreateJobSeekerStep2ForSenderView(CreateJobSeekerForSenderBaseView):
-    template_name = "apply/submit/create_or_update_job_seeker/step_2.html"
+    template_name = "job_seekers_views/create_or_update_job_seeker/step_2.html"
 
     previous_apply_url = "apply:create_job_seeker_step_1_for_sender"
     previous_hire_url = "apply:create_job_seeker_step_1_for_hire"
@@ -654,7 +654,7 @@ class CreateJobSeekerStep2ForSenderView(CreateJobSeekerForSenderBaseView):
 
 
 class CreateJobSeekerStep3ForSenderView(CreateJobSeekerForSenderBaseView):
-    template_name = "apply/submit/create_or_update_job_seeker/step_3.html"
+    template_name = "job_seekers_views/create_or_update_job_seeker/step_3.html"
 
     previous_apply_url = "apply:create_job_seeker_step_2_for_sender"
     previous_hire_url = "apply:create_job_seeker_step_2_for_hire"
@@ -688,7 +688,7 @@ class CreateJobSeekerStep3ForSenderView(CreateJobSeekerForSenderBaseView):
 
 
 class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
-    template_name = "apply/submit/create_or_update_job_seeker/step_end.html"
+    template_name = "job_seekers_views/create_or_update_job_seeker/step_end.html"
 
     previous_apply_url = "apply:create_job_seeker_step_3_for_sender"
     previous_hire_url = "apply:create_job_seeker_step_3_for_hire"
@@ -1397,7 +1397,7 @@ class UpdateJobSeekerBaseView(SessionNamespaceRequiredMixin, ApplyStepBaseView):
 
 
 class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
-    template_name = "apply/submit/create_or_update_job_seeker/step_1.html"
+    template_name = "job_seekers_views/create_or_update_job_seeker/step_1.html"
 
     previous_apply_url = "apply:application_jobs"
     previous_hire_url = "apply:check_job_seeker_info_for_hire"
@@ -1464,7 +1464,7 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
 
 
 class UpdateJobSeekerStep2View(UpdateJobSeekerBaseView):
-    template_name = "apply/submit/create_or_update_job_seeker/step_2.html"
+    template_name = "job_seekers_views/create_or_update_job_seeker/step_2.html"
     required_session_namespaces = ["job_seeker_session"] + UpdateJobSeekerBaseView.required_session_namespaces
 
     previous_apply_url = "apply:update_job_seeker_step_1"
@@ -1504,7 +1504,7 @@ class UpdateJobSeekerStep2View(UpdateJobSeekerBaseView):
 
 
 class UpdateJobSeekerStep3View(UpdateJobSeekerBaseView):
-    template_name = "apply/submit/create_or_update_job_seeker/step_3.html"
+    template_name = "job_seekers_views/create_or_update_job_seeker/step_3.html"
     required_session_namespaces = ["job_seeker_session"] + UpdateJobSeekerBaseView.required_session_namespaces
 
     previous_apply_url = "apply:update_job_seeker_step_2"
@@ -1559,7 +1559,7 @@ class UpdateJobSeekerStep3View(UpdateJobSeekerBaseView):
 
 
 class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
-    template_name = "apply/submit/create_or_update_job_seeker/step_end.html"
+    template_name = "job_seekers_views/create_or_update_job_seeker/step_end.html"
     required_session_namespaces = ["job_seeker_session"] + UpdateJobSeekerBaseView.required_session_namespaces
 
     previous_apply_url = "apply:update_job_seeker_step_3"
