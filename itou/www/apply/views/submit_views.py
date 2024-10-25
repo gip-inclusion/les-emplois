@@ -312,7 +312,7 @@ class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
 
 
 class CheckNIRForJobSeekerView(ApplyStepBaseView):
-    template_name = "apply/submit_step_check_job_seeker_nir.html"
+    template_name = "job_seekers_views/step_check_job_seeker_nir.html"
 
     def __init__(self):
         super().__init__()
@@ -364,7 +364,7 @@ class CheckNIRForJobSeekerView(ApplyStepBaseView):
 
 
 class CheckNIRForSenderView(ApplyStepForSenderBaseView):
-    template_name = "apply/submit_step_check_job_seeker_nir.html"
+    template_name = "job_seekers_views/step_check_job_seeker_nir.html"
 
     def __init__(self):
         super().__init__()
