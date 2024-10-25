@@ -1200,12 +1200,12 @@
       dict({
         'origin': list([
           'CustomFieldRenderer.render[utils/custom_renderer.py]',
-          'SimpleNode[apply/submit/create_or_update_job_seeker/step_1.html]',
-          'IfNode[apply/submit/create_or_update_job_seeker/step_1.html]',
-          'BlockNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -2077,8 +2077,8 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -2100,12 +2100,12 @@
       dict({
         'origin': list([
           'CustomFieldRenderer.render[utils/custom_renderer.py]',
-          'SimpleNode[apply/submit/create_or_update_job_seeker/step_1.html]',
-          'IfNode[apply/submit/create_or_update_job_seeker/step_1.html]',
-          'BlockNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -2427,8 +2427,8 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_2.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_2.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -2762,8 +2762,8 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_3.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_3.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -3060,12 +3060,12 @@
       dict({
         'origin': list([
           'CustomFieldRenderer.render[utils/custom_renderer.py]',
-          'SimpleNode[apply/submit/create_or_update_job_seeker/step_1.html]',
-          'IfNode[apply/submit/create_or_update_job_seeker/step_1.html]',
-          'BlockNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -3937,8 +3937,8 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -3960,12 +3960,12 @@
       dict({
         'origin': list([
           'CustomFieldRenderer.render[utils/custom_renderer.py]',
-          'SimpleNode[apply/submit/create_or_update_job_seeker/step_1.html]',
-          'IfNode[apply/submit/create_or_update_job_seeker/step_1.html]',
-          'BlockNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -4287,8 +4287,8 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_2.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_2.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -4622,8 +4622,8 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_3.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_3.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -4977,8 +4977,8 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -5000,12 +5000,12 @@
       dict({
         'origin': list([
           'CustomFieldRenderer.render[utils/custom_renderer.py]',
-          'SimpleNode[apply/submit/create_or_update_job_seeker/step_1.html]',
-          'IfNode[apply/submit/create_or_update_job_seeker/step_1.html]',
-          'BlockNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -5347,8 +5347,8 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_2.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_2.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -5702,8 +5702,8 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_3.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_3.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -6057,8 +6057,8 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -6080,12 +6080,12 @@
       dict({
         'origin': list([
           'CustomFieldRenderer.render[utils/custom_renderer.py]',
-          'SimpleNode[apply/submit/create_or_update_job_seeker/step_1.html]',
-          'IfNode[apply/submit/create_or_update_job_seeker/step_1.html]',
-          'BlockNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -6427,8 +6427,8 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_2.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_2.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -6782,8 +6782,8 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_3.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_3.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
