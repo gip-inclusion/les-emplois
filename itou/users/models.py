@@ -33,6 +33,8 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.enums import CompanyKind
+from itou.companies.models import Company
+from itou.prescribers.models import PrescriberOrganization
 from itou.utils.db import or_queries
 from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.templatetags.str_filters import mask_unless
@@ -985,6 +987,21 @@ class JobSeekerProfile(models.Model):
         verbose_name="date de la dernière tentative de certification",
         null=True,
         help_text="Date à laquelle nous avons tenté pour la dernière fois de certifier ce candidat",
+    )
+
+    created_by_company = models.ForeignKey(
+        Company,
+        verbose_name="créé par l'entreprise",
+        on_delete=models.RESTRICT,  # For traceability and accountability
+        null=True,
+        blank=True,
+    )
+    created_by_prescriber_organization = models.ForeignKey(
+        PrescriberOrganization,
+        verbose_name="créé par l'organisme prescripteur",
+        on_delete=models.RESTRICT,  # For traceability and accountability
+        null=True,
+        blank=True,
     )
 
     class Meta:

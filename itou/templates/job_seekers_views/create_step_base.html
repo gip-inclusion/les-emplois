@@ -1,0 +1,68 @@
+{% extends "layout/base.html" %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% load buttons_form %}
+
+{% block title %}
+    Créer un compte candidat
+    {{ block.super }}
+{% endblock %}
+
+{% block title_content %}
+    <h1>Créer un compte candidat</h1>
+    {% include "job_seekers_views/includes/progress_bar.html" with progress=progress %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section-twocolumns s-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-4 order-md-2 ps-lg-5 d-none d-lg-block mb-6"></div>
+                <div class="col-12 col-lg-8 order-md-1 pe-lg-5">
+                    <div class="c-form">
+                        {% if form %}
+                            {% bootstrap_form_errors form type="all" %}
+                        {% endif %}
+                        <form method="post" class="js-collapsable-subfields js-format-nir"{% if matomo_form_name|default:"" %} data-matomo-name="{{ matomo_form_name }}"{% endif %}>
+                            {% csrf_token %}
+
+                            {% block form_content %}{% endblock %}
+
+                            {% block form_buttons %}
+                                {% if back_url == reset_url %}
+                                    {% itou_buttons_form primary_label="Suivant" reset_url=reset_url %}
+                                {% else %}
+                                    {% itou_buttons_form primary_label="Suivant" secondary_url=back_url reset_url=reset_url %}
+                                {% endif %}
+                            {% endblock form_buttons %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+
+    <script nonce="{{ CSP_NONCE }}">
+        $(document).ready(() => {
+            /**
+             * JS to collapse subfields
+             **/
+            $(".js-collapsable-subfields").each(function() {
+                $(this).find('input[type="checkbox"]').change(function(e) {
+                    $('#subfields_' + e.target.name).collapse("toggle")
+                })
+            })
+        })
+    </script>
+{% endblock %}
+
+
+{% comment %}FAILED tests/www/apply/test_submit.py::ApplyAsPrescriberTest::test_apply_as_prescriber - Failed: Undefined template variable 'reset_url' in '/home/vincentporte/Entreprises/Neuralia.co.Products/betagouv/itou/itou/templates/apply/submit/create_or_update_job_seeker/step_end.html'
+FAILED tests/www/apply/test_submit.py::ApplyAsAuthorizedPrescriberTest::test_apply_as_prescriber_with_pending_authorization - Failed: Undefined template variable 'reset_url' in '/home/vincentporte/Entreprises/Neuralia.co.Products/betagouv/itou/itou/templates/apply/submit/create_or_update_job_seeker/step_end.html'
+FAILED tests/www/apply/test_submit.py::ApplyAsAuthorizedPrescriberTest::test_apply_as_authorized_prescriber - Failed: Undefined template variable 'reset_url' in '/home/vincentporte/Entreprises/Neuralia.co.Products/betagouv/itou/itou/templates/apply/submit/create_or_update_job_seeker/step_end.html'
+FAILED tests/www/apply/test_submit.py::DirectHireFullProcessTest::test_hire_as_company - Failed: Undefined template variable 'reset_url' in '/home/vincentporte/Entreprises/Neuralia.co.Products/betagouv/itou/itou/templates/apply/submit/create_or_update_job_seeker/step_end.html'
+FAILED tests/www/apply/test_submit.py::ApplyAsCompanyTest::test_apply_as_company - Failed: Undefined template variable 'reset_url' in '/home/vincentporte/Entreprises/Neuralia.co.Products/betagouv/itou/itou/templates/apply/submit/create_or_update_job_seeker/step_end.html'{% endcomment %}

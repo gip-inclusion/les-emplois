@@ -1,0 +1,32 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Postuler {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    <h1>{% include 'apply/includes/_submit_title.html' %}</h1>
+{% endblock %}
+
+{% block content %}
+    <section class="s-section-twocolumns s-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-6 order-md-1 pe-lg-5">
+                    {% include "companies/includes/_company_info.html" with company=siae extra_box_class="mb-3 mb-lg-5" only %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-lg-6 order-md-2 ps-lg-5 d-none d-lg-block">
+                    <h2 class="h1 ff-extra-01">Où trouver {{ request.user.is_job_seeker|yesno:"mon,le" }} numéro de sécurité sociale ?</h2>
+                    <img class="mt-3 img-fluid" src="{% static 'img/carte_vitale.png' %}" alt="Spécimen de carte vitale">
+                    <p class="ff-extra-01 mt-0">
+                        Il est présent à cet endroit sur {{ request.user.is_job_seeker|yesno:"votre,la" }} carte Vitale.
+                    </p>
+                </div>
+                <div class="col-12 col-lg-6 order-md-1 pe-lg-5">
+                    {% block left_column %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

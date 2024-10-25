@@ -794,6 +794,8 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
                     "pe_obfuscated_nir",
                     "pe_last_certification_attempt_at",
                     "disabled_notifications",
+                    "created_by_company",
+                    "created_by_prescriber_organization",
                 )
             },
         ),

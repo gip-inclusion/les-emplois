@@ -1,0 +1,48 @@
+{% extends "job_seekers_views/create_step_base.html" %}
+{% load django_bootstrap5 %}
+
+{% block progress_title %}
+    Coordonnées du
+    {% if is_gps %}
+        bénéficiaire
+    {% else %}
+        candidat
+    {% endif %}
+{% endblock %}
+{% block step_title %}
+    Quelles sont les coordonnées du
+    {% if is_gps %}
+        bénéficiaire
+    {% else %}
+        candidat
+    {% endif %}
+    ?
+{% endblock %}
+
+{% block form_content %}
+    <fieldset>
+        <legend class="visually-hidden">
+            Coordonnées du
+            {% if is_gps %}
+                bénéficiaire
+            {% else %}
+                candidat
+            {% endif %}
+        </legend>
+        {% bootstrap_field form.address_for_autocomplete %}
+        {% bootstrap_field form.address_line_1 %}
+        {% bootstrap_field form.address_line_2 %}
+        {% bootstrap_field form.post_code %}
+        {% bootstrap_field form.city %}
+
+        {% bootstrap_field form.insee_code %}
+        {% bootstrap_field form.ban_api_resolved_address %}
+        {% bootstrap_field form.fill_mode %}
+        {% bootstrap_field form.phone %}
+    </fieldset>
+{% endblock %}
+{% block script %}
+    {{ block.super }}
+    {% comment %} Needed for the AddressAutocompleteWidget {% endcomment %}
+    {{ form.media.js }}
+{% endblock %}

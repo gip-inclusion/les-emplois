@@ -1,0 +1,82 @@
+{% extends "job_seekers_views/create_step_base.html" %}
+{% load django_bootstrap5 %}
+
+{% block progress_title %}
+    État civil du
+    {% if is_gps %}
+        bénéficiaire
+    {% else %}
+        candidat
+    {% endif %}
+{% endblock %}
+{% block step_title %}
+    Quel est l’état civil du
+    {% if is_gps %}
+        bénéficiaire
+    {% else %}
+        candidat
+    {% endif %}
+    ?
+{% endblock %}
+
+{% block form_content %}
+    <fieldset>
+        <legend class="visually-hidden">État civil du candidat</legend>
+        {% bootstrap_field form.title %}
+        {% bootstrap_field form.first_name %}
+        {% bootstrap_field form.last_name %}
+        {% bootstrap_field form.nir %}
+        {% bootstrap_field form.lack_of_nir %}
+        {% bootstrap_field form.lack_of_nir_reason wrapper_class=form.lack_of_nir_reason.field.form_group_class %}
+        {% bootstrap_field form.birthdate %} {# TODO: Duet border-color button is not of the correct color #}
+        {% if form.birth_place %}
+            {% bootstrap_field form.birth_place %}
+            {% bootstrap_field form.birth_country %}
+        {% endif %}
+    </fieldset>
+
+    {% if confirmation_needed %}
+        <!-- Modal -->
+        <div class="modal" id="email-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="email-confirmation-label" aria-modal="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="email-confirmation-label">Attention</h3>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            <strong>
+                                D'après les informations renseignées, il semblerait que ce
+                                candidat soit déjà rattaché à un autre email : {{ redacted_existing_email }}.
+                            </strong>
+                        </p>
+                        <p>
+                            Nous vous invitons à vérifier l'email renseigné précédemment
+                            afin d'éviter la création d'un compte en doublon.
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        {# Go to the next step. #}
+                        <button name="confirm" value="1" class="btn btn-sm btn-outline-primary">Poursuivre la création du compte</button>
+                        {# Reload this page with a new form. #}
+                        <a href="{{ back_url }}" class="btn btn-sm btn-primary">Modifier l'email du candidat</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {% if confirmation_needed %}
+        {# Show the confirmation modal after submitting the form. #}
+        <script nonce="{{ CSP_NONCE }}">
+            // Adding the "show" CSS class is not enough and not documented.
+            // A JS initialization is recommended.
+            const emailConfirmationModal = new bootstrap.Modal("#email-confirmation-modal");
+            emailConfirmationModal.show();
+        </script>
+    {% endif %}
+{% endblock %}

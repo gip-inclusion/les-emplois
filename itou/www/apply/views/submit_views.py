@@ -302,8 +302,14 @@ class StartView(ApplyStepBaseView):
             )
 
         return HttpResponseRedirect(
-            reverse(f"apply:check_nir_for_{tunnel}", kwargs={"company_pk": self.company.pk})
-            + ("?gps=true" if self.is_gps else "")
+            add_url_params(
+                reverse(f"job_seekers_views:check_nir_for_{tunnel}"),
+                {
+                    "company": self.company.pk,
+                    "reset_url": self.get_reset_url(),
+                    "gps": True if self.is_gps else None,
+                },
+            )
         )
 
 
