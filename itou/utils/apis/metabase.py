@@ -107,7 +107,7 @@ METABASE_DASHBOARDS = {
         "dashboard_id": 182,
     },
     "stats_ft_state_main": {
-        "dashboard_id": 479,
+        "dashboard_id": 488,
         "tally_popup_form_id": "mRG61J",
         "tally_embed_form_id": "3qLKad",
     },
@@ -123,7 +123,7 @@ METABASE_DASHBOARDS = {
     # Authorized Prescribers' stats
     #
     "stats_ph_state_main": {
-        "dashboard_id": 479,
+        "dashboard_id": 488,
         "tally_popup_form_id": "mRG61J",
         "tally_embed_form_id": "3qLKad",
     },
