@@ -15,6 +15,8 @@ from .test import *  # noqa: E402,F403
 DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.0.1", "0.0.0.0"]
+if os.getenv("CUSTOM_ALLOWED_HOST"):
+    ALLOWED_HOSTS.append(os.getenv("CUSTOM_ALLOWED_HOST"))
 
 ASYNC_EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
