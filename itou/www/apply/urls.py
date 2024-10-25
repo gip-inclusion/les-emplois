@@ -1,6 +1,7 @@
 from django.urls import path
 
 from itou.www.apply.views import edit_views, list_views, process_views, submit_views
+from itou.www.job_seekers_views.views import CheckNIRForJobSeekerView, CheckNIRForSenderView
 
 
 # https://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces-and-included-urlconfs
@@ -15,9 +16,8 @@ urlpatterns = [
         submit_views.PendingAuthorizationForSender.as_view(),
         name="pending_authorization_for_sender",
     ),
-    path(
-        "<int:company_pk>/sender/check_nir", submit_views.CheckNIRForSenderView.as_view(), name="check_nir_for_sender"
-    ),
+    # Ewen: deprecated url. These urls are going to job_seekers_views.views
+    path("<int:company_pk>/sender/check_nir", CheckNIRForSenderView.as_view(), name="check_nir_for_sender"),
     path(
         "<int:company_pk>/sender/search-by-email/<uuid:session_uuid>",
         submit_views.SearchByEmailForSenderView.as_view(),
@@ -44,9 +44,10 @@ urlpatterns = [
         name="create_job_seeker_step_end_for_sender",
     ),
     # Submit - job seeker.
+    # Ewen: deprecated url. These urls are going to job_seekers_views.views
     path(
         "<int:company_pk>/job_seeker/check_nir",
-        submit_views.CheckNIRForJobSeekerView.as_view(),
+        CheckNIRForJobSeekerView.as_view(),
         name="check_nir_for_job_seeker",
     ),
     # Submit - common.
@@ -107,9 +108,10 @@ urlpatterns = [
         name="update_job_seeker_step_end",
     ),
     # Direct hire process
+    # Ewen: deprecated url. These urls are going to job_seekers_views.views
     path(
         "<int:company_pk>/hire/check-nir",
-        submit_views.CheckNIRForSenderView.as_view(),
+        CheckNIRForSenderView.as_view(),
         name="check_nir_for_hire",
         kwargs={"hire_process": True},
     ),

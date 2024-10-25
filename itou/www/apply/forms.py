@@ -9,7 +9,6 @@ from django.db.models import Q, TextChoices
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.html import format_html
 from django_select2.forms import Select2MultipleWidget, Select2Widget
 
 from itou.approvals.models import Approval
@@ -24,14 +23,12 @@ from itou.eligibility.models import AdministrativeCriteria
 from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, PriorAction
-from itou.users.enums import LackOfPoleEmploiId, UserKind
+from itou.users.enums import LackOfPoleEmploiId
 from itou.users.forms import JobSeekerProfileFieldsMixin
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
-from itou.utils.emails import redact_email_address
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.types import InclusiveDateRange
-from itou.utils.validators import validate_nir
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.companies_views.forms import JobAppellationAndLocationMixin
 
@@ -70,69 +67,6 @@ class JobSeekerExistsForm(forms.Form):
 
     def get_user(self):
         return self.user
-
-
-class CheckJobSeekerNirForm(forms.Form):
-    nir = forms.CharField(
-        label="Numéro de sécurité sociale",
-        max_length=21,  # 15 + 6 white spaces
-        required=True,
-        strip=True,
-        validators=[validate_nir],
-        widget=forms.TextInput(
-            attrs={
-                "placeholder": "2 69 05 49 588 157 80",
-            }
-        ),
-    )
-
-    def __init__(self, *args, job_seeker=None, is_gps=False, **kwargs):
-        self.job_seeker = job_seeker
-        super().__init__(*args, **kwargs)
-        if self.job_seeker:
-            self.fields["nir"].label = "Votre numéro de sécurité sociale"
-        else:
-            self.fields["nir"].label = "Numéro de sécurité sociale du " + ("bénéficiaire" if is_gps else "candidat")
-
-    def clean_nir(self):
-        nir = self.cleaned_data["nir"].upper()
-        nir = nir.replace(" ", "")
-        existing_account = User.objects.filter(jobseeker_profile__nir=nir).first()
-
-        # Job application sent by autonomous job seeker.
-        if self.job_seeker:
-            if existing_account:
-                error_message = (
-                    "Ce numéro de sécurité sociale est déjà utilisé par un autre compte. Merci de vous "
-                    "reconnecter avec l'adresse e-mail <b>{}</b>. "
-                    "Si vous ne vous souvenez plus de votre mot de passe, vous pourrez "
-                    "cliquer sur « mot de passe oublié ». "
-                    'En cas de souci, vous pouvez <a href="{}" rel="noopener" '
-                    'target="_blank" aria-label="Ouverture dans un nouvel onglet">nous contacter</a>.'
-                )
-                raise forms.ValidationError(
-                    format_html(
-                        error_message,
-                        redact_email_address(existing_account.email),
-                        global_constants.ITOU_HELP_CENTER_URL,
-                    )
-                )
-        else:
-            # For the moment, consider NIR to be unique among users.
-            self.job_seeker = existing_account
-        return nir
-
-    def clean(self):
-        super().clean()
-        if self.job_seeker and self.job_seeker.kind != UserKind.JOB_SEEKER:
-            error_message = (
-                "Vous ne pouvez postuler pour cet utilisateur car ce numéro de sécurité sociale "
-                "n'est pas associé à un compte candidat."
-            )
-            raise forms.ValidationError(error_message)
-
-    def get_job_seeker(self):
-        return self.job_seeker
 
 
 class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):

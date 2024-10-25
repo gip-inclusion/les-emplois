@@ -54,7 +54,7 @@ def test_create_job_seeker(_mock, client):
     apply_start_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
 
     response = client.get(apply_start_url)
-    next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+    next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     assertRedirects(response, next_url)
     response = client.get(next_url)
     france_travail = Company.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
@@ -227,7 +227,7 @@ def test_gps_bypass(client):
     apply_start_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     response = client.get(apply_start_url)
 
-    next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+    next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     assertRedirects(response, next_url)
 
     # SIAE has an active suspension, but we should be able to create the job_seeker for GPS
@@ -243,7 +243,7 @@ def test_gps_bypass(client):
     apply_start_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     response = client.get(apply_start_url)
 
-    next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+    next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     assertRedirects(response, next_url)
 
 
@@ -267,7 +267,10 @@ def test_existing_user_with_email(client):
     # …until a job seeker has to be determined.
     assert response.status_code == 200
     last_url = response.redirect_chain[-1][0]
-    assert last_url == reverse("apply:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+    assert (
+        last_url
+        == reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+    )
 
     # Enter a non-existing NIR.
     # ----------------------------------------------------------------------
@@ -328,7 +331,10 @@ def test_existing_user_with_nir(client):
     # …until a job seeker has to be determined.
     assert response.status_code == 200
     last_url = response.redirect_chain[-1][0]
-    assert last_url == reverse("apply:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+    assert (
+        last_url
+        == reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+    )
 
     # Enter an existing NIR.
     # ----------------------------------------------------------------------
@@ -375,5 +381,5 @@ def test_creation_by_user_kind(client, UserFactory, factory_args, expected_acces
     assert response.status_code == 302
     assert (
         response["Location"]
-        == reverse("apply:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+        == reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     )

@@ -73,7 +73,7 @@ class TestDashboardView:
 
     @staticmethod
     def check_nir_for_hire_url(company):
-        return reverse("apply:check_nir_for_hire", kwargs={"company_pk": company.pk})
+        return reverse("job_seekers_views:check_nir_for_hire", kwargs={"company_pk": company.pk})
 
     def test_dashboard(self, client, snapshot):
         company = CompanyFactory(with_membership=True)
