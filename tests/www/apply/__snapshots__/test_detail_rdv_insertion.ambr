@@ -23,7 +23,7 @@
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" type="button">
                                   <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
-                              <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
+                              <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade text-start" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
                                       <div class="modal-content">
                                           <div class="modal-header">
@@ -97,7 +97,7 @@
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" type="button">
                                   <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
-                              <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
+                              <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade text-start" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
                                       <div class="modal-content">
                                           <div class="modal-header">
@@ -153,7 +153,7 @@
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" type="button">
                                   <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
-                              <div aria-hidden="true" aria-labelledby="participation-22222222-2222-2222-2222-222222222222-modal-title" class="modal modal--mini fade" id="participation-22222222-2222-2222-2222-222222222222-modal" tabindex="-1">
+                              <div aria-hidden="true" aria-labelledby="participation-22222222-2222-2222-2222-222222222222-modal-title" class="modal modal--mini fade text-start" id="participation-22222222-2222-2222-2222-222222222222-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
                                       <div class="modal-content">
                                           <div class="modal-header">
@@ -227,7 +227,7 @@
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" type="button">
                                   <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
-                              <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
+                              <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade text-start" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
                                       <div class="modal-content">
                                           <div class="modal-header">
@@ -283,7 +283,7 @@
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" type="button">
                                   <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
-                              <div aria-hidden="true" aria-labelledby="participation-22222222-2222-2222-2222-222222222222-modal-title" class="modal modal--mini fade" id="participation-22222222-2222-2222-2222-222222222222-modal" tabindex="-1">
+                              <div aria-hidden="true" aria-labelledby="participation-22222222-2222-2222-2222-222222222222-modal-title" class="modal modal--mini fade text-start" id="participation-22222222-2222-2222-2222-222222222222-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
                                       <div class="modal-content">
                                           <div class="modal-header">
@@ -339,7 +339,7 @@
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-33333333-3333-3333-3333-333333333333-modal" data-bs-toggle="modal" type="button">
                                   <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
-                              <div aria-hidden="true" aria-labelledby="participation-33333333-3333-3333-3333-333333333333-modal-title" class="modal modal--mini fade" id="participation-33333333-3333-3333-3333-333333333333-modal" tabindex="-1">
+                              <div aria-hidden="true" aria-labelledby="participation-33333333-3333-3333-3333-333333333333-modal-title" class="modal modal--mini fade text-start" id="participation-33333333-3333-3333-3333-333333333333-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
                                       <div class="modal-content">
                                           <div class="modal-header">
@@ -395,7 +395,7 @@
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-44444444-4444-4444-4444-444444444444-modal" data-bs-toggle="modal" type="button">
                                   <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
-                              <div aria-hidden="true" aria-labelledby="participation-44444444-4444-4444-4444-444444444444-modal-title" class="modal modal--mini fade" id="participation-44444444-4444-4444-4444-444444444444-modal" tabindex="-1">
+                              <div aria-hidden="true" aria-labelledby="participation-44444444-4444-4444-4444-444444444444-modal-title" class="modal modal--mini fade text-start" id="participation-44444444-4444-4444-4444-444444444444-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
                                       <div class="modal-content">
                                           <div class="modal-header">
@@ -451,7 +451,7 @@
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-55555555-5555-5555-5555-555555555555-modal" data-bs-toggle="modal" type="button">
                                   <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
-                              <div aria-hidden="true" aria-labelledby="participation-55555555-5555-5555-5555-555555555555-modal-title" class="modal modal--mini fade" id="participation-55555555-5555-5555-5555-555555555555-modal" tabindex="-1">
+                              <div aria-hidden="true" aria-labelledby="participation-55555555-5555-5555-5555-555555555555-modal-title" class="modal modal--mini fade text-start" id="participation-55555555-5555-5555-5555-555555555555-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
                                       <div class="modal-content">
                                           <div class="modal-header">
@@ -507,7 +507,7 @@
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" type="button">
                                   <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
-                              <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
+                              <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade text-start" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
                                       <div class="modal-content">
                                           <div class="modal-header">
