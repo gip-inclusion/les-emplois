@@ -426,7 +426,7 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
 
 class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSenderBaseView):
     required_session_namespaces = ["job_seeker_session"]
-    template_name = "apply/submit_step_job_seeker.html"
+    template_name = "job_seekers_views/step_search_job_seeker_by_email.html"
 
     def __init__(self):
         super().__init__()
