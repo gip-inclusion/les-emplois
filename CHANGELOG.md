@@ -1,5 +1,26 @@
 # Journal des modifications
 
+## 2024-10-28
+
+### Ajouté
+
+- [Candidature : postuler pour un candidat depuis l'espace "Mes candidats"](https://github.com/gip-inclusion/les-emplois/pull/4860)
+- [Connexion : Nouvelle page pour se connecter à un compte existant suite à un conflit d'email lors de l'enregistrement](https://github.com/gip-inclusion/les-emplois/pull/4865)
+- [Employeur : Utilisation d'un drapeau pour rendre une entreprise non recherchable](https://github.com/gip-inclusion/les-emplois/pull/4938)
+
+### Modifié
+
+- [Candidature : le bouton Annuler renvoie vers la fiche de poste ou l'entreprise](https://github.com/gip-inclusion/les-emplois/pull/4788)
+- [Fiches salarié : Alléger le texte d’introduction de la page “liste des fiches salarié”](https://github.com/gip-inclusion/les-emplois/pull/4967) 🖼
+- [Limitation du prénom à 30 caractères dans le sérialiseur à destination de l'ASP](https://github.com/gip-inclusion/les-emplois/pull/4981)
+- [Pilotage : Publier le TB 440/485 en Occitanie et en Bretagne pour les SIAE, les DDETS, les DREETS, les CD, et la DGEFP](https://github.com/gip-inclusion/les-emplois/pull/4931)
+- [Prescripteur : Ignorer les diagnostics d’éligibilité des auto-prescriptions](https://github.com/gip-inclusion/les-emplois/pull/4950)
+- [Tableau de bord: correction du message lié au délai de carence pour l'encart PASS IAE du candidat](https://github.com/gip-inclusion/les-emplois/pull/4952)
+
+### Supprimé
+
+- [Fiches salarié : Arrêt des hologrammes (en attente de création)](https://github.com/gip-inclusion/les-emplois/pull/4827)
+
 ## 2024-10-21
 
 ### Ajouté
