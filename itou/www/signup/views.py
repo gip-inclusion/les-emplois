@@ -154,19 +154,15 @@ def job_seeker_situation(request, template_name="signup/job_seeker_situation.htm
 def job_seeker_nir(request, template_name="signup/job_seeker_nir.html"):
     form = forms.JobSeekerNirForm(data=request.POST or None)
 
-    if request.method == "POST":
+    if request.method == "POST" and form.is_valid():
         next_url = reverse("signup:job_seeker")
-        if form.is_valid():
-            request.session[global_constants.ITOU_SESSION_NIR_KEY] = form.cleaned_data["nir"]
+        request.session[global_constants.ITOU_SESSION_NIR_KEY] = form.cleaned_data["nir"]
 
-            # forward next page
-            if REDIRECT_FIELD_NAME in form.data:
-                next_url = f"{next_url}?{REDIRECT_FIELD_NAME}={form.data[REDIRECT_FIELD_NAME]}"
+        # forward next page
+        if REDIRECT_FIELD_NAME in form.data:
+            next_url = f"{next_url}?{REDIRECT_FIELD_NAME}={form.data[REDIRECT_FIELD_NAME]}"
 
-            return HttpResponseRedirect(next_url)
-
-        if form.data.get("skip"):
-            return HttpResponseRedirect(next_url)
+        return HttpResponseRedirect(next_url)
 
     context = {
         "form": form,
