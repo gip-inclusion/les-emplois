@@ -119,11 +119,10 @@ Vous pouvez y accéder à l'adresse http://localhost:8000/.
 
 ### Accéder au serveur de développement depuis un autre appareil (optionnel)
 
-En supposant que votre serveur ait pour IP `100.1.2.3`, ajoutez ces lignes à votre `.envrc` :
+En supposant que votre serveur ait pour IP `100.1.2.3`, ajoutez cette ligne à votre `.envrc` :
 
 ```
 export RUNSERVER_DOMAIN=100.1.2.3:8000
-export CUSTOM_ALLOWED_HOST=100.1.2.3
 ```
 
 puis `direnv reload` et relancez `make runserver`.
