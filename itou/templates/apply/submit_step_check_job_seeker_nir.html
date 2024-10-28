@@ -49,9 +49,9 @@
                         </div>
                         <div class="col">
                             <p class="mb-0">Vous possédez un numéro de sécurité sociale temporaire ?</p>
-                            <button name="skip" value="1" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "candidature" %}>
+                            <a href="{{ temporary_nir_url }}" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "candidature" %}>
                                 Cliquez ici pour accéder à l'étape suivante.
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>

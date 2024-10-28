@@ -342,24 +342,17 @@ class CheckNIRForJobSeekerView(ApplyStepBaseView):
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        if self.form.data.get("skip"):
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:step_check_job_seeker_info",
-                    kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-                )
-            )
-
+        next_url = reverse(
+            "apply:step_check_job_seeker_info",
+            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+        )
         if self.form.is_valid():
             self.job_seeker.jobseeker_profile.nir = self.form.cleaned_data["nir"]
             self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
             self.job_seeker.jobseeker_profile.save()
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:step_check_job_seeker_info",
-                    kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-                )
-            )
+            return HttpResponseRedirect(next_url)
+        else:
+            kwargs["temporary_nir_url"] = next_url
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
@@ -381,20 +374,13 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
         super().setup(request, *args, **kwargs)
         self.form = CheckJobSeekerNirForm(job_seeker=None, data=request.POST or None, is_gps=self.is_gps)
 
-    def redirect_to_check_email(self, session_uuid):
+    def search_by_email_url(self, session_uuid):
         view_name = "apply:search_by_email_for_hire" if self.hire_process else "apply:search_by_email_for_sender"
-        return HttpResponseRedirect(
-            reverse(view_name, kwargs={"company_pk": self.company.pk, "session_uuid": session_uuid})
-            + ("?gps=true" if self.is_gps else "")
+        return reverse(view_name, kwargs={"company_pk": self.company.pk, "session_uuid": session_uuid}) + (
+            "?gps=true" if self.is_gps else ""
         )
 
     def post(self, request, *args, **kwargs):
-        if self.form.data.get("skip"):
-            # Redirect to search by e-mail address.
-            job_seeker_session = SessionNamespace.create_temporary(request.session)
-            job_seeker_session.init({"profile": {"nir": ""}})
-            return self.redirect_to_check_email(job_seeker_session.name)
-
         context = {}
         if self.form.is_valid():
             job_seeker = self.form.get_job_seeker()
@@ -403,7 +389,7 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
             if not job_seeker:
                 job_seeker_session = SessionNamespace.create_temporary(request.session)
                 job_seeker_session.init({"profile": {"nir": self.form.cleaned_data["nir"]}})
-                return self.redirect_to_check_email(job_seeker_session.name)
+                return HttpResponseRedirect(self.search_by_email_url(job_seeker_session.name))
 
             # The NIR we found is correct
             if self.form.data.get("confirm"):
@@ -421,6 +407,12 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
                 "job_seeker": job_seeker,
                 "can_view_personal_information": self.sender.can_view_personal_information(job_seeker),
             }
+        else:
+            # Require at least one attempt with an invalid NIR to access the search by email feature.
+            # The goal is to prevent users from skipping the search by NIR and creating duplicates.
+            job_seeker_session = SessionNamespace.create_temporary(request.session)
+            job_seeker_session.init({})
+            context["temporary_nir_url"] = self.search_by_email_url(job_seeker_session.name)
 
         return self.render_to_response(self.get_context_data(**kwargs) | context)
 
