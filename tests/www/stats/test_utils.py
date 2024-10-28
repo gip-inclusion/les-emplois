@@ -16,6 +16,10 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
 )
 from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
     PrescriberFactory,
 )
 from tests.utils.tests import get_response_for_middlewaremixin
@@ -322,3 +326,17 @@ def test_can_view_stats_dgefp_iae():
     request = get_request(institution.members.get())
     assert not utils.can_view_stats_dgefp_iae(request)
     assert utils.can_view_stats_dashboard_widget(request)
+
+
+def test_can_view_stats_staff():
+    for user in [
+        EmployerFactory(with_company=True),
+        PrescriberFactory(),
+        LaborInspectorFactory(membership=True),
+        JobSeekerFactory(),
+    ]:
+        request = get_request(user)
+        assert request.user.is_authenticated
+        assert not utils.can_view_stats_staff(request)
+
+    assert utils.can_view_stats_staff(get_request(ItouStaffFactory()))

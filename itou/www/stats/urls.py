@@ -145,4 +145,6 @@ urlpatterns = [
         views.stats_convergence_job_application,
         name="stats_convergence_job_application",
     ),
+    # Staff stats - Les Emplois
+    path("staff/service_indicators", views.stats_staff_service_indicators, name="stats_staff_service_indicators"),
 ]
