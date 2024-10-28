@@ -125,7 +125,7 @@ En supposant que votre serveur ait pour IP `100.1.2.3`, ajoutez cette ligne à v
 export RUNSERVER_DOMAIN=100.1.2.3:8000
 ```
 
-puis `direnv reload` et relancez `make runserver`.
+puis `direnv allow`, `direnv reload` et enfin relancez `make runserver`.
 
 Vous pouvez y accéder à l'adresse http://100.1.2.3:8000/ depuis n'importe quel appareil de votre réseau local.
 
