@@ -1118,14 +1118,14 @@
       
           <form class="d-inline-flex has-btn-with-spinner-loading-text" hx-post="/apply/11111111-1111-1111-1111-111111111111/rdv_insertion_invite_for_detail" hx-swap="outerHTML" hx-target="#rdvi-invitation-requests">
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-              <button aria-label="Proposer un rendez-vous à Jacques HENRY" class="btn btn-secondary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
+              <button aria-label="Proposer un rendez-vous à Jacques HENRY" class="btn btn-secondary btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
                   <div class="stable-text">
                       <i aria-hidden="true" class="ri-mail-send-line fw-medium"></i>
                       <span>Proposer un rendez-vous</span>
                   </div>
                   <div class="loading-text">
-                      <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
-                      <span>Envoi en cours</span>
+                      <span aria-hidden="true" class="spinner-border spinner-border-sm"></span>
+                      <span role="status">Envoi en cours</span>
                   </div>
               </button>
           </form>
@@ -1150,14 +1150,14 @@
       
           <form class="d-inline-flex has-btn-with-spinner-loading-text" hx-post="/apply/11111111-1111-1111-1111-111111111111/rdv_insertion_invite_for_detail" hx-swap="outerHTML" hx-target="#rdvi-invitation-requests">
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-              <button aria-label="Proposer un rendez-vous à Jacques HENRY" class="btn btn-secondary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
+              <button aria-label="Proposer un rendez-vous à Jacques HENRY" class="btn btn-secondary btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
                   <div class="stable-text">
                       <i aria-hidden="true" class="ri-mail-send-line fw-medium"></i>
                       <span>Proposer un rendez-vous</span>
                   </div>
                   <div class="loading-text">
-                      <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
-                      <span>Envoi en cours</span>
+                      <span aria-hidden="true" class="spinner-border spinner-border-sm"></span>
+                      <span role="status">Envoi en cours</span>
                   </div>
               </button>
           </form>
@@ -1180,12 +1180,13 @@
   
   
       
-          <button class="btn btn-success btn-ico" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après.
-              &lt;br&gt;
-              Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" disabled="" type="button">
-              <i aria-hidden="true" class="ri-check-line fw-medium"></i>
-              <span>Invitation envoyée</span>
-          </button>
+          <span class="text-success text-center flex-grow-1 flex-md-grow-0" role="status">
+              <i aria-hidden="true" class="ri-check-line ri-xl fw-medium"></i>
+              Invitation envoyée
+              <i aria-hidden="true" class="ri-error-warning-line" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après.
+                  &lt;br&gt;
+              Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip"></i>
+          </span>
       
   
   

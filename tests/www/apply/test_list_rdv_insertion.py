@@ -256,7 +256,7 @@ class TestRdvInsertionView:
         assert InvitationRequest.objects.count() == 0
         assert not respx.routes["rdv_solidarites_create_and_invite"].called
 
-        error_button = parse_response_to_soup(response, selector=".btn-danger")
+        error_button = parse_response_to_soup(response, selector=".text-danger")
         assert str(error_button) == snapshot()
 
     @respx.mock
@@ -273,7 +273,7 @@ class TestRdvInsertionView:
         assert InvitationRequest.objects.count() == 0
         assert not respx.routes["rdv_solidarites_create_and_invite"].called
 
-        error_button = parse_response_to_soup(response, selector=".btn-danger")
+        error_button = parse_response_to_soup(response, selector=".text-danger")
         assert str(error_button) == snapshot()
 
     @respx.mock
@@ -320,7 +320,7 @@ class TestRdvInsertionView:
         assert invitation.invitation_request == invitation_request
         assert response.context["job_application"] == self.job_application
 
-        success_button = parse_response_to_soup(response, selector=".btn-success")
+        success_button = parse_response_to_soup(response, selector=".text-success")
         assert str(success_button) == snapshot()
 
     @respx.mock
@@ -347,7 +347,7 @@ class TestRdvInsertionView:
             assert InvitationRequest.objects.count() == 1
             assert not respx.routes["rdv_solidarites_create_and_invite"].called
             assert response.context["job_application"] == self.job_application
-            pending_request_exists = parse_response_to_soup(response, selector=".btn-success")
+            pending_request_exists = parse_response_to_soup(response, selector=".text-success")
             assert str(pending_request_exists) == snapshot(name="pending_invitation_request_too_recent")
 
             # Go to next tick
@@ -359,7 +359,7 @@ class TestRdvInsertionView:
             assert InvitationRequest.objects.count() == 1
             assert not respx.routes["rdv_solidarites_create_and_invite"].called
             assert response.context["job_application"] == self.job_application
-            pending_request_exists = parse_response_to_soup(response, selector=".btn-success")
+            pending_request_exists = parse_response_to_soup(response, selector=".text-success")
             assert str(pending_request_exists) == snapshot(name="pending_invitation_request_still_too_recent")
 
             # Go to next tick
@@ -371,5 +371,5 @@ class TestRdvInsertionView:
             assert InvitationRequest.objects.count() == 2
             assert respx.routes["rdv_solidarites_create_and_invite"].called
             assert response.context["job_application"] == self.job_application
-            success_button = parse_response_to_soup(response, selector=".btn-success")
+            success_button = parse_response_to_soup(response, selector=".text-success")
             assert str(success_button) == snapshot(name="invitation_request_created")
