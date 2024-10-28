@@ -139,12 +139,20 @@ class TestJobSeekerSignup:
         url = reverse("signup:job_seeker_nir")
         post_data = {"nir": nir}
         response = client.post(url, post_data)
-        assert response.status_code == 200
+        assertContains(
+            response,
+            f"""
+            <a href="{reverse('signup:job_seeker')}"
+                class="btn btn-link p-0"
+                data-matomo-event="true"
+                data-matomo-category="nir-temporaire"
+                data-matomo-action="etape-suivante"
+                data-matomo-option="inscription">
+               Cliquez ici pour accéder à l'étape suivante.
+            </a>""",
+            html=True,
+        )
         assert not response.context.get("form").is_valid()
-
-        post_data = {"nir": nir, "skip": 1}
-        response = client.post(url, post_data)
-        assertRedirects(response, reverse("signup:job_seeker"))
         assert global_constants.ITOU_SESSION_NIR_KEY not in list(client.session.keys())
         assert not client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
 
