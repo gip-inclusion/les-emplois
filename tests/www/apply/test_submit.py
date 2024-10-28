@@ -526,16 +526,26 @@ class TestApplyAsJobSeeker:
         response = client.post(next_url, data={"nir": "123456789KLOIU"})
         assert response.status_code == 200
         assert not response.context["form"].is_valid()
-
-        # Temporary number should be skipped.
-        response = client.post(next_url, data={"nir": "123456789KLOIU", "skip": 1}, follow=True)
-        assert response.status_code == 200
-        assert response.redirect_chain[-1][0] == reverse(
-            "apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id}
-        )
-
         user.jobseeker_profile.refresh_from_db()
         assert not user.jobseeker_profile.nir
+        check_job_seeker_info_url = reverse(
+            "apply:step_check_job_seeker_info",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id},
+        )
+        assertContains(
+            response,
+            f"""
+            <a href="{check_job_seeker_info_url}"
+                class="btn btn-link p-0"
+                data-matomo-event="true"
+                data-matomo-category="nir-temporaire"
+                data-matomo-action="etape-suivante"
+                data-matomo-option="candidature">
+               Cliquez ici pour accéder à l'étape suivante.
+            </a>
+            """,
+            html=True,
+        )
 
     def test_apply_as_job_seeker_on_sender_tunnel(self, client):
         company = CompanyFactory()
@@ -1384,6 +1394,44 @@ class TestApplyAsAuthorizedPrescriber:
         )
         assert response.status_code == 200
         assert response.context["eligibility_diagnosis"] is None
+
+    def test_apply_with_temporary_nir(self, client):
+        company = CompanyWithMembershipAndJobsFactory(romes=["N1101"])
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        user = prescriber_organization.members.get()
+        client.force_login(user)
+
+        response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
+        assert response.status_code == 302
+        assertRedirects(response, reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk}))
+
+        response = client.post(response.url, {"nir": "invalid"})
+        known_session_keys = {
+            "_auth_user_id",
+            "_auth_user_backend",
+            "_auth_user_hash",
+            "current_organization",
+            "_csrftoken",
+        }
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in known_session_keys]
+        search_by_email_url = reverse(
+            "apply:search_by_email_for_sender",
+            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+        )
+        assertContains(
+            response,
+            f"""
+            <a href="{search_by_email_url}"
+                class="btn btn-link p-0"
+                data-matomo-event="true"
+                data-matomo-category="nir-temporaire"
+                data-matomo-action="etape-suivante"
+                data-matomo-option="candidature">
+               Cliquez ici pour accéder à l'étape suivante.
+            </a>
+            """,
+            html=True,
+        )
 
 
 class TestApplyAsPrescriber:
@@ -4557,15 +4605,32 @@ class TestFindJobSeekerForHireView:
 
         response = client.post(self.check_nir_url, data={"nir": INVALID_NIR, "preview": 1})
         assertContains(response, "Le numéro de sécurité sociale est trop court")
-        response = client.post(self.check_nir_url, data={"nir": INVALID_NIR, "skip": 1})
-        assert response.status_code == 302
-
-        job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
+        known_session_keys = {
+            "_auth_user_id",
+            "_auth_user_backend",
+            "_auth_user_hash",
+            "current_organization",
+            "_csrftoken",
+        }
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in known_session_keys]
         search_by_email_url = reverse(
             "apply:search_by_email_for_hire",
             kwargs={"company_pk": self.company.pk, "session_uuid": job_seeker_session_name},
         )
-        assert response.url == search_by_email_url
+        assertContains(
+            response,
+            f"""
+            <a href="{search_by_email_url}"
+                class="btn btn-link p-0"
+                data-matomo-event="true"
+                data-matomo-category="nir-temporaire"
+                data-matomo-action="etape-suivante"
+                data-matomo-option="candidature">
+               Cliquez ici pour accéder à l'étape suivante.
+            </a>
+            """,
+            html=True,
+        )
 
         response = client.get(search_by_email_url)
         assertContains(response, "Déclarer une embauche")  # Check page title
