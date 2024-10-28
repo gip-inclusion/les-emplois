@@ -566,7 +566,7 @@ class TestEditUserInfoView:
         assertContains(response, f"Prénom : <strong>{original_user.first_name.title()}</strong>")
         assertContains(response, f"Nom : <strong>{original_user.last_name.upper()}</strong>")
         assertContains(response, f"Adresse e-mail : <strong>{original_user.email}</strong>")
-        assertContains(response, "Ces informations doivent être modifiées sur votre fournisseur d'identité.")
+        assertContains(response, "Ces informations doivent être modifiées sur votre compte ")
 
         post_data = {
             "email": "notbob@notsaintclair.com",
