@@ -969,9 +969,9 @@ parso==0.8.4 \
     --hash=sha256:a418670a20291dacd2dddc80c377c5c3791378ee1e8d12bffc35420643d43f18 \
     --hash=sha256:eb3a7b58240fb99099a345571deecc0f9540ea5f4dd2fe14c2a99d6b281ab92d
     # via jedi
-patchy==2.8.0 \
-    --hash=sha256:0b7837f90f9729361a2a8ae7daef3a42bb81a8346d27945c125e312c3fe0fd05 \
-    --hash=sha256:ae7fbcdde436272fb32485e4392c2b3cd2d0c1ac91b0af76b41242e92ff084ec
+patchy==2.9.0 \
+    --hash=sha256:cb1329b9fc4156fb8a4279a8298ec646b64daf3bdf24d24294142a3b7686e334 \
+    --hash=sha256:f4364bbe9d0281d12fe92690e79ef3c86c317294b3ae9d33405e7a4b6e8d9d5f
     # via -r requirements/test.txt
 pathspec==0.12.1 \
     --hash=sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08 \
