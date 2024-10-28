@@ -9,6 +9,7 @@ asgiref==3.8.1 \
     --hash=sha256:c343bd80a0bec947a9860adb4c432ffa7db769836c64238fc34bdc3fec84d590
     # via
     #   django
+    #   django-allauth
     #   django-htmx
 attrs==24.2.0 \
     --hash=sha256:5cfb1b9148b5b086569baec03f20d7b6bf3bcacc9a42bebf87ffaaca362f6346 \
@@ -299,8 +300,8 @@ django==5.1.2 \
     #   django-xworkflows
     #   djangorestframework
     #   drf-spectacular
-django-allauth==65.0.2 \
-    --hash=sha256:6b5b3a7a65b1c28078b6eb0dd234310b58a44e8addfd187dc30437b0b2bc41a5
+django-allauth==65.1.0 \
+    --hash=sha256:ab2c32c51797bab1e7a334f37afa61ef4a88c6f13dfd7bd898a16e2b7e567ef0
     # via -r requirements/base.in
 django-anymail==12.0 \
     --hash=sha256:65789c1b0f42915aa0450a4f173f77572d4c552979b748ddd8125af41972ad30 \
