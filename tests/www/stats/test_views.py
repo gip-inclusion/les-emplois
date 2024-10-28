@@ -5,7 +5,7 @@ import pytest
 from django.test import override_settings
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertQuerySetEqual
+from pytest_django.asserts import assertQuerySetEqual, assertRedirects
 
 from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION
@@ -18,7 +18,7 @@ from itou.www.stats.views import get_params_aci_asp_ids_for_department
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import PrescriberFactory
+from tests.users.factories import ItouStaffFactory, PrescriberFactory
 
 
 class TestStatsView:
@@ -379,6 +379,39 @@ def test_stats_iae_network_log_visit(client, view_name):
             None,
             None,
             institution.pk,
+            user.kind,
+            user.pk,
+            datetime(2023, 3, 10, tzinfo=UTC),
+        ),
+    )
+
+
+@freeze_time("2023-03-10")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@pytest.mark.parametrize(
+    "view_name",
+    ["stats_staff_service_indicators"],
+)
+def test_stats_staff(client, view_name):
+    # Login required
+    url = reverse(f"stats:{view_name}")
+    response = client.get(url)
+    assertRedirects(response, reverse("account_login") + f"?next={url}")
+
+    user = ItouStaffFactory()
+    client.force_login(user)
+    response = client.get(reverse(f"stats:{view_name}"))
+    assert response.status_code == 200
+
+    assert_stats_dashboard_equal(
+        (
+            METABASE_DASHBOARDS.get(view_name)["dashboard_id"],
+            view_name,
+            None,
+            None,
+            None,
+            None,
+            None,
             user.kind,
             user.pk,
             datetime(2023, 3, 10, tzinfo=UTC),

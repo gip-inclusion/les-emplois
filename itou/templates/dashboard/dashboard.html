@@ -160,6 +160,7 @@
                                     {% if user.is_superuser %}
                                         {% include "dashboard/includes/staff_export_card.html" %}
                                     {% endif %}
+                                    {% include "dashboard/includes/staff_stats_card.html" %}
                                 {% endif %}
 
                                 {% if user.is_job_seeker %}

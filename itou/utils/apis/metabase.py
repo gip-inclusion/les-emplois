@@ -298,6 +298,9 @@ METABASE_DASHBOARDS = {
     "stats_convergence_job_application": {
         "dashboard_id": 469,
     },
+    "stats_staff_service_indicators": {
+        "dashboard_id": 438,
+    },
 }
 
 

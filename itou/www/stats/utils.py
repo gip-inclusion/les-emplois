@@ -12,6 +12,7 @@ from itou.prescribers.enums import (
     PrescriberOrganizationKind,
 )
 from itou.prescribers.models import PrescriberOrganization
+from itou.users.enums import UserKind
 
 
 WHITELIST_IAE_ORGA_ETP_REGIONS = ["Bretagne", "Occitanie"]
@@ -235,6 +236,10 @@ def can_view_stats_convergence(request):
         and isinstance(request.current_organization, Institution)
         and request.current_organization.kind == InstitutionKind.CONVERGENCE
     )
+
+
+def can_view_stats_staff(request):
+    return request.user.is_authenticated and (request.user.kind == UserKind.ITOU_STAFF or request.user.is_staff)
 
 
 def get_stats_ft_departments(request):

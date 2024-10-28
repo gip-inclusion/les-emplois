@@ -920,3 +920,11 @@ def stats_convergence_job_application(request):
             "page_title": "Traitement et résultats des candidatures",
         },
     )
+
+
+@login_required
+def stats_staff_service_indicators(request):
+    """Indicator statistics for Les Emplois staff"""
+    if not utils.can_view_stats_staff(request):
+        raise PermissionDenied
+    return render_stats(request=request, context={"page_title": "Indicateurs à suivre"})
