@@ -809,7 +809,7 @@ class CheckJobSeekerInformations(ApplicationBaseView):
     Ensure the job seeker has all required info.
     """
 
-    template_name = "apply/submit_step_job_seeker_check_info.html"
+    template_name = "job_seekers_views/check_job_seeker_info.html"
 
     def __init__(self):
         super().__init__()
@@ -860,7 +860,7 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
     Ensure the job seeker has all required info.
     """
 
-    template_name = "apply/submit/check_job_seeker_info_for_hire.html"
+    template_name = "job_seekers_views/check_job_seeker_info_for_hire.html"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
