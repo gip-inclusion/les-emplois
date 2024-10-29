@@ -4,6 +4,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.html import format_html
 
+from itou.users.enums import IdentityProvider
 from itou.users.models import User
 
 
@@ -31,7 +32,11 @@ class ItouLoginForm(LoginForm):
             # Bypass sso login error if we show the test account banner and the form received the hidden field value
             and not (self.cleaned_data.get("demo_banner_account") and settings.SHOW_DEMO_ACCOUNTS_BANNER)
         ):
-            identity_provider = user.get_identity_provider_display()
-            error_message = f"Votre compte est relié à {identity_provider}. Merci de vous connecter avec ce service."
+            identity_provider = IdentityProvider(user.identity_provider)
+            if identity_provider == IdentityProvider.INCLUSION_CONNECT:
+                identity_provider = IdentityProvider.PRO_CONNECT
+            error_message = (
+                f"Votre compte est relié à {identity_provider.label}. Merci de vous connecter avec ce service."
+            )
             raise forms.ValidationError(error_message)
         return super().clean()
