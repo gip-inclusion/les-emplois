@@ -124,8 +124,7 @@ class TestPrescriberLogin:
         response = client.post(url, data=form_data)
         assertContains(
             response,
-            f"Votre compte est relié à {sso_setup.identity_provider.label}. "
-            "Merci de vous connecter avec ce service.",
+            "Votre compte est relié à ProConnect. Merci de vous connecter avec ce service.",
         )
 
 
@@ -182,8 +181,7 @@ class TestEmployerLogin:
         response = client.post(url, data=form_data)
         assertContains(
             response,
-            f"Votre compte est relié à {sso_setup.identity_provider.label}. "
-            "Merci de vous connecter avec ce service.",
+            "Votre compte est relié à ProConnect. Merci de vous connecter avec ce service.",
         )
 
 
