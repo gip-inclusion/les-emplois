@@ -46,12 +46,6 @@
                         <span>Modifier</span>
                     </a>
                 </div>
-                <div class="form-group col-12 col-lg-auto">
-                    <a href="{% url "companies_views:job_description_list" %}" class="btn btn-lg btn-outline-white btn-block btn-ico">
-                        <i class="ri-arrow-go-back-line fw-medium" aria-hidden="true"></i>
-                        <span>Retour vers la liste des postes</span>
-                    </a>
-                </div>
             {% else %}
                 {% if job.is_active and not siae.block_job_applications %}
                     {% if job_app_to_transfer %}

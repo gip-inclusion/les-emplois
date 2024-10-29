@@ -582,7 +582,6 @@ class TestJobDescriptionCard(JobDescriptionAbstract):
 
         assertContains(response, "Modifier la fiche de poste")
         assertContains(response, self.update_job_description_url(self.job_description))
-        assertContains(response, "Retour vers la liste des postes")
         assertContains(response, reverse("companies_views:job_description_list"))
         assertNotContains(response, self.apply_start_url(self.company))
 
