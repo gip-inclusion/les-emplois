@@ -230,7 +230,7 @@ def test_app_model_change_url(admin_client):
     assert response.status_code == 200
 
 
-def test_free_ic_email(admin_client):
+def test_free_sso_email_errors(admin_client):
     employer = EmployerFactory(with_company=True, username="ic_uuid_username", email="ic_user@email.com")
     prescriber = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
 
@@ -238,7 +238,7 @@ def test_free_ic_email(admin_client):
     response = admin_client.post(
         reverse("admin:users_user_changelist"),
         {
-            "action": "free_ic_email",
+            "action": "free_sso_email",
             helpers.ACTION_CHECKBOX_NAME: [prescriber.pk, employer.pk],
         },
         follow=True,
@@ -253,20 +253,28 @@ def test_free_ic_email(admin_client):
     response = admin_client.post(
         reverse("admin:users_user_changelist"),
         {
-            "action": "free_ic_email",
+            "action": "free_sso_email",
             helpers.ACTION_CHECKBOX_NAME: [prescriber.pk],
         },
         follow=True,
     )
-    assertContains(response, "Vous devez sélectionner un compte Inclusion Connect")
+    assertContains(response, "Vous devez sélectionner un compte Inclusion Connect ou ProConnect")
     prescriber.refresh_from_db()
     assert prescriber.is_active is True
 
-    # When it works
+
+def test_free_sso_email_ic(admin_client):
+    employer = EmployerFactory(
+        with_company=True,
+        username="ic_uuid_username",
+        email="ic_user@email.com",
+        identity_provider=IdentityProvider.INCLUSION_CONNECT,
+    )
+
     response = admin_client.post(
         reverse("admin:users_user_changelist"),
         {
-            "action": "free_ic_email",
+            "action": "free_sso_email",
             helpers.ACTION_CHECKBOX_NAME: [employer.pk],
         },
         follow=True,
@@ -282,12 +290,51 @@ def test_free_ic_email(admin_client):
     response = admin_client.post(
         reverse("admin:users_user_changelist"),
         {
-            "action": "free_ic_email",
+            "action": "free_sso_email",
             helpers.ACTION_CHECKBOX_NAME: [employer.pk],
         },
         follow=True,
     )
-    assertContains(response, "Ce compte a déjà été libré de l'emprise d'Inclusion Connect", html=True)
+    assertContains(response, "Ce compte a déjà été libéré", html=True)
+    employer.refresh_from_db()
+    assert employer.is_active is False
+    assert employer.username == "old_ic_uuid_username"
+    assert employer.email == "ic_user@email.com_old"
+
+
+def test_free_sso_email_proconnect(admin_client):
+    employer = EmployerFactory(
+        with_company=True,
+        username="ic_uuid_username",
+        email="ic_user@email.com",
+        identity_provider=IdentityProvider.PRO_CONNECT,
+    )
+
+    response = admin_client.post(
+        reverse("admin:users_user_changelist"),
+        {
+            "action": "free_sso_email",
+            helpers.ACTION_CHECKBOX_NAME: [employer.pk],
+        },
+        follow=True,
+    )
+    assertContains(response, "L'utilisateur peut à présent se créer un nouveau compte", html=True)
+    employer.refresh_from_db()
+    assert employer.is_active is False
+    assert employer.companymembership_set.get().is_active is False
+    assert employer.username == "old_ic_uuid_username"
+    assert employer.email == "ic_user@email.com_old"
+
+    # It won't work twice on the same user
+    response = admin_client.post(
+        reverse("admin:users_user_changelist"),
+        {
+            "action": "free_sso_email",
+            helpers.ACTION_CHECKBOX_NAME: [employer.pk],
+        },
+        follow=True,
+    )
+    assertContains(response, "Ce compte a déjà été libéré", html=True)
     employer.refresh_from_db()
     assert employer.is_active is False
     assert employer.username == "old_ic_uuid_username"

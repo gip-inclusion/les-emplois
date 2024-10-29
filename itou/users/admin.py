@@ -426,20 +426,20 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
             )
         return "Aucune"
 
-    @admin.action(description="Désactiver le compte IC pour changement prescripteur <-> employeur")
-    def free_ic_email(self, request, queryset):
+    @admin.action(description="Désactiver le compte IC / PC pour changement prescripteur <-> employeur")
+    def free_sso_email(self, request, queryset):
         try:
             [user] = queryset
         except ValueError:
             messages.error(request, "Vous ne pouvez selectionner qu'un seul utilisateur à la fois")
             return
 
-        if user.identity_provider != IdentityProvider.INCLUSION_CONNECT:
-            messages.error(request, "Vous devez sélectionner un compte Inclusion Connect")
+        if user.identity_provider not in [IdentityProvider.INCLUSION_CONNECT, IdentityProvider.PRO_CONNECT]:
+            messages.error(request, "Vous devez sélectionner un compte Inclusion Connect ou ProConnect")
             return
 
         if user.username.startswith("old"):
-            messages.error(request, "Ce compte a déjà été libré de l'emprise d'Inclusion Connect")
+            messages.error(request, "Ce compte a déjà été libéré")
             return
 
         user.email = f"{user.email}_old"
@@ -451,7 +451,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
 
         messages.success(request, "L'utilisateur peut à présent se créer un nouveau compte")
 
-    actions = [free_ic_email]
+    actions = [free_sso_email]
 
     def get_queryset(self, request):
         """
