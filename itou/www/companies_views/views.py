@@ -580,7 +580,7 @@ def edit_company_step_preview(request, template_name="companies/edit_siae_previe
             # Clear the session now, so that we start fresh if we edit again.
             del request.session[ITOU_SESSION_EDIT_COMPANY_KEY]
             request.session.modified = True
-            messages.success(request, "Mise à jour effectuée !")
+            messages.success(request, "Mise à jour effectuée !", extra_tags="toast")
             return HttpResponseRedirect(reverse("dashboard:index"))
         except GeocodingDataError:
             messages.error(

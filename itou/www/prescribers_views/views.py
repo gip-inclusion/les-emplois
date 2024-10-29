@@ -38,7 +38,7 @@ def edit_organization(request, template_name="prescribers/edit_organization.html
     if request.method == "POST" and form.is_valid():
         try:
             form.save()
-            messages.success(request, "Mise à jour effectuée !")
+            messages.success(request, "Mise à jour effectuée !", extra_tags="toast")
             return HttpResponseRedirect(reverse_lazy("dashboard:index"))
         except GeocodingDataError:
             messages.error(request, "L'adresse semble erronée. Veuillez la corriger avant de pouvoir « Enregistrer ».")
