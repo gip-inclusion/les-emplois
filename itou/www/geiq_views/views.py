@@ -15,6 +15,7 @@ from django.views.decorators.http import require_POST, require_safe
 
 from itou.common_apps.address.departments import REGIONS
 from itou.files.models import File
+from itou.geiq.emails import GIEQImplementationAssessmentFactory
 from itou.geiq.models import (
     Employee,
     EmployeeContract,
@@ -22,11 +23,11 @@ from itou.geiq.models import (
     ImplementationAssessment,
     ReviewState,
 )
-from itou.geiq.notifications import GEIQImplementationAssessmentSubmittedNotification
 from itou.geiq.sync import sync_employee_and_contracts
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.utils.apis import geiq_label
+from itou.utils.emails import send_email_messages
 from itou.utils.pagination import pager
 from itou.utils.urls import get_safe_url
 
@@ -99,7 +100,7 @@ def _assessment_info_for_employer(request, assessment_pk, template_name="geiq/as
             assessment.submitted_at = timezone.now()
             assessment.submitted_by = request.user
             assessment.save(update_fields={"activity_report_file", "submitted_at", "submitted_by"})
-            GEIQImplementationAssessmentSubmittedNotification(assessment).send()
+            send_email_messages([GIEQImplementationAssessmentFactory(assessment).submitted()])
 
     if assessment.submitted_at:
         submission_form.fields["up_to_date_information"].widget.attrs.update(
