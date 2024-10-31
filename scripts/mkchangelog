@@ -1,0 +1,182 @@
+#!/usr/bin/env python3
+
+
+import argparse
+import collections
+import datetime
+import json
+import logging
+import os
+import pathlib
+import re
+import subprocess
+import sys
+import tempfile
+
+
+logger = logging.getLogger(__name__)
+
+ADDED = "ajouté"
+CHANGED = "modifié"
+REMOVED = "supprimé"
+TECH = "tech"
+SKIP = "no-changelog"
+DEPS = "dependencies"
+
+# To appear in the changelog, the PR needs to have one (and only one!) of those labels
+LABEL_TITLES = {
+    ADDED: "Ajouté",
+    CHANGED: "Modifié",
+    REMOVED: "Supprimé",
+    TECH: "Tech",
+}
+
+
+def prepare_branch(branch):
+    # The remote branch may not exist, ignore errors.
+    subprocess.run(["git", "fetch", "origin", "master", branch])
+    try:
+        subprocess.run(["git", "switch", branch], check=True)
+        created = False
+    except subprocess.CalledProcessError:
+        subprocess.run(["git", "switch", "--create", branch], check=True)
+        created = True
+    subprocess.run(["git", "reset", "--hard", "origin/master"], check=True)
+    return created
+
+
+def gh(*args, **kwargs):
+    env = (
+        {
+            "GH_TOKEN": os.getenv("GH_TOKEN", ""),
+            "PATH": os.environ["PATH"],
+        }
+        if os.getenv("CI", False)
+        else None
+    )
+    return subprocess.run(["gh", *args], check=True, env=env, **kwargs)
+
+
+def list_pull_requests(start, end, labels):
+    limit = 1000
+    result = gh(
+        "search",
+        "prs",
+        "--merged-at",
+        f"{start}..{end}",
+        "--repo",
+        "gip-inclusion/les-emplois",
+        "--limit",
+        f"{limit}",
+        "--json",
+        "title,url,labels,body",
+        "--",
+        labels,
+        capture_output=True,
+    )
+    pull_requests = json.loads(result.stdout)
+    if len(pull_requests) == limit:
+        sys.exit("Limit has been exceeded when fetching pull requests, keep up the good work!")
+    return pull_requests
+
+
+def list_missing_pull_requests(start, end):
+    return list_pull_requests(start, end, f"-label:{ADDED},{CHANGED},{REMOVED},{DEPS},{SKIP},{TECH}")
+
+
+def list_merged_pull_requests(start, end):
+    return list_pull_requests(start, end, f"label:{','.join(LABEL_TITLES)}")
+
+
+def open_pull_request(branch, title):
+    gh("pr", "create", "--label", SKIP, "--title", title, "--body", "")
+
+
+def ci_sort(iterable):
+    return sorted(iterable, key=str.casefold)
+
+
+def main(publish):
+    changelog_path = pathlib.Path("CHANGELOG.md")
+    with (
+        open(changelog_path, "r+") as changelog,
+        tempfile.NamedTemporaryFile(dir=os.getcwd(), mode="w+", suffix="~", delete=False) as new_changelog,
+    ):
+        try:
+            for line in changelog:
+                if line.strip() in ["# Journal des modifications", ""]:
+                    new_changelog.write(line)
+                    continue
+                break
+            last_entry_header = line
+
+            _h2, sprint_start_text = last_entry_header.split()
+            sprint_start = datetime.date.fromisoformat(sprint_start_text)
+            sprint_end = sprint_start + datetime.timedelta(days=6)  # End date is inclusive.
+
+            branch = f"changelog/{sprint_end}"
+            new_branch = prepare_branch(branch)
+
+            if missing := list_missing_pull_requests(sprint_start, sprint_end):
+                missing_pull_requests = "\n- ".join(pr["url"] for pr in missing)
+                sys.exit(f"The following pull requests should have a label:\n- {missing_pull_requests}\n")
+
+            log_entries = collections.defaultdict(list)
+            for pull_request in list_merged_pull_requests(sprint_start, sprint_end):
+                title = re.sub(r"\[(GEN|ITOU)-[0-9]+\]", "", pull_request["title"]).strip()
+                title = f"[{title}]({pull_request['url']})"
+                if re.search(r"\!\[[^]]+]", pull_request["body"]):
+                    title += " 🖼"
+                pr_labels = {label["name"] for label in pull_request["labels"]}
+                pr_changelog_labels = set(LABEL_TITLES).intersection(pr_labels)
+                if len(pr_changelog_labels) != 1:
+                    raise ValueError(
+                        f"Expected only one of {', '.join(LABEL_TITLES)} in labels, got {' '.join(pr_labels)}."
+                    )
+                log_entries[pr_changelog_labels.pop()].append(title)
+
+            if any(log_entries.values()):
+                # Changelog entries are up to the next Monday (excluded).
+                new_changelog.write(f"## {sprint_end + datetime.timedelta(days=1)}\n\n")
+
+            for label, label_title in LABEL_TITLES.items():
+                if log_entries[label]:
+                    new_changelog.write(f"### {label_title}\n\n")
+                    for title in ci_sort(log_entries[label]):
+                        new_changelog.write(f"- {title}\n")
+                    new_changelog.write("\n")
+
+            # Don’t forget the previous header.
+            new_changelog.write(last_entry_header)
+            for line in changelog:
+                new_changelog.write(line)
+
+            # Atomically replace file.
+            pathlib.Path(new_changelog.name).rename(changelog_path)
+        finally:
+            pathlib.Path(new_changelog.name).unlink(missing_ok=True)
+
+    if publish:
+        commit_command_base = [
+            "git",
+            "-c",
+            "user.name=Changelog Bot",
+            "-c",
+            "user.email=noreply@inclusion.beta.gouv.fr",
+            "commit",
+        ]
+        title = f"changelog: From {sprint_start} to {sprint_end}"
+        subprocess.run([*commit_command_base, "--all", "--message", title], check=True)
+        subprocess.run(
+            ["git", "push", "--set-upstream", "origin", branch, "--force-with-lease", "--force-if-includes"],
+            check=True,
+        )
+        if new_branch:
+            open_pull_request(branch, title)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--publish", action="store_true")
+    args = parser.parse_args()
+    main(args.publish)

@@ -1,14 +1,40 @@
-**Carte Notion : **
+## :thinking: Pourquoi ?
 
-<!-- Pensez à mettre le label "no-changelog" si nécessaire. -->
+> _Indiquez le problème que nous sommes en train de résoudre et les objectifs métiers ou techniques qui sont visés par ces changements._
 
-### Pourquoi ?
+<!--
+# Catégories changelog
 
-Indiquer le problème que nous sommes en train de résoudre et les objectifs métiers ou techniques qui sont visés par ces changements.
+ +--------------------------|--------------------------+
+ | API                      | Notifications            |
+ | Accessibilité            | Page d’accueil           |
+ | Admin                    | PASS IAE                 |
+ | Annexes financières      | Performances             |
+ | Candidature              | Pilotage                 |
+ | Connexion                | Profil salarié           |
+ | Contrôle a posteriori    | Prescripteur             |
+ | Demandes de prolongation | Recherche employeur      |
+ | Demandeur d’emploi       | Recherche fiche de poste |
+ | Employeur                | Recherche prescripteur   |
+ | Fiche de poste           | Stabilité                |
+ | Fiche entreprise         | Statistiques             |
+ | Fiches salarié           | Tableau de bord          |
+ | GEIQ                     | UX/UI                    |
+ | Inscription              | Vie privée               |
+ +--------------------------|--------------------------+
 
-### Comment <!-- optionnel -->
+-->
 
-Attirer l'attention sur les décisions d'architecture ou de conception importantes.
+## :cake: Comment ? <!-- optionnel -->
 
-### Captures d'écran <!-- optionnel -->
+> _Décrivez en quelques mots la solution retenue et mise en oeuvre, les difficultés ou problèmes rencontrés. Attirez l'attention sur les décisions d'architecture ou de conception importantes._
 
+## :rotating_light: À vérifier
+
+- [ ] Mettre à jour le CHANGELOG_breaking_changes.md ?
+
+## :desert_island: Comment tester
+
+> _Les instructions pour reproduire le problème, les profils de test, le parcours spécifique à utiliser, etc. Si vous disposez d'une recette jetable, mettre l'URL pour tester dans cette partie._
+
+## :computer: Captures d'écran <!-- optionnel -->

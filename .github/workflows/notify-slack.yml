@@ -1,0 +1,36 @@
+name: 📢 Notify Slack of changed PR
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  notify:
+    # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-pull_request-workflow-when-a-pull-request-merges
+    if: >
+      github.event.pull_request.merged == true
+      && !contains(github.event.pull_request.labels.*.name, 'dependencies')
+    runs-on: ubuntu-latest
+    steps:
+      - name: "📢 Notify the #mep-c1 channel"
+        # Can't use `!contains(...)` because it give us a "tag suffix cannot contain flow indicator characters" error.
+        # Oddly enough, using `if: > !contains(...)` works...
+        if: contains(github.event.pull_request.labels.*.name, 'no-changelog') == false
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "text": ${{ toJSON(format('<{0}|{1}>', github.event.pull_request.html_url, github.event.pull_request.title)) }}
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_MEP_C1_WEBHOOK_URL }}
+      - name: "📢 Notify the #mep-c2 channel"
+        if: contains(github.event.pull_request.labels.*.name, 'pilotage')
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "text": ${{ toJSON(format('<{0}|{1}>', github.event.pull_request.html_url, github.event.pull_request.title)) }}
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_MEP_C2_WEBHOOK_URL }}

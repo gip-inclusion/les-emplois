@@ -2,6 +2,7 @@
 Base settings to build other settings files upon.
 https://docs.djangoproject.com/en/dev/ref/settings
 """
+
 import json
 import os
 
@@ -661,3 +662,8 @@ CSP_REPORT_URI = os.getenv("CSP_REPORT_URI", None)
 AIRFLOW_BASE_URL = os.getenv("AIRFLOW_BASE_URL")
 
 FORCE_IC_LOGIN = True
+AWS_S3_ENDPOINT_URL = f"https://{os.getenv('CELLAR_ADDON_HOST')}/"
+AWS_S3_REGION_NAME = "eu-west-3"
+AWS_S3_ACCESS_KEY_ID = os.getenv("CELLAR_ADDON_KEY_ID")
+AWS_S3_SECRET_ACCESS_KEY = os.getenv("CELLAR_ADDON_KEY_SECRET")
+AWS_STORAGE_BUCKET_NAME = os.getenv("S3_STORAGE_BUCKET_NAME")

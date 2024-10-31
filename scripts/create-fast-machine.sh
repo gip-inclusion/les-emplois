@@ -14,19 +14,10 @@ if [[ ! $RUN_DIRECTORY =~ "scripts" ]]; then
    exit 1
 fi
 
-# If the script is loaded from the root we can import the local environment variables
-# shellcheck source=/dev/null
-source .env
-if [ -z "$CLEVER_TOKEN" ]; then
-  echo "please add 'CLEVER_TOKEN=some_token' in .env at the root of the project in order to run this script. You can find its value with 'clever login'"
+if [ ! -f "$HOME/.config/clever-cloud/clever-tools.json" ]; then
+  echo "clever-tools doesn't seems to be initialized, run 'clever login' to do so."
   exit 1
 fi
-if [ -z "$CLEVER_SECRET" ]; then
-  echo "please add 'CLEVER_SECRET=some_secret' in .env at the root of the project in order to run this script. You can find its value with 'clever login'"
-  exit 1
-fi
-
-clever login --token "$CLEVER_TOKEN" --secret "$CLEVER_SECRET"
 
 APP_NAME=c1-fast-machine-$(date +%y-%m-%d-%Hh-%M)
 
@@ -35,13 +26,18 @@ clever link "$APP_NAME" --org Itou
 clever scale --flavor XL --alias "$APP_NAME"
 
 clever env set ITOU_ENVIRONMENT "FAST-MACHINE" --alias "$APP_NAME"
+# By default Clever creates a python app with CC_PYTHON_VERSION set to "3"
+clever env rm CC_PYTHON_VERSION --alias "$APP_NAME"
 
 clever service link-addon c1-bucket-config --alias "$APP_NAME"
 clever service link-addon c1-deployment-config --alias "$APP_NAME"
 clever service link-addon c1-imports-config --alias "$APP_NAME"
-clever service link-addon c1-prod-database-encrypted  --alias "$APP_NAME"
+clever service link-addon c1-prod-database-encrypted --alias "$APP_NAME"
+clever service link-addon c1-redis --alias "$APP_NAME"
+clever service link-addon c1-s3 --alias "$APP_NAME"
 
-clever deploy --alias "$APP_NAME" --branch master_clever --force
+git fetch
+./scripts/clever-deploy --app-alias "$APP_NAME" --branch origin/master
 
 cat << EOF
 
@@ -49,9 +45,9 @@ cat << EOF
 
 Vous pouvez maintenant:
  - ✈️ Aller sur la machine:
-    clever ssh --alias $APP_NAME
- - 🔨 Jouer un script d’import, par ex:
-    cd ~/app_* && ./scripts/imports-asp.sh
+    clever ssh --alias "$APP_NAME"
+ - 🔨 Jouer les scripts d’import, par exemple:
+    cd ~/app_* && scripts/import-iae.sh
  - 🍺 Supprimer la machine:
     clever delete --alias $APP_NAME --yes
 EOF
