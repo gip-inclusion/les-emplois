@@ -12,6 +12,7 @@ from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.management.commands import prolongation_requests_chores
 from itou.approvals.models import ProlongationRequest
 from tests.approvals.factories import ProlongationRequestDenyInformationFactory, ProlongationRequestFactory
+from tests.users.factories import PrescriberFactory
 
 
 @pytest.fixture(name="command")
@@ -139,3 +140,28 @@ def test_chores_send_reminder_to_prescriber_organization_other_members_every_ten
             with django_capture_on_commit_callbacks(execute=True):
                 command.handle(command="email_reminder", wet_run=True)
         assert len(mailoutbox) == expected
+
+
+def test_chores_send_reminder_to_prescriber_organization_other_members_copy_limit(
+    mailoutbox, snapshot, django_capture_on_commit_callbacks, command
+):
+    prolongation_request = ProlongationRequestFactory(for_snapshot=True)
+    admin_prescribers = PrescriberFactory.create_batch(
+        9, membership__organization=prolongation_request.prescriber_organization, membership__is_admin=True
+    )
+    regular_prescribers = PrescriberFactory.create_batch(
+        3, membership__organization=prolongation_request.prescriber_organization, membership__is_admin=False
+    )
+
+    with freeze_time(prolongation_request.created_at + relativedelta(days=30)):
+        with django_capture_on_commit_callbacks(execute=True):
+            command.handle(command="email_reminder", wet_run=True)
+
+    assert len(mailoutbox) == 11  # prolongation_request.validated_by and 10 collegues
+
+    assert set(email.to[0] for email in mailoutbox) == {prolongation_request.validated_by.email} | {
+        member.email for member in admin_prescribers
+    } | {regular_prescribers[-1].email}
+    for email in mailoutbox:
+        assert email.subject == snapshot(name="subject")
+        assert email.body == snapshot(name="body")

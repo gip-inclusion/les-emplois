@@ -1606,7 +1606,9 @@ class ProlongationRequest(CommonProlongation):
         return f"{self.approval} — {self.get_status_display()} — {self.start_at:%d/%m/%Y} - {self.end_at:%d/%m/%Y}"
 
     def notify_authorized_prescriber(self):
-        notifications.ProlongationRequestCreated(self).send()
+        notifications.ProlongationRequestCreatedForPrescriberNotification(
+            self.validated_by, self.prescriber_organization, prolongation_request=self
+        ).send()
 
     def grant(self, user):
         self.status = enums.ProlongationRequestStatus.GRANTED
@@ -1642,8 +1644,12 @@ class ProlongationRequest(CommonProlongation):
             information.save()
             self.save()
 
-        notifications.ProlongationRequestDeniedEmployer(self).send()
-        notifications.ProlongationRequestDeniedJobSeeker(self).send()
+        notifications.ProlongationRequestDeniedForEmployerNotification(
+            self.declared_by, self.declared_by_siae, prolongation_request=self
+        ).send()
+        notifications.ProlongationRequestDeniedForJobSeekerNotification(
+            self.approval.user, prolongation_request=self
+        ).send()
 
 
 class ProlongationRequestDenyInformation(models.Model):

@@ -1,12 +1,13 @@
 from dateutil.relativedelta import relativedelta
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import F, Q
 from django.template.defaultfilters import pluralize
 from django.utils import timezone
 
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
-from itou.approvals.notifications import ProlongationRequestCreatedReminder
+from itou.approvals.notifications import ProlongationRequestCreatedReminderForPrescriberNotification
+from itou.prescribers.models import PrescriberMembership
 from itou.utils.command import BaseCommand
 
 
@@ -31,7 +32,28 @@ class Command(BaseCommand):
         prolongation_reminded = 0
         for prolongation_request in queryset:
             if wet_run:
-                ProlongationRequestCreatedReminder(prolongation_request).send()
+                ProlongationRequestCreatedReminderForPrescriberNotification(
+                    prolongation_request.validated_by,
+                    prolongation_request.prescriber_organization,
+                    prolongation_request=prolongation_request,
+                ).send()
+                colleagues_to_notify = [
+                    membership.user
+                    for membership in PrescriberMembership.objects.active()
+                    .filter(organization=prolongation_request.prescriber_organization)
+                    .exclude(user=prolongation_request.validated_by)
+                    .select_related("user")
+                    # Limit to the last 10 active colleagues, admins take precedence over regular members.
+                    # It should cover the ones dedicated to the IAE and some more.
+                    .order_by("-is_admin", F("user__last_login").desc(nulls_last=True), "-joined_at", "-pk")[:10]
+                ]
+                for colleague in colleagues_to_notify:
+                    ProlongationRequestCreatedReminderForPrescriberNotification(
+                        colleague,
+                        prolongation_request.prescriber_organization,
+                        prolongation_request=prolongation_request,
+                    ).send()
+
                 prolongation_request.reminder_sent_at = timezone.now()
                 prolongation_request.save(update_fields=["reminder_sent_at"])
                 prolongation_reminded += 1

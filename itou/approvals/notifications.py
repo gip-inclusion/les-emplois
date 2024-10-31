@@ -1,104 +1,75 @@
-from django.db.models import F
 from django.urls import reverse
 
-from itou.common_apps.notifications.base_class import BaseNotification
 from itou.communications import NotificationCategory, registry as notifications_registry
 from itou.communications.dispatch import EmailNotification, EmployerNotification, JobSeekerNotification
+from itou.communications.dispatch.utils import PrescriberNotification
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
-from itou.prescribers.models import PrescriberMembership
-from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
 
 
-class ProlongationRequestCreated(BaseNotification):
+@notifications_registry.register
+class ProlongationRequestCreatedForPrescriberNotification(PrescriberNotification, EmailNotification):
     """Notification sent to the authorized prescriber when a prolongation request is created"""
 
-    NAME = "prolongation_request_created"
+    name = "Nouvelle demande de prolongation"
+    category = NotificationCategory.IAE_PASS
+    can_be_disabled = False
+    subject_template = "approvals/email/prolongation_request/created_subject.txt"
+    body_template = "approvals/email/prolongation_request/created_body.txt"
 
-    def __init__(self, prolongation_request):
-        self.prolongation_request = prolongation_request
-
-    @property
-    def email(self):
-        to = [self.prolongation_request.validated_by.email]
-        context = {
-            "prolongation_request": self.prolongation_request,
-            "report_file_url": get_absolute_url(
-                reverse(
-                    "approvals:prolongation_request_report_file",
-                    kwargs={"prolongation_request_id": self.prolongation_request.pk},
-                )
-            ),
-        }
-        subject = "approvals/email/prolongation_request/created_subject.txt"
-        body = "approvals/email/prolongation_request/created_body.txt"
-        return get_email_message(to, context, subject, body)
+    def get_context(self):
+        context = super().get_context()
+        context["report_file_url"] = get_absolute_url(
+            reverse(
+                "approvals:prolongation_request_report_file",
+                kwargs={"prolongation_request_id": context["prolongation_request"].pk},
+            )
+        )
+        return context
 
 
-class ProlongationRequestCreatedReminder(BaseNotification):
+@notifications_registry.register
+class ProlongationRequestCreatedReminderForPrescriberNotification(PrescriberNotification, EmailNotification):
     """Notification sent to the other members of the prescriber organization"""
 
-    def __init__(self, prolongation_request):
-        self.prolongation_request = prolongation_request
+    name = "Rappel de demande de prolongation"
+    category = NotificationCategory.IAE_PASS
+    can_be_disabled = False
+    subject_template = "approvals/email/prolongation_request/created_reminder_subject.txt"
+    body_template = "approvals/email/prolongation_request/created_reminder_body.txt"
 
-    @property
-    def email(self):
-        to = [self.prolongation_request.validated_by.email]
-        cc = (
-            PrescriberMembership.objects.active()
-            .filter(organization=self.prolongation_request.prescriber_organization)
-            .exclude(user=self.prolongation_request.validated_by)
-            # Limit to the last 10 active colleagues, admins take precedence over regular members.
-            # It should cover the ones dedicated to the IAE and some more.
-            .order_by("-is_admin", F("user__last_login").desc(nulls_last=True), "-joined_at", "-pk")[:10]
-            .values_list("user__email", flat=True)
+    def get_context(self):
+        context = super().get_context()
+        context["report_file_url"] = get_absolute_url(
+            reverse(
+                "approvals:prolongation_request_report_file",
+                kwargs={"prolongation_request_id": context["prolongation_request"].pk},
+            )
         )
-        context = {
-            "prolongation_request": self.prolongation_request,
-            "report_file_url": get_absolute_url(
-                reverse(
-                    "approvals:prolongation_request_report_file",
-                    kwargs={"prolongation_request_id": self.prolongation_request.pk},
-                )
-            ),
-        }
-        subject = "approvals/email/prolongation_request/created_reminder_subject.txt"
-        body = "approvals/email/prolongation_request/created_reminder_body.txt"
-        return get_email_message(to, context, subject, body, cc=cc)
+        return context
 
 
-class ProlongationRequestDeniedEmployer(BaseNotification):
+@notifications_registry.register
+class ProlongationRequestDeniedForEmployerNotification(EmployerNotification, EmailNotification):
     """Notification sent to the employer when the prolongation request is denied"""
 
-    NAME = "prolongation_request_denied_employer"
+    name = "Demande de prolongation refusée"
+    category = NotificationCategory.IAE_PASS
+    subject_template = "approvals/email/prolongation_request/denied/employer_subject.txt"
+    body_template = "approvals/email/prolongation_request/denied/employer_body.txt"
 
-    def __init__(self, prolongation_request):
-        self.prolongation_request = prolongation_request
-
-    @property
-    def email(self):
-        to = [self.prolongation_request.declared_by.email]
-        context = {"prolongation_request": self.prolongation_request}
-        subject = "approvals/email/prolongation_request/denied/employer_subject.txt"
-        body = "approvals/email/prolongation_request/denied/employer_body.txt"
-        return get_email_message(to, context, subject, body)
+    def is_applicable(self):
+        return self.structure and self.structure.kind in SIAE_WITH_CONVENTION_KINDS
 
 
-class ProlongationRequestDeniedJobSeeker(BaseNotification):
+@notifications_registry.register
+class ProlongationRequestDeniedForJobSeekerNotification(JobSeekerNotification, EmailNotification):
     """Notification sent to the jobseeker when the prolongation request is denied"""
 
-    NAME = "prolongation_request_denied_jobseeker"
-
-    def __init__(self, prolongation_request):
-        self.prolongation_request = prolongation_request
-
-    @property
-    def email(self):
-        to = [self.prolongation_request.approval.user.email]
-        context = {"prolongation_request": self.prolongation_request}
-        subject = "approvals/email/prolongation_request/denied/jobseeker_subject.txt"
-        body = "approvals/email/prolongation_request/denied/jobseeker_body.txt"
-        return get_email_message(to, context, subject, body)
+    name = "Demande de prolongation refusée"
+    category = NotificationCategory.IAE_PASS
+    subject_template = "approvals/email/prolongation_request/denied/jobseeker_subject.txt"
+    body_template = "approvals/email/prolongation_request/denied/jobseeker_body.txt"
 
 
 @notifications_registry.register
