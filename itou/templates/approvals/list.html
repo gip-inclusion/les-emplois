@@ -14,7 +14,7 @@
 
 {% block title_extra %}
     {% if request.current_organization.can_use_employee_record %}
-        <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true">
+        <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
             <li class="nav-item active">
                 <a class="nav-link active" href="{% url 'approvals:list' %}" {% matomo_event "employeurs" "clic" "onglet-salaries-pass-iae" %}>
                     Salariés et PASS IAE
