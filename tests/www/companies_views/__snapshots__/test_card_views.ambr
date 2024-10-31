@@ -554,9 +554,8 @@
 # name: TestJobDescriptionCardView.test_card_tally_url_no_user
   '''
   <div class="c-box c-box--action">
-          <h2 class="visually-hidden">Actions rapides</h2>
-          <div class="form-row align-items-center gx-3">
-              
+              <h2 class="visually-hidden">Actions rapides</h2>
+              <div class="form-row align-items-center gx-3">
                   
                       
                           <div class="form-group col-12 col-lg-auto">
@@ -590,17 +589,15 @@
                           </li>
                       </ul>
                   </div>
-              
+              </div>
           </div>
-      </div>
   '''
 # ---
 # name: TestJobDescriptionCardView.test_card_tally_url_with_user[with_other_jobs]
   '''
   <div class="c-box c-box--action">
-          <h2 class="visually-hidden">Actions rapides</h2>
-          <div class="form-row align-items-center gx-3">
-              
+              <h2 class="visually-hidden">Actions rapides</h2>
+              <div class="form-row align-items-center gx-3">
                   
                       
                           <div class="form-group col-12 col-lg-auto">
@@ -641,17 +638,15 @@
                           </li>
                       </ul>
                   </div>
-              
+              </div>
           </div>
-      </div>
   '''
 # ---
 # name: TestJobDescriptionCardView.test_card_tally_url_with_user[without_other_jobs]
   '''
   <div class="c-box c-box--action">
-          <h2 class="visually-hidden">Actions rapides</h2>
-          <div class="form-row align-items-center gx-3">
-              
+              <h2 class="visually-hidden">Actions rapides</h2>
+              <div class="form-row align-items-center gx-3">
                   
                       
                           <div class="form-group col-12 col-lg-auto">
@@ -685,9 +680,8 @@
                           </li>
                       </ul>
                   </div>
-              
+              </div>
           </div>
-      </div>
   '''
 # ---
 # name: TestJobDescriptionCardView.test_job_description_card

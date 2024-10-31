@@ -25,28 +25,35 @@
     {% if job_app_to_transfer %}
         {% include "apply/includes/job_application_external_transfer_progress.html" with job_app_to_transfer=job_app_to_transfer step=1 only %}
     {% endif %}
-    <h1>{{ job.display_name }}</h1>
-    {% if job.is_active %}
-        <p>
-            <span class="badge rounded-pill bg-success">
-                {{ job.open_positions }} poste{{ job.open_positions|pluralizefr }} ouvert{{ job.open_positions|pluralizefr }} au recrutement
-            </span>
-        </p>
-    {% endif %}
-    <div class="c-box c-box--action">
-        <h2 class="visually-hidden">Actions rapides</h2>
-        <div class="form-row align-items-center gx-3">
-            {% if can_update_job_description %}
-                <div class="form-group col-12 col-lg-auto">
-                    <a href="{% url "companies_views:update_job_description" job_description_id=job.pk %}"
-                       class="btn btn-lg btn-white btn-block btn-ico"
-                       aria-label="Modifier la fiche de poste"
-                       {% matomo_event "employeurs" "clic" "edit-fiche-de-poste" %}>
-                        <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
-                        <span>Modifier</span>
-                    </a>
-                </div>
-            {% else %}
+
+    <div class="d-flex flex-column flex-md-row gap-3 mb-3 mb-md-4 justify-content-md-between">
+        <div>
+            <h1 class="mb-0">{{ job.display_name }}</h1>
+            {% if job.is_active %}
+                <p class="mt-1 mb-0">
+                    <span class="badge rounded-pill bg-success">
+                        {{ job.open_positions }} poste{{ job.open_positions|pluralizefr }} ouvert{{ job.open_positions|pluralizefr }} au recrutement
+                    </span>
+                </p>
+            {% endif %}
+        </div>
+        {% if can_update_job_description %}
+            <div>
+                <a href="{% url "companies_views:update_job_description" job_description_id=job.pk %}"
+                   class="btn btn-lg btn-block btn-primary btn-ico"
+                   aria-label="Modifier la fiche de poste"
+                   {% matomo_event "employeurs" "clic" "edit-fiche-de-poste" %}>
+                    <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
+                    <span>Modifier</span>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if not can_update_job_description %}
+        <div class="c-box c-box--action">
+            <h2 class="visually-hidden">Actions rapides</h2>
+            <div class="form-row align-items-center gx-3">
                 {% if job.is_active and not siae.block_job_applications %}
                     {% if job_app_to_transfer %}
                         <div class="form-group col-12 col-lg-auto">
@@ -96,9 +103,9 @@
                         </li>
                     </ul>
                 </div>
-            {% endif %}
+            </div>
         </div>
-    </div>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
