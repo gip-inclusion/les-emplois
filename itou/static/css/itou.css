@@ -210,7 +210,7 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
 
 .dropzone .dz-preview .dz-error-message::after {
     border-top: 6px solid var(--bs-red);
-    border-bottom: 0 solid #be2626 !important;
+    border-bottom: 0 solid var(--bs-danger) !important;
     bottom: -5px !important;
     top: auto !important;
 }
@@ -270,16 +270,8 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     border-left-width: 3px !important;
 }
 
-.test-accounts-banner-overlay {
-    z-index: 2;
-}
-
 .test-accounts-image-menu {
     min-height: 11rem;
-}
-
-.give-my-advice {
-    width: 150px;
 }
 
 /* HTMX button indicator */
@@ -353,19 +345,6 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     width: 100px;
 }
 
-/* Inclusion connect
---------------------------------------------------------------------------- */
-.p-inclusion-connect .s-main {
-    background-color: var(--bs-white) !important;
-    background-image: url("../img/illustration-bg-ic.svg");
-    background-repeat: no-repeat;
-    background-position: top -120px left;
-}
-
-.s-banner-01.s-banner-01--ic .s-banner-01__col > div::before {
-    display: none;
-}
-
 /* Dashboard
 --------------------------------------------------------------------------- */
 .c-box__header--dora {
@@ -416,7 +395,6 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
 .w-lg-400px .select2-selection__rendered {
     white-space: nowrap !important;
 }
-
 
 /* Pro Connect button theme */
 .proconnect-button {
