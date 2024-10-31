@@ -396,6 +396,12 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     white-space: nowrap !important;
 }
 
+/* Fix for .modal-content than inherit style rules from td parent */
+table.table td > .modal .modal-content {
+    text-align: left;
+    font-size: var(--bs-body-font-size);
+}
+
 /* Pro Connect button theme */
 .proconnect-button {
   background-color: transparent !important;
