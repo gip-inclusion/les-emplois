@@ -115,6 +115,10 @@ def _add_user_kind_error_message(request, existing_user, new_user_kind):
 
 
 def inclusion_connect_authorize(request):
+    # Block access if ProConnect is enabled
+    if settings.PRO_CONNECT_BASE_URL:
+        return HttpResponseRedirect(reverse("search:employers_home"))
+
     # Start a new session.
     user_kind = request.GET.get("user_kind")
     previous_url = request.GET.get("previous_url", reverse("search:employers_home"))
@@ -219,6 +223,10 @@ def _get_user_info(request, access_token):
 
 
 def inclusion_connect_callback(request):
+    # Block access if ProConnect is enabled
+    if settings.PRO_CONNECT_BASE_URL:
+        return HttpResponseRedirect(reverse("search:employers_home"))
+
     code = request.GET.get("code")
     state = request.GET.get("state")
     if code is None or state is None:

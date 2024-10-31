@@ -44,6 +44,7 @@ from tests.openid_connect.inclusion_connect.test import (
     inclusion_connect_setup,
     mock_oauth_dance,
 )
+from tests.openid_connect.pro_connect.test import pro_connect_setup
 from tests.prescribers.factories import PrescriberPoleEmploiFactory
 from tests.users.factories import (
     DEFAULT_PASSWORD,
@@ -981,3 +982,16 @@ class TestInclusionConnectmapChannel:
                 ),
             ],
         )
+
+
+def test_inclusion_connect_is_forbidden_when_pro_connect_is_enabled(client):
+    with pro_connect_setup():
+        url = f"{reverse('inclusion_connect:authorize')}?user_kind={UserKind.PRESCRIBER}"
+        response = client.get(url)
+        assertRedirects(response, reverse("search:employers_home"))
+        assert constants.INCLUSION_CONNECT_SESSION_KEY not in client.session
+
+        url = f"{reverse('inclusion_connect:callback')}"
+        response = client.get(url)
+        assertRedirects(response, reverse("search:employers_home"))
+        assert constants.INCLUSION_CONNECT_SESSION_KEY not in client.session
