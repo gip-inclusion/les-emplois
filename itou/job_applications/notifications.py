@@ -1,4 +1,3 @@
-from itou.common_apps.notifications.base_class import BaseNotification
 from itou.communications import NotificationCategory, registry as notifications_registry
 from itou.communications.dispatch import (
     EmailNotification,
@@ -7,28 +6,6 @@ from itou.communications.dispatch import (
     PrescriberNotification,
     PrescriberOrEmployerNotification,
 )
-from itou.utils.emails import get_email_message
-
-
-class NewSpontaneousJobAppEmployersNotification(BaseNotification):
-    NAME = "new_spontaneous_job_application_employers_email"
-
-    def __init__(self, job_application):
-        self.job_application = job_application
-        active_memberships = job_application.to_company.companymembership_set.active()
-        super().__init__(recipients_qs=active_memberships)
-
-    @property
-    def email(self):
-        to = self.recipients_emails
-        context = {"job_application": self.job_application}
-        subject = "apply/email/new_for_employer_subject.txt"
-        body = "apply/email/new_for_employer_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    @property
-    def recipients_emails(self):
-        return self.get_recipients().values_list("user__email", flat=True)
 
 
 @notifications_registry.register
