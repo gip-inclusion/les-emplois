@@ -444,9 +444,29 @@ djangorestframework==3.15.2 \
     #   -r requirements/test.txt
     #   django-datadog-logger
     #   drf-spectacular
-djlint==1.35.2 \
-    --hash=sha256:318de9d4b9b0061a111f8f5164ecbacd8215f449dd4bd5a76d2a691c815ee103 \
-    --hash=sha256:4ba995bad378f2afa77c8ea56ba1c14429d9ff26a18e8ae23bc71eedb9152243
+djlint==1.35.4 \
+    --hash=sha256:085fdc16d359abf270f1bfe7b22d4cc73c85ab070147cefb09b32d962cefddc3 \
+    --hash=sha256:0c41a21de3de0e60cc02154d432d407577e83e21e2ac7ca45f195095beb57099 \
+    --hash=sha256:14a278a340a46f8e1187afba8e0bccdd6ebee58ac129807448d35f6445671665 \
+    --hash=sha256:24aca63394d2f060d5f6367c34e3dca3ecb1c5c5a908ce24147243bccc8710c9 \
+    --hash=sha256:2effff20e821199439882843a56179e6b1c158c2c2a1b058e1e5d87643f84c77 \
+    --hash=sha256:491a41c23981164bbc7bc754ab0d39c99f5aa1887680a3fd00543f6dd50fc907 \
+    --hash=sha256:519546a873909ab7832cb1b07f9503fa8b6fee2a8178e4ee42ae62640eb19b93 \
+    --hash=sha256:65ebe3f4dcee2944d101e3ccadc71cab13a4c59cebd428bb5ba59609d365c232 \
+    --hash=sha256:66db077a033c03abe26ebdd7819229a86cee9edb7ce6c5eab03100c5dc178202 \
+    --hash=sha256:677d95914d45b6fdeaf3f356dd857feef55be041804909e5a35042acc7c7c196 \
+    --hash=sha256:6982bebd9e2587bc503d6bd0fdea492fd70ebac79aad7cbecd0d67dfebe1de4e \
+    --hash=sha256:7b12ad12048c4a44a61bd39e5f85147e9b8f1ca85b76c5066603747f660a2922 \
+    --hash=sha256:858e6bce13aedaf387a20d625e4795113b78ac1fb572bd4d03abb76f89822722 \
+    --hash=sha256:8adcfb56fcb20010f4c778b879846ec488689356a1f9e502326d980e582e78a9 \
+    --hash=sha256:9c4bfbaba4622a1439d30956da891315aefce7c56ffaefe1220cfeb1d99cf628 \
+    --hash=sha256:b457e672fca03eefdfcf6e4c1dd4bfc2c324e8b0755e5def2d94c9273eb6edc7 \
+    --hash=sha256:c5dddbf2d5cb2bbbf4ef53c6e7c0042e41ff3e7097eed3f1ce53a8e4c2cb7eec \
+    --hash=sha256:c7864eceffed926eabc78f52a2aeda3895df8eb38b6ff17e4455debba64cd922 \
+    --hash=sha256:d4a1342d83e65171059925b87ab351a1d5201289a764f9e092ef7a99e312554e \
+    --hash=sha256:d62563deae046bc2e94747110bc785cce416088e9ee6db6c31702c01d0f5212f \
+    --hash=sha256:e741641de0a26025ef6ba04978aea9480a1d3ddd4d9060820cbc250a34a552bf \
+    --hash=sha256:ed6088d416019e453c1451463ed44ffbf3f84c3bd8b1dfeadc456103fd1e5d14
     # via -r requirements/test.txt
 drf-spectacular==0.27.2 \
     --hash=sha256:a199492f2163c4101055075ebdbb037d59c6e0030692fc83a1a8c0fc65929981 \
@@ -1678,6 +1698,7 @@ typing-extensions==4.12.2 \
     --hash=sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8
     # via
     #   -r requirements/test.txt
+    #   djlint
     #   faker
     #   ipython
     #   psycopg
