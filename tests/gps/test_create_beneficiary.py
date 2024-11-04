@@ -5,10 +5,11 @@ from dateutil.relativedelta import relativedelta
 from django.test import override_settings
 from django.urls import resolve, reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateNotUsed
 
 from itou.asp.models import Commune, Country, RSAAllocation
 from itou.companies import enums as companies_enums
+from itou.companies.enums import POLE_EMPLOI_SIRET
 from itou.companies.models import Company
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfPoleEmploiId, UserKind
@@ -55,6 +56,12 @@ def test_create_job_seeker(_mock, client):
     response = client.get(apply_start_url)
     next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     assertRedirects(response, next_url)
+    response = client.get(next_url)
+    france_travail = Company.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
+    assertTemplateNotUsed(response, "companies/includes/_company_info.html")
+    assertNotContains(response, france_travail.display_name)
+    assertNotContains(response, france_travail.siret)
+    assertNotContains(response, france_travail.kind)
 
     response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
 
