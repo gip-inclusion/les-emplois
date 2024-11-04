@@ -160,6 +160,22 @@ class TestProConnectModel:
         with pytest.raises(ValidationError):
             pc_user_data.create_or_update_user()
 
+    def test_create_user_from_user_info_with_already_existing_email_but_other_sub(self, caplog):
+        """
+        If there already is an existing user with this emailbut another ProConnect sub,
+        raise an error and log something.
+        """
+        pc_user_data = ProConnectPrescriberData.from_user_info(OIDC_USERINFO)
+        PrescriberFactory(
+            username="another_sub",
+            identity_provider=users_enums.IdentityProvider.PRO_CONNECT,
+            email=pc_user_data.email,
+        )
+        with pytest.raises(EmailInUseException):
+            pc_user_data.create_or_update_user()
+
+        assert caplog.messages == [f"Email {pc_user_data.email} already in used with provider ProConnect"]
+
     def test_join_org(self, caplog):
         # New membership.
         organization = PrescriberPoleEmploiFactory()

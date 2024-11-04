@@ -1,4 +1,5 @@
 import dataclasses
+import logging
 from typing import ClassVar
 from urllib.parse import unquote
 
@@ -10,6 +11,9 @@ from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 
 from .constants import OIDC_STATE_CLEANUP, OIDC_STATE_EXPIRATION
+
+
+logger = logging.getLogger(__name__)
 
 
 class EmailInUseException(Exception):
@@ -141,6 +145,13 @@ class OIDConnectUserData:
                 # A different user has already claimed this email address (we require emails to be unique)
                 user = User.objects.get(email=self.email)
                 if user.identity_provider not in self.allowed_identity_provider_migration:
+                    if user.identity_provider == self.identity_provider:
+                        logger.error(
+                            "Email %s already in used with provider %s",
+                            self.email,
+                            self.identity_provider.label,
+                            exc_info=True,
+                        )
                     self.check_valid_kind(user, user_data_dict, is_login)
                     raise EmailInUseException(user)
             except User.DoesNotExist:
