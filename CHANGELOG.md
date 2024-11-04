@@ -1,5 +1,25 @@
 # Journal des modifications
 
+## 2024-11-04
+
+### Ajouté
+
+- [RDVI: En tant que candidat je vois tous les rendez-vous pris depuis les pages de candidatures](https://github.com/gip-inclusion/les-emplois/pull/4941)
+
+### Modifié
+
+- [Admin: Permettre de libérer des comptes ProConnect pour bascule Employer <-> Prescripteur](https://github.com/gip-inclusion/les-emplois/pull/5011)
+- [Connexion: Bloquer l'accès à la connexion Inclusion Connect quand ProConnect est activé](https://github.com/gip-inclusion/les-emplois/pull/5022)
+- [Connexion: Correction du message d'erreur pour les comptes Inclusion Connect](https://github.com/gip-inclusion/les-emplois/pull/5014)
+- [UX/UI: Corriger l'alignement du texte dans les modales imbriquées](https://github.com/gip-inclusion/les-emplois/pull/5020)
+- [UX/UI: Corriger les boutons des cartes candidats](https://github.com/gip-inclusion/les-emplois/pull/4951) 🖼
+- [UX/UI: Remplacer message de confirmation de maj de la fiche structure par un toast](https://github.com/gip-inclusion/les-emplois/pull/5013)
+- [UX/UI: Retirer le bouton “Retour vers la liste des postes”](https://github.com/gip-inclusion/les-emplois/pull/5016)
+
+### Tech
+
+- [Technique : Simplification de l'accès au serveur de développement local depuis d'autres appareils](https://github.com/gip-inclusion/les-emplois/pull/4988)
+
 ## 2024-10-28
 
 ### Ajouté
