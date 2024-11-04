@@ -359,6 +359,14 @@ class TestDashboardView:
 
         evaluation_campaign.evaluations_asked_at = timezone.now()
         evaluation_campaign.save(update_fields=["evaluations_asked_at"])
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign=evaluation_campaign,
+            complete=True,
+            # Did not submit proofs for job application → refused.
+            job_app__complete=False,
+        )
+        # Accepted, ignored throughout the test.
+        EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, complete=True)
         response = client.get(reverse("dashboard:index"))
         assertContains(response, evaluation_campaign_label)
         assertNotContains(response, sample_selection_url)
@@ -367,8 +375,16 @@ class TestDashboardView:
 
         evaluation_campaign.ended_at = timezone.now()
         evaluation_campaign.save(update_fields=["ended_at"])
+        assert evaluated_siae.state == "REFUSED"
         response = client.get(reverse("dashboard:index"))
         assertContains(response, evaluation_campaign_label)
+        assertContains(response, IN_PROGRESS_LINK)
+        assertContains(response, evaluated_siae_list_url)
+        assertNotContains(response, sample_selection_url)
+
+        evaluation_campaign.ended_at = timezone.now() - timedelta(days=182)
+        evaluation_campaign.save(update_fields=["ended_at"])
+        response = client.get(reverse("dashboard:index"))
         assertNotContains(response, IN_PROGRESS_LINK)
         assertNotContains(response, sample_selection_url)
         assertContains(response, evaluated_siae_list_url)

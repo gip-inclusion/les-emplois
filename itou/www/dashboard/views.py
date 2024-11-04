@@ -139,8 +139,9 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 ).count()
     elif request.user.is_labor_inspector:
         current_org = get_current_institution_or_404(request)
+        six_months_ago = timezone.now() - timezone.timedelta(days=182)
         for campaign in EvaluationCampaign.objects.for_institution(current_org).viewable():
-            if campaign.ended_at is None:
+            if campaign.ended_at is None or campaign.ended_at >= six_months_ago:
                 context["active_campaigns"].append(campaign)
             else:
                 context["closed_campaigns"].append(campaign)
