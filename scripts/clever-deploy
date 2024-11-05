@@ -37,8 +37,7 @@ def deploy():
 
     known_deployment_uids = {d["uuid"] for d in get_deployments(clever_cli, app_alias)}
 
-    # TODO(xfernandez: switch to delete_on_close=False in 3.12
-    with tempfile.NamedTemporaryFile(prefix="clever_git_alias", delete=False) as f:
+    with tempfile.NamedTemporaryFile(prefix="clever_git_alias", delete_on_close=False) as f:
         f.write(b"""#!/bin/bash
 case "$1" in
     Username*) echo "$CLEVER_TOKEN" ;;
@@ -55,7 +54,6 @@ esac
                 "GIT_ASKPASS": f.name,
             },
         )
-    os.remove(f.name)
 
     for _attempt in range(10):
         new_deployments = [d for d in get_deployments(clever_cli, app_alias) if d["uuid"] not in known_deployment_uids]
