@@ -6,7 +6,7 @@
 
 # Global tasks.
 # =============================================================================
-PYTHON_VERSION := python3.11
+PYTHON_VERSION := python3.12
 LINTER_CHECKED_DIRS := config itou scripts tests
 PGDATABASE ?= itou
 REQUIREMENTS_PATH ?= requirements/dev.txt

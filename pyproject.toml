@@ -1,5 +1,5 @@
 [project]
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 
 [tool.ruff]
 line-length = 119
@@ -33,7 +33,10 @@ format_js = true
 DJANGO_SETTINGS_MODULE = "config.settings.test"
 FAIL_INVALID_TEMPLATE_VARS = true
 python_files = ["tests*.py", "test_*.py"]
-filterwarnings = ["error"]
+filterwarnings = [
+    "error",
+    "ignore:.*Use timezone-aware objects to represent datetimes in UTC.*:DeprecationWarning:(botocore|django_datadog_logger)",
+]
 addopts = [
     "--reuse-db",
     "--strict-markers",
