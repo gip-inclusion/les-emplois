@@ -1,6 +1,10 @@
+import re
+from unittest.mock import patch
+
 import pytest
+from django.core.files.storage import storages
 from django.urls import reverse
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.users.enums import UserKind
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
@@ -107,3 +111,17 @@ class TestNewsRender:
         AnnouncementItemFactory(user_kind_tags=[UserKind.PRESCRIBER])
         client.force_login(JobSeekerFactory())
         assert_content_matches_snapshot(client.get(url))
+
+    def test_rendering_invalid_file_does_not_crash(self, client):
+        user = JobSeekerFactory()
+        item = AnnouncementItemFactory(with_image=True, user_kind_tags=[user.kind])
+
+        with patch.object(storages["public"], "_open", side_effect=FileNotFoundError("File does not exist")):
+            response = client.get(reverse("announcements:news"))
+
+            self._assert_all_items_rendered(response, item.campaign)
+
+            # Contains placeholder image
+            assertNotContains(response, item.image.url)
+            pattern = re.compile(r"ico-bicro-important\.?[a-zA-Z0-9_]*\.?svg")
+            assert pattern.search(str(parse_response_to_soup(response, "#news-1 img.img-muted"))) is not None

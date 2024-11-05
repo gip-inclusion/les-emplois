@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load file_access %}
 {% load theme_inclusion %}
 
 {% block title %}Nouveautés {{ block.super }}{% endblock %}
@@ -32,7 +33,7 @@
                             {% for news_item in month_news.items.all %}
                                 <div class="row mb-3">
                                     <div class="col-12 col-md-4{% if news_item.image %} mb-3{% else %} d-none d-md-inline{% endif %}">
-                                        {% if news_item.image %}
+                                        {% if news_item.image|can_open_file %}
                                             <img src="{{ news_item.image.url }}"
                                                  alt="{{ news_item.image_alt_text }}"
                                                  {% if not news_item.image_alt_text %}aria-hidden="true"{% endif %}
