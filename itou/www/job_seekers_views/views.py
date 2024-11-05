@@ -1,8 +1,13 @@
+import logging
+
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, DateTimeField, Exists, IntegerField, Max, OuterRef, Subquery
 from django.db.models.functions import Coalesce
+from django.forms import ValidationError
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils.html import format_html
 from django.views.generic import DetailView, ListView
 
 from itou.companies.enums import CompanyKind
@@ -13,11 +18,14 @@ from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.pagination import ItouPaginator
-from itou.utils.session import SessionNamespace
+from itou.utils.session import SessionNamespace, SessionNamespaceRequiredMixin
 from itou.utils.urls import get_safe_url
 from itou.www.apply.views.submit_views import ApplyStepBaseView, ApplyStepForSenderBaseView
 
-from .forms import CheckJobSeekerNirForm, FilterForm
+from .forms import CheckJobSeekerNirForm, FilterForm, JobSeekerExistsForm
+
+
+logger = logging.getLogger(__name__)
 
 
 class JobSeekerDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
@@ -226,7 +234,11 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
         self.form = CheckJobSeekerNirForm(job_seeker=None, data=request.POST or None, is_gps=self.is_gps)
 
     def search_by_email_url(self, session_uuid):
-        view_name = "apply:search_by_email_for_hire" if self.hire_process else "apply:search_by_email_for_sender"
+        view_name = (
+            "job_seekers_views:search_by_email_for_hire"
+            if self.hire_process
+            else "job_seekers_views:search_by_email_for_sender"
+        )
         return reverse(view_name, kwargs={"company_pk": self.company.pk, "session_uuid": session_uuid}) + (
             "?gps=true" if self.is_gps else ""
         )
@@ -271,5 +283,107 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
             "job_seeker": None,
+            "preview_mode": False,
+        }
+
+
+class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSenderBaseView):
+    required_session_namespaces = ["job_seeker_session"]
+    template_name = "job_seekers_views/step_search_job_seeker_by_email.html"
+
+    def __init__(self):
+        super().__init__()
+        self.form = None
+
+    def setup(self, request, *args, **kwargs):
+        self.job_seeker_session = SessionNamespace(request.session, kwargs["session_uuid"])
+        super().setup(request, *args, **kwargs)
+        self.form = JobSeekerExistsForm(
+            is_gps=self.is_gps, initial=self.job_seeker_session.get("user", {}), data=request.POST or None
+        )
+
+    def post(self, request, *args, **kwargs):
+        can_add_nir = False
+        preview_mode = False
+        job_seeker = None
+
+        if self.form.is_valid():
+            job_seeker = self.form.get_user()
+            nir = self.job_seeker_session.get("profile", {}).get("nir")
+            can_add_nir = nir and self.sender.can_add_nir(job_seeker)
+
+            # No user found with that email, redirect to create a new account.
+            if not job_seeker:
+                user_infos = self.job_seeker_session.get("user", {})
+                user_infos.update({"email": self.form.cleaned_data["email"]})
+                profile_infos = self.job_seeker_session.get("profile", {})
+                profile_infos.update({"nir": nir})
+                self.job_seeker_session.update({"user": user_infos, "profile": profile_infos})
+                view_name = (
+                    "apply:create_job_seeker_step_1_for_hire"
+                    if self.hire_process
+                    else "apply:create_job_seeker_step_1_for_sender"
+                )
+
+                return HttpResponseRedirect(
+                    reverse(
+                        view_name, kwargs={"company_pk": self.company.pk, "session_uuid": self.job_seeker_session.name}
+                    )
+                    + ("?gps=true" if self.is_gps else "")
+                )
+
+            # Ask the sender to confirm the email we found is associated to the correct user
+            if self.form.data.get("preview"):
+                preview_mode = True
+
+            # The email we found is correct
+            if self.form.data.get("confirm"):
+                if not can_add_nir:
+                    return self.redirect_to_check_infos(job_seeker.public_id)
+
+                try:
+                    job_seeker.jobseeker_profile.nir = nir
+                    job_seeker.jobseeker_profile.lack_of_nir_reason = ""
+                    job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
+                except ValidationError:
+                    msg = format_html(
+                        "Le<b> numéro de sécurité sociale</b> renseigné ({}) est "
+                        "déjà utilisé par un autre candidat sur la Plateforme.<br>"
+                        "Merci de renseigner <b>le numéro personnel et unique</b> "
+                        "du candidat pour lequel vous souhaitez postuler.",
+                        nir,
+                    )
+                    messages.warning(request, msg)
+                    logger.exception("step_job_seeker: error when saving job_seeker=%s nir=%s", job_seeker, nir)
+                else:
+                    if self.is_gps:
+                        FollowUpGroup.objects.follow_beneficiary(
+                            beneficiary=job_seeker, user=request.user, is_referent=True
+                        )
+                        return HttpResponseRedirect(reverse("gps:my_groups"))
+                    else:
+                        return self.redirect_to_check_infos(job_seeker.public_id)
+
+        return self.render_to_response(
+            self.get_context_data(**kwargs)
+            | {
+                "can_add_nir": can_add_nir,
+                "preview_mode": preview_mode,
+                "job_seeker": job_seeker,
+                "can_view_personal_information": job_seeker and self.sender.can_view_personal_information(job_seeker),
+            }
+        )
+
+    def get_back_url(self):
+        view_name = (
+            "job_seekers_views:check_nir_for_hire" if self.hire_process else "job_seekers_views:check_nir_for_sender"
+        )
+        return reverse(view_name, kwargs={"company_pk": self.company.pk})
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "form": self.form,
+            "nir": self.job_seeker_session.get("profile", {}).get("nir"),
+            "siae": self.company,
             "preview_mode": False,
         }
