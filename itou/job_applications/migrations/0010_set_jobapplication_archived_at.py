@@ -1,13 +1,9 @@
 import datetime
 import time
+from itertools import batched
 
 from django.db import migrations
 from django.utils import timezone
-
-
-def chunks(lst, n):
-    for i in range(0, len(lst), n):
-        yield lst[i : i + n]
 
 
 def forward(apps, editor):
@@ -28,7 +24,7 @@ def forward(apps, editor):
         ).values_list("pk", flat=True)
     )
     print()
-    for chunk in chunks(archivable, BATCH_SIZE):
+    for chunk in batched(archivable, BATCH_SIZE):
         matched = JobApplication.objects.filter(pk__in=chunk).update(archived_at=now)
         total += matched
         print(f"Archived {total} job applications, elapsed {time.perf_counter() - start}s")

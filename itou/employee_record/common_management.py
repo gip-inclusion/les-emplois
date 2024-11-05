@@ -1,5 +1,6 @@
 import argparse
 from io import BytesIO
+from itertools import batched
 
 import paramiko
 from django.db import transaction
@@ -12,7 +13,6 @@ from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, Emp
 from itou.employee_record.serializers import EmployeeRecordSerializer, EmployeeRecordUpdateNotificationSerializer
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from itou.utils.command import BaseCommand
-from itou.utils.iterators import chunks
 
 
 class IgnoreFile(Exception):
@@ -175,7 +175,7 @@ class EmployeeRecordTransferCommand(BaseCommand):
         )
 
         errors = False
-        for idx, elements in enumerate(chunks(new_objects, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS), 1):
+        for idx, elements in enumerate(batched(new_objects, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS), 1):
             # A batch + serializer must be created with notifications for correct serialization
             batch = EmployeeRecordBatch(elements)
 

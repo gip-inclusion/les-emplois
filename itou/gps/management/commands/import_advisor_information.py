@@ -1,4 +1,5 @@
 import logging
+from itertools import batched
 from math import ceil
 
 from django.db import transaction
@@ -8,7 +9,6 @@ from itou.gps.utils import create_or_update_advisor, parse_gps_advisors_file
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.command import BaseCommand
-from itou.utils.iterators import chunks
 
 
 logger = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ class Command(BaseCommand):
         created_rows_count = 0
         updated_rows_count = 0
 
-        for chunk_idx, chunked_beneficiary_pks in enumerate(chunks(beneficiaries_pks, chunk_size), 1):
+        for chunk_idx, chunked_beneficiary_pks in enumerate(batched(beneficiaries_pks, chunk_size), 1):
             # NOTE: cannot use select_for_update below
             # NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
             implicated_profiles = JobSeekerProfile.objects.filter(user_id__in=chunked_beneficiary_pks).select_related(

@@ -1,5 +1,6 @@
 import datetime
 import logging
+from itertools import batched
 from math import ceil
 
 from django.conf import settings
@@ -15,7 +16,6 @@ from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.models import JobApplication, JobApplicationState, JobApplicationTransitionLog
 from itou.users.models import User
 from itou.utils.command import BaseCommand
-from itou.utils.iterators import chunks
 
 
 logger = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ class Command(BaseCommand):
         chunks_total = ceil(len(beneficiaries_pks) / 1000)
 
         chunks_count = 0
-        for beneficiaries_ids in chunks(beneficiaries_pks, 1000):
+        for beneficiaries_ids in batched(beneficiaries_pks, 1000):
             beneficiaries_qs = (
                 User.objects.filter(pk__in=beneficiaries_ids)
                 .annotate(
