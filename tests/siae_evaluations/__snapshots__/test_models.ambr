@@ -238,7 +238,6 @@
       dict({
         'origin': list([
           'select_min_max_job_applications[siae_evaluations/models.py]',
-          'EvaluationCampaign.<listcomp>[siae_evaluations/models.py]',
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
         'sql': '''
@@ -265,7 +264,6 @@
       }),
       dict({
         'origin': list([
-          'EvaluationCampaign.<listcomp>[siae_evaluations/models.py]',
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
         'sql': '''
@@ -454,7 +452,6 @@
           'get_email_text_template[utils/emails.py]',
           'get_email_message[utils/emails.py]',
           'SIAEEmailFactory.selected[siae_evaluations/emails.py]',
-          '<listcomp>[siae_evaluations/models.py]',
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
         'sql': '''
@@ -477,7 +474,6 @@
         'origin': list([
           'get_email_message[utils/emails.py]',
           'SIAEEmailFactory.selected[siae_evaluations/emails.py]',
-          '<listcomp>[siae_evaluations/models.py]',
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
         'sql': '''

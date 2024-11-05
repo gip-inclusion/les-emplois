@@ -81,7 +81,7 @@ jobs:
     - name: 💂 Install Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.11"
+        python-version: "3.12"
 
     - name: 🚀 Deploy to Clever Cloud
       timeout-minutes: 15
@@ -134,7 +134,7 @@ jobs:
     - name: 💂 Install Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.11"
+        python-version: "3.12"
 
     - name: 🚀 Deploy to Clever Cloud
       timeout-minutes: 15
