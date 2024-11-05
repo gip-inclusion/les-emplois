@@ -13,7 +13,7 @@ from pytest_django.asserts import assertContains, assertMessages, assertRedirect
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.openid_connect.france_connect import constants
 from itou.openid_connect.france_connect.models import FranceConnectState, FranceConnectUserData
-from itou.openid_connect.models import EmailInUseException, InvalidKindException
+from itou.openid_connect.models import EmailInUseException, InvalidKindException, MultipleSubSameEmailException
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from tests.users.factories import JobSeekerFactory, UserFactory
@@ -274,6 +274,17 @@ class TestFranceConnect:
         response = mock_oauth_dance(client, expected_route="signup:choose_user_kind")
         assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
 
+    @respx.mock
+    def test_callback_redirect_on_sub_conflict(self, client, snapshot):
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
+        JobSeekerFactory(
+            username="another_sub", email=fc_user_data.email, identity_provider=IdentityProvider.FRANCE_CONNECT
+        )
+
+        # Test redirection and modal content
+        response = mock_oauth_dance(client, expected_route="login:job_seeker")
+        assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
+
     def test_logout_no_id_token(self, client):
         url = reverse("france_connect:logout")
         response = client.get(url + "?")
@@ -313,10 +324,12 @@ class TestFranceConnect:
         assert not auth.get_user(client).is_authenticated
 
 
-@pytest.mark.parametrize(
-    "identity_provider", [IdentityProvider.DJANGO, IdentityProvider.PE_CONNECT, IdentityProvider.FRANCE_CONNECT]
-)
-def test_create_django_user_with_already_existing_fc_email_fails(identity_provider):
+@pytest.mark.parametrize("identity_provider", [IdentityProvider.DJANGO, IdentityProvider.PE_CONNECT])
+def test_create_fc_user_with_already_existing_email_fails(identity_provider):
+    """
+    In OIDC, SSO provider + username represents unicity.
+    However, we require that emails are unique as well.
+    """
     fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
     JobSeekerFactory(
         username="another_username",
@@ -324,4 +337,19 @@ def test_create_django_user_with_already_existing_fc_email_fails(identity_provid
         identity_provider=identity_provider,
     )
     with pytest.raises(EmailInUseException):
+        fc_user_data.create_or_update_user()
+
+
+def test_create_fc_user_with_already_existing_fc_email_fails():
+    """
+    In OIDC, SSO provider + username represents unicity.
+    However, we require that emails are unique as well.
+    """
+    fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
+    JobSeekerFactory(
+        username="another_username",
+        email=fc_user_data.email,
+        identity_provider=IdentityProvider.FRANCE_CONNECT,
+    )
+    with pytest.raises(MultipleSubSameEmailException):
         fc_user_data.create_or_update_user()

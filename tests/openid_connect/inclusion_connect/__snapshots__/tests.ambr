@@ -1,0 +1,4 @@
+# serializer version: 1
+# name: TestInclusionConnectCallbackViewTest.test_callback_redirect_on_sub_conflict
+  "La connexion via Inclusion Connect a échoué car un compte existe déjà avec l’adresse email michel@lestontons.fr (ancien id another_sub / nouvel id af6b26f9-85cd-484e-beb9-bea5be13e30f). Veuillez vous rapprocher du support pour débloquer la situation en suivant <a href='https://aide.emplois.inclusion.beta.gouv.fr/hc/fr'>ce lien</a> et en leur transmettant ce message."
+# ---

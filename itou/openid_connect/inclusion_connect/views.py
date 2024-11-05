@@ -20,7 +20,12 @@ from itou.utils.constants import ITOU_HELP_CENTER_URL
 from itou.utils.urls import add_url_params, get_absolute_url
 
 from ..errors import redirect_with_error_sso_email_conflict_on_registration
-from ..models import EmailInUseException, InvalidKindException, MultipleUsersFoundException
+from ..models import (
+    EmailInUseException,
+    InvalidKindException,
+    MultipleSubSameEmailException,
+    MultipleUsersFoundException,
+)
 from . import constants
 from .enums import InclusionConnectChannel
 from .models import (
@@ -285,6 +290,9 @@ def inclusion_connect_callback(request):
     except InvalidKindException:
         existing_user = User.objects.get(email=user_data["email"])
         _add_user_kind_error_message(request, existing_user, user_kind)
+        is_successful = False
+    except MultipleSubSameEmailException as e:
+        messages.error(request, e.format_message_html(IdentityProvider.INCLUSION_CONNECT, ic_user_data.username))
         is_successful = False
     except EmailInUseException as e:
         return redirect_with_error_sso_email_conflict_on_registration(
