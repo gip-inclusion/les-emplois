@@ -420,7 +420,9 @@
                   </div>
                   <div class="modal-footer">
                       <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
-                      <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                      
+                          <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                      
                   </div>
               </div>
           </div>
@@ -485,7 +487,9 @@
                   </div>
                   <div class="modal-footer">
                       <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
-                      <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                      
+                          <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                      
                   </div>
               </div>
           </div>
@@ -550,7 +554,9 @@
                   </div>
                   <div class="modal-footer">
                       <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
-                      <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                      
+                          <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                      
                   </div>
               </div>
           </div>
