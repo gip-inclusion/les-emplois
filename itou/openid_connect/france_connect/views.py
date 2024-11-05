@@ -15,7 +15,12 @@ from itou.utils import constants as global_constants
 from itou.utils.urls import get_absolute_url
 
 from ..errors import redirect_with_error_sso_email_conflict_on_registration
-from ..models import EmailInUseException, InvalidKindException, MultipleUsersFoundException
+from ..models import (
+    EmailInUseException,
+    InvalidKindException,
+    MultipleSubSameEmailException,
+    MultipleUsersFoundException,
+)
 from . import constants
 from .models import FranceConnectState, FranceConnectUserData
 
@@ -120,6 +125,11 @@ def france_connect_callback(request):
     except InvalidKindException as e:
         messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
         return HttpResponseRedirect(UserKind.get_login_url(e.user.kind))
+    except MultipleSubSameEmailException as e:
+        return _redirect_to_job_seeker_login_on_error(
+            e.format_message_html(IdentityProvider.FRANCE_CONNECT, fc_user_data.username),
+            request=request,
+        )
     except EmailInUseException as e:
         return redirect_with_error_sso_email_conflict_on_registration(
             request, e.user, IdentityProvider.FRANCE_CONNECT.label

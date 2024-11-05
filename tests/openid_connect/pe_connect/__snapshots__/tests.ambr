@@ -2,3 +2,6 @@
 # name: TestPoleEmploiConnect.test_callback_redirect_on_email_in_use_exception
   '<div class="modal-body"><p>L’inscription via Pôle emploi Connect a échoué car un compte existe déjà avec l’adresse email w**************@y******.c** mais avec un mode de connexion différent.</p><p>Pour accéder à votre compte cliquez sur le bouton <strong>“Je me connecte avec ce compte”</strong>.</p><p>Si ce compte n’est pas le vôtre, cliquez sur <strong>"Retour"</strong> et utilisez une autre adresse email pour vous inscrire.</p></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/login/existing/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/signup/" class="btn btn-sm btn-primary">Je me connecte avec ce compte</a></div>'
 # ---
+# name: TestPoleEmploiConnect.test_callback_redirect_on_sub_conflict
+  "La connexion via Pôle emploi Connect a échoué car un compte existe déjà avec l’adresse email wossewodda-3728@yopmail.com (ancien id another_sub / nouvel id b6048e95bb134ec5b1d1e1fa69f287172e91722b9354d637a1bcf2ebb0fd2ef5v1). Veuillez vous rapprocher du support pour débloquer la situation en suivant <a href='https://aide.emplois.inclusion.beta.gouv.fr/hc/fr'>ce lien</a> et en leur transmettant ce message."
+# ---

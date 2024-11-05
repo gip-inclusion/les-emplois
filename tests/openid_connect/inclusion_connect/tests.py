@@ -28,7 +28,7 @@ from itou.openid_connect.inclusion_connect.models import (
     InclusionConnectState,
 )
 from itou.openid_connect.inclusion_connect.views import InclusionConnectSession
-from itou.openid_connect.models import EmailInUseException, InvalidKindException
+from itou.openid_connect.models import InvalidKindException, MultipleSubSameEmailException
 from itou.prescribers.models import PrescriberOrganization
 from itou.users import enums as users_enums
 from itou.users.enums import IdentityProvider, UserKind
@@ -202,7 +202,7 @@ class TestInclusionConnectModel:
             email=ic_user_data.email,
             identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
-        with pytest.raises(EmailInUseException):
+        with pytest.raises(MultipleSubSameEmailException):
             ic_user_data.create_or_update_user()
 
     def test_update_user_from_user_info(self):
@@ -479,6 +479,23 @@ class TestInclusionConnectCallbackViewTest:
             assertContains(response, "existe déjà avec cette adresse e-mail")
             assertContains(response, "pour devenir employeur sur la plateforme")
             user.delete()
+
+    @respx.mock
+    def test_callback_redirect_on_sub_conflict(self, client, snapshot):
+        oidc_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
+        PrescriberFactory(
+            username="another_sub", email=oidc_user_data.email, identity_provider=IdentityProvider.INCLUSION_CONNECT
+        )
+
+        # Test redirection and modal content
+        response = mock_oauth_dance(
+            client,
+            UserKind.PRESCRIBER,
+            expected_redirect_url=add_url_params(
+                reverse("inclusion_connect:logout"), {"redirect_url": reverse("search:employers_home")}
+            ),
+        )
+        assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
 
     @respx.mock
     def test_callback_updating_email_collision(self, client):

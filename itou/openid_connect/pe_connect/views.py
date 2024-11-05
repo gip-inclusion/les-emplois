@@ -19,7 +19,12 @@ from itou.utils import constants as global_constants
 from itou.utils.urls import add_url_params, get_absolute_url
 
 from ..errors import redirect_with_error_sso_email_conflict_on_registration
-from ..models import EmailInUseException, InvalidKindException, MultipleUsersFoundException
+from ..models import (
+    EmailInUseException,
+    InvalidKindException,
+    MultipleSubSameEmailException,
+    MultipleUsersFoundException,
+)
 from . import constants
 from .models import PoleEmploiConnectState, PoleEmploiConnectUserData
 
@@ -131,6 +136,11 @@ def pe_connect_callback(request):
     except InvalidKindException as e:
         messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
         return HttpResponseRedirect(UserKind.get_login_url(e.user.kind))
+    except MultipleSubSameEmailException as e:
+        return _redirect_to_job_seeker_login_on_error(
+            e.format_message_html(IdentityProvider.PE_CONNECT, pe_user_data.username),
+            request=request,
+        )
     except MultipleUsersFoundException as e:
         return _redirect_to_job_seeker_login_on_error(
             format_html(
