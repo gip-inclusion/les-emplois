@@ -78,6 +78,11 @@ jobs:
         # but we want to use the one from c1-deployment-config
         $CLEVER_CLI env rm CC_PYTHON_VERSION
 
+    - name: 💂 Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
     - name: 🚀 Deploy to Clever Cloud
       timeout-minutes: 15
       run: |
@@ -125,6 +130,11 @@ jobs:
     - name: ⏭ Skip fixtures
       run:
         $CLEVER_CLI env set SKIP_FIXTURES true
+
+    - name: 💂 Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
 
     - name: 🚀 Deploy to Clever Cloud
       timeout-minutes: 15
