@@ -120,7 +120,7 @@ class TestApply:
         client.force_login(user)
         response = client.get(
             reverse(
-                "apply:search_by_email_for_sender",
+                "job_seekers_views:search_by_email_for_sender",
                 kwargs={"company_pk": company.pk, "session_uuid": str(uuid.uuid4())},
             )
         )
@@ -228,7 +228,8 @@ class TestHire:
         client.force_login(user)
         response = client.get(
             reverse(
-                "apply:search_by_email_for_hire", kwargs={"company_pk": company.pk, "session_uuid": str(uuid.uuid4())}
+                "job_seekers_views:search_by_email_for_hire",
+                kwargs={"company_pk": company.pk, "session_uuid": str(uuid.uuid4())},
             )
         )
         assert response.status_code == 403
@@ -833,7 +834,7 @@ class TestApplyAsAuthorizedPrescriber:
 
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
         next_url = reverse(
-            "apply:search_by_email_for_sender",
+            "job_seekers_views:search_by_email_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -875,7 +876,7 @@ class TestApplyAsAuthorizedPrescriber:
         assertContains(
             response,
             reverse(
-                "apply:search_by_email_for_sender",
+                "job_seekers_views:search_by_email_for_sender",
                 kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
             ),
         )
@@ -1098,7 +1099,8 @@ class TestApplyAsAuthorizedPrescriber:
 
         session_uuid = str(resolve(response.url).kwargs["session_uuid"])
         next_url = reverse(
-            "apply:search_by_email_for_sender", kwargs={"company_pk": company.pk, "session_uuid": session_uuid}
+            "job_seekers_views:search_by_email_for_sender",
+            kwargs={"company_pk": company.pk, "session_uuid": session_uuid},
         )
         assert response.url == next_url
 
@@ -1137,7 +1139,7 @@ class TestApplyAsAuthorizedPrescriber:
         assertContains(
             response,
             reverse(
-                "apply:search_by_email_for_sender",
+                "job_seekers_views:search_by_email_for_sender",
                 kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
             ),
         )
@@ -1355,7 +1357,8 @@ class TestApplyAsAuthorizedPrescriber:
 
         session_uuid = str(resolve(response.url).kwargs["session_uuid"])
         email_url = reverse(
-            "apply:search_by_email_for_sender", kwargs={"company_pk": company.pk, "session_uuid": session_uuid}
+            "job_seekers_views:search_by_email_for_sender",
+            kwargs={"company_pk": company.pk, "session_uuid": session_uuid},
         )
         assert response.url == email_url
 
@@ -1415,7 +1418,7 @@ class TestApplyAsAuthorizedPrescriber:
         }
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in known_session_keys]
         search_by_email_url = reverse(
-            "apply:search_by_email_for_sender",
+            "job_seekers_views:search_by_email_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assertContains(
@@ -1502,7 +1505,7 @@ class TestApplyAsPrescriber:
 
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
         next_url = reverse(
-            "apply:search_by_email_for_sender",
+            "job_seekers_views:search_by_email_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -1545,7 +1548,7 @@ class TestApplyAsPrescriber:
         assertContains(
             response,
             reverse(
-                "apply:search_by_email_for_sender",
+                "job_seekers_views:search_by_email_for_sender",
                 kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
             ),
         )
@@ -1880,7 +1883,7 @@ class TestApplyAsPrescriberNirExceptions:
         response = client.post(last_url, data=post_data)
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
         next_url = reverse(
-            "apply:search_by_email_for_sender",
+            "job_seekers_views:search_by_email_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -1953,7 +1956,8 @@ class TestApplyAsPrescriberNirExceptions:
         response = client.post(last_url, data=post_data)
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
         next_url = reverse(
-            "apply:search_by_email_for_sender", kwargs={"company_pk": siae.pk, "session_uuid": job_seeker_session_name}
+            "job_seekers_views:search_by_email_for_sender",
+            kwargs={"company_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
         assert client.session[job_seeker_session_name] == {"profile": {"nir": nir}}
@@ -2053,7 +2057,7 @@ class TestApplyAsCompany:
 
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
         next_url = reverse(
-            "apply:search_by_email_for_sender",
+            "job_seekers_views:search_by_email_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -2095,7 +2099,7 @@ class TestApplyAsCompany:
         assertContains(
             response,
             reverse(
-                "apply:search_by_email_for_sender",
+                "job_seekers_views:search_by_email_for_sender",
                 kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
             ),
         )
@@ -2405,7 +2409,8 @@ class TestApplyAsCompany:
 
         session_uuid = str(resolve(response.url).kwargs["session_uuid"])
         email_url = reverse(
-            "apply:search_by_email_for_sender", kwargs={"company_pk": company.pk, "session_uuid": session_uuid}
+            "job_seekers_views:search_by_email_for_sender",
+            kwargs={"company_pk": company.pk, "session_uuid": session_uuid},
         )
         assert response.url == email_url
 
@@ -2502,7 +2507,7 @@ class TestDirectHireFullProcess:
 
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
         next_url = reverse(
-            "apply:search_by_email_for_hire",
+            "job_seekers_views:search_by_email_for_hire",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -2543,7 +2548,7 @@ class TestDirectHireFullProcess:
         assertContains(
             response,
             reverse(
-                "apply:search_by_email_for_hire",
+                "job_seekers_views:search_by_email_for_hire",
                 kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
             ),
         )
@@ -4001,7 +4006,8 @@ def test_detect_existing_job_seeker(client):
     assert response.status_code == 302
     job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
     next_url = reverse(
-        "apply:search_by_email_for_sender", kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name}
+        "job_seekers_views:search_by_email_for_sender",
+        kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
     )
     assert response.url == next_url
     assert client.session[job_seeker_session_name] == {"profile": {"nir": NEW_NIR}}
@@ -4067,7 +4073,8 @@ def test_detect_existing_job_seeker(client):
         html=True,
     )
     check_email_url = reverse(
-        "apply:search_by_email_for_sender", kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name}
+        "job_seekers_views:search_by_email_for_sender",
+        kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
     )
     assertContains(
         response,
@@ -4613,7 +4620,7 @@ class TestFindJobSeekerForHireView:
         }
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in known_session_keys]
         search_by_email_url = reverse(
-            "apply:search_by_email_for_hire",
+            "job_seekers_views:search_by_email_for_hire",
             kwargs={"company_pk": self.company.pk, "session_uuid": job_seeker_session_name},
         )
         assertContains(
@@ -4667,7 +4674,7 @@ class TestFindJobSeekerForHireView:
 
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
         search_by_email_url = reverse(
-            "apply:search_by_email_for_hire",
+            "job_seekers_views:search_by_email_for_hire",
             kwargs={"company_pk": self.company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == search_by_email_url

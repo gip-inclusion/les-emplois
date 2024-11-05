@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import ValidationError
 from django.utils.html import format_html
 from django_select2.forms import Select2Widget
 
@@ -90,3 +91,39 @@ class CheckJobSeekerNirForm(forms.Form):
 
     def get_job_seeker(self):
         return self.job_seeker
+
+
+class JobSeekerExistsForm(forms.Form):
+    def __init__(self, is_gps=False, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = None
+
+        if is_gps:
+            self.fields["email"].label = "Adresse e-mail du bénéficiaire"
+
+    email = forms.EmailField(
+        label="Adresse e-mail personnelle du candidat",
+        widget=forms.EmailInput(attrs={"autocomplete": "off", "placeholder": "julie@example.com"}),
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        if email.endswith(global_constants.POLE_EMPLOI_EMAIL_SUFFIX):
+            raise ValidationError("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
+        if email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
+            raise ValidationError("Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
+        self.user = User.objects.filter(email__iexact=email).first()
+        if self.user:
+            if not self.user.is_active:
+                error = "Vous ne pouvez pas postuler pour cet utilisateur car son compte a été désactivé."
+                raise forms.ValidationError(error)
+            if not self.user.is_job_seeker:
+                error = (
+                    "Vous ne pouvez pas postuler pour cet utilisateur car "
+                    "cet e-mail est déjà rattaché à un prescripteur ou à un employeur."
+                )
+                raise forms.ValidationError(error)
+        return email
+
+    def get_user(self):
+        return self.user

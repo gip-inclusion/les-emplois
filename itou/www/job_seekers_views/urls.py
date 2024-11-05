@@ -11,12 +11,25 @@ urlpatterns = [
     # For sender
     # TODO(ewen): this URL will change to a new one with a session_uuid instead of a company_pk
     path("<int:company_pk>/sender/check-nir", views.CheckNIRForSenderView.as_view(), name="check_nir_for_sender"),
+    # TODO(ewen): this URL will change to a new one without company_pk
+    path(
+        "<int:company_pk>/sender/search-by-email/<uuid:session_uuid>",
+        views.SearchByEmailForSenderView.as_view(),
+        name="search_by_email_for_sender",
+    ),
     # Direct hire process
     # TODO(ewen): this URL will change to a new one with a session_uuid instead of a company_pk
     path(
         "<int:company_pk>/hire/check-nir",
         views.CheckNIRForSenderView.as_view(),
         name="check_nir_for_hire",
+        kwargs={"hire_process": True},
+    ),
+    # TODO(ewen): this URL will change to a new one without company_pk
+    path(
+        "<int:company_pk>/hire/search-by-email/<uuid:session_uuid>",
+        views.SearchByEmailForSenderView.as_view(),
+        name="search_by_email_for_hire",
         kwargs={"hire_process": True},
     ),
     # For job seeker

@@ -68,7 +68,7 @@ def test_create_job_seeker(_mock, client):
     job_seeker_session_name = str(resolve(response.url.replace("?gps=true", "")).kwargs["session_uuid"])
     next_url = (
         reverse(
-            "apply:search_by_email_for_sender",
+            "job_seekers_views:search_by_email_for_sender",
             kwargs={"company_pk": singleton.pk, "session_uuid": job_seeker_session_name},
         )
         + "?gps=true"
@@ -111,7 +111,7 @@ def test_create_job_seeker(_mock, client):
     assertContains(
         response,
         reverse(
-            "apply:search_by_email_for_sender",
+            "job_seekers_views:search_by_email_for_sender",
             kwargs={"company_pk": singleton.pk, "session_uuid": job_seeker_session_name},
         ),
     )
@@ -280,7 +280,7 @@ def test_existing_user_with_email(client):
     job_seeker_session_name = str(resolve(response.url.replace("?gps=true", "")).kwargs["session_uuid"])
     next_url = (
         reverse(
-            "apply:search_by_email_for_sender",
+            "job_seekers_views:search_by_email_for_sender",
             kwargs={"company_pk": singleton.pk, "session_uuid": job_seeker_session_name},
         )
         + "?gps=true"

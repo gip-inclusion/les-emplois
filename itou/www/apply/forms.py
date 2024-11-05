@@ -4,7 +4,6 @@ from operator import itemgetter
 import sentry_sdk
 from dateutil.relativedelta import relativedelta
 from django import forms
-from django.core.exceptions import ValidationError
 from django.db.models import Q, TextChoices
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse
@@ -31,42 +30,6 @@ from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.types import InclusiveDateRange
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.companies_views.forms import JobAppellationAndLocationMixin
-
-
-class JobSeekerExistsForm(forms.Form):
-    def __init__(self, is_gps=False, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.user = None
-
-        if is_gps:
-            self.fields["email"].label = "Adresse e-mail du bénéficiaire"
-
-    email = forms.EmailField(
-        label="Adresse e-mail personnelle du candidat",
-        widget=forms.EmailInput(attrs={"autocomplete": "off", "placeholder": "julie@example.com"}),
-    )
-
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-        if email.endswith(global_constants.POLE_EMPLOI_EMAIL_SUFFIX):
-            raise ValidationError("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
-        if email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
-            raise ValidationError("Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
-        self.user = User.objects.filter(email__iexact=email).first()
-        if self.user:
-            if not self.user.is_active:
-                error = "Vous ne pouvez pas postuler pour cet utilisateur car son compte a été désactivé."
-                raise forms.ValidationError(error)
-            if not self.user.is_job_seeker:
-                error = (
-                    "Vous ne pouvez pas postuler pour cet utilisateur car "
-                    "cet e-mail est déjà rattaché à un prescripteur ou à un employeur."
-                )
-                raise forms.ValidationError(error)
-        return email
-
-    def get_user(self):
-        return self.user
 
 
 class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):
