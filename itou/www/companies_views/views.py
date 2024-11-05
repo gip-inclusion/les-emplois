@@ -435,7 +435,10 @@ def select_financial_annex(request, template_name="companies/select_financial_an
         messages.success(request, message)
         return HttpResponseRedirect(reverse("companies_views:show_financial_annexes"))
 
-    context = {"select_form": select_form}
+    context = {
+        "select_form": select_form,
+        "back_url": reverse("companies_views:show_financial_annexes"),
+    }
     return render(request, template_name, context)
 
 
