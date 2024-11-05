@@ -1,5 +1,6 @@
 import logging
 from functools import partial
+from itertools import batched
 
 import sentry_sdk
 from anymail.exceptions import AnymailError
@@ -12,7 +13,6 @@ from huey.contrib.djhuey import task
 from requests.exceptions import InvalidJSONError
 
 from itou.emails.models import Email
-from itou.utils.iterators import chunks
 
 
 logger = logging.getLogger("itou.emails")
@@ -44,7 +44,7 @@ def sanitize_mailjet_recipients(email_message):
         return [email_message]
 
     sanitized_emails = []
-    to_chunks = chunks(email_message.to, _MAILJET_MAX_RECIPIENTS)
+    to_chunks = batched(email_message.to, _MAILJET_MAX_RECIPIENTS)
     # We could also combine to, cc and bcc, but it's useless for now
 
     for to_chunk in to_chunks:

@@ -1,4 +1,5 @@
 import logging
+from itertools import batched
 
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -10,7 +11,6 @@ from itou.job_applications.models import JobApplication, JobApplicationState
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.command import BaseCommand
-from itou.utils.iterators import chunks
 
 
 logger = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ class Command(BaseCommand):
         logger.info(f"Job applications: {job_applications.count()}.")
         logger.info(f"Groups to be created: {len(beneficiaries_without_group_ids)}.")
 
-        for beneficiaries_ids in chunks(beneficiaries_without_group_ids, 1000):
+        for beneficiaries_ids in batched(beneficiaries_without_group_ids, 1000):
             job_applications_filters = ~Q(job_applications__sender__kind=UserKind.JOB_SEEKER) & ~Q(
                 job_applications__state=JobApplicationState.NEW
             )

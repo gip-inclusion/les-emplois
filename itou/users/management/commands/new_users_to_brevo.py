@@ -1,5 +1,6 @@
 import enum
 import logging
+from itertools import batched
 
 import httpx
 from allauth.account.models import EmailAddress
@@ -13,7 +14,6 @@ from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils.command import BaseCommand
-from itou.utils.iterators import chunks
 
 
 logger = logging.getLogger(__name__)
@@ -74,9 +74,9 @@ class BrevoClient:
             )
 
     def import_users(self, users, category):
-        for chunk in chunks(users, self.IMPORT_BATCH_SIZE):
-            if chunk:
-                self._import_contacts(chunk, category)
+        for batch in batched(users, self.IMPORT_BATCH_SIZE):
+            if batch:
+                self._import_contacts(batch, category)
 
 
 class Command(BaseCommand):
