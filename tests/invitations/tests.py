@@ -122,7 +122,7 @@ class TestPrescriberWithOrgInvitation:
 
 class TestPrescriberWithOrgInvitationEmails:
     def test_accepted_notif_sender(self):
-        invitation = PrescriberWithOrgSentInvitationFactory.build()
+        invitation = PrescriberWithOrgSentInvitationFactory()
         email = invitation.notifications_accepted_notif_sender.build()
 
         # Subject
