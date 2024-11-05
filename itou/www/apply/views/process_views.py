@@ -738,6 +738,7 @@ class JobApplicationExternalTransferStep1JobDescriptionCardView(LoginRequiredMix
         return data | {
             "job_app_to_transfer": self.job_application,
             "matomo_custom_title": data["matomo_custom_title"] + " (transfert)",
+            "can_update_job_description": False,
         }
 
 

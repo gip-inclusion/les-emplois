@@ -166,6 +166,34 @@ def test_step_1(client, snapshot):
     )
 
 
+def test_step_1_same_company(client):
+    create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)
+    vannes = create_city_vannes()
+    company = CompanyFactory(coords=vannes.coords, post_code="56760", with_membership=True)
+    job = JobDescriptionFactory(company=company)
+
+    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, to_company=company)
+    employer = job_application.to_company.members.get()
+    client.force_login(employer)
+
+    response = client.get(
+        reverse(
+            "apply:job_application_external_transfer_step_1_job_description_card",
+            kwargs={"job_application_id": job_application.pk, "job_description_id": job.pk},
+        )
+    )
+    assertNotContains(response, POSTULER)
+    assertContains(
+        response,
+        "<span>Transférer la candidature</span>",
+        count=1,
+    )
+    assertNotContains(
+        response,
+        reverse("companies_views:update_job_description", kwargs={"job_description_id": job.pk}),
+    )
+
+
 def test_step_2_same_company(client):
     job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, for_snapshot=True)
     company = job_application.to_company
