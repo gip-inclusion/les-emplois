@@ -7,10 +7,11 @@ Arguments:
     detail_view_version (defaults to False)
     job_seeker_dashboard_version (defaults to False)
     link_from_current_url (defauts to None - hence no link to detail view)
+    extra_class (defaults to "")
 
 {% endcomment %}
 
-<div class="c-box c-box--pass {% if approval.state == 'EXPIRED' %}bg-danger-lightest border-danger{% elif approval.state == 'SUSPENDED' %}bg-info-lightest border-info{% else %}bg-success-lightest border-success{% endif %} mb-3 mb-md-4">
+<div class="c-box c-box--pass {% if approval.state == 'EXPIRED' %}bg-danger-lightest border-danger{% elif approval.state == 'SUSPENDED' %}bg-info-lightest border-info{% else %}bg-success-lightest border-success{% endif %} {{ extra_class|default:'' }}">
     <div class="mb-3 mb-md-4">
         <span class="badge badge-base rounded-pill {% if approval.state == 'EXPIRED' %}bg-danger{% elif approval.state == 'SUSPENDED' %}bg-info{% else %}bg-success{% endif %} text-white">
             <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %}" aria-hidden="true"></i>
