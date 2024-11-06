@@ -100,12 +100,14 @@ def parse_response_to_soup(response, selector=None, no_html_body=False, replace_
     return soup
 
 
-class NoInlineClient(Client):
+class ItouClient(Client):
     def request(self, **request):
-        response = super().request(**request)
+        with TestCase.captureOnCommitCallbacks(execute=True):
+            response = super().request(**request)
         content_type = response["Content-Type"].split(";")[0]
         if content_type == "text/html" and response.content:
             content = response.content.decode(response.charset)
+            # Detect unwanted inline JS
             assert " onclick=" not in content
             assert " onbeforeinput=" not in content
             assert " onbeforeinput=" not in content
@@ -122,12 +124,6 @@ class NoInlineClient(Client):
             assert " oninput=" not in content
             assert "<script>" not in content
         return response
-
-
-class ItouClient(NoInlineClient):
-    def request(self, *args, **kwargs):
-        with TestCase.captureOnCommitCallbacks(execute=True):
-            return super().request(*args, **kwargs)
 
 
 class reload_module(TestContextDecorator):
