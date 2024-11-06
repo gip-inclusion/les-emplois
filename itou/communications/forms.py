@@ -2,9 +2,11 @@ import pathlib
 import uuid
 
 from django import forms
+from django.utils import timezone
 
 from itou.communications.models import AnnouncementItem
 from itou.files.forms import ItouAdminImageInput
+from itou.files.models import File
 from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
 
@@ -31,9 +33,14 @@ class AnnouncementItemForm(forms.ModelForm):
         model = AnnouncementItem
         fields = ["priority", "title", "description", "user_kind_tags", "image", "image_alt_text", "link"]
 
-    def clean_image(self):
-        image = self.cleaned_data.get("image")
-        if image:
-            extension = pathlib.Path(image.name).suffix
-            image.name = f"{uuid.uuid4()}{extension}"
-        return image
+    def save(self, commit=True):
+        if "image" in self.changed_data:
+            extension = pathlib.Path(self.instance.image.name).suffix
+            self.instance.image.name = f"{uuid.uuid4()}{extension}"
+            if image := self.initial.get("image"):
+                File.objects.filter(key=image.name).update(deleted_at=timezone.now())
+        instance = super().save(commit=commit)
+        if "image" in self.changed_data:
+            instance.image_storage = File.objects.create(key=instance.image.name)
+            instance.save()
+        return instance

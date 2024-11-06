@@ -1,3 +1,4 @@
+import uuid
 from datetime import date
 
 import factory
@@ -7,6 +8,7 @@ from faker import Faker
 
 from itou.communications.models import AnnouncementCampaign, AnnouncementItem
 from itou.users.enums import UserKind
+from tests.files.factories import FileFactory
 
 
 faker = Faker()
@@ -38,11 +40,21 @@ class AnnouncementCampaignFactory(factory.django.DjangoModelFactory):
 class AnnouncementItemFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = AnnouncementItem
+        skip_postgeneration_save = True
 
     class Params:
         with_image = factory.Trait(
-            image=factory.django.ImageField(width=1, height=1, format="JPEG"),
+            image=factory.django.ImageField(
+                filename=factory.LazyFunction(lambda: f"{uuid.uuid4()}.png"),
+                width=1,
+                height=1,
+                format="JPEG",
+            ),
             image_alt_text=factory.Faker("sentence", locale="fr_FR"),
+            image_storage=factory.RelatedFactory(
+                FileFactory,
+                key=factory.LazyAttribute(lambda obj: f"news-images/{obj.factory_parent.image.name}"),
+            ),
         )
         for_snapshot = factory.Trait(
             title="Nouvelle fonctionnalité sur notre site",

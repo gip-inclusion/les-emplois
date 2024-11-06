@@ -254,20 +254,6 @@ class AnnouncementItem(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-
-        def get_image_storage_key():
-            return self.image.name
-
-        def create_image_storage():
-            self.image_storage = File.objects.create(key=get_image_storage_key())
-
-        if self.image:
-            if self.image_storage is None:
-                create_image_storage()
-            elif self.image_storage.key != get_image_storage_key():
-                self.image_storage.delete()
-                create_image_storage()
-
         self._update_cached_active_announcement()
 
     def delete(self, *args, **kwargs):
