@@ -4,7 +4,6 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.core.files.storage import default_storage
-from django.template import loader
 from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertMessages, assertRedirects
@@ -261,21 +260,38 @@ def test_deny_view_for_reasons(snapshot, client, reason):
     assert prolongation_request.deny_information.reason == reason
 
 
+@freeze_time("2024-11-07")
 @pytest.mark.parametrize("status", ProlongationRequestStatus)
-def test_template_status_card(snapshot, status):
+def test_snapshot_by_status(client, snapshot, status):
     prolongation_request = approvals_factories.ProlongationRequestFactory(
         for_snapshot=True,
         processed=True,
         status=status,
     )
+    client.force_login(prolongation_request.validated_by)
 
+    default_storage.location = "snapshot"
+    response = client.get(
+        reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})
+    )
     assert (
-        loader.render_to_string(
-            "approvals/prolongation_requests/_status_box.html",
-            context={
-                "ProlongationRequestStatus": ProlongationRequestStatus,
-                "prolongation_request": prolongation_request,
-            },
+        str(
+            parse_response_to_soup(
+                response,
+                "#main",
+                replace_in_attr=[
+                    (
+                        "href",
+                        f"/company/{prolongation_request.declared_by_siae_id}/card",
+                        "/company/[PK of Company]/card",
+                    ),
+                    (
+                        "href",
+                        f"/approvals/details/{prolongation_request.approval.pk}",
+                        "/approvals/details/[PK of Approval]",
+                    ),
+                ],
+            )
         )
         == snapshot
     )

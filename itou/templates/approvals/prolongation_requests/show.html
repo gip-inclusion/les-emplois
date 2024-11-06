@@ -11,22 +11,60 @@
 {% endblock %}
 
 {% block title_content %}
-    <h1>Demande de prolongation pour {{ prolongation_request.approval.user.get_full_name }}</h1>
-    {% include "approvals/prolongation_requests/_status_badge.html" with badge_size="badge-base" %}
+    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+        <div class="d-xl-flex align-items-xl-center">
+            <h1 class="mb-0 me-3 text-md-nowrap">
+                Demande de prolongation pour {{ prolongation_request.approval.user.get_full_name }}
+            </h1>
+            {% include "approvals/prolongation_requests/_status_badge.html" with badge_size="badge-base" %}
+        </div>
+    </div>
+    {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}
+        <div class="c-box c-box--action">
+            <h2 class="visually-hidden">Actions rapides</h2>
+            <div class="form-row align-items-center gx-3">
+                <div class="form-group col-12 col-lg-auto">
+                    <form method="post" action="{% url "approvals:prolongation_request_grant" prolongation_request.pk %}">
+                        {% csrf_token %}
+                        <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center">
+                            <i class="ri-check-line"></i>
+                            <span>Accepter</span>
+                        </button>
+                    </form>
+                </div>
+                <div class="form-group col-12 col-lg-auto">
+                    <a class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center" href="{% url "approvals:prolongation_request_deny" prolongation_request.pk %}?reset=1">
+                        <i class="ri-close-line"></i>
+                        <span>Refuser</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
-                <div class="col-12 col-lg-8">
-                    <div class="c-box mb-3 mb-lg-5">
-                        {# Approval status. #}
-                        <div>
-                            {% include "approvals/includes/status.html" with common_approval=prolongation_request.approval hiring_pending=False %}
+                <div class="col-12 col-lg-8 order-2 order-lg-1">
+                    {% if prolongation_request.status == ProlongationRequestStatus.GRANTED %}
+                        <div class="c-box mb-3 mb-lg-5">
+                            <h2>Décision</h2>
+                            <hr>
+                            <p class="mb-2 fw-bold text-success">
+                                Demande acceptée le {{ prolongation_request.processed_at|date:"d F Y" }} par {{ prolongation_request.processed_by.get_full_name }}
+                            </p>
                         </div>
-                    </div>
-
+                    {% elif prolongation_request.status == ProlongationRequestStatus.DENIED %}
+                        <div class="c-box mb-3 mb-lg-5">
+                            <h2>Décision</h2>
+                            <hr>
+                            <p class="mb-2 fw-bold text-danger">
+                                Demande refusée le {{ prolongation_request.processed_at|date:"d F Y" }} par {{ prolongation_request.processed_by.get_full_name }}
+                            </p>
+                        </div>
+                    {% endif %}
                     <div class="c-box mb-3 mb-lg-5">
                         <h2>Détail de la demande</h2>
                         <hr>
@@ -73,9 +111,8 @@
                     </div>
                     {% include "approvals/prolongation_requests/_deny_information_card.html" %}
                 </div>
-                <div class="col-12 col-lg-4">
-                    {# Status card #}
-                    {% include "approvals/prolongation_requests/_status_box.html" %}
+                <div class="col-12 col-lg-4 order-1 order-lg-2">
+                    {% include "approvals/includes/box.html" with approval=prolongation_request.approval link_from_current_url=request.get_full_path extra_class='mb-3 mb-md-4' only %}
                     {# SIAE card #}
                     {% with siae=prolongation_request.declared_by_siae %}
                         {% if siae %}
