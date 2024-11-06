@@ -123,6 +123,9 @@ class ItouClient(Client):
             assert " ondrop=" not in content
             assert " oninput=" not in content
             assert "<script>" not in content
+            # Detect rendering issues in templates
+            assert "{{" not in content
+            assert "{%" not in content
         return response
 
 
