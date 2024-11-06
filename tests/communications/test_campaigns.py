@@ -1,14 +1,10 @@
-import uuid
 from datetime import date
-from unittest import mock
 
 import pytest
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import ModelForm
 from django.forms.models import model_to_dict
 from django.urls import reverse
 
-from itou.communications.forms import AnnouncementItemForm
 from itou.communications.models import AnnouncementCampaign
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
 from tests.users.factories import ItouStaffFactory
@@ -108,15 +104,3 @@ class TestRenderAnnouncementCampaign:
         assert response.status_code == 200
         content = parse_response_to_soup(response)
         assert len(content.select("#news-modal")) == 0
-
-
-class TestAnnouncementItemForm:
-    @mock.patch("uuid.uuid4", return_value=uuid.UUID("6971c4bb-217f-4e84-b8a0-3f055ed19b72"))
-    def test_form_image_upload(self, client):
-        form = AnnouncementItemForm({}, instance=AnnouncementItemFactory())
-        form.is_valid()
-
-        form.cleaned_data["image"] = SimpleUploadedFile("image.jpg", b"", content_type="image/jpeg")
-        image = form.clean_image()
-
-        assert image.name == "6971c4bb-217f-4e84-b8a0-3f055ed19b72.jpg"

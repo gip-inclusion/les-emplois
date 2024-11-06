@@ -9,6 +9,9 @@ class File(models.Model):
     # encoding is at most 1024 bytes long.
     key = models.CharField(primary_key=True, max_length=1024)
     last_modified = models.DateTimeField("dernière modification sur Cellar", default=timezone.now)
+    deleted_at = models.DateTimeField(
+        verbose_name="supprimé le", help_text="Marqué pour suppression du stockage", null=True
+    )
 
     class Meta:
         verbose_name = "fichier"

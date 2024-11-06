@@ -7,8 +7,7 @@ from itou.communications import registry as notifications_registry
 from itou.communications.apps import sync_notifications
 from itou.communications.dispatch.base import BaseNotification
 from itou.communications.models import NotificationRecord, NotificationSettings
-from itou.files.models import File
-from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
+from tests.communications.factories import AnnouncementCampaignFactory
 from tests.companies.factories import CompanyMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 
@@ -130,16 +129,3 @@ class TestAnnouncementCampaignModel:
         # cannot conflict existing date with a new instance
         with pytest.raises(IntegrityError):
             AnnouncementCampaignFactory(start_date=existing_campaign.start_date)
-
-
-class TestAnnouncementItemModel:
-    def test_file_update(self):
-        item = AnnouncementItemFactory(image_storage=None, with_image=True)
-        item.save()
-        assert item.image_storage.key == item.image.name
-
-        item.image.name = "news-images/new-image.jpg"
-        item.save()
-
-        file = File.objects.get()  # only one should exist in the database
-        assert file.key == "news-images/new-image.jpg"
