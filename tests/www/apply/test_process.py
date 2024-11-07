@@ -41,13 +41,12 @@ from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.mocks.api_particulier import rsa_certified_mocker
 from itou.utils.models import InclusiveDateRange
-from itou.utils.templatetags.format_filters import format_approval_number, format_nir, format_phone
+from itou.utils.templatetags.format_filters import format_nir, format_phone
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
 from tests.approvals.factories import (
-    ProlongationFactory,
-    ProlongationRequestFactory,
+    ApprovalFactory,
     SuspensionFactory,
 )
 from tests.asp.factories import CommuneFactory, CountryFranceFactory
@@ -62,7 +61,6 @@ from tests.job_applications.factories import (
     PriorActionFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
@@ -144,6 +142,7 @@ class TestProcessViews:
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             {"back_url": back_url},
         )
+        approval_url = reverse("approvals:details", kwargs={"pk": job_application.approval.pk})
         with assertSnapshotQueries(snapshot(name="job application detail for company")):
             response = client.get(url)
         assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
@@ -151,7 +150,7 @@ class TestProcessViews:
         assertContains(response, job_application.job_seeker.jobseeker_profile.pole_emploi_id)
         assertContains(response, job_application.job_seeker.phone.replace(" ", ""))
         assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)  # the company is not a GEIQ
-        assertContains(response, f"{back_url}?back_url={urlencode_filter(url)}")
+        assertContains(response, f"{approval_url}?back_url={urlencode_filter(url)}")
         assert_previous_step(response, back_url)
 
         job_application.job_seeker.created_by = employer
@@ -257,6 +256,36 @@ class TestProcessViews:
         response = client.get(url)
         assertContains(response, resume_link)
         assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
+
+    def test_details_for_company_with_expired_approval(self, client, subtests):
+        # Expired but still retrieved by job_seerk.latest_common_approval
+        approval = ApprovalFactory(
+            start_at=timezone.now() - datetime.timedelta(days=3 * 365),
+            end_at=timezone.now() - datetime.timedelta(days=365),
+        )
+        company = CompanyFactory(for_snapshot=True, with_membership=True)
+        employer = company.members.first()
+        client.force_login(employer)
+
+        for state in job_applications_enums.JobApplicationState:
+            with subtests.test(state=state.label):
+                # Expired approval are only shown to employers on already accepted applications
+                assertion = (
+                    assertContains
+                    if state is job_applications_enums.JobApplicationState.ACCEPTED
+                    else assertNotContains
+                )
+                job_application = JobApplicationFactory(
+                    job_seeker=approval.user,
+                    approval=approval,
+                    to_company=company,
+                    sent_by_authorized_prescriber_organisation=True,
+                    state=state,
+                )
+                url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+                response = client.get(url)
+                # Check if approval is displayed
+                assertion(response, "Numéro de PASS IAE")
 
     def test_details_archived(self, client):
         UNARCHIVE = "Désarchiver"
@@ -3623,7 +3652,7 @@ def test_precriber_details_with_older_valid_approval(client, faker):
         reverse("apply:details_for_prescriber", kwargs={"job_application_id": new_job_application.pk})
     )
     # Must display approval status template (tested in many other places)
-    assertTemplateUsed(response, template_name="approvals/includes/status.html")
+    assertTemplateUsed(response, template_name="approvals/includes/box.html")
 
 
 @pytest.mark.parametrize(
@@ -3783,140 +3812,3 @@ def test_htmx_reload_contract_type_and_options(client):
     response = client.post(accept_url, data=data)
     reloaded_form_soup = parse_response_to_soup(response, selector="#acceptForm")
     assertSoupEqual(form_soup, reloaded_form_soup)
-
-
-@pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
-@freeze_time("2023-04-26")
-def test_approval_status_includes(client, snapshot):
-    """
-    templates/approvals/includes/status.html
-    This template is used in approval views but also in many other places.
-    Test its content only once.
-    """
-    # This gives access to the employer
-    accepted_app = JobApplicationFactory(
-        job_seeker__public_id="11111111-9999-2222-8888-555555555555",
-        state=JobApplicationState.ACCEPTED,
-    )
-    job_application = JobApplicationFactory(
-        job_seeker=accepted_app.job_seeker,
-        to_company=accepted_app.to_company,
-        state=JobApplicationState.PROCESSING,
-        with_approval=True,
-        approval__id=1,
-        sent_by_authorized_prescriber_organisation=True,
-    )
-    approval = job_application.approval
-
-    # Employer version
-    user = job_application.to_company.members.first()
-    client.force_login(user)
-
-    url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-    response = client.get(url)
-    assertContains(response, format_approval_number(approval))
-    assertContains(response, "26/04/2023")
-    assertContains(response, approval.get_remainder_display())
-
-    url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-    response = client.get(url)
-    assertContains(
-        response,
-        "PASS IAE valide jusqu’au 24/04/2025, si le contrat démarre aujourd’hui.",
-    )
-
-    ## Display suspensions
-    # Valid
-    SuspensionFactory(
-        id=1,
-        approval=approval,
-        start_at=timezone.localdate() - relativedelta(days=7),
-        end_at=timezone.localdate() + relativedelta(days=3),
-    )
-    # Older
-    SuspensionFactory(
-        id=2,
-        approval=approval,
-        start_at=timezone.localdate() - relativedelta(days=30),
-        end_at=timezone.localdate() - relativedelta(days=20),
-    )
-
-    response = client.get(url)
-
-    suspensions_section = parse_response_to_soup(
-        response, selector="#suspensions-list", replace_in_attr=[job_application]
-    )
-    assert str(suspensions_section) == snapshot(name="Approval suspensions list")
-
-    approval.suspension_set.all().delete()
-
-    prescriber = PrescriberFactory(first_name="Milady", last_name="de Winter", email="milady@dewinter.com")
-
-    ## Display prolongations
-    default_kwargs = {
-        "declared_by": prescriber,
-        "validated_by": None,
-        "approval": approval,
-    }
-    # Valid
-    active_prolongation = ProlongationFactory(
-        id=1,
-        start_at=timezone.localdate() - relativedelta(days=7),
-        end_at=timezone.localdate() + relativedelta(days=3),
-        **default_kwargs,
-    )
-
-    ProlongationRequestFactory(
-        declared_by=prescriber,
-        validated_by=PrescriberFactory(
-            first_name="First",
-            last_name="Last",
-            email="first@last.com",
-        ),
-        approval=approval,
-        prescriber_organization=PrescriberOrganizationFactory(name="Organization", department="72"),
-    )
-
-    # Older
-    ProlongationFactory(
-        id=2,
-        start_at=timezone.localdate() - relativedelta(days=30),
-        end_at=timezone.localdate() - relativedelta(days=20),
-        **default_kwargs,
-    )
-    ProlongationFactory(
-        id=3,
-        start_at=timezone.localdate() - relativedelta(days=60),
-        end_at=timezone.localdate() - relativedelta(days=50),
-        **default_kwargs,
-    )
-
-    # In the future
-    ProlongationFactory(
-        id=4,
-        start_at=active_prolongation.end_at + relativedelta(days=10),
-        end_at=active_prolongation.end_at + relativedelta(days=15),
-        **default_kwargs,
-    )
-
-    response = client.get(url)
-
-    prolongations_section = parse_response_to_soup(response, selector="#prolongations-list")
-    assert str(prolongations_section) == snapshot(name="Approval prolongations list")
-
-    # Prescriber version
-    job_application.state = JobApplicationState.ACCEPTED
-    job_application.processed_at = timezone.now()
-    job_application.save()
-    user = job_application.sender
-    client.force_login(user)
-
-    url = reverse(
-        "apply:details_for_prescriber",
-        kwargs={"job_application_id": job_application.pk},
-    )
-    response = client.get(url)
-    assertContains(
-        response,
-        "Date de fin prévisionnelle : 29/05/2025",
-    )

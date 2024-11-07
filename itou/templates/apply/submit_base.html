@@ -10,19 +10,15 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
-                <div class="col-12 col-lg-8">
-                    {% if is_subject_to_eligibility_rules %}
-                        {% with common_approval=job_seeker.latest_common_approval %}
-                            {% if common_approval %}
-                                <div class="c-box mb-4">
-                                    {% include "approvals/includes/status.html" with common_approval=common_approval hiring_pending=True %}
-                                </div>
-                            {% endif %}
-                        {% endwith %}
-                    {% endif %}
-
+                <div class="col-12 col-lg-8 {% if is_subject_to_eligibility_rules and job_seeker.has_valid_approval %}order-2 order-lg-1{% endif %}">
                     {% block content_extend %}{% endblock %}
                 </div>
+                {% if is_subject_to_eligibility_rules and job_seeker.has_valid_approval %}
+                    {# We don't want to show expired approval when applying/hiring #}
+                    <div class="col-12 col-lg-4 order-1 order-lg-2">
+                        {% include "approvals/includes/box.html" with approval=job_seeker.latest_approval link_from_current_url=request.get_full_path extra_class='my-3 my-md-4' only %}
+                    </div>
+                {% endif %}
             </div>
         </div>
     </section>

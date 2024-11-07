@@ -107,20 +107,7 @@
                             {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
                         </div>
                         <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
-                            {% block sidebar %}
-                                {{ block.super }}
-                                {% if job_application.to_company.is_subject_to_eligibility_rules and request.user.is_employer and job_application.state.is_accepted and job_application.approval %}
-                                    <div class="c-box mb-4">
-                                        <h4>PASS IAE</h4>
-                                        <p>
-                                            La consultation et la gestion du PASS IAE (exemple : « suspendre » ou « prolonger » un PASS IAE) se fait depuis le profil salarié.
-                                        </p>
-                                        <a class="btn btn-block btn-primary"
-                                           href="{% url 'employees:detail' public_id=job_application.job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
-                                           {% matomo_event "salaries" "clic" "detail-salarie-depuis-candidature" %}>Accéder au profil salarié</a>
-                                    </div>
-                                {% endif %}
-                            {% endblock %}
+                            {% block sidebar %}{{ block.super }}{% endblock %}
                         </div>
                     </div>
                 </div>
