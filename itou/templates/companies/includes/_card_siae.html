@@ -119,23 +119,23 @@
                 </ul>
             {% endif %}
         </div>
+        {% if siae.active_job_descriptions|length > 3 %}
+            <div class="c-box--results__footer">
+                <button class="btn btn-link has-collapse-caret btn-block"
+                        type="button"
+                        data-it-collapse-text-show="Voir"
+                        data-it-collapse-text-hide="Masquer"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseMoreJobs_{{ siae.pk }}"
+                        aria-expanded="false"
+                        aria-controls="collapseMoreJobs_{{ siae.pk }}"
+                        aria-label="Voir ou masquer les autres métiers">
+                    les {{ siae.active_job_descriptions|length|add:"-3" }} autres métiers
+                </button>
+            </div>
+        {% endif %}
     {% endif %}
 
-    {% if siae.active_job_descriptions and siae.active_job_descriptions|length > 3 %}
-        <div class="c-box--results__footer">
-            <button class="btn btn-link has-collapse-caret btn-block"
-                    type="button"
-                    data-it-collapse-text-show="Voir"
-                    data-it-collapse-text-hide="Masquer"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#collapseMoreJobs_{{ siae.pk }}"
-                    aria-expanded="false"
-                    aria-controls="collapseMoreJobs_{{ siae.pk }}"
-                    aria-label="Voir ou masquer les autres métiers">
-                les {{ siae.active_job_descriptions|length|add:"-3" }} autres métiers
-            </button>
-        </div>
-    {% endif %}
 
     {% if siae.has_active_members and not siae.block_job_applications and not siae.active_job_descriptions %}
         {% if job_app_to_transfer|default:False %}
