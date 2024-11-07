@@ -424,7 +424,7 @@ class TestJobDescriptionCardView:
         soup = parse_response_to_soup(response, selector=".c-box--action")
         assert str(soup) == snapshot(name="without_other_jobs")
         # Create other job_description
-        JobDescriptionFactory(company=job_description.company)
+        JobDescriptionFactory(pk=43, company=job_description.company)
         response = client.get(url)
         soup = parse_response_to_soup(response, selector=".c-box--action")
         assert str(soup) == snapshot(name="with_other_jobs")
