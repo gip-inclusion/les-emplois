@@ -279,3 +279,33 @@ class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
                 )
         else:
             self.cleaned_data["has_rsa_allocation"] = asp_models.RSAAllocation.NO
+
+
+class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):
+    PROFILE_FIELDS = ["birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+
+    class Meta:
+        model = User
+        fields = [
+            "phone",
+        ]
+        help_texts = {
+            "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978.",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["birthdate"].required = True
+        self.fields["birthdate"].widget = DuetDatePickerWidget(
+            {
+                "min": DuetDatePickerWidget.min_birthdate(),
+                "max": DuetDatePickerWidget.max_birthdate(),
+            }
+        )
+
+    def clean(self):
+        super().clean()
+        JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
+        JobSeekerProfile.clean_nir_title_birthdate_fields(
+            self.cleaned_data | {"nir": self.instance.jobseeker_profile.nir}, remind_nir_in_error=True
+        )

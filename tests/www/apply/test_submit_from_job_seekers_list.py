@@ -555,7 +555,7 @@ class TestApplyAsJobSeeker:
         client.force_login(job_seeker)
 
         check_info_url = reverse(
-            "apply:step_check_job_seeker_info",
+            "job_seekers_views:check_job_seeker_info",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         # Step apply to company

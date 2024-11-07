@@ -2,6 +2,8 @@ from django.urls import path
 
 from itou.www.apply.views import edit_views, list_views, process_views, submit_views
 from itou.www.job_seekers_views.views import (
+    CheckJobSeekerInformations,
+    CheckJobSeekerInformationsForHire,
     CheckNIRForJobSeekerView,
     CheckNIRForSenderView,
     CreateJobSeekerStep1ForSenderView,
@@ -65,9 +67,10 @@ urlpatterns = [
         name="check_nir_for_job_seeker",
     ),
     # Submit - common.
+    # Ewen: deprecated url. These urls are going to job_seekers_views
     path(
         "<int:company_pk>/create/<uuid:job_seeker_public_id>/check_job_seeker_info",
-        submit_views.CheckJobSeekerInformations.as_view(),
+        CheckJobSeekerInformations.as_view(),
         name="step_check_job_seeker_info",
     ),
     path(
@@ -186,9 +189,10 @@ urlpatterns = [
         name="update_job_seeker_step_end_for_hire",
         kwargs={"hire_process": True},
     ),
+    # Ewen: deprecated url. These urls are going to job_seekers_views
     path(
         "<int:company_pk>/hire/<uuid:job_seeker_public_id>/check-infos",
-        submit_views.CheckJobSeekerInformationsForHire.as_view(),
+        CheckJobSeekerInformationsForHire.as_view(),
         name="check_job_seeker_info_for_hire",
         kwargs={"hire_process": True},
     ),

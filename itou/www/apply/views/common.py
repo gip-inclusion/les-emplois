@@ -280,7 +280,7 @@ def _geiq_eligibility_criteria(
         "allowance_amount": allowance_amount,
         "progress": 66,
         "back_url": reverse(
-            "apply:check_job_seeker_info_for_hire",
+            "job_seekers_views:check_job_seeker_info_for_hire",
             kwargs={"job_seeker_public_id": job_seeker.public_id, "company_pk": company.pk},
         ),
     }
