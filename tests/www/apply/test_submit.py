@@ -129,10 +129,10 @@ class TestApply:
 
     def test_we_raise_a_permission_denied_on_missing_temporary_session_for_create_job_seeker(self, client, subtests):
         routes = {
-            "apply:create_job_seeker_step_1_for_sender",
-            "apply:create_job_seeker_step_2_for_sender",
-            "apply:create_job_seeker_step_3_for_sender",
-            "apply:create_job_seeker_step_end_for_sender",
+            "job_seekers_views:create_job_seeker_step_1_for_sender",
+            "job_seekers_views:create_job_seeker_step_2_for_sender",
+            "job_seekers_views:create_job_seeker_step_3_for_sender",
+            "job_seekers_views:create_job_seeker_step_end_for_sender",
         }
         user = JobSeekerFactory()
         company = CompanyFactory(with_jobs=True)
@@ -237,10 +237,10 @@ class TestHire:
 
     def test_we_raise_a_permission_denied_on_missing_temporary_session_for_create_job_seeker(self, client, subtests):
         routes = {
-            "apply:create_job_seeker_step_1_for_hire",
-            "apply:create_job_seeker_step_2_for_hire",
-            "apply:create_job_seeker_step_3_for_hire",
-            "apply:create_job_seeker_step_end_for_hire",
+            "job_seekers_views:create_job_seeker_step_1_for_hire",
+            "job_seekers_views:create_job_seeker_step_2_for_hire",
+            "job_seekers_views:create_job_seeker_step_3_for_hire",
+            "job_seekers_views:create_job_seeker_step_end_for_hire",
         }
         user = JobSeekerFactory()
         company = CompanyFactory(with_jobs=True)
@@ -257,10 +257,10 @@ class TestHire:
         prescriber = PrescriberFactory()
         client.force_login(company.members.first())
         for viewname in (
-            "apply:update_job_seeker_step_1_for_hire",
-            "apply:update_job_seeker_step_2_for_hire",
-            "apply:update_job_seeker_step_3_for_hire",
-            "apply:update_job_seeker_step_end_for_hire",
+            "job_seekers_views:update_job_seeker_step_1_for_hire",
+            "job_seekers_views:update_job_seeker_step_2_for_hire",
+            "job_seekers_views:update_job_seeker_step_3_for_hire",
+            "job_seekers_views:update_job_seeker_step_end_for_hire",
         ):
             url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_public_id": prescriber.public_id})
             response = client.get(url)
@@ -861,7 +861,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_1_for_sender",
+            "job_seekers_views:create_job_seeker_step_1_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -904,7 +904,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_2_for_sender",
+            "job_seekers_views:create_job_seeker_step_2_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -929,7 +929,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_3_for_sender",
+            "job_seekers_views:create_job_seeker_step_3_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -964,7 +964,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_end_for_sender",
+            "job_seekers_views:create_job_seeker_step_end_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -1126,7 +1126,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_1_for_sender",
+            "job_seekers_views:create_job_seeker_step_1_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -1170,7 +1170,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_2_for_sender",
+            "job_seekers_views:create_job_seeker_step_2_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -1195,7 +1195,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_3_for_sender",
+            "job_seekers_views:create_job_seeker_step_3_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -1231,7 +1231,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_end_for_sender",
+            "job_seekers_views:create_job_seeker_step_end_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -1533,7 +1533,7 @@ class TestApplyAsPrescriber:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_1_for_sender",
+            "job_seekers_views:create_job_seeker_step_1_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -1607,7 +1607,7 @@ class TestApplyAsPrescriber:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_2_for_sender",
+            "job_seekers_views:create_job_seeker_step_2_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -1631,7 +1631,7 @@ class TestApplyAsPrescriber:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_3_for_sender",
+            "job_seekers_views:create_job_seeker_step_3_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -1667,7 +1667,7 @@ class TestApplyAsPrescriber:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_end_for_sender",
+            "job_seekers_views:create_job_seeker_step_end_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -2084,7 +2084,7 @@ class TestApplyAsCompany:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_1_for_sender",
+            "job_seekers_views:create_job_seeker_step_1_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -2158,7 +2158,7 @@ class TestApplyAsCompany:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_2_for_sender",
+            "job_seekers_views:create_job_seeker_step_2_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -2183,7 +2183,7 @@ class TestApplyAsCompany:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_3_for_sender",
+            "job_seekers_views:create_job_seeker_step_3_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -2219,7 +2219,7 @@ class TestApplyAsCompany:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_end_for_sender",
+            "job_seekers_views:create_job_seeker_step_end_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -2533,7 +2533,7 @@ class TestDirectHireFullProcess:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_1_for_hire",
+            "job_seekers_views:create_job_seeker_step_1_for_hire",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -2606,7 +2606,7 @@ class TestDirectHireFullProcess:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_2_for_hire",
+            "job_seekers_views:create_job_seeker_step_2_for_hire",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -2632,7 +2632,7 @@ class TestDirectHireFullProcess:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_3_for_hire",
+            "job_seekers_views:create_job_seeker_step_3_for_hire",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -2668,7 +2668,7 @@ class TestDirectHireFullProcess:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
-            "apply:create_job_seeker_step_end_for_hire",
+            "job_seekers_views:create_job_seeker_step_end_for_hire",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
@@ -3282,7 +3282,7 @@ class TestLastCheckedAtView:
 
         # Check the presence of the verify link
         update_url = reverse(
-            "apply:update_job_seeker_step_1",
+            "job_seekers_views:update_job_seeker_step_1",
             kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
         )
         link_check = assertContains if sees_verify_link else assertNotContains
@@ -3646,10 +3646,10 @@ class UpdateJobSeekerTestMixin:
 
 
 class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
-    STEP_1_VIEW_NAME = "apply:update_job_seeker_step_1"
-    STEP_2_VIEW_NAME = "apply:update_job_seeker_step_2"
-    STEP_3_VIEW_NAME = "apply:update_job_seeker_step_3"
-    STEP_END_VIEW_NAME = "apply:update_job_seeker_step_end"
+    STEP_1_VIEW_NAME = "job_seekers_views:update_job_seeker_step_1"
+    STEP_2_VIEW_NAME = "job_seekers_views:update_job_seeker_step_2"
+    STEP_3_VIEW_NAME = "job_seekers_views:update_job_seeker_step_3"
+    STEP_END_VIEW_NAME = "job_seekers_views:update_job_seeker_step_end"
     FINAL_REDIRECT_VIEW_NAME = "apply:application_jobs"
 
     def test_anonymous_step_1(self, client):
@@ -3801,10 +3801,10 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
 
 
 class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
-    STEP_1_VIEW_NAME = "apply:update_job_seeker_step_1_for_hire"
-    STEP_2_VIEW_NAME = "apply:update_job_seeker_step_2_for_hire"
-    STEP_3_VIEW_NAME = "apply:update_job_seeker_step_3_for_hire"
-    STEP_END_VIEW_NAME = "apply:update_job_seeker_step_end_for_hire"
+    STEP_1_VIEW_NAME = "job_seekers_views:update_job_seeker_step_1_for_hire"
+    STEP_2_VIEW_NAME = "job_seekers_views:update_job_seeker_step_2_for_hire"
+    STEP_3_VIEW_NAME = "job_seekers_views:update_job_seeker_step_3_for_hire"
+    STEP_END_VIEW_NAME = "job_seekers_views:update_job_seeker_step_end_for_hire"
     FINAL_REDIRECT_VIEW_NAME = "apply:check_job_seeker_info_for_hire"
 
     def test_anonymous_step_1(self, client):
@@ -3948,7 +3948,7 @@ class TestUpdateJobSeekerStep3View:
         # STEP 1 to setup jobseeker session
         response = client.get(
             reverse(
-                "apply:update_job_seeker_step_1",
+                "job_seekers_views:update_job_seeker_step_1",
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
@@ -3957,7 +3957,7 @@ class TestUpdateJobSeekerStep3View:
         # Go straight to STEP 3
         response = client.get(
             reverse(
-                "apply:update_job_seeker_step_3",
+                "job_seekers_views:update_job_seeker_step_3",
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
@@ -4032,7 +4032,7 @@ def test_detect_existing_job_seeker(client):
     assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
     next_url = reverse(
-        "apply:create_job_seeker_step_1_for_sender",
+        "job_seekers_views:create_job_seeker_step_1_for_sender",
         kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
     )
     assert response.url == next_url
@@ -4095,7 +4095,7 @@ def test_detect_existing_job_seeker(client):
     assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
     next_url = reverse(
-        "apply:create_job_seeker_step_2_for_sender",
+        "job_seekers_views:create_job_seeker_step_2_for_sender",
         kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
     )
     assert response.url == next_url
@@ -4688,7 +4688,7 @@ class TestFindJobSeekerForHireView:
         assertRedirects(
             response,
             reverse(
-                "apply:create_job_seeker_step_1_for_hire",
+                "job_seekers_views:create_job_seeker_step_1_for_hire",
                 kwargs={"company_pk": self.company.pk, "session_uuid": job_seeker_session_name},
             ),
         )
@@ -4730,7 +4730,7 @@ class TestCheckJobSeekerInformationsForHire:
         assertContains(
             response,
             reverse(
-                "apply:update_job_seeker_step_1_for_hire",
+                "job_seekers_views:update_job_seeker_step_1_for_hire",
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
         )
@@ -4772,7 +4772,7 @@ class TestCheckJobSeekerInformationsForHire:
         assertContains(
             response,
             reverse(
-                "apply:update_job_seeker_step_1_for_hire",
+                "job_seekers_views:update_job_seeker_step_1_for_hire",
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
         )
