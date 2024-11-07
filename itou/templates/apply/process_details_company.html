@@ -20,7 +20,7 @@
                aria-selected="true"
                {% matomo_event "candidature" "clic-onglet" "informations-generales" %}>Informations générales</a>
         </li>
-        {% if job_application.upcoming_appointments or request.current_organization.rdv_solidarites_id %}
+        {% if job_application.upcoming_participations_count or request.current_organization.rdv_solidarites_id %}
             <li class="nav-item" role="presentation">
                 <a class="nav-link"
                    id="appointments-tab"
