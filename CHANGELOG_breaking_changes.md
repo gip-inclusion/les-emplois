@@ -1,4 +1,12 @@
 # Journal des changements techniques majeurs
+## 2024-11-06
+
+- Mise à jour vers Python 3.12:
+    1. Reconstruire le _virtual env_ : `rm -r $VIRTUAL_ENV && make venv`
+    2. Mettre à jour ses recettes jetables après avoir `git rebase master`, en
+       retirant la variable `CC_CLEVER_PYTHON_VERSION=3.11` de l’environnement
+       de l’app sur la console CleverCloud.
+
 ## 2024-09-23
 
 - Ajout des variables d'environnement `PRO_CONNECT_*`
