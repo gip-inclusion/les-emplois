@@ -102,7 +102,13 @@ def remap_columns(df, column_mapping):
 def could_siae_be_deleted(siae):
     if siae.evaluated_siaes.exists():
         return False
-    if siae.job_applications_received.exists():
+    if (
+        siae.job_applications_received.exists()
+        or siae.jobapplication_set.exists()
+        or siae.job_application_transferred.exists()
+    ):
+        return False
+    if siae.prolongationrequest_set.exists():
         return False
     # Do not delete SIAE if any approval is linked to one of the elibility diagnosis it has created
     if siae.eligibilitydiagnosis_set.exclude(approval=None).exists():
