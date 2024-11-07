@@ -156,6 +156,17 @@
                           </article>
                       </li>
                   
+                  
+              </ul>
+          </div>
+  '''
+# ---
+# name: TestNewsRender.test_none_exists[none_exists]
+  '''
+  <div class="s-section__container container">
+              <ul class="list-group list-group-collapse list-group-flush">
+                  
+                  <p>Aucune nouveauté pour le moment.</p>
               </ul>
           </div>
   '''
