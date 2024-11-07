@@ -1044,8 +1044,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1122,8 +1122,8 @@
           'User.is_prescriber_with_authorized_org[users/models.py]',
           'User.can_edit_personal_information[users/models.py]',
           'User.can_view_personal_information[users/models.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -1141,8 +1141,8 @@
         'origin': list([
           'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep1View.setup[utils/session.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -1365,8 +1365,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1412,8 +1412,8 @@
           'User.is_prescriber_with_authorized_org[users/models.py]',
           'User.can_edit_personal_information[users/models.py]',
           'User.can_view_personal_information[users/models.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -1431,8 +1431,8 @@
         'origin': list([
           'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep2View.setup[utils/session.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -1609,8 +1609,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1687,8 +1687,8 @@
           'User.is_prescriber_with_authorized_org[users/models.py]',
           'User.can_edit_personal_information[users/models.py]',
           'User.can_view_personal_information[users/models.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -1706,8 +1706,8 @@
         'origin': list([
           'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep3View.setup[utils/session.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -1936,8 +1936,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2013,8 +2013,8 @@
         'origin': list([
           'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep1View.setup[utils/session.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -2317,8 +2317,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2363,8 +2363,8 @@
         'origin': list([
           'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep2View.setup[utils/session.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -2621,8 +2621,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2698,8 +2698,8 @@
         'origin': list([
           'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep3View.setup[utils/session.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -2904,8 +2904,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2982,8 +2982,8 @@
           'User.is_prescriber_with_authorized_org[users/models.py]',
           'User.can_edit_personal_information[users/models.py]',
           'User.can_view_personal_information[users/models.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -3001,8 +3001,8 @@
         'origin': list([
           'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep1View.setup[utils/session.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -3225,8 +3225,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -3272,8 +3272,8 @@
           'User.is_prescriber_with_authorized_org[users/models.py]',
           'User.can_edit_personal_information[users/models.py]',
           'User.can_view_personal_information[users/models.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -3291,8 +3291,8 @@
         'origin': list([
           'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep2View.setup[utils/session.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -3469,8 +3469,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -3547,8 +3547,8 @@
           'User.is_prescriber_with_authorized_org[users/models.py]',
           'User.can_edit_personal_information[users/models.py]',
           'User.can_view_personal_information[users/models.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -3566,8 +3566,8 @@
         'origin': list([
           'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep3View.setup[utils/session.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -3796,8 +3796,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -3873,8 +3873,8 @@
         'origin': list([
           'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep1View.setup[utils/session.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -4177,8 +4177,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -4223,8 +4223,8 @@
         'origin': list([
           'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep2View.setup[utils/session.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -4481,8 +4481,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -4558,8 +4558,8 @@
         'origin': list([
           'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep3View.setup[utils/session.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -4816,8 +4816,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -4893,8 +4893,8 @@
         'origin': list([
           'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep1View.setup[utils/session.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -5217,8 +5217,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -5263,8 +5263,8 @@
         'origin': list([
           'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep2View.setup[utils/session.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -5541,8 +5541,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -5618,8 +5618,8 @@
         'origin': list([
           'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep3View.setup[utils/session.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -5896,8 +5896,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -5973,8 +5973,8 @@
         'origin': list([
           'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep1View.setup[utils/session.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep1View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -6297,8 +6297,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -6343,8 +6343,8 @@
         'origin': list([
           'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep2View.setup[utils/session.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep2View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -6621,8 +6621,8 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -6698,8 +6698,8 @@
         'origin': list([
           'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
           'UpdateJobSeekerStep3View.setup[utils/session.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
-          'UpdateJobSeekerStep3View.setup[www/apply/views/submit_views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
+          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",

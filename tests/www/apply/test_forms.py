@@ -397,9 +397,3 @@ class TestCertifiedCriteriaInfoRequiredForm:
             f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {early_date:%d/%m/%Y}"
         )
         assert form.errors["birth_place"] == [expected_msg]
-
-
-class TestCreateOrUpdateJobSeekerStep1Form:
-    def test_commune_birthdate_dependency(self):
-        form = apply_forms.CreateOrUpdateJobSeekerStep1Form()
-        assert form.with_birthdate_field

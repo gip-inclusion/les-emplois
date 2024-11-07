@@ -4,7 +4,15 @@ from itou.www.apply.views import edit_views, list_views, process_views, submit_v
 from itou.www.job_seekers_views.views import (
     CheckNIRForJobSeekerView,
     CheckNIRForSenderView,
+    CreateJobSeekerStep1ForSenderView,
+    CreateJobSeekerStep2ForSenderView,
+    CreateJobSeekerStep3ForSenderView,
+    CreateJobSeekerStepEndForSenderView,
     SearchByEmailForSenderView,
+    UpdateJobSeekerStep1View,
+    UpdateJobSeekerStep2View,
+    UpdateJobSeekerStep3View,
+    UpdateJobSeekerStepEndView,
 )
 
 
@@ -28,24 +36,25 @@ urlpatterns = [
         SearchByEmailForSenderView.as_view(),
         name="search_by_email_for_sender",
     ),
+    # Ewen: deprecated urls. These urls are going to job_seekers_views
     path(
         "<int:company_pk>/sender/create_job_seeker/<uuid:session_uuid>/1",
-        submit_views.CreateJobSeekerStep1ForSenderView.as_view(),
+        CreateJobSeekerStep1ForSenderView.as_view(),
         name="create_job_seeker_step_1_for_sender",
     ),
     path(
         "<int:company_pk>/sender/create_job_seeker/<uuid:session_uuid>/2",
-        submit_views.CreateJobSeekerStep2ForSenderView.as_view(),
+        CreateJobSeekerStep2ForSenderView.as_view(),
         name="create_job_seeker_step_2_for_sender",
     ),
     path(
         "<int:company_pk>/sender/create_job_seeker/<uuid:session_uuid>/3",
-        submit_views.CreateJobSeekerStep3ForSenderView.as_view(),
+        CreateJobSeekerStep3ForSenderView.as_view(),
         name="create_job_seeker_step_3_for_sender",
     ),
     path(
         "<int:company_pk>/sender/create_job_seeker/<uuid:session_uuid>/end",
-        submit_views.CreateJobSeekerStepEndForSenderView.as_view(),
+        CreateJobSeekerStepEndForSenderView.as_view(),
         name="create_job_seeker_step_end_for_sender",
     ),
     # Submit - job seeker.
@@ -92,24 +101,25 @@ urlpatterns = [
         name="application_end",
     ),
     # Job seeker check/updates
+    # Ewen: deprecated urls. These urls are going to job_seekers_views
     path(
         "<int:company_pk>/update_job_seeker/<uuid:job_seeker_public_id>/1",
-        submit_views.UpdateJobSeekerStep1View.as_view(),
+        UpdateJobSeekerStep1View.as_view(),
         name="update_job_seeker_step_1",
     ),
     path(
         "<int:company_pk>/update_job_seeker/<uuid:job_seeker_public_id>/2",
-        submit_views.UpdateJobSeekerStep2View.as_view(),
+        UpdateJobSeekerStep2View.as_view(),
         name="update_job_seeker_step_2",
     ),
     path(
         "<int:company_pk>/update_job_seeker/<uuid:job_seeker_public_id>/3",
-        submit_views.UpdateJobSeekerStep3View.as_view(),
+        UpdateJobSeekerStep3View.as_view(),
         name="update_job_seeker_step_3",
     ),
     path(
         "<int:company_pk>/update_job_seeker/<uuid:job_seeker_public_id>/end",
-        submit_views.UpdateJobSeekerStepEndView.as_view(),
+        UpdateJobSeekerStepEndView.as_view(),
         name="update_job_seeker_step_end",
     ),
     # Direct hire process
@@ -127,51 +137,52 @@ urlpatterns = [
         name="search_by_email_for_hire",
         kwargs={"hire_process": True},
     ),
+    # Ewen: deprecated urls. These urls are going to job_seekers_views
     path(
         "<int:company_pk>/hire/create-job-seeker/<uuid:session_uuid>/1",
-        submit_views.CreateJobSeekerStep1ForSenderView.as_view(),
+        CreateJobSeekerStep1ForSenderView.as_view(),
         name="create_job_seeker_step_1_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
         "<int:company_pk>/hire/create-job-seeker/<uuid:session_uuid>/2",
-        submit_views.CreateJobSeekerStep2ForSenderView.as_view(),
+        CreateJobSeekerStep2ForSenderView.as_view(),
         name="create_job_seeker_step_2_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
         "<int:company_pk>/hire/create-job-seeker/<uuid:session_uuid>/3",
-        submit_views.CreateJobSeekerStep3ForSenderView.as_view(),
+        CreateJobSeekerStep3ForSenderView.as_view(),
         name="create_job_seeker_step_3_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
         "<int:company_pk>/hire/create-job-seeker/<uuid:session_uuid>/end",
-        submit_views.CreateJobSeekerStepEndForSenderView.as_view(),
+        CreateJobSeekerStepEndForSenderView.as_view(),
         name="create_job_seeker_step_end_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
         "<int:company_pk>/hire/update-job-seeker/<uuid:job_seeker_public_id>/1",
-        submit_views.UpdateJobSeekerStep1View.as_view(),
+        UpdateJobSeekerStep1View.as_view(),
         name="update_job_seeker_step_1_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
         "<int:company_pk>/hire/update-job-seeker/<uuid:job_seeker_public_id>/2",
-        submit_views.UpdateJobSeekerStep2View.as_view(),
+        UpdateJobSeekerStep2View.as_view(),
         name="update_job_seeker_step_2_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
         "<int:company_pk>/hire/update-job-seeker/<uuid:job_seeker_public_id>/3",
-        submit_views.UpdateJobSeekerStep3View.as_view(),
+        UpdateJobSeekerStep3View.as_view(),
         name="update_job_seeker_step_3_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
         "<int:company_pk>/hire/update-job-seeker/<uuid:job_seeker_public_id>/end",
-        submit_views.UpdateJobSeekerStepEndView.as_view(),
+        UpdateJobSeekerStepEndView.as_view(),
         name="update_job_seeker_step_end_for_hire",
         kwargs={"hire_process": True},
     ),
