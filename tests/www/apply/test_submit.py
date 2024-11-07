@@ -2694,7 +2694,7 @@ class TestDirectHireFullProcess:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assertTemplateNotUsed(response, "approvals/includes/status.html")
+        assertTemplateNotUsed(response, "approvals/includes/box.html")
 
         criterion1 = (
             AdministrativeCriteria.objects.level1().exclude(kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS).first()
@@ -2727,7 +2727,7 @@ class TestDirectHireFullProcess:
         birth_place = CommuneFactory()
 
         response = client.get(next_url)
-        assertTemplateNotUsed(response, "approvals/includes/status.html")
+        assertTemplateNotUsed(response, "approvals/includes/box.html")
         assertContains(response, "Valider l’embauche")
         check_infos_url = reverse(
             "job_seekers_views:check_job_seeker_info_for_hire",
@@ -2814,7 +2814,7 @@ class TestDirectHireFullProcess:
         # ----------------------------------------------------------------------
 
         response = client.get(check_infos_url)
-        assertTemplateNotUsed(response, "approvals/includes/status.html")
+        assertTemplateNotUsed(response, "approvals/includes/box.html")
 
         prev_applicaitons_url = reverse(
             "apply:check_prev_applications_for_hire",
@@ -2828,7 +2828,7 @@ class TestDirectHireFullProcess:
         # ----------------------------------------------------------------------
 
         response = client.get(prev_applicaitons_url)
-        assertTemplateNotUsed(response, "approvals/includes/status.html")
+        assertTemplateNotUsed(response, "approvals/includes/box.html")
         geiq_eligibility_url = reverse(
             "apply:geiq_eligibility_for_hire",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
@@ -2846,7 +2846,7 @@ class TestDirectHireFullProcess:
         )
 
         response = client.get(geiq_eligibility_url)
-        assertTemplateNotUsed(response, "approvals/includes/status.html")
+        assertTemplateNotUsed(response, "approvals/includes/box.html")
         response = client.post(
             geiq_eligibility_url,
             data={"choice": "True"},
@@ -2873,7 +2873,7 @@ class TestDirectHireFullProcess:
         # Hire confirmation
         # ----------------------------------------------------------------------
         response = client.get(confirmation_url)
-        assertTemplateNotUsed(response, "approvals/includes/status.html")
+        assertTemplateNotUsed(response, "approvals/includes/box.html")
         assertContains(response, "Valider l’embauche")
         check_infos_url = reverse(
             "job_seekers_views:check_job_seeker_info_for_hire",
@@ -4725,7 +4725,7 @@ class TestCheckJobSeekerInformationsForHire:
             '<h1>Informations personnelles de <span class="text-muted">Son Prénom Son Nom De Famille</span></h1>',
             html=True,
         )
-        assertTemplateNotUsed(response, "approvals/includes/status.html")
+        assertTemplateNotUsed(response, "approvals/includes/box.html")
         assertContains(response, "Éligibilité IAE à valider")
         assertContains(
             response,
@@ -4768,7 +4768,7 @@ class TestCheckJobSeekerInformationsForHire:
             '<h1>Informations personnelles de <span class="text-muted">Son Prénom Son Nom De Famille</span></h1>',
             html=True,
         )
-        assertTemplateNotUsed(response, "approvals/includes/status.html")
+        assertTemplateNotUsed(response, "approvals/includes/box.html")
         assertContains(
             response,
             reverse(
@@ -4810,7 +4810,7 @@ class TestCheckPreviousApplicationsForHireView:
         client.force_login(self.company.members.first())
 
         response = client.get(self._reverse("apply:check_prev_applications_for_hire"))
-        assertTemplateNotUsed(response, "approvals/includes/status.html")
+        assertTemplateNotUsed(response, "approvals/includes/box.html")
         assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
         response = client.post(
             self._reverse("apply:check_prev_applications_for_hire"), data={"force_new_application": "force"}
@@ -4831,7 +4831,7 @@ class TestCheckPreviousApplicationsForHireView:
 
         response = client.get(self._reverse("apply:check_prev_applications_for_hire"))
         assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
-        assertTemplateNotUsed(response, "approvals/includes/status.html")
+        assertTemplateNotUsed(response, "approvals/includes/box.html")
         response = client.post(
             self._reverse("apply:check_prev_applications_for_hire"), data={"force_new_application": "force"}
         )

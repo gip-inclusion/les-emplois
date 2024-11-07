@@ -953,7 +953,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_approval[job application detail for company]
   dict({
-    'num_queries': 18,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -1843,6 +1843,122 @@
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
           ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'IfNode[approvals/includes/box.html]',
+          'IncludeNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'WithNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'BlockNode',
+          'VariableNode[apply/process_details_company.html]',
+          'BlockNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Approval.remainder[approvals/models.py]',
+          'Approval.remainder_as_date[approvals/models.py]',
+          'VariableNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
+          'IncludeNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'WithNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'BlockNode',
+          'VariableNode[apply/process_details_company.html]',
+          'BlockNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE "approvals_suspension"."approval_id" = %s
+          ORDER BY "approvals_suspension"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'Approval.pending_prolongation_request[approvals/models.py]',
+          'WithNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
+          'IncludeNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'WithNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'BlockNode',
+          'VariableNode[apply/process_details_company.html]',
+          'BlockNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongationrequest"."id",
+                 "approvals_prolongationrequest"."approval_id",
+                 "approvals_prolongationrequest"."start_at",
+                 "approvals_prolongationrequest"."end_at",
+                 "approvals_prolongationrequest"."reason",
+                 "approvals_prolongationrequest"."reason_explanation",
+                 "approvals_prolongationrequest"."declared_by_id",
+                 "approvals_prolongationrequest"."declared_by_siae_id",
+                 "approvals_prolongationrequest"."validated_by_id",
+                 "approvals_prolongationrequest"."prescriber_organization_id",
+                 "approvals_prolongationrequest"."created_at",
+                 "approvals_prolongationrequest"."created_by_id",
+                 "approvals_prolongationrequest"."updated_at",
+                 "approvals_prolongationrequest"."updated_by_id",
+                 "approvals_prolongationrequest"."report_file_id",
+                 "approvals_prolongationrequest"."require_phone_interview",
+                 "approvals_prolongationrequest"."contact_email",
+                 "approvals_prolongationrequest"."contact_phone",
+                 "approvals_prolongationrequest"."status",
+                 "approvals_prolongationrequest"."processed_at",
+                 "approvals_prolongationrequest"."processed_by_id",
+                 "approvals_prolongationrequest"."reminder_sent_at"
+          FROM "approvals_prolongationrequest"
+          WHERE ("approvals_prolongationrequest"."approval_id" = %s
+                 AND "approvals_prolongationrequest"."status" = %s)
+          ORDER BY "approvals_prolongationrequest"."created_at" DESC
+          LIMIT 1
         ''',
       }),
       dict({
@@ -1939,7 +2055,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_list[job application detail for company]
   dict({
-    'num_queries': 18,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -2829,6 +2945,122 @@
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
           ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'IfNode[approvals/includes/box.html]',
+          'IncludeNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'WithNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'BlockNode',
+          'VariableNode[apply/process_details_company.html]',
+          'BlockNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Approval.remainder[approvals/models.py]',
+          'Approval.remainder_as_date[approvals/models.py]',
+          'VariableNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
+          'IncludeNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'WithNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'BlockNode',
+          'VariableNode[apply/process_details_company.html]',
+          'BlockNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE "approvals_suspension"."approval_id" = %s
+          ORDER BY "approvals_suspension"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'Approval.pending_prolongation_request[approvals/models.py]',
+          'WithNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
+          'IncludeNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'WithNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'BlockNode',
+          'VariableNode[apply/process_details_company.html]',
+          'BlockNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongationrequest"."id",
+                 "approvals_prolongationrequest"."approval_id",
+                 "approvals_prolongationrequest"."start_at",
+                 "approvals_prolongationrequest"."end_at",
+                 "approvals_prolongationrequest"."reason",
+                 "approvals_prolongationrequest"."reason_explanation",
+                 "approvals_prolongationrequest"."declared_by_id",
+                 "approvals_prolongationrequest"."declared_by_siae_id",
+                 "approvals_prolongationrequest"."validated_by_id",
+                 "approvals_prolongationrequest"."prescriber_organization_id",
+                 "approvals_prolongationrequest"."created_at",
+                 "approvals_prolongationrequest"."created_by_id",
+                 "approvals_prolongationrequest"."updated_at",
+                 "approvals_prolongationrequest"."updated_by_id",
+                 "approvals_prolongationrequest"."report_file_id",
+                 "approvals_prolongationrequest"."require_phone_interview",
+                 "approvals_prolongationrequest"."contact_email",
+                 "approvals_prolongationrequest"."contact_phone",
+                 "approvals_prolongationrequest"."status",
+                 "approvals_prolongationrequest"."processed_at",
+                 "approvals_prolongationrequest"."processed_by_id",
+                 "approvals_prolongationrequest"."reminder_sent_at"
+          FROM "approvals_prolongationrequest"
+          WHERE ("approvals_prolongationrequest"."approval_id" = %s
+                 AND "approvals_prolongationrequest"."status" = %s)
+          ORDER BY "approvals_prolongationrequest"."created_at" DESC
+          LIMIT 1
         ''',
       }),
       dict({

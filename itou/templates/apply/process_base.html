@@ -44,7 +44,7 @@
                 <div class="col-12 col-lg-8 order-2 order-lg-1">
                     {% block content_extend %}{% endblock %}
                 </div>
-                <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                <div class="col-12 col-lg-4 order-1 order-lg-2">
                     {% block sidebar %}
                         {% if job_application.archived_at %}
                             <div class="c-box mb-4">
@@ -93,32 +93,28 @@
                         {% endif %}
                         {% if job_application.to_company.is_subject_to_eligibility_rules %}
                             {% if request.user.is_employer %}
-                                {% if not job_application.state.is_accepted and not job_application.state.is_cancelled %}
-                                    {# Employers need to know the expiration date of an approval #}
-                                    {# to decide whether they may accept a job application or not. #}
-                                    {% with common_approval=job_application.job_seeker.latest_common_approval %}
-                                        {% if common_approval %}
-                                            <div class="c-box mb-4">
-                                                {% include "approvals/includes/status.html" with common_approval=common_approval hiring_pending=job_application.is_pending %}
-                                            </div>
+                                {# Employers need to know the expiration date of an approval #}
+                                {# to decide whether they may accept a job application or not. #}
+                                {% with common_approval=job_application.job_seeker.latest_common_approval %}
+                                    {% if common_approval %}
+                                        {% if common_approval.is_valid or job_application.state.is_accepted %}
+                                            {% include "approvals/includes/box.html" with approval=common_approval link_from_current_url=request.get_full_path extra_class='mb-3 mb-md-4' only %}
                                         {% endif %}
-                                    {% endwith %}
-                                {% endif %}
-                            {% elif request.user.is_prescriber %}
-                                <div class="c-box mb-4">
-                                    {# Approval status. #}
-                                    {% if job_application.approval %}
-                                        {% include "approvals/includes/status.html" with common_approval=job_application.approval hiring_pending=job_application.is_pending %}
-                                    {% elif job_application.job_seeker.has_valid_approval %}
-                                        {% include "approvals/includes/status.html" with common_approval=job_application.job_seeker.latest_approval hiring_pending=job_application.is_pending %}
-                                    {% elif job_application.hiring_without_approval %}
-                                        Vous n'avez pas demandé de PASS IAE (agrément).
-                                    {% elif job_application.approval_manually_refused_at %}
-                                        PASS IAE refusé (délai de carence non respecté).
-                                    {% elif job_application.manual_approval_delivery_required %}
-                                        PASS IAE (agrément) en cours de délivrance.
                                     {% endif %}
-                                </div>
+                                {% endwith %}
+                            {% elif request.user.is_prescriber %}
+                                {# Approval status. #}
+                                {% if job_application.approval %}
+                                    {% include "approvals/includes/box.html" with approval=job_application.approval link_from_current_url=request.get_full_path extra_class='mb-3 mb-md-4' only %}
+                                {% elif job_application.job_seeker.has_valid_approval %}
+                                    {% include "approvals/includes/box.html" with approval=job_application.job_seeker.latest_approval link_from_current_url=request.get_full_path extra_class='mb-3 mb-md-4' only %}
+                                {% elif job_application.hiring_without_approval %}
+                                    <div class="c-box mb-4">Vous n'avez pas demandé de PASS IAE (agrément).</div>
+                                {% elif job_application.approval_manually_refused_at %}
+                                    <div class="c-box mb-4">PASS IAE refusé (délai de carence non respecté).</div>
+                                {% elif job_application.manual_approval_delivery_required %}
+                                    <div class="c-box mb-4">PASS IAE (agrément) en cours de délivrance.</div>
+                                {% endif %}
                             {% endif %}
                         {% endif %}
                     {% endblock %}
