@@ -28,7 +28,7 @@ from itou.companies.management.commands._import_siae.vue_structure import (
     get_vue_structure_df,
 )
 from itou.companies.models import Company
-from tests.approvals.factories import ApprovalFactory
+from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory, SiaeConventionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -264,3 +264,16 @@ class TestCouldSiaeBeDeleted:
     def test_with_job_app(self):
         company = JobApplicationFactory().to_company
         assert not could_siae_be_deleted(company)
+
+    def test_transferred_job_apps(self):
+        company = CompanyFactory()
+        JobApplicationFactory(transferred_from=company)
+        assert could_siae_be_deleted(company) is False
+
+    def test_sent_job_apps(self):
+        job_app = JobApplicationFactory(sent_by_another_employer=True)
+        assert could_siae_be_deleted(job_app.sender_company) is False
+
+    def test_prolongation_request(self):
+        prolongation_request = ProlongationRequestFactory()
+        assert could_siae_be_deleted(prolongation_request.declared_by_siae) is False
