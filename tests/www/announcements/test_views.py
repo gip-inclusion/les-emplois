@@ -1,9 +1,8 @@
 import pytest
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains
 
 from itou.users.enums import UserKind
-from itou.utils.constants import ITOU_HELP_CENTER_URL
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import parse_response_to_soup
@@ -91,17 +90,20 @@ class TestNewsRender:
         paged_campaigns = campaigns[items_per_page : (items_per_page + expected_len)]
         self._assert_all_items_rendered(response, *paged_campaigns)
 
-    def test_none_exists(self, client):
-        expected_redirect_url = f"{ ITOU_HELP_CENTER_URL }/categories/25225629682321--Nouveaut%C3%A9s"
+    def test_none_exists(self, client, snapshot):
+        def assert_content_matches_snapshot(response):
+            content = parse_response_to_soup(response, ".s-section__container")
+            assert str(content) == snapshot(name="none_exists")
 
         client.force_login(PrescriberFactory())
         url = reverse("announcements:news")
-        assertRedirects(client.get(url), expected_redirect_url, fetch_redirect_response=False)
+
+        assert_content_matches_snapshot(client.get(url))
 
         AnnouncementCampaignFactory(live=False, with_item=True)
-        assertRedirects(client.get(url), expected_redirect_url, fetch_redirect_response=False)
+        assert_content_matches_snapshot(client.get(url))
 
         # it's also possible that there are live campaigns without content for my user kind
         AnnouncementItemFactory(user_kind_tags=[UserKind.PRESCRIBER])
         client.force_login(JobSeekerFactory())
-        assertRedirects(client.get(url), expected_redirect_url, fetch_redirect_response=False)
+        assert_content_matches_snapshot(client.get(url))
