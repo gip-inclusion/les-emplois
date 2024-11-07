@@ -1,6 +1,5 @@
 import datetime
 
-import pytest  # noqa
 from django.template import Context, Template
 from django.test import RequestFactory
 from freezegun import freeze_time
