@@ -97,6 +97,12 @@ urlpatterns = [
         name="update_job_seeker_step_end_for_hire",
         kwargs={"hire_process": True},
     ),
+    path(
+        "<int:company_pk>/hire/<uuid:job_seeker_public_id>/check-infos",
+        views.CheckJobSeekerInformationsForHire.as_view(),
+        name="check_job_seeker_info_for_hire",
+        kwargs={"hire_process": True},
+    ),
     # For job seeker
     path(
         "<int:company_pk>/job-seeker/check-nir",
@@ -123,5 +129,11 @@ urlpatterns = [
         "<int:company_pk>/update/<uuid:job_seeker_public_id>/end",
         views.UpdateJobSeekerStepEndView.as_view(),
         name="update_job_seeker_step_end",
+    ),
+    # Common
+    path(
+        "<int:company_pk>/create/<uuid:job_seeker_public_id>/check-infos",
+        views.CheckJobSeekerInformations.as_view(),
+        name="check_job_seeker_info",
     ),
 ]

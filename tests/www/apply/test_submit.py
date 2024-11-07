@@ -102,7 +102,7 @@ class TestApply:
 
         job_seeker = JobSeekerFactory()
         for viewname in (
-            "apply:step_check_job_seeker_info",
+            "job_seekers_views:check_job_seeker_info",
             "apply:step_check_prev_applications",
             "apply:application_jobs",
             "apply:application_eligibility",
@@ -149,7 +149,7 @@ class TestApply:
         prescriber = PrescriberFactory()
         client.force_login(prescriber)
         for viewname in (
-            "apply:step_check_job_seeker_info",
+            "job_seekers_views:check_job_seeker_info",
             "apply:step_check_prev_applications",
             "apply:application_jobs",
             "apply:application_eligibility",
@@ -210,7 +210,7 @@ class TestHire:
 
         job_seeker = JobSeekerFactory()
         for viewname in (
-            "apply:check_job_seeker_info_for_hire",
+            "job_seekers_views:check_job_seeker_info_for_hire",
             "apply:check_prev_applications_for_hire",
             "apply:eligibility_for_hire",
             "apply:geiq_eligibility_for_hire",
@@ -271,7 +271,7 @@ class TestHire:
         prescriber = PrescriberFactory()
         client.force_login(company.members.first())
         for viewname in (
-            "apply:check_job_seeker_info_for_hire",
+            "job_seekers_views:check_job_seeker_info_for_hire",
             "apply:check_prev_applications_for_hire",
             "apply:eligibility_for_hire",
             "apply:geiq_eligibility_for_hire",
@@ -287,7 +287,7 @@ class TestHire:
         job_seeker = user_with_approval_in_waiting_period()
         client.force_login(company.members.first())
         for viewname in (
-            "apply:check_job_seeker_info_for_hire",
+            "job_seekers_views:check_job_seeker_info_for_hire",
             "apply:check_prev_applications_for_hire",
             "apply:eligibility_for_hire",
             "apply:hire_confirmation",
@@ -388,7 +388,7 @@ class TestApplyAsJobSeeker:
         assert user.jobseeker_profile.nir == nir
 
         next_url = reverse(
-            "apply:step_check_job_seeker_info",
+            "job_seekers_views:check_job_seeker_info",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id},
         )
         assert response.url == next_url
@@ -530,7 +530,7 @@ class TestApplyAsJobSeeker:
         user.jobseeker_profile.refresh_from_db()
         assert not user.jobseeker_profile.nir
         check_job_seeker_info_url = reverse(
-            "apply:step_check_job_seeker_info",
+            "job_seekers_views:check_job_seeker_info",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id},
         )
         assertContains(
@@ -584,7 +584,7 @@ class TestApplyAsJobSeeker:
         response = client.get(next_url)
 
         next_url = reverse(
-            "apply:step_check_job_seeker_info",
+            "job_seekers_views:check_job_seeker_info",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         assert response.url == next_url
@@ -1810,7 +1810,7 @@ class TestApplyAsPrescriber:
         )
 
         next_url = reverse(
-            "apply:step_check_job_seeker_info",
+            "job_seekers_views:check_job_seeker_info",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": dummy_job_seeker.public_id},
         )
 
@@ -1912,7 +1912,7 @@ class TestApplyAsPrescriberNirExceptions:
         assertRedirects(
             response,
             reverse(
-                "apply:step_check_job_seeker_info",
+                "job_seekers_views:check_job_seeker_info",
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
             target_status_code=302,
@@ -1970,7 +1970,7 @@ class TestApplyAsPrescriberNirExceptions:
         assertRedirects(
             response,
             reverse(
-                "apply:step_check_job_seeker_info",
+                "job_seekers_views:check_job_seeker_info",
                 kwargs={"company_pk": siae.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
             target_status_code=302,
@@ -2372,7 +2372,7 @@ class TestApplyAsCompany:
         )
 
         next_url = reverse(
-            "apply:step_check_job_seeker_info",
+            "job_seekers_views:check_job_seeker_info",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": dummy_job_seeker.public_id},
         )
 
@@ -2730,7 +2730,7 @@ class TestDirectHireFullProcess:
         assertTemplateNotUsed(response, "approvals/includes/status.html")
         assertContains(response, "Valider l’embauche")
         check_infos_url = reverse(
-            "apply:check_job_seeker_info_for_hire",
+            "job_seekers_views:check_job_seeker_info_for_hire",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assertContains(response, LINK_RESET_MARKUP % check_infos_url)
@@ -2805,7 +2805,7 @@ class TestDirectHireFullProcess:
 
         response = client.post(check_nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": 1})
         check_infos_url = reverse(
-            "apply:check_job_seeker_info_for_hire",
+            "job_seekers_views:check_job_seeker_info_for_hire",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         assertRedirects(response, check_infos_url, fetch_redirect_response=False)
@@ -2876,7 +2876,7 @@ class TestDirectHireFullProcess:
         assertTemplateNotUsed(response, "approvals/includes/status.html")
         assertContains(response, "Valider l’embauche")
         check_infos_url = reverse(
-            "apply:check_job_seeker_info_for_hire",
+            "job_seekers_views:check_job_seeker_info_for_hire",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         assertContains(response, LINK_RESET_MARKUP % check_infos_url)
@@ -3805,7 +3805,7 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
     STEP_2_VIEW_NAME = "job_seekers_views:update_job_seeker_step_2_for_hire"
     STEP_3_VIEW_NAME = "job_seekers_views:update_job_seeker_step_3_for_hire"
     STEP_END_VIEW_NAME = "job_seekers_views:update_job_seeker_step_end_for_hire"
-    FINAL_REDIRECT_VIEW_NAME = "apply:check_job_seeker_info_for_hire"
+    FINAL_REDIRECT_VIEW_NAME = "job_seekers_views:check_job_seeker_info_for_hire"
 
     def test_anonymous_step_1(self, client):
         response = client.get(self.step_1_url)
@@ -4415,7 +4415,7 @@ class TestCheckPreviousApplicationsView:
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         self.job_seeker = JobSeekerFactory()
         self.check_infos_url = reverse(
-            "apply:step_check_job_seeker_info",
+            "job_seekers_views:check_job_seeker_info",
             kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
         )
         self.check_prev_applications_url = reverse(
@@ -4594,7 +4594,7 @@ class TestFindJobSeekerForHireView:
         assertRedirects(
             response,
             reverse(
-                "apply:check_job_seeker_info_for_hire",
+                "job_seekers_views:check_job_seeker_info_for_hire",
                 kwargs={"company_pk": self.company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
         )
@@ -4652,7 +4652,7 @@ class TestFindJobSeekerForHireView:
         assertRedirects(
             response,
             reverse(
-                "apply:check_job_seeker_info_for_hire",
+                "job_seekers_views:check_job_seeker_info_for_hire",
                 kwargs={"company_pk": self.company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
         )
@@ -4716,7 +4716,7 @@ class TestCheckJobSeekerInformationsForHire:
         client.force_login(company.members.first())
         response = client.get(
             reverse(
-                "apply:check_job_seeker_info_for_hire",
+                "job_seekers_views:check_job_seeker_info_for_hire",
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
@@ -4759,7 +4759,7 @@ class TestCheckJobSeekerInformationsForHire:
         client.force_login(company.members.first())
         response = client.get(
             reverse(
-                "apply:check_job_seeker_info_for_hire",
+                "job_seekers_views:check_job_seeker_info_for_hire",
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
@@ -4869,7 +4869,7 @@ class TestEligibilityForHire:
         response = client.get(self._reverse("apply:eligibility_for_hire"))
         assertContains(response, "Déclarer l’embauche de Ellie GIBILITAY")
         assertContains(response, "Valider l'éligibilité IAE")
-        assertContains(response, self._reverse("apply:check_job_seeker_info_for_hire"))  # cancel button
+        assertContains(response, self._reverse("job_seekers_views:check_job_seeker_info_for_hire"))  # cancel button
 
         criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
         criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
@@ -4919,7 +4919,7 @@ class TestGEIQEligibilityForHire:
         response = client.get(self._reverse("apply:geiq_eligibility_for_hire"))
         assertContains(response, "Déclarer l’embauche de Ellie GIBILITAY")
         assertContains(response, "Eligibilité GEIQ")
-        assertContains(response, self._reverse("apply:check_job_seeker_info_for_hire"))  # cancel button
+        assertContains(response, self._reverse("job_seekers_views:check_job_seeker_info_for_hire"))  # cancel button
 
         response = client.post(
             self._reverse("apply:geiq_eligibility_for_hire"),
@@ -4929,7 +4929,7 @@ class TestGEIQEligibilityForHire:
         criteria_url = add_url_params(
             self._reverse("apply:geiq_eligibility_criteria_for_hire"),
             {
-                "back_url": self._reverse("apply:check_job_seeker_info_for_hire"),
+                "back_url": self._reverse("job_seekers_views:check_job_seeker_info_for_hire"),
                 "next_url": self._reverse("apply:hire_confirmation"),
             },
         )

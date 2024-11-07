@@ -113,11 +113,11 @@ class TestWelcomingTourExceptions:
         # another action before signing up.
         assert response.wsgi_request.path not in reverse("welcoming_tour:index")
 
-        # The user is redirected to "apply:step_check_job_seeker_info"
+        # The user is redirected to "job_seekers_views:check_job_seeker_info"
         # as birthdate and pole_emploi_id are missing from the signup form.
         # This is a valid behavior that may change in the future so
         # let's avoid too specific tests.
-        assert response.wsgi_request.path.startswith("/apply")
+        assert response.wsgi_request.path.startswith("/job-seekers")
 
         content = mailoutbox[0].body
         assert next_to in content

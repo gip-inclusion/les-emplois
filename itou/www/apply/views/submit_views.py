@@ -27,7 +27,6 @@ from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params
 from itou.www.apply.forms import (
     ApplicationJobsForm,
-    CheckJobSeekerInfoForm,
     SubmitJobApplicationForm,
 )
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
@@ -235,7 +234,11 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
         return super().dispatch(request, *args, **kwargs)
 
     def redirect_to_check_infos(self, job_seeker_public_id):
-        view_name = "apply:check_job_seeker_info_for_hire" if self.hire_process else "apply:step_check_job_seeker_info"
+        view_name = (
+            "job_seekers_views:check_job_seeker_info_for_hire"
+            if self.hire_process
+            else "job_seekers_views:check_job_seeker_info"
+        )
         return HttpResponseRedirect(
             reverse(view_name, kwargs={"company_pk": self.company.pk, "job_seeker_public_id": job_seeker_public_id})
         )
@@ -301,75 +304,6 @@ class StartView(ApplyStepBaseView):
 
 class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
     template_name = "apply/submit_step_pending_authorization.html"
-
-
-class CheckJobSeekerInformations(ApplicationBaseView):
-    """
-    Ensure the job seeker has all required info.
-    """
-
-    template_name = "job_seekers_views/check_job_seeker_info.html"
-
-    def __init__(self):
-        super().__init__()
-
-        self.form = None
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-
-        self.form = CheckJobSeekerInfoForm(instance=self.job_seeker, data=request.POST or None)
-
-    def get(self, request, *args, **kwargs):
-        # Check required info that will allow us to find a pre-existing approval.
-        has_required_info = self.job_seeker.jobseeker_profile.birthdate and (
-            self.job_seeker.jobseeker_profile.pole_emploi_id
-            or self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason
-        )
-        if has_required_info:
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:step_check_prev_applications",
-                    kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-                )
-            )
-
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        if self.form.is_valid():
-            self.form.save()
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:step_check_prev_applications",
-                    kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-                )
-            )
-
-        return self.render_to_response(self.get_context_data(**kwargs))
-
-    def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {
-            "form": self.form,
-        }
-
-
-class CheckJobSeekerInformationsForHire(ApplicationBaseView):
-    """
-    Ensure the job seeker has all required info.
-    """
-
-    template_name = "job_seekers_views/check_job_seeker_info_for_hire.html"
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        assert self.hire_process
-
-    def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {
-            "profile": self.job_seeker.jobseeker_profile,
-            "back_url": reverse("job_seekers_views:check_nir_for_hire", kwargs={"company_pk": self.company.pk}),
-        }
 
 
 class CheckPreviousApplications(ApplicationBaseView):
@@ -869,7 +803,7 @@ def eligibility_for_hire(
         company,
         job_seeker,
         cancel_url=reverse(
-            "apply:check_job_seeker_info_for_hire",
+            "job_seekers_views:check_job_seeker_info_for_hire",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         ),
         next_url=next_url,
@@ -899,7 +833,7 @@ def geiq_eligibility_for_hire(
         company,
         job_seeker,
         back_url=reverse(
-            "apply:check_job_seeker_info_for_hire",
+            "job_seekers_views:check_job_seeker_info_for_hire",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         ),
         next_url=next_url,
@@ -970,7 +904,7 @@ def hire_confirmation(
             "apply:hire_confirmation", kwargs={"company_pk": company_pk, "job_seeker_public_id": job_seeker_public_id}
         ),
         back_url=reverse(
-            "apply:check_job_seeker_info_for_hire",
+            "job_seekers_views:check_job_seeker_info_for_hire",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         ),
         template_name=template_name,
