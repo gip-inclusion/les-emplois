@@ -3,7 +3,6 @@ from urllib.parse import urlencode
 import respx
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import get_user
 from django.shortcuts import reverse
 from django.utils.html import escape
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
@@ -346,11 +345,9 @@ class TestAcceptInvitation:
             previous_url=previous_url,
             next_url=next_url,
         )
-        # response redirects to /invitation/uid/join-company
-        response = client.get(response.url)
-        # company is inactive so the user will be logged out
-        response = sso_setup.assert_and_mock_forced_logout(client, response)
-        assert not get_user(client).is_authenticated
+        # Follow the redirection.
+        response = client.get(response.url, follow=True)
+        assertRedirects(response, reverse("account_logout"))
         assertMessages(
             response,
             [

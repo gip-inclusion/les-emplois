@@ -4,13 +4,14 @@ from functools import partial
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.contrib.auth import get_user
+from django.contrib import messages
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import (
     assertContains,
+    assertMessages,
     assertNotContains,
     assertRedirects,
     assertTemplateNotUsed,
@@ -104,12 +105,20 @@ class TestDashboardView:
 
         url = reverse("dashboard:index")
         response = client.get(url, follow=True)
-        # Should be redirected to home page and logged out
-        assertRedirects(response, reverse("search:employers_home"))
-        assert response.status_code == 200
-        assert not get_user(client).is_authenticated
-        expected_message = "votre compte n&#x27;est malheureusement plus actif"
-        assertContains(response, expected_message)
+        assertRedirects(response, reverse("account_logout"))
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.WARNING,
+                    (
+                        "Nous sommes désolés, votre compte n'est malheureusement plus actif car la ou les "
+                        "structures associées ne sont plus conventionnées. "
+                        "Nous espérons cependant avoir l'occasion de vous accueillir de nouveau."
+                    ),
+                )
+            ],
+        )
 
     def test_dashboard_eiti(self, client):
         company = CompanyFactory(kind=CompanyKind.EITI, with_membership=True)

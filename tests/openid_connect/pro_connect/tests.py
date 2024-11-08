@@ -604,8 +604,9 @@ class TestProConnectCallbackView:
             UserKind.PRESCRIBER,
             oidc_userinfo=oidc_userinfo,
         )
-        response = assert_and_mock_forced_logout(client, response)
-        assert get_user(client).is_authenticated is False
+        # fetch post login page to trigger perm middleware
+        response = client.get(response.url)
+        assertRedirects(response, reverse("account_logout"))
         assertMessages(
             response,
             [
@@ -618,6 +619,10 @@ class TestProConnectCallbackView:
             ],
         )
 
+        response = client.post(reverse("account_logout"))
+        assert_and_mock_forced_logout(client, response)
+        assert get_user(client).is_authenticated is False
+
     @respx.mock
     def test_callback_ft_users_unknown_safir(self, client):
         PrescriberFactory(**dataclasses.asdict(ProConnectPrescriberData.from_user_info(OIDC_USERINFO)))
@@ -628,8 +633,9 @@ class TestProConnectCallbackView:
             UserKind.PRESCRIBER,
             oidc_userinfo=oidc_userinfo,
         )
-        response = assert_and_mock_forced_logout(client, response)
-        assert get_user(client).is_authenticated is False
+        # fetch post login page to trigger perm middleware
+        response = client.get(response.url)
+        assertRedirects(response, reverse("account_logout"))
         assertMessages(
             response,
             [
@@ -650,6 +656,10 @@ class TestProConnectCallbackView:
                 ),
             ],
         )
+
+        response = client.post(reverse("account_logout"))
+        assert_and_mock_forced_logout(client, response)
+        assert get_user(client).is_authenticated is False
 
     @respx.mock
     def test_callback_ft_users_unknown_safir_already_in_org(self, client):
@@ -709,12 +719,13 @@ class TestProConnectLogin:
         He logs out.
         He can log in again later.
         """
-        # Create an account with IC.
+        # Create an account with ProConnect.
         response = mock_oauth_dance(client, UserKind.PRESCRIBER)
         client.get(response.url)  # display welcoming_tour
 
         # Then log out.
         response = client.post(reverse("account_logout"))
+        assert_and_mock_forced_logout(client, response)
 
         # Then log in again.
         login_url = reverse("login:prescriber")
@@ -732,8 +743,8 @@ class TestProConnectLogin:
     def test_old_django_account(self, client):
         """
         A user has a Django account.
-        He clicks on IC button and creates his account.
-        His old Django account should now be considered as an IC one.
+        He clicks on ProConnect button and creates his account.
+        His old Django account should now be considered as an ProConnect one.
         """
         user_info = OIDC_USERINFO
         user = PrescriberFactory(
@@ -742,8 +753,8 @@ class TestProConnectLogin:
             identity_provider=IdentityProvider.DJANGO,
         )
 
-        # Existing user connects with IC which results in:
-        # - IC side: account creation
+        # Existing user connects with Proconnect which results in:
+        # - ProConnect side: account creation
         # - Django side: account update.
         # This logic is already tested here: ProConnectModelTest
         response = mock_oauth_dance(client, UserKind.PRESCRIBER, expected_redirect_url=reverse("dashboard:index"))
@@ -753,7 +764,7 @@ class TestProConnectLogin:
         assert users_count == 1
 
         response = client.post(reverse("account_logout"))
-        assert response.status_code == 302
+        assert_and_mock_forced_logout(client, response)
         assert not auth.get_user(client).is_authenticated
 
         # Try to login with Django.
@@ -824,8 +835,8 @@ class TestProConnectLogout:
     @respx.mock
     def test_django_account_logout_from_pro(self, client):
         """
-        When ac IC user wants to log out from his local account,
-        he should be logged out too from IC.
+        When ac ProConnect user wants to log out from his local account,
+        he should be logged out too from ProConnect.
         """
         response = mock_oauth_dance(client, UserKind.PRESCRIBER)
         assert auth.get_user(client).is_authenticated
@@ -836,13 +847,7 @@ class TestProConnectLogout:
         assert client.session.get(constants.PRO_CONNECT_SESSION_KEY)
 
         response = client.post(logout_url)
-        expected_redirection = reverse("pro_connect:logout")
-        # For simplicity, exclude GET params. They are tested elsewhere anyway..
-        assert response.url.startswith(expected_redirection)
-
-        response = client.get(response.url)
-        # The following redirection is tested in self.test_logout_with_redirection
-        assert response.status_code == 302
+        assert_and_mock_forced_logout(client, response)
         assert not auth.get_user(client).is_authenticated
 
     def test_django_account_logout(self, client):
@@ -869,6 +874,7 @@ class TestProConnectLogout:
 
         response = client.post(reverse("account_logout"))
         assertRedirects(response, reverse("search:employers_home"))
+        assert not auth.get_user(client).is_authenticated
 
 
 class TestProConnectMapChannel:
@@ -914,7 +920,7 @@ class TestProConnectMapChannel:
         )
 
         # Prescriber does not belong to this organization on Itou but
-        # IC says that he is allowed to join it.
+        # ProConnect says that he is allowed to join it.
         # A new user should be created automatically, only when coming from MAP conseiller,
         # and then be able to see a job application details.
         url_from_map = "{path}?channel={channel}".format(
@@ -949,7 +955,7 @@ class TestProConnectMapChannel:
         )
 
         # Prescriber does not belong to this organization on Itou but
-        # IC says that he is allowed to join it.
+        # ProConnect says that he is allowed to join it.
         # A new user should be created automatically and redirected to the job application details page.
         url_from_map = "{path}?channel={channel}".format(
             path=reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk}),
@@ -968,10 +974,11 @@ class TestProConnectMapChannel:
             channel=ProConnectChannel.MAP_CONSEILLER,
             oidc_userinfo=OIDC_USERINFO_FT_WITH_SAFIR.copy(),
         )
-        response = assert_and_mock_forced_logout(client, response)
+        # fetch post login page to trigger perm middleware
+        response = client.get(response.url)
+        assertRedirects(response, reverse("account_logout"))
 
         assert job_application.sender_prescriber_organization.members.count() == 1
-        assert not auth.get_user(client).is_authenticated
 
         assertMessages(
             response,
@@ -993,3 +1000,7 @@ class TestProConnectMapChannel:
                 ),
             ],
         )
+
+        response = client.post(reverse("account_logout"))
+        assert_and_mock_forced_logout(client, response)
+        assert get_user(client).is_authenticated is False

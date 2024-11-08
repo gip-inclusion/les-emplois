@@ -1,8 +1,8 @@
 import pytest
-from django.contrib.auth import get_user
+from django.contrib import messages
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains
 
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.companies.factories import (
@@ -160,10 +160,19 @@ class TestUserMembershipDeactivation:
         url = reverse("dashboard:index")
         response = client.get(url)
 
-        # should be redirected to home page and logged out
+        # should be redirected to logout
         assert response.status_code == 302
-        assert response.url == reverse("search:employers_home")
-        assert not get_user(client).is_authenticated
+        assert response.url == reverse("account_logout")
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.WARNING,
+                    "Nous sommes désolés, votre compte n'est actuellement rattaché à aucune structure."
+                    "<br>Nous espérons cependant avoir l'occasion de vous accueillir de nouveau.",
+                ),
+            ],
+        )
 
     def test_structure_selector(self, client):
         """
