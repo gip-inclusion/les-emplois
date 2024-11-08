@@ -292,7 +292,7 @@ def inclusion_connect_callback(request):
         _add_user_kind_error_message(request, existing_user, user_kind)
         is_successful = False
     except MultipleSubSameEmailException as e:
-        messages.error(request, e.format_message_html(IdentityProvider.INCLUSION_CONNECT, ic_user_data.username))
+        messages.error(request, e.format_message_html(IdentityProvider.INCLUSION_CONNECT))
         is_successful = False
     except EmailInUseException as e:
         return redirect_with_error_sso_email_conflict_on_registration(

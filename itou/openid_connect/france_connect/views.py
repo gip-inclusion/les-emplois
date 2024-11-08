@@ -127,8 +127,7 @@ def france_connect_callback(request):
         return HttpResponseRedirect(UserKind.get_login_url(e.user.kind))
     except MultipleSubSameEmailException as e:
         return _redirect_to_job_seeker_login_on_error(
-            e.format_message_html(IdentityProvider.FRANCE_CONNECT, fc_user_data.username),
-            request=request,
+            e.format_message_html(IdentityProvider.FRANCE_CONNECT), request=request
         )
     except EmailInUseException as e:
         return redirect_with_error_sso_email_conflict_on_registration(

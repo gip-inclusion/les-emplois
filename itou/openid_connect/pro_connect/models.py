@@ -49,6 +49,12 @@ class ProConnectPrescriberData(ProConnectUserData):
         IdentityProvider.DJANGO,
         IdentityProvider.INCLUSION_CONNECT,
     )
+    # Only ProConnect may update the sub based on the email.
+    # Users may delete the account on MonComptePro (the default identity provider for ProConnect)
+    # and create a new one, changing the sub in the process and generating many support tickets.
+    # We are confident that the email is enough to identity prescribers and employers
+    # See https://mattermost.incubateur.net/betagouv/pl/c3g197oud3dr5pg5yaq344dh9r
+    allow_sub_update = True
 
 
 @dataclasses.dataclass
@@ -59,3 +65,9 @@ class ProConnectEmployerData(ProConnectUserData):
         IdentityProvider.DJANGO,
         IdentityProvider.INCLUSION_CONNECT,
     )
+    # Only ProConnect may update the sub based on the email.
+    # Users may delete the account on MonComptePro (the default identity provider for ProConnect)
+    # and create a new one, changing the sub in the process and generating many support tickets.
+    # We are confident that the email is enough to identity prescribers and employers
+    # See https://mattermost.incubateur.net/betagouv/pl/c3g197oud3dr5pg5yaq344dh9r
+    allow_sub_update = True

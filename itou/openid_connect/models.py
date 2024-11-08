@@ -29,16 +29,13 @@ class MultipleSubSameEmailException(Exception):
         self.user = user
         super().__init__(*args)
 
-    def format_message_html(self, identity_provider, new_sub):
+    def format_message_html(self, identity_provider):
         return format_html(
-            "La connexion via {} a échoué car un compte existe déjà avec "
-            "l’adresse email {} (ancien id {} / nouvel id {}). "
+            "La connexion via {} a échoué car un compte existe déjà avec l’adresse email {}. "
             "Veuillez vous rapprocher du support pour débloquer la situation en suivant "
-            "<a href='{}'>ce lien</a> et en leur transmettant ce message.",
+            "<a href='{}'>ce lien</a>.",
             identity_provider.label,
             self.user.email,
-            self.user.username,
-            new_sub,
             ITOU_HELP_CENTER_URL,
         )
 
@@ -131,6 +128,7 @@ class OIDConnectUserData:
     identity_provider: IdentityProvider
     kind: UserKind
     allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = ()
+    allow_sub_update: ClassVar[bool] = False
 
     @property
     def login_allowed_user_kinds(self) -> tuple[UserKind]:
@@ -166,16 +164,9 @@ class OIDConnectUserData:
                 # A different user has already claimed this email address (we require emails to be unique)
                 user = User.objects.get(email=self.email)
                 if user.identity_provider == self.identity_provider:
-                    logger.error(
-                        "Email %s already in used with provider %s : old_sub=%s new_sub=%s",
-                        self.email,
-                        self.identity_provider.label,
-                        user.username,
-                        self.username,
-                        exc_info=True,
-                    )
-                    raise MultipleSubSameEmailException(user)
-                if user.identity_provider not in self.allowed_identity_provider_migration:
+                    if not self.allow_sub_update:
+                        raise MultipleSubSameEmailException(user)
+                elif user.identity_provider not in self.allowed_identity_provider_migration:
                     self.check_valid_kind(user, user_data_dict, is_login)
                     raise EmailInUseException(user)
             except User.DoesNotExist:

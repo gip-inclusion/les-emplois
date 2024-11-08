@@ -24,7 +24,6 @@ from ..errors import redirect_with_error_sso_email_conflict_on_registration
 from ..models import (
     EmailInUseException,
     InvalidKindException,
-    MultipleSubSameEmailException,
     MultipleUsersFoundException,
 )
 from . import constants
@@ -242,9 +241,6 @@ def pro_connect_callback(request):
     except InvalidKindException:
         existing_user = User.objects.get(email=user_data["email"])
         _add_user_kind_error_message(request, existing_user, user_kind)
-        is_successful = False
-    except MultipleSubSameEmailException as e:
-        messages.error(request, e.format_message_html(IdentityProvider.PRO_CONNECT, pc_user_data.username))
         is_successful = False
     except EmailInUseException as e:
         return redirect_with_error_sso_email_conflict_on_registration(
