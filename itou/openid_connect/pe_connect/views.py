@@ -138,8 +138,7 @@ def pe_connect_callback(request):
         return HttpResponseRedirect(UserKind.get_login_url(e.user.kind))
     except MultipleSubSameEmailException as e:
         return _redirect_to_job_seeker_login_on_error(
-            e.format_message_html(IdentityProvider.PE_CONNECT, pe_user_data.username),
-            request=request,
+            e.format_message_html(IdentityProvider.PE_CONNECT), request=request
         )
     except MultipleUsersFoundException as e:
         return _redirect_to_job_seeker_login_on_error(

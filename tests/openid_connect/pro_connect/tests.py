@@ -26,7 +26,7 @@ from pytest_django.asserts import (
 )
 
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
-from itou.openid_connect.models import InvalidKindException, MultipleSubSameEmailException
+from itou.openid_connect.models import InvalidKindException
 from itou.openid_connect.pro_connect import constants
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.openid_connect.pro_connect.models import (
@@ -162,8 +162,8 @@ class TestProConnectModel:
 
     def test_create_user_from_user_info_with_already_existing_email_but_other_sub(self, caplog):
         """
-        If there already is an existing user with this emailbut another ProConnect sub,
-        raise an error and log something.
+        If there already is an existing user with this email but another ProConnect sub,
+        allow login and update the sub.
         """
         pc_user_data = ProConnectPrescriberData.from_user_info(OIDC_USERINFO)
         PrescriberFactory(
@@ -171,13 +171,12 @@ class TestProConnectModel:
             identity_provider=users_enums.IdentityProvider.PRO_CONNECT,
             email=pc_user_data.email,
         )
-        with pytest.raises(MultipleSubSameEmailException):
-            pc_user_data.create_or_update_user()
-
-        assert caplog.messages == [
-            f"Email {pc_user_data.email} already in used with provider ProConnect : "
-            "old_sub=another_sub new_sub=af6b26f9-85cd-484e-beb9-bea5be13e30f"
-        ]
+        user, created = pc_user_data.create_or_update_user()
+        assert not created
+        assert user.username == OIDC_USERINFO["sub"]
+        assert user.last_name == OIDC_USERINFO["usual_name"]
+        assert user.first_name == OIDC_USERINFO["given_name"]
+        assert user.external_data_source_history[0]["source"] == "PC"
 
     def test_join_org(self, caplog):
         # New membership.
@@ -508,21 +507,18 @@ class TestProConnectCallbackView:
             user.delete()
 
     @respx.mock
-    def test_callback_redirect_on_sub_conflict(self, client, snapshot):
+    def test_callback_update_sub_on_sub_conflict(self, client, snapshot):
         oidc_user_data = ProConnectPrescriberData.from_user_info(OIDC_USERINFO)
-        PrescriberFactory(
+        user = PrescriberFactory(
             username="another_sub", email=oidc_user_data.email, identity_provider=IdentityProvider.PRO_CONNECT
         )
 
-        # Test redirection and modal content
-        response = mock_oauth_dance(
+        mock_oauth_dance(
             client,
             UserKind.PRESCRIBER,
-            expected_redirect_url=add_url_params(
-                reverse("pro_connect:logout"), {"redirect_url": reverse("search:employers_home")}
-            ),
         )
-        assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
+        user.refresh_from_db()
+        assert user.username == OIDC_USERINFO["sub"]
 
     @respx.mock
     def test_callback_updating_email_collision(self, client):
