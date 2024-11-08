@@ -48,7 +48,7 @@ def pprint_html(response, **selectors):
 
 
 def remove_static_hash(content):
-    return re.sub(r"\.[\da-f]{12}\.svg\b", ".svg", content)
+    return re.sub(r"\.[\da-f]{12}\.(svg|png|jpg)\b", r".\1", content)
 
 
 def parse_response_to_soup(response, selector=None, no_html_body=False, replace_in_attr=None):

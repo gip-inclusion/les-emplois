@@ -17,6 +17,26 @@
         </div>
     {% endif %}
 
+    {% if user.is_prescriber and not request.current_organization %}
+        <div class="alert alert-warning" role="alert">
+            <p class="mb-0">Votre compte n’est actuellement rattaché à aucune organisation.</p>
+            <p>Les candidatures de prescripteur sans organisation ont 2 fois moins de chances d’être acceptées !</p>
+            <ul>
+                <li>
+                    Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser <a href="https://tally.so/r/npPpNq">ce formulaire d’aide</a>.
+                </li>
+                <li>
+                    Si vous souhaitez rejoindre le tableau de bord d’une organisation présente sur les Emplois de l’inclusion, vous pouvez demander à un de vos collègues de vous inviter.
+                </li>
+                <li>
+                    Si votre organisation ne dispose pas encore d'un espace professionnel sur les Emplois de l’inclusion, utilisez
+                    <a href="{% url 'signup:prescriber_check_already_exists' %}">le formulaire d'inscription</a>.
+                </li>
+            </ul>
+            <p>Sans action de votre part avant le 31 décembre 2024, l'accès à votre compte sera désactivé.</p>
+        </div>
+    {% endif %}
+
     {# Alerte pour les employeurs en cas d'absence ou de mauvais score de geocoding. #}
     {% if user.is_employer and request.current_organization and not request.current_organization.has_reliable_coords_legacy %}
         <div class="alert alert-warning alert-dismissible show" role="status">

@@ -347,18 +347,8 @@ class TestAcceptInvitation:
         )
         # Follow the redirection.
         response = client.get(response.url, follow=True)
-        assertRedirects(response, reverse("account_logout"))
-        assertMessages(
-            response,
-            [
-                messages.Message(messages.ERROR, "Cette structure n'est plus active."),
-                messages.Message(
-                    messages.WARNING,
-                    "Nous sommes désolés, votre compte n'est actuellement rattaché à aucune structure."
-                    "<br>Nous espérons cependant avoir l'occasion de vous accueillir de nouveau.",
-                ),
-            ],
-        )
+        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "employer_no_company"}))
+
         user = User.objects.get(email=invitation.email)
         assert user.company_set.count() == 0
 
