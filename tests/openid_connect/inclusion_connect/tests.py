@@ -580,8 +580,9 @@ class TestInclusionConnectCallbackViewTest:
             UserKind.PRESCRIBER,
             oidc_userinfo=oidc_userinfo,
         )
-        response = assert_and_mock_forced_logout(client, response)
-        assert get_user(client).is_authenticated is False
+        # fetch post login page to trigger perm middleware
+        response = client.get(response.url)
+        assertRedirects(response, reverse("account_logout"))
         assertMessages(
             response,
             [
@@ -594,6 +595,10 @@ class TestInclusionConnectCallbackViewTest:
             ],
         )
 
+        response = client.post(reverse("account_logout"))
+        assert_and_mock_forced_logout(client, response)
+        assert get_user(client).is_authenticated is False
+
     @respx.mock
     def test_callback_ft_users_unknown_safir(self, client):
         PrescriberFactory(**dataclasses.asdict(InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)))
@@ -604,8 +609,9 @@ class TestInclusionConnectCallbackViewTest:
             UserKind.PRESCRIBER,
             oidc_userinfo=oidc_userinfo,
         )
-        response = assert_and_mock_forced_logout(client, response)
-        assert get_user(client).is_authenticated is False
+        # fetch post login page to trigger perm middleware
+        response = client.get(response.url)
+        assertRedirects(response, reverse("account_logout"))
         assertMessages(
             response,
             [
@@ -626,6 +632,10 @@ class TestInclusionConnectCallbackViewTest:
                 ),
             ],
         )
+
+        response = client.post(reverse("account_logout"))
+        assert_and_mock_forced_logout(client, response)
+        assert get_user(client).is_authenticated is False
 
     @respx.mock
     def test_callback_ft_users_unknown_safir_already_in_org(self, client):
@@ -738,6 +748,7 @@ class TestInclusionConnectLogin:
 
         # Then log out.
         response = client.post(reverse("account_logout"))
+        assert_and_mock_forced_logout(client, response)
 
         # Then log in again.
         login_url = reverse("login:prescriber")
@@ -776,7 +787,7 @@ class TestInclusionConnectLogin:
         assert users_count == 1
 
         response = client.post(reverse("account_logout"))
-        assert response.status_code == 302
+        assert_and_mock_forced_logout(client, response)
         assert not auth.get_user(client).is_authenticated
 
         # Try to login with Django.
@@ -842,13 +853,7 @@ class TestInclusionConnectLogout:
         assert client.session.get(constants.INCLUSION_CONNECT_SESSION_KEY)
 
         response = client.post(logout_url)
-        expected_redirection = reverse("inclusion_connect:logout")
-        # For simplicity, exclude GET params. They are tested elsewhere anyway..
-        assert response.url.startswith(expected_redirection)
-
-        response = client.get(response.url)
-        # The following redirection is tested in self.test_logout_with_redirection
-        assert response.status_code == 302
+        assert_and_mock_forced_logout(client, response)
         assert not auth.get_user(client).is_authenticated
 
     def test_django_account_logout(self, client):
@@ -974,10 +979,11 @@ class TestInclusionConnectmapChannel:
             channel=InclusionConnectChannel.MAP_CONSEILLER,
             oidc_userinfo=OIDC_USERINFO_FT_WITH_SAFIR.copy(),
         )
-        response = assert_and_mock_forced_logout(client, response)
+        # fetch post login page to trigger perm middleware
+        response = client.get(response.url)
+        assertRedirects(response, reverse("account_logout"))
 
         assert job_application.sender_prescriber_organization.members.count() == 1
-        assert not auth.get_user(client).is_authenticated
 
         assertMessages(
             response,
@@ -999,6 +1005,10 @@ class TestInclusionConnectmapChannel:
                 ),
             ],
         )
+
+        response = client.post(reverse("account_logout"))
+        assert_and_mock_forced_logout(client, response)
+        assert get_user(client).is_authenticated is False
 
 
 def test_inclusion_connect_is_forbidden_when_pro_connect_is_enabled(client):

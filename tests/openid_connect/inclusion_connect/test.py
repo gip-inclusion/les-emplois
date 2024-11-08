@@ -88,7 +88,6 @@ def mock_oauth_dance(
 
 
 def assert_and_mock_forced_logout(client, response, expected_redirect_url=reverse("search:employers_home")):
-    response = client.get(response.url)
     assertRedirects(response, reverse("inclusion_connect:logout") + "?token=123456", fetch_redirect_response=False)
     response = client.get(response.url)
     assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT)
@@ -102,7 +101,6 @@ class inclusion_connect_setup:
     oidc_userinfo = OIDC_USERINFO
     oidc_userinfo_with_safir = OIDC_USERINFO_FT_WITH_SAFIR
     mock_oauth_dance = mock_oauth_dance
-    assert_and_mock_forced_logout = assert_and_mock_forced_logout
     identity_provider = IdentityProvider.INCLUSION_CONNECT
     session_key = constants.INCLUSION_CONNECT_SESSION_KEY
 
