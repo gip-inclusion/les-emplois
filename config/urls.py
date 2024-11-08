@@ -80,6 +80,7 @@ urlpatterns = [
     re_path(r"^siae/.*$", redirect_legacy_views.redirect_siaes_views),
     path("siae_evaluation/", include("itou.www.siae_evaluations_views.urls")),
     path("login/", include("itou.www.login.urls")),
+    path("logout/", include("itou.www.logout.urls")),
     path("signup/", include("itou.www.signup.urls")),
     path("stats/", include("itou.www.stats.urls")),
     path("users/", include("itou.www.users_views.urls")),

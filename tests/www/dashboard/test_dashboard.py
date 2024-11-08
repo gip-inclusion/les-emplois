@@ -4,14 +4,12 @@ from functools import partial
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.contrib import messages
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import (
     assertContains,
-    assertMessages,
     assertNotContains,
     assertRedirects,
     assertTemplateNotUsed,
@@ -58,11 +56,7 @@ DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
 
 
 class TestDashboardView:
-    NO_PRESCRIBER_ORG_MSG = "Votre compte utilisateur n’est rattaché à aucune organisation."
-    NO_PRESCRIBER_ORG_FOR_PE_MSG = (
-        "Votre compte utilisateur n’est rattaché à aucune agence France Travail, "
-        "par conséquent vous ne pouvez pas bénéficier du statut de prescripteur habilité."
-    )
+    NO_PRESCRIBER_ORG_MSG = "Votre compte n’est actuellement rattaché à aucune organisation."
     SUSPEND_TEXT = "Suspendre un PASS IAE"
     HIRE_LINK_LABEL = "Déclarer une embauche"
     DORA_LABEL = "DORA"
@@ -104,21 +98,8 @@ class TestDashboardView:
         client.force_login(user)
 
         url = reverse("dashboard:index")
-        response = client.get(url, follow=True)
-        assertRedirects(response, reverse("account_logout"))
-        assertMessages(
-            response,
-            [
-                messages.Message(
-                    messages.WARNING,
-                    (
-                        "Nous sommes désolés, votre compte n'est malheureusement plus actif car la ou les "
-                        "structures associées ne sont plus conventionnées. "
-                        "Nous espérons cependant avoir l'occasion de vous accueillir de nouveau."
-                    ),
-                )
-            ],
-        )
+        response = client.get(url)
+        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "employer_inactive_company"}))
 
     def test_dashboard_eiti(self, client):
         company = CompanyFactory(kind=CompanyKind.EITI, with_membership=True)
@@ -671,17 +652,7 @@ class TestDashboardView:
         client.force_login(orienter)
         response = client.get(reverse("dashboard:index"))
         assertContains(response, self.NO_PRESCRIBER_ORG_MSG)
-        assertNotContains(response, self.NO_PRESCRIBER_ORG_FOR_PE_MSG)
         assertContains(response, reverse("signup:prescriber_check_already_exists"))
-
-    def test_dashboard_pole_emploi_prescriber_without_organization_message(self, client):
-        # Pôle emploi employees can sometimes be orienters
-        pe_orienter = PrescriberFactory(email="john.doe@pole-emploi.fr")
-        client.force_login(pe_orienter)
-        response = client.get(reverse("dashboard:index"))
-        assertContains(response, self.NO_PRESCRIBER_ORG_FOR_PE_MSG)
-        assertNotContains(response, self.NO_PRESCRIBER_ORG_MSG)
-        assertContains(response, reverse("signup:prescriber_pole_emploi_safir_code"))
 
     def test_dashboard_delete_one_of_multiple_prescriber_orgs_while_logged_in(self, client):
         org_1 = prescribers_factories.PrescriberOrganizationWithMembershipFactory()

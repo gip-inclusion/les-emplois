@@ -1,13 +1,11 @@
 from django.conf import settings
-from django.contrib import messages
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.safestring import mark_safe
 
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
+from itou.www.logout.enums import LogoutWarning
 
 
 def extract_membership_infos_and_update_session(memberships, org_through_field, session):
@@ -50,7 +48,7 @@ class ItouCurrentOrganizationMiddleware:
     def __call__(self, request):
         user = request.user
 
-        redirect_message = None
+        logout_warning = None
         if user.is_authenticated:
             if user.is_employer:
                 active_memberships = list(user.companymembership_set.filter(is_active=True).order_by("created_at"))
@@ -86,21 +84,9 @@ class ItouCurrentOrganizationMiddleware:
                     # SIAE user has no active SIAE and thus must not be able to access any page,
                     # thus we force a logout with a few exceptions (cf skip_middleware_conditions)
                     if not active_memberships:
-                        redirect_message = mark_safe(
-                            "Nous sommes désolés, votre compte n'est "
-                            "actuellement rattaché à aucune structure.<br>"
-                            "Nous espérons cependant avoir l'occasion de vous accueillir de "
-                            "nouveau."
-                        )
+                        logout_warning = LogoutWarning.EMPLOYER_NO_COMPANY
                     else:
-                        redirect_message = (
-                            "Nous sommes désolés, votre compte n'est "
-                            "malheureusement plus actif car la ou les "
-                            "structures associées ne sont plus "
-                            "conventionnées. Nous espérons cependant "
-                            "avoir l'occasion de vous accueillir de "
-                            "nouveau."
-                        )
+                        logout_warning = LogoutWarning.EMPLOYER_INACTIVE_COMPANY
 
             elif user.is_prescriber:
                 active_memberships = list(
@@ -111,11 +97,7 @@ class ItouCurrentOrganizationMiddleware:
                 if user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX) and not any(
                     m.organization.kind == PrescriberOrganizationKind.PE for m in active_memberships
                 ):
-                    redirect_message = (
-                        "En tant qu'agent France Travail vous devez appartenir à une agence pour vous connecter à la "
-                        "plateforme des emplois. Veuillez vous faire inviter par l'administrateur d'une agence afin "
-                        "d'accéder au service."
-                    )
+                    logout_warning = LogoutWarning.FT_NO_FT_ORGANIZATION
                 (
                     request.organizations,
                     request.current_organization,
@@ -139,12 +121,7 @@ class ItouCurrentOrganizationMiddleware:
                     request.session,
                 )
                 if not request.current_organization:
-                    redirect_message = mark_safe(
-                        "Nous sommes désolés, votre compte n'est "
-                        "actuellement rattaché à aucune structure.<br>"
-                        "Nous espérons cependant avoir l'occasion de vous accueillir de "
-                        "nouveau."
-                    )
+                    logout_warning = LogoutWarning.LABOR_INSPECTOR_NO_INSTITUTION
 
         # Accepting an invitation to join a group is a two-step process.
         # - View one: account creation or login.
@@ -153,6 +130,7 @@ class ItouCurrentOrganizationMiddleware:
         # This raises an error so we skip the middleware only in this case.
         skip_middleware_conditions = [
             request.path.startswith("/login/"),
+            request.path.startswith("/logout/"),
             request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
             request.path.startswith("/signup/siae/join"),  # employer about to join a company
             request.path.startswith("/signup/facilitator/join"),  # facilitator about to join a company
@@ -177,8 +155,7 @@ class ItouCurrentOrganizationMiddleware:
             # Add request.path as next param ?
             return HttpResponseRedirect(reverse("dashboard:activate_ic_account"))
 
-        if redirect_message is not None:
-            messages.warning(request, redirect_message)
-            return redirect("account_logout")
+        if logout_warning is not None:
+            return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))
 
         return self.get_response(request)

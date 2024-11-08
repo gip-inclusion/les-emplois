@@ -11,7 +11,6 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.http import urlencode
-from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 from rest_framework.authtoken.models import Token
@@ -138,29 +137,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                     prescriber_organization=current_org,
                     status=ProlongationRequestStatus.PENDING,
                 ).count()
-        elif request.user.email.endswith("pole-emploi.fr"):
-            messages.info(
-                request,
-                mark_safe(
-                    f"Votre compte utilisateur n’est rattaché à aucune agence France Travail, "
-                    f"par conséquent vous ne pouvez pas bénéficier du statut de prescripteur habilité.<br>"
-                    f"Rejoignez l’espace de travail de votre agence France Travail "
-                    f"<a href='{reverse('signup:prescriber_pole_emploi_safir_code')}'>en cliquant ici</a>."
-                ),
-            )
-        else:
-            messages.info(
-                request,
-                mark_safe(
-                    f"Votre compte utilisateur n’est rattaché à aucune organisation.<br>"
-                    f"Si vous souhaitez rejoindre le tableau de bord d’une organisation, "
-                    f"vous pouvez demander une invitation à vos collègues ou suivre la "
-                    f"<a href='{reverse('signup:prescriber_check_already_exists')}'>procédure d’inscription</a> "
-                    f"si votre organisation n’est pas encore enregistrée sur le site.<br>"
-                    f"Si vous souhaitez continuer à utiliser le service sans être rattaché(e) à une organisation, "
-                    f"vous pouvez ignorer ce message."
-                ),
-            )
     elif request.user.is_labor_inspector:
         current_org = get_current_institution_or_404(request)
         for campaign in EvaluationCampaign.objects.for_institution(current_org).viewable():

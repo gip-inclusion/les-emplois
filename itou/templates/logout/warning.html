@@ -1,0 +1,60 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+
+{% block title %}Déconnexion {{ block.super }}{% endblock %}
+
+{% block title_content %}<h1>Déconnexion</h1>{% endblock %}
+
+{% block content %}
+    <section class="s-section pt-lg-3">
+        <div class="s-section__container container">
+            <div class="s-section__row row g-0">
+                <div class="s-section__col col-12 col-lg-2 bg-lg-white">
+                    <img class="img-fluid" src="{% static 'img/illustration-error.png' %}" alt="" loading="lazy">
+                </div>
+                <div class="s-section__col col-12 col-lg-10 bg-lg-white">
+                    {% if warning == LogoutWarning.EMPLOYER_NO_COMPANY %}
+                        <p>Nous sommes désolés, votre compte n’est actuellement rattaché à aucune structure.</p>
+                        <ul>
+                            <li>
+                                Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser <a href="https://tally.so/r/npPpNq">ce formulaire d’aide</a>.
+                            </li>
+                            <li>
+                                Si vous souhaitez rejoindre une structure présente sur les Emplois de l’inclusion, vous pouvez demander à un de vos collègues de vous inviter.
+                            </li>
+                            <li>
+                                Si votre structure ne dispose pas encore d'un espace professionnel sur les Emplois de l’inclusion, utilisez
+                                <a href="{% url 'signup:company_select' %}">le formulaire d'inscription</a>.
+                            </li>
+                        </ul>
+                        <p>Nous espérons cependant avoir l’occasion de vous accueillir de nouveau.</p>
+                    {% elif warning == LogoutWarning.EMPLOYER_INACTIVE_COMPANY %}
+                        <p>
+                            Nous sommes désolés, votre compte n’est malheureusement plus actif car la ou les structures associées ne sont plus conventionnées.
+                        </p>
+                        <p>Nous espérons cependant avoir l’occasion de vous accueillir de nouveau.</p>
+                    {% elif warning == LogoutWarning.FT_NO_FT_ORGANIZATION %}
+                        <p>
+                            En tant qu’agent France Travail vous devez appartenir à une agence pour vous connecter aux Emplois de l’inclusion.
+                        </p>
+                        <p>Veuillez vous faire inviter par un collaborateur de votre agence afin d’accéder au service.</p>
+                    {% elif warning == LogoutWarning.LABOR_INSPECTOR_NO_INSTITUTION %}
+                        <p>Nous sommes désolés, votre compte n’est actuellement rattaché à aucune structure.</p>
+                        <p>Veuillez vous faire inviter par un collaborateur de votre institution afin de pouvoir accéder au service.</p>
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-2">
+                            <form method="post" action="{% url 'account_logout' %}" class="js-prevent-multiple-submit">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-block btn-primary" aria-label="Se déconnecter">
+                                    <span>Se déconnecter</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

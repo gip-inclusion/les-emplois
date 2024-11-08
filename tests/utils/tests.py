@@ -15,7 +15,6 @@ import pytest
 from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.contrib import messages
 from django.contrib.admin import site
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -41,6 +40,7 @@ from itou.common_apps.address.departments import DEPARTMENTS, department_from_po
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership
 from itou.job_applications.enums import JobApplicationState
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants, pagination
@@ -158,16 +158,11 @@ class TestItouCurrentOrganizationMiddleware:
         with assertNumQueries(1):  # Retrieve user memberships
             response = ItouCurrentOrganizationMiddleware(get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
-        assertRedirects(response, reverse("account_logout"), fetch_redirect_response=False)
-        assert list(messages.get_messages(request)) == [
-            messages.Message(
-                messages.WARNING,
-                (
-                    "Nous sommes désolés, votre compte n'est actuellement rattaché à aucune structure."
-                    "<br>Nous espérons cependant avoir l'occasion de vous accueillir de nouveau."
-                ),
-            )
-        ]
+        assertRedirects(
+            response,
+            reverse("logout:warning", kwargs={"kind": "employer_no_company"}),
+            fetch_redirect_response=False,
+        )
         # Session untouched
         assert request.session.is_empty()
 
@@ -224,8 +219,7 @@ class TestItouCurrentOrganizationMiddleware:
     def test_employer_of_inactive_siae(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        company = CompanyMembershipFactory(company__subject_to_eligibility=True, company__convention=None).company
-        request.user = company.members.first()
+        request.user = CompanyMembershipFactory(company__subject_to_eligibility=True, company__convention=None).user
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
@@ -236,17 +230,11 @@ class TestItouCurrentOrganizationMiddleware:
         ):
             response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
-        assertRedirects(response, reverse("account_logout"), fetch_redirect_response=False)
-        assert list(messages.get_messages(request)) == [
-            messages.Message(
-                messages.WARNING,
-                (
-                    "Nous sommes désolés, votre compte n'est malheureusement plus actif car la ou les "
-                    "structures associées ne sont plus conventionnées. "
-                    "Nous espérons cependant avoir l'occasion de vous accueillir de nouveau."
-                ),
-            )
-        ]
+        assertRedirects(
+            response,
+            reverse("logout:warning", kwargs={"kind": "employer_inactive_company"}),
+            fetch_redirect_response=False,
+        )
         # Session untouched
         assert request.session.is_empty()
 
@@ -386,6 +374,27 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.organizations == []
         assert not request.is_current_organization_admin
 
+    def test_ft_prescriber_with_no_ft_organization(self, mocked_get_response_for_middlewaremixin):
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = PrescriberFactory(email="prenom.nom@francetravail.fr")
+        PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.AFPA)
+        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
+        with assertNumQueries(1):  # retrieve user memberships
+            response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 0
+        assertRedirects(
+            response,
+            reverse("logout:warning", kwargs={"kind": "ft_no_ft_organization"}),
+            fetch_redirect_response=False,
+        )
+        # Session untouched
+        assert request.session.is_empty()
+        # Check new request attributes
+        assert request.current_organization is None
+        assert request.organizations == []
+        assert not request.is_current_organization_admin
+
     def test_labor_inspector_admin_member(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
@@ -432,16 +441,11 @@ class TestItouCurrentOrganizationMiddleware:
         with assertNumQueries(1):  # retrieve user memberships
             response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
-        assertRedirects(response, reverse("account_logout"), fetch_redirect_response=False)
-        assert list(messages.get_messages(request)) == [
-            messages.Message(
-                messages.WARNING,
-                (
-                    "Nous sommes désolés, votre compte n'est actuellement rattaché à aucune structure."
-                    "<br>Nous espérons cependant avoir l'occasion de vous accueillir de nouveau."
-                ),
-            )
-        ]
+        assertRedirects(
+            response,
+            reverse("logout:warning", kwargs={"kind": "labor_inspector_no_institution"}),
+            fetch_redirect_response=False,
+        )
         # Session untouched
         assert request.session.is_empty()
         # Check new request attributes

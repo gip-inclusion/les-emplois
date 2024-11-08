@@ -581,19 +581,8 @@ class TestInclusionConnectCallbackViewTest:
             oidc_userinfo=oidc_userinfo,
         )
         # fetch post login page to trigger perm middleware
-        response = client.get(response.url)
-        assertRedirects(response, reverse("account_logout"))
-        assertMessages(
-            response,
-            [
-                Message(
-                    messages.WARNING,
-                    "En tant qu'agent France Travail vous devez appartenir à une agence pour vous connecter à la "
-                    "plateforme des emplois. Veuillez vous faire inviter par l'administrateur d'une agence afin "
-                    "d'accéder au service.",
-                ),
-            ],
-        )
+        response = client.get(response.url, follow=True)
+        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "ft_no_ft_organization"}))
 
         response = client.post(reverse("account_logout"))
         assert_and_mock_forced_logout(client, response)
@@ -610,8 +599,8 @@ class TestInclusionConnectCallbackViewTest:
             oidc_userinfo=oidc_userinfo,
         )
         # fetch post login page to trigger perm middleware
-        response = client.get(response.url)
-        assertRedirects(response, reverse("account_logout"))
+        response = client.get(response.url, follow=True)
+        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "ft_no_ft_organization"}))
         assertMessages(
             response,
             [
@@ -623,12 +612,6 @@ class TestInclusionConnectCallbackViewTest:
                     "Si vous pensez qu'il y a une erreur, vérifiez que le code SAFIR est le bon "
                     f"puis <a href='{global_constants.ITOU_HELP_CENTER_URL}'>contactez le support</a> en indiquant "
                     "le code SAFIR.",
-                ),
-                Message(
-                    messages.WARNING,
-                    "En tant qu'agent France Travail vous devez appartenir à une agence pour vous connecter à la "
-                    "plateforme des emplois. Veuillez vous faire inviter par l'administrateur d'une agence afin "
-                    "d'accéder au service.",
                 ),
             ],
         )
@@ -979,12 +962,11 @@ class TestInclusionConnectmapChannel:
             channel=InclusionConnectChannel.MAP_CONSEILLER,
             oidc_userinfo=OIDC_USERINFO_FT_WITH_SAFIR.copy(),
         )
-        # fetch post login page to trigger perm middleware
-        response = client.get(response.url)
-        assertRedirects(response, reverse("account_logout"))
-
         assert job_application.sender_prescriber_organization.members.count() == 1
 
+        # fetch post login page to trigger perm middleware
+        response = client.get(response.url, follow=True)
+        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "ft_no_ft_organization"}))
         assertMessages(
             response,
             [
@@ -996,12 +978,6 @@ class TestInclusionConnectmapChannel:
                     "Si vous pensez qu'il y a une erreur, vérifiez que le code SAFIR est le bon "
                     f"puis <a href='{global_constants.ITOU_HELP_CENTER_URL}'>contactez le support</a> en indiquant "
                     "le code SAFIR.",
-                ),
-                Message(
-                    messages.WARNING,
-                    "En tant qu'agent France Travail vous devez appartenir à une agence pour vous connecter à la "
-                    "plateforme des emplois. Veuillez vous faire inviter par l'administrateur d'une agence afin "
-                    "d'accéder au service.",
                 ),
             ],
         )
