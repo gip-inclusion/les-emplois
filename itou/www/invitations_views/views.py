@@ -4,7 +4,6 @@ from allauth.account.adapter import get_adapter
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import formats, safestring
@@ -28,6 +27,11 @@ from itou.www.invitations_views.forms import (
     LaborInspectorInvitationFormSet,
     NewUserInvitationForm,
     PrescriberWithOrgInvitationFormSet,
+)
+from itou.www.invitations_views.helpers import (
+    handle_employer_invitation,
+    handle_labor_inspector_invitation,
+    handle_prescriber_intivation,
 )
 from itou.www.signup import forms as signup_forms
 
@@ -178,19 +182,7 @@ def invite_prescriber_with_org(request, template_name="invitations_views/create.
 @login_required
 def join_prescriber_organization(request, invitation_id):
     invitation = get_object_or_404(PrescriberWithOrgInvitation, pk=invitation_id)
-    if not invitation.guest_can_join_organization(request):
-        raise PermissionDenied()
-
-    if invitation.can_be_accepted:
-        invitation.add_invited_user_to_organization()
-        # Send an email after the model changes
-        invitation.accept()
-        messages.success(
-            request, f"Vous êtes désormais membre de l'organisation {invitation.organization.display_name}."
-        )
-    else:
-        messages.error(request, "Cette invitation n'est plus valide.")
-
+    handle_prescriber_intivation(invitation, request)
     request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = invitation.organization.pk
     url = get_adapter(request).get_login_redirect_url(request)
     return HttpResponseRedirect(url)
@@ -224,18 +216,7 @@ def invite_employer(request, template_name="invitations_views/create.html"):
 @login_required
 def join_company(request, invitation_id):
     invitation = get_object_or_404(EmployerInvitation, pk=invitation_id)
-    if not invitation.guest_can_join_company(request):
-        raise PermissionDenied()
-
-    if not invitation.company.is_active:
-        messages.error(request, "Cette structure n'est plus active.")
-    elif invitation.can_be_accepted:
-        invitation.add_invited_user_to_company()
-        invitation.accept()
-        messages.success(request, f"Vous êtes désormais membre de la structure {invitation.company.display_name}.")
-    else:
-        messages.error(request, "Cette invitation n'est plus valide.")
-
+    handle_employer_invitation(invitation, request)
     request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = invitation.company.pk
     url = get_adapter(request).get_login_redirect_url(request)
     return HttpResponseRedirect(url)
@@ -285,17 +266,6 @@ def invite_labor_inspector(request, template_name="invitations_views/create.html
 @login_required
 def join_institution(request, invitation_id):
     invitation = get_object_or_404(LaborInspectorInvitation, pk=invitation_id)
-    if not invitation.guest_can_join_institution(request):
-        raise PermissionDenied()
-
-    if invitation.can_be_accepted:
-        invitation.add_invited_user_to_institution()
-        invitation.accept()
-        messages.success(
-            request, f"Vous êtes désormais membre de l'organisation {invitation.institution.display_name}."
-        )
-    else:
-        messages.error(request, "Cette invitation n'est plus valide.")
-
+    handle_labor_inspector_invitation(invitation, request)
     request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = invitation.institution.pk
     return redirect("dashboard:index")
