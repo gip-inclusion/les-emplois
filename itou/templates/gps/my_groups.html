@@ -5,55 +5,46 @@
 {% load str_filters %}
 {% load tally %}
 
-{% block title %}Mes bénéficiaires {{ block.super }}{% endblock %}
-
-{% block title_content %}<h1>Mes bénéficiaires</h1>{% endblock %}
+{% block title %}GPS - Mes bénéficiaires {{ block.super }}{% endblock %}
 
 {% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
+{% block title_content %}
+    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between align-items-md-center">
+        <h1 class="m-0">Mes bénéficiaires</h1>
+        <div class="d-flex flex-column flex-md-row gap-md-3" role="group" aria-label="Actions sur les groupes de suivi">
+            <a href='{% tally_form_url form_id="w5kLqM" user_public_id=user.public_id user_first_name=user.first_name user_last_name=user.last_name %}&{% if request.current_organization %}&user_organization_uid={{ request.current_organization.uid }}&user_organization_name={{ request.current_organization.display_name }}{% endif %}'
+               rel="noopener"
+               target="_blank"
+               class="btn btn-lg btn-ico btn-secondary mt-3 mt-md-0"
+               aria-label="Inviter un partenaire"
+               {% matomo_event "gps" "clic" "liste_benef_inviter_partenaire" %}>
+                <i class="ri-mail-send-line" aria-hidden="true"></i>
+                <span>Inviter un partenaire</span>
+            </a>
+            <a href="{% url 'gps:join_group' %}" class="btn btn-lg btn-ico btn-primary mt-3 mt-md-0" aria-label="Suivre un nouveau bénéficiaire" {% matomo_event "GPS_liste_groupes" "clic" "ajout_groupe" %}>
+                <i class="ri-user-add-line" aria-hidden="true"></i>
+                <span>Ajouter un bénéficiaire</span>
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+
 {% block content %}
-    <section class="s-box" id="gps-my-groups">
-        <div class="s-box__container container">
-            <div class="s-box__row row">
+    <section class="s-secion" id="gps-my-groups">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
                 <div class="col-12">
-                    <div class="alert alert-info alert-dismissible fade show" role="status">
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-                        <div class="row">
-                            <div class="col-auto pe-0">
-                                <i class="ri-mail-send-line ri-xl text-info" aria-hidden="true"></i>
-                            </div>
-                            <div class="col">
-                                <p class="mb-2">
-                                    <strong>Inviter un partenaire</strong>
-                                </p>
-                                <p class="mb-0">
-                                    Invitez un partenaire à rejoindre l’expérimentation GPS pour suivre ses propres bénéficiaires. Votre partenaire recevra un email de votre part afin de créer son compte.
-                                </p>
-                            </div>
-                            <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                                <a href='{% tally_form_url form_id="w5kLqM" user_public_id=user.public_id user_first_name=user.first_name user_last_name=user.last_name %}&{% if request.current_organization %}&user_organization_uid={{ request.current_organization.uid }}&user_organization_name={{ request.current_organization.display_name }}{% endif %}'
-                                   rel="noopener"
-                                   target="_blank"
-                                   aria-label="Inviter un partenaire."
-                                   class="btn btn-sm btn-primary"
-                                   {% matomo_event "gps" "clic" "liste_benef_inviter_partenaire" %}>
-                                    <span>Inviter un partenaire</span>
-                                    <i class="ri-external-link-line fw-normal ms-2"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="d-flex flex-column flex-md-row my-3 my-md-4">
+                    <div class="d-flex flex-column flex-md-row my-3 my-md-4 gap-3 align-items-md-center">
                         <h3 class="h4 mb-0 flex-grow-1" id="results">
                             {% with memberships_page.paginator.count as counter %}
                                 {{ counter }} bénéficiaire{{ counter|pluralizefr }} suivi{{ counter|pluralizefr }}
                             {% endwith %}
                         </h3>
-                        <form class="px-3"
+                        <form class="px-md-3"
                               hx-get="{{ request.path }}"
                               hx-trigger="change delay:.5s, duetChange delay:.5s, change from:#id_beneficiary"
                               hx-indicator="#follow-up-groups-section"
@@ -63,12 +54,6 @@
                               hx-push-url="true">
                             {% bootstrap_field filters_form.beneficiary wrapper_class="w-lg-400px" show_label=False %}
                         </form>
-                        <div class="btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les groupes de suivi">
-                            <a href="{% url 'gps:join_group' %}" class="btn btn-ico btn-primary mt-3 mt-md-0" aria-label="Rejoindre un group de suivi" {% matomo_event "GPS_liste_groupes" "clic" "ajout_groupe" %}>
-                                <i class="ri-user-add-line" aria-hidden="true"></i>
-                                <span>Ajouter un bénéficiaire</span>
-                            </a>
-                        </div>
                     </div>
                 </div>
                 <div class="col-12">{% include "gps/includes/memberships_results.html" with memberships_page=memberships_page %}</div>
