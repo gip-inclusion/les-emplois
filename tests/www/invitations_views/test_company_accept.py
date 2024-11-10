@@ -37,6 +37,7 @@ class TestAcceptInvitation:
         assertContains(
             response, escape(f"Vous êtes désormais membre de la structure {invitation.company.display_name}.")
         )
+        assertNotContains(response, escape("Cette invitation n'est plus valide."))
 
         # Assert the user sees his new siae dashboard
         current_company = get_current_company_or_404(response.wsgi_request)
@@ -106,6 +107,7 @@ class TestAcceptInvitation:
 
         total_users_before = User.objects.count()
 
+        # coming back from another browser without the next_url
         other_client = ItouClient()
         response = sso_setup.mock_oauth_dance(
             client,
@@ -117,9 +119,27 @@ class TestAcceptInvitation:
             other_client=other_client,
         )
         response = other_client.get(response.url, follow=True)
-        # Check user is redirected to the welcoming tour
-        last_url, _status_code = response.redirect_chain[-1]
-        assert last_url == reverse("welcoming_tour:index")
+
+        total_users_after = User.objects.count()
+        assert (total_users_before + 1) == total_users_after
+
+        user = User.objects.get(email=invitation.email)
+        self.assert_accepted_invitation(response, invitation, user, mailoutbox)
+
+    @sso_parametrize
+    @respx.mock
+    def test_accept_invitation_signup_without_link(self, client, mailoutbox, sso_setup):
+        # The user's invitations are automatically accepted at login
+        invitation = EmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"])
+
+        total_users_before = User.objects.count()
+
+        response = sso_setup.mock_oauth_dance(
+            client,
+            KIND_EMPLOYER,
+            user_email=invitation.email,
+        )
+        response = client.get(response.url, follow=True)
 
         total_users_after = User.objects.count()
         assert (total_users_before + 1) == total_users_after

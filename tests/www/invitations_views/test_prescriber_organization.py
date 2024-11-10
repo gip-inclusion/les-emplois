@@ -8,11 +8,16 @@ from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import reverse
 from django.utils.html import escape
-from pytest_django.asserts import assertContains, assertMessages, assertRedirects, assertTemplateUsed
+from pytest_django.asserts import (
+    assertContains,
+    assertMessages,
+    assertNotContains,
+    assertRedirects,
+)
 
 from itou.invitations.models import PrescriberWithOrgInvitation
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -228,13 +233,6 @@ class TestAcceptPrescriberWithOrgInvitation:
         self.sender = self.organization.members.first()
 
     def assert_invitation_is_accepted(self, response, user, invitation, mailoutbox, new_user=True):
-        if new_user:
-            assertRedirects(response, reverse("welcoming_tour:index"))
-        elif user.identity_provider == IdentityProvider.DJANGO:
-            assertRedirects(response, reverse("dashboard:activate_ic_account"))
-        else:
-            assertRedirects(response, reverse("dashboard:index"))
-
         user.refresh_from_db()
         invitation.refresh_from_db()
         assert user.kind == UserKind.PRESCRIBER
@@ -247,6 +245,7 @@ class TestAcceptPrescriberWithOrgInvitation:
         assertContains(
             response, escape(f"Vous êtes désormais membre de l'organisation {self.organization.display_name}.")
         )
+        assertNotContains(response, escape("Cette invitation n'est plus valide."))
 
         # A confirmation e-mail is sent to the invitation sender.
         assert len(mailoutbox) == 1
@@ -317,7 +316,7 @@ class TestAcceptPrescriberWithOrgInvitation:
         )
         # Follow the redirection.
         response = client.get(response.url, follow=True)
-        assertTemplateUsed(response, "welcoming_tour/prescriber.html")
+        assertRedirects(response, reverse("welcoming_tour:index"))
 
         user = User.objects.get(email=invitation.email)
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
@@ -325,7 +324,11 @@ class TestAcceptPrescriberWithOrgInvitation:
     @sso_parametrize
     @respx.mock
     def test_accept_prescriber_org_invitation_returns_on_other_browser(self, client, mailoutbox, sso_setup):
-        invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
+        invitation = PrescriberWithOrgSentInvitationFactory(
+            email=sso_setup.oidc_userinfo["email"],
+            sender=self.sender,
+            organization=self.organization,
+        )
         response = client.get(invitation.acceptance_link)
         sso_setup.assertContainsButton(response)
 
@@ -343,8 +346,6 @@ class TestAcceptPrescriberWithOrgInvitation:
         assertContains(response, url + '"')
 
         other_client = ItouClient()
-        invitation.email = sso_setup.oidc_userinfo["email"]
-        invitation.save()
         response = sso_setup.mock_oauth_dance(
             client,
             UserKind.PRESCRIBER,
@@ -354,9 +355,29 @@ class TestAcceptPrescriberWithOrgInvitation:
             next_url=next_url,
             other_client=other_client,
         )
-        # Follow the redirection.
         response = other_client.get(response.url, follow=True)
-        assertTemplateUsed(response, "welcoming_tour/prescriber.html")
+        assertRedirects(response, reverse("welcoming_tour:index"))
+
+        user = User.objects.get(email=invitation.email)
+        self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
+
+    @sso_parametrize
+    @respx.mock
+    def test_accept_prescriber_org_invitation_without_link(self, client, mailoutbox, sso_setup):
+        # The user's invitations are automatically accepted at login
+        invitation = PrescriberWithOrgSentInvitationFactory(
+            email=sso_setup.oidc_userinfo["email"],
+            sender=self.sender,
+            organization=self.organization,
+        )
+
+        response = sso_setup.mock_oauth_dance(
+            client,
+            UserKind.PRESCRIBER,
+            user_email=invitation.email,
+        )
+        assertRedirects(response, reverse("welcoming_tour:index"), fetch_redirect_response=False)
+        response = client.get(response.url)
 
         user = User.objects.get(email=invitation.email)
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
@@ -372,6 +393,7 @@ class TestAcceptPrescriberWithOrgInvitation:
         )
         client.force_login(user)
         response = client.get(invitation.acceptance_link, follow=True)
+        assertRedirects(response, reverse("dashboard:index"))
         # /invitations/<uui>/join_company then /welcoming_tour/index
         assert len(response.redirect_chain) == 2
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox, new_user=False)
@@ -387,6 +409,7 @@ class TestAcceptPrescriberWithOrgInvitation:
         )
         client.force_login(user)
         response = client.get(invitation.acceptance_link, follow=True)
+        assertRedirects(response, reverse("dashboard:index"))
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox, new_user=False)
 
     def test_accept_existing_user_belongs_to_another_organization(self, client, mailoutbox):
@@ -402,6 +425,7 @@ class TestAcceptPrescriberWithOrgInvitation:
         )
         client.force_login(user)
         response = client.get(invitation.acceptance_link, follow=True)
+        assertRedirects(response, reverse("dashboard:index"))
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox, new_user=False)
 
     @sso_parametrize
@@ -445,6 +469,7 @@ class TestAcceptPrescriberWithOrgInvitation:
         )
         # Follow the redirection.
         response = client.get(response.url, follow=True)
+        assertRedirects(response, reverse("dashboard:index"))
 
         assert response.context["user"].is_authenticated
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox, new_user=False)
@@ -471,6 +496,7 @@ class TestAcceptPrescriberWithOrgInvitation:
             follow=True,
         )
         assert response.context["user"].is_authenticated
+        assertRedirects(response, reverse("dashboard:activate_ic_account"))
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox, new_user=False)
 
 

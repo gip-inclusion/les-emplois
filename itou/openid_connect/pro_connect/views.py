@@ -19,6 +19,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.constants import ITOU_HELP_CENTER_URL
 from itou.utils.urls import add_url_params, get_absolute_url
+from itou.www.invitations_views.helpers import accept_all_pending_invitations
 
 from ..errors import redirect_with_error_sso_email_conflict_on_registration
 from ..models import (
@@ -297,6 +298,8 @@ def pro_connect_callback(request):
     # reattach prescriber session
     if prescriber_session_data := pro_connect_state.data.get("prescriber_session_data"):
         request.session.update(prescriber_session_data)
+
+    accept_all_pending_invitations(request)
 
     next_url = pro_connect_state.data["next_url"] or get_adapter(request).get_login_redirect_url(request)
     return HttpResponseRedirect(next_url)
