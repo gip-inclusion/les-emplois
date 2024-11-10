@@ -51,7 +51,7 @@ class TestInvitationModel:
         invitation = EmployerInvitationFactory(expired=True)
         assert not invitation.can_be_accepted
 
-        invitation = EmployerInvitationFactory(sent=False)
+        invitation = EmployerInvitationFactory(sent_at=None)
         assert not invitation.can_be_accepted
 
         invitation = EmployerInvitationFactory(accepted=True)

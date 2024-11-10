@@ -48,7 +48,7 @@ class TestSendSingleCompanyInvitation:
 
         invitation = invitations[0]
         assert invitation.sender.pk == self.sender.pk
-        assert invitation.sent
+        assert invitation.sent_at
 
         # Make sure an email has been sent to the invited person
         outbox_emails = [receiver for message in mailoutbox for receiver in message.to]
@@ -71,7 +71,7 @@ class TestSendSingleCompanyInvitation:
         invitation = invitations[0]
 
         # At least one complete test of the invitation fields in our test suite
-        assert not invitation.accepted
+        assert not invitation.accepted_at
         assert invitation.sent_at < timezone.now()
         assert invitation.first_name == guest.first_name
         assert invitation.last_name == guest.last_name

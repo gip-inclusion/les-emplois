@@ -237,7 +237,6 @@ class TestAcceptPrescriberWithOrgInvitation:
         invitation.refresh_from_db()
         assert user.kind == UserKind.PRESCRIBER
 
-        assert invitation.accepted
         assert invitation.accepted_at
         assert self.organization.members.count() == 3
 
@@ -448,7 +447,7 @@ class TestAcceptPrescriberWithOrgInvitation:
         )
         response = client.get(invitation.acceptance_link, follow=True)
         assert reverse("login:prescriber") in response.wsgi_request.get_full_path()
-        assert not invitation.accepted
+        assert not invitation.accepted_at
         next_url = reverse("invitations_views:join_prescriber_organization", args=(invitation.pk,))
         previous_url = f"{reverse('login:prescriber')}?{urlencode({'next': next_url})}"
         params = {
@@ -488,7 +487,7 @@ class TestAcceptPrescriberWithOrgInvitation:
         )
         response = client.get(invitation.acceptance_link, follow=True)
         assert reverse("login:prescriber") in response.wsgi_request.get_full_path()
-        assert not invitation.accepted
+        assert not invitation.accepted_at
 
         response = client.post(
             response.wsgi_request.get_full_path(),
@@ -520,7 +519,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions:
         response = client.get(invitation.acceptance_link, follow=True)
         assert response.status_code == 403
         invitation.refresh_from_db()
-        assert not invitation.accepted
+        assert not invitation.accepted_at
 
     def test_connected_user_is_not_the_invited_user(self, client):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
@@ -528,7 +527,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions:
         response = client.get(invitation.acceptance_link, follow=True)
         assertRedirects(response, reverse("account_logout"))
         invitation.refresh_from_db()
-        assert not invitation.accepted
+        assert not invitation.accepted_at
         assertContains(response, escape("Un utilisateur est déjà connecté."))
 
     def test_expired_invitation_with_new_user(self, client):
