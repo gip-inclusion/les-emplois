@@ -38,7 +38,7 @@ class InvitationQuerySet(models.QuerySet):
         return self.exclude(self.valid_lookup)
 
     def pending(self):
-        return self.valid().filter(accepted=False).order_by("sent_at")
+        return self.valid().filter(accepted_at=None).order_by("sent_at")
 
 
 class InvitationAbstract(models.Model):
@@ -48,17 +48,15 @@ class InvitationAbstract(models.Model):
     email = models.EmailField(verbose_name="e-mail")
     first_name = models.CharField(verbose_name="prénom", max_length=255)
     last_name = models.CharField(verbose_name="nom", max_length=255)
-    sent = models.BooleanField(verbose_name="envoyée", default=False)
     validity_days = models.PositiveSmallIntegerField(
         verbose_name="durée de validité en jours",
         default=DEFAULT_VALIDITY_DAYS,
         validators=[MinValueValidator(1), MaxValueValidator(90)],
     )
 
-    accepted = models.BooleanField(verbose_name="acceptée", default=False)
-    accepted_at = models.DateTimeField(verbose_name="date d'acceptation", blank=True, null=True, db_index=True)
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now, db_index=True)
     sent_at = models.DateTimeField(verbose_name="date d'envoi", blank=True, null=True, db_index=True)
+    accepted_at = models.DateTimeField(verbose_name="date d'acceptation", blank=True, null=True, db_index=True)
 
     objects = InvitationQuerySet.as_manager()
 
@@ -109,18 +107,16 @@ class InvitationAbstract(models.Model):
 
     @property
     def can_be_accepted(self):
-        return not self.accepted and not self.has_expired and self.sent
+        return self.sent_at and not self.accepted_at and not self.has_expired
 
     def accept(self):
-        self.accepted = True
         self.accepted_at = timezone.now()
-        self.save()
+        self.save(update_fields=["accepted_at"])
         self.accepted_notif_sender()
 
     def send(self):
-        self.sent = True
         self.sent_at = timezone.now()
-        self.save()
+        self.save(update_fields=["sent_at"])
         self.send_invitation()
 
     def accepted_notif_sender(self):

@@ -25,7 +25,6 @@ class TestAcceptInvitation:
         user.refresh_from_db()
         invitation.refresh_from_db()
         assert user.kind == UserKind.EMPLOYER
-        assert invitation.accepted
         assert invitation.accepted_at
 
         # A confirmation e-mail is sent to the invitation sender.
@@ -197,7 +196,7 @@ class TestAcceptInvitation:
         )
         response = client.get(invitation.acceptance_link, follow=True)
         assert reverse("login:employer") in response.wsgi_request.get_full_path()
-        assert not invitation.accepted
+        assert not invitation.accepted_at
         next_url = reverse("invitations_views:join_company", args=(invitation.pk,))
         previous_url = f"{reverse('login:employer')}?{urlencode({'next': next_url})}"
         params = {
@@ -384,7 +383,7 @@ class TestAcceptInvitation:
         response = client.get(invitation.acceptance_link, follow=True)
 
         assert response.status_code == 403
-        assert not invitation.accepted
+        assert not invitation.accepted_at
 
     def test_accept_connected_user_is_not_the_invited_user(self, client):
         invitation = EmployerInvitationFactory()
@@ -392,7 +391,7 @@ class TestAcceptInvitation:
         response = client.get(invitation.acceptance_link, follow=True)
 
         assert reverse("account_logout") == response.wsgi_request.path
-        assert not invitation.accepted
+        assert not invitation.accepted_at
         assertContains(response, "Un utilisateur est déjà connecté.")
 
     def test_accept_existing_user_email_different_case(self, client, mailoutbox):
@@ -418,4 +417,4 @@ class TestAcceptInvitation:
         response = client.get(acceptance_link, follow=True)
         assertRedirects(response, reverse("search:employers_home"))
         invitation.refresh_from_db()
-        assert not invitation.accepted
+        assert not invitation.accepted_at

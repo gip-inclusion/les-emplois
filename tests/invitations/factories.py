@@ -19,11 +19,11 @@ class EmployerInvitationFactory(factory.django.DjangoModelFactory):
                 lambda: timezone.now() - timedelta(days=models.InvitationAbstract.DEFAULT_VALIDITY_DAYS)
             )
         )
+        accepted = factory.Trait(accepted_at=factory.LazyFunction(lambda: timezone.now()))
 
     email = factory.Sequence("email{}@employer.com".format)
     first_name = factory.Sequence("first_name{}".format)
     last_name = factory.Sequence("last_name{}".format)
-    sent = True
     sent_at = factory.LazyFunction(timezone.now)
     company = factory.SubFactory(CompanyFactory, with_membership=True)
     sender = factory.LazyAttribute(lambda o: o.company.members.first())
@@ -39,11 +39,11 @@ class PrescriberWithOrgSentInvitationFactory(factory.django.DjangoModelFactory):
                 lambda: timezone.now() - timedelta(days=models.InvitationAbstract.DEFAULT_VALIDITY_DAYS)
             )
         )
+        accepted = factory.Trait(accepted_at=factory.LazyFunction(lambda: timezone.now()))
 
     email = factory.Faker("email", locale="fr_FR")
     first_name = factory.Faker("first_name", locale="fr_FR")
     last_name = factory.Faker("last_name", locale="fr_FR")
-    sent = True
     sent_at = factory.LazyFunction(timezone.now)
     organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
     sender = factory.LazyAttribute(lambda o: o.organization.members.first())
@@ -59,11 +59,11 @@ class LaborInspectorInvitationFactory(factory.django.DjangoModelFactory):
                 lambda: timezone.now() - timedelta(days=models.InvitationAbstract.DEFAULT_VALIDITY_DAYS)
             )
         )
+        accepted = factory.Trait(accepted_at=factory.LazyFunction(lambda: timezone.now()))
 
     email = factory.Sequence("email{}@employer.com".format)
     first_name = factory.Sequence("first_name{}".format)
     last_name = factory.Sequence("last_name{}".format)
-    sent = True
     sent_at = factory.LazyFunction(timezone.now)
     institution = factory.SubFactory(InstitutionWithMembershipFactory)
     sender = factory.LazyAttribute(lambda o: o.institution.members.first())
