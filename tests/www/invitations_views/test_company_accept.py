@@ -13,7 +13,7 @@ from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.templatetags.theme_inclusion import static_theme_images
 from itou.utils.urls import add_url_params
 from tests.companies.factories import CompanyFactory
-from tests.invitations.factories import ExpiredEmployerInvitationFactory, SentEmployerInvitationFactory
+from tests.invitations.factories import EmployerInvitationFactory
 from tests.openid_connect.test import sso_parametrize
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory
@@ -46,7 +46,7 @@ class TestAcceptInvitation:
     @sso_parametrize
     @respx.mock
     def test_accept_invitation_signup(self, client, mailoutbox, sso_setup):
-        invitation = SentEmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"])
+        invitation = EmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"])
         response = client.get(invitation.acceptance_link, follow=True)
         sso_setup.assertContainsButton(response)
 
@@ -87,7 +87,7 @@ class TestAcceptInvitation:
     @sso_parametrize
     @respx.mock
     def test_accept_invitation_signup_returns_on_other_browser(self, client, mailoutbox, sso_setup):
-        invitation = SentEmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"])
+        invitation = EmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"])
         response = client.get(invitation.acceptance_link, follow=True)
         sso_setup.assertContainsButton(response)
 
@@ -130,7 +130,7 @@ class TestAcceptInvitation:
     @sso_parametrize
     @respx.mock
     def test_accept_invitation_signup_bad_email_case(self, client, mailoutbox, sso_setup):
-        invitation = SentEmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"].upper())
+        invitation = EmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"].upper())
         response = client.get(invitation.acceptance_link, follow=True)
         sso_setup.assertContainsButton(response)
 
@@ -169,7 +169,7 @@ class TestAcceptInvitation:
     @sso_parametrize
     @respx.mock
     def test_accept_existing_user_not_logged_in_using_ProConnect(self, client, mailoutbox, sso_setup):
-        invitation = SentEmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"])
+        invitation = EmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"])
         user = EmployerFactory(
             username=sso_setup.oidc_userinfo["sub"],
             email=sso_setup.oidc_userinfo["email"],
@@ -207,14 +207,14 @@ class TestAcceptInvitation:
         logged_in_user = EmployerFactory()
         client.force_login(logged_in_user)
         # Invitation for another user
-        invitation = SentEmployerInvitationFactory(email="loutre@example.com")
+        invitation = EmployerInvitationFactory(email="loutre@example.com")
         response = client.get(invitation.acceptance_link, follow=True)
         assertRedirects(response, reverse("account_logout"))
 
     @sso_parametrize
     @respx.mock
     def test_accept_invitation_signup_wrong_email(self, client, sso_setup):
-        invitation = SentEmployerInvitationFactory()
+        invitation = EmployerInvitationFactory()
         response = client.get(invitation.acceptance_link, follow=True)
         sso_setup.assertContainsButton(response)
 
@@ -260,7 +260,7 @@ class TestAcceptInvitation:
         assert not User.objects.filter(email=invitation.email).exists()
 
     def test_expired_invitation(self, client):
-        invitation = ExpiredEmployerInvitationFactory()
+        invitation = EmployerInvitationFactory(expired=True)
         assert invitation.has_expired
 
         # User wants to join our website but it's too late!
@@ -274,8 +274,8 @@ class TestAcceptInvitation:
         assertContains(response, escape("Cette invitation n'est plus valide."))
 
     def test_inactive_siae(self, client):
-        company = CompanyFactory(convention__is_active=False)
-        invitation = SentEmployerInvitationFactory(company=company)
+        company = CompanyFactory(convention__is_active=False, with_membership=True)
+        invitation = EmployerInvitationFactory(company=company)
         user = EmployerFactory(email=invitation.email)
         client.force_login(user)
         join_url = reverse("invitations_views:join_company", kwargs={"invitation_id": invitation.id})
@@ -283,14 +283,14 @@ class TestAcceptInvitation:
         assertContains(response, escape("Cette structure n'est plus active."))
 
     def test_non_existent_invitation(self, client):
-        invitation = SentEmployerInvitationFactory.build(
-            first_name="Léonie", last_name="Bathiat", email="leonie@bathiat.com"
-        )
-        response = client.get(invitation.acceptance_link, follow=True)
+        invitation = EmployerInvitationFactory(first_name="Léonie", last_name="Bathiat", email="leonie@bathiat.com")
+        url = invitation.acceptance_link
+        invitation.delete()
+        response = client.get(url, follow=True)
         assert response.status_code == 404
 
     def test_accepted_invitation(self, client):
-        invitation = SentEmployerInvitationFactory(accepted=True)
+        invitation = EmployerInvitationFactory(accepted=True)
         response = client.get(invitation.acceptance_link, follow=True)
         assertContains(response, escape("Invitation acceptée"))
 
@@ -303,7 +303,7 @@ class TestAcceptInvitation:
         company = CompanyFactory(with_membership=True)
         sender = company.members.first()
         user = CompanyFactory(convention__is_active=False, with_membership=True).members.first()
-        invitation = SentEmployerInvitationFactory(
+        invitation = EmployerInvitationFactory(
             sender=sender,
             company=company,
             first_name=user.first_name,
@@ -325,7 +325,7 @@ class TestAcceptInvitation:
     def test_accept_new_user_to_inactive_siae(self, client, sso_setup):
         company = CompanyFactory(convention__is_active=False, with_membership=True)
         sender = company.members.first()
-        invitation = SentEmployerInvitationFactory(
+        invitation = EmployerInvitationFactory(
             sender=sender,
             company=company,
             email=sso_setup.oidc_userinfo["email"],
@@ -354,7 +354,7 @@ class TestAcceptInvitation:
 
     def test_accept_existing_user_is_not_employer(self, client):
         user = PrescriberOrganizationWithMembershipFactory().members.first()
-        invitation = SentEmployerInvitationFactory(
+        invitation = EmployerInvitationFactory(
             first_name=user.first_name,
             last_name=user.last_name,
             email=user.email,
@@ -367,7 +367,7 @@ class TestAcceptInvitation:
         assert not invitation.accepted
 
     def test_accept_connected_user_is_not_the_invited_user(self, client):
-        invitation = SentEmployerInvitationFactory()
+        invitation = EmployerInvitationFactory()
         client.force_login(invitation.sender)
         response = client.get(invitation.acceptance_link, follow=True)
 
@@ -377,7 +377,7 @@ class TestAcceptInvitation:
 
     def test_accept_existing_user_email_different_case(self, client, mailoutbox):
         user = EmployerFactory(has_completed_welcoming_tour=True, email="HEY@example.com")
-        invitation = SentEmployerInvitationFactory(
+        invitation = EmployerInvitationFactory(
             email="hey@example.com",
         )
         client.force_login(user)
@@ -387,7 +387,7 @@ class TestAcceptInvitation:
     def test_expired_invitation_old_link(self, client):
         user = EmployerFactory()
         # Invitation for another user
-        invitation = SentEmployerInvitationFactory(email=user.email)
+        invitation = EmployerInvitationFactory(email=user.email)
         acceptance_link = reverse(
             "invitations_views:new_user",
             kwargs={
