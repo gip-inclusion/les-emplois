@@ -6,9 +6,7 @@ from itou.users.enums import KIND_EMPLOYER
 from tests.companies.factories import CompanyMembershipFactory
 from tests.invitations.factories import (
     EmployerInvitationFactory,
-    ExpiredEmployerInvitationFactory,
     PrescriberWithOrgSentInvitationFactory,
-    SentEmployerInvitationFactory,
 )
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
@@ -17,12 +15,12 @@ from tests.users.factories import EmployerFactory, PrescriberFactory
 class TestEmployerInvitationQuerySet:
     def test_pending(self):
         # Create some non-expired invitations.
-        invitation1 = SentEmployerInvitationFactory()
-        invitation2 = SentEmployerInvitationFactory()
-        invitation3 = SentEmployerInvitationFactory()
+        invitation1 = EmployerInvitationFactory()
+        invitation2 = EmployerInvitationFactory()
+        invitation3 = EmployerInvitationFactory()
 
         # Add one expired invitation.
-        invitation4 = ExpiredEmployerInvitationFactory()
+        invitation4 = EmployerInvitationFactory(expired=True)
 
         pending_invitations = EmployerInvitation.objects.pending()
 
@@ -36,30 +34,30 @@ class TestEmployerInvitationQuerySet:
 
 class TestInvitationModel:
     def test_acceptance_link(self):
-        invitation = SentEmployerInvitationFactory.build()
+        invitation = EmployerInvitationFactory()
         assert str(invitation.pk) in invitation.acceptance_link
 
         # Must be an absolute URL
         assert invitation.acceptance_link.startswith("http")
 
     def has_expired(self):
-        invitation = ExpiredEmployerInvitationFactory.build()
+        invitation = EmployerInvitationFactory(expired=True)
         assert invitation.has_expired
 
-        invitation = SentEmployerInvitationFactory.build()
+        invitation = EmployerInvitationFactory()
         assert not invitation.has_expired
 
     def test_can_be_accepted(self):
-        invitation = ExpiredEmployerInvitationFactory.build()
+        invitation = EmployerInvitationFactory(expired=True)
         assert not invitation.can_be_accepted
 
-        invitation = EmployerInvitationFactory.build(sent_at=timezone.now())
+        invitation = EmployerInvitationFactory(sent=False)
         assert not invitation.can_be_accepted
 
-        invitation = SentEmployerInvitationFactory.build(accepted=True)
+        invitation = EmployerInvitationFactory(accepted=True)
         assert not invitation.can_be_accepted
 
-        invitation = SentEmployerInvitationFactory.build()
+        invitation = EmployerInvitationFactory()
         assert invitation.can_be_accepted
 
     def test_get_model_from_string(self):
@@ -75,7 +73,7 @@ class TestInvitationModel:
 
 class TestInvitationEmails:
     def test_send_invitation(self):
-        invitation = SentEmployerInvitationFactory.build()
+        invitation = EmployerInvitationFactory()
         email = invitation.email_invitation
 
         # Subject
@@ -139,7 +137,7 @@ class TestPrescriberWithOrgInvitationEmails:
         assert invitation.sender.email in email.to
 
     def test_email_invitation(self):
-        invitation = PrescriberWithOrgSentInvitationFactory.build()
+        invitation = PrescriberWithOrgSentInvitationFactory()
         email = invitation.email_invitation
 
         # Subject
@@ -157,7 +155,7 @@ class TestPrescriberWithOrgInvitationEmails:
 
 class TestCompanyInvitation:
     def test_add_or_activate_member_to_company(self):
-        invitation = SentEmployerInvitationFactory(email="hey@you.com")
+        invitation = EmployerInvitationFactory(email="hey@you.com")
         EmployerFactory(email=invitation.email)
         employers = invitation.company.members.count()
         invitation.add_invited_user_to_company()
@@ -165,7 +163,7 @@ class TestCompanyInvitation:
         assert employers + 1 == employers_after
 
     def test_add_inactive_member_back_to_company(self):
-        invitation = SentEmployerInvitationFactory(email="hey@you.com")
+        invitation = EmployerInvitationFactory(email="hey@you.com")
         CompanyMembershipFactory(company=invitation.company, user__email=invitation.email, is_active=False)
         employers = invitation.company.members.count()
         company_active_members = invitation.company.active_members.count()
@@ -178,7 +176,7 @@ class TestCompanyInvitation:
 
 class TestCompanyInvitationEmails:
     def test_accepted_notif_sender(self):
-        invitation = SentEmployerInvitationFactory.build()
+        invitation = EmployerInvitationFactory()
         email = invitation.notifications_accepted_notif_sender.build()
 
         # Subject
@@ -195,7 +193,7 @@ class TestCompanyInvitationEmails:
         assert invitation.sender.email in email.to
 
     def test_email_invitation(self):
-        invitation = SentEmployerInvitationFactory.build()
+        invitation = EmployerInvitationFactory()
         email = invitation.email_invitation
 
         # Subject
