@@ -1,5 +1,31 @@
 # Journal des modifications
 
+## 2024-11-11
+
+### Modifié
+
+- [API particulier : Respecter la fréquence d’appels et les workers web](https://github.com/gip-inclusion/les-emplois/pull/4983)
+- [Connexion: AJout de remontée d'erreur en cas de problème de connexion avec ProConnect](https://github.com/gip-inclusion/les-emplois/pull/5041)
+- [GPS : Cacher les informations de l’entreprise fictive France Travail lors de la création d’un bénéficiaire](https://github.com/gip-inclusion/les-emplois/pull/5042)
+- [Inscription: Améliorer la deconnexion forcée des employeurs sans structure](https://github.com/gip-inclusion/les-emplois/pull/5024) 🖼
+- [PASS IAE: utilisation du nouvel encart dans les vues de traitement des demandes de prolongation](https://github.com/gip-inclusion/les-emplois/pull/5058)
+- [Tableau de bord: mise à jour de l'encart du PASS pour les candidats](https://github.com/gip-inclusion/les-emplois/pull/4947) 🖼
+- [UX/UI: Passer le bouton “Modifier” de la fiche de poste à droite](https://github.com/gip-inclusion/les-emplois/pull/5021) 🖼
+- [UX/UI: Remplacer role=button par des <button>](https://github.com/gip-inclusion/les-emplois/pull/4912)
+
+### Supprimé
+
+- [Retirer les campagnes de contrôle a posteriori de 2021](https://github.com/gip-inclusion/les-emplois/pull/5039)
+- [UX/UI : Retrait de la banière d’expérimentation Maze sur la page des candidatures](https://github.com/gip-inclusion/les-emplois/pull/5040)
+
+### Tech
+
+- [Ajouter Python 3.12 au CHANGELOG_breaking_changes.md](https://github.com/gip-inclusion/les-emplois/pull/5062)
+- [Connexion: Meilleure prise en charge d'erreurs avec ProConnect](https://github.com/gip-inclusion/les-emplois/pull/5045)
+- [Mise à jour de Python vers 3.12](https://github.com/gip-inclusion/les-emplois/pull/5049)
+- [Performances: Ajout d'un log pour estimer le nombre d'email envoyés par une future fonctionnalité](https://github.com/gip-inclusion/les-emplois/pull/5044)
+- [ProConnect: écraser les comptes avec le même email.](https://github.com/gip-inclusion/les-emplois/pull/5052)
+
 ## 2024-11-04
 
 ### Ajouté
