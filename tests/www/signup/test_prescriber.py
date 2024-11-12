@@ -130,8 +130,10 @@ class TestPrescriberSignup:
         user = User.objects.get(email=email)
         assert user.kind == UserKind.PRESCRIBER
 
-        # Emails are not checked in Django anymore.
-        assert not user.emailaddress_set.exists()
+        # Email is saved to user account but the email is not verified.
+        email_address = user.emailaddress_set.get()
+        assert email_address.primary
+        assert not email_address.verified
 
         # Check organization.
         assert organization.is_authorized
@@ -206,8 +208,10 @@ class TestPrescriberSignup:
         user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
         assert user.kind == UserKind.PRESCRIBER
 
-        # Emails are not checked in Django anymore.
-        assert not user.emailaddress_set.exists()
+        # Email is saved to user account but the email is not verified.
+        email_address = user.emailaddress_set.get()
+        assert email_address.primary
+        assert not email_address.verified
 
         # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
@@ -284,8 +288,10 @@ class TestPrescriberSignup:
         user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
         assert user.kind == UserKind.PRESCRIBER
 
-        # Emails are not checked in Django anymore.
-        assert not user.emailaddress_set.exists()
+        # Email is saved to user account but the email is not verified.
+        email_address = user.emailaddress_set.get()
+        assert email_address.primary
+        assert not email_address.verified
 
         # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
@@ -382,8 +388,10 @@ class TestPrescriberSignup:
         user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
         assert user.kind == UserKind.PRESCRIBER
 
-        # Emails are not checked in Django anymore.
-        assert not user.emailaddress_set.exists()
+        # Email is saved to user account but the email is not verified.
+        email_address = user.emailaddress_set.get()
+        assert email_address.primary
+        assert not email_address.verified
 
         # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
@@ -468,8 +476,10 @@ class TestPrescriberSignup:
         user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
         assert user.kind == UserKind.PRESCRIBER
 
-        # Emails are not checked in Django anymore.
-        assert not user.emailaddress_set.exists()
+        # Email is saved to user account but the email is not verified.
+        email_address = user.emailaddress_set.get()
+        assert email_address.primary
+        assert not email_address.verified
 
         # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
@@ -606,8 +616,10 @@ class TestPrescriberSignup:
         user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
         assert user.kind == UserKind.PRESCRIBER
 
-        # Emails are not checked in Django anymore.
-        assert not user.emailaddress_set.exists()
+        # Email is saved to user account but the email is not verified.
+        email_address = user.emailaddress_set.get()
+        assert email_address.primary
+        assert not email_address.verified
 
         # Check membership.
         assert 0 == user.prescriberorganization_set.count()

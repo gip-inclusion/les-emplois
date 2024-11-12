@@ -24,6 +24,13 @@ urlpatterns = [
     # We don't want any user to be able to signup using the default allauth `signup` url
     # because we have multiple specific signup processes for different kind of users.
     re_path(r"^accounts/signup/$", signup_views.signup),
+    # Override allauth `account_confirm_email` URL
+    # We want to control how EmailAddress is managed during this view
+    re_path(
+        r"^accounts/confirm-email/(?P<key>[-:\w]+)/$",
+        signup_views.ItouConfirmEmailView.as_view(),
+        name="account_confirm_email",
+    ),
     # --------------------------------------------------------------------------------------
     # Override allauth `account_login` URL.
     # /accounts/login/ <=> account_login

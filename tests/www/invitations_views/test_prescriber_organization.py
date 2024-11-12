@@ -3,7 +3,6 @@ from urllib.parse import urlencode
 
 import pytest
 import respx
-from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import reverse
@@ -437,7 +436,7 @@ class TestAcceptPrescriberWithOrgInvitation:
             has_completed_welcoming_tour=True,
         )
         # The user verified its email
-        EmailAddress(user_id=user.pk, email=user.email, verified=True, primary=True).save()
+        user.emailaddress_set.filter(email=user.email).update(verified=True, primary=True)
         invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
             organization=self.organization,
@@ -475,9 +474,9 @@ class TestAcceptPrescriberWithOrgInvitation:
 
     def test_accept_existing_user_not_logged_in_using_django_auth(self, client, mailoutbox):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
-        user = PrescriberFactory(has_completed_welcoming_tour=True, identity_provider="DJANGO")
-        # The user verified its email
-        EmailAddress(user_id=user.pk, email=user.email, verified=True, primary=True).save()
+        user = PrescriberFactory(
+            has_completed_welcoming_tour=True, identity_provider="DJANGO", with_verified_email=True
+        )
         invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
             organization=self.organization,

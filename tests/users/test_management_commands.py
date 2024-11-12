@@ -379,7 +379,7 @@ class TestCommandNewUsersToBrevo:
         not_primary = CompanyMembershipFactory(
             company__kind=CompanyKind.EI, user__identity_provider=IdentityProvider.DJANGO
         ).user
-        EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
+        EmailAddress.objects.filter(user=not_primary, email=not_primary.email).update(primary=False, verified=True)
         # Inactive memberships are ignored.
         CompanyMembershipFactory(user__with_verified_email=True, company__kind=CompanyKind.EI, is_active=False)
         # Inactive users are ignored.
@@ -528,7 +528,7 @@ class TestCommandNewUsersToBrevo:
             not_primary = PrescriberMembershipFactory(
                 organization=organization, user__identity_provider=IdentityProvider.DJANGO
             ).user
-            EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
+            EmailAddress.objects.filter(user=not_primary, email=not_primary.email).update(primary=False, verified=True)
             # Inactive users are ignored.
             PrescriberMembershipFactory(
                 user__is_active=False, user__with_verified_email=True, organization=organization
@@ -622,7 +622,7 @@ class TestCommandNewUsersToBrevo:
         )
         # Ignored, email is not the primary email when not using IC
         not_primary = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
-        EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
+        EmailAddress.objects.filter(user=not_primary, email=not_primary.email).update(primary=False, verified=True)
         # New email not verified is ignored.
         changed_email = PrescriberFactory(with_verified_email=True, identity_provider=IdentityProvider.DJANGO)
         changed_email.email = "changed@mailinator.com"

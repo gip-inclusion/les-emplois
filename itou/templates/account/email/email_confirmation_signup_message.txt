@@ -1,7 +1,7 @@
 {% autoescape off %}
-Nous avons bien reçu votre demande de modification d'adresse e-mail de connexion aux Emplois de l'inclusion.
+Nous avons bien enregistré votre demande d'inscription et vous remercions de votre confiance.
 
-Pour finaliser cette modification, veuillez cliquer sur le lien suivant :
+Afin de finaliser votre inscription, cliquez sur le lien suivant :
 
 {{ activate_url }}
 

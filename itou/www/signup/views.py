@@ -5,7 +5,7 @@ Handle multiple user types sign up with django-allauth.
 import logging
 
 from allauth.account.adapter import get_adapter
-from allauth.account.views import PasswordResetFromKeyView, PasswordResetView, SignupView
+from allauth.account.views import ConfirmEmailView, PasswordResetFromKeyView, PasswordResetView, SignupView
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth import REDIRECT_FIELD_NAME, login
@@ -37,6 +37,26 @@ from itou.www.signup import forms
 logger = logging.getLogger(__name__)
 
 ITOU_SESSION_FACILITATOR_SIGNUP_KEY = "facilitator_signup"
+
+
+class ItouConfirmEmailView(ConfirmEmailView):
+    def post(self, *args, **kwargs):
+        response = super().post(*args, **kwargs)
+
+        email_address = self.object.email_address
+        if email_address.verified:
+            user = email_address.user
+            with transaction.atomic():
+                # Replace user email
+                user.emailaddress_set.exclude(email=email_address.email).delete()
+                user.email = email_address.email
+                user.save()
+
+                # Mark new email as primary
+                email_address.primary = True
+                email_address.save()
+
+        return response
 
 
 class ItouPasswordResetView(PasswordResetView):

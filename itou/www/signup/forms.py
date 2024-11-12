@@ -1,3 +1,4 @@
+from allauth.account.adapter import get_adapter
 from allauth.account.forms import SignupForm
 from django import forms
 from django.core.exceptions import ValidationError
@@ -156,7 +157,15 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         self.cleaned_data["username"] = User.generate_unique_username()
         # Create the user.
         self.user_kind = UserKind.JOB_SEEKER
-        user = super().save(request)
+
+        # Below code is taken from allauth SignupForm
+        # We don't call super().save() because there are some behaviours we want to avoid
+        # (calls to setup_user_email) and their comments suggest their code might be reorganized in future
+        adapter = get_adapter()
+        user = adapter.new_user(request)
+        adapter.save_user(request, user, self)
+        self.custom_signup(request, user)
+
         user.title = self.cleaned_data["title"]
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]

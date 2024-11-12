@@ -1,7 +1,6 @@
 import math
 
 import pytest
-from allauth.account.models import EmailAddress
 from django.contrib.gis.geos import Point
 from django.test import override_settings
 from django.urls import reverse
@@ -436,16 +435,14 @@ class TestEditJobSeekerInfo:
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
         new_email = "bidou@yopmail.com"
-        job_application = JobApplicationSentByPrescriberFactory(job_seeker__jobseeker_profile__nir="178122978200508")
+        job_application = JobApplicationSentByPrescriberFactory(
+            job_seeker__jobseeker_profile__nir="178122978200508", job_seeker__with_verified_email=True
+        )
         user = job_application.to_company.members.first()
 
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
         job_application.job_seeker.created_by = user
         job_application.job_seeker.save()
-
-        # Confirm job seeker email
-        job_seeker = User.objects.get(id=job_application.job_seeker.id)
-        EmailAddress.objects.create(user=job_seeker, email=job_seeker.email, verified=True)
 
         # Now the SIAE wants to edit the jobseeker email. The field is not available, and it cannot be bypassed
         client.force_login(user)

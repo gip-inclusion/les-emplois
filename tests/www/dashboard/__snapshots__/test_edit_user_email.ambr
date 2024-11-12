@@ -1,0 +1,16 @@
+# serializer version: 1
+# name: TestChangeEmailView.test_update_email
+  '''
+  Nous avons bien reçu votre demande de modification d'adresse e-mail de connexion aux Emplois de l'inclusion.
+  
+  Pour finaliser cette modification, veuillez cliquer sur le lien suivant :
+  
+  http://testserver[CONFIRM EMAIL LINK REMOVED]
+  
+  Si vous n'êtes pas à l'origine de cette demande, merci de ne pas prendre en compte ce message.
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---

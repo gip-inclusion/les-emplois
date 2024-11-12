@@ -256,6 +256,22 @@ class TestModel:
         with pytest.raises(ValidationError):
             JobSeekerFactory(email=email)
 
+    def test_email_address_maintained_on_model_changes(self):
+        user = JobSeekerFactory(with_verified_email=True)
+        new_email = "changed@mailinator.com"
+        user.email = new_email
+        user.save()
+        assert user.email == new_email
+        assert user.emailaddress_set.count() == 1  # Old email removed
+        email_address = user.emailaddress_set.get(email=new_email)
+        assert not email_address.verified
+        assert email_address.primary
+
+        # Email is a nullable field
+        user.email = None
+        user.save()
+        assert user.emailaddress_set.count() == 0
+
     def test_is_handled_by_proxy(self):
         job_seeker = JobSeekerFactory()
         assert not job_seeker.is_handled_by_proxy
@@ -442,8 +458,7 @@ class TestModel:
         assert not user.can_edit_email(job_seeker)
 
         # Job seeker has verified his email.
-        job_seeker = JobSeekerFactory(created_by=user)
-        job_seeker.emailaddress_set.create(email=job_seeker.email, verified=True)
+        job_seeker = JobSeekerFactory(created_by=user, with_verified_email=True)
         assert not user.can_edit_email(job_seeker)
 
     def test_can_edit_personal_information(self):
@@ -584,7 +599,8 @@ class TestModel:
         user = JobSeekerFactory()
 
         assert not user.has_verified_email
-        address = user.emailaddress_set.create(email=user.email, verified=False)
+        address = user.emailaddress_set.filter(email=user.email, verified=False, primary=True).first()
+        assert address is not None
         del user.has_verified_email
         assert not user.has_verified_email
         address.delete()

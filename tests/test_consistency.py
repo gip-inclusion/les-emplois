@@ -43,6 +43,7 @@ def test_unused_templates():
         "account/email/unknown_account_message.txt",
         "account/email/unknown_account_subject.txt",
         "account/email/email_confirmation_message.txt",
+        "account/email/email_confirmation_signup_message.txt",
         "account/email/email_confirmation_subject.txt",
         "account/email/password_reset_key_message.txt",
         "account/email/password_reset_key_subject.txt",

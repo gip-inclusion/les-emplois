@@ -350,6 +350,13 @@ class User(AbstractUser, AddressMixin):
 
         self.set_old_values()
 
+        # Ensure EmailAddress consistency
+        if self.email is None:
+            self.emailaddress_set.all().delete()
+        elif self.email not in self.emailaddress_set.values_list("email", flat=True):
+            self.emailaddress_set.all().delete()
+            self.emailaddress_set.create(email=self.email, primary=True)
+
     def get_full_name(self):
         """
         Return the first_name plus the last_name, with a space in between.

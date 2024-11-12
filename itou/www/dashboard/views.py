@@ -1,3 +1,4 @@
+from allauth.account.utils import send_email_confirmation
 from allauth.account.views import PasswordChangeView
 from django.conf import settings
 from django.contrib import auth, messages
@@ -213,13 +214,17 @@ password_change = login_required(ItouPasswordChangeView.as_view())
 def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
     if request.user.has_sso_provider:
         return HttpResponseForbidden()
-    form = EditUserEmailForm(data=request.POST or None, user_email=request.user.email)
+    form = EditUserEmailForm(data=request.POST or None, user=request.user)
     if request.method == "POST" and form.is_valid():
-        request.user.email = form.cleaned_data["email"]
-        request.user.save()
-        request.user.emailaddress_set.all().delete()
+        # User can only request one email modification at a time
+        request.user.emailaddress_set.filter(verified=False, primary=False).delete()
+
+        email = form.cleaned_data["email"]
+        request.user.emailaddress_set.create(email=email)
+
+        send_email_confirmation(request, request.user, email=email)
         auth.logout(request)
-        return HttpResponseRedirect(reverse("account_logout"))
+        return HttpResponseRedirect(reverse("account_email_verification_sent"))
 
     context = {
         "form": form,
