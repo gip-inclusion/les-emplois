@@ -1,21 +1,6 @@
 from django.urls import path
 
 from itou.www.apply.views import edit_views, list_views, process_views, submit_views
-from itou.www.job_seekers_views.views import (
-    CheckJobSeekerInformations,
-    CheckJobSeekerInformationsForHire,
-    CheckNIRForJobSeekerView,
-    CheckNIRForSenderView,
-    CreateJobSeekerStep1ForSenderView,
-    CreateJobSeekerStep2ForSenderView,
-    CreateJobSeekerStep3ForSenderView,
-    CreateJobSeekerStepEndForSenderView,
-    SearchByEmailForSenderView,
-    UpdateJobSeekerStep1View,
-    UpdateJobSeekerStep2View,
-    UpdateJobSeekerStep3View,
-    UpdateJobSeekerStepEndView,
-)
 
 
 # https://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces-and-included-urlconfs
@@ -30,49 +15,7 @@ urlpatterns = [
         submit_views.PendingAuthorizationForSender.as_view(),
         name="pending_authorization_for_sender",
     ),
-    # Ewen: deprecated url. These urls are going to job_seekers_views.views
-    path("<int:company_pk>/sender/check_nir", CheckNIRForSenderView.as_view(), name="check_nir_for_sender"),
-    # Ewen: deprecated url. These urls are going to job_seekers_views
-    path(
-        "<int:company_pk>/sender/search-by-email/<uuid:session_uuid>",
-        SearchByEmailForSenderView.as_view(),
-        name="search_by_email_for_sender",
-    ),
-    # Ewen: deprecated urls. These urls are going to job_seekers_views
-    path(
-        "<int:company_pk>/sender/create_job_seeker/<uuid:session_uuid>/1",
-        CreateJobSeekerStep1ForSenderView.as_view(),
-        name="create_job_seeker_step_1_for_sender",
-    ),
-    path(
-        "<int:company_pk>/sender/create_job_seeker/<uuid:session_uuid>/2",
-        CreateJobSeekerStep2ForSenderView.as_view(),
-        name="create_job_seeker_step_2_for_sender",
-    ),
-    path(
-        "<int:company_pk>/sender/create_job_seeker/<uuid:session_uuid>/3",
-        CreateJobSeekerStep3ForSenderView.as_view(),
-        name="create_job_seeker_step_3_for_sender",
-    ),
-    path(
-        "<int:company_pk>/sender/create_job_seeker/<uuid:session_uuid>/end",
-        CreateJobSeekerStepEndForSenderView.as_view(),
-        name="create_job_seeker_step_end_for_sender",
-    ),
-    # Submit - job seeker.
-    # Ewen: deprecated url. These urls are going to job_seekers_views.views
-    path(
-        "<int:company_pk>/job_seeker/check_nir",
-        CheckNIRForJobSeekerView.as_view(),
-        name="check_nir_for_job_seeker",
-    ),
     # Submit - common.
-    # Ewen: deprecated url. These urls are going to job_seekers_views
-    path(
-        "<int:company_pk>/create/<uuid:job_seeker_public_id>/check_job_seeker_info",
-        CheckJobSeekerInformations.as_view(),
-        name="step_check_job_seeker_info",
-    ),
     path(
         "<int:company_pk>/create/<uuid:job_seeker_public_id>/check_prev_applications",
         submit_views.CheckPreviousApplications.as_view(),
@@ -103,99 +46,7 @@ urlpatterns = [
         submit_views.ApplicationEndView.as_view(),
         name="application_end",
     ),
-    # Job seeker check/updates
-    # Ewen: deprecated urls. These urls are going to job_seekers_views
-    path(
-        "<int:company_pk>/update_job_seeker/<uuid:job_seeker_public_id>/1",
-        UpdateJobSeekerStep1View.as_view(),
-        name="update_job_seeker_step_1",
-    ),
-    path(
-        "<int:company_pk>/update_job_seeker/<uuid:job_seeker_public_id>/2",
-        UpdateJobSeekerStep2View.as_view(),
-        name="update_job_seeker_step_2",
-    ),
-    path(
-        "<int:company_pk>/update_job_seeker/<uuid:job_seeker_public_id>/3",
-        UpdateJobSeekerStep3View.as_view(),
-        name="update_job_seeker_step_3",
-    ),
-    path(
-        "<int:company_pk>/update_job_seeker/<uuid:job_seeker_public_id>/end",
-        UpdateJobSeekerStepEndView.as_view(),
-        name="update_job_seeker_step_end",
-    ),
     # Direct hire process
-    # Ewen: deprecated url. These urls are going to job_seekers_views.views
-    path(
-        "<int:company_pk>/hire/check-nir",
-        CheckNIRForSenderView.as_view(),
-        name="check_nir_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    # Ewen: deprecated url. These urls are going to job_seekers_views
-    path(
-        "<int:company_pk>/hire/search-by-email/<uuid:session_uuid>",
-        SearchByEmailForSenderView.as_view(),
-        name="search_by_email_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    # Ewen: deprecated urls. These urls are going to job_seekers_views
-    path(
-        "<int:company_pk>/hire/create-job-seeker/<uuid:session_uuid>/1",
-        CreateJobSeekerStep1ForSenderView.as_view(),
-        name="create_job_seeker_step_1_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/create-job-seeker/<uuid:session_uuid>/2",
-        CreateJobSeekerStep2ForSenderView.as_view(),
-        name="create_job_seeker_step_2_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/create-job-seeker/<uuid:session_uuid>/3",
-        CreateJobSeekerStep3ForSenderView.as_view(),
-        name="create_job_seeker_step_3_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/create-job-seeker/<uuid:session_uuid>/end",
-        CreateJobSeekerStepEndForSenderView.as_view(),
-        name="create_job_seeker_step_end_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/update-job-seeker/<uuid:job_seeker_public_id>/1",
-        UpdateJobSeekerStep1View.as_view(),
-        name="update_job_seeker_step_1_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/update-job-seeker/<uuid:job_seeker_public_id>/2",
-        UpdateJobSeekerStep2View.as_view(),
-        name="update_job_seeker_step_2_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/update-job-seeker/<uuid:job_seeker_public_id>/3",
-        UpdateJobSeekerStep3View.as_view(),
-        name="update_job_seeker_step_3_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/update-job-seeker/<uuid:job_seeker_public_id>/end",
-        UpdateJobSeekerStepEndView.as_view(),
-        name="update_job_seeker_step_end_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    # Ewen: deprecated url. These urls are going to job_seekers_views
-    path(
-        "<int:company_pk>/hire/<uuid:job_seeker_public_id>/check-infos",
-        CheckJobSeekerInformationsForHire.as_view(),
-        name="check_job_seeker_info_for_hire",
-        kwargs={"hire_process": True},
-    ),
     path(
         "<int:company_pk>/hire/<uuid:job_seeker_public_id>/check-previous-applications",
         submit_views.CheckPreviousApplications.as_view(),
