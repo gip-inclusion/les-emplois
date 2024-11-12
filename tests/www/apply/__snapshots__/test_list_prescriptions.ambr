@@ -1029,6 +1029,7 @@
           'IncludeNode[apply/includes/list_job_applications.html]',
           'ForNode[apply/includes/list_job_applications.html]',
           'IfNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
           'IncludeNode[apply/list_prescriptions.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/list_prescriptions.html]',
@@ -1076,6 +1077,7 @@
           'IfNode[apply/includes/list_card_body.html]',
           'IncludeNode[apply/includes/list_job_applications.html]',
           'ForNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
           'IfNode[apply/includes/list_job_applications.html]',
           'IncludeNode[apply/list_prescriptions.html]',
           'BlockNode[layout/base.html]',
@@ -2231,6 +2233,7 @@
       </fieldset>
   
   
+      <input id="display-kind" name="display" type="hidden" value="list"/>
       
           
   
@@ -2441,6 +2444,7 @@
       
           
               
+                  
   
   
   
@@ -2456,7 +2460,7 @@
           
           
               chez
-              <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list">
+              <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist">
                   <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1"></i>
                   <span>Acme inc.</span>
               </a>
@@ -2516,14 +2520,14 @@
           <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
               
               
-                  <a aria-label="Gérer la candidature de J… D…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list">Voir sa candidature</a>
+                  <a aria-label="Gérer la candidature de J… D…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist">Voir sa candidature</a>
               
           </div>
       </div>
   </div>
   
-          
               
+                  
   
   
   
@@ -2539,7 +2543,7 @@
           
           
               chez
-              <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list">
+              <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist">
                   <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1"></i>
                   <span>Acme inc.</span>
               </a>
@@ -2599,14 +2603,14 @@
           <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
               
               
-                  <a aria-label="Gérer la candidature de J… D…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list">Voir sa candidature</a>
+                  <a aria-label="Gérer la candidature de J… D…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist">Voir sa candidature</a>
               
           </div>
       </div>
   </div>
   
-          
               
+                  
   
   
   
@@ -2622,7 +2626,7 @@
           
           
               chez
-              <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list">
+              <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist">
                   <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1"></i>
                   <span>Acme inc.</span>
               </a>
@@ -2682,11 +2686,262 @@
           <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
               
               
-                  <a aria-label="Gérer la candidature de J… D…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list">Voir sa candidature</a>
+                  <a aria-label="Gérer la candidature de J… D…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist">Voir sa candidature</a>
               
           </div>
       </div>
   </div>
+  
+              
+          
+          
+  
+  
+  
+      
+  </section>
+  '''
+# ---
+# name: test_list_snapshot[applications table]
+  '''
+  <section aria-labelledby="apply-list-count" id="job-applications-section">
+      
+          
+              <div class="table-responsive mt-3 mt-md-4">
+                  <table class="table table-hover">
+                      <caption class="visually-hidden">Liste des candidatures</caption>
+                      <thead>
+                          <tr>
+                              
+                                  <th scope="col">Candidature de</th>
+                              
+                              <th scope="col">Émise le</th>
+                              <th scope="col">Statut</th>
+                              <th scope="col">Employeur</th>
+                              <th scope="col">Poste</th>
+                              <th scope="col">Emetteur</th>
+                              
+                                  
+                                  <th class="text-nowrap" scope="col">Critères administratifs IAE</th>
+                              
+                              <th class="text-end w-50px" scope="col"></th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          
+                              
+  
+  
+  
+  
+      
+  
+  
+  <tr class="align-top">
+      
+          <td>
+              <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
+                  J… D…
+              </a>
+              <span class="d-block">
+                  35 -
+                  Rennes
+              </span>
+              
+                  
+                      
+                                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+              <i aria-hidden="true" class="ri-error-warning-line"></i>
+              Éligibilité IAE à valider
+          </span>
+                      
+                  
+              
+          </td>
+      
+  
+      <td>27/11/2024</td>
+      <td><span class="badge rounded-pill text-nowrap badge-xs bg-danger" id="state_[PK of JobApplication]">Candidature déclinée</span></td>
+  
+      
+          <td>Acme inc.</td>
+      
+  
+      <td>
+          
+              
+                  Candidature spontanée
+              
+          
+      </td>
+      <td>
+          
+              Vous
+          
+      </td>
+      
+          
+          <td>
+              
+                  <i class="text-disabled">Aucun critère sélectionné</i>
+              
+              
+          </td>
+      
+  
+      <td class="text-end w-50px align-middle">
+          
+              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
+                  <i aria-label="Gérer la candidature de J… D…" class="ri-arrow-drop-right-line fs-lg"></i>
+              </a>
+          
+      </td>
+  </tr>
+  
+                          
+                              
+  
+  
+  
+  
+      
+  
+  
+  <tr class="align-top">
+      
+          <td>
+              <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
+                  J… D…
+              </a>
+              <span class="d-block">
+                  35 -
+                  Rennes
+              </span>
+              
+                  
+                      
+                                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+              <i aria-hidden="true" class="ri-error-warning-line"></i>
+              Éligibilité IAE à valider
+          </span>
+                      
+                  
+              
+          </td>
+      
+  
+      <td>27/11/2024</td>
+      <td><span class="badge rounded-pill text-nowrap badge-xs bg-info" id="state_[PK of JobApplication]">Nouvelle candidature</span></td>
+  
+      
+          <td>Acme inc.</td>
+      
+  
+      <td>
+          
+              
+                  Candidature spontanée
+              
+          
+      </td>
+      <td>
+          
+              Vous
+          
+      </td>
+      
+          
+          <td>
+              
+                  <i class="text-disabled">Aucun critère sélectionné</i>
+              
+              
+          </td>
+      
+  
+      <td class="text-end w-50px align-middle">
+          
+              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
+                  <i aria-label="Gérer la candidature de J… D…" class="ri-arrow-drop-right-line fs-lg"></i>
+              </a>
+          
+      </td>
+  </tr>
+  
+                          
+                              
+  
+  
+  
+  
+      
+  
+  
+  <tr class="align-top">
+      
+          <td>
+              <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
+                  J… D…
+              </a>
+              <span class="d-block">
+                  35 -
+                  Rennes
+              </span>
+              
+                  
+                      
+                                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+              <i aria-hidden="true" class="ri-error-warning-line"></i>
+              Éligibilité IAE à valider
+          </span>
+                      
+                  
+              
+          </td>
+      
+  
+      <td>27/11/2024</td>
+      <td><span class="badge rounded-pill text-nowrap badge-xs bg-success" id="state_[PK of JobApplication]">Candidature acceptée</span></td>
+  
+      
+          <td>Acme inc.</td>
+      
+  
+      <td>
+          
+              
+                  Candidature spontanée
+              
+          
+      </td>
+      <td>
+          
+              Vous
+          
+      </td>
+      
+          
+          <td>
+              
+                  <i class="text-disabled">Aucun critère sélectionné</i>
+              
+              
+          </td>
+      
+  
+      <td class="text-end w-50px align-middle">
+          
+              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
+                  <i aria-label="Gérer la candidature de J… D…" class="ri-arrow-drop-right-line fs-lg"></i>
+              </a>
+          
+      </td>
+  </tr>
+  
+                          
+                      </tbody>
+                  </table>
+              </div>
   
           
           
@@ -2697,7 +2952,7 @@
   </section>
   '''
 # ---
-# name: test_list_snapshot[empty list]
+# name: test_list_snapshot[empty]
   '''
   <section aria-labelledby="apply-list-count" id="job-applications-section">
       

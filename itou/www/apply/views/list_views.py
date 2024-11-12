@@ -40,6 +40,24 @@ class JobApplicationsListKind(enum.Enum):
     do_not_call_in_templates = enum.nonmember(True)
 
 
+class JobApplicationsDisplayKind(enum.StrEnum):
+    LIST = "list"
+    TABLE = "table"
+
+    # Make the Enum work in Django's templates
+    # See :
+    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
+    # - https://github.com/django/django/pull/12304
+    do_not_call_in_templates = enum.nonmember(True)
+
+    # Ease the use in templates by avoiding the need to have access to JobApplicationsDisplayKind
+    def is_list(self):
+        return self is self.LIST
+
+    def is_table(self):
+        return self is self.TABLE
+
+
 def _add_user_can_view_personal_information(job_applications, can_view):
     for job_application in job_applications:
         job_application.user_can_view_personal_information = can_view(job_application.job_seeker)
@@ -128,8 +146,14 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     # The candidate has obviously access to its personal info
     _add_user_can_view_personal_information(job_applications_page, lambda ja: True)
 
+    try:
+        display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
+    except ValueError:
+        display_kind = JobApplicationsDisplayKind.LIST
+
     context = {
         "job_applications_page": job_applications_page,
+        "display_kind": display_kind,
         "job_applications_list_kind": JobApplicationsListKind.SENT_FOR_ME,
         "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,
@@ -180,9 +204,15 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     _add_user_can_view_personal_information(job_applications_page, request.user.can_view_personal_information)
     _add_administrative_criteria(job_applications_page)
 
+    try:
+        display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
+    except ValueError:
+        display_kind = JobApplicationsDisplayKind.LIST
+
     context = {
         "title": title,
         "job_applications_page": job_applications_page,
+        "display_kind": display_kind,
         "job_applications_list_kind": JobApplicationsListKind.SENT,
         "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,
@@ -300,10 +330,16 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     if iae_company:
         _add_administrative_criteria(job_applications_page)
 
+    try:
+        display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
+    except ValueError:
+        display_kind = JobApplicationsDisplayKind.LIST
+
     context = {
         "title": title,
         "siae": company,
         "job_applications_page": job_applications_page,
+        "display_kind": display_kind,
         "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
         "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,

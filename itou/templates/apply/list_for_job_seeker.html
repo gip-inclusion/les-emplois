@@ -14,7 +14,12 @@
             {% include "apply/includes/job_applications_filters/top_filters.html" %}
             <div class="s-section__row row">
                 <div class="col-12">
-                    {% include "apply/includes/list_counter.html" %}
+                    <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                        <div class="flex-md-grow-1">{% include "apply/includes/list_counter.html" %}</div>
+                        <div class="d-flex gap-2 mt-3 mt-md-0 ms-0 ms-md-2" role="group" aria-label="Changement du mode d'affichage des candidatures">
+                            {% include "apply/includes/list_view_switcher.html" %}
+                        </div>
+                    </div>
                     {% include "apply/includes/list_job_applications.html" %}
                 </div>
             </div>

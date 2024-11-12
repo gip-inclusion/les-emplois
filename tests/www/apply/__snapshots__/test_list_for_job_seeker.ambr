@@ -83,6 +83,7 @@
       </fieldset>
   
   
+      <input id="display-kind" name="display" type="hidden" value="list"/>
       
       
   
@@ -123,6 +124,7 @@
       
           
               
+                  
   
   
   
@@ -179,7 +181,7 @@
           <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
               
               
-                  <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list">
+                  <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dlist">
                       Voir ma candidature
                   </a>
               
@@ -187,8 +189,8 @@
       </div>
   </div>
   
-          
               
+                  
   
   
   
@@ -243,7 +245,7 @@
           <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
               
               
-                  <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list">
+                  <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dlist">
                       Voir ma candidature
                   </a>
               
@@ -251,8 +253,8 @@
       </div>
   </div>
   
-          
               
+                  
   
   
   
@@ -304,13 +306,193 @@
           <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
               
               
-                  <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list">
+                  <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dlist">
                       Voir ma candidature
                   </a>
               
           </div>
       </div>
   </div>
+  
+              
+          
+          
+  
+  
+  
+      
+  </section>
+  '''
+# ---
+# name: test_list_snapshot[applications table]
+  '''
+  <section aria-labelledby="apply-list-count" id="job-applications-section">
+      
+          
+              <div class="table-responsive mt-3 mt-md-4">
+                  <table class="table table-hover">
+                      <caption class="visually-hidden">Liste des candidatures</caption>
+                      <thead>
+                          <tr>
+                              
+                                  <th scope="col">Candidature chez</th>
+                              
+                              <th scope="col">Émise le</th>
+                              <th scope="col">Statut</th>
+                              
+                              <th scope="col">Poste</th>
+                              <th scope="col">Emetteur</th>
+                              
+                              <th class="text-end w-50px" scope="col"></th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          
+                              
+  
+  
+  
+  
+      
+  
+  
+  <tr class="align-top">
+      
+          <td>
+              <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                  Acme inc.
+              </a>
+          </td>
+      
+  
+      <td>27/11/2024</td>
+      <td><span class="badge rounded-pill text-nowrap badge-xs bg-danger" id="state_[PK of JobApplication]">Candidature déclinée</span></td>
+  
+      
+  
+      <td>
+          
+              
+                  Candidature spontanée
+              
+          
+      </td>
+      <td>
+          
+              <i class="ri-home-smile-2-line"></i>
+              
+                  Pres. Org.
+              
+          
+      </td>
+      
+  
+      <td class="text-end w-50px align-middle">
+          
+              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                  <i aria-label="Voir ma candidature" class="ri-arrow-drop-right-line fs-lg"></i>
+              </a>
+          
+      </td>
+  </tr>
+  
+                          
+                              
+  
+  
+  
+  
+      
+  
+  
+  <tr class="align-top">
+      
+          <td>
+              <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                  Acme inc.
+              </a>
+          </td>
+      
+  
+      <td>27/11/2024</td>
+      <td><span class="badge rounded-pill text-nowrap badge-xs bg-info" id="state_[PK of JobApplication]">Nouvelle candidature</span></td>
+  
+      
+  
+      <td>
+          
+              
+                  Candidature spontanée
+              
+          
+      </td>
+      <td>
+          
+              <i class="ri-community-line"></i>
+              Acme inc.
+          
+      </td>
+      
+  
+      <td class="text-end w-50px align-middle">
+          
+              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                  <i aria-label="Voir ma candidature" class="ri-arrow-drop-right-line fs-lg"></i>
+              </a>
+          
+      </td>
+  </tr>
+  
+                          
+                              
+  
+  
+  
+  
+      
+  
+  
+  <tr class="align-top">
+      
+          <td>
+              <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                  Acme inc.
+              </a>
+          </td>
+      
+  
+      <td>27/11/2024</td>
+      <td><span class="badge rounded-pill text-nowrap badge-xs bg-success" id="state_[PK of JobApplication]">Candidature acceptée</span></td>
+  
+      
+  
+      <td>
+          
+              
+                  Candidature spontanée
+              
+          
+      </td>
+      <td>
+          
+              Vous
+          
+      </td>
+      
+  
+      <td class="text-end w-50px align-middle">
+          
+              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                  <i aria-label="Voir ma candidature" class="ri-arrow-drop-right-line fs-lg"></i>
+              </a>
+          
+      </td>
+  </tr>
+  
+                          
+                      </tbody>
+                  </table>
+              </div>
   
           
           
@@ -321,7 +503,7 @@
   </section>
   '''
 # ---
-# name: test_list_snapshot[empty list]
+# name: test_list_snapshot[empty]
   '''
   <section aria-labelledby="apply-list-count" id="job-applications-section">
       

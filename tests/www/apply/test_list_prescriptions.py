@@ -13,6 +13,7 @@ from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import Title
 from itou.utils.urls import add_url_params
+from itou.www.apply.views.list_views import JobApplicationsDisplayKind
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
@@ -214,6 +215,28 @@ def test_filtered_by_eligibility_validated_prescriber(client):
     assert applications == [prescriber_jobapp]
 
 
+def test_list_display_kind(client):
+    prescriber_jobapp = JobApplicationFactory()
+    client.force_login(prescriber_jobapp.sender)
+    url = reverse("apply:list_prescriptions")
+
+    TABLE_VIEW_MARKER = '<caption class="visually-hidden">Liste des candidatures</caption>'
+    LIST_VIEW_MARKER = '<div class="c-box--results__header">'
+
+    for display_param, expected_marker in [
+        ({}, LIST_VIEW_MARKER),
+        ({"display": "invalid"}, LIST_VIEW_MARKER),
+        ({"display": JobApplicationsDisplayKind.LIST}, LIST_VIEW_MARKER),
+        ({"display": JobApplicationsDisplayKind.TABLE}, TABLE_VIEW_MARKER),
+    ]:
+        response = client.get(url, display_param)
+        for marker in (LIST_VIEW_MARKER, TABLE_VIEW_MARKER):
+            if marker == expected_marker:
+                assertContains(response, marker)
+            else:
+                assertNotContains(response, marker)
+
+
 def test_filters(client, snapshot):
     client.force_login(PrescriberFactory())
 
@@ -298,6 +321,21 @@ def test_htmx_filters(client):
     fresh_page = parse_response_to_soup(response, selector="#main")
     assertSoupEqual(page, fresh_page)
 
+    # Switch display kind
+    [display_input] = page.find_all(id="display-kind")
+    display_input["value"] = JobApplicationsDisplayKind.TABLE.value
+
+    response = client.get(
+        url,
+        {"states": ["refused"], "display": JobApplicationsDisplayKind.TABLE},
+        headers={"HX-Request": "true"},
+    )
+    update_page_with_htmx(page, f"form[hx-get='{url}']", response)
+
+    response = client.get(url, {"states": ["refused"], "display": JobApplicationsDisplayKind.TABLE})
+    fresh_page = parse_response_to_soup(response, selector="#main")
+    assertSoupEqual(page, fresh_page)
+
 
 @freeze_time("2024-11-27", tick=True)
 def test_list_snapshot(client, snapshot):
@@ -306,9 +344,14 @@ def test_list_snapshot(client, snapshot):
     client.force_login(prescriber)
     url = reverse("apply:list_prescriptions")
 
-    response = client.get(url)
-    page = parse_response_to_soup(response, selector="#job-applications-section")
-    assert str(page) == snapshot(name="empty list")
+    for display_param in [
+        {},
+        {"display": JobApplicationsDisplayKind.LIST},
+        {"display": JobApplicationsDisplayKind.TABLE},
+    ]:
+        response = client.get(url, display_param)
+        page = parse_response_to_soup(response, selector="#job-applications-section")
+        assert str(page) == snapshot(name="empty")
 
     job_seeker = JobSeekerFactory(for_snapshot=True)
     company = CompanyFactory(for_snapshot=True, with_membership=True)
@@ -332,7 +375,8 @@ def test_list_snapshot(client, snapshot):
         ),
     ]
 
-    response = client.get(url)
+    # List display
+    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST})
     page = parse_response_to_soup(
         response,
         selector="#job-applications-section",
@@ -356,6 +400,31 @@ def test_list_snapshot(client, snapshot):
         ),
     )
     assert str(page) == snapshot(name="applications list")
+
+    # Table display
+    response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
+    page = parse_response_to_soup(
+        response,
+        selector="#job-applications-section",
+        replace_in_attr=itertools.chain(
+            *(
+                [
+                    (
+                        "href",
+                        f"/apply/{job_application.pk}/prescriber/details",
+                        "/apply/[PK of JobApplication]/prescriber/details",
+                    ),
+                    (
+                        "id",
+                        f"state_{job_application.pk}",
+                        "state_[PK of JobApplication]",
+                    ),
+                ]
+                for job_application in job_applications
+            )
+        ),
+    )
+    assert str(page) == snapshot(name="applications table")
 
 
 def test_exports_without_organization(client):

@@ -13,7 +13,7 @@ from itou.job_applications.enums import Origin
 from itou.jobs.models import Appellation
 from itou.utils.context_processors import expose_enums
 from itou.utils.mocks.api_particulier import rsa_certified_mocker
-from itou.www.apply.views.list_views import JobApplicationsListKind
+from itou.www.apply.views.list_views import JobApplicationsDisplayKind, JobApplicationsListKind
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
@@ -51,6 +51,7 @@ def test_job_application_multiple_jobs():
                 "job_application": job_application,
                 "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
                 "JobApplicationsListKind": JobApplicationsListKind,
+                "display_kind": JobApplicationsDisplayKind.LIST,
                 "request": get_request(),
                 **expose_enums(),
             }
@@ -85,6 +86,7 @@ def test_job_application_auto_prescription_badge_in_list():
                 "job_application": job_application,
                 "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
                 "JobApplicationsListKind": JobApplicationsListKind,
+                "display_kind": JobApplicationsDisplayKind.LIST,
                 "request": get_request(),
                 **expose_enums(),
             }
@@ -105,6 +107,7 @@ def test_job_application_imported_from_pe_in_list():
                 "job_application": job_application,
                 "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
                 "JobApplicationsListKind": JobApplicationsListKind,
+                "display_kind": JobApplicationsDisplayKind.LIST,
                 "request": get_request(),
                 **expose_enums(),
             }
@@ -125,6 +128,7 @@ def test_job_application_job_seeker_in_list():
                 "job_application": job_application,
                 "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
                 "JobApplicationsListKind": JobApplicationsListKind,
+                "display_kind": JobApplicationsDisplayKind.LIST,
                 "request": get_request(),
                 **expose_enums(),
             }

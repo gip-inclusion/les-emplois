@@ -1,10 +1,11 @@
 <form hx-get="{{ request.path }}"
-      hx-trigger="change delay:.5s, duetChange delay:.5s{% if not request.user.is_job_seeker %}, change from:#id_job_seeker{% endif %}"
+      hx-trigger="change from:#display-kind, change delay:.5s, duetChange delay:.5s{% if not request.user.is_job_seeker %}, change from:#id_job_seeker{% endif %}"
       hx-indicator="#job-applications-section"
       hx-target="#job-applications-section"
       {% if not request.user.is_job_seeker %}hx-include="#id_job_seeker"{% endif %}
       hx-swap="outerHTML"
       hx-push-url="true">
+    {# display-kind is inside the form but we don't want to have the .5s delay #}
     {% comment %}
     Do not reload the entire offcanvas with HTMX. Otherwise, STR :
     1. Select a filter from the top bar (one with btn_dropdown_filter=True)
