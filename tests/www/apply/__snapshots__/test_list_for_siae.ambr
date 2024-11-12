@@ -1323,52 +1323,6 @@
           'IncludeNode[apply/includes/list_job_applications.html]',
           'ForNode[apply/includes/list_job_applications.html]',
           'IfNode[apply/includes/list_job_applications.html]',
-          'IncludeNode[apply/list_for_siae.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/list_for_siae.html]',
-          'list_for_siae[www/apply/views/list_views.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_poleemploiapproval"."id",
-                 "approvals_poleemploiapproval"."start_at",
-                 "approvals_poleemploiapproval"."end_at",
-                 "approvals_poleemploiapproval"."created_at",
-                 "approvals_poleemploiapproval"."pe_notification_status",
-                 "approvals_poleemploiapproval"."pe_notification_time",
-                 "approvals_poleemploiapproval"."pe_notification_endpoint",
-                 "approvals_poleemploiapproval"."pe_notification_exit_code",
-                 "approvals_poleemploiapproval"."pe_structure_code",
-                 "approvals_poleemploiapproval"."number",
-                 "approvals_poleemploiapproval"."pole_emploi_id",
-                 "approvals_poleemploiapproval"."first_name",
-                 "approvals_poleemploiapproval"."last_name",
-                 "approvals_poleemploiapproval"."birth_name",
-                 "approvals_poleemploiapproval"."birthdate",
-                 "approvals_poleemploiapproval"."nir",
-                 "approvals_poleemploiapproval"."ntt_nia",
-                 "approvals_poleemploiapproval"."siae_siret",
-                 "approvals_poleemploiapproval"."siae_kind"
-          FROM "approvals_poleemploiapproval"
-          WHERE ("approvals_poleemploiapproval"."nir" = %s
-                 AND NOT ("approvals_poleemploiapproval"."number" IN
-                            (SELECT U0."number"
-                             FROM "approvals_approval" U0
-                             WHERE U0."user_id" = %s)))
-          ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
-                   "approvals_poleemploiapproval"."start_at" ASC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
-          'User.latest_pe_approval[users/models.py]',
-          'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_card_body.html]',
-          'IfNode[apply/includes/list_card_body.html]',
-          'IfNode[apply/includes/list_card_body.html]',
-          'IncludeNode[apply/includes/list_job_applications.html]',
-          'ForNode[apply/includes/list_job_applications.html]',
           'IfNode[apply/includes/list_job_applications.html]',
           'IncludeNode[apply/list_for_siae.html]',
           'BlockNode[layout/base.html]',
@@ -1416,6 +1370,55 @@
           'IfNode[apply/includes/list_card_body.html]',
           'IncludeNode[apply/includes/list_job_applications.html]',
           'ForNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IncludeNode[apply/list_for_siae.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/list_for_siae.html]',
+          'list_for_siae[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_poleemploiapproval"."id",
+                 "approvals_poleemploiapproval"."start_at",
+                 "approvals_poleemploiapproval"."end_at",
+                 "approvals_poleemploiapproval"."created_at",
+                 "approvals_poleemploiapproval"."pe_notification_status",
+                 "approvals_poleemploiapproval"."pe_notification_time",
+                 "approvals_poleemploiapproval"."pe_notification_endpoint",
+                 "approvals_poleemploiapproval"."pe_notification_exit_code",
+                 "approvals_poleemploiapproval"."pe_structure_code",
+                 "approvals_poleemploiapproval"."number",
+                 "approvals_poleemploiapproval"."pole_emploi_id",
+                 "approvals_poleemploiapproval"."first_name",
+                 "approvals_poleemploiapproval"."last_name",
+                 "approvals_poleemploiapproval"."birth_name",
+                 "approvals_poleemploiapproval"."birthdate",
+                 "approvals_poleemploiapproval"."nir",
+                 "approvals_poleemploiapproval"."ntt_nia",
+                 "approvals_poleemploiapproval"."siae_siret",
+                 "approvals_poleemploiapproval"."siae_kind"
+          FROM "approvals_poleemploiapproval"
+          WHERE ("approvals_poleemploiapproval"."nir" = %s
+                 AND NOT ("approvals_poleemploiapproval"."number" IN
+                            (SELECT U0."number"
+                             FROM "approvals_approval" U0
+                             WHERE U0."user_id" = %s)))
+          ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
+                   "approvals_poleemploiapproval"."start_at" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'User.latest_pe_approval[users/models.py]',
+          'User.latest_common_approval[users/models.py]',
+          'WithNode[apply/includes/list_card_body.html]',
+          'IfNode[apply/includes/list_card_body.html]',
+          'IfNode[apply/includes/list_card_body.html]',
+          'IncludeNode[apply/includes/list_job_applications.html]',
+          'ForNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
           'IfNode[apply/includes/list_job_applications.html]',
           'IncludeNode[apply/list_for_siae.html]',
           'BlockNode[layout/base.html]',
@@ -1726,6 +1729,7 @@
       </fieldset>
   
   
+      <input id="display-kind" name="display" type="hidden" value="list"/>
       
           
   
@@ -1974,6 +1978,7 @@
       </fieldset>
   
   
+      <input id="display-kind" name="display" type="hidden" value="list"/>
       
           
   
@@ -2248,6 +2253,7 @@
       </fieldset>
   
   
+      <input id="display-kind" name="display" type="hidden" value="list"/>
       
           
   
@@ -2425,6 +2431,7 @@
       
           
               
+                  
   
   
   
@@ -2500,14 +2507,14 @@
               
               
                   
-                  <a aria-label="Gérer la candidature de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
+                  <a aria-label="Gérer la candidature de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dlist">Voir sa candidature</a>
               
           </div>
       </div>
   </div>
   
-          
               
+                  
   
   
   
@@ -2578,14 +2585,14 @@
               
               
                   
-                  <a aria-label="Gérer la candidature de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
+                  <a aria-label="Gérer la candidature de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dlist">Voir sa candidature</a>
               
           </div>
       </div>
   </div>
   
-          
               
+                  
   
   
   
@@ -2656,11 +2663,259 @@
               
               
                   
-                  <a aria-label="Gérer la candidature de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
+                  <a aria-label="Gérer la candidature de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dlist">Voir sa candidature</a>
               
           </div>
       </div>
   </div>
+  
+              
+          
+          
+  
+  
+  
+      
+  </section>
+  '''
+# ---
+# name: test_list_snapshot[applications table]
+  '''
+  <section aria-labelledby="apply-list-count" id="job-applications-section">
+      
+          
+              <div class="table-responsive mt-3 mt-md-4">
+                  <table class="table table-hover">
+                      <caption class="visually-hidden">Liste des candidatures</caption>
+                      <thead>
+                          <tr>
+                              
+                                  <th scope="col">Candidature de</th>
+                              
+                              <th scope="col">Émise le</th>
+                              <th scope="col">Statut</th>
+                              
+                              <th scope="col">Poste</th>
+                              <th scope="col">Emetteur</th>
+                              
+                                  
+                                  <th class="text-nowrap" scope="col">Critères administratifs IAE</th>
+                              
+                              <th class="text-end w-50px" scope="col"></th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          
+                              
+  
+  
+  
+  
+      
+  
+  
+  <tr class="align-top">
+      
+          <td>
+              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                  Jane DOE
+              </a>
+              <span class="d-block">
+                  35 -
+                  Rennes
+              </span>
+              
+                  
+                      
+                                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+              <i aria-hidden="true" class="ri-check-line"></i>
+              Éligible à l’IAE
+          </span>
+                      
+                  
+              
+          </td>
+      
+  
+      <td>27/11/2024</td>
+      <td><span class="badge rounded-pill text-nowrap badge-xs bg-danger" id="state_[PK of JobApplication]">Candidature déclinée</span></td>
+  
+      
+  
+      <td>
+          
+              
+                  Candidature spontanée
+              
+          
+      </td>
+      <td>
+          
+              <i class="ri-home-smile-2-line"></i>
+              
+                  Pres. Org.
+              
+          
+      </td>
+      
+          
+          <td>
+              
+                  <i class="text-disabled">Aucun critère sélectionné</i>
+              
+              
+          </td>
+      
+  
+      <td class="text-end w-50px align-middle">
+          
+              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                  <i aria-label="Gérer la candidature de Jane DOE" class="ri-arrow-drop-right-line fs-lg"></i>
+              </a>
+          
+      </td>
+  </tr>
+  
+                          
+                              
+  
+  
+  
+  
+      
+  
+  
+  <tr class="align-top">
+      
+          <td>
+              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                  Jane DOE
+              </a>
+              <span class="d-block">
+                  35 -
+                  Rennes
+              </span>
+              
+                  
+                      
+                                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+              <i aria-hidden="true" class="ri-check-line"></i>
+              Éligible à l’IAE
+          </span>
+                      
+                  
+              
+          </td>
+      
+  
+      <td>27/11/2024</td>
+      <td><span class="badge rounded-pill text-nowrap badge-xs bg-info" id="state_[PK of JobApplication]">Nouvelle candidature</span></td>
+  
+      
+  
+      <td>
+          
+              
+                  Candidature spontanée
+              
+          
+      </td>
+      <td>
+          
+              Vous
+          
+      </td>
+      
+          
+          <td>
+              
+                  <i class="text-disabled">Aucun critère sélectionné</i>
+              
+              
+          </td>
+      
+  
+      <td class="text-end w-50px align-middle">
+          
+              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                  <i aria-label="Gérer la candidature de Jane DOE" class="ri-arrow-drop-right-line fs-lg"></i>
+              </a>
+          
+      </td>
+  </tr>
+  
+                          
+                              
+  
+  
+  
+  
+      
+  
+  
+  <tr class="align-top">
+      
+          <td>
+              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                  Jane DOE
+              </a>
+              <span class="d-block">
+                  35 -
+                  Rennes
+              </span>
+              
+                  
+                      
+                                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+              <i aria-hidden="true" class="ri-check-line"></i>
+              Éligible à l’IAE
+          </span>
+                      
+                  
+              
+          </td>
+      
+  
+      <td>27/11/2024</td>
+      <td><span class="badge rounded-pill text-nowrap badge-xs bg-success" id="state_[PK of JobApplication]">Candidature acceptée</span></td>
+  
+      
+  
+      <td>
+          
+              
+                  Candidature spontanée
+              
+          
+      </td>
+      <td>
+          
+              <i aria-hidden="true" class="ri-user-line me-1"></i>Le candidat lui-même
+          
+      </td>
+      
+          
+          <td>
+              
+                  <i class="text-disabled">Aucun critère sélectionné</i>
+              
+              
+          </td>
+      
+  
+      <td class="text-end w-50px align-middle">
+          
+              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                  <i aria-label="Gérer la candidature de Jane DOE" class="ri-arrow-drop-right-line fs-lg"></i>
+              </a>
+          
+      </td>
+  </tr>
+  
+                          
+                      </tbody>
+                  </table>
+              </div>
   
           
           
@@ -2671,7 +2926,7 @@
   </section>
   '''
 # ---
-# name: test_list_snapshot[empty list]
+# name: test_list_snapshot[empty]
   '''
   <section aria-labelledby="apply-list-count" id="job-applications-section">
       

@@ -1,0 +1,16 @@
+<button id="list_display_button"
+        class="btn btn-ico btn-block {{ display_kind.is_list|yesno:'btn-secondary,btn-link' }}"
+        data-setter-target="#display-kind"
+        data-setter-value="{{ display_kind.LIST }}"
+        {% if request.htmx %}hx-swap-oob="true"{% endif %}>
+    <i class="ri-stacked-view" aria-hidden="true"></i>
+    <span>Liste</span>
+</button>
+<button id="table_display_button"
+        class="btn btn-ico btn-block {{ display_kind.is_table|yesno:'btn-secondary,btn-link' }}"
+        data-setter-target="#display-kind"
+        data-setter-value="{{ display_kind.TABLE }}"
+        {% if request.htmx %}hx-swap-oob="true"{% endif %}>
+    <i class="ri-table-line" aria-hidden="true"></i>
+    <span>Tableau</span>
+</button>

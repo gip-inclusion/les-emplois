@@ -4,10 +4,12 @@ import factory
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.widgets import DuetDatePickerWidget
+from itou.www.apply.views.list_views import JobApplicationsDisplayKind
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
@@ -82,6 +84,29 @@ def test_list_for_job_seeker_filtered_by_dates(client):
     assert applications[0].created_at <= end_date
 
 
+def test_list_display_kind(client):
+    job_seeker = JobSeekerFactory()
+    JobApplicationFactory(job_seeker=job_seeker, state=JobApplicationState.ACCEPTED)
+    client.force_login(job_seeker)
+    url = reverse("apply:list_for_job_seeker")
+
+    TABLE_VIEW_MARKER = '<caption class="visually-hidden">Liste des candidatures</caption>'
+    LIST_VIEW_MARKER = '<div class="c-box--results__header">'
+
+    for display_param, expected_marker in [
+        ({}, LIST_VIEW_MARKER),
+        ({"display": "invalid"}, LIST_VIEW_MARKER),
+        ({"display": JobApplicationsDisplayKind.LIST}, LIST_VIEW_MARKER),
+        ({"display": JobApplicationsDisplayKind.TABLE}, TABLE_VIEW_MARKER),
+    ]:
+        response = client.get(url, display_param)
+        for marker in (LIST_VIEW_MARKER, TABLE_VIEW_MARKER):
+            if marker == expected_marker:
+                assertContains(response, marker)
+            else:
+                assertNotContains(response, marker)
+
+
 def test_list_for_job_seeker_htmx_filters(client):
     job_seeker = JobSeekerFactory()
     JobApplicationFactory(job_seeker=job_seeker, state=JobApplicationState.ACCEPTED)
@@ -117,9 +142,14 @@ def test_list_snapshot(client, snapshot):
     client.force_login(job_seeker)
     url = reverse("apply:list_for_job_seeker")
 
-    response = client.get(url)
-    page = parse_response_to_soup(response, selector="#job-applications-section")
-    assert str(page) == snapshot(name="empty list")
+    for display_param in [
+        {},
+        {"display": JobApplicationsDisplayKind.LIST},
+        {"display": JobApplicationsDisplayKind.TABLE},
+    ]:
+        response = client.get(url, display_param)
+        page = parse_response_to_soup(response, selector="#job-applications-section")
+        assert str(page) == snapshot(name="empty")
 
     company = CompanyFactory(for_snapshot=True, with_membership=True)
     common_kwargs = {"job_seeker": job_seeker, "eligibility_diagnosis": None, "to_company": company}
@@ -145,7 +175,8 @@ def test_list_snapshot(client, snapshot):
         ),
     ]
 
-    response = client.get(url)
+    # List display
+    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST})
     page = parse_response_to_soup(
         response,
         selector="#job-applications-section",
@@ -168,3 +199,28 @@ def test_list_snapshot(client, snapshot):
         ),
     )
     assert str(page) == snapshot(name="applications list")
+
+    # Table display
+    response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
+    page = parse_response_to_soup(
+        response,
+        selector="#job-applications-section",
+        replace_in_attr=itertools.chain(
+            *(
+                [
+                    (
+                        "href",
+                        f"/apply/{job_application.pk}/jobseeker/details",
+                        "/apply/[PK of JobApplication]/jobseeker/details",
+                    ),
+                    (
+                        "id",
+                        f"state_{job_application.pk}",
+                        "state_[PK of JobApplication]",
+                    ),
+                ]
+                for job_application in job_applications
+            )
+        ),
+    )
+    assert str(page) == snapshot(name="applications table")

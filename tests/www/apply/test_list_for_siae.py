@@ -16,6 +16,7 @@ from itou.job_applications.models import JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
+from itou.www.apply.views.list_views import JobApplicationsDisplayKind
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
@@ -527,6 +528,30 @@ class TestProcessListSiae:
         assertContains(response, f'hx-get="{url}"')
 
 
+def test_list_display_kind(client):
+    company = CompanyFactory(with_membership=True)
+    employer = company.members.first()
+    JobApplicationFactory(to_company=company, eligibility_diagnosis=None)
+    client.force_login(employer)
+    url = reverse("apply:list_for_siae")
+
+    TABLE_VIEW_MARKER = '<caption class="visually-hidden">Liste des candidatures</caption>'
+    LIST_VIEW_MARKER = '<div class="c-box--results__header">'
+
+    for display_param, expected_marker in [
+        ({}, LIST_VIEW_MARKER),
+        ({"display": "invalid"}, LIST_VIEW_MARKER),
+        ({"display": JobApplicationsDisplayKind.LIST}, LIST_VIEW_MARKER),
+        ({"display": JobApplicationsDisplayKind.TABLE}, TABLE_VIEW_MARKER),
+    ]:
+        response = client.get(url, display_param)
+        for marker in (LIST_VIEW_MARKER, TABLE_VIEW_MARKER):
+            if marker == expected_marker:
+                assertContains(response, marker)
+            else:
+                assertNotContains(response, marker)
+
+
 @pytest.mark.parametrize("filter_state", JobApplicationWorkflow.states)
 def test_list_for_siae_message_when_company_got_no_new_nor_processing_nor_postponed_application(client, filter_state):
     company = CompanyFactory(with_membership=True)
@@ -662,6 +687,63 @@ def test_list_for_siae_htmx_filters(client):
     fresh_page = parse_response_to_soup(response, selector="#main")
     assertSoupEqual(page, fresh_page)
 
+    # Switch display kind
+    [display_input] = page.find_all(id="display-kind")
+    display_input["value"] = JobApplicationsDisplayKind.TABLE.value
+
+    response = client.get(
+        url,
+        {"states": ["refused"], "display": JobApplicationsDisplayKind.TABLE},
+        headers={"HX-Request": "true"},
+    )
+    update_page_with_htmx(page, f"form[hx-get='{url}']", response)
+
+    response = client.get(url, {"states": ["refused"], "display": JobApplicationsDisplayKind.TABLE})
+    fresh_page = parse_response_to_soup(response, selector="#main")
+    assertSoupEqual(page, fresh_page)
+
+
+def test_table_for_siae_hide_criteria_for_non_SIAE_employers(client, subtests):
+    company = CompanyFactory(with_membership=True)
+    employer = company.members.first()
+
+    diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
+    # Level 1 criteria
+    diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(name="Allocataire AAH"))
+    JobApplicationFactory(
+        job_seeker=diagnosis.job_seeker,
+        to_company=company,
+        eligibility_diagnosis=None,  # fallback on the jobseeker's
+    )
+
+    TITLE = '<th scope="col" class="text-nowrap">Critères administratifs IAE</th>'
+    CRITERION = "<li>Allocataire AAH</li>"
+
+    client.force_login(employer)
+
+    expect_to_see_criteria = {
+        CompanyKind.EA: False,
+        CompanyKind.EATT: False,
+        CompanyKind.EI: True,
+        CompanyKind.GEIQ: False,
+        CompanyKind.OPCS: False,
+        CompanyKind.ACI: True,
+        CompanyKind.AI: True,
+        CompanyKind.EITI: True,
+        CompanyKind.ETTI: True,
+    }
+    for kind in CompanyKind:
+        with subtests.test(kind=kind.label):
+            company.kind = kind
+            company.save(update_fields=("kind",))
+            response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.TABLE})
+            if expect_to_see_criteria[kind]:
+                assertContains(response, TITLE, html=True)
+                assertContains(response, CRITERION, html=True)
+            else:
+                assertNotContains(response, TITLE, html=True)
+                assertNotContains(response, CRITERION, html=True)
+
 
 @freeze_time("2024-11-27", tick=True)
 def test_list_snapshot(client, snapshot):
@@ -669,9 +751,14 @@ def test_list_snapshot(client, snapshot):
     client.force_login(company.members.get())
     url = reverse("apply:list_for_siae")
 
-    response = client.get(url)
-    page = parse_response_to_soup(response, selector="#job-applications-section")
-    assert str(page) == snapshot(name="empty list")
+    for display_param in [
+        {},
+        {"display": JobApplicationsDisplayKind.LIST},
+        {"display": JobApplicationsDisplayKind.TABLE},
+    ]:
+        response = client.get(url, display_param)
+        page = parse_response_to_soup(response, selector="#job-applications-section")
+        assert str(page) == snapshot(name="empty")
 
     job_seeker = JobSeekerFactory(for_snapshot=True)
     common_kwargs = {"job_seeker": job_seeker, "to_company": company}
@@ -695,7 +782,8 @@ def test_list_snapshot(client, snapshot):
         ),
     ]
 
-    response = client.get(url)
+    # List display
+    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST})
     page = parse_response_to_soup(
         response,
         selector="#job-applications-section",
@@ -718,6 +806,31 @@ def test_list_snapshot(client, snapshot):
         ),
     )
     assert str(page) == snapshot(name="applications list")
+
+    # Table display
+    response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
+    page = parse_response_to_soup(
+        response,
+        selector="#job-applications-section",
+        replace_in_attr=itertools.chain(
+            *(
+                [
+                    (
+                        "href",
+                        f"/apply/{job_application.pk}/siae/details",
+                        "/apply/[PK of JobApplication]/siae/details",
+                    ),
+                    (
+                        "id",
+                        f"state_{job_application.pk}",
+                        "state_[PK of JobApplication]",
+                    ),
+                ]
+                for job_application in job_applications
+            )
+        ),
+    )
+    assert str(page) == snapshot(name="applications table")
 
 
 def test_list_for_siae_exports(client, snapshot):

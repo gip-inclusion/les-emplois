@@ -154,4 +154,17 @@ htmx.onLoad((target) => {
       }
     })
   })
+
+  /**
+   * JS to set an input value from a button
+   **/
+  querySelectorAllIncludingTarget(target, "button[data-setter-target]").forEach((button) => {
+    button.addEventListener("click", function() {
+      const inputElement = document.querySelector(this.getAttribute("data-setter-target"))
+      inputElement.value = this.getAttribute("data-setter-value")
+      inputElement.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+
+  })
+
 });

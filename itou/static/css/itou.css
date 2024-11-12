@@ -396,6 +396,11 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     white-space: nowrap !important;
 }
 
+/* Fix for form.job_seeker width */
+.w-lg-400px select + .select2-container--bootstrap-5 {
+   width: 100% !important;
+}
+
 /* Fix for .modal-content than inherit style rules from td parent */
 table.table td > .modal .modal-content {
     text-align: left;

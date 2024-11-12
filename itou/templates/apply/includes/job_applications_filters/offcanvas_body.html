@@ -2,6 +2,7 @@
 
 <div class="offcanvas-body" id="offcanvasApplyFiltersContent"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
     {% include "apply/includes/job_applications_filters/status.html" %}
+    {% if display_kind %}<input id="display-kind" type="hidden" name="display" value="{{ display_kind }}">{% endif %}
     {% if job_applications_list_kind is JobApplicationsListKind.SENT or job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
         {% include "apply/includes/job_applications_filters/selected_jobs.html" %}
         {% include "apply/includes/job_applications_filters/departments.html" %}

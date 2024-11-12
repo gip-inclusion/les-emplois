@@ -1,0 +1,115 @@
+{% load badges %}
+{% load matomo %}
+{% load str_filters %}
+
+{% if job_applications_list_kind is JobApplicationsListKind.SENT %}
+    {% url 'apply:details_for_prescriber' job_application_id=job_application.id as details_url %}
+{% elif job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
+    {% url 'apply:details_for_company' job_application_id=job_application.id as details_url %}
+{% elif job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %}
+    {% url 'apply:details_for_jobseeker' job_application_id=job_application.id as details_url %}
+{% endif %}
+
+<tr class="align-top">
+    {% if job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %}
+        <td>
+            <a class="btn-link" href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}">
+                {{ job_application.to_company.display_name }}
+            </a>
+        </td>
+    {% else %}
+        <td>
+            <a class="btn-link" href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}">
+                {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}
+            </a>
+            <span class="d-block">
+                {% if job_application.job_seeker.department %}{{ job_application.job_seeker.department }} -{% endif %}
+                {{ job_application.job_seeker.city|title }}
+            </span>
+            {% if job_application.to_company.is_subject_to_eligibility_rules %}
+                {% with approval=job_application.job_seeker.latest_common_approval %}
+                    {% if approval %}
+                        {% approval_state_badge approval span_extra_class="badge-xs" %}
+                    {% else %}
+                        {% iae_eligibility_badge is_eligible=job_application.jobseeker_valid_eligibility_diagnosis extra_class="badge-xs" %}
+                    {% endif %}
+                {% endwith %}
+            {% endif %}
+        </td>
+    {% endif %}
+
+    <td>{{ job_application.created_at|date:"d/m/Y" }}</td>
+    <td>{% job_application_state_badge job_application extra_class="badge-xs" %}</td>
+
+    {% if job_applications_list_kind is JobApplicationsListKind.SENT %}
+        <td>{{ job_application.to_company.display_name }}</td>
+    {% endif %}
+
+    <td>
+        {% with all_jobs=job_application.selected_jobs.all %}
+            {% if all_jobs|length == 0 %}
+                Candidature spontanée
+            {% else %}
+                <ul class="list-unstyled">
+                    {% for job in all_jobs %}<li>{{ job.display_name }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </td>
+    <td>
+        {% if request.user == job_application.sender %}
+            Vous
+        {% elif job_application.sender_kind == SenderKind.JOB_SEEKER %}
+            <i class="ri-user-line me-1" aria-hidden="true"></i>Le candidat lui-même
+        {% elif job_application.sender_kind == SenderKind.EMPLOYER %}
+            <i class="ri-community-line"></i>
+            {{ job_application.sender_company.display_name }}
+        {% elif job_application.sender_kind == SenderKind.PRESCRIBER %}
+            <i class="ri-home-smile-2-line"></i>
+            {% if job_application.sender_prescriber_organization %}
+                {{ job_application.sender_prescriber_organization.display_name }}
+            {% else %}
+                {{ job_application.sender.get_full_name }}
+            {% endif %}
+        {% endif %}
+    </td>
+    {% if job_applications_list_kind is JobApplicationsListKind.SENT or job_applications_list_kind is JobApplicationsListKind.RECEIVED and request.current_organization.is_subject_to_eligibility_rules %}
+        {# prescription or received by IAE employer #}
+        <td>
+            {% if job_application.preloaded_administrative_criteria %}
+                <ul class="mb-0">
+                    {% for criteria in job_application.preloaded_administrative_criteria %}<li>{{ criteria.name }}</li>{% endfor %}
+                </ul>
+            {% else %}
+                <i class="text-disabled">Aucun critère sélectionné</i>
+            {% endif %}
+            {% if job_application.preloaded_administrative_criteria_extra_nb %}
+                <span>+ {{ job_application.preloaded_administrative_criteria_extra_nb }} autres critères</span>
+            {% endif %}
+        </td>
+    {% endif %}
+
+    <td class="text-end w-50px align-middle">
+        {% if job_applications_list_kind is JobApplicationsListKind.SENT %}
+            <a class="btn btn-sm btn-link btn-ico-only"
+               href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
+               data-bs-toggle="tooltip"
+               data-bs-title="Voir sa candidature"
+               {% matomo_event "candidature" "clic" "voir_candidature_prescripteur" %}>
+                <i class="ri-arrow-drop-right-line fs-lg" aria-label="Gérer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}"></i>
+            </a>
+        {% elif job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
+            <a class="btn btn-sm btn-link btn-ico-only"
+               href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}"
+               data-bs-toggle="tooltip"
+               data-bs-title="Voir sa candidature"
+               {% matomo_event "candidature" "clic" "voir-candidature-employeur" %}>
+                <i class="ri-arrow-drop-right-line fs-lg" aria-label="Gérer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}"></i>
+            </a>
+        {% elif job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %}
+            <a class="btn btn-sm btn-link btn-ico-only" href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}" data-bs-toggle="tooltip" data-bs-title="Voir ma candidature">
+                <i class="ri-arrow-drop-right-line fs-lg" aria-label="Voir ma candidature"></i>
+            </a>
+        {% endif %}
+    </td>
+</tr>
