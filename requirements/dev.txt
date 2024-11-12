@@ -356,8 +356,8 @@ django==5.1.3 \
     #   django-xworkflows
     #   djangorestframework
     #   drf-spectacular
-django-allauth==65.1.0 \
-    --hash=sha256:ab2c32c51797bab1e7a334f37afa61ef4a88c6f13dfd7bd898a16e2b7e567ef0
+django-allauth==65.2.0 \
+    --hash=sha256:0a3d7baf7beefd6fe8027316302c26ece7433cf4331a3b245d15fc9a7be68b6f
     # via -r requirements/test.txt
 django-anymail==12.0 \
     --hash=sha256:65789c1b0f42915aa0450a4f173f77572d4c552979b748ddd8125af41972ad30 \
