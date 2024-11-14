@@ -81,16 +81,16 @@ class TestListEmployeeRecords:
         client.force_login(self.user)
 
         response = client.get(self.URL)
-        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
+        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW&status=REJECTED")
 
         response = client.get(self.URL, data={"status": ""})
-        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
+        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW&status=REJECTED")
 
         response = client.get(self.URL, data={"status": []})
-        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
+        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW&status=REJECTED")
 
         response = client.get(self.URL, data={"status": [""]})
-        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
+        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW&status=REJECTED")
 
     def test_redirection_with_missing_or_empty_status_keep_other_params(self, client):
         client.force_login(self.user)
@@ -101,7 +101,8 @@ class TestListEmployeeRecords:
         )
         assertRedirects(
             response,
-            reverse("employee_record_views:list") + f"?order={EmployeeRecordOrder.HIRING_START_AT_ASC}&status=NEW",
+            reverse("employee_record_views:list")
+            + f"?order={EmployeeRecordOrder.HIRING_START_AT_ASC}&status=NEW&status=REJECTED",
         )
 
     def test_status_filter(self, client):
@@ -126,7 +127,7 @@ class TestListEmployeeRecords:
         for status in no_results_statuses:
             response = client.get(self.URL, data={"status": status})
             if status is Status.ARCHIVED:  # ARCHIVED is a reserved status
-                assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
+                assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW&status=REJECTED")
             else:
                 assertNotContains(response, approval_number_for_new)
                 assertNotContains(response, approval_number_for_ready)
@@ -137,7 +138,7 @@ class TestListEmployeeRecords:
         assertContains(response, approval_number_for_ready)
 
         response = client.get(self.URL, data={"status": list(no_results_statuses)})  # ARCHIVED is still reserved
-        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW")
+        assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW&status=REJECTED")
 
         response = client.get(self.URL, data={"status": list(no_results_statuses - {Status.ARCHIVED})})
         assertNotContains(response, approval_number_for_new)
@@ -165,14 +166,14 @@ class TestListEmployeeRecords:
         response = client.get(self.URL, data={"job_seeker": accepted_job_application.job_seeker.pk})
         assertRedirects(
             response,
-            reverse("employee_record_views:list") + "?status=NEW&order=",
+            reverse("employee_record_views:list") + "?status=NEW&status=REJECTED&order=",
         )
 
         # An invalid job seeker is treated as empty so we fall back on the missing status case
         response = client.get(self.URL, data={"job_seeker": -1})
         assertRedirects(
             response,
-            reverse("employee_record_views:list") + "?status=NEW&order=",
+            reverse("employee_record_views:list") + "?status=NEW&status=REJECTED&order=",
         )
 
     def test_employee_records_approval_display(self, client):

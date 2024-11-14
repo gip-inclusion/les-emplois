@@ -168,10 +168,8 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     # Redirect if status is missing or empty and we are not searching by job seeker
     if not form.cleaned_data.get("status") and not any(filters_form.cleaned_data.values()):
         return HttpResponseRedirect(
-            add_url_params(
-                reverse("employee_record_views:list"),
-                {**form.cleaned_data, "status": Status.NEW},
-            )
+            reverse("employee_record_views:list")
+            + f"?status={Status.NEW}&status={Status.REJECTED}&order={form.cleaned_data['order']}"
         )
     order_by = EmployeeRecordOrder(form.cleaned_data.get("order") or EmployeeRecordOrder.HIRING_START_AT_DESC)
 
