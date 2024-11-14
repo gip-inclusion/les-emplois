@@ -1003,7 +1003,7 @@
                                               <td class="text-end w-50px">
                                                   <a class="btn btn-sm btn-link btn-ico-only" href="/approvals/prolongation/request/666">
                                                       
-                                                          <i class="ri-search-line" data-bs-title="Traiter" data-bs-toggle="tooltip"></i>
+                                                          <i class="ri-pencil-line" data-bs-title="Traiter" data-bs-toggle="tooltip"></i>
                                                       
                                                   </a>
                                               </td>
@@ -1422,7 +1422,7 @@
                                               <td class="text-end w-50px">
                                                   <a class="btn btn-sm btn-link btn-ico-only" href="/approvals/prolongation/request/666">
                                                       
-                                                          <i class="ri-search-line" data-bs-title="Traiter" data-bs-toggle="tooltip"></i>
+                                                          <i class="ri-pencil-line" data-bs-title="Traiter" data-bs-toggle="tooltip"></i>
                                                       
                                                   </a>
                                               </td>

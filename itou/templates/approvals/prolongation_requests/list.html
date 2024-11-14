@@ -60,9 +60,9 @@
                                             <td class="text-end w-50px">
                                                 <a class="btn btn-sm btn-link btn-ico-only" href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}">
                                                     {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}
-                                                        <i class="ri-search-line" data-bs-toggle="tooltip" data-bs-title="Traiter"></i>
+                                                        <i class="ri-pencil-line" data-bs-toggle="tooltip" data-bs-title="Traiter"></i>
                                                     {% else %}
-                                                        <i class="ri-search-line" data-bs-toggle="tooltip" data-bs-title="Ouvrir"></i>
+                                                        <i class="ri-eye-line" data-bs-toggle="tooltip" data-bs-title="Ouvrir"></i>
                                                     {% endif %}
                                                 </a>
                                             </td>
