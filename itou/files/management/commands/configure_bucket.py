@@ -42,6 +42,11 @@ class Command(BaseCommand):
             ),
         )
 
+        client.put_bucket_versioning(
+            Bucket=bucket,
+            VersioningConfiguration={"Status": "Enabled"},
+        )
+
         # MinIO does not support setting CORS.
         if not is_minio:
             protocol = "https" if settings.ITOU_ENVIRONMENT != ItouEnvironment.DEV else "http"
@@ -76,7 +81,17 @@ class Command(BaseCommand):
                         "Expiration": {"Days": 7},
                         "Filter": auto_expire_rule_filter,
                         "Status": "Enabled",
-                    }
+                    },
+                    {
+                        "Prefix": "",
+                        "Expiration": {"ExpiredObjectDeleteMarker": True},
+                        "Status": "Enabled",
+                    },
+                    {
+                        "Prefix": "",
+                        "NoncurrentVersionExpiration": {"NoncurrentDays": 365},
+                        "Status": "Enabled",
+                    },
                 ]
             },
         )

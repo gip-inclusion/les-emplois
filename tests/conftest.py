@@ -191,15 +191,22 @@ def temporary_bucket():
         call_command("configure_bucket")
         yield
         client = s3_client()
-        paginator = client.get_paginator("list_objects_v2")
+        paginator = client.get_paginator("list_object_versions")
         try:
             for page in paginator.paginate(Bucket=settings.AWS_STORAGE_BUCKET_NAME):
-                # Empty pages don’t have a Contents key.
-                if "Contents" in page:
-                    client.delete_objects(
-                        Bucket=settings.AWS_STORAGE_BUCKET_NAME,
-                        Delete={"Objects": [{"Key": obj["Key"]} for obj in page["Contents"]]},
-                    )
+                objects_to_delete = page.get("DeleteMarkers", []) + page.get("Versions", [])
+                client.delete_objects(
+                    Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                    Delete={
+                        "Objects": [
+                            {
+                                "Key": obj["Key"],
+                                "VersionId": obj["VersionId"],
+                            }
+                            for obj in objects_to_delete
+                        ]
+                    },
+                )
             client.delete_bucket(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
         except client.exceptions.NoSuchBucket:
             pass

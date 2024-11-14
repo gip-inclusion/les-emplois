@@ -57,3 +57,18 @@ def test_bucket_policy_for_anonymous_user():
     with io.BytesIO() as content:
         response = httpx.put(base_url, content=content)
     assert response.status_code == 403
+
+
+def test_deletion(temporary_bucket):
+    client = s3_client()
+    key = "evaluations/test.xlsx"
+    with io.BytesIO() as content:
+        client.upload_fileobj(content, Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=key)
+    paginator = client.get_paginator("list_objects_v2")
+    for page in paginator.paginate(Bucket=settings.AWS_STORAGE_BUCKET_NAME):
+        client.delete_objects(
+            Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+            Delete={"Objects": [{"Key": obj["Key"]} for obj in page["Contents"]]},
+        )
+    [page_after_deletion] = paginator.paginate(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
+    assert page_after_deletion["KeyCount"] == 0
