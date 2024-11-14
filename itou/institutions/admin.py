@@ -2,7 +2,6 @@ from django.contrib import admin, messages
 
 from itou.common_apps.organizations.admin import MembersInline, OrganizationAdmin
 from itou.institutions import models
-from itou.institutions.admin_forms import InstitutionAdminForm
 from itou.utils.admin import ItouGISMixin
 from itou.utils.apis.exceptions import GeocodingDataError
 
@@ -13,7 +12,6 @@ class InstitutionMembersInline(MembersInline):
 
 @admin.register(models.Institution)
 class InstitutionAdmin(ItouGISMixin, OrganizationAdmin):
-    form = InstitutionAdminForm
     fieldsets = (
         (
             "Organisation",
@@ -34,7 +32,7 @@ class InstitutionAdmin(ItouGISMixin, OrganizationAdmin):
                     "post_code",
                     "city",
                     "department",
-                    "extra_field_refresh_geocoding",
+                    "automatic_geocoding_update",
                     "coords",
                     "geocoding_score",
                 )
@@ -81,7 +79,7 @@ class InstitutionAdmin(ItouGISMixin, OrganizationAdmin):
                     # do nothing, the user has not made any changes to the address
                     pass
 
-        if change and form.cleaned_data.get("extra_field_refresh_geocoding") and obj.geocoding_address:
+        if change and form.cleaned_data.get("automatic_geocoding_update") and obj.geocoding_address:
             try:
                 # Refresh geocoding.
                 obj.geocode_address()

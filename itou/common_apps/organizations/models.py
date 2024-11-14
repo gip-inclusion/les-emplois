@@ -44,6 +44,12 @@ class OrganizationAbstract(models.Model):
         null=True,
         verbose_name="date d'envoi du dernier rappel pour vérifier les membres actifs",
     )
+    automatic_geocoding_update = models.BooleanField(
+        verbose_name="recalculer le geocoding",
+        help_text="Si cette case est cochée, les coordonnées géographiques seront mises à jour si l'adresse est "
+        "correctement renseignée dans le formulaire d'admin.",
+        default=True,
+    )
 
     # Child class should have a "members" attribute, for example:
     # members = models.ManyToManyField(

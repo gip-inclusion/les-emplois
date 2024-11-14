@@ -133,6 +133,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -446,6 +447,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -676,6 +678,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -828,6 +831,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -870,7 +874,7 @@
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable"
                  AND "companies_company"."id" = %s)
-          ORDER BY 36 DESC,
+          ORDER BY 37 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -940,6 +944,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -1059,6 +1064,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -1210,6 +1216,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -1251,7 +1258,7 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 36 DESC,
+          ORDER BY 37 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -1321,6 +1328,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -1441,6 +1449,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -1592,6 +1601,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -1633,7 +1643,7 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 36 DESC,
+          ORDER BY 37 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -1703,6 +1713,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -1822,6 +1833,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -1973,6 +1985,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
@@ -2014,7 +2027,7 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 36 DESC,
+          ORDER BY 37 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -2084,6 +2097,7 @@
                  "companies_company"."updated_at",
                  "companies_company"."uid",
                  "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
                  "companies_company"."siret",
                  "companies_company"."naf",
                  "companies_company"."kind",
