@@ -10,7 +10,7 @@ from django.utils.html import format_html
 from itou.approvals.models import Approval
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 from itou.companies import enums, models, transfer
-from itou.companies.admin_forms import CompanyAdminForm, CompanyChooseFieldsToTransfer, SelectTargetCompanyForm
+from itou.companies.admin_forms import CompanyChooseFieldsToTransfer, SelectTargetCompanyForm
 from itou.siae_evaluations.models import EvaluatedSiae
 from itou.utils.admin import (
     ItouGISMixin,
@@ -136,7 +136,6 @@ class CompanyAdmin(ItouGISMixin, OrganizationAdmin):
             with_time=True,
         )
 
-    form = CompanyAdminForm
     change_form_template = "admin/companies/change_company_form.html"
     list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count", "created_at")
     list_filter = (HasMembersFilter, "kind", "block_job_applications", "source", "department")
@@ -180,7 +179,7 @@ class CompanyAdmin(ItouGISMixin, OrganizationAdmin):
                     "post_code",
                     "city",
                     "department",
-                    "extra_field_refresh_geocoding",
+                    "automatic_geocoding_update",
                     "coords",
                     "geocoding_score",
                 )
@@ -223,7 +222,7 @@ class CompanyAdmin(ItouGISMixin, OrganizationAdmin):
                     # do nothing, the user has not made any changes to the address
                     pass
 
-        if change and form.cleaned_data.get("extra_field_refresh_geocoding") and obj.geocoding_address:
+        if change and form.cleaned_data.get("automatic_geocoding_update") and obj.geocoding_address:
             try:
                 # Refresh geocoding.
                 obj.geocode_address()
