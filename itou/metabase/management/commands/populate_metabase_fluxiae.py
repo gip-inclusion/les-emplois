@@ -101,6 +101,7 @@ class Command(BaseCommand):
         self.populate_fluxiae_view(vue_name="fluxIAE_Financement")
         self.populate_fluxiae_view(vue_name="fluxIAE_Formations")
         self.populate_fluxiae_view(vue_name="fluxIAE_Missions")
+        self.populate_fluxiae_view(vue_name="fluxIAE_MarchesPublics")
         self.populate_fluxiae_view(vue_name="fluxIAE_MissionsEtatMensuelIndiv")
         self.populate_fluxiae_view(vue_name="fluxIAE_PMSMP")
         self.populate_fluxiae_view(vue_name="fluxIAE_Salarie")
