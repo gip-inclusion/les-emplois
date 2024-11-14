@@ -46,4 +46,9 @@
             {% include 'includes/copy_to_clipboard.html' with content=job_application.sender.phone|cut:" " css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
         </li>
     {% endif %}
+
+    <li>
+        <small>Date</small>
+        <strong>Le {{ job_application.created_at|date:"d/m/Y" }}</strong>
+    </li>
 </ul>
