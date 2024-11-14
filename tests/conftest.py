@@ -201,7 +201,7 @@ def temporary_bucket():
                         Delete={"Objects": [{"Key": obj["Key"]} for obj in page["Contents"]]},
                     )
             client.delete_bucket(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
-        except s3_client.exceptions.NoSuchBucket:
+        except client.exceptions.NoSuchBucket:
             pass
 
 
