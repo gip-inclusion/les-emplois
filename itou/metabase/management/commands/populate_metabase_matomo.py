@@ -184,7 +184,17 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
-    @monitor(monitor_slug="populate-metabase-matomo")
+    @monitor(
+        monitor_slug="populate-metabase-matomo",
+        monitor_config={
+            "schedule": {"type": "crontab", "value": "0 2 * * 1"},
+            "checkin_margin": 5,
+            "max_runtime": 10,
+            "failure_issue_threshold": 1,
+            "recovery_threshold": 1,
+            "timezone": "UTC",
+        },
+    )
     def handle(self, *, wet_run, **options):
         last_week_monday = monday_of_the_week() - datetime.timedelta(days=7)
 

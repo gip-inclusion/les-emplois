@@ -111,12 +111,32 @@ class Command(EmployeeRecordTransferCommand):
                 else:
                     self.stdout.write(f"DRY-RUN: Rejected {notification}: {processing_code=}, {processing_label=}")
 
-    @monitor(monitor_slug="transfer-employee-records-updates-download")
+    @monitor(
+        monitor_slug="transfer-employee-records-updates-download",
+        monitor_config={
+            "schedule": {"type": "crontab", "value": "25 8-18/2 * * 1-5"},
+            "checkin_margin": 5,
+            "max_runtime": 10,
+            "failure_issue_threshold": 2,
+            "recovery_threshold": 1,
+            "timezone": "UTC",
+        },
+    )
     def download(self, sftp: paramiko.SFTPClient, dry_run: bool):
         """Fetch and process feedback ASP files for employee record notifications"""
         self.download_json_file(sftp, dry_run)
 
-    @monitor(monitor_slug="transfer-employee-records-updates-upload")
+    @monitor(
+        monitor_slug="transfer-employee-records-updates-upload",
+        monitor_config={
+            "schedule": {"type": "crontab", "value": "55 8-18/2 * * 1-5"},
+            "checkin_margin": 5,
+            "max_runtime": 10,
+            "failure_issue_threshold": 2,
+            "recovery_threshold": 1,
+            "timezone": "UTC",
+        },
+    )
     def upload(self, sftp: paramiko.SFTPClient, dry_run: bool):
         new_notifications = EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW)
 

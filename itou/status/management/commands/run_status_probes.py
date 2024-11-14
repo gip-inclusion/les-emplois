@@ -14,7 +14,17 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     help = "Run status probes"
 
-    @monitor(monitor_slug="run-status-probes")
+    @monitor(
+        monitor_slug="run-status-probes",
+        monitor_config={
+            "schedule": {"type": "crontab", "value": "*/5 * * * *"},
+            "checkin_margin": 2,
+            "max_runtime": 5,
+            "failure_issue_threshold": 2,
+            "recovery_threshold": 1,
+            "timezone": "UTC",
+        },
+    )
     def handle(self, **options):
         self.stdout.write("Start probing")
 
