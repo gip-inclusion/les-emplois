@@ -150,6 +150,20 @@ ASSET_INFOS = {
             ],
         },
     },
+    "intro.js": {
+        "download": {
+            "url": "https://registry.npmjs.org/intro.js/-/intro.js-7.2.0.tgz",
+            "sha256": "4578c4cde6d9800cf210ca4bc7d3f5a3a6afd8f545a5acc9ed4a9e03b65c87df",
+        },
+        "extract": {
+            "origin": "package/minified",
+            "destination": "vendor/intro-js",
+            "files": [
+                "intro.min.js",
+                "intro.min.js.map",
+            ],
+        },
+    },
     "redoc": {
         "download": {
             "url": "https://cdn.redoc.ly/redoc/v2.0.0/bundles/redoc.standalone.js",

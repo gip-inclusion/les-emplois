@@ -42,7 +42,11 @@
                                 {% else %}
                                     {% url_add_query search_url job_seeker=job_seeker.public_id as url_query %}
                                 {% endif %}
-                                <a class="btn btn-sm btn-link btn-ico-only" aria-label="Postuler pour ce candidat" href="{{ url_query }}" {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %}>
+                                <a class="btn btn-sm btn-link btn-ico-only"
+                                   aria-label="Postuler pour ce candidat"
+                                   href="{{ url_query }}"
+                                   {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %}
+                                   {% if forloop.counter == 1 %}id="introJsBtnPostuler"{% endif %}>
                                     <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip" title="Postuler pour ce candidat"></i>
                                 </a>
                             </td>

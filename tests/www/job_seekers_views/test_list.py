@@ -101,7 +101,8 @@ def test_multiple(client, snapshot):
         assert str(parse_response_to_soup(response, selector="tbody")) == snapshot(name="job seekers list tbody")
 
         # Address is in search URL
-        for application in (job_app, job_app2, job_app3):
+        for i, application in enumerate([job_app, job_app2, job_app3]):
+            introjs_id = 'id="introJsBtnPostuler"' if i == 0 else ""
             assertContains(
                 response,
                 f"""
@@ -109,6 +110,7 @@ def test_multiple(client, snapshot):
                     aria-label="Postuler pour ce candidat"
                     data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
                     data-matomo-option="postuler-pour-ce-candidat"
+                    {introjs_id}
                     href="{reverse("search:employers_results")}?job_seeker={application.job_seeker.public_id}&city={application.job_seeker.city_slug}">
                     <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip"
                     title="Postuler pour ce candidat">
@@ -146,6 +148,7 @@ def test_multiple(client, snapshot):
                 aria-label="Postuler pour ce candidat"
                 data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="postuler-pour-ce-candidat"
+                id="introJsBtnPostuler"
                 href="{reverse("search:employers_results")}?job_seeker={job_app5.job_seeker.public_id}">
                 <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip"
                 title="Postuler pour ce candidat">
