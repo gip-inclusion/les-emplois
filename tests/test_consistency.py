@@ -64,6 +64,9 @@ def test_unused_templates():
         for template_dir in template_conf["DIRS"]:
             for dirpath, _dirnames, filenames in os.walk(template_dir):
                 for filename in filenames:
+                    if filename == ".DS_Store":
+                        # Ignore macOS hidden files
+                        continue
                     template_name = os.path.relpath(os.path.join(dirpath, filename), template_dir)
                     if template_name not in APP_TEMPLATES:
                         template_names_to_check.add(template_name)
