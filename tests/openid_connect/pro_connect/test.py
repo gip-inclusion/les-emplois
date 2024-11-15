@@ -3,9 +3,11 @@ from urllib.parse import parse_qs, urlencode, urlparse
 import httpx
 import jwt
 import respx
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.functional import classproperty
 from pytest_django.asserts import assertContains, assertRedirects
 
@@ -66,7 +68,8 @@ def mock_oauth_dance(
     user_info = oidc_userinfo or OIDC_USERINFO.copy()
     if user_info_email:
         user_info["email"] = user_info_email
-    user_info = user_info | {"aud": constants.PRO_CONNECT_CLIENT_ID}
+    # Put a issued at in the future to ensure we don't check it
+    user_info = user_info | {"aud": constants.PRO_CONNECT_CLIENT_ID, "iat": timezone.now() + relativedelta(hours=1)}
     user_info_jwt = jwt.encode(payload=user_info, key=constants.PRO_CONNECT_CLIENT_SECRET, algorithm="HS256")
     respx.get(constants.PRO_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, content=user_info_jwt))
 

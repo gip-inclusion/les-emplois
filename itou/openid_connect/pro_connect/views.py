@@ -179,6 +179,8 @@ def _get_user_info(request, access_token):
         key=constants.PRO_CONNECT_CLIENT_SECRET,
         algorithms=["HS256"],
         audience=constants.PRO_CONNECT_CLIENT_ID,
+        # TODO: Remove once https://github.com/jpadilla/pyjwt/issues/939 is fixed
+        options={"verify_iat": False},
     )
     return decoded_id_token, None
 
