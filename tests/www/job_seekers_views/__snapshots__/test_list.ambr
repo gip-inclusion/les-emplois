@@ -3,20 +3,20 @@
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
+
   </div>
-  
+
               <section class="s-title-02">
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-  
-  
-                              
+
+
+
+
+
+
+
       <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
           <h1 class="m-0">Candidats</h1>
           <div aria-label="Actions sur les candidatures" class="d-flex flex-column flex-md-row gap-3" role="group">
@@ -26,62 +26,62 @@
               </a>
           </div>
       </div>
-  
-                              
-                                  
-  
-  
-                              
-                              
+
+
+
+
+
+
+
                           </div>
                       </div>
                   </div>
               </section>
-  
-              
+
+
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
                   <div class="col-12">
                       <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                          
-  
+
+
   <p class="mb-0" id="job-seekers-list-count">
       0 résultat
   </p>
-  
+
                           <div class="flex-column flex-md-row mt-3 mt-md-0">
                               <form hx-get="/job-seekers/list" hx-indicator="#job-seekers-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-seekers-section" hx-trigger="change delay:.5s">
                                   <div class="w-lg-400px"><label class="visually-hidden" for="id_job_seeker">Nom</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du candidat" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
     <option selected="" value=""></option>
-  
+
   </select></div>
                               </form>
                           </div>
                       </div>
-                      
-  
-  
-  
-  
+
+
+
+
+
   <section aria-labelledby="job-seekers-list-count" id="job-seekers-section">
-      
+
           <div class="text-center my-3 my-md-4">
               <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-siae-card-no-result.svg"/>
               <p class="mb-1 mt-3">
                   <strong>Aucun candidat pour le moment</strong>
               </p>
           </div>
-      
+
   </section>
-  
-  
-  
+
+
+
                   </div>
               </div>
           </div>
       </section>
-  
+
           </main>
   '''
 # ---
@@ -319,7 +319,7 @@
                                      OR U0."sender_prescriber_organization_id" = %s)
                                     AND U0."job_seeker_id" = ("users_user"."id"))
                              GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
-          
+
             (SELECT MAX(U0."updated_at") AS "last_update"
              FROM "job_applications_jobapplication" U0
              WHERE (((U0."sender_id" = %s
@@ -327,7 +327,7 @@
                      OR U0."sender_prescriber_organization_id" = %s)
                     AND U0."job_seeker_id" = ("users_user"."id"))
              GROUP BY U0."job_seeker_id") AS "last_updated_at",
-          
+
             (SELECT U0."id"
              FROM "eligibility_eligibilitydiagnosis" U0
              WHERE (U0."expires_at" > %s
@@ -438,123 +438,123 @@
 # name: test_multiple[job seekers list tbody]
   '''
   <tbody>
-                      
+
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list">Alain ZORRO</a>
                               </td>
                               <td>
-                                  
-  
-      
+
+
+
                   <span class="badge badge-base rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
-      
-  
-  
+
+
+
                               </td>
                               <td>2</td>
                               <td>29/08/2024</td>
                               <td class="text-end w-50px">
-                                  
-                                  
-                                      
-                                  
+
+
+
+
                                   <a aria-label="Postuler pour ce candidat" class="btn btn-sm btn-link btn-ico-only" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=11111111-1111-1111-1111-111111111111&amp;city=brest-29">
                                       <i aria-hidden="true" class="ri-draft-line" data-bs-toggle="tooltip" title="Postuler pour ce candidat"></i>
                                   </a>
                               </td>
                           </tr>
-                      
+
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list">Bernard YGREC</a>
                               </td>
                               <td>
-                                  
-  
-      
+
+
+
                   <span class="badge badge-base rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-      
-  
-  
+
+
+
                               </td>
                               <td>1</td>
                               <td>30/08/2024</td>
                               <td class="text-end w-50px">
-                                  
-                                  
-                                      
-                                  
+
+
+
+
                                   <a aria-label="Postuler pour ce candidat" class="btn btn-sm btn-link btn-ico-only" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=22222222-2222-2222-2222-222222222222&amp;city=brest-29">
                                       <i aria-hidden="true" class="ri-draft-line" data-bs-toggle="tooltip" title="Postuler pour ce candidat"></i>
                                   </a>
                               </td>
                           </tr>
-                      
+
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list">Charlotte XERUS</a>
                               </td>
                               <td>
-                                  
-  
-      
+
+
+
                       <span class="badge badge-base rounded-pill bg-success-lighter text-success">
                   <i aria-hidden="true" class="ri-pass-valid-line"></i>
                   PASS IAE valide
               </span>
-      
-  
-  
+
+
+
                               </td>
                               <td>1</td>
                               <td>30/08/2024</td>
                               <td class="text-end w-50px">
-                                  
-                                  
-                                      
-                                  
+
+
+
+
                                   <a aria-label="Postuler pour ce candidat" class="btn btn-sm btn-link btn-ico-only" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=33333333-3333-3333-3333-333333333333&amp;city=brest-29">
                                       <i aria-hidden="true" class="ri-draft-line" data-bs-toggle="tooltip" title="Postuler pour ce candidat"></i>
                                   </a>
                               </td>
                           </tr>
-                      
+
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list">David WATERFORD</a>
                               </td>
                               <td>
-                                  
-  
-      
+
+
+
                   <span class="badge badge-base rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
-      
-  
-  
+
+
+
                               </td>
                               <td>1</td>
                               <td>30/08/2024</td>
                               <td class="text-end w-50px">
-                                  
-                                  
-                                      
-                                  
+
+
+
+
                                   <a aria-label="Postuler pour ce candidat" class="btn btn-sm btn-link btn-ico-only" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=44444444-4444-4444-4444-444444444444">
                                       <i aria-hidden="true" class="ri-draft-line" data-bs-toggle="tooltip" title="Postuler pour ce candidat"></i>
                                   </a>
                               </td>
                           </tr>
-                      
+
                   </tbody>
   '''
 # ---
