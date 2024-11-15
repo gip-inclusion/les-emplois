@@ -396,8 +396,8 @@ class TestSearchCompany:
             html=True,
             count=1,
         )
-        assertContains(response, searchable_company.display_name)
-        assertNotContains(response, unsearchable_company.display_name)
+        assertContains(response, f"<h3>{searchable_company.display_name}</h3>")
+        assertNotContains(response, f"<h3>{unsearchable_company.display_name}</h3>")
 
     def test_results_links_from_job_seeker_list(self, client):
         """
