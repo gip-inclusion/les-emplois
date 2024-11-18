@@ -406,6 +406,16 @@ class TestApprovalDetailView:
             # Don't set an ASP_ITOU_PREFIX (see approval.save for details)
             approval__number="XXXXX1234568",
         )
+        # Create another accepted application lacking a proper hiring_start_at (like most old applications):
+        # it should not impact the button display, and it should not crash
+        JobApplicationFactory(
+            hiring_start_at=None,
+            to_company=membership.company,
+            job_seeker=job_application.job_seeker,
+            # Don't set an ASP_ITOU_PREFIX (see approval.save for details)
+            approval=job_application.approval,
+            state=JobApplicationState.ACCEPTED,
+        )
 
         client.force_login(membership.user)
 
