@@ -1,8 +1,9 @@
+from functools import partial
+
 import freezegun
 import pytest
-from django.test.utils import override_settings
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertQuerySetEqual, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual, assertRedirects
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
 from itou.users.models import User
@@ -11,6 +12,7 @@ from tests.prescribers.factories import PrescriberOrganizationWithMembershipFact
 from tests.users.factories import (
     EmployerFactory,
     JobSeekerFactory,
+    LaborInspectorFactory,
     PrescriberFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
@@ -21,24 +23,6 @@ def test_job_seeker_cannot_use_gps(client):
     job_seeker = JobSeekerFactory()
     client.force_login(job_seeker)
     group = FollowUpGroupFactory(beneficiary=job_seeker)
-
-    for route, kwargs in [
-        ("gps:my_groups", {}),
-        ("gps:join_group", {}),
-        ("gps:leave_group", {"group_id": group.pk}),
-        ("gps:toggle_referent", {"group_id": group.pk}),
-    ]:
-        response = client.get(reverse(route, kwargs=kwargs))
-        assertRedirects(response, reverse("dashboard:index"), fetch_redirect_response=False)
-    response = client.get(reverse("users:details", kwargs={"public_id": job_seeker.public_id}))
-    assert response.status_code == 403
-
-
-def test_orienter_cannot_use_gps(client):
-    prescriber = PrescriberFactory()
-    job_seeker = JobSeekerFactory()
-    client.force_login(prescriber)
-    group = FollowUpGroupFactory(beneficiary=job_seeker, memberships__member=prescriber)
 
     for route, kwargs in [
         ("gps:my_groups", {}),
@@ -170,17 +154,51 @@ def test_join_group_of_a_prescriber(client):
     )
 
 
-@override_settings(TALLY_URL="https://hello-tally.so")
-def test_dashboard_card(snapshot, client):
-    member = PrescriberFactory(
-        for_snapshot=True,
-        membership=True,
-        membership__organization__authorized=True,
-        membership__organization__for_snapshot=True,
-    )
-    client.force_login(member)
-    response = client.get(reverse("dashboard:index"))
-    assert str(parse_response_to_soup(response, "#gps-card")) == snapshot
+@pytest.mark.parametrize(
+    "factory,access",
+    [
+        [partial(JobSeekerFactory, for_snapshot=True), None],
+        [partial(EmployerFactory, with_company=True), "full"],
+        [PrescriberFactory, "partial"],  # no org
+        [PrescriberFactory, "partial"],  # non authorizd org
+        [
+            partial(
+                PrescriberFactory,
+                membership=True,
+                membership__organization__authorized=True,
+            ),
+            "full",
+        ],  # authorized_org
+        [partial(LaborInspectorFactory, membership=True), None],
+    ],
+    ids=[
+        "job_seeker",
+        "employer",
+        "prescriber_no_org",
+        "prescriber_non_authorized_org",
+        "prescriber",
+        "labor_inspector",
+    ],
+)
+def test_gps_access(client, factory, access):
+    client.force_login(factory())
+    response = client.get(reverse("gps:my_groups"))
+    FEATURE_INVITE = "<span>Inviter un partenaire</span>"
+    FEATURE_ADD = "<span>Ajouter un bénéficiaire</span>"
+    if access is None:
+        assertRedirects(response, reverse("dashboard:index"))
+    elif access == "partial":
+        assertContains(response, FEATURE_INVITE)
+        assertNotContains(response, FEATURE_ADD)
+    else:
+        assertContains(response, FEATURE_INVITE)
+        assertContains(response, FEATURE_ADD)
+
+    response = client.get(reverse("gps:join_group"))
+    if access is None or access == "partial":
+        assertRedirects(response, reverse("dashboard:index"))
+    else:
+        assert response.status_code == 200
 
 
 @freezegun.freeze_time("2024-06-21", tick=True)
@@ -212,17 +230,6 @@ def test_my_groups(snapshot, client):
     assert len(groups) == 2
     assert "Janis" in str(groups[0])
     assert "et êtes <strong>référent</strong>" in str(groups[0])
-
-
-def test_access_as_jobseeker(client):
-    user = JobSeekerFactory(with_address=True)
-    client.force_login(user)
-
-    response = client.get(reverse("gps:my_groups"))
-    assert response.status_code == 302
-
-    response = client.get(reverse("gps:join_group"))
-    assert response.status_code == 302
 
 
 def test_leave_group(client):

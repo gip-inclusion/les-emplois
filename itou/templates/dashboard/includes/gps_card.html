@@ -14,12 +14,14 @@
                         <span>Visualiser les bénéficiaires</span>
                     </a>
                 </li>
-                <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'gps:join_group' %}?back_url={% url 'dashboard:index' %}" aria-label="Créer ou rejoindre un groupe." class="btn-link btn-ico" {% matomo_event "gps" "clic" "tbd_ajout_groupe" %}>
-                        <i class="ri-play-list-add-line ri-lg fw-normal align-self-start"></i>
-                        <span>Ajouter un bénéficiaire</span>
-                    </a>
-                </li>
+                {% if can_use_gps_advanced_features %}
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'gps:join_group' %}?back_url={% url 'dashboard:index' %}" aria-label="Créer ou rejoindre un groupe." class="btn-link btn-ico" {% matomo_event "gps" "clic" "tbd_ajout_groupe" %}>
+                            <i class="ri-play-list-add-line ri-lg fw-normal align-self-start"></i>
+                            <span>Ajouter un bénéficiaire</span>
+                        </a>
+                    </li>
+                {% endif %}
                 <li class="d-flex justify-content-between align-items-center mb-3">
                     <a href='{% tally_form_url form_id="w5kLqM" user_public_id=user.public_id user_first_name=user.first_name user_last_name=user.last_name %}&{% if request.current_organization %}&user_organization_uid={{ request.current_organization.uid }}&user_organization_name={{ request.current_organization.display_name }}{% endif %}'
                        rel="noopener"

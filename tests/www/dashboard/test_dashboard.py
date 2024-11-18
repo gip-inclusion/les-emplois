@@ -12,8 +12,6 @@ from pytest_django.asserts import (
     assertContains,
     assertNotContains,
     assertRedirects,
-    assertTemplateNotUsed,
-    assertTemplateUsed,
 )
 
 from itou.companies.enums import CompanyKind
@@ -618,33 +616,68 @@ class TestDashboardView:
             "https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-candidat",
         )
 
-    def test_gps_card_is_not_shown_for_job_seeker(self, client):
-        user = JobSeekerFactory()
+    @override_settings(TALLY_URL="https://hello-tally.so")
+    @pytest.mark.parametrize(
+        "factory,snapshot_name",
+        [
+            [partial(JobSeekerFactory, for_snapshot=True), None],
+            [
+                partial(
+                    EmployerFactory,
+                    for_snapshot=True,
+                    with_company=True,
+                    with_company__company__for_snapshot=True,
+                ),
+                "full",
+            ],
+            [partial(PrescriberFactory, for_snapshot=True), "partial"],  # no org
+            [
+                partial(
+                    PrescriberFactory,
+                    for_snapshot=True,
+                    membership=True,
+                    membership__organization__authorized=False,
+                    membership__organization__for_snapshot=True,
+                ),
+                "partial",
+            ],  # non authorizd org
+            [
+                partial(
+                    PrescriberFactory,
+                    for_snapshot=True,
+                    membership=True,
+                    membership__organization__authorized=True,
+                    membership__organization__for_snapshot=True,
+                ),
+                "full",
+            ],  # authorized_org
+            [partial(LaborInspectorFactory, membership=True), None],
+        ],
+        ids=[
+            "job_seeker",
+            "employer",
+            "prescriber_no_org",
+            "prescriber_non_authorized_org",
+            "prescriber",
+            "labor_inspector",
+        ],
+    )
+    def test_gps_card(self, snapshot, client, factory, snapshot_name):
+        user = factory()
         client.force_login(user)
-
-        with assertTemplateNotUsed("dashboard/includes/gps_card.html"):
-            client.get(reverse("dashboard:index"))
-
-    def test_gps_card_is_shown_for_employer(self, client):
-        company = CompanyFactory(with_membership=True)
-        client.force_login(company.members.first())
-
-        with assertTemplateUsed("dashboard/includes/gps_card.html"):
-            client.get(reverse("dashboard:index"))
-
-    def test_gps_card_is_shown_for_prescriber(self, client):
-        prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory(authorized=True)
-        client.force_login(prescriber_organization.members.first())
-
-        with assertTemplateUsed("dashboard/includes/gps_card.html"):
-            client.get(reverse("dashboard:index"))
-
-    def test_gps_card_is_not_shown_for_orienter(self, client):
-        prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory()
-        client.force_login(prescriber_organization.members.first())
-
-        with assertTemplateNotUsed("dashboard/includes/gps_card.html"):
-            client.get(reverse("dashboard:index"))
+        response = client.get(reverse("dashboard:index"))
+        if snapshot_name is None:
+            assertNotContains(response, "gps-card")
+        elif snapshot_name == "partial":
+            assert str(parse_response_to_soup(response, "#gps-card")) == snapshot(name=snapshot_name)
+        else:
+            assert str(
+                parse_response_to_soup(
+                    response,
+                    "#gps-card",
+                    replace_in_attr=[("href", str(response.wsgi_request.current_organization.uid), "[UID of org]")],
+                )
+            ) == snapshot(name=snapshot_name)
 
     def test_dashboard_prescriber_without_organization_message(self, client):
         # An orienter is a prescriber without prescriber organization

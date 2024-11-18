@@ -41,6 +41,7 @@ from itou.www.dashboard.forms import (
     EditUserInfoForm,
     EditUserNotificationForm,
 )
+from itou.www.gps.views import is_allowed_to_use_gps, is_allowed_to_use_gps_advanced_features
 from itou.www.search.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
 
@@ -80,7 +81,6 @@ def _employer_dashboard_context(request):
                 "evaluated_job_applications__evaluated_administrative_criteria",
             )
         ),
-        "can_view_gps_card": True,
         "can_create_siae_antenna": request.user.can_create_siae_antenna(parent_siae=current_org),
         "can_show_employee_records": current_org.can_use_employee_record,
         "can_show_financial_annexes": current_org.convention_can_be_accessed_by(request.user),
@@ -118,7 +118,8 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_create_siae_antenna": False,
         "can_show_financial_annexes": False,
         "can_show_employee_records": False,
-        "can_view_gps_card": False,
+        "can_view_gps_card": is_allowed_to_use_gps(request.user),
+        "can_use_gps_advanced_features": is_allowed_to_use_gps_advanced_features(request.user),
         "can_view_stats_dashboard_widget": stats_utils.can_view_stats_dashboard_widget(request),
         "num_rejected_employee_records": 0,
         "pending_prolongation_requests": None,
@@ -132,7 +133,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     elif request.user.is_prescriber:
         if current_org := request.current_organization:
             if current_org.is_authorized:
-                context["can_view_gps_card"] = True
                 context["pending_prolongation_requests"] = ProlongationRequest.objects.filter(
                     prescriber_organization=current_org,
                     status=ProlongationRequestStatus.PENDING,

@@ -24,10 +24,12 @@
                 <i class="ri-mail-send-line" aria-hidden="true"></i>
                 <span>Inviter un partenaire</span>
             </a>
-            <a href="{% url 'gps:join_group' %}" class="btn btn-lg btn-ico btn-primary mt-3 mt-md-0" aria-label="Suivre un nouveau bénéficiaire" {% matomo_event "GPS_liste_groupes" "clic" "ajout_groupe" %}>
-                <i class="ri-user-add-line" aria-hidden="true"></i>
-                <span>Ajouter un bénéficiaire</span>
-            </a>
+            {% if can_use_gps_advanced_features %}
+                <a href="{% url 'gps:join_group' %}" class="btn btn-lg btn-ico btn-primary mt-3 mt-md-0" aria-label="Suivre un nouveau bénéficiaire" {% matomo_event "GPS_liste_groupes" "clic" "ajout_groupe" %}>
+                    <i class="ri-user-add-line" aria-hidden="true"></i>
+                    <span>Ajouter un bénéficiaire</span>
+                </a>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
