@@ -11,6 +11,10 @@ from itou.www.gps.forms import GpsUserSearchForm, MembershipsFiltersForm
 
 
 def is_allowed_to_use_gps(user):
+    return user.is_employer or user.is_prescriber
+
+
+def is_allowed_to_use_gps_advanced_features(user):
     return user.is_employer or user.is_prescriber_with_authorized_org
 
 
@@ -40,6 +44,7 @@ def my_groups(request, template_name="gps/my_groups.html"):
         "back_url": reverse("dashboard:index"),
         "filters_form": filters_form,
         "memberships_page": memberships_page,
+        "can_use_gps_advanced_features": is_allowed_to_use_gps_advanced_features(request.user),
     }
 
     return render(request, "gps/includes/memberships_results.html" if request.htmx else template_name, context)
@@ -47,7 +52,7 @@ def my_groups(request, template_name="gps/my_groups.html"):
 
 @login_required
 @user_passes_test(
-    is_allowed_to_use_gps,
+    is_allowed_to_use_gps_advanced_features,
     login_url=reverse_lazy("dashboard:index"),
     redirect_field_name=None,
 )

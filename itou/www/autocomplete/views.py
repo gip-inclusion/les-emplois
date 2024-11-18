@@ -11,7 +11,7 @@ from itou.asp.models import Commune
 from itou.cities.models import City
 from itou.jobs.models import Appellation
 from itou.users.models import User
-from itou.www.gps.views import is_allowed_to_use_gps
+from itou.www.gps.views import is_allowed_to_use_gps_advanced_features
 
 
 # Consider that after 50 matches the user should refine its search.
@@ -124,7 +124,11 @@ def communes_autocomplete(request):
 
 
 @login_required
-@user_passes_test(is_allowed_to_use_gps, login_url=reverse_lazy("dashboard:index"), redirect_field_name=None)
+@user_passes_test(
+    is_allowed_to_use_gps_advanced_features,
+    login_url=reverse_lazy("dashboard:index"),
+    redirect_field_name=None,
+)
 def gps_users_autocomplete(request):
     """
     Returns JSON data compliant with Select2
