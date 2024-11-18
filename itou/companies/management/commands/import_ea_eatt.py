@@ -5,6 +5,7 @@ import zipfile
 import pandas as pd
 from django.conf import settings
 from django.db import transaction
+from sentry_sdk.crons import monitor
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
@@ -219,6 +220,17 @@ class Command(BaseCommand):
         self.stdout.write("-" * 80)
         self.stdout.write("Done.")
 
+    @monitor(
+        monitor_slug="import-ea-eatt",
+        monitor_config={
+            "schedule": {"type": "crontab", "value": "0 12 * * 1"},
+            "checkin_margin": 5,
+            "max_runtime": 10,
+            "failure_issue_threshold": 1,
+            "recovery_threshold": 1,
+            "timezone": "UTC",
+        },
+    )
     def handle(self, *, from_archive=None, from_asp=False, wet_run=False, **options):
         archive = self.retrieve_archive_of_the_week() if from_asp else from_archive
 
