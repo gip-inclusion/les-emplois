@@ -10,10 +10,10 @@
 ### Modifié
 
 - [Admin: Recalculer automatiquement le geocoding des organisations, sauf cas particuliers](https://github.com/gip-inclusion/les-emplois/pull/4910)
-- [Fiches salarié : Modifications sur les filtres](https://github.com/gip-inclusion/les-emplois/pull/4974)
+- [Fiches salarié: Modifications sur les filtres](https://github.com/gip-inclusion/les-emplois/pull/4974)
 - [Invitations: utiliser automatiquement toutes les invitations valides disponibles à la connexion](https://github.com/gip-inclusion/les-emplois/pull/5067)
 - [UX/UI: Mise à jour d'icônes dans la liste de prolongation](https://github.com/gip-inclusion/les-emplois/pull/5091)
-- [UX/UI: Problème de rechargement des sliding-tabs apres reload htmx](https://github.com/gip-inclusion/les-emplois/pull/5023)
+- [UX/UI: Correction de l’espace autour des onglets lors de rechargements de fragments de page](https://github.com/gip-inclusion/les-emplois/pull/5023)
 - [Vie privée: modification de l'adresse mail contact pour demandes RGPD](https://github.com/gip-inclusion/les-emplois/pull/5090)
 
 ### Tech
@@ -25,19 +25,19 @@
 
 ### Modifié
 
-- [API particulier : Respecter la fréquence d’appels et les workers web](https://github.com/gip-inclusion/les-emplois/pull/4983)
-- [Connexion: AJout de remontée d'erreur en cas de problème de connexion avec ProConnect](https://github.com/gip-inclusion/les-emplois/pull/5041)
-- [GPS : Cacher les informations de l’entreprise fictive France Travail lors de la création d’un bénéficiaire](https://github.com/gip-inclusion/les-emplois/pull/5042)
-- [Inscription: Améliorer la deconnexion forcée des employeurs sans structure](https://github.com/gip-inclusion/les-emplois/pull/5024) 🖼
+- [API particulier: Respecter la fréquence d’appels et les workers web](https://github.com/gip-inclusion/les-emplois/pull/4983)
+- [Connexion: Ajout de remontée d'erreur en cas de problème de connexion avec ProConnect](https://github.com/gip-inclusion/les-emplois/pull/5041)
+- [GPS: Cacher les informations de l’entreprise fictive France Travail lors de la création d’un bénéficiaire](https://github.com/gip-inclusion/les-emplois/pull/5042)
+- [Inscription: Améliorer la déconnexion forcée des employeurs sans structure](https://github.com/gip-inclusion/les-emplois/pull/5024) 🖼
 - [PASS IAE: utilisation du nouvel encart dans les vues de traitement des demandes de prolongation](https://github.com/gip-inclusion/les-emplois/pull/5058)
 - [Tableau de bord: mise à jour de l'encart du PASS pour les candidats](https://github.com/gip-inclusion/les-emplois/pull/4947) 🖼
-- [UX/UI: Passer le bouton “Modifier” de la fiche de poste à droite](https://github.com/gip-inclusion/les-emplois/pull/5021) 🖼
-- [UX/UI: Remplacer role=button par des <button>](https://github.com/gip-inclusion/les-emplois/pull/4912)
+- [UX/UI: Déplacer le bouton “Modifier” de la fiche de poste à droite](https://github.com/gip-inclusion/les-emplois/pull/5021) 🖼
+- [UX/UI: Remplacer `role=button` par des `<button>`](https://github.com/gip-inclusion/les-emplois/pull/4912)
 
 ### Supprimé
 
 - [Retirer les campagnes de contrôle a posteriori de 2021](https://github.com/gip-inclusion/les-emplois/pull/5039)
-- [UX/UI : Retrait de la banière d’expérimentation Maze sur la page des candidatures](https://github.com/gip-inclusion/les-emplois/pull/5040)
+- [UX/UI: Retrait de la bannière d’expérimentation Maze sur la page des candidatures](https://github.com/gip-inclusion/les-emplois/pull/5040)
 
 ### Tech
 
