@@ -9,7 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
 from django.db import IntegrityError
-from django.db.models import Prefetch
+from django.db.models import Max, Prefetch
 from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -248,9 +248,11 @@ class ApprovalDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
             if any(suspension.is_in_progress for suspension in long_suspensions):
                 approval_can_be_deleted = True
             elif long_suspensions:
-                last_hiring = approval.jobapplication_set.accepted().order_by("hiring_start_at").last()
-                if last_hiring is None or any(
-                    suspension.end_at > last_hiring.hiring_start_at for suspension in long_suspensions
+                last_hiring_start_at = approval.jobapplication_set.accepted().aggregate(Max("hiring_start_at"))[
+                    "hiring_start_at__max"
+                ]
+                if last_hiring_start_at is None or any(
+                    suspension.end_at > last_hiring_start_at for suspension in long_suspensions
                 ):
                     approval_can_be_deleted = True
 
