@@ -1,5 +1,26 @@
 # Journal des modifications
 
+## 2024-11-18
+
+### Ajouté
+
+- [Admin: ajout d'un bouton pour transférer des données entre entreprises](https://github.com/gip-inclusion/les-emplois/pull/4676)
+- [Statistiques: Indicateurs à suivre accessible aux membres de l'équipe des emplois](https://github.com/gip-inclusion/les-emplois/pull/5007)
+
+### Modifié
+
+- [Admin: Recalculer automatiquement le geocoding des organisations, sauf cas particuliers](https://github.com/gip-inclusion/les-emplois/pull/4910)
+- [Fiches salarié : Modifications sur les filtres](https://github.com/gip-inclusion/les-emplois/pull/4974)
+- [Invitations: utiliser automatiquement toutes les invitations valides disponibles à la connexion](https://github.com/gip-inclusion/les-emplois/pull/5067)
+- [UX/UI: Mise à jour d'icônes dans la liste de prolongation](https://github.com/gip-inclusion/les-emplois/pull/5091)
+- [UX/UI: Problème de rechargement des sliding-tabs apres reload htmx](https://github.com/gip-inclusion/les-emplois/pull/5023)
+- [Vie privée: modification de l'adresse mail contact pour demandes RGPD](https://github.com/gip-inclusion/les-emplois/pull/5090)
+
+### Tech
+
+- [Connexion: Amélioration de la fiabilité de la connexion avec ProConnect](https://github.com/gip-inclusion/les-emplois/pull/5097)
+- [Nettoyage des modèles d'invitations](https://github.com/gip-inclusion/les-emplois/pull/5068)
+
 ## 2024-11-11
 
 ### Modifié
