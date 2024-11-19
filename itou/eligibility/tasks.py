@@ -3,6 +3,7 @@ from json import JSONDecodeError
 
 import httpx
 from django.apps import apps
+from django.db import transaction
 from django.utils import timezone
 from huey.contrib.djhuey import task
 from huey.exceptions import RetryTask
@@ -97,7 +98,8 @@ def async_certify_criteria(model_name, eligibility_diagnosis_pk):
         pk=eligibility_diagnosis_pk
     )
     try:
-        certify_criteria(eligibility_diagnosis)
+        with transaction.atomic():
+            certify_criteria(eligibility_diagnosis)
     except (
         httpx.HTTPError,  # Could not connect, unexpected status code, …
         JSONDecodeError,  # Response was not JSON (text, HTML, …).
