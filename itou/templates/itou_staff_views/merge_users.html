@@ -1,0 +1,31 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load django_bootstrap5 %}
+
+{% block title %}Fusion de comptes {{ block.super }}{% endblock %}
+
+{% block title_content %}<h1>Fusion de comptes employeurs ou prescripteurs</h1>{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% bootstrap_form_errors form type="non_fields" %}
+                        <div class="form-row">
+                            {% bootstrap_field form.old_email wrapper_class='form-group col-md-5' %}
+                            {% bootstrap_field form.new_email wrapper_class='form-group col-md-5' %}
+                            <div class="form-group col-md-2 mt-5">
+                                <button type="submit" class="btn btn-block btn-primary">
+                                    <span>Chercher</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
