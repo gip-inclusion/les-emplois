@@ -198,7 +198,23 @@ class TestListEmployeeRecords:
                 parse_response_to_soup(
                     response,
                     selector=".employee-records-list .c-box--results__footer",
-                    replace_in_attr=[self.job_application, self.employee_record],
+                    replace_in_attr=[
+                        (
+                            "href",
+                            f"/employee_record/disable/{self.employee_record.pk}",
+                            "/employee_record/disable/[PK of EmployeeRecord]",
+                        ),
+                        (
+                            "href",
+                            f"/employee_record/summary/{self.employee_record.pk}",
+                            "/employee_record/summary/[PK of EmployeeRecord]",
+                        ),
+                        (
+                            "href",
+                            f"/employee_record/create/{self.job_application.pk}",
+                            "/employee_record/create/[PK of JobApplication]",
+                        ),
+                    ],
                 )
             )
             == snapshot()
