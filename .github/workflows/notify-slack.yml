@@ -21,7 +21,8 @@ jobs:
           webhook: ${{ secrets.SLACK_MEP_C1_WEBHOOK_URL }}
           webhook-type: incoming-webhook
           payload: |
-            text: ${{ format('<{0}|{1}>', github.event.pull_request.html_url, github.event.pull_request.title) }}
+            text: >-
+              ${{ format('<{0}|{1}>', github.event.pull_request.html_url, github.event.pull_request.title) }}
       - name: "📢 Notify the #mep-c2 channel"
         if: contains(github.event.pull_request.labels.*.name, 'pilotage')
         uses: slackapi/slack-github-action@v2.0.0
@@ -29,4 +30,5 @@ jobs:
           webhook: ${{ secrets.SLACK_MEP_C2_WEBHOOK_URL }}
           webhook-type: incoming-webhook
           payload: |
-            text: ${{ format('<{0}|{1}>', github.event.pull_request.html_url, github.event.pull_request.title) }}
+            text: >-
+              ${{ format('<{0}|{1}>', github.event.pull_request.html_url, github.event.pull_request.title) }}
