@@ -587,8 +587,15 @@ class TestApprovalModel:
         ]:
             assert approval._get_human_readable_estimate(delta) == expected_display
 
-    @freeze_time("2023-04-26")
-    def test_remainder_as_date(self):
+    @pytest.mark.parametrize(
+        "now,expected",
+        [
+            ("2021-07-01", datetime.date(2023, 7, 25)),  # Yet to start
+            ("2022-07-26", datetime.date(2023, 7, 25)),  # In progress
+            ("2023-08-01", datetime.date(2023, 7, 25)),  # Is already ended
+        ],
+    )
+    def test_remainder_as_date(self, now, expected):
         """
         Only test return type and value as the algorithm is already tested in `self.test_remainder`.
         """
@@ -596,7 +603,8 @@ class TestApprovalModel:
             start_at=datetime.date(2021, 7, 26),
             end_at=datetime.date(2023, 7, 25),
         )
-        assert approval.remainder_as_date == datetime.date(2023, 7, 25)
+        with freeze_time(now):
+            assert approval.remainder_as_date == expected
 
     def test_diagnosis_constraint(self):
         ApprovalFactory(origin_ai_stock=True)
