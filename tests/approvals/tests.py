@@ -571,21 +571,21 @@ class TestApprovalModel:
     @freeze_time("2024-07-18")
     def test_human_readable_estimate(self):
         approval = Approval()
-        for date, expected_display in [
-            (datetime.date(2026, 7, 18), "Environ 2 ans"),
-            (datetime.date(2026, 7, 17), "Environ 1 an et 11 mois"),
-            (datetime.date(2025, 7, 28), "Environ 1 an"),
-            (datetime.date(2025, 3, 13), "Environ 7 mois et 3 semaines"),
-            (datetime.date(2024, 12, 26), "Environ 5 mois et 1 semaine"),
-            (datetime.date(2024, 11, 18), "Environ 4 mois"),
-            (datetime.date(2024, 8, 2), "2 semaines et 1 jour"),
-            (datetime.date(2024, 8, 1), "2 semaines"),
-            (datetime.date(2024, 7, 31), "1 semaine et 6 jours"),
-            (datetime.date(2024, 7, 25), "1 semaine"),
-            (datetime.date(2024, 7, 24), "6 jours"),
-            (datetime.date(2024, 7, 19), "1 jour"),
+        for delta, expected_display in [
+            (datetime.timedelta(days=730), "Environ 2 ans"),
+            (datetime.timedelta(days=729), "Environ 1 an et 11 mois"),
+            (datetime.timedelta(days=375), "Environ 1 an"),
+            (datetime.timedelta(days=238), "Environ 7 mois et 3 semaines"),
+            (datetime.timedelta(days=161), "Environ 5 mois et 1 semaine"),
+            (datetime.timedelta(days=123), "Environ 4 mois"),
+            (datetime.timedelta(days=15), "2 semaines et 1 jour"),
+            (datetime.timedelta(days=14), "2 semaines"),
+            (datetime.timedelta(days=13), "1 semaine et 6 jours"),
+            (datetime.timedelta(days=7), "1 semaine"),
+            (datetime.timedelta(days=6), "6 jours"),
+            (datetime.timedelta(days=1), "1 jour"),
         ]:
-            assert approval._get_human_readable_estimate(date) == expected_display
+            assert approval._get_human_readable_estimate(delta) == expected_display
 
     @freeze_time("2023-04-26")
     def test_remainder_as_date(self):
