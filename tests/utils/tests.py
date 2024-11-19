@@ -1525,19 +1525,24 @@ class TestUtilsParseResponseToSoup:
         response = HttpResponse('<html><head></head><body><div id="foo">bar</div></body></html>')
         assert str(parse_response_to_soup(response, selector="#foo")) == '<div id="foo">bar</div>'
 
-    def test_replace_in_href_mixing_tuple_and_object(self):
-        jobseeker = JobSeekerFactory()
+    def test_replace_in_href(self):
         response = HttpResponse(
             "<html><head></head><body>"
-            f'<div><a href="http://server.com/{jobseeker.pk}/">salmon</a></div>'
+            '<div><a href="/path/to/replace">salmon</a></div>'
             '<div><a href="http://server.com/bream/">bream</a></div>'
             '<div><a href="http://server.com/red_mullet/">red mullet</a></div>'
             "</body></html>"
         )
-        soup = parse_response_to_soup(response, replace_in_attr=[jobseeker, ("href", "red_mullet", "slug2")])
+        soup = parse_response_to_soup(
+            response,
+            replace_in_attr=[
+                ("href", "/path/to/replace", "[newpath]"),
+                ("href", "red_mullet", "slug2"),
+            ],
+        )
         assert str(soup) == (
             "<html><head></head><body>"
-            '<div><a href="http://server.com/[PK of User]/">salmon</a></div>'
+            '<div><a href="[newpath]">salmon</a></div>'
             '<div><a href="http://server.com/bream/">bream</a></div>'
             '<div><a href="http://server.com/slug2/">red mullet</a></div>'
             "</body></html>"

@@ -2972,7 +2972,13 @@ class TestProcessTransferJobApplication:
                 parse_response_to_soup(
                     response,
                     ".c-box--action .dropdown-structure",
-                    replace_in_attr=[job_application],
+                    replace_in_attr=[
+                        (
+                            "href",
+                            f"/apply/{job_application.pk}/siae/external-transfer/1",
+                            "/apply/[PK of JobApplication]/siae/external-transfer/1",
+                        )
+                    ],
                 )
             )
             == snapshot

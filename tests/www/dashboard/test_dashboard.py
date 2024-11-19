@@ -675,7 +675,13 @@ class TestDashboardView:
                 parse_response_to_soup(
                     response,
                     "#gps-card",
-                    replace_in_attr=[("href", str(response.wsgi_request.current_organization.uid), "[UID of org]")],
+                    replace_in_attr=[
+                        (
+                            "href",
+                            f"user_organization_uid={response.wsgi_request.current_organization.uid}",
+                            "user_organization_uid=[UID of org]",
+                        )
+                    ],
                 )
             ) == snapshot(name=snapshot_name)
 

@@ -86,26 +86,18 @@ def parse_response_to_soup(response, selector=None, no_html_body=False, replace_
     for img in soup.find_all("source", attrs={"srcset": True}):
         img["srcset"] = remove_static_hash(img["srcset"])
     if replace_in_attr:
-        replacements = [
-            (
-                replacement
-                if isinstance(replacement, tuple)
-                else ("href", str(replacement.pk), f"[PK of {type(replacement).__name__}]")
-            )
-            for replacement in replace_in_attr
-        ]
-
+        replace_in_attr = list(replace_in_attr)
         # Get the list of the attrs (deduplicated) we should search for replacement
-        unique_attrs = set([replace_tuple[0] for replace_tuple in replacements])
+        unique_attrs = set(replace_tuple[0] for replace_tuple in replace_in_attr)
 
         for attr in unique_attrs:
             # Search and replace in descendant nodes
             for links in soup.find_all(attrs={attr: True}):
-                for _, from_str, to_str in replacements:
+                for _, from_str, to_str in replace_in_attr:
                     links.attrs.update({f"{attr}": links.attrs[attr].replace(from_str, to_str)})
             # Also replace attributes in the top node
             if attr in soup.attrs:
-                for _, from_str, to_str in replacements:
+                for _, from_str, to_str in replace_in_attr:
                     soup.attrs.update({f"{attr}": soup.attrs[attr].replace(from_str, to_str)})
     return soup
 
