@@ -169,13 +169,17 @@ class CommonApprovalMixin(models.Model):
     @property
     def remainder_as_date(self):
         """
-        Return an estimated end date if this approval was "activated" today:
-        prolongations are taken into account but not suspensions as an approval can be unsuspended.
+        Return an estimated end date.
+        Prolongations are taken into account but not suspensions as an approval can be unsuspended.
         """
-        return timezone.localdate() + relativedelta(
-            days=self.remainder.days
-            # end_at is inclusive.
-            - 1,
+        return min(
+            max(self.start_at, timezone.localdate())  # Approval can start in the future
+            + relativedelta(
+                days=self.remainder.days
+                # end_at is inclusive.
+                - 1,
+            ),
+            self.end_at,
         )
 
     @property
