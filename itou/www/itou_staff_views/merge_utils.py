@@ -145,6 +145,7 @@ def migrate_field(model, field_name, from_user, to_user):
 def merge_users(to_user, from_user, update_personal_data):
     assert to_user.kind in [UserKind.EMPLOYER, UserKind.PRESCRIBER]
     assert to_user.kind == from_user.kind
+    support_remark = f"{timezone.localdate()}: Fusion d'utilisateurs {to_user.email} ← {from_user.email}"
     for model, field_name in get_users_relations():
         migrate_field(model, field_name, from_user, to_user)
     if update_personal_data:
@@ -155,12 +156,9 @@ def merge_users(to_user, from_user, update_personal_data):
         to_user.last_name = from_user.last_name
         to_user.identity_provider = from_user.identity_provider
         # No need to update external_data_source_history, it will be done at next login
-        add_support_remark_to_obj(
-            to_user,
-            f"Fusion d'utilisateurs {to_user.email} ← {from_user.email} en mettant à jour les infos personnelles",
-        )
+        add_support_remark_to_obj(to_user, support_remark + " en mettant à jour les infos personnelles")
     else:
-        add_support_remark_to_obj(to_user, f"Fusion d'utilisateurs {to_user.email} ← {from_user.email}")
+        add_support_remark_to_obj(to_user, support_remark)
     final_log = get_log_prefix(to_user, from_user) + "Done !"
     _number, result = from_user.delete()
     deleted_models = set(result.keys())
