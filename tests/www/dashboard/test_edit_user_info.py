@@ -138,7 +138,7 @@ class TestEditUserInfoView:
         user = JobSeekerFactory(
             jobseeker_profile__nir="178122978200508",
             title="M",
-            jobseeker_profile__birthdate=datetime(1978, 12, 20, tzinfo=UTC),
+            jobseeker_profile__birthdate=date(1978, 12, 20),
         )
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
@@ -187,7 +187,7 @@ class TestEditUserInfoView:
         user = JobSeekerFactory(
             jobseeker_profile__nir="178332978200553",
             title="M",
-            jobseeker_profile__birthdate=datetime(1978, 12, 20, tzinfo=UTC),
+            jobseeker_profile__birthdate=date(1978, 12, 20),
         )
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
@@ -213,7 +213,7 @@ class TestEditUserInfoView:
         user = JobSeekerFactory(
             jobseeker_profile__nir="178332978200553",
             title="M",
-            jobseeker_profile__birthdate=datetime(1978, 12, 20, tzinfo=UTC),
+            jobseeker_profile__birthdate=date(1978, 12, 20),
         )
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
