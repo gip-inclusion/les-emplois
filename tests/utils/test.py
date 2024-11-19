@@ -5,6 +5,7 @@ import linecache
 import os.path
 import random
 import re
+from collections import defaultdict
 from contextlib import contextmanager
 from itertools import chain
 
@@ -88,17 +89,19 @@ def parse_response_to_soup(response, selector=None, no_html_body=False, replace_
     if replace_in_attr:
         replace_in_attr = list(replace_in_attr)
         # Get the list of the attrs (deduplicated) we should search for replacement
-        unique_attrs = set(replace_tuple[0] for replace_tuple in replace_in_attr)
-
-        for attr in unique_attrs:
-            # Search and replace in descendant nodes
-            for links in soup.find_all(attrs={attr: True}):
-                for _, from_str, to_str in replace_in_attr:
-                    links.attrs.update({f"{attr}": links.attrs[attr].replace(from_str, to_str)})
-            # Also replace attributes in the top node
-            if attr in soup.attrs:
-                for _, from_str, to_str in replace_in_attr:
-                    soup.attrs.update({f"{attr}": soup.attrs[attr].replace(from_str, to_str)})
+        attr_replacements = defaultdict(list)
+        for attr, from_str, to_str in replace_in_attr:
+            attr_replacements[attr].append((from_str, to_str))
+        for attr, replacements in attr_replacements.items():
+            nodes = (
+                # Search and replace in descendant nodes
+                *soup.find_all(attrs={attr: True}),
+                # Also replace attributes in the top node
+                *([soup] if attr in soup.attrs else []),
+            )
+            for node in nodes:
+                for from_str, to_str in replacements:
+                    node.attrs.update({attr: node.attrs[attr].replace(from_str, to_str)})
     return soup
 
 
