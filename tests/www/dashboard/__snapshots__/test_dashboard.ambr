@@ -18,7 +18,7 @@
   </select>
               <div class="input-group-text bg-white p-0">
                   <button aria-label="Rechercher un emploi inclusif" class="btn btn-ico btn-link">
-                      <i aria-hidden="true" class="ri-search-line fw-bold"></i>
+                      <i aria-hidden="true" class="ri-search-line fw-medium"></i>
                       <span class="d-none d-sm-inline-flex me-0 me-sm-1">Rechercher</span>
                   </button>
               </div>

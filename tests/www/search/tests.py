@@ -458,7 +458,7 @@ class TestSearchCompany:
         reset_button = (
             f'<a href="{reverse("search:employers_results")}?city={guerande.slug}&job_seeker={job_seeker_public_id}" '
             'class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser les filtres actifs">'
-            '<i class="ri-eraser-line fw-bold" aria-hidden="true"></i>'
+            '<i class="ri-eraser-line fw-medium" aria-hidden="true"></i>'
             '<span>Effacer tout</span></a>'
         )
         assertContains(response, reset_button, html=True)
@@ -1256,7 +1256,7 @@ class TestJobDescriptionSearchView:
             f'<a href="{reverse("search:job_descriptions_results")}?city={guerande.slug}'
             f'&job_seeker={job_seeker_public_id}" '
             'class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser les filtres actifs">'
-            '<i class="ri-eraser-line fw-bold" aria-hidden="true"></i>'
+            '<i class="ri-eraser-line fw-medium" aria-hidden="true"></i>'
             '<span>Effacer tout</span></a>'
         )
         assertContains(response, reset_button, html=True)
