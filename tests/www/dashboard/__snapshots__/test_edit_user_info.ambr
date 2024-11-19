@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestEditUserInfoView.test_edit_with_nir
   dict({
-    'num_queries': 9,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -70,6 +70,7 @@
           'EditJobSeekerInfoForm.__init__[users/forms.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
+          'EditJobSeekerInfoForm.__init__[asp/forms.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'edit_user_info[www/dashboard/views.py]',
         ]),
@@ -126,6 +127,26 @@
                  AND "external_data_externaldataimport"."source" = %s)
           ORDER BY "external_data_externaldataimport"."id" ASC
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CustomFieldRenderer.render[utils/custom_renderer.py]',
+          'SimpleNode[dashboard/includes/edit_job_seeker_info_form.html]',
+          'IncludeNode[dashboard/edit_user_info.html]',
+          'IfNode[dashboard/edit_user_info.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[dashboard/edit_user_info.html]',
+          'edit_user_info[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          ORDER BY "asp_country"."name" ASC
         ''',
       }),
       dict({
@@ -211,6 +232,10 @@
                                                   
                                               
                                                   
+                                              
+                                                  
+                                              
+                                                  
                                                       <li>
                                                           <strong>Adresse actuelle</strong>
                                                       </li>
@@ -255,6 +280,10 @@
                                                       <li>
                                                           <strong>Civilité</strong>
                                                       </li>
+                                                  
+                                              
+                                                  
+                                              
                                                   
                                               
                                                   

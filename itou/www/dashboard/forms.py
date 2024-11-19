@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.text import slugify
 
+from itou.asp.forms import BirthPlaceAndCountryMixin
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.communications import registry as notification_registry
@@ -30,13 +31,26 @@ class SSOReadonlyMixin:
 # SSOReadonlyMixin needs to be before JobSeekerProfileFieldsMixin here
 # since it disables the birthdate field that is added by JobSeekerProfileFieldsMixin
 class EditJobSeekerInfoForm(
-    JobSeekerNIRUpdateMixin, SSOReadonlyMixin, JobSeekerProfileFieldsMixin, JobSeekerAddressForm, forms.ModelForm
+    BirthPlaceAndCountryMixin,
+    JobSeekerNIRUpdateMixin,
+    SSOReadonlyMixin,
+    JobSeekerProfileFieldsMixin,
+    JobSeekerAddressForm,
+    forms.ModelForm,
 ):
     """
     Edit a job seeker profile.
     """
 
-    PROFILE_FIELDS = ["birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason", "nir", "lack_of_nir_reason"]
+    PROFILE_FIELDS = [
+        "birthdate",
+        "birth_place",
+        "birth_country",
+        "pole_emploi_id",
+        "lack_of_pole_emploi_id_reason",
+        "nir",
+        "lack_of_nir_reason",
+    ]
 
     email = forms.EmailField(
         label="Adresse électronique personnelle",

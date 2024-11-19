@@ -8,10 +8,12 @@ from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertFormError, assertNotContains, assertRedirects
 
+from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
+from tests.asp.factories import CountryEuropeFactory, CountryOutsideEuropeFactory
 from tests.openid_connect.inclusion_connect.test import inclusion_connect_setup
 from tests.users.factories import (
     JobSeekerFactory,
@@ -91,12 +93,15 @@ class TestEditUserInfoView:
             html=True,
         )
 
+        birthdate = date(1978, 12, 20)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         post_data = {
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
-            "birthdate": "20/12/1978",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         } | self.address_form_fields(fill_mode="ban_api")
@@ -107,7 +112,7 @@ class TestEditUserInfoView:
         assert user.first_name == post_data["first_name"]
         assert user.last_name == post_data["last_name"]
         assert user.phone == post_data["phone"]
-        assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
+        assert user.jobseeker_profile.birthdate == birthdate
         self._test_address_autocomplete(user=user, post_data=post_data)
 
         # Ensure that the job seeker cannot edit email here.
@@ -118,12 +123,15 @@ class TestEditUserInfoView:
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = client.get(url)
+        birthdate = date(1978, 12, 20)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         post_data = {
             "email": user.email,
             "title": "",
             "first_name": user.first_name,
             "last_name": user.last_name,
-            "birthdate": "20/12/1978",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
             "phone": user.phone,
             "lack_of_pole_emploi_id_reason": user.jobseeker_profile.lack_of_pole_emploi_id_reason,
             "lack_of_nir": False,
@@ -135,21 +143,24 @@ class TestEditUserInfoView:
         assert response.context["form"].errors.get("title") == ["Ce champ est obligatoire."]
 
     def test_inconsistent_nir_title_birthdate(self, client):
+        birthdate = date(1978, 12, 20)
         user = JobSeekerFactory(
             jobseeker_profile__nir="178122978200508",
             title="M",
-            jobseeker_profile__birthdate=date(1978, 12, 20),
+            jobseeker_profile__birthdate=birthdate,
         )
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
 
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         # Inconsistent title
         post_data = {
             "email": "bob@saintclar.net",
             "title": "MME",
             "first_name": "Bob",
             "last_name": "Saint Clar",
-            "birthdate": "20/12/1978",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "lack_of_nir": False,
@@ -169,7 +180,8 @@ class TestEditUserInfoView:
             "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
-            "birthdate": "20/11/1978",
+            "birthdate": date(1978, 11, 20).isoformat(),
+            "birth_place": birth_place.pk,
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "lack_of_nir": False,
@@ -181,24 +193,27 @@ class TestEditUserInfoView:
         user = User.objects.get(id=user.id)
 
         # Ensure that the job seeker did not change the birthdate.
-        assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") != post_data["birthdate"]
+        assert user.jobseeker_profile.birthdate == birthdate
 
     def test_validate_nir_unknown_birth_month(self, client):
+        birthdate = date(1978, 12, 20)
         user = JobSeekerFactory(
             jobseeker_profile__nir="178332978200553",
             title="M",
-            jobseeker_profile__birthdate=date(1978, 12, 20),
+            jobseeker_profile__birthdate=birthdate,
         )
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
 
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         # the month isn't between 1 and 12 -> only check for the year
         post_data = {
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
-            "birthdate": "20/11/1978",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "lack_of_nir": False,
@@ -207,17 +222,19 @@ class TestEditUserInfoView:
         assertRedirects(response, reverse("dashboard:index"))
         user = User.objects.get(id=user.id)
         # The birthdate was updated
-        assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
+        assert user.jobseeker_profile.birthdate == birthdate
 
     def test_validate_nir_unknown_birth_month_bad_year(self, client):
+        birthdate = date(1978, 12, 20)
         user = JobSeekerFactory(
             jobseeker_profile__nir="178332978200553",
             title="M",
-            jobseeker_profile__birthdate=date(1978, 12, 20),
+            jobseeker_profile__birthdate=birthdate,
         )
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
 
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         # Inconsistant birth year
         post_data = {
             "email": "bob@saintclar.net",
@@ -225,6 +242,7 @@ class TestEditUserInfoView:
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": "20/11/1979",
+            "birth_place": birth_place.pk,
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "lack_of_nir": False,
@@ -260,12 +278,15 @@ class TestEditUserInfoView:
         url = reverse("dashboard:edit_user_info")
         response = client.get(url)
         # Address is mandatory.
+        birthdate = date(1978, 12, 20)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         post_data = {
             "title": "M",
             "email": "bob@saintclar.net",
             "first_name": "Bob",
             "last_name": "Saint Clar",
-            "birthdate": "20/12/1978",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         }
@@ -314,12 +335,15 @@ class TestEditUserInfoView:
         url = reverse("dashboard:edit_user_info")
         response = client.get(url)
         # Address is mandatory.
+        birthdate = date(1978, 12, 20)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         post_data = {
             "title": "M",
             "email": "bob@saintclar.net",
             "first_name": "Bob",
             "last_name": "Saint Clar",
-            "birthdate": "20/12/1978",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             # Address fallback fields,
@@ -350,12 +374,15 @@ class TestEditUserInfoView:
         assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
 
         NEW_NIR = "1 781 22978200508"
+        birthdate = date(1978, 12, 20)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         post_data = {
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
-            "birthdate": "20/12/1978",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "lack_of_nir": False,
@@ -382,12 +409,15 @@ class TestEditUserInfoView:
         assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
 
         NEW_NIR = "1 781 22978200508"
+        birthdate = date(1978, 12, 20)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         post_data = {
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
-            "birthdate": "20/12/1978",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "lack_of_nir": False,
@@ -411,12 +441,15 @@ class TestEditUserInfoView:
         assert not response.context["form"]["nir"].field.disabled
         assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
 
+        birthdate = date(1978, 12, 20)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         post_data = {
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
-            "birthdate": "20/12/1978",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "address_line_1": "10 rue du Gué",
@@ -433,6 +466,101 @@ class TestEditUserInfoView:
         assert user.jobseeker_profile.lack_of_nir_reason == ""
         assert user.jobseeker_profile.nir == ""
 
+    def test_only_birth_country(self, client):
+        user = JobSeekerFactory(jobseeker_profile__nir="178122978200508")
+        client.force_login(user)
+        birthdate = date(1978, 12, 20)
+        birth_country = CountryOutsideEuropeFactory()
+        post_data = {
+            "email": "bob@saintclar.net",
+            "title": "M",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": birthdate.isoformat(),
+            "birth_country": birth_country.pk,
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            "address_line_1": "10 rue du Gué",
+            "address_line_2": "Sous l'escalier",
+            "post_code": "35400",
+            "city": "Saint-Malo",
+            "lack_of_nir": False,
+            "nir": user.jobseeker_profile.nir,
+        }
+        response = client.post(reverse("dashboard:edit_user_info"), data=post_data)
+        assertRedirects(response, reverse("dashboard:index"))
+        user = User.objects.select_related("jobseeker_profile").get(pk=user.id)
+        assert user.jobseeker_profile.birth_country_id == birth_country.pk
+
+    def test_born_in_france_no_birthplace(self, client):
+        user = JobSeekerFactory(jobseeker_profile__nir="178122978200508")
+        client.force_login(user)
+        birthdate = date(1978, 12, 20)
+        birth_country = Country.objects.get(code=Country.INSEE_CODE_FRANCE)
+        post_data = {
+            "email": "bob@saintclar.net",
+            "title": "M",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": birthdate.isoformat(),
+            "birth_country": birth_country.pk,
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            "address_line_1": "10 rue du Gué",
+            "address_line_2": "Sous l'escalier",
+            "post_code": "35400",
+            "city": "Saint-Malo",
+            "lack_of_nir": False,
+            "nir": user.jobseeker_profile.nir,
+        }
+        response = client.post(reverse("dashboard:edit_user_info"), data=post_data)
+        assertContains(
+            response,
+            """
+            <div class="alert alert-danger" role="alert">
+            Si le pays de naissance est la France, la commune de naissance est obligatoire.
+            </div>""",
+            html=True,
+            count=1,
+        )
+        user = User.objects.select_related("jobseeker_profile").get(pk=user.id)
+        assert user.jobseeker_profile.birth_country_id is None
+
+    def test_accept_born_outside_of_france_specifies_birth_place(self, client):
+        user = JobSeekerFactory(jobseeker_profile__nir="178122978200508")
+        client.force_login(user)
+        birthdate = date(1978, 12, 20)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
+        birth_country = CountryEuropeFactory()
+        post_data = {
+            "email": "bob@saintclar.net",
+            "title": "M",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": birthdate.isoformat(),
+            "birth_country": birth_country.pk,
+            "birth_place": birth_place.pk,
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            "address_line_1": "10 rue du Gué",
+            "address_line_2": "Sous l'escalier",
+            "post_code": "35400",
+            "city": "Saint-Malo",
+            "lack_of_nir": False,
+            "nir": user.jobseeker_profile.nir,
+        }
+        response = client.post(reverse("dashboard:edit_user_info"), data=post_data)
+        assertContains(
+            response,
+            """
+            <div class="alert alert-danger" role="alert">
+            Il n'est pas possible de saisir une commune de naissance hors de France.
+            </div>""",
+            html=True,
+            count=1,
+        )
+        assert user.jobseeker_profile.birth_country_id is None
+
     @freeze_time("2023-03-10")
     def test_edit_sso(self, client):
         user = JobSeekerFactory(
@@ -447,12 +575,15 @@ class TestEditUserInfoView:
         response = client.get(url)
         assertContains(response, self.EMAIL_LABEL)
 
+        birthdate = date(1978, 12, 20)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         post_data = {
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
-            "birthdate": "20/12/1978",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         } | self.address_form_fields(fill_mode="ban_api")
@@ -467,7 +598,7 @@ class TestEditUserInfoView:
         # Ensure that the job seeker cannot update data retreived from the SSO here.
         assert user.first_name != post_data["first_name"]
         assert user.last_name != post_data["last_name"]
-        assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") != post_data["birthdate"]
+        assert user.jobseeker_profile.birthdate != birthdate
         assert user.email != post_data["email"]
 
     def test_edit_without_title(self, client, snapshot):
@@ -508,12 +639,15 @@ class TestEditUserInfoView:
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = client.get(url)
+        birthdate = date(1978, 12, 20)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         post_data = {
             "email": user.email,
             "title": user.title,
             "first_name": user.first_name,
             "last_name": user.last_name,
-            "birthdate": "20/12/1978",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
             "phone": user.phone,
             "pole_emploi_id": "trop long",
             "lack_of_pole_emploi_id_reason": "",
