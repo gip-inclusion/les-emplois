@@ -160,7 +160,7 @@ class CommonApprovalMixin(models.Model):
 
     def get_remainder_display(self):
         remainder_display = f"{self.remainder.days} jour{pluralizefr(self.remainder.days)}"
-        if self.remainder.days:
+        if self.remainder.days >= 7:  # Prevent displaying "2 jours (2 jours)"
             remainder_display += f" ({self._get_human_readable_estimate(self.remainder)})"
         return remainder_display
 

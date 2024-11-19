@@ -751,13 +751,22 @@ class TestPoleEmploiApprovalModel:
         approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
         assert approval.is_valid()
 
-    @freeze_time("2022-11-22")
-    def test_get_remainder_display(self):
+    @pytest.mark.parametrize(
+        "date,expected",
+        [
+            ("2022-11-22", "123 jours (Environ 4 mois)"),
+            ("2023-03-18", "7 jours (1 semaine)"),
+            ("2023-03-19", "6 jours"),
+            ("2023-03-24", "1 jour"),
+        ],
+    )
+    def test_get_remainder_display(self, date, expected):
         pole_emploi_approval = PoleEmploiApprovalFactory(
             start_at=datetime.date(2021, 3, 25),
             end_at=datetime.date(2023, 3, 24),
         )
-        assert pole_emploi_approval.get_remainder_display() == "123 jours (Environ 4 mois)"
+        with freeze_time(date):
+            assert pole_emploi_approval.get_remainder_display() == expected
 
 
 class TestPoleEmploiApprovalManager:
