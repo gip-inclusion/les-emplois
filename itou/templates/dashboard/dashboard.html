@@ -179,6 +179,7 @@
                                     {% include "dashboard/includes/admin_card.html" %}
                                     {% if user.is_superuser %}
                                         {% include "dashboard/includes/staff_export_card.html" %}
+                                        {% include "dashboard/includes/staff_actions_card.html" %}
                                     {% endif %}
                                     {% include "dashboard/includes/staff_stats_card.html" %}
                                 {% endif %}

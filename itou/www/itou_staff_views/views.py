@@ -4,11 +4,11 @@ import io
 
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
 from django.http import FileResponse, Http404, HttpResponseRedirect, StreamingHttpResponse
-from django.shortcuts import render
-from django.urls import reverse
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.http import content_disposition_header
 
@@ -16,15 +16,18 @@ from itou.approvals.models import Approval
 from itou.companies.models import CompanyMembership
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
+from itou.users.enums import UserKind
+from itou.users.models import User
 from itou.utils.db import or_queries
 from itou.utils.export import generate_excel_sheet
+from itou.www.itou_staff_views import merge_utils
 from itou.www.itou_staff_views.export_utils import (
     cta_export_spec,
     export_row,
     get_export_ts,
     job_app_export_spec,
 )
-from itou.www.itou_staff_views.forms import ItouStaffExportJobApplicationForm
+from itou.www.itou_staff_views.forms import ItouStaffExportJobApplicationForm, MergeUserConfirmForm, MergeUserForm
 
 
 class Echo:
@@ -173,7 +176,7 @@ def export_ft_api_rejections(request):
     )
 
 
-@login_required()
+@login_required
 def export_cta(request):
     if not request.user.is_superuser:
         raise Http404
@@ -199,3 +202,93 @@ def export_cta(request):
         },
         streaming_content=(writer.writerow(row) for row in content()),
     )
+
+
+@login_required
+@user_passes_test(
+    lambda u: u.is_superuser,
+    login_url=reverse_lazy("dashboard:index"),
+    redirect_field_name=None,
+)
+def merge_users(request, template_name="itou_staff_views/merge_users.html"):
+    form = MergeUserForm(data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        return HttpResponseRedirect(
+            reverse(
+                "itou_staff_views:merge_users_confirm",
+                kwargs={"to_user_pk": form.old_user.pk, "from_user_pk": form.new_user.pk},
+            )
+        )
+
+    return render(request, template_name, {"form": form})
+
+
+@login_required
+@user_passes_test(
+    lambda u: u.is_superuser,
+    login_url=reverse_lazy("dashboard:index"),
+    redirect_field_name=None,
+)
+def merge_users_confirm(request, to_user_pk, from_user_pk, template_name="itou_staff_views/merge_users_confirm.html"):
+    ALLOWED_USER_KINDS = [UserKind.PRESCRIBER, UserKind.EMPLOYER]
+
+    to_user = get_object_or_404(User, pk=to_user_pk)
+    from_user = get_object_or_404(User, pk=from_user_pk)
+    to_user_error = None
+    from_user_error = None
+    transfer_data = []
+    merge_allowed = False
+
+    # checks
+    if to_user.kind != from_user.kind:
+        to_user_error = from_user_error = "Les utilisateurs doivent être du même type"
+    if to_user == from_user:
+        to_user_error = from_user_error = "Les utilisateurs doivent être différents"
+    if to_user.kind not in ALLOWED_USER_KINDS:
+        to_user_error = "L’utilisateur doit être employeur ou prescripteur"
+    if from_user.kind not in ALLOWED_USER_KINDS:
+        from_user_error = "L’utilisateur doit être employeur ou prescripteur"
+
+    form = MergeUserConfirmForm(data=request.POST or None)
+
+    if to_user_error is None and from_user_error is None:
+        merge_allowed = True
+        if request.method == "POST" and form.is_valid():
+            try:
+                success_message = f"Fusion {to_user.email} ← {from_user.email} effectuée"
+                merge_utils.merge_users(
+                    to_user, from_user, update_personal_data=form.cleaned_data["update_personal_data"]
+                )
+                messages.success(request, success_message)
+                return HttpResponseRedirect(reverse("itou_staff_views:merge_users"))
+            except Exception as e:
+                messages.error(request, f"Erreur survenue: {e}")
+                return HttpResponseRedirect(
+                    reverse(
+                        "itou_staff_views:merge_users_confirm",
+                        kwargs={"to_user_pk": to_user.pk, "from_user_pk": from_user.pk},
+                    )
+                )
+
+        for model, field_name in merge_utils.get_users_relations():
+            repr_func, related = merge_utils.MODEL_REPR_MAPPING.get(model, (repr, []))
+            data = [
+                (repr_func(obj), merge_utils.admin_url(obj))
+                for obj in model.objects.filter(**{field_name: from_user}).select_related(*related).iterator()
+            ]
+            if data:
+                transfer_data.append((f"{model.__name__}.{field_name}", f"{model.__module__}.{model.__name__}", data))
+
+    context = {
+        "to_user": to_user,
+        "to_user_admin_link": merge_utils.admin_url(to_user),
+        "to_user_error": to_user_error,
+        "from_user": from_user,
+        "from_user_admin_link": merge_utils.admin_url(from_user),
+        "from_user_error": from_user_error,
+        "merge_allowed": merge_allowed,
+        "transfer_data": transfer_data,
+        "form": form,
+    }
+    return render(request, template_name, context)

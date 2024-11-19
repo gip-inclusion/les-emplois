@@ -1,0 +1,165 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load django_bootstrap5 %}
+
+{% block title %}Fusion de comptes {{ block.super }}{% endblock %}
+
+{% block title_content %}<h1>Fusion de comptes employeurs ou prescripteurs</h1>{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <form method="post" class="js-prevent-multiple-submit">
+                {% csrf_token %}
+                {% bootstrap_form_errors form type="non_fields" %}
+
+                <div class="alert alert-warning" role="status">
+                    <p class="mb-0">
+                        <strong>Fonctionnement</strong>
+                    </p>
+                    <p class="mb-0">
+                        L'ensemble des relations du compte de droite (listées plus bas) seront reliées à la place à celui de gauche.
+                    </p>
+                    <p class="mb-0">
+                        Par défaut, le compte fusionné utilise les informations personnelles du compte de droite, mais il est possible de changer
+                        ce comportement en selectionnant celui de gauche.
+                    </p>
+                    <p>
+                        <strong>Attention : si les identités ne correspondent pas, il ne faut probablement pas fusionner les comptes mais plutôt inviter le nouveau collaborateur</strong>
+                    </p>
+                </div>
+
+                <h2>Informations personnelles</h2>
+                <div class="row mb-5">
+                    <div class="col">
+                        <div class="c-box {% if to_user_error %}bg-danger-lightest border-danger{% endif %}" id="left_user_box">
+                            <ul class="list-unstyled">
+                                <li>
+                                    <a href="{{ to_user_admin_link }}">Lien vers l'admin</a>
+                                </li>
+                                <li>
+                                    Adresse e-mail : <strong>{{ to_user.email }}</strong>
+                                </li>
+                                <li>
+                                    Prénom : <strong>{{ to_user.first_name|title }}</strong>
+                                </li>
+                                <li>
+                                    Nom : <strong>{{ to_user.last_name|upper }}</strong>
+                                </li>
+                                <li>
+                                    Type : <strong>{{ to_user.get_kind_display }}</strong>
+                                </li>
+                                <li>
+                                    Connexion : <strong>{{ to_user.get_identity_provider_display }}</strong>
+                                </li>
+                                <li>
+                                    Identifiant unique (du SSO) : <strong>{{ to_user.username }}</strong>
+                                </li>
+                            </ul>
+                            {% if to_user_error %}
+                                <p class="text-danger">{{ to_user_error }}</p>
+                            {% else %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="update_personal_data" id="id_update_personal_data_0" value="False">
+                                    <label class="form-check-label" for="id_update_personal_data_0">Conserver ces informations personnelles</label>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-1 text-center d-flex justify-content-center align-items-center">
+                        <i class="ri-arrow-left-line ri-3x"></i>
+                    </div>
+                    <div class="col">
+                        <div class="c-box {% if from_user_error %}bg-danger-lightest border-danger{% else %}bg-success-lightest border-success{% endif %}" id="right_user_box">
+                            <ul class="list-unstyled">
+                                <li>
+                                    <a href="{{ from_user_admin_link }}">Lien vers l'admin</a>
+                                </li>
+                                <li>
+                                    Adresse e-mail : <strong>{{ from_user.email }}</strong>
+                                </li>
+                                <li>
+                                    Prénom : <strong>{{ from_user.first_name|title }}</strong>
+                                </li>
+                                <li>
+                                    Nom : <strong>{{ from_user.last_name|upper }}</strong>
+                                </li>
+                                <li>
+                                    Type : <strong>{{ from_user.get_kind_display }}</strong>
+                                </li>
+                                <li>
+                                    Connexion : <strong>{{ from_user.get_identity_provider_display }}</strong>
+                                </li>
+                                <li>
+                                    Identifiant unique (du SSO) : <strong>{{ from_user.username }}</strong>
+                                </li>
+                            </ul>
+                            {% if from_user_error %}
+                                <p class="text-danger">{{ from_user_error }}</p>
+                            {% else %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="update_personal_data" id="id_update_personal_data_1" value="True" checked="checked">
+                                    <label class="form-check-label" for="id_update_personal_data_1">
+                                        Mettre à jour avec ces informations personnelles
+                                    </label>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% if merge_allowed %}
+                    <h2>Données qui seront transférées</h2>
+                    {% for field, model, data in transfer_data %}
+                        <div class="row">
+                            <div class="col-md-auto">
+                                <h3 class="mb-0">{{ field }}</h3>
+                            </div>
+                            <div class="col">
+                                <p class="text-disabled">{{ model }}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <ul>
+                                {% for obj_repr, admin_url in data %}
+                                    <li>
+                                        {% if admin_url %}
+                                            <a href="{{ admin_url }}">{{ obj_repr }}</a>
+                                        {% else %}
+                                            {{ obj_repr }}
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endfor %}
+
+                    <div class="form-group">
+                        {% url 'itou_staff_views:merge_users' as reset_url %}
+                        {% itou_buttons_form primary_label="Confirmer la fusion" reset_url=reset_url show_mandatory_fields_mention=False %}
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    </section>
+{% endblock content %}
+
+{% block script %}
+    {{ block.super }}
+
+    <script nonce="{{ CSP_NONCE }}">
+        htmx.onLoad(function() {
+            var left_user_box = $("#left_user_box");
+            var right_user_box = $("#right_user_box");
+            var left_user_choice = $("#id_update_personal_data_0");
+            var right_user_choice = $("#id_update_personal_data_1");
+            left_user_choice.change(function() {
+                left_user_box.addClass("bg-success-lightest border-success")
+                right_user_box.removeClass("bg-success-lightest border-success")
+            })
+            right_user_choice.change(function() {
+                left_user_box.removeClass("bg-success-lightest border-success")
+                right_user_box.addClass("bg-success-lightest border-success")
+            })
+        });
+    </script>
+{% endblock %}

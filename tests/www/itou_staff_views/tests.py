@@ -6,15 +6,26 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.companies.models import CompanyMembership
 from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplicationTransitionLog
+from itou.prescribers.models import PrescriberMembership
+from itou.users.models import User
 from itou.www.itou_staff_views.forms import DEPARTMENTS_CHOICES
-from tests.approvals.factories import ApprovalFactory, ProlongationFactory
-from tests.companies.factories import CompanyFactory
-from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
+from tests.approvals.factories import (
+    ApprovalFactory,
+    ProlongationFactory,
+    ProlongationRequestFactory,
+    SuspensionFactory,
+)
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
+from tests.gps.factories import FollowUpGroupMembershipFactory
+from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberMembershipFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -206,3 +217,308 @@ class TestExportCTA:
             assert response.status_code == 200
             assert response["Content-Disposition"] == ("attachment; " 'filename="export_cta_2024-05-17_11-11-11.csv"')
             assert b"".join(response.streaming_content).decode() == snapshot(name="streaming content")
+
+
+class TestMergeUsers:
+    @pytest.mark.parametrize(
+        "factory,factory_kwargs,expected_status",
+        [
+            (JobSeekerFactory, {"for_snapshot": True}, 302),
+            (EmployerFactory, {"with_company": True}, 302),
+            (PrescriberFactory, {}, 302),
+            (LaborInspectorFactory, {"membership": True}, 302),
+            (ItouStaffFactory, {}, 302),
+            (ItouStaffFactory, {"is_superuser": True}, 200),
+        ],
+    )
+    def test_requires_superuser(self, client, factory, factory_kwargs, expected_status):
+        user = factory(**factory_kwargs)
+        client.force_login(user)
+        response = client.get(reverse("itou_staff_views:merge_users"))
+        if expected_status == 302:
+            assertRedirects(response, reverse("dashboard:index"))
+        else:
+            assert response.status_code == expected_status
+        response = client.get(reverse("itou_staff_views:merge_users_confirm", args=(user.pk, user.pk)))
+        if expected_status == 302:
+            assertRedirects(response, reverse("dashboard:index"))
+        else:
+            assert response.status_code == expected_status
+
+    def test_merge_users(self, client):
+        client.force_login(ItouStaffFactory(is_superuser=True))
+        url = reverse("itou_staff_views:merge_users")
+
+        response = client.post(url, data={"old_email": "", "new_email": ""})
+        assert response.context["form"].errors == {
+            "old_email": ["Ce champ est obligatoire."],
+            "new_email": ["Ce champ est obligatoire."],
+        }
+
+        response = client.post(url, data={"old_email": "one@mailinator.com", "new_email": "two@mailinator.com"})
+        assert response.context["form"].errors == {
+            "old_email": ["Cet utilisateur n'existe pas."],
+            "new_email": ["Cet utilisateur n'existe pas."],
+        }
+
+        user_1 = PrescriberFactory(email="one@mailinator.com")
+        response = client.post(url, data={"old_email": "one@mailinator.com", "new_email": "two@mailinator.com"})
+        assert response.context["form"].errors == {
+            "new_email": ["Cet utilisateur n'existe pas."],
+        }
+
+        response = client.post(url, data={"old_email": "one@mailinator.com", "new_email": "one@mailinator.com"})
+        assert response.context["form"].errors == {
+            "__all__": ["Les deux adresses doivent être différentes."],
+        }
+
+        user_2 = PrescriberFactory(email="two@mailinator.com")
+        response = client.post(url, data={"old_email": "one@mailinator.com", "new_email": "two@mailinator.com"})
+        assertRedirects(response, reverse("itou_staff_views:merge_users_confirm", args=(user_1.pk, user_2.pk)))
+
+    def test_check_user_kind(self, client, mocker):
+        prescriber = PrescriberFactory()
+        employer = EmployerFactory()
+        job_seeker = JobSeekerFactory()
+        labor_inspector = LaborInspectorFactory()
+        itou_staff = ItouStaffFactory(is_superuser=True)
+
+        client.force_login(itou_staff)
+        merge_users_mock = mocker.patch("itou.www.itou_staff_views.merge_utils.merge_users")
+
+        BUTTON_TXT = "Confirmer la fusion"
+        DATA_TITLE = "<h2>Données qui seront transférées</h2>"
+
+        # if user is the same
+        url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber.pk, prescriber.pk))
+        response = client.get(url)
+        assertContains(response, "Les utilisateurs doivent être différents", count=2)
+        assertNotContains(response, BUTTON_TXT)
+        assertNotContains(response, DATA_TITLE)
+        response = client.post(url)
+        assert merge_users_mock.call_count == 0
+
+        # if the users are not employers of prescribers
+        url = reverse("itou_staff_views:merge_users_confirm", args=(job_seeker.pk, labor_inspector.pk))
+        response = client.get(url)
+        assertContains(response, "L’utilisateur doit être employeur ou prescripteur", count=2)
+        assertNotContains(response, BUTTON_TXT)
+        assertNotContains(response, DATA_TITLE)
+        response = client.post(url)
+        assert merge_users_mock.call_count == 0
+
+        # if kind is different
+        url = reverse("itou_staff_views:merge_users_confirm", args=(employer.pk, prescriber.pk))
+        response = client.get(url)
+        assertContains(response, "Les utilisateurs doivent être du même type", count=2)
+        assertNotContains(response, BUTTON_TXT)
+        assertNotContains(response, DATA_TITLE)
+        response = client.post(url)
+        assert merge_users_mock.call_count == 0
+
+        # everything is OK
+        other_employer = EmployerFactory()
+        url = reverse("itou_staff_views:merge_users_confirm", args=(employer.pk, other_employer.pk))
+        response = client.get(url)
+        assertContains(response, BUTTON_TXT)
+        assertContains(response, DATA_TITLE)
+        response = client.post(url, data={"update_personal_data": "True"}, follow=True)
+        assert merge_users_mock.call_count == 1
+        assertContains(response, f"Fusion {employer.email} ← {other_employer.email} effectuée")
+        assertRedirects(response, reverse("itou_staff_views:merge_users"))
+
+    def test_merge_personnal_data(self, client, caplog):
+        prescriber_1 = PrescriberFactory()
+        prescriber_2 = PrescriberFactory()
+
+        client.force_login(ItouStaffFactory(is_superuser=True))
+
+        url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_1.pk, prescriber_2.pk))
+        client.post(url, data={"update_personal_data": "True"})
+        merged_user = User.objects.get(pk=prescriber_1.pk)
+        assert not User.objects.filter(pk=prescriber_2.pk).exists()
+        assert merged_user.email == prescriber_2.email
+        assert merged_user.first_name == prescriber_2.first_name
+        assert merged_user.last_name == prescriber_2.last_name
+        assert merged_user.username == prescriber_2.username
+        assert merged_user.identity_provider == prescriber_2.identity_provider
+
+        assert caplog.messages == [
+            f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — Updated personal data",
+            f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — Done !",
+            "HTTP 302 Found",
+        ]
+
+        caplog.clear()
+        prescriber_1.save()
+        prescriber_2.save()
+        url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_1.pk, prescriber_2.pk))
+        client.post(url, data={"update_personal_data": "False"})
+        merged_user = User.objects.get(pk=prescriber_1.pk)
+        assert not User.objects.filter(pk=prescriber_2.pk).exists()
+        assert merged_user.email == prescriber_1.email
+        assert merged_user.first_name == prescriber_1.first_name
+        assert merged_user.last_name == prescriber_1.last_name
+        assert merged_user.username == prescriber_1.username
+        assert merged_user.identity_provider == prescriber_1.identity_provider
+
+        assert caplog.messages == [
+            f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — Done !",
+            "HTTP 302 Found",
+        ]
+
+    def test_merge_prescriber_memberships(self, client, caplog):
+        prescriber_1 = PrescriberFactory()
+        prescriber_2 = PrescriberFactory()
+        other_prescriber = PrescriberFactory()
+        org = PrescriberOrganizationFactory()
+        membership_1 = PrescriberMembershipFactory(user=prescriber_1, organization=org, is_active=False, is_admin=True)
+        membership_2 = PrescriberMembershipFactory(
+            user=prescriber_2, organization=org, is_active=True, is_admin=False, updated_by=other_prescriber
+        )
+
+        with freeze_time() as frozen_now:
+            client.force_login(ItouStaffFactory(is_superuser=True))
+            url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_1.pk, prescriber_2.pk))
+            client.post(url, data={"update_personal_data": "False"})
+            membership = PrescriberMembership.objects.get()
+            assert membership.user == prescriber_1
+            assert membership.is_admin is True
+            assert membership.is_active is True
+            assert membership.joined_at == min(membership_1.joined_at, membership_2.joined_at)
+            assert membership.created_at == min(membership_1.created_at, membership_2.created_at)
+            assert membership.updated_at == frozen_now().replace(tzinfo=datetime.UTC)
+            assert membership.updated_by == other_prescriber
+
+        assert caplog.messages == [
+            f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — "
+            f"itou.prescribers.models.PrescriberMembership.user updated : [{membership_1.pk}]",
+            f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — Done !",
+            "HTTP 302 Found",
+        ]
+
+    def test_merge_employer_memberships(self, client, caplog):
+        employer_1 = EmployerFactory()
+        employer_2 = EmployerFactory()
+        other_employer = EmployerFactory()
+        company = CompanyFactory()
+        membership_1 = CompanyMembershipFactory(user=employer_1, company=company, is_active=False, is_admin=True)
+        membership_2 = CompanyMembershipFactory(
+            user=employer_2, company=company, is_active=True, is_admin=False, updated_by=other_employer
+        )
+
+        with freeze_time() as frozen_now:
+            client.force_login(ItouStaffFactory(is_superuser=True))
+            url = reverse("itou_staff_views:merge_users_confirm", args=(employer_1.pk, employer_2.pk))
+            client.post(url, data={"update_personal_data": "False"})
+            membership = CompanyMembership.objects.get()
+            assert membership.user == employer_1
+            assert membership.is_admin is True
+            assert membership.is_active is True
+            assert membership.joined_at == min(membership_1.joined_at, membership_2.joined_at)
+            assert membership.created_at == min(membership_1.created_at, membership_2.created_at)
+            assert membership.updated_at == frozen_now().replace(tzinfo=datetime.UTC)
+            assert membership.updated_by == other_employer
+
+        assert caplog.messages == [
+            f"Fusion utilisateurs {employer_1.pk} ← {employer_2.pk} — "
+            f"itou.companies.models.CompanyMembership.user updated : [{membership_1.pk}]",
+            f"Fusion utilisateurs {employer_1.pk} ← {employer_2.pk} — Done !",
+            "HTTP 302 Found",
+        ]
+
+    def test_merge_other_relations(self, client, caplog):
+        prescriber_1 = PrescriberFactory()
+        prescriber_2 = PrescriberFactory()
+        job_app = JobApplicationFactory(
+            sender=prescriber_2,
+            approval_manually_refused_by=prescriber_2,
+            archived_by=prescriber_2,
+            archived_at=timezone.now(),
+            transferred_by=prescriber_2,
+            eligibility_diagnosis=None,
+        )
+        log = JobApplicationTransitionLog(job_application=job_app, user=prescriber_2)
+        log.save()
+        prolongation = ProlongationFactory(
+            created_by=prescriber_2,
+            updated_by=prescriber_2,
+            validated_by=prescriber_2,
+            declared_by=prescriber_2,
+        )
+        prolongation_request = ProlongationRequestFactory(
+            created_by=prescriber_2,
+            updated_by=prescriber_2,
+            validated_by=prescriber_2,
+            declared_by=prescriber_2,
+            processed_by=prescriber_2,
+        )
+        job_seeker = JobSeekerFactory(created_by=prescriber_2)
+        invitation = EmployerInvitationFactory(sender=prescriber_2)
+        gps_group = FollowUpGroupMembershipFactory(member=prescriber_2)
+        iae_diagnosis = IAEEligibilityDiagnosisFactory(author=prescriber_2, from_prescriber=True)
+        geiq_diagnosis = GEIQEligibilityDiagnosisFactory(author=prescriber_2, from_prescriber=True)
+        suspension = SuspensionFactory(created_by=prescriber_2, updated_by=prescriber_2)
+
+        client.force_login(ItouStaffFactory(is_superuser=True))
+        url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_1.pk, prescriber_2.pk))
+        client.post(url, data={"update_personal_data": "False"})
+
+        job_app.refresh_from_db()
+        assert job_app.sender == prescriber_1
+        assert job_app.approval_manually_refused_by == prescriber_1
+        assert job_app.archived_by == prescriber_1
+        assert job_app.transferred_by == prescriber_1
+        log.refresh_from_db()
+        assert log.user == prescriber_1
+        prolongation.refresh_from_db()
+        assert prolongation.created_by == prescriber_1
+        assert prolongation.updated_by == prescriber_1
+        assert prolongation.validated_by == prescriber_1
+        assert prolongation.declared_by == prescriber_1
+        prolongation_request.refresh_from_db()
+        assert prolongation_request.created_by == prescriber_1
+        assert prolongation_request.updated_by == prescriber_1
+        assert prolongation_request.validated_by == prescriber_1
+        assert prolongation_request.declared_by == prescriber_1
+        assert prolongation_request.processed_by == prescriber_1
+        job_seeker.refresh_from_db()
+        assert job_seeker.created_by == prescriber_1
+        invitation.refresh_from_db()
+        assert invitation.sender == prescriber_1
+        gps_group.refresh_from_db()
+        assert gps_group.member == prescriber_1
+        iae_diagnosis.refresh_from_db()
+        assert iae_diagnosis.author == prescriber_1
+        geiq_diagnosis.refresh_from_db()
+        assert geiq_diagnosis.author == prescriber_1
+        suspension.refresh_from_db()
+        assert suspension.created_by == prescriber_1
+        assert suspension.updated_by == prescriber_1
+
+        prefix = f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — "
+        assert caplog.messages == [
+            f"{prefix}itou.approvals.models.Prolongation.created_by : [{prolongation.pk}]",
+            f"{prefix}itou.approvals.models.Prolongation.declared_by : [{prolongation.pk}]",
+            f"{prefix}itou.approvals.models.Prolongation.updated_by : [{prolongation.pk}]",
+            f"{prefix}itou.approvals.models.Prolongation.validated_by : [{prolongation.pk}]",
+            f"{prefix}itou.approvals.models.ProlongationRequest.created_by : [{prolongation_request.pk}]",
+            f"{prefix}itou.approvals.models.ProlongationRequest.declared_by : [{prolongation_request.pk}]",
+            f"{prefix}itou.approvals.models.ProlongationRequest.processed_by : [{prolongation_request.pk}]",
+            f"{prefix}itou.approvals.models.ProlongationRequest.updated_by : [{prolongation_request.pk}]",
+            f"{prefix}itou.approvals.models.ProlongationRequest.validated_by : [{prolongation_request.pk}]",
+            f"{prefix}itou.approvals.models.Suspension.created_by : [{suspension.pk}]",
+            f"{prefix}itou.approvals.models.Suspension.updated_by : [{suspension.pk}]",
+            f"{prefix}itou.eligibility.models.geiq.GEIQEligibilityDiagnosis.author : [{geiq_diagnosis.pk}]",
+            f"{prefix}itou.eligibility.models.iae.EligibilityDiagnosis.author : [{iae_diagnosis.pk}]",
+            f"{prefix}itou.gps.models.FollowUpGroupMembership.member : [{gps_group.pk}]",
+            f"{prefix}itou.invitations.models.EmployerInvitation.sender : [{invitation.pk}]",
+            f"{prefix}itou.job_applications.models.JobApplication.approval_manually_refused_by : [{job_app.pk}]",
+            f"{prefix}itou.job_applications.models.JobApplication.archived_by : [{job_app.pk}]",
+            f"{prefix}itou.job_applications.models.JobApplication.sender : [{job_app.pk}]",
+            f"{prefix}itou.job_applications.models.JobApplication.transferred_by : [{job_app.pk}]",
+            f"{prefix}itou.job_applications.models.JobApplicationTransitionLog.user : [{log.pk}]",
+            f"{prefix}itou.users.models.User.created_by : [{job_seeker.pk}]",
+            f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — Done !",
+            "HTTP 302 Found",
+        ]
