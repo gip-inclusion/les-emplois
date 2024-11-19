@@ -264,8 +264,9 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
 
             # No user found with that NIR, save the NIR in the session and redirect to search by e-mail address.
             if not job_seeker:
-                job_seeker_session = SessionNamespace.create_temporary(request.session)
-                job_seeker_session.init({"profile": {"nir": self.form.cleaned_data["nir"]}})
+                job_seeker_session = SessionNamespace.create_uuid_namespace(
+                    request.session, data={"profile": {"nir": self.form.cleaned_data["nir"]}}
+                )
                 return HttpResponseRedirect(self.search_by_email_url(job_seeker_session.name))
 
             # The NIR we found is correct
@@ -287,8 +288,7 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
         else:
             # Require at least one attempt with an invalid NIR to access the search by email feature.
             # The goal is to prevent users from skipping the search by NIR and creating duplicates.
-            job_seeker_session = SessionNamespace.create_temporary(request.session)
-            job_seeker_session.init({})
+            job_seeker_session = SessionNamespace.create_uuid_namespace(request.session, data={})
             context["temporary_nir_url"] = self.search_by_email_url(job_seeker_session.name)
 
         return self.render_to_response(self.get_context_data(**kwargs) | context)

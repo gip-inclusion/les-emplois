@@ -55,8 +55,12 @@ class SessionNamespace:
         return dict(self._session[self.name])
 
     @classmethod
-    def create_temporary(cls, session):
-        return cls(session, namespace=str(uuid.uuid4()))
+    def create_uuid_namespace(cls, session, data=None):
+        s = cls(session, namespace=str(uuid.uuid4()))
+        if data is None:
+            data = {}
+        s.init(data)
+        return s
 
 
 class SessionNamespaceRequiredMixin:

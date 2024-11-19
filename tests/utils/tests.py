@@ -1162,11 +1162,19 @@ class TestSessionNamespace:
     def test_class_method(self):
         session = self._get_session_store()
 
-        # .create_temporary()
-        ns = itou.utils.session.SessionNamespace.create_temporary(session)
+        # .create_uuid_namespace()
+        ns = itou.utils.session.SessionNamespace.create_uuid_namespace(session)
         assert isinstance(ns, itou.utils.session.SessionNamespace)
         assert str(uuid.UUID(ns.name)) == ns.name
-        assert ns.name not in session  # .init() wasn't called
+        assert session[ns.name] == {}
+        assert ns.name in session
+
+        # .create_uuid_namespace() with data
+        ns = itou.utils.session.SessionNamespace.create_uuid_namespace(session, data={"content": "a nice content"})
+        assert isinstance(ns, itou.utils.session.SessionNamespace)
+        assert str(uuid.UUID(ns.name)) == ns.name
+        assert ns.name in session
+        assert session[ns.name] == {"content": "a nice content"}
 
 
 class TestJSON:
