@@ -135,8 +135,8 @@ class CommonApprovalMixin(models.Model):
             datetime.timedelta(0),
         ) - max(obj.start_at - timezone.localdate(), datetime.timedelta(0))
 
-    def _get_human_readable_estimate(self, dt):
-        res = timeuntil(dt)
+    def _get_human_readable_estimate(self, delta: datetime.timedelta) -> str:
+        res = timeuntil(timezone.localdate() + delta)
         res = res.replace("année", "an")
         res = res.split(", ")
         if any(v in res[0] for v in ["an", "mois"]):
@@ -161,7 +161,7 @@ class CommonApprovalMixin(models.Model):
     def get_remainder_display(self):
         remainder_display = f"{self.remainder.days} jour{pluralizefr(self.remainder.days)}"
         if self.remainder.days:
-            remainder_display += f" ({self._get_human_readable_estimate(self.remainder_as_date)})"
+            remainder_display += f" ({self._get_human_readable_estimate(self.remainder)})"
         return remainder_display
 
     get_remainder_display.short_description = "Reliquat"
