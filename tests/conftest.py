@@ -126,6 +126,14 @@ def preload_contenttype_cache(django_db_setup, django_db_blocker):
 
 
 @pytest.fixture(autouse=True, scope="session")
+def preload_country_france(django_db_setup, django_db_blocker):
+    from itou.asp.models import Country
+
+    with django_db_blocker.unblock():
+        Country.france_id
+
+
+@pytest.fixture(autouse=True, scope="session")
 def test_bucket():
     # TODO: Remove this code block once we stop using a models.URLField() to store a S3 link (ie. `resume_link`)
     from django.core.validators import URLValidator

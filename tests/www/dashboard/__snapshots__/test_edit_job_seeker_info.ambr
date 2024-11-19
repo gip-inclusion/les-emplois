@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestEditJobSeekerInfo.test_edit_by_company_with_nir[view queries]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -296,6 +296,25 @@
       }),
       dict({
         'origin': list([
+          'CustomFieldRenderer.render[utils/custom_renderer.py]',
+          'SimpleNode[dashboard/includes/edit_job_seeker_info_form.html]',
+          'IncludeNode[dashboard/edit_job_seeker_info.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[dashboard/edit_job_seeker_info.html]',
+          'edit_job_seeker_info[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          ORDER BY "asp_country"."name" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -331,7 +350,7 @@
 # ---
 # name: TestEditJobSeekerInfo.test_edit_by_prescriber[view queries]
   dict({
-    'num_queries': 11,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -548,6 +567,28 @@
       }),
       dict({
         'origin': list([
+          'EditJobSeekerInfoForm.__init__[users/forms.py]',
+          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
+          'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
+          'EditJobSeekerInfoForm.__init__[asp/forms.py]',
+          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
+          'edit_job_seeker_info[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id"
+          FROM "asp_commune"
+          WHERE "asp_commune"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'User.has_verified_email[users/models.py]',
           'User.can_edit_email[users/models.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
@@ -560,6 +601,48 @@
                  AND "account_emailaddress"."email" = %s
                  AND "account_emailaddress"."verified")
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
+          'CustomFieldRenderer.render[utils/custom_renderer.py]',
+          'SimpleNode[dashboard/includes/edit_job_seeker_info_form.html]',
+          'IncludeNode[dashboard/edit_job_seeker_info.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[dashboard/edit_job_seeker_info.html]',
+          'edit_job_seeker_info[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id"
+          FROM "asp_commune"
+          WHERE "asp_commune"."id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CustomFieldRenderer.render[utils/custom_renderer.py]',
+          'SimpleNode[dashboard/includes/edit_job_seeker_info_form.html]',
+          'IncludeNode[dashboard/edit_job_seeker_info.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[dashboard/edit_job_seeker_info.html]',
+          'edit_job_seeker_info[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          ORDER BY "asp_country"."name" ASC
         ''',
       }),
       dict({

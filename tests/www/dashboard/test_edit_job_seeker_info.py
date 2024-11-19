@@ -1,3 +1,4 @@
+import datetime
 import math
 
 import pytest
@@ -7,6 +8,7 @@ from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertFormError, assertNotContains, assertRedirects
 
+from itou.asp.models import Commune
 from itou.cities.models import City
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
 from itou.users.models import User
@@ -93,12 +95,15 @@ class TestEditJobSeekerInfo:
             html=True,
         )
 
+        birthdate = datetime.date(1978, 12, 20)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         post_data = {
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
-            "birthdate": "20/12/1978",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         } | self.address_form_fields
 
@@ -110,7 +115,7 @@ class TestEditJobSeekerInfo:
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
         assert job_seeker.first_name == post_data["first_name"]
         assert job_seeker.last_name == post_data["last_name"]
-        assert job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
+        assert job_seeker.jobseeker_profile.birthdate == birthdate
         self._test_address_autocomplete(user=job_seeker, post_data=post_data)
 
         # Optional fields
@@ -158,12 +163,16 @@ class TestEditJobSeekerInfo:
         assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
 
         NEW_NIR = "1 781 22978200508"
+
+        birthdate = datetime.date(1978, 12, 20)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         post_data = {
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
-            "birthdate": "20/12/1978",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "lack_of_nir": False,
             "nir": NEW_NIR,
@@ -209,12 +218,15 @@ class TestEditJobSeekerInfo:
         assert not response.context["form"]["nir"].field.disabled
         assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
 
+        birthdate = datetime.date(1978, 12, 20)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         post_data = {
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
-            "birthdate": "20/12/1978",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "lack_of_nir": False,
         } | self.address_form_fields
@@ -269,7 +281,10 @@ class TestEditJobSeekerInfo:
         assert job_seeker.last_checked_at > previous_last_checked_at
 
     def test_edit_by_prescriber(self, client, snapshot):
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            job_seeker__with_birth_place=True,
+        )
         user = job_application.sender
 
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
@@ -402,12 +417,15 @@ class TestEditJobSeekerInfo:
         response = client.get(url)
         assertContains(response, self.EMAIL_LABEL)
 
+        birthdate = datetime.date(1978, 12, 20)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         post_data = {
             "title": "M",
             "first_name": "Manuel",
             "last_name": "Calavera",
             "email": new_email,
-            "birthdate": "20/12/1978",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         } | self.address_form_fields
 
@@ -459,12 +477,15 @@ class TestEditJobSeekerInfo:
         response = client.get(url)
         assertNotContains(response, self.EMAIL_LABEL)
 
+        birthdate = datetime.date(1978, 12, 20)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         post_data = {
             "title": "M",
             "first_name": "Manuel",
             "last_name": "Calavera",
             "email": new_email,
-            "birthdate": "20/12/1978",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         } | self.address_form_fields
 
@@ -476,7 +497,7 @@ class TestEditJobSeekerInfo:
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
         # The email is not changed, but other fields are taken into account
         assert job_seeker.email != new_email
-        assert job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
+        assert job_seeker.jobseeker_profile.birthdate == birthdate
         assert job_seeker.address_line_1 == post_data["address_line_1"]
         assert job_seeker.post_code == post_data["post_code"]
         assert job_seeker.city == self.city.name
