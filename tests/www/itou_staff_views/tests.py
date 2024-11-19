@@ -3,6 +3,7 @@ import io
 
 import openpyxl
 import pytest
+from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -13,6 +14,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from itou.prescribers.models import PrescriberMembership
 from itou.users.models import User
+from itou.utils.models import PkSupportRemark
 from itou.www.itou_staff_views.forms import DEPARTMENTS_CHOICES
 from tests.approvals.factories import (
     ApprovalFactory,
@@ -327,6 +329,7 @@ class TestMergeUsers:
         assertContains(response, f"Fusion {employer.email} ← {other_employer.email} effectuée")
         assertRedirects(response, reverse("itou_staff_views:merge_users"))
 
+    @freeze_time("2024-11-19")
     def test_merge_personnal_data(self, client, caplog):
         prescriber_1 = PrescriberFactory()
         prescriber_2 = PrescriberFactory()
@@ -349,6 +352,15 @@ class TestMergeUsers:
             "HTTP 302 Found",
         ]
 
+        admin_remark = PkSupportRemark.objects.get(
+            content_type=ContentType.objects.get_for_model(prescriber_1), object_id=prescriber_1.pk
+        )
+        assert admin_remark.remark == (
+            f"2024-11-19: Fusion d'utilisateurs {prescriber_1.email} ← {prescriber_2.email} "
+            "en mettant à jour les infos personnelles"
+        )
+        admin_remark.delete()
+
         caplog.clear()
         prescriber_1.save()
         prescriber_2.save()
@@ -366,6 +378,11 @@ class TestMergeUsers:
             f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — Done !",
             "HTTP 302 Found",
         ]
+
+        admin_remark = PkSupportRemark.objects.get(
+            content_type=ContentType.objects.get_for_model(prescriber_1), object_id=prescriber_1.pk
+        )
+        assert admin_remark.remark == f"2024-11-19: Fusion d'utilisateurs {prescriber_1.email} ← {prescriber_2.email}"
 
     def test_merge_prescriber_memberships(self, client, caplog):
         prescriber_1 = PrescriberFactory()
