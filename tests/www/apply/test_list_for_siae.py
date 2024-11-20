@@ -744,3 +744,19 @@ def test_list_for_siae_exports_download_by_month(client):
     )
     assert 200 == response.status_code
     assert "spreadsheetml" in response.get("Content-Type")
+
+
+@pytest.mark.parametrize(
+    "job_app_kwargs",
+    [
+        pytest.param({"with_approval": True}, id="with_approval"),
+        pytest.param({}, id="with_eligibility_diag"),
+        pytest.param({"eligibility_diagnosis": None}, id="no_eligibility_diag"),
+    ],
+)
+def test_list_for_siae_badge(client, snapshot, job_app_kwargs):
+    job_application = JobApplicationFactory(**job_app_kwargs)
+    client.force_login(job_application.to_company.members.get())
+    response = client.get(reverse("apply:list_for_siae"))
+    badge = parse_response_to_soup(response, selector=".c-box--results__summary span.badge")
+    assert str(badge) == snapshot

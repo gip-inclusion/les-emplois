@@ -1484,6 +1484,30 @@
     ]),
   })
 # ---
+# name: test_list_for_siae_badge[no_eligibility_diag]
+  '''
+  <span class="badge badge-xs rounded-pill bg-accent-02-lighter text-primary">
+                                      <i aria-hidden="true" class="ri-error-warning-line"></i>
+                                      Éligibilité IAE à valider
+                                  </span>
+  '''
+# ---
+# name: test_list_for_siae_badge[with_approval]
+  '''
+  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-pass-valid-line"></i>
+                                  PASS IAE valide
+                              </span>
+  '''
+# ---
+# name: test_list_for_siae_badge[with_eligibility_diag]
+  '''
+  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                      <i aria-hidden="true" class="ri-check-line"></i>
+                                      Éligible à l’IAE
+                                  </span>
+  '''
+# ---
 # name: test_list_for_siae_exports
   '''
   <div class="c-info mb-3 mb-md-4" id="besoin-dun-chiffre">
