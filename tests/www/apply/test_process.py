@@ -431,6 +431,9 @@ class TestProcessViews:
         response = client.get(url)
         assertContains(response, LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER.label, html=True)
 
+        assertContains(response, f"<strong>{job_application.to_company.display_name}</strong>")
+        assertContains(response, reverse("companies_views:card", kwargs={"siae_id": job_application.to_company.pk}))
+
     def test_details_for_prescriber_as_company_when_i_am_not_the_sender(self, client):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         employer = job_application.to_company.members.first()
@@ -508,6 +511,9 @@ class TestProcessViews:
         assertNotContains(response, format_phone(job_application.sender.phone))
 
         assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
+
+        assertContains(response, f"<strong>{job_application.to_company.display_name}</strong>")
+        assertContains(response, reverse("companies_views:card", kwargs={"siae_id": job_application.to_company.pk}))
 
     def test_details_for_job_seeker_as_other_user(self, client, subtests):
         job_application = JobApplicationFactory()
