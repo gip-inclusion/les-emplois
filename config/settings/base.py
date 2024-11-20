@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.gis",
     "django.contrib.postgres",
+    "django.contrib.humanize",
     "django.forms",  # Required to override default Django widgets. See FORM_RENDERER
     # Third party apps.
     "anymail",
