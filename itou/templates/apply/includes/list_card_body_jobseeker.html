@@ -7,7 +7,7 @@
         <i class="ri-user-line" aria-hidden="true"></i>
         <div>
             <span>{{ job_application.to_company.get_kind_display }}</span>
-            <a href="{% url 'companies_views:card' siae_id=job_application.to_company.id %}" class="h3 d-block text-decoration-none">{{ job_application.to_company.display_name }}</a>
+            <h3>{{ job_application.to_company.display_name }}</h3>
             {% if job_application.next_appointment_start_at %}
                 <span {% if job_application.other_appointments_count %} data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{% blocktrans count other_appointments_count=job_application.other_appointments_count %}{{ other_appointments_count }} autre rendez-vous prévu, consultez-le dans le détail de candidature"{% plural %}{{ other_appointments_count }} autres rendez-vous prévus, consultez-les dans le détail de candidature{% endblocktrans%}"{% endif %}>
                     <i class="ri-calendar-line font-weight-normal me-1" aria-hidden="true"></i>

@@ -66,14 +66,11 @@ def test_get(client):
     assert len(response.context["job_applications_page"].object_list) == organization.jobapplication_set.count()
 
     assertContains(response, job_application.job_seeker.get_full_name())
-    assertContains(
-        response, reverse("job_seekers_views:details", kwargs={"public_id": job_application.job_seeker.public_id})
-    )
 
 
 def test_as_unauthorized_prescriber(client, snapshot):
     prescriber = PrescriberFactory()
-    job_application = JobApplicationFactory(
+    JobApplicationFactory(
         job_seeker_with_address=True,
         job_seeker__first_name="Supersecretname",
         job_seeker__last_name="Unknown",
@@ -81,7 +78,7 @@ def test_as_unauthorized_prescriber(client, snapshot):
         sender=prescriber,
         sender_kind=SenderKind.PRESCRIBER,
     )
-    another_job_application = JobApplicationFactory(
+    JobApplicationFactory(
         job_seeker_with_address=True,
         job_seeker__first_name="Liz",
         job_seeker__last_name="Ible",
@@ -95,17 +92,9 @@ def test_as_unauthorized_prescriber(client, snapshot):
     with assertSnapshotQueries(snapshot(name="SQL queries for prescriptions list")):
         response = client.get(list_url)
 
-    job_seeker_detail_url = reverse(
-        "job_seekers_views:details", kwargs={"public_id": job_application.job_seeker.public_id}
-    )
-    assertContains(response, f'<a href="{job_seeker_detail_url}?back_url={list_url}" class="btn-link">S… U…</a>')
+    assertContains(response, "<h3>S… U…</h3>")
     assertNotContains(response, "Supersecretname")
-    another_job_seeker_detail_url = reverse(
-        "job_seekers_views:details", kwargs={"public_id": another_job_application.job_seeker.public_id}
-    )
-    assertContains(
-        response, f'<a href="{another_job_seeker_detail_url}?back_url={list_url}" class="btn-link">Liz IBLE</a>'
-    )
+    assertContains(response, "<h3>Liz IBLE</h3>")
 
 
 def test_filtered_by_state(client):
