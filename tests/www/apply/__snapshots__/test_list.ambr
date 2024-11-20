@@ -32,7 +32,7 @@
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
               <span>Entreprise d'insertion</span>
-              <a class="h3 d-block text-decoration-none" href="/company/42/card">Hit pit</a>
+              <h3>Hit pit</h3>
               
           </div>
       </div>
@@ -95,7 +95,7 @@
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
               <span>Entreprise d'insertion</span>
-              <a class="h3 d-block text-decoration-none" href="/company/42/card">Hit pit</a>
+              <h3>Hit pit</h3>
               
           </div>
       </div>
@@ -163,7 +163,7 @@
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
               <span>Entreprise d'insertion</span>
-              <a class="h3 d-block text-decoration-none" href="/company/42/card">Hit pit</a>
+              <h3>Hit pit</h3>
               
           </div>
       </div>
@@ -244,11 +244,7 @@
       <div class="c-box--results__summary">
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
-              <h3>
-                  
-                      <a class="btn-link" href="/job-seekers/details/00000000-1111-2222-3333-444444444444?back_url=/apply/prescriptions/list">J… H…</a>
-                  
-              </h3>
+              <h3>J… H…</h3>
               <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                   
                   
@@ -326,11 +322,7 @@
       <div class="c-box--results__summary">
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
-              <h3>
-                  
-                      <a class="btn-link" href="/job-seekers/details/00000000-1111-2222-3333-444444444444?back_url=/apply/prescriptions/list">J… H…</a>
-                  
-              </h3>
+              <h3>J… H…</h3>
               <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                   
                   
@@ -413,11 +405,7 @@
       <div class="c-box--results__summary">
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
-              <h3>
-                  
-                      <a class="btn-link" href="/job-seekers/details/00000000-1111-2222-3333-444444444444?back_url=/apply/prescriptions/list">J… H…</a>
-                  
-              </h3>
+              <h3>J… H…</h3>
               <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                   
                   
@@ -512,11 +500,7 @@
       <div class="c-box--results__summary">
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
-              <h3>
-                  
-                      Jacques HENRY
-                  
-              </h3>
+              <h3>Jacques HENRY</h3>
               <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                   
                   
@@ -592,11 +576,7 @@
       <div class="c-box--results__summary">
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
-              <h3>
-                  
-                      Jacques HENRY
-                  
-              </h3>
+              <h3>Jacques HENRY</h3>
               <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                   
                   
@@ -677,11 +657,7 @@
       <div class="c-box--results__summary">
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
-              <h3>
-                  
-                      Jacques HENRY
-                  
-              </h3>
+              <h3>Jacques HENRY</h3>
               <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                   
                   
