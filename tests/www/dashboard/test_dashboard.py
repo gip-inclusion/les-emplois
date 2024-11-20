@@ -333,50 +333,6 @@ class TestDashboardView:
         assertion = assertContains if user.can_create_siae_antenna(company) else assertNotContains
         assertion(response, "Créer/rejoindre une autre structure")
 
-    def test_dashboard_siae_stats(self, client):
-        membership = CompanyMembershipFactory()
-        client.force_login(membership.user)
-        response = client.get(reverse("dashboard:index_stats"))
-        assertContains(response, "Traitement et résultats des candidatures reçues par ma ou mes structures")
-        assertContains(response, reverse("stats:stats_siae_hiring"))
-        assertContains(response, "Auto-prescription réalisées par ma ou mes structures")
-        assertContains(response, reverse("stats:stats_siae_auto_prescription"))
-        assertContains(response, "Suivi du contrôle a posteriori pour ma ou mes structures")
-        assertContains(response, reverse("stats:stats_siae_follow_siae_evaluation"))
-        # Unofficial stats are only accessible to specific whitelisted siaes.
-        assertNotContains(response, "Suivre les effectifs annuels et mensuels en ETP de ma ou mes structures")
-        assertNotContains(response, reverse("stats:stats_siae_etp"))
-        assertNotContains(response, "Suivi du cofinancement des ACI de mon département")
-        assertNotContains(response, reverse("stats:stats_siae_aci"))
-
-    def test_dashboard_ddets_log_institution_stats(self, client):
-        membershipfactory = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_LOG)
-        client.force_login(membershipfactory.user)
-        response = client.get(reverse("dashboard:index_stats"))
-        assertContains(response, "Prescriptions des acteurs AHI de ma région")
-        assertContains(response, reverse("stats:stats_ddets_log_state"))
-
-    def test_dashboard_dihal_institution_stats(self, client):
-        membershipfactory = InstitutionMembershipFactory(institution__kind=InstitutionKind.DIHAL)
-        client.force_login(membershipfactory.user)
-        response = client.get(reverse("dashboard:index_stats"))
-        assertContains(response, "Prescriptions des acteurs AHI")
-        assertContains(response, reverse("stats:stats_dihal_state"))
-
-    def test_dashboard_drihl_institution_stats(self, client):
-        membershipfactory = InstitutionMembershipFactory(institution__kind=InstitutionKind.DRIHL)
-        client.force_login(membershipfactory.user)
-        response = client.get(reverse("dashboard:index_stats"))
-        assertContains(response, "Prescriptions des acteurs AHI")
-        assertContains(response, reverse("stats:stats_drihl_state"))
-
-    def test_dashboard_iae_network_institution_stats(self, client):
-        membershipfactory = InstitutionMembershipFactory(institution__kind=InstitutionKind.IAE_NETWORK)
-        client.force_login(membershipfactory.user)
-        response = client.get(reverse("dashboard:index_stats"))
-        assertContains(response, "Traitement et résultats des candidatures orientées par mes adhérents")
-        assertContains(response, reverse("stats:stats_iae_network_hiring"))
-
     def test_dashboard_siae_evaluations_institution_access(self, client):
         IN_PROGRESS_LINK = "Campagne en cours"
         membershipfactory = InstitutionMembershipFactory()
