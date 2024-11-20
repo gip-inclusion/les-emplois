@@ -415,8 +415,9 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
 
     def notify_pole_emploi(self):
         at = timezone.now()
-        if self.start_at > at.date():
-            self.pe_log_err("start_at={} starts after today={}", self.start_at, at.date())
+        today = timezone.localdate(at)
+        if self.start_at > today:
+            self.pe_log_err("start_at={} starts after today={}", self.start_at, today)
             self.pe_save_pending(
                 api_enums.PEApiPreliminaryCheckFailureReason.STARTS_IN_FUTURE,
                 at,
