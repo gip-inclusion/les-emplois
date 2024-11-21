@@ -67,7 +67,7 @@
   <section aria-labelledby="job-seekers-list-count" id="job-seekers-section">
       
           <div class="text-center my-3 my-md-4">
-              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-siae-card-no-result.svg"/>
+              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-siae-card-no-result.png"/>
               <p class="mb-1 mt-3">
                   <strong>Aucun candidat pour le moment</strong>
               </p>

@@ -106,6 +106,21 @@ def report_tally_url(user, company, job_description=None):
     return add_url_params(base_url, params)
 
 
+### Main company view
+
+
+@login_required
+def overview(request, template_name="companies/overview.html"):
+    company = get_current_company_or_404(request)
+
+    context = {
+        "company": company,
+        "can_show_financial_annexes": company.convention_can_be_accessed_by(request.user),
+        "back_url": reverse("dashboard:index"),
+    }
+    return render(request, template_name, context)
+
+
 ### Job description views
 
 
@@ -529,7 +544,11 @@ def edit_company_step_contact_infos(request, template_name="companies/edit_siae.
         request.session.modified = True
         return HttpResponseRedirect(reverse("companies_views:edit_company_step_description"))
 
-    context = {"form": form, "siae": company}
+    context = {
+        "form": form,
+        "siae": company,
+        "reset_url": get_safe_url(request, "back_url", reverse("dashboard:index")),
+    }
     return render(request, template_name, context)
 
 

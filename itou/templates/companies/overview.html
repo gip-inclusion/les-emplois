@@ -1,0 +1,114 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% load str_filters %}
+{% load markdownify %}
+{% load matomo %}
+
+{% block title %}Présentation {{ block.super }}{% endblock %}
+
+{% block title_prevstep %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}<h1>Structure</h1>{% endblock %}
+
+{% block title_extra %}
+    <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'companies_views:overview' %}" {% matomo_event "employeurs" "clic" "structure-presentation" %}>
+                Présentation
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'companies_views:job_description_list' %}" {% matomo_event "employeurs" "clic" "voir-liste-metiers" %}>
+                Métiers et recrutements
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'companies_views:members' %}" {% matomo_event "employeurs" "clic" "gerer-collaborateurs" %}>
+                Collaborateurs
+            </a>
+        </li>
+        {% if can_show_financial_annexes %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'companies_views:show_financial_annexes' %}">Annexes financières</a>
+            </li>
+        {% endif %}
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <div class="tab-content">
+                        <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3 mb-lg-4">
+                            <h2 class="mb-0">Présentation</h2>
+                            <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur la structure">
+                                <a class="btn btn-outline-primary btn-ico"
+                                   href="{{ request.current_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}"
+                                   {% matomo_event "employeurs" "clic" "voir-infos-entreprise" %}>
+                                    <i class="ri-eye-line ri-lg" aria-hidden="true"></i>
+                                    <span>Voir la fiche publique</span>
+                                </a>
+                                <a class="btn btn-primary btn-ico"
+                                   href="{% url 'companies_views:edit_company_step_contact_infos' %}?back_url={{ request.get_full_path|urlencode }}"
+                                   {% matomo_event "employeurs" "clic" "modifier-infos-entreprise" %}>
+                                    <i class="ri-pencil-line ri-lg" aria-hidden="true"></i>
+                                    <span>Modifier</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-lg-8 order-2 order-lg-1">
+                                <div class="c-box h-100 {% if not company.description and not company.provided_support %}d-flex align-items-center justify-content-center{% endif %}">
+                                    {% if company.description %}
+                                        <article class="mb-3 mb-lg-5">
+                                            <h3>Son activité</h3>
+                                            {{ company.description|markdownify }}
+                                        </article>
+                                    {% endif %}
+
+                                    {% if company.provided_support %}
+                                        <article>
+                                            <h3>L'accompagnement proposé</h3>
+                                            {{ company.provided_support|markdownify }}
+                                        </article>
+                                    {% endif %}
+
+                                    {% if not company.description and not company.provided_support %}
+                                        <div class="text-center">
+                                            <img class="img-fluid" src="{% static 'img/illustration-siae-card-no-result.png' %}" alt="" loading="lazy">
+                                            <p class="mb-0 mt-3">
+                                                <strong>Oups ! Aucune information en vue !</strong>
+                                            </p>
+                                            <p>
+                                                <i>Vous n’avez pas encore renseigné d’informations
+                                                    <br class="d-none d-lg-inline">
+                                                    à propos de votre structure.
+                                                </i>
+                                            </p>
+                                            <a class="btn btn-sm btn-primary btn-ico" href="{% url 'companies_views:edit_company_step_contact_infos' %}?back_url={{ request.get_full_path|urlencode }}">
+                                                <i class="ri-pencil-line ri-lg" aria-hidden="true"></i>
+                                                <span>Modifier</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-4 order-1 order-lg-2">
+                                {% include "companies/includes/_company_info.html" with company=company show=True show_cta=False extra_box_class="mb-3 mb-lg-5" %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js'%}"></script>
+{% endblock %}
