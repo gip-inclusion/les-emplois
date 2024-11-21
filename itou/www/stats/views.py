@@ -14,15 +14,12 @@ make sure that the correct filters are "Verrouillé".
 
 """
 
-import datetime
-
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils import timezone
 
 from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import (
@@ -137,10 +134,10 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
         base_context["pilotage_webinar_banners"] = [
             {
                 "title": "Des questions sur l’utilisation des tableaux de bord ?",
-                "description": "Nous y répondons lors d’un webinaire questions / réponses animé chaque mois.<br /> Dates des prochaines sessions : jeudi 24 octobre ou jeudi 21 novembre de 14h à 14h45.",  # noqa: E501
+                "description": "Nous y répondons lors d’un webinaire questions / réponses animé chaque mois.",  # noqa: E501
                 "call_to_action": "Je m’inscris",
                 "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-professionnels-de-liae-questions-reponses-sur-les-tableaux-de-bord-1",
-                "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 11, 21),
+                "is_displayable": lambda: True,
             }
         ]
     base_context["pilotage_webinar_banners"] = [
