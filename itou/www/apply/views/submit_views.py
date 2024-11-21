@@ -306,6 +306,13 @@ class StartView(ApplyStepBaseView):
 class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
     template_name = "apply/submit_step_pending_authorization.html"
 
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": self.company.pk})
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {"next_url": self.next_url}
+
 
 class CheckPreviousApplications(ApplicationBaseView):
     """

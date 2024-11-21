@@ -29,8 +29,7 @@
                             <strong>Êtes-vous certain de vouloir continuer ?</strong>
                         </div>
                         {% url 'search:employers_home' as reset_url %}
-                        {% url 'job_seekers_views:check_nir_for_sender' company_pk=siae.pk as primary_url %}
-                        {% itou_buttons_form primary_label="Suivant" primary_url=primary_url reset_url=reset_url %}
+                        {% itou_buttons_form primary_label="Suivant" primary_url=next_url reset_url=reset_url %}
                     </div>
                 </div>
             </div>
