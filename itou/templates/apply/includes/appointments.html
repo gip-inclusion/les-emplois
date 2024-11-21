@@ -1,4 +1,5 @@
 {% load datetime_filters %}
+{% load matomo %}
 
 {% if request.user.is_employer %}
     {% include "apply/includes/invitation_requests.html" with job_application=job_application invitation_requests=invitation_requests %}
@@ -26,7 +27,7 @@
                         <td>{{ participation.appointment.start_at }}</td>
                         <td>{{ participation.appointment.reason }}</td>
                         <td id="participation-{{ participation.pk }}-row" class="text-end w-50px">
-                            <button type="button" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="modal" data-bs-target="#participation-{{ participation.pk }}-modal">
+                            <button type="button" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="modal" data-bs-target="#participation-{{ participation.pk }}-modal" {% matomo_event "candidature" "clic" "visualisation-rdv" %}>
                                 <i class="ri-search-line" data-bs-toggle="tooltip" data-bs-title="Voir"></i>
                             </button>
                             <div class="modal modal--mini fade text-start" id="participation-{{ participation.pk }}-modal" tabindex="-1" aria-labelledby="participation-{{ participation.pk }}-modal-title" aria-hidden="true">
