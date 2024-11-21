@@ -116,7 +116,7 @@
                     {# SIAE card #}
                     {% with siae=prolongation_request.declared_by_siae %}
                         {% if siae %}
-                            {% include "companies/includes/_company_info.html" with company=siae only %}
+                            {% include "companies/includes/_company_info.html" with company=siae show_cta=True only %}
                         {% endif %}
                     {% endwith %}
                 </div>

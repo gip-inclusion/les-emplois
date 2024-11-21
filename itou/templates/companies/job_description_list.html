@@ -9,7 +9,12 @@
 {% block title_content %}<h1>Structure</h1>{% endblock %}
 
 {% block title_extra %}
-    <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+    <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="1">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'companies_views:overview' %}" {% matomo_event "employeurs" "clic" "structure-presentation" %}>
+                Présentation
+            </a>
+        </li>
         <li class="nav-item">
             <a class="nav-link active" href="{% url 'companies_views:job_description_list' %}" {% matomo_event "employeurs" "clic" "voir-liste-metiers" %}>
                 Métiers et recrutements

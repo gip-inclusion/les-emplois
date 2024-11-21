@@ -925,7 +925,7 @@
                       
                           <hr class="my-3"/>
                           <div class="text-center my-3 my-md-4">
-                              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-siae-card-no-result.svg"/>
+                              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-siae-card-no-result.png"/>
                               <p class="mb-1 mt-3">
                                   <strong>Aucune demande de prolongation pour le moment</strong>
                               </p>
@@ -1720,10 +1720,12 @@
           </ul>
           
               
-              
                   
+                  
+                      
+                  
+                  <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
               
-              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
           
       </div>
   </div>
@@ -1961,10 +1963,12 @@
           </ul>
           
               
-              
                   
+                  
+                      
+                  
+                  <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
               
-              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
           
       </div>
   </div>
@@ -2225,10 +2229,12 @@
           </ul>
           
               
-              
                   
+                  
+                      
+                  
+                  <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
               
-              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
           
       </div>
   </div>

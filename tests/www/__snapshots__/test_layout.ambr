@@ -327,6 +327,11 @@
                       <ul>
                           
                               <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="structure-presentation" href="/company/overview">
+                                  Présentation</a>
+                              </li>
+                          
+                              <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="metiers-recrutement" href="/company/job_description_list">
                                   Métiers et recrutements</a>
                               </li>

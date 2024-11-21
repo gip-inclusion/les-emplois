@@ -149,6 +149,14 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="fiches-salaries-asp",
     ),
+    "employer-company": NavItem(
+        label="Présentation",
+        target=reverse("companies_views:overview"),
+        active_view_names=["companies_views:overview"],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="structure-presentation",
+    ),
     "employer-jobs": NavItem(
         label="Métiers et recrutements",
         target=reverse("companies_views:job_description_list"),
@@ -221,7 +229,7 @@ def nav(request):
                 if request.current_organization.can_use_employee_record:
                     employee_group_items.append(NAV_ENTRIES["employer-employee-records"])
                 menu_items.append(NavGroup(label="Salariés", icon="ri-team-line", items=employee_group_items))
-            company_group_items = [NAV_ENTRIES["employer-jobs"]]
+            company_group_items = [NAV_ENTRIES["employer-company"], NAV_ENTRIES["employer-jobs"]]
             if request.current_organization.is_active:
                 company_group_items.append(NAV_ENTRIES["employer-members"])
             if request.current_organization.convention_can_be_accessed_by(request.user):
