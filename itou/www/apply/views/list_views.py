@@ -121,7 +121,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
         job_applications = filters_form.filter(job_applications)
         filters_counter = filters_form.get_qs_filters_counter()
 
-    job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=50)
+    job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=20)
     _add_pending_for_weeks(job_applications_page)
 
     # The candidate has obviously access to its personal info
@@ -178,7 +178,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         filters_counter = filters_form.get_qs_filters_counter()
         title = annotate_title(title, filters_form.cleaned_data["archived"])
 
-    job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=50)
+    job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=20)
     _add_pending_for_weeks(job_applications_page)
     _add_user_can_view_personal_information(job_applications_page, request.user.can_view_personal_information)
     _add_administrative_criteria(job_applications_page)
@@ -301,7 +301,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         - 1,  # Exclude the next appointment
     )
 
-    job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=50)
+    job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=20)
     _add_pending_for_weeks(job_applications_page)
 
     # SIAE members have access to personal info
