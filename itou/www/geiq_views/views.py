@@ -227,7 +227,7 @@ def employee_list(request, assessment_pk, info_type):
 
     context = {
         "active_tab": info_type,
-        "data_page": pager(queryset, request.GET.get("page"), items_per_page=50),
+        "data_page": pager(queryset, request.GET.get("page"), items_per_page=20),
         "InfoType": InfoType,
         "assessment": assessment,
         "back_url": get_safe_url(

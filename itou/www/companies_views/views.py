@@ -227,7 +227,7 @@ def job_description_list(request, template_name="companies/job_description_list.
 
         return HttpResponseRedirect(f"{reverse('companies_views:job_description_list')}?page={page}")
 
-    job_pager = pager(job_descriptions, page, items_per_page=50)
+    job_pager = pager(job_descriptions, page, items_per_page=20)
 
     context = {
         "siae": company,
