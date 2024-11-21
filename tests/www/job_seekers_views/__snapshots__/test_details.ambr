@@ -163,7 +163,7 @@
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
               
                   
-                      <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary">
+                      <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                           <i aria-hidden="true" class="ri-check-line"></i>Éligibilité GEIQ non confirmée
                       </span>
                   
