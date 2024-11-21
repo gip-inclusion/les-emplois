@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block title_content %}
-    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between align-items-md-center">
+    <div class="d-flex flex-column flex-md-row gap-3 mb-3 mb-md-4 justify-content-md-between align-items-md-center">
         <h1 class="m-0">Mes bénéficiaires</h1>
         <div class="d-flex flex-column flex-md-row gap-md-3" role="group" aria-label="Actions sur les groupes de suivi">
             <a href='{% tally_form_url form_id="w5kLqM" user_public_id=user.public_id user_first_name=user.first_name user_last_name=user.last_name %}&{% if request.current_organization %}&user_organization_uid={{ request.current_organization.uid }}&user_organization_name={{ request.current_organization.display_name }}{% endif %}'
@@ -40,13 +40,13 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="col-12">
-                    <div class="d-flex flex-column flex-md-row my-3 my-md-4 gap-3 align-items-md-center">
-                        <h3 class="h4 mb-0 flex-grow-1" id="results">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                        <p class="mb-0 flex-grow-1" id="results">
                             {% with memberships_page.paginator.count as counter %}
                                 {{ counter }} bénéficiaire{{ counter|pluralizefr }} suivi{{ counter|pluralizefr }}
                             {% endwith %}
-                        </h3>
-                        <form class="px-md-3"
+                        </p>
+                        <form class="flex-column flex-md-row mt-3 mt-md-0"
                               hx-get="{{ request.path }}"
                               hx-trigger="change delay:.5s, duetChange delay:.5s, change from:#id_beneficiary"
                               hx-indicator="#follow-up-groups-section"
@@ -61,24 +61,25 @@
                 <div class="col-12">{% include "gps/includes/memberships_results.html" with memberships_page=memberships_page %}</div>
             </div>
         </div>
+    </section>
+{% endblock %}
 
-        <div id="confirm_modal" class="modal fade" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title"></h3>
-                    </div>
-                    <div class="modal-body"></div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
-                        <a href="" class="modal-confirm btn btn-sm"></a>
-                    </div>
+{% block modals %}
+    <div id="confirm_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title"></h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                    <a href="" class="modal-confirm btn btn-sm btn-primary"></a>
                 </div>
             </div>
         </div>
-
-    </section>
-
+    </div>
 {% endblock %}
 
 {% block script %}
@@ -97,7 +98,6 @@
                 var body = button.getAttribute('data-bs-body');
                 var confirmText = button.getAttribute('data-bs-confirm-text');
                 var confirmUrl = button.getAttribute('data-bs-confirm-url');
-                var confirmClass = button.getAttribute('data-bs-confirm-class');
 
                 // Update the modal's content.
                 var modalTitle = confirmModal.querySelector('.modal-title');
@@ -107,7 +107,6 @@
                 modalTitle.textContent = title;
                 modalBody.textContent = body;
                 modalConfirm.textContent = confirmText;
-                modalConfirm.classList.add(confirmClass);
                 modalConfirm.href = confirmUrl;
             })
         });
