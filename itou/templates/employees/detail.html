@@ -31,7 +31,8 @@
                         <hr>
                         {% matomo_event "salaries" "clic" "voir-candidature-employeur" as matomo_event_attrs %}
                         {% for job_application_for_card in all_job_applications %}
-                            {% include "apply/includes/job_application_box_for_user.html" with job_application=job_application_for_card matomo_event_attrs=matomo_event_attrs %}
+                            {% url 'apply:details_for_company' job_application_id=job_application_for_card.id as detail_url %}
+                            {% include "apply/includes/job_application_box_for_user.html" with job_application=job_application_for_card detail_url=detail_url matomo_event_attrs=matomo_event_attrs %}
                         {% endfor %}
                     </div>
                 </div>
