@@ -20,19 +20,6 @@
 <hr class="m-0">
 <div class="c-box--results__body">
     <div class="c-box--results__list-data">
-        {% if job_application.preloaded_administrative_criteria %}
-            <div class="col-12 col-lg-7 mb-3 mb-lg-0">
-                <p class="h5">Critères administratifs IAE</p>
-                <div class="mb-3 mb-md-4">
-                    <ul>
-                        {% for criteria in job_application.preloaded_administrative_criteria %}<li>{{ criteria.name }}</li>{% endfor %}
-                    </ul>
-                    {% if job_application.preloaded_administrative_criteria_extra_nb %}
-                        <span>+ {{ job_application.preloaded_administrative_criteria_extra_nb }} autres critères</span>
-                    {% endif %}
-                </div>
-            </div>
-        {% endif %}
         {% include "approvals/includes/job_description_list.html" with job_application=job_application %}
     </div>
 </div>
