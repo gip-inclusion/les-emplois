@@ -1,6 +1,7 @@
 from django import template
 from django.utils.safestring import mark_safe
 
+from itou.approvals.enums import ApprovalStatus
 from itou.job_applications.enums import JobApplicationState
 
 
@@ -36,3 +37,43 @@ def job_application_state_badge(job_application, *, hx_swap_oob=False, extra_cla
               <i class="ri-archive-line mx-0"></i>
             </span>{badge}"""
     return mark_safe(badge)
+
+
+@register.simple_tag
+def approval_state_badge(
+    approval, *, force_valid=False, in_approval_box=False, span_extra_class="badge-sm", icon_extra_class=""
+):
+    # If force_valid is set to True, ignore the provided approval and display a VALID state
+    # It is mainly used to show a VALID state to employers instead of SUSPENDED
+    # which can be confusing.
+    approval_state = ApprovalStatus.VALID if force_valid else approval.state
+    if in_approval_box:
+        span_class = {
+            ApprovalStatus.EXPIRED: "bg-danger text-white",
+            ApprovalStatus.FUTURE: "bg-success text-white",
+            ApprovalStatus.SUSPENDED: "bg-info text-white",
+            ApprovalStatus.VALID: "bg-success text-white",
+        }[approval_state]
+    else:
+        span_class = {
+            ApprovalStatus.EXPIRED: "bg-emploi-light text-primary",
+            ApprovalStatus.FUTURE: "bg-success-lighter text-success",
+            ApprovalStatus.SUSPENDED: "bg-success-lighter text-success",
+            ApprovalStatus.VALID: "bg-success-lighter text-success",
+        }[approval_state]
+    icon_class = {
+        ApprovalStatus.EXPIRED: "ri-pass-expired-line",
+        ApprovalStatus.FUTURE: "ri-pass-valid-line",
+        ApprovalStatus.SUSPENDED: "ri-pass-pending-line",
+        ApprovalStatus.VALID: "ri-pass-valid-line",
+    }[approval_state]
+    if icon_extra_class:
+        icon_class = f"{icon_class} {icon_extra_class}"
+    approval_type = "PASS IAE" if approval.is_pass_iae else "Agrément"
+    return mark_safe(
+        f"""\
+            <span class="badge {span_extra_class} rounded-pill { span_class }">
+                <i class="{ icon_class }" aria-hidden="true"></i>
+                {approval_type} { approval_state.label.lower()}
+            </span>"""
+    )

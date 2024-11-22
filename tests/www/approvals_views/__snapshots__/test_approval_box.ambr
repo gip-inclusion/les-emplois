@@ -4,13 +4,12 @@
   
   
   
+  
   <div class="c-box c-box--pass bg-danger-lightest border-danger ">
-      <div class="mb-3 mb-md-4">
-          <span class="badge badge-base rounded-pill bg-danger text-white">
-              <i class="ri-pass-expired-line" aria-hidden="true"></i>
-              PASS IAE expiré
-          </span>
-      </div>
+      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-danger text-white">
+                  <i class="ri-pass-expired-line" aria-hidden="true"></i>
+                  PASS IAE expiré
+              </span></div>
       <ul class="list-data">
           <li class="order-1">
               <small>Numéro de PASS IAE</small>
@@ -43,13 +42,12 @@
   
   
   
+  
   <div class="c-box c-box--pass bg-danger-lightest border-danger ">
-      <div class="mb-3 mb-md-4">
-          <span class="badge badge-base rounded-pill bg-danger text-white">
-              <i class="ri-pass-expired-line" aria-hidden="true"></i>
-              PASS IAE expiré
-          </span>
-      </div>
+      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-danger text-white">
+                  <i class="ri-pass-expired-line" aria-hidden="true"></i>
+                  PASS IAE expiré
+              </span></div>
       <ul class="list-data">
           <li class="order-1">
               <small>Numéro de PASS IAE</small>
@@ -94,13 +92,12 @@
   
   
   
+  
   <div class="c-box c-box--pass bg-danger-lightest border-danger ">
-      <div class="mb-3 mb-md-4">
-          <span class="badge badge-base rounded-pill bg-danger text-white">
-              <i class="ri-pass-expired-line" aria-hidden="true"></i>
-              PASS IAE expiré
-          </span>
-      </div>
+      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-danger text-white">
+                  <i class="ri-pass-expired-line" aria-hidden="true"></i>
+                  PASS IAE expiré
+              </span></div>
       <ul class="list-data">
           <li class="order-1">
               <small>Numéro de PASS IAE</small>
@@ -145,13 +142,12 @@
   
   
   
+  
   <div class="c-box c-box--pass bg-danger-lightest border-danger ">
-      <div class="mb-3 mb-md-4">
-          <span class="badge badge-base rounded-pill bg-danger text-white">
-              <i class="ri-pass-expired-line" aria-hidden="true"></i>
-              PASS IAE expiré
-          </span>
-      </div>
+      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-danger text-white">
+                  <i class="ri-pass-expired-line" aria-hidden="true"></i>
+                  PASS IAE expiré
+              </span></div>
       <ul class="list-data">
           <li class="order-1">
               <small>Numéro de PASS IAE</small>
@@ -196,13 +192,12 @@
   
   
   
+  
   <div class="c-box c-box--pass bg-danger-lightest border-danger ">
-      <div class="mb-3 mb-md-4">
-          <span class="badge badge-base rounded-pill bg-danger text-white">
-              <i class="ri-pass-expired-line" aria-hidden="true"></i>
-              PASS IAE expiré
-          </span>
-      </div>
+      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-danger text-white">
+                  <i class="ri-pass-expired-line" aria-hidden="true"></i>
+                  PASS IAE expiré
+              </span></div>
       <ul class="list-data">
           <li class="order-1">
               <small>Numéro de PASS IAE</small>
@@ -247,13 +242,12 @@
   
   
   
+  
   <div class="c-box c-box--pass bg-danger-lightest border-danger ">
-      <div class="mb-3 mb-md-4">
-          <span class="badge badge-base rounded-pill bg-danger text-white">
-              <i class="ri-pass-expired-line" aria-hidden="true"></i>
-              Agrément expiré
-          </span>
-      </div>
+      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-danger text-white">
+                  <i class="ri-pass-expired-line" aria-hidden="true"></i>
+                  Agrément expiré
+              </span></div>
       <ul class="list-data">
           <li class="order-1">
               <small>Numéro d’agrément</small>
@@ -281,13 +275,12 @@
   
   
   
+  
   <div class="c-box c-box--pass bg-success-lightest border-success ">
-      <div class="mb-3 mb-md-4">
-          <span class="badge badge-base rounded-pill bg-success text-white">
-              <i class="ri-pass-valid-line" aria-hidden="true"></i>
-              PASS IAE valide (non démarré)
-          </span>
-      </div>
+      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-success text-white">
+                  <i class="ri-pass-valid-line" aria-hidden="true"></i>
+                  PASS IAE valide (non démarré)
+              </span></div>
       <ul class="list-data">
           <li class="order-1">
               <small>Numéro de PASS IAE</small>
@@ -330,13 +323,12 @@
   
   
   
+  
   <div class="c-box c-box--pass bg-info-lightest border-info ">
-      <div class="mb-3 mb-md-4">
-          <span class="badge badge-base rounded-pill bg-info text-white">
-              <i class="ri-pass-pending-line" aria-hidden="true"></i>
-              PASS IAE valide (suspendu)
-          </span>
-      </div>
+      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-info text-white">
+                  <i class="ri-pass-pending-line" aria-hidden="true"></i>
+                  PASS IAE valide (suspendu)
+              </span></div>
       <ul class="list-data">
           <li class="order-1">
               <small>Numéro de PASS IAE</small>
@@ -391,13 +383,12 @@
   
   
   
+  
   <div class="c-box c-box--pass bg-success-lightest border-success ">
-      <div class="mb-3 mb-md-4">
-          <span class="badge badge-base rounded-pill bg-success text-white">
-              <i class="ri-pass-valid-line" aria-hidden="true"></i>
-              PASS IAE valide
-          </span>
-      </div>
+      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-success text-white">
+                  <i class="ri-pass-valid-line" aria-hidden="true"></i>
+                  PASS IAE valide
+              </span></div>
       <ul class="list-data">
           <li class="order-1">
               <small>Numéro de PASS IAE</small>
@@ -439,13 +430,12 @@
   
   
   
+  
   <div class="c-box c-box--pass bg-success-lightest border-success ">
-      <div class="mb-3 mb-md-4">
-          <span class="badge badge-base rounded-pill bg-success text-white">
-              <i class="ri-pass-valid-line" aria-hidden="true"></i>
-              PASS IAE valide
-          </span>
-      </div>
+      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-success text-white">
+                  <i class="ri-pass-valid-line" aria-hidden="true"></i>
+                  PASS IAE valide
+              </span></div>
       <ul class="list-data">
           <li class="order-1">
               <small>Numéro de PASS IAE</small>
@@ -502,13 +492,12 @@
   
   
   
+  
   <div class="c-box c-box--pass bg-success-lightest border-success ">
-      <div class="mb-3 mb-md-4">
-          <span class="badge badge-base rounded-pill bg-success text-white">
-              <i class="ri-pass-valid-line" aria-hidden="true"></i>
-              Agrément valide
-          </span>
-      </div>
+      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-success text-white">
+                  <i class="ri-pass-valid-line" aria-hidden="true"></i>
+                  Agrément valide
+              </span></div>
       <ul class="list-data">
           <li class="order-1">
               <small>Numéro d’agrément</small>

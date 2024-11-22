@@ -2,12 +2,10 @@
 # name: TestApprovalDetailView.test_approval_detail_box[expired approval]
   '''
   <div class="c-box c-box--pass bg-danger-lightest border-danger mb-3 mb-md-4">
-      <div class="mb-3 mb-md-4">
-          <span class="badge badge-base rounded-pill bg-danger text-white">
-              <i aria-hidden="true" class="ri-pass-expired-line"></i>
-              PASS IAE expiré
-          </span>
-      </div>
+      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-danger text-white">
+                  <i aria-hidden="true" class="ri-pass-expired-line"></i>
+                  PASS IAE expiré
+              </span></div>
       <ul class="list-data list-data__two-column-lg">
           <li class="order-1">
               <small>Numéro de PASS IAE</small>
@@ -31,12 +29,10 @@
 # name: TestApprovalDetailView.test_approval_detail_box[future approval]
   '''
   <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
-      <div class="mb-3 mb-md-4">
-          <span class="badge badge-base rounded-pill bg-success text-white">
-              <i aria-hidden="true" class="ri-pass-valid-line"></i>
-              PASS IAE valide (non démarré)
-          </span>
-      </div>
+      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-success text-white">
+                  <i aria-hidden="true" class="ri-pass-valid-line"></i>
+                  PASS IAE valide (non démarré)
+              </span></div>
       <ul class="list-data list-data__two-column-lg">
           <li class="order-1">
               <small>Numéro de PASS IAE</small>
@@ -68,12 +64,10 @@
 # name: TestApprovalDetailView.test_approval_detail_box[in progress approval from pe approval]
   '''
   <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
-      <div class="mb-3 mb-md-4">
-          <span class="badge badge-base rounded-pill bg-success text-white">
-              <i aria-hidden="true" class="ri-pass-valid-line"></i>
-              PASS IAE valide
-          </span>
-      </div>
+      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-success text-white">
+                  <i aria-hidden="true" class="ri-pass-valid-line"></i>
+                  PASS IAE valide
+              </span></div>
       <ul class="list-data list-data__two-column-lg">
           <li class="order-1">
               <small>Numéro de PASS IAE</small>
@@ -105,12 +99,10 @@
 # name: TestApprovalDetailView.test_approval_detail_box[suspended approval]
   '''
   <div class="c-box c-box--pass bg-info-lightest border-info mb-3 mb-md-4">
-      <div class="mb-3 mb-md-4">
-          <span class="badge badge-base rounded-pill bg-info text-white">
-              <i aria-hidden="true" class="ri-pass-pending-line"></i>
-              PASS IAE valide (suspendu)
-          </span>
-      </div>
+      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-info text-white">
+                  <i aria-hidden="true" class="ri-pass-pending-line"></i>
+                  PASS IAE valide (suspendu)
+              </span></div>
       <ul class="list-data list-data__two-column-lg">
           <li class="order-1">
               <small>Numéro de PASS IAE</small>

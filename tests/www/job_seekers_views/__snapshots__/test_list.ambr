@@ -445,6 +445,7 @@
                               </td>
                               <td>
                                   
+  
       
           <span class="badge badge-base rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
@@ -473,6 +474,7 @@
                               </td>
                               <td>
                                   
+  
       
           <span class="badge badge-base rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
@@ -501,11 +503,12 @@
                               </td>
                               <td>
                                   
+  
       
-          <span class="badge badge-base rounded-pill bg-success-lighter text-success">
-              <i aria-hidden="true" class="ri-pass-valid-line"></i>
-              PASS IAE valide
-          </span>
+                      <span class="badge badge-base rounded-pill bg-success-lighter text-success">
+                  <i aria-hidden="true" class="ri-pass-valid-line"></i>
+                  PASS IAE valide
+              </span>
       
   
   
@@ -529,6 +532,7 @@
                               </td>
                               <td>
                                   
+  
       
           <span class="badge badge-base rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>

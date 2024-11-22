@@ -1,3 +1,4 @@
+{% load badges %}
 {% load format_filters %}
 {% load str_filters %}
 {% load matomo %}
@@ -14,11 +15,7 @@
                 <h3>{{ approval.user.get_full_name }}</h3>
 
                 <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                    <span class="badge badge-sm rounded-pill text-wrap {% if approval.state == 'EXPIRED' %} bg-emploi-light text-primary{% else %} bg-success-lighter text-success{% endif %}">
-                        <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %} ri-xl" aria-hidden="true"></i>
-                        PASS IAE {{ approval.get_state_display|lower }}
-                    </span>
-
+                    {% approval_state_badge approval span_extra_class="badge-sm text-wrap" icon_extra_class="ri-xl" %}
                 </div>
 
             </div>
