@@ -1,4 +1,4 @@
-{% load job_applications %}
+{% load badges %}
 
 <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
     <p class="fs-sm mb-0 flex-grow-1">
@@ -40,5 +40,5 @@
             </a>
         {% endif %}
     </p>
-    <div>{% state_badge job_application %}</div>
+    <div>{% job_application_state_badge job_application %}</div>
 </div>
