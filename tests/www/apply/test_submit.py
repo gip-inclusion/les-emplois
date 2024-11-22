@@ -125,19 +125,28 @@ class TestApply:
             response = client.get(url)
             assertRedirects(response, reverse("account_login") + f"?next={url}")
 
-    def test_we_raise_a_permission_denied_on_missing_session(self, client):
+    def test_we_raise_a_404_on_missing_session(self, client):
         user = JobSeekerFactory()
-        company = CompanyFactory(with_jobs=True)
-
         client.force_login(user)
+
         response = client.get(
             reverse(
-                "job_seekers_views:search_by_email_for_sender",
+                "job_seekers_views:search_by_email_for_hire",
+                kwargs={"session_uuid": str(uuid.uuid4())},
+            )
+        )
+        assert response.status_code == 404
+
+        # TODO(ewen): to remove when migration is done. This view should work with and without the company_pk kwarg
+        company = CompanyFactory(with_jobs=True)
+
+        response = client.get(
+            reverse(
+                "job_seekers_views:search_by_email_for_hire",
                 kwargs={"company_pk": company.pk, "session_uuid": str(uuid.uuid4())},
             )
         )
-        assert response.status_code == 403
-        assert response.context["exception"] == "A session namespace doesn't exist."
+        assert response.status_code == 404
 
     def test_we_raise_a_permission_denied_on_missing_temporary_session_for_create_job_seeker(self, client, subtests):
         routes = {
@@ -234,19 +243,28 @@ class TestHire:
             response = client.get(url)
             assertRedirects(response, reverse("account_login") + f"?next={url}")
 
-    def test_we_raise_a_permission_denied_on_missing_session(self, client):
+    def test_we_raise_a_404_on_missing_session(self, client):
         user = JobSeekerFactory()
+        client.force_login(user)
+
+        response = client.get(
+            reverse(
+                "job_seekers_views:search_by_email_for_hire",
+                kwargs={"session_uuid": str(uuid.uuid4())},
+            )
+        )
+        assert response.status_code == 404
+
+        # TODO(ewen): to remove when migration is done. This view should work with and without the company_pk kwarg
         company = CompanyFactory(with_jobs=True)
 
-        client.force_login(user)
         response = client.get(
             reverse(
                 "job_seekers_views:search_by_email_for_hire",
                 kwargs={"company_pk": company.pk, "session_uuid": str(uuid.uuid4())},
             )
         )
-        assert response.status_code == 403
-        assert response.context["exception"] == "A session namespace doesn't exist."
+        assert response.status_code == 404
 
     def test_we_raise_a_permission_denied_on_missing_temporary_session_for_create_job_seeker(self, client, subtests):
         routes = {
@@ -874,7 +892,7 @@ class TestApplyAsAuthorizedPrescriber:
 
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"session_uuid": job_seeker_session_name},
         )
         expected_job_seeker_session = {
             "config": {
@@ -910,6 +928,32 @@ class TestApplyAsAuthorizedPrescriber:
         )
         assert response.url == next_url
 
+        # TODO(ewen): to remove when migration is done. This view should work with and without the company_pk kwarg
+        # Step get job seeker e-mail (deprecated URL)
+        # ----------------------------------------------------------------------
+        deprecated_next_url = reverse(
+            "job_seekers_views:search_by_email_for_sender",
+            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+        )
+        response = client.get(deprecated_next_url)
+        assert response.status_code == 200
+
+        response = client.post(deprecated_next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
+        assert response.status_code == 302
+
+        expected_job_seeker_session |= {
+            "user": {
+                "email": dummy_job_seeker.email,
+            },
+        }
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "job_seekers_views:create_job_seeker_step_1_for_sender",
+            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+        )
+        assert response.url == next_url
+
         # Step create a job seeker.
         # ----------------------------------------------------------------------
 
@@ -921,7 +965,7 @@ class TestApplyAsAuthorizedPrescriber:
             response,
             reverse(
                 "job_seekers_views:search_by_email_for_sender",
-                kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+                kwargs={"session_uuid": job_seeker_session_name},
             ),
         )
 
@@ -1144,7 +1188,7 @@ class TestApplyAsAuthorizedPrescriber:
 
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
 
@@ -1178,6 +1222,40 @@ class TestApplyAsAuthorizedPrescriber:
         )
         assert response.url == next_url
 
+        # TODO(ewen): to remove when migration is done. This view should work with and without the company_pk kwarg
+        # Step get job seeker e-mail (deprecated URL)
+        # ----------------------------------------------------------------------
+        deprecated_next_url = reverse(
+            "job_seekers_views:search_by_email_for_sender",
+            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+        )
+        response = client.get(deprecated_next_url)
+        assert response.status_code == 200
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
+
+        response = client.post(deprecated_next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
+        assert response.status_code == 302
+
+        expected_job_seeker_session = {
+            "config": {
+                "reset_url": reset_url_company,
+            },
+            "apply": {"company_pk": company.pk},
+            "user": {
+                "email": dummy_job_seeker.email,
+            },
+            "profile": {
+                "nir": dummy_job_seeker.jobseeker_profile.nir,
+            },
+        }
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "job_seekers_views:create_job_seeker_step_1_for_sender",
+            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+        )
+        assert response.url == next_url
+
         # Step create a job seeker.
         # ----------------------------------------------------------------------
 
@@ -1187,7 +1265,7 @@ class TestApplyAsAuthorizedPrescriber:
             response,
             reverse(
                 "job_seekers_views:search_by_email_for_sender",
-                kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+                kwargs={"session_uuid": job_seeker_session_name},
             ),
         )
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
@@ -1408,7 +1486,7 @@ class TestApplyAsAuthorizedPrescriber:
 
         email_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"session_uuid": job_seeker_session_name},
         )
         assert response.url == email_url
 
@@ -1423,6 +1501,24 @@ class TestApplyAsAuthorizedPrescriber:
         assertContains(response, "Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
 
         response = client.post(email_url, data={"email": "titi@francetravail.fr", "confirm": "1"})
+        assert response.status_code == 200
+        assertContains(response, "Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
+
+        # TODO(ewen): to remove when migration is done. This view should work with and without the company_pk kwarg
+        # Step get job seeker e-mail (deprecated URL)
+        # ----------------------------------------------------------------------
+        deprecated_email_url = reverse(
+            "job_seekers_views:search_by_email_for_sender",
+            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+        )
+        response = client.get(deprecated_email_url)
+        assert response.status_code == 200
+
+        response = client.post(deprecated_email_url, data={"email": "toto@pole-emploi.fr", "confirm": "1"})
+        assert response.status_code == 200
+        assertContains(response, "Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
+
+        response = client.post(deprecated_email_url, data={"email": "titi@francetravail.fr", "confirm": "1"})
         assert response.status_code == 200
         assertContains(response, "Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
 
@@ -1467,7 +1563,7 @@ class TestApplyAsAuthorizedPrescriber:
 
         search_by_email_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"session_uuid": job_seeker_session_name},
         )
         assertContains(
             response,
@@ -1559,7 +1655,7 @@ class TestApplyAsPrescriber:
 
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
 
@@ -1607,7 +1703,7 @@ class TestApplyAsPrescriber:
             response,
             reverse(
                 "job_seekers_views:search_by_email_for_sender",
-                kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+                kwargs={"session_uuid": job_seeker_session_name},
             ),
         )
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
@@ -1956,7 +2052,7 @@ class TestApplyAsPrescriberNirExceptions:
         response = client.post(last_url, data=post_data)
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"session_uuid": job_seeker_session_name},
         )
         expected_job_seeker_session = {
             "config": {
@@ -2041,7 +2137,7 @@ class TestApplyAsPrescriberNirExceptions:
         response = client.post(last_url, data=post_data)
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
-            kwargs={"company_pk": siae.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"session_uuid": job_seeker_session_name},
         )
         expected_job_seeker_session = {
             "config": {
@@ -2070,6 +2166,28 @@ class TestApplyAsPrescriberNirExceptions:
         )
 
         response = client.post(next_url, data=post_data, follow=True)
+        assert response.status_code == 200
+        assert 0 == len(list(response.context["messages"]))
+
+        # TODO(ewen): to remove when migration is done. This view should work with and without the company_pk kwarg
+        # Enter an existing email (deprecated URL)
+        # ----------------------------------------------------------------------
+        deprecated_next_url = reverse(
+            "job_seekers_views:search_by_email_for_sender",
+            kwargs={"company_pk": siae.pk, "session_uuid": job_seeker_session_name},
+        )
+        post_data = {"email": job_seeker.email, "confirm": "1"}
+        response = client.post(deprecated_next_url, data=post_data)
+        assertRedirects(
+            response,
+            reverse(
+                "job_seekers_views:check_job_seeker_info",
+                kwargs={"company_pk": siae.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+            target_status_code=302,
+        )
+
+        response = client.post(deprecated_next_url, data=post_data, follow=True)
         assert response.status_code == 200
         assert 0 == len(list(response.context["messages"]))
 
@@ -2155,7 +2273,7 @@ class TestApplyAsCompany:
 
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"session_uuid": job_seeker_session_name},
         )
         expected_job_seeker_session = {
             "config": {"reset_url": reset_url},
@@ -2190,6 +2308,33 @@ class TestApplyAsCompany:
         )
         assert response.url == next_url
 
+        # TODO(ewen): to remove when migration is done. This view should work with and without the company_pk kwarg
+        # Step get job seeker e-mail (deprecated URL)
+        # ----------------------------------------------------------------------
+        deprecated_next_url = reverse(
+            "job_seekers_views:search_by_email_for_sender",
+            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+        )
+        response = client.get(deprecated_next_url)
+        assert response.status_code == 200
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
+
+        response = client.post(deprecated_next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
+        assert response.status_code == 302
+
+        expected_job_seeker_session |= {
+            "user": {
+                "email": dummy_job_seeker.email,
+            },
+        }
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "job_seekers_views:create_job_seeker_step_1_for_sender",
+            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+        )
+        assert response.url == next_url
+
         # Step create a job seeker.
         # ----------------------------------------------------------------------
 
@@ -2201,7 +2346,7 @@ class TestApplyAsCompany:
             response,
             reverse(
                 "job_seekers_views:search_by_email_for_sender",
-                kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+                kwargs={"session_uuid": job_seeker_session_name},
             ),
         )
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
@@ -2514,7 +2659,7 @@ class TestApplyAsCompany:
 
         email_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"session_uuid": job_seeker_session_name},
         )
         assert response.url == email_url
 
@@ -2529,6 +2674,24 @@ class TestApplyAsCompany:
         assertContains(response, "Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
 
         response = client.post(email_url, data={"email": "titi@francetravail.fr", "confirm": "1"})
+        assert response.status_code == 200
+        assertContains(response, "Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
+
+        # TODO(ewen): to remove when migration is done. This view should work with and without the company_pk kwarg
+        # Step get job seeker e-mail (deprecated URL)
+        # ----------------------------------------------------------------------
+        deprecated_email_url = reverse(
+            "job_seekers_views:search_by_email_for_sender",
+            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+        )
+        response = client.get(deprecated_email_url)
+        assert response.status_code == 200
+
+        response = client.post(deprecated_email_url, data={"email": "toto@pole-emploi.fr", "confirm": "1"})
+        assert response.status_code == 200
+        assertContains(response, "Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
+
+        response = client.post(deprecated_email_url, data={"email": "titi@francetravail.fr", "confirm": "1"})
         assert response.status_code == 200
         assertContains(response, "Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
 
@@ -2616,7 +2779,7 @@ class TestDirectHireFullProcess:
 
         next_url = reverse(
             "job_seekers_views:search_by_email_for_hire",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
 
@@ -2648,6 +2811,38 @@ class TestDirectHireFullProcess:
         )
         assert response.url == next_url
 
+        # TODO(ewen): to remove when migration is done. This view should work with and without the company_pk kwarg
+        # Step get job seeker e-mail (deprecated URL)
+        # ----------------------------------------------------------------------
+        deprecated_next_url = reverse(
+            "job_seekers_views:search_by_email_for_hire",
+            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+        )
+        response = client.get(deprecated_next_url)
+        assert response.status_code == 200
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
+
+        response = client.post(deprecated_next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
+        assert response.status_code == 302
+
+        expected_job_seeker_session = {
+            "config": {"reset_url": reset_url_dashboard},
+            "apply": {"company_pk": company.pk},
+            "profile": {
+                "nir": dummy_job_seeker.jobseeker_profile.nir,
+            },
+            "user": {
+                "email": dummy_job_seeker.email,
+            },
+        }
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "job_seekers_views:create_job_seeker_step_1_for_hire",
+            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+        )
+        assert response.url == next_url
+
         # Step create a job seeker.
         # ----------------------------------------------------------------------
 
@@ -2659,7 +2854,7 @@ class TestDirectHireFullProcess:
             response,
             reverse(
                 "job_seekers_views:search_by_email_for_hire",
-                kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+                kwargs={"session_uuid": job_seeker_session_name},
             ),
         )
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
@@ -4149,7 +4344,7 @@ def test_detect_existing_job_seeker(client):
     assert response.status_code == 302
     next_url = reverse(
         "job_seekers_views:search_by_email_for_sender",
-        kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+        kwargs={"session_uuid": job_seeker_session_name},
     )
     expected_job_seeker_session = {
         "config": {
@@ -4170,6 +4365,32 @@ def test_detect_existing_job_seeker(client):
     assert response.status_code == 200
 
     response = client.post(next_url, data={"email": "wrong-email@example.com", "confirm": "1"})
+    assert response.status_code == 302
+
+    expected_job_seeker_session |= {
+        "user": {
+            "email": "wrong-email@example.com",
+        },
+    }
+    assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+    next_url = reverse(
+        "job_seekers_views:create_job_seeker_step_1_for_sender",
+        kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+    )
+    assert response.url == next_url
+
+    # TODO(ewen): to remove when migration is done. This view should work with and without the company_pk kwarg
+    # Step get job seeker e-mail.
+    # ----------------------------------------------------------------------
+    deprecated_next_url = reverse(
+        "job_seekers_views:search_by_email_for_sender",
+        kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+    )
+    response = client.get(deprecated_next_url)
+    assert response.status_code == 200
+
+    response = client.post(deprecated_next_url, data={"email": "wrong-email@example.com", "confirm": "1"})
     assert response.status_code == 302
 
     expected_job_seeker_session |= {
@@ -4222,7 +4443,7 @@ def test_detect_existing_job_seeker(client):
     )
     check_email_url = reverse(
         "job_seekers_views:search_by_email_for_sender",
-        kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+        kwargs={"session_uuid": job_seeker_session_name},
     )
     assertContains(
         response,
@@ -4770,7 +4991,7 @@ class TestFindJobSeekerForHireView:
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
         search_by_email_url = reverse(
             "job_seekers_views:search_by_email_for_hire",
-            kwargs={"company_pk": self.company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"session_uuid": job_seeker_session_name},
         )
         assertContains(
             response,
@@ -4825,7 +5046,7 @@ class TestFindJobSeekerForHireView:
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
         search_by_email_url = reverse(
             "job_seekers_views:search_by_email_for_hire",
-            kwargs={"company_pk": self.company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"session_uuid": job_seeker_session_name},
         )
         assert response.url == search_by_email_url
 
