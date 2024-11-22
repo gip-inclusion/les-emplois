@@ -2,27 +2,13 @@
 {% if is_subject_to_eligibility_rules %}
     {% if job_seeker.has_valid_approval %}
         {% approval_state_badge job_seeker.latest_approval force_valid=True span_extra_class="badge-base" %}
-    {% elif eligibility_diagnosis %}
-        <span class="badge badge-base rounded-pill bg-success-lighter text-success">
-            <i class="ri-check-line" aria-hidden="true"></i>
-            Éligible à l’IAE
-        </span>
     {% else %}
-        <span class="badge badge-base rounded-pill bg-warning-lighter text-warning">
-            <i class="ri-error-warning-line" aria-hidden="true"></i>
-            Éligibilité IAE à valider
-        </span>
+        {% iae_eligibility_badge is_eligible=eligibility_diagnosis extra_class="badge-base" %}
     {% endif %}
 {% elif is_subject_to_geiq_eligibility_rules %}
     {% if geiq_eligibility_diagnosis.is_valid and geiq_eligibility_diagnosis.allowance_amount %}
-        <span class="badge badge-base rounded-pill bg-success-lighter text-success">
-            <i class="ri-check-line" aria-hidden="true"></i>
-            Éligibilité GEIQ confirmée
-        </span>
+        {% geiq_eligibility_badge is_eligible=True extra_class="badge-base" %}
     {% else %}
-        <span class="badge badge-base rounded-pill bg-warning-lighter text-warning">
-            <i class="ri-error-warning-line" aria-hidden="true"></i>
-            Éligibilité GEIQ non confirmée
-        </span>
+        {% geiq_eligibility_badge is_eligible=False extra_class="badge-base" %}
     {% endif %}
 {% endif %}

@@ -152,7 +152,8 @@
                                       </div>
                                       
                                       
-                                          <div class="c-box mb-3 mb-lg-5">
+                                          
+  <div class="c-box mb-3 mb-lg-5">
       <div class="row mb-3">
           <div class="col-12 col-sm">
               
@@ -163,9 +164,10 @@
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
               
                   
-                      <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
-                          <i aria-hidden="true" class="ri-check-line"></i>Éligibilité GEIQ non confirmée
-                      </span>
+                              <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
+              <i aria-hidden="true" class="ri-error-warning-line"></i>
+              Éligibilité GEIQ non confirmée
+          </span>
                   
               
           </div>
@@ -391,7 +393,8 @@
   
                                       </div>
                                       
-                                          <div class="c-box mb-3 mb-lg-5">
+                                          
+  <div class="c-box mb-3 mb-lg-5">
       <div class="row mb-3">
           <div class="col-12 col-sm">
               
@@ -401,9 +404,10 @@
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
               
-                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                      <i aria-hidden="true" class="ri-check-line"></i>Éligible à l’IAE
-                  </span>
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+              <i aria-hidden="true" class="ri-check-line"></i>
+              Éligible à l’IAE
+          </span>
               
           </div>
       </div>
@@ -787,7 +791,8 @@
   
                                       </div>
                                       
-                                          <div class="c-box mb-3 mb-lg-5">
+                                          
+  <div class="c-box mb-3 mb-lg-5">
       <div class="row mb-3">
           <div class="col-12 col-sm">
               
@@ -797,9 +802,10 @@
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
               
-                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                      <i aria-hidden="true" class="ri-check-line"></i>Éligible à l’IAE
-                  </span>
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+              <i aria-hidden="true" class="ri-check-line"></i>
+              Éligible à l’IAE
+          </span>
               
           </div>
       </div>
@@ -830,7 +836,8 @@
   
                                       
                                       
-                                          <div class="c-box mb-3 mb-lg-5">
+                                          
+  <div class="c-box mb-3 mb-lg-5">
       <div class="row mb-3">
           <div class="col-12 col-sm">
               
@@ -841,9 +848,10 @@
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
               
                   
-                      <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                          <i aria-hidden="true" class="ri-check-line"></i>Éligible public prioritaire GEIQ
-                      </span>
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+              <i aria-hidden="true" class="ri-check-line"></i>
+              Éligibilité GEIQ confirmée
+          </span>
                   
               
           </div>
@@ -1939,7 +1947,8 @@
                                       </div>
                                       
                                       
-                                          <div class="c-box mb-3 mb-lg-5">
+                                          
+  <div class="c-box mb-3 mb-lg-5">
       <div class="row mb-3">
           <div class="col-12 col-sm">
               
@@ -1950,9 +1959,10 @@
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
               
                   
-                      <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                          <i aria-hidden="true" class="ri-check-line"></i>Éligible public prioritaire GEIQ
-                      </span>
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+              <i aria-hidden="true" class="ri-check-line"></i>
+              Éligibilité GEIQ confirmée
+          </span>
                   
               
           </div>
@@ -2181,7 +2191,8 @@
                                       </div>
                                       
                                       
-                                          <div class="c-box mb-3 mb-lg-5">
+                                          
+  <div class="c-box mb-3 mb-lg-5">
       <div class="row mb-3">
           <div class="col-12 col-sm">
               
@@ -2192,9 +2203,10 @@
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
               
                   
-                      <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                          <i aria-hidden="true" class="ri-check-line"></i>Éligible public prioritaire GEIQ
-                      </span>
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+              <i aria-hidden="true" class="ri-check-line"></i>
+              Éligibilité GEIQ confirmée
+          </span>
                   
               
           </div>
@@ -2580,7 +2592,8 @@
   
                                       </div>
                                       
-                                          <div class="c-box mb-3 mb-lg-5">
+                                          
+  <div class="c-box mb-3 mb-lg-5">
       <div class="row mb-3">
           <div class="col-12 col-sm">
               
@@ -2590,9 +2603,10 @@
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
               
-                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                      <i aria-hidden="true" class="ri-check-line"></i>Éligible à l’IAE
-                  </span>
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+              <i aria-hidden="true" class="ri-check-line"></i>
+              Éligible à l’IAE
+          </span>
               
           </div>
       </div>

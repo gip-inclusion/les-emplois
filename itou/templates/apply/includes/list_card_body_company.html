@@ -22,15 +22,9 @@
                             {% approval_state_badge approval span_extra_class="badge-xs" %}
                         {% else %}
                             {% if not job_application.jobseeker_valid_eligibility_diagnosis %}
-                                <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
-                                    <i class="ri-error-warning-line" aria-hidden="true"></i>
-                                    Éligibilité IAE à valider
-                                </span>
+                                {% iae_eligibility_badge is_eligible=False extra_class="badge-xs" %}
                             {% else %}
-                                <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                                    <i class="ri-check-line" aria-hidden="true"></i>
-                                    Éligible à l’IAE
-                                </span>
+                                {% iae_eligibility_badge is_eligible=True extra_class="badge-xs" %}
                             {% endif %}
                         {% endif %}
                     {% endwith %}

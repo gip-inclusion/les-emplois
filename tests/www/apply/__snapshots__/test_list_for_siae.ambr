@@ -1491,9 +1491,9 @@
 # name: test_list_for_siae_badge[no_eligibility_diag]
   '''
   <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
-                                      <i aria-hidden="true" class="ri-error-warning-line"></i>
-                                      Éligibilité IAE à valider
-                                  </span>
+              <i aria-hidden="true" class="ri-error-warning-line"></i>
+              Éligibilité IAE à valider
+          </span>
   '''
 # ---
 # name: test_list_for_siae_badge[with_approval]
@@ -1507,9 +1507,9 @@
 # name: test_list_for_siae_badge[with_eligibility_diag]
   '''
   <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                                      <i aria-hidden="true" class="ri-check-line"></i>
-                                      Éligible à l’IAE
-                                  </span>
+              <i aria-hidden="true" class="ri-check-line"></i>
+              Éligible à l’IAE
+          </span>
   '''
 # ---
 # name: test_list_for_siae_exports
