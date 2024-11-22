@@ -1,4 +1,36 @@
 # serializer version: 1
+# name: test_approval_state_badge[expired]
+  '''
+              <span class="badge badge-sm rounded-pill bg-emploi-light text-primary">
+                  <i class="ri-pass-expired-line" aria-hidden="true"></i>
+                  PASS IAE expiré
+              </span>
+  '''
+# ---
+# name: test_approval_state_badge[future]
+  '''
+              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                  <i class="ri-pass-valid-line" aria-hidden="true"></i>
+                  PASS IAE valide (non démarré)
+              </span>
+  '''
+# ---
+# name: test_approval_state_badge[suspended]
+  '''
+              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                  <i class="ri-pass-pending-line" aria-hidden="true"></i>
+                  PASS IAE valide (suspendu)
+              </span>
+  '''
+# ---
+# name: test_approval_state_badge[valid]
+  '''
+              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                  <i class="ri-pass-valid-line" aria-hidden="true"></i>
+                  PASS IAE valide
+              </span>
+  '''
+# ---
 # name: test_job_application_state_badge_oob_swap
   '<span id="state_00000000-0000-0000-0000-000000000000" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" hx-swap-oob="true">Nouvelle candidature</span>'
 # ---

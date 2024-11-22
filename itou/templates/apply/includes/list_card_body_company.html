@@ -1,3 +1,4 @@
+{% load badges %}
 {% load i18n %}
 {% load str_filters %}
 
@@ -18,10 +19,7 @@
                 {% if job_application.to_company.is_subject_to_eligibility_rules %}
                     {% with approval=job_application.job_seeker.latest_common_approval %}
                         {% if approval %}
-                            <span class="badge badge-xs rounded-pill {% if approval.state == 'EXPIRED' %} bg-emploi-light text-primary{% else %} bg-success-lighter text-success{% endif %}">
-                                <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %}" aria-hidden="true"></i>
-                                PASS IAE {{ approval.get_state_display|lower }}
-                            </span>
+                            {% approval_state_badge approval span_extra_class="badge-xs" %}
                         {% else %}
                             {% if not job_application.jobseeker_valid_eligibility_diagnosis %}
                                 <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">

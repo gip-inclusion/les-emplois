@@ -33,6 +33,7 @@ from pytest_django.asserts import assertContains, assertNumQueries, assertRedire
 
 import itou.utils.json
 import itou.utils.session
+from itou.approvals.enums import ApprovalStatus
 from itou.approvals.models import Suspension
 from itou.asp.models import Commune
 from itou.cities.models import City
@@ -73,7 +74,7 @@ from itou.utils.validators import (
     validate_siren,
     validate_siret,
 )
-from tests.approvals.factories import SuspensionFactory
+from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.communications.factories import AnnouncementCampaignFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyPendingGracePeriodFactory
 from tests.institutions.factories import (
@@ -1462,6 +1463,38 @@ def test_job_application_state_badge_processing(state, snapshot):
 def test_job_application_state_badge_oob_swap(snapshot):
     job_application = JobApplicationFactory(id="00000000-0000-0000-0000-000000000000")
     assert badges.job_application_state_badge(job_application, hx_swap_oob=True) == snapshot
+
+
+def test_approval_state_badge(snapshot):
+    # in_approval_box=True is not tested as it is already covered by approval/box.html tests
+    today = timezone.localdate()
+
+    approval = ApprovalFactory(
+        number="999999999999",
+        start_at=today - +datetime.timedelta(days=100),
+        end_at=today - datetime.timedelta(days=10),
+        origin_ai_stock=True,
+    )
+    assert approval.state == ApprovalStatus.EXPIRED
+    assert badges.approval_state_badge(approval) == snapshot(name="expired")
+
+    approval.start_at = today + datetime.timedelta(days=10)
+    approval.end_at = today + datetime.timedelta(days=100)
+    assert approval.state == ApprovalStatus.FUTURE
+    assert badges.approval_state_badge(approval) == snapshot(name="future")
+
+    approval.start_at = today - datetime.timedelta(days=10)
+    assert approval.state == ApprovalStatus.VALID
+    assert badges.approval_state_badge(approval) == snapshot(name="valid")
+
+    SuspensionFactory(
+        approval=approval,
+        start_at=today - datetime.timedelta(days=5),
+        end_at=today + datetime.timedelta(days=5),
+    )
+    del approval.is_suspended  # Invalidate cache
+    assert approval.state == ApprovalStatus.SUSPENDED
+    assert badges.approval_state_badge(approval) == snapshot(name="suspended")
 
 
 def test_active_announcement_campaign_context_processor(client, empty_active_announcements_cache):
