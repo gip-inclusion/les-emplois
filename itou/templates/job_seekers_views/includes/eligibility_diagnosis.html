@@ -1,3 +1,4 @@
+{% load badges %}
 <div class="c-box mb-3 mb-lg-5">
     <div class="row mb-3">
         <div class="col-12 col-sm">
@@ -10,18 +11,12 @@
         </div>
         <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
             {% if kind == "IAE" %}
-                <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                    <i class="ri-check-line" aria-hidden="true"></i>Éligible à l’IAE
-                </span>
+                {% iae_eligibility_badge is_eligible=True extra_class="badge-sm" %}
             {% elif kind == "GEIQ" %}
                 {% if eligibility_diagnosis.allowance_amount %}
-                    <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                        <i class="ri-check-line" aria-hidden="true"></i>Éligible public prioritaire GEIQ
-                    </span>
+                    {% geiq_eligibility_badge is_eligible=True extra_class="badge-sm" %}
                 {% else %}
-                    <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
-                        <i class="ri-check-line" aria-hidden="true"></i>Éligibilité GEIQ non confirmée
-                    </span>
+                    {% geiq_eligibility_badge is_eligible=False extra_class="badge-sm" %}
                 {% endif %}
             {% endif %}
         </div>

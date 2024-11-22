@@ -1497,6 +1497,16 @@ def test_approval_state_badge(snapshot):
     assert badges.approval_state_badge(approval) == snapshot(name="suspended")
 
 
+@pytest.mark.parametrize("is_eligible", [True, False])
+def test_iae_eligibility_badge(snapshot, is_eligible):
+    assert badges.iae_eligibility_badge(is_eligible=is_eligible) == snapshot
+
+
+@pytest.mark.parametrize("is_eligible", [True, False])
+def test_geiq_eligibility_badge(snapshot, is_eligible):
+    assert badges.geiq_eligibility_badge(is_eligible=is_eligible) == snapshot
+
+
 def test_active_announcement_campaign_context_processor(client, empty_active_announcements_cache):
     campaign = AnnouncementCampaignFactory(with_item=True, start_date=date.today().replace(day=1), live=True)
 

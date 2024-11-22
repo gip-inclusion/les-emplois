@@ -77,3 +77,35 @@ def approval_state_badge(
                 {approval_type} { approval_state.label.lower()}
             </span>"""
     )
+
+
+@register.simple_tag
+def iae_eligibility_badge(*, is_eligible, extra_class=""):
+    if is_eligible:
+        return mark_safe(f"""\
+        <span class="badge {extra_class} rounded-pill bg-success-lighter text-success">
+            <i class="ri-check-line" aria-hidden="true"></i>
+            Éligible à l’IAE
+        </span>""")
+    else:
+        return mark_safe(f"""\
+        <span class="badge {extra_class} rounded-pill bg-warning-lighter text-warning">
+            <i class="ri-error-warning-line" aria-hidden="true"></i>
+            Éligibilité IAE à valider
+        </span>""")
+
+
+@register.simple_tag
+def geiq_eligibility_badge(*, is_eligible, extra_class=""):
+    if is_eligible:
+        return mark_safe(f"""\
+        <span class="badge {extra_class} rounded-pill bg-success-lighter text-success">
+            <i class="ri-check-line" aria-hidden="true"></i>
+            Éligibilité GEIQ confirmée
+        </span>""")
+    else:
+        return mark_safe(f"""\
+        <span class="badge {extra_class} rounded-pill bg-warning-lighter text-warning">
+            <i class="ri-error-warning-line" aria-hidden="true"></i>
+            Éligibilité GEIQ non confirmée
+        </span>""")

@@ -31,6 +31,38 @@
               </span>
   '''
 # ---
+# name: test_geiq_eligibility_badge[False]
+  '''
+          <span class="badge  rounded-pill bg-warning-lighter text-warning">
+              <i class="ri-error-warning-line" aria-hidden="true"></i>
+              Éligibilité GEIQ non confirmée
+          </span>
+  '''
+# ---
+# name: test_geiq_eligibility_badge[True]
+  '''
+          <span class="badge  rounded-pill bg-success-lighter text-success">
+              <i class="ri-check-line" aria-hidden="true"></i>
+              Éligibilité GEIQ confirmée
+          </span>
+  '''
+# ---
+# name: test_iae_eligibility_badge[False]
+  '''
+          <span class="badge  rounded-pill bg-warning-lighter text-warning">
+              <i class="ri-error-warning-line" aria-hidden="true"></i>
+              Éligibilité IAE à valider
+          </span>
+  '''
+# ---
+# name: test_iae_eligibility_badge[True]
+  '''
+          <span class="badge  rounded-pill bg-success-lighter text-success">
+              <i class="ri-check-line" aria-hidden="true"></i>
+              Éligible à l’IAE
+          </span>
+  '''
+# ---
 # name: test_job_application_state_badge_oob_swap
   '<span id="state_00000000-0000-0000-0000-000000000000" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" hx-swap-oob="true">Nouvelle candidature</span>'
 # ---

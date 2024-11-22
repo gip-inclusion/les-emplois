@@ -447,7 +447,7 @@
                                   
   
       
-          <span class="badge badge-base rounded-pill bg-success-lighter text-success">
+                  <span class="badge badge-base rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
@@ -476,7 +476,7 @@
                                   
   
       
-          <span class="badge badge-base rounded-pill bg-warning-lighter text-warning">
+                  <span class="badge badge-base rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
@@ -534,7 +534,7 @@
                                   
   
       
-          <span class="badge badge-base rounded-pill bg-success-lighter text-success">
+                  <span class="badge badge-base rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
