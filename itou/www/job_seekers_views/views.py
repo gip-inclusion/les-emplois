@@ -459,9 +459,7 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
             if self.hire_process
             else "job_seekers_views:search_by_email_for_sender"
         )
-        return reverse(view_name, kwargs={"company_pk": self.company.pk, "session_uuid": session_uuid}) + (
-            "?gps=true" if self.is_gps else ""
-        )
+        return reverse(view_name, kwargs={"session_uuid": session_uuid}) + ("?gps=true" if self.is_gps else "")
 
     def post(self, request, *args, **kwargs):
         context = {}
@@ -505,7 +503,7 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
         }
 
 
-class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSenderBaseView):
+class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, JobSeekerForSenderBaseView):
     required_session_namespaces = ["job_seeker_session"]
     template_name = "job_seekers_views/step_search_job_seeker_by_email.html"
 
@@ -514,11 +512,22 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSend
         self.form = None
 
     def setup(self, request, *args, **kwargs):
-        self.job_seeker_session = SessionNamespace(request.session, kwargs["session_uuid"])
         super().setup(request, *args, **kwargs)
         self.form = JobSeekerExistsForm(
             is_gps=self.is_gps, initial=self.job_seeker_session.get("user", {}), data=request.POST or None
         )
+        # TODO(ewen): temporary condition to fill self.company when not using the new session system
+        if company_pk := kwargs.get("company_pk"):
+            self.job_seeker_session.set("apply", {"company_pk": company_pk} | self.job_seeker_session.get("apply", {}))
+        if self.company is None:
+            self.company = (
+                get_object_or_404(
+                    Company.objects.with_has_active_members(),
+                    pk=self.job_seeker_session.get("apply").get("company_pk"),
+                )
+                if not self.is_gps
+                else Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
+            )
 
     def post(self, request, *args, **kwargs):
         can_add_nir = False
@@ -695,6 +704,14 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
                 return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(context)
+
+    # TODO(ewen): remove this method overloading when migration is over
+    def get_back_url(self):
+        view_name = self.previous_hire_url if self.hire_process else self.previous_apply_url
+        kwargs = {"session_uuid": self.job_seeker_session.name}
+        if not self.job_seeker_session.get("apply", {}).get("company_pk"):
+            kwargs["company_pk"] = self.company.pk
+        return reverse(view_name, kwargs=kwargs)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
