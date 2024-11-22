@@ -49,7 +49,7 @@ from itou.utils.models import PkSupportRemark
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.utils.sync import DiffItem, DiffItemKind, yield_sync_diff
-from itou.utils.templatetags import dict_filters, format_filters, job_applications, job_seekers
+from itou.utils.templatetags import badges, dict_filters, format_filters, job_seekers
 from itou.utils.templatetags.datetime_filters import duration
 from itou.utils.tokens import COMPANY_SIGNUP_MAGIC_LINK_TIMEOUT, CompanySignupTokenGenerator
 from itou.utils.urls import (
@@ -1456,12 +1456,12 @@ def test_matomo_context_processor(client, settings, snapshot):
 @pytest.mark.parametrize("state", JobApplicationState.values)
 def test_job_application_state_badge_processing(state, snapshot):
     job_application = JobApplicationFactory(id="00000000-0000-0000-0000-000000000000", state=state)
-    assert job_applications.state_badge(job_application) == snapshot
+    assert badges.job_application_state_badge(job_application) == snapshot
 
 
 def test_job_application_state_badge_oob_swap(snapshot):
     job_application = JobApplicationFactory(id="00000000-0000-0000-0000-000000000000")
-    assert job_applications.state_badge(job_application, hx_swap_oob=True) == snapshot
+    assert badges.job_application_state_badge(job_application, hx_swap_oob=True) == snapshot
 
 
 def test_active_announcement_campaign_context_processor(client, empty_active_announcements_cache):

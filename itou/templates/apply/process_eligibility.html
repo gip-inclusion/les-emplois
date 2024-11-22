@@ -1,5 +1,5 @@
 {% extends "apply/process_base.html" %}
-{% load job_applications %}
+{% load badges %}
 {% load str_filters %}
 
 {% block title_content %}
@@ -7,7 +7,7 @@
         <h1 class="mb-1 mb-md-0 me-3">
             Accepter la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
         </h1>
-        {% state_badge job_application extra_class="badge-base" %}
+        {% job_application_state_badge job_application extra_class="badge-base" %}
     </div>
 {% endblock %}
 

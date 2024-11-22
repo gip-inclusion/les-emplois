@@ -8,7 +8,7 @@ register = template.Library()
 
 
 @register.simple_tag
-def state_badge(job_application, *, hx_swap_oob=False, extra_class="badge-sm mb-1"):
+def job_application_state_badge(job_application, *, hx_swap_oob=False, extra_class="badge-sm mb-1"):
     state_classes = {
         JobApplicationState.ACCEPTED: "bg-success",
         JobApplicationState.CANCELLED: "bg-primary",
