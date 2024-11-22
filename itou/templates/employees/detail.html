@@ -30,7 +30,7 @@
                         <h2>Candidatures de ce salarié</h2>
                         <hr>
                         {% for job_application_for_card in all_job_applications %}
-                            {% include "approvals/includes/job_applications.html" with job_application=job_application_for_card %}
+                            {% include "apply/includes/job_application_box_for_user.html" with job_application=job_application_for_card %}
                         {% endfor %}
                     </div>
                 </div>

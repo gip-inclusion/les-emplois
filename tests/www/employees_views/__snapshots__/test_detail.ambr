@@ -1158,7 +1158,7 @@
         'origin': list([
           'IfNode[approvals/includes/job_description_creation.html]',
           'IfNode[approvals/includes/job_description_creation.html]',
-          'IncludeNode[approvals/includes/job_applications.html]',
+          'IncludeNode[apply/includes/job_application_box_for_user.html]',
           'IncludeNode[employees/detail.html]',
           'ForNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
@@ -1205,7 +1205,7 @@
         'origin': list([
           'IfNode[approvals/includes/job_description_creation.html]',
           'IfNode[approvals/includes/job_description_creation.html]',
-          'IncludeNode[approvals/includes/job_applications.html]',
+          'IncludeNode[apply/includes/job_application_box_for_user.html]',
           'IncludeNode[employees/detail.html]',
           'ForNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
