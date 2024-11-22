@@ -25,7 +25,7 @@
                     {% else %}
                         Cet espace vous permet d’enregistrer une nouvelle candidature.
                     {% endif %}
-                    Si vous souhaitez déclarer directement une embauche, veuillez vous rendre sur <a href="{% url 'job_seekers_views:check_nir_for_hire' company_pk=siae.pk %}">Déclarer une embauche</a> depuis le tableau de bord.
+                    Si vous souhaitez déclarer directement une embauche, veuillez vous rendre sur <a href="{% url 'apply:start_hire' company_pk=siae.pk %}">Déclarer une embauche</a> depuis le tableau de bord.
                 {% endif %}
             </p>
         {% endif %}
