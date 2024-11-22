@@ -14,16 +14,14 @@
                     <form method="post">
                         {% csrf_token %}
                         {% bootstrap_form_errors form type="non_fields" %}
-                        <div class="form-row">
-                            {% bootstrap_field form.old_email wrapper_class='form-group col-md-5' %}
-                            {% bootstrap_field form.new_email wrapper_class='form-group col-md-5' %}
-                            <div class="form-group col-md-2 mt-5">
-                                <button type="submit" class="btn btn-block btn-primary">
-                                    <span>Chercher</span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                        {% bootstrap_field form.email_1 wrapper_class='form-group col-md-5' %}
+                        {% bootstrap_field form.email_2 wrapper_class='form-group col-md-5' %}
+                        <div class="form-group col-md-2 mt-5">
+                            <button type="submit" class="btn btn-block btn-primary">
+                                <span>Chercher</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
