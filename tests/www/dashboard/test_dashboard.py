@@ -65,8 +65,8 @@ class TestDashboardView:
         return reverse("apply:start", kwargs={"company_pk": company.pk})
 
     @staticmethod
-    def check_nir_for_hire_url(company):
-        return reverse("job_seekers_views:check_nir_for_hire", kwargs={"company_pk": company.pk})
+    def apply_start_hire_url(company):
+        return reverse("apply:start_hire", kwargs={"company_pk": company.pk})
 
     def test_dashboard(self, client, snapshot):
         company = CompanyFactory(with_membership=True)
@@ -290,7 +290,7 @@ class TestDashboardView:
                 assertContains(response, APPLICATION_SAVE_LABEL)
                 assertContains(response, self.apply_start_url(company))
                 assertContains(response, self.HIRE_LINK_LABEL)
-                assertContains(response, self.check_nir_for_hire_url(company))
+                assertContains(response, self.apply_start_hire_url(company))
 
         for kind in set(CompanyKind) - set(display_kinds):
             with subtests.test(f"should not display when company_kind={kind}"):
@@ -301,7 +301,7 @@ class TestDashboardView:
                 assertNotContains(response, APPLICATION_SAVE_LABEL)
                 assertNotContains(response, self.apply_start_url(company))
                 assertNotContains(response, self.HIRE_LINK_LABEL)
-                assertNotContains(response, self.check_nir_for_hire_url(company))
+                assertNotContains(response, self.apply_start_hire_url(company))
 
     def test_dashboard_agreements_with_suspension_sanction(self, client):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True)

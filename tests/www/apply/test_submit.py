@@ -92,6 +92,7 @@ class TestApply:
         company = CompanyFactory(with_jobs=True, with_membership=True)
         for viewname in (
             "apply:start",
+            "apply:start_hire",
             "apply:pending_authorization_for_sender",
             "job_seekers_views:check_nir_for_sender",
             "job_seekers_views:check_nir_for_job_seeker",
@@ -204,7 +205,8 @@ class TestApply:
 class TestHire:
     def test_anonymous_access(self, client):
         company = CompanyFactory(with_jobs=True, with_membership=True)
-        url = reverse("job_seekers_views:check_nir_for_hire", kwargs={"company_pk": company.pk})
+
+        url = reverse("apply:start_hire", kwargs={"company_pk": company.pk})
         response = client.get(url)
         assertRedirects(response, reverse("account_login") + f"?next={url}")
 
@@ -2446,7 +2448,7 @@ class TestDirectHireFullProcess:
         user = company_1.members.first()
         client.force_login(user)
 
-        response = client.get(reverse("job_seekers_views:check_nir_for_hire", kwargs={"company_pk": company_2.pk}))
+        response = client.get(reverse("apply:start_hire", kwargs={"company_pk": company_2.pk}))
         assert response.status_code == 403
 
     def test_hire_as_siae_with_suspension_sanction(self, client):
@@ -2935,6 +2937,7 @@ class TestDirectHireFullProcess:
 class TestApplyAsOther:
     ROUTES = [
         "apply:start",
+        "apply:start_hire",
         "job_seekers_views:check_nir_for_job_seeker",
         "job_seekers_views:check_nir_for_sender",
     ]
@@ -4744,7 +4747,7 @@ class TestCheckJobSeekerInformationsForHire:
 
         assertContains(
             response,
-            reverse("job_seekers_views:check_nir_for_hire", kwargs={"company_pk": company.pk}),
+            reverse("apply:start_hire", kwargs={"company_pk": company.pk}),
         )
         assertContains(response, reverse("dashboard:index"))
 

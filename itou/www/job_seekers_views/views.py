@@ -1058,5 +1058,5 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "profile": self.job_seeker.jobseeker_profile,
-            "back_url": reverse("job_seekers_views:check_nir_for_hire", kwargs={"company_pk": self.company.pk}),
+            "back_url": reverse("apply:start_hire", kwargs={"company_pk": self.company.pk}),
         }
