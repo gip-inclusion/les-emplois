@@ -60,7 +60,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.users.test_models import user_with_approval_in_waiting_period
-from tests.utils.test import assertSnapshotQueries
+from tests.utils.test import KNOWN_SESSION_KEYS, assertSnapshotQueries
 
 
 BACK_BUTTON_ARIA_LABEL = "Retourner à l’étape précédente"
@@ -97,7 +97,18 @@ class TestApply:
             "job_seekers_views:check_nir_for_sender",
             "job_seekers_views:check_nir_for_job_seeker",
         ):
-            url = reverse(viewname, kwargs={"company_pk": company.pk})
+            if viewname.startswith("apply"):
+                url = reverse(viewname, kwargs={"company_pk": company.pk})
+            else:
+                # Init session (as it would be in apply:start)
+                session = client.session
+                session_name = str(uuid.uuid4())
+                session[session_name] = {
+                    "config": {},
+                    "apply": {"company_pk": company.pk},
+                }
+                session.save()
+                url = reverse(viewname, kwargs={"session_uuid": session_name})
             response = client.get(url)
             assertRedirects(response, reverse("account_login") + f"?next={url}")
 
@@ -317,7 +328,8 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
     response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
     assert response.status_code == 302
 
-    next_url = reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"company_pk": company.pk})
+    [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+    next_url = reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name})
     assert response.url == next_url
 
     # Step check job seeker NIR.
@@ -349,10 +361,13 @@ class TestApplyAsJobSeeker:
         client.force_login(user)
 
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
         # The suspension does not prevent access to the process
         assertRedirects(
             response,
-            expected_url=reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"company_pk": company.pk}),
+            expected_url=reverse(
+                "job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name}
+            ),
         )
 
     def test_apply_as_jobseeker(self, client, pdf_file):
@@ -370,7 +385,10 @@ class TestApplyAsJobSeeker:
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
         assert response.status_code == 302
 
-        next_url = reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"company_pk": company.pk})
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        next_url = reverse(
+            "job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name}
+        )
         assert response.url == next_url
 
         # Step check job seeker NIR.
@@ -524,7 +542,10 @@ class TestApplyAsJobSeeker:
 
         # Follow all redirections until NIR.
         # ----------------------------------------------------------------------
-        next_url = reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"company_pk": company.pk})
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        next_url = reverse(
+            "job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name}
+        )
 
         response = client.post(next_url, data={"nir": "123456789KLOIU"})
         assert response.status_code == 200
@@ -555,8 +576,17 @@ class TestApplyAsJobSeeker:
         user = JobSeekerFactory()
         client.force_login(user)
 
-        client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))  # Init the session
-        response = client.get(reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": company.pk}))
+        # Init session (as it would be in apply:start)
+        session = client.session
+        session_name = str(uuid.uuid4())
+        session[session_name] = {
+            "config": {
+                "reset_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+            },
+            "apply": {"company_pk": company.pk},
+        }
+        session.save()
+        response = client.get(reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": session_name}))
         assertRedirects(
             response, reverse("apply:start", kwargs={"company_pk": company.pk}), fetch_redirect_response=False
         )
@@ -580,8 +610,12 @@ class TestApplyAsJobSeeker:
             reverse("apply:start", kwargs={"company_pk": company.pk}),
             {"job_description_id": job_description.pk},
         )
-
-        next_url = reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"company_pk": company.pk})
+        [job_seeker_session_name] = [
+            k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
+        ]
+        next_url = reverse(
+            "job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name}
+        )
         assert response.url == next_url
         response = client.get(next_url)
 
@@ -813,15 +847,19 @@ class TestApplyAsAuthorizedPrescriber:
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
         assert response.status_code == 302
 
-        next_url = reverse("apply:pending_authorization_for_sender", kwargs={"company_pk": company.pk})
+        next_url = reverse(
+            "apply:pending_authorization_for_sender",
+            kwargs={"company_pk": company.pk},
+        )
         assert response.url == next_url
 
         # Step show warning message about pending authorization.
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
 
-        next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": company.pk})
+        next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
         assertContains(response, "Statut de prescripteur habilité non vérifié")
         assertContains(response, next_url)
 
@@ -834,13 +872,21 @@ class TestApplyAsAuthorizedPrescriber:
         response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assert response.status_code == 302
 
-        job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
+        expected_job_seeker_session = {
+            "config": {
+                "reset_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+            },
+            "apply": {"company_pk": company.pk},
+            "profile": {
+                "nir": dummy_job_seeker.jobseeker_profile.nir,
+            },
+        }
         assert response.url == next_url
-        assert client.session[job_seeker_session_name] == {"profile": {"nir": dummy_job_seeker.jobseeker_profile.nir}}
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         # Step get job seeker e-mail.
         # ----------------------------------------------------------------------
@@ -850,14 +896,10 @@ class TestApplyAsAuthorizedPrescriber:
 
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
         assert response.status_code == 302
-        job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
 
-        expected_job_seeker_session = {
+        expected_job_seeker_session |= {
             "user": {
                 "email": dummy_job_seeker.email,
-            },
-            "profile": {
-                "nir": dummy_job_seeker.jobseeker_profile.nir,
             },
         }
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
@@ -1086,7 +1128,8 @@ class TestApplyAsAuthorizedPrescriber:
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
         assert response.status_code == 302
 
-        next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": company.pk})
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
         assert response.url == next_url
 
         # Step determine the job seeker with a NIR.
@@ -1099,10 +1142,9 @@ class TestApplyAsAuthorizedPrescriber:
         response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assert response.status_code == 302
 
-        session_uuid = str(resolve(response.url).kwargs["session_uuid"])
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": session_uuid},
+            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
 
@@ -1115,9 +1157,12 @@ class TestApplyAsAuthorizedPrescriber:
 
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
         assert response.status_code == 302
-        job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
 
         expected_job_seeker_session = {
+            "config": {
+                "reset_url": reset_url_company,
+            },
+            "apply": {"company_pk": company.pk},
             "user": {
                 "email": dummy_job_seeker.email,
             },
@@ -1350,17 +1395,20 @@ class TestApplyAsAuthorizedPrescriber:
         user = prescriber_organization.members.first()
         client.force_login(user)
 
-        nir_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": company.pk})
+        # Init session
+        start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
+        client.get(start_url)
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        nir_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
         response = client.get(nir_url)
         assert response.status_code == 200
 
         response = client.post(nir_url, data={"nir": JobSeekerProfileFactory.build().nir, "confirm": 1})
         assert response.status_code == 302
 
-        session_uuid = str(resolve(response.url).kwargs["session_uuid"])
         email_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": session_uuid},
+            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == email_url
 
@@ -1408,17 +1456,15 @@ class TestApplyAsAuthorizedPrescriber:
 
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
         assert response.status_code == 302
-        assertRedirects(response, reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": company.pk}))
+
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        assertRedirects(
+            response,
+            reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}),
+        )
 
         response = client.post(response.url, {"nir": "invalid"})
-        known_session_keys = {
-            "_auth_user_id",
-            "_auth_user_backend",
-            "_auth_user_hash",
-            "current_organization",
-            "_csrftoken",
-        }
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in known_session_keys]
+
         search_by_email_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
@@ -1462,9 +1508,14 @@ class TestApplyAsPrescriber:
         client.force_login(user)
 
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+
         # The suspension does not prevent the access to the process
         assertRedirects(
-            response, expected_url=reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": company.pk})
+            response,
+            expected_url=reverse(
+                "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}
+            ),
         )
 
     @pytest.mark.ignore_unknown_variable_template_error(
@@ -1492,7 +1543,8 @@ class TestApplyAsPrescriber:
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
         assert response.status_code == 302
 
-        next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": company.pk})
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
         assert response.url == next_url
 
         # Step determine the job seeker with a NIR.
@@ -1505,13 +1557,21 @@ class TestApplyAsPrescriber:
         response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assert response.status_code == 302
 
-        job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
-        assert client.session[job_seeker_session_name] == {"profile": {"nir": dummy_job_seeker.jobseeker_profile.nir}}
+
+        expected_job_seeker_session = {
+            "config": {
+                "reset_url": reset_url_company,
+            },
+            "apply": {"company_pk": company.pk},
+            "profile": {"nir": dummy_job_seeker.jobseeker_profile.nir},
+        }
+
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         # Step get job seeker e-mail.
         # ----------------------------------------------------------------------
@@ -1522,14 +1582,10 @@ class TestApplyAsPrescriber:
 
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
         assert response.status_code == 302
-        job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
 
-        expected_job_seeker_session = {
+        expected_job_seeker_session |= {
             "user": {
                 "email": dummy_job_seeker.email,
-            },
-            "profile": {
-                "nir": dummy_job_seeker.jobseeker_profile.nir,
             },
         }
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
@@ -1791,8 +1847,20 @@ class TestApplyAsPrescriber:
         user = PrescriberFactory()
         client.force_login(user)
 
-        client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))  # Use that view to init the session
-        response = client.get(reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"company_pk": company.pk}))
+        # Init session (as it would be in apply:start)
+        session = client.session
+        session_name = str(uuid.uuid4())
+        session[session_name] = {
+            "config": {
+                "reset_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+            },
+            "apply": {"company_pk": company.pk},
+        }
+        session.save()
+
+        response = client.get(
+            reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": session_name})
+        )
         assertRedirects(
             response, reverse("apply:start", kwargs={"company_pk": company.pk}), fetch_redirect_response=False
         )
@@ -1876,20 +1944,32 @@ class TestApplyAsPrescriberNirExceptions:
         # …until a job seeker has to be determined.
         assert response.status_code == 200
         last_url = response.redirect_chain[-1][0]
-        assert last_url == reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": company.pk})
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        assert last_url == reverse(
+            "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}
+        )
 
         # Enter a non-existing NIR.
         # ----------------------------------------------------------------------
         nir = "141068078200557"
         post_data = {"nir": nir, "confirm": 1}
         response = client.post(last_url, data=post_data)
-        job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
+        expected_job_seeker_session = {
+            "config": {
+                "reset_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+            },
+            "apply": {"company_pk": company.pk},
+            "profile": {
+                "nir": nir,
+            },
+        }
+
         assert response.url == next_url
-        assert client.session[job_seeker_session_name] == {"profile": {"nir": nir}}
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
         assertRedirects(response, next_url)
 
         # Create a job seeker with this NIR right after the check. Sorry.
@@ -1945,24 +2025,35 @@ class TestApplyAsPrescriberNirExceptions:
 
         # Follow all redirections…
         response = client.get(reverse("apply:start", kwargs={"company_pk": siae.pk}), follow=True)
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
 
         # …until a job seeker has to be determined.
         assert response.status_code == 200
         last_url = response.redirect_chain[-1][0]
-        assert last_url == reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": siae.pk})
+        assert last_url == reverse(
+            "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}
+        )
 
         # Enter a non-existing NIR.
         # ----------------------------------------------------------------------
         nir = "141068078200557"
         post_data = {"nir": nir, "confirm": 1}
         response = client.post(last_url, data=post_data)
-        job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
             kwargs={"company_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
+        expected_job_seeker_session = {
+            "config": {
+                "reset_url": reverse("companies_views:card", kwargs={"siae_id": siae.pk}),
+            },
+            "apply": {"company_pk": siae.pk},
+            "profile": {
+                "nir": nir,
+            },
+        }
         assert response.url == next_url
-        assert client.session[job_seeker_session_name] == {"profile": {"nir": nir}}
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
         assertRedirects(response, next_url)
 
         # Enter an existing email.
@@ -2008,10 +2099,14 @@ class TestApplyAsCompany:
         client.force_login(user)
 
         response = client.get(reverse("apply:start", kwargs={"company_pk": company_2.pk}))
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
         assertRedirects(
             response,
-            expected_url=reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": company_2.pk}),
+            expected_url=reverse(
+                "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}
+            ),
         )
+        assert client.session[job_seeker_session_name].get("apply").get("company_pk") == company_2.pk
 
     def test_apply_as_siae_with_suspension_sanction(self, client):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
@@ -2044,7 +2139,8 @@ class TestApplyAsCompany:
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
         assert response.status_code == 302
 
-        next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": company.pk})
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
         assert response.url == next_url
 
         # Step determine the job seeker with a NIR.
@@ -2057,13 +2153,19 @@ class TestApplyAsCompany:
         response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assert response.status_code == 302
 
-        job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
+        expected_job_seeker_session = {
+            "config": {"reset_url": reset_url},
+            "apply": {"company_pk": company.pk},
+            "profile": {
+                "nir": dummy_job_seeker.jobseeker_profile.nir,
+            },
+        }
         assert response.url == next_url
-        assert client.session[job_seeker_session_name] == {"profile": {"nir": dummy_job_seeker.jobseeker_profile.nir}}
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         # Step get job seeker e-mail.
         # ----------------------------------------------------------------------
@@ -2075,12 +2177,9 @@ class TestApplyAsCompany:
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
         assert response.status_code == 302
 
-        expected_job_seeker_session = {
+        expected_job_seeker_session |= {
             "user": {
                 "email": dummy_job_seeker.email,
-            },
-            "profile": {
-                "nir": dummy_job_seeker.jobseeker_profile.nir,
             },
         }
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
@@ -2402,17 +2501,20 @@ class TestApplyAsCompany:
         user = membership.user
         client.force_login(user)
 
-        nir_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": company.pk})
+        # Init session
+        start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
+        client.get(start_url)
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        nir_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
         response = client.get(nir_url)
         assert response.status_code == 200
 
         response = client.post(nir_url, data={"nir": JobSeekerProfileFactory.build().nir, "confirm": 1})
         assert response.status_code == 302
 
-        session_uuid = str(resolve(response.url).kwargs["session_uuid"])
         email_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": session_uuid},
+            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == email_url
 
@@ -2498,8 +2600,13 @@ class TestDirectHireFullProcess:
 
         # Step determine the job seeker with a NIR.
         # ----------------------------------------------------------------------
+        # Init session
+        response = client.get(reverse("apply:start_hire", kwargs={"company_pk": company.pk}))
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
 
-        check_nir_url = reverse("job_seekers_views:check_nir_for_hire", kwargs={"company_pk": company.pk})
+        check_nir_url = reverse(
+            "job_seekers_views:check_nir_for_hire", kwargs={"session_uuid": job_seeker_session_name}
+        )
         response = client.get(check_nir_url)
         assert response.status_code == 200
         assertContains(response, LINK_RESET_MARKUP % reset_url_dashboard)
@@ -2507,7 +2614,6 @@ class TestDirectHireFullProcess:
         response = client.post(check_nir_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "preview": 1})
         assert response.status_code == 302
 
-        job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
         next_url = reverse(
             "job_seekers_views:search_by_email_for_hire",
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
@@ -2525,11 +2631,13 @@ class TestDirectHireFullProcess:
         assert response.status_code == 302
 
         expected_job_seeker_session = {
-            "user": {
-                "email": dummy_job_seeker.email,
-            },
+            "config": {"reset_url": reset_url_dashboard},
+            "apply": {"company_pk": company.pk},
             "profile": {
                 "nir": dummy_job_seeker.jobseeker_profile.nir,
+            },
+            "user": {
+                "email": dummy_job_seeker.email,
             },
         }
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
@@ -2799,8 +2907,13 @@ class TestDirectHireFullProcess:
 
         # Step determine the job seeker with a NIR.
         # ----------------------------------------------------------------------
+        # Init session
+        response = client.get(reverse("apply:start_hire", kwargs={"company_pk": company.pk}))
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
 
-        check_nir_url = reverse("job_seekers_views:check_nir_for_hire", kwargs={"company_pk": company.pk})
+        check_nir_url = reverse(
+            "job_seekers_views:check_nir_for_hire", kwargs={"session_uuid": job_seeker_session_name}
+        )
         response = client.get(check_nir_url)
         assert response.status_code == 200
         assertContains(response, LINK_RESET_MARKUP % reset_url_dashboard)
@@ -2950,7 +3063,18 @@ class TestApplyAsOther:
 
         for route in self.ROUTES:
             with subtests.test(route=route):
-                response = client.get(reverse(route, kwargs={"company_pk": company.pk}), follow=True)
+                if route.startswith("apply"):
+                    response = client.get(reverse(route, kwargs={"company_pk": company.pk}), follow=True)
+                else:
+                    # Init session (as it would be in apply:start)
+                    session = client.session
+                    session_name = str(uuid.uuid4())
+                    session[session_name] = {
+                        "config": {},
+                        "apply": {"company_pk": company.pk},
+                    }
+                    session.save()
+                    response = client.get(reverse(route, kwargs={"session_uuid": session_name}), follow=True)
                 assert response.status_code == 403
 
     def test_itou_staff_are_not_allowed_to_submit_application(self, client, subtests):
@@ -2960,7 +3084,18 @@ class TestApplyAsOther:
 
         for route in self.ROUTES:
             with subtests.test(route=route):
-                response = client.get(reverse(route, kwargs={"company_pk": company.pk}), follow=True)
+                if route.startswith("apply"):
+                    response = client.get(reverse(route, kwargs={"company_pk": company.pk}), follow=True)
+                else:
+                    # Init session (as it would be in apply:start)
+                    session = client.session
+                    session_name = str(uuid.uuid4())
+                    session[session_name] = {
+                        "config": {},
+                        "apply": {"company_pk": company.pk},
+                    }
+                    session.save()
+                    response = client.get(reverse(route, kwargs={"session_uuid": session_name}), follow=True)
                 assert response.status_code == 403
 
 
@@ -3002,7 +3137,11 @@ class TestApplicationView:
         response = client.get(
             reverse("apply:start", kwargs={"company_pk": company.pk}), {"job_description_id": "invalid"}
         )
-        assertRedirects(response, reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": company.pk}))
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        assertRedirects(
+            response,
+            reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}),
+        )
         assert self.apply_session_key(company) not in client.session
 
     def test_access_without_session(self, client):
@@ -3995,7 +4134,8 @@ def test_detect_existing_job_seeker(client):
     response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
     assert response.status_code == 302
 
-    next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": company.pk})
+    [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+    next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
     assert response.url == next_url
 
     # Step determine the job seeker with a NIR.
@@ -4007,13 +4147,21 @@ def test_detect_existing_job_seeker(client):
     NEW_NIR = "197013625838386"
     response = client.post(next_url, data={"nir": NEW_NIR, "confirm": 1})
     assert response.status_code == 302
-    job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
     next_url = reverse(
         "job_seekers_views:search_by_email_for_sender",
         kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
     )
+    expected_job_seeker_session = {
+        "config": {
+            "reset_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+        },
+        "apply": {"company_pk": company.pk},
+        "profile": {
+            "nir": NEW_NIR,
+        },
+    }
     assert response.url == next_url
-    assert client.session[job_seeker_session_name] == {"profile": {"nir": NEW_NIR}}
+    assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
     # Step get job seeker e-mail.
     # ----------------------------------------------------------------------
@@ -4024,12 +4172,9 @@ def test_detect_existing_job_seeker(client):
     response = client.post(next_url, data={"email": "wrong-email@example.com", "confirm": "1"})
     assert response.status_code == 302
 
-    expected_job_seeker_session = {
+    expected_job_seeker_session |= {
         "user": {
             "email": "wrong-email@example.com",
-        },
-        "profile": {
-            "nir": NEW_NIR,
         },
     }
     assert client.session[job_seeker_session_name] == expected_job_seeker_session
@@ -4577,7 +4722,13 @@ class TestFindJobSeekerForHireView:
     @pytest.fixture(autouse=True)
     def setup_method(self):
         self.company = CompanyFactory(with_membership=True)
-        self.check_nir_url = reverse("job_seekers_views:check_nir_for_hire", kwargs={"company_pk": self.company.pk})
+
+    def get_check_nir_url(self, client):
+        # Init session
+        start_url = reverse("apply:start", kwargs={"company_pk": self.company.pk})
+        client.get(start_url)
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        return reverse("job_seekers_views:check_nir_for_hire", kwargs={"session_uuid": job_seeker_session_name})
 
     def test_job_seeker_found_with_nir(self, client):
         user = self.company.members.first()
@@ -4585,15 +4736,16 @@ class TestFindJobSeekerForHireView:
 
         job_seeker = JobSeekerFactory(first_name="Sylvie", last_name="Martin")
 
-        response = client.get(self.check_nir_url)
+        check_nir_url = self.get_check_nir_url(client)
+        response = client.get(check_nir_url)
         assertContains(response, "Déclarer une embauche")
 
-        response = client.post(self.check_nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "preview": 1})
+        response = client.post(check_nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "preview": 1})
         assertContains(response, "Sylvie MARTIN")
         # Confirmation modal is shown
         assert response.context["preview_mode"] is True
 
-        response = client.post(self.check_nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": 1})
+        response = client.post(check_nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": 1})
         assertRedirects(
             response,
             reverse(
@@ -4609,19 +4761,13 @@ class TestFindJobSeekerForHireView:
         job_seeker = JobSeekerFactory(first_name="Sylvie", last_name="Martin")
         INVALID_NIR = "123456"
 
-        response = client.get(self.check_nir_url)
+        check_nir_url = self.get_check_nir_url(client)
+        response = client.get(check_nir_url)
         assertContains(response, "Déclarer une embauche")
 
-        response = client.post(self.check_nir_url, data={"nir": INVALID_NIR, "preview": 1})
+        response = client.post(check_nir_url, data={"nir": INVALID_NIR, "preview": 1})
         assertContains(response, "Le numéro de sécurité sociale est trop court")
-        known_session_keys = {
-            "_auth_user_id",
-            "_auth_user_backend",
-            "_auth_user_hash",
-            "current_organization",
-            "_csrftoken",
-        }
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in known_session_keys]
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
         search_by_email_url = reverse(
             "job_seekers_views:search_by_email_for_hire",
             kwargs={"company_pk": self.company.pk, "session_uuid": job_seeker_session_name},
@@ -4643,7 +4789,7 @@ class TestFindJobSeekerForHireView:
 
         response = client.get(search_by_email_url)
         assertContains(response, "Déclarer une embauche")  # Check page title
-        assertContains(response, self.check_nir_url)  # Check back button URL
+        assertContains(response, check_nir_url)  # Check back button URL
         assertNotContains(response, INVALID_NIR)
 
         response = client.post(search_by_email_url, data={"email": job_seeker.email, "preview": 1})
@@ -4669,10 +4815,11 @@ class TestFindJobSeekerForHireView:
             jobseeker_profile__with_hexa_address=True,
         )
 
-        response = client.get(self.check_nir_url)
+        check_nir_url = self.get_check_nir_url(client)
+        response = client.get(check_nir_url)
         assertContains(response, "Déclarer une embauche")
 
-        response = client.post(self.check_nir_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "preview": 1})
+        response = client.post(check_nir_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "preview": 1})
         assert response.status_code == 302
 
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
@@ -4684,7 +4831,7 @@ class TestFindJobSeekerForHireView:
 
         response = client.get(search_by_email_url)
         assertContains(response, "Déclarer une embauche")  # Check page title
-        assertContains(response, self.check_nir_url)  # Check back button URL
+        assertContains(response, check_nir_url)  # Check back button URL
         assertContains(response, dummy_job_seeker.jobseeker_profile.nir)
 
         response = client.post(search_by_email_url, data={"email": dummy_job_seeker.email})
@@ -4697,6 +4844,10 @@ class TestFindJobSeekerForHireView:
         )
 
         expected_job_seeker_session = {
+            "config": {
+                "reset_url": reverse("dashboard:index"),  # Hire: reset_url = dashboard
+            },
+            "apply": {"company_pk": self.company.pk},
             "user": {
                 "email": dummy_job_seeker.email,
             },
@@ -5102,43 +5253,51 @@ class TestNewHireProcessInfo:
 
     def test_as_job_seeker(self, client):
         client.force_login(self.job_seeker)
-        response = client.get(
-            reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"company_pk": self.company.pk})
-        )
+        response = client.get(reverse("apply:start", kwargs={"company_pk": self.company.pk}), follow=True)
         assertNotContains(response, self.OTHER_APPLY_PROCESS_INFO)
         assertNotContains(response, self.OTHER_DIRECT_HIRE_PROCESS_INFO)
-        response = client.get(
-            reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"company_pk": self.geiq.pk})
-        )
+        response = client.get(reverse("apply:start", kwargs={"company_pk": self.geiq.pk}), follow=True)
         assertNotContains(response, self.GEIQ_APPLY_PROCESS_INFO)
         assertNotContains(response, self.GEIQ_DIRECT_HIRE_PROCESS_INFO)
 
     def test_as_prescriber(self, client):
         client.force_login(PrescriberFactory())
-        response = client.get(
-            reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": self.company.pk})
-        )
+        response = client.get(reverse("apply:start", kwargs={"company_pk": self.company.pk}), follow=True)
         assertNotContains(response, self.OTHER_APPLY_PROCESS_INFO)
         assertNotContains(response, self.OTHER_DIRECT_HIRE_PROCESS_INFO)
-        response = client.get(reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": self.geiq.pk}))
+        response = client.get(reverse("apply:start", kwargs={"company_pk": self.geiq.pk}), follow=True)
         assertNotContains(response, self.GEIQ_APPLY_PROCESS_INFO)
         assertNotContains(response, self.GEIQ_DIRECT_HIRE_PROCESS_INFO)
 
     def test_as_employer(self, client):
         client.force_login(self.company.members.first())
+
+        # Init session
+        response = client.get(reverse("apply:start_hire", kwargs={"company_pk": self.company.pk}))
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
         response = client.get(
-            reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": self.company.pk})
+            reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
         )
         assertContains(response, self.OTHER_APPLY_PROCESS_INFO)
         assertNotContains(response, self.OTHER_DIRECT_HIRE_PROCESS_INFO)
-        response = client.get(reverse("job_seekers_views:check_nir_for_hire", kwargs={"company_pk": self.company.pk}))
+        response = client.get(
+            reverse("job_seekers_views:check_nir_for_hire", kwargs={"session_uuid": job_seeker_session_name})
+        )
         assertNotContains(response, self.OTHER_APPLY_PROCESS_INFO)
         assertContains(response, self.OTHER_DIRECT_HIRE_PROCESS_INFO)
 
         client.force_login(self.geiq.members.first())
-        response = client.get(reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": self.geiq.pk}))
+
+        # Init session
+        response = client.get(reverse("apply:start_hire", kwargs={"company_pk": self.geiq.pk}))
+        [job_seeker_session_name_geiq] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        response = client.get(
+            reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name_geiq})
+        )
         assertContains(response, self.GEIQ_APPLY_PROCESS_INFO)
         assertNotContains(response, self.GEIQ_DIRECT_HIRE_PROCESS_INFO)
-        response = client.get(reverse("job_seekers_views:check_nir_for_hire", kwargs={"company_pk": self.geiq.pk}))
+        response = client.get(
+            reverse("job_seekers_views:check_nir_for_hire", kwargs={"session_uuid": job_seeker_session_name_geiq})
+        )
         assertNotContains(response, self.GEIQ_APPLY_PROCESS_INFO)
         assertContains(response, self.GEIQ_DIRECT_HIRE_PROCESS_INFO)

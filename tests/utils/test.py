@@ -28,6 +28,16 @@ from itou.common_apps.address.departments import DEPARTMENTS
 BASE_NUM_QUERIES = 2
 
 
+# Used to find the session namespace by elimination
+KNOWN_SESSION_KEYS = {
+    "_auth_user_id",
+    "_auth_user_backend",
+    "_auth_user_hash",
+    "current_organization",
+    "_csrftoken",
+}
+
+
 def pprint_html(response, **selectors):
     """
     Pretty-print HTML responses (or fragment selected with :arg:`selector`)

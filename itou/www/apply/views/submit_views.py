@@ -156,6 +156,18 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
             return reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
         return reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description})
 
+    def init_job_seeker_session(self, request):
+        job_seeker_session = SessionNamespace.create_uuid_namespace(
+            request.session,
+            data={
+                "config": {
+                    "reset_url": self.get_reset_url(),
+                },
+                "apply": {"company_pk": self.company.pk},
+            },
+        )
+        return job_seeker_session
+
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "siae": self.company,
@@ -234,6 +246,7 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
             return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.company.pk}))
         return super().dispatch(request, *args, **kwargs)
 
+    # TODO(ewen): to be removed in favor of job_seekers_views/views.py::JobSeekerForSenderBaseView
     def redirect_to_check_infos(self, job_seeker_public_id):
         view_name = (
             "job_seekers_views:check_job_seeker_info_for_hire"
@@ -247,7 +260,12 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
 
 class StartView(ApplyStepBaseView):
     def get(self, request, *args, **kwargs):
-        tunnel = "job_seeker" if request.user.is_job_seeker else "sender"
+        if request.user.is_job_seeker:
+            tunnel = "job_seeker"
+        elif self.hire_process:
+            tunnel = "hire"
+        else:
+            tunnel = "sender"
 
         if not self.is_gps:
             # Checks are not relevants for the creation of a job_seeker in the GPS context
@@ -297,8 +315,11 @@ class StartView(ApplyStepBaseView):
                 reverse("apply:pending_authorization_for_sender", kwargs={"company_pk": self.company.pk})
             )
 
+        # Init a job_seeker_session needed for job_seekers_views
+        job_seeker_session = self.init_job_seeker_session(request)
+
         return HttpResponseRedirect(
-            reverse(f"job_seekers_views:check_nir_for_{tunnel}", kwargs={"company_pk": self.company.pk})
+            reverse(f"job_seekers_views:check_nir_for_{tunnel}", kwargs={"session_uuid": job_seeker_session.name})
             + ("?gps=true" if self.is_gps else "")
         )
 
@@ -308,7 +329,10 @@ class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": self.company.pk})
+        self.job_seeker_session = self.init_job_seeker_session(request)
+        self.next_url = reverse(
+            "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": self.job_seeker_session.name}
+        )
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {"next_url": self.next_url}

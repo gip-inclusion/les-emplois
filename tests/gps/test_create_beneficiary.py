@@ -25,6 +25,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     PrescriberFactory,
 )
+from tests.utils.test import KNOWN_SESSION_KEYS
 
 
 @pytest.mark.ignore_unknown_variable_template_error(
@@ -54,7 +55,11 @@ def test_create_job_seeker(_mock, client):
     apply_start_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
 
     response = client.get(apply_start_url)
-    next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+    [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+    next_url = (
+        reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
+        + "?gps=true"
+    )
     assertRedirects(response, next_url)
     response = client.get(next_url)
     france_travail = Company.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
@@ -73,8 +78,18 @@ def test_create_job_seeker(_mock, client):
         )
         + "?gps=true"
     )
+
+    expected_job_seeker_session = {
+        "config": {
+            "reset_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
+        },
+        "apply": {"company_pk": singleton.pk},
+        "profile": {
+            "nir": dummy_job_seeker.jobseeker_profile.nir,
+        },
+    }
     assertRedirects(response, next_url)
-    assert client.session[job_seeker_session_name] == {"profile": {"nir": dummy_job_seeker.jobseeker_profile.nir}}
+    assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
     # Step get job seeker e-mail.
     # ----------------------------------------------------------------------
@@ -82,12 +97,10 @@ def test_create_job_seeker(_mock, client):
     response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
 
     job_seeker_session_name = str(resolve(response.url.replace("?gps=true", "")).kwargs["session_uuid"])
-    expected_job_seeker_session = {
+
+    expected_job_seeker_session |= {
         "user": {
             "email": dummy_job_seeker.email,
-        },
-        "profile": {
-            "nir": dummy_job_seeker.jobseeker_profile.nir,
         },
     }
     next_url = (
@@ -227,7 +240,11 @@ def test_gps_bypass(client):
     apply_start_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     response = client.get(apply_start_url)
 
-    next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+    [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+    next_url = (
+        reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
+        + "?gps=true"
+    )
     assertRedirects(response, next_url)
 
     # SIAE has an active suspension, but we should be able to create the job_seeker for GPS
@@ -243,7 +260,11 @@ def test_gps_bypass(client):
     apply_start_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     response = client.get(apply_start_url)
 
-    next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+    [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+    next_url = (
+        reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
+        + "?gps=true"
+    )
     assertRedirects(response, next_url)
 
 
@@ -263,13 +284,15 @@ def test_existing_user_with_email(client):
 
     # Follow all redirections…
     response = client.get(reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true", follow=True)
+    [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
 
     # …until a job seeker has to be determined.
     assert response.status_code == 200
     last_url = response.redirect_chain[-1][0]
     assert (
         last_url
-        == reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+        == reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
+        + "?gps=true"
     )
 
     # Enter a non-existing NIR.
@@ -285,8 +308,18 @@ def test_existing_user_with_email(client):
         )
         + "?gps=true"
     )
+    expected_job_seeker_session = {
+        "config": {
+            "reset_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
+        },
+        "apply": {"company_pk": singleton.pk},
+        "profile": {
+            "nir": nir,
+        },
+    }
+
     assert response.url == next_url
-    assert client.session[job_seeker_session_name] == {"profile": {"nir": nir}}
+    assert client.session[job_seeker_session_name] == expected_job_seeker_session
     assertRedirects(response, next_url)
 
     # Enter an existing email.
@@ -327,13 +360,15 @@ def test_existing_user_with_nir(client):
 
     # Follow all redirections…
     response = client.get(reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true", follow=True)
+    [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
 
     # …until a job seeker has to be determined.
     assert response.status_code == 200
     last_url = response.redirect_chain[-1][0]
     assert (
         last_url
-        == reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+        == reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
+        + "?gps=true"
     )
 
     # Enter an existing NIR.
@@ -378,8 +413,10 @@ def test_creation_by_user_kind(client, UserFactory, factory_args, expected_acces
         assertRedirects(response, reverse("dashboard:index"))
 
     response = client.get(create_beneficiary_url)
+    [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
     assert response.status_code == 302
     assert (
         response["Location"]
-        == reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+        == reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
+        + "?gps=true"
     )
