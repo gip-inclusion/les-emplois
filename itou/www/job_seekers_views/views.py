@@ -199,6 +199,7 @@ class CheckNIRForJobSeekerView(ApplyStepBaseView):
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated and not self.job_seeker.is_job_seeker:
+            logger.info(f"dispatch ({request.path}) : {request.user.kind} in jobseeker tunnel")
             return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.company.pk}))
         return super().dispatch(request, *args, **kwargs)
 

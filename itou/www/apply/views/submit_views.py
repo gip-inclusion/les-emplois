@@ -230,6 +230,7 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
 
     def dispatch(self, request, *args, **kwargs):
         if self.sender.is_authenticated and self.sender.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
+            logger.info(f"dispatch ({request.path}) : {self.sender.kind} in sender tunnel")
             return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.company.pk}))
         return super().dispatch(request, *args, **kwargs)
 
