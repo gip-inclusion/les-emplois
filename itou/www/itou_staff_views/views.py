@@ -10,6 +10,7 @@ from django.http import FileResponse, Http404, HttpResponseRedirect, StreamingHt
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.http import content_disposition_header
 
 from itou.approvals.models import Approval
@@ -217,7 +218,7 @@ def merge_users(request, template_name="itou_staff_views/merge_users.html"):
         return HttpResponseRedirect(
             reverse(
                 "itou_staff_views:merge_users_confirm",
-                kwargs={"to_user_pk": form.old_user.pk, "from_user_pk": form.new_user.pk},
+                kwargs={"user_1_pk": form.user_1.pk, "user_2_pk": form.user_2.pk},
             )
         )
 
@@ -230,8 +231,11 @@ def merge_users(request, template_name="itou_staff_views/merge_users.html"):
     login_url=reverse_lazy("dashboard:index"),
     redirect_field_name=None,
 )
-def merge_users_confirm(request, to_user_pk, from_user_pk, template_name="itou_staff_views/merge_users_confirm.html"):
+def merge_users_confirm(request, user_1_pk, user_2_pk, template_name="itou_staff_views/merge_users_confirm.html"):
     ALLOWED_USER_KINDS = [UserKind.PRESCRIBER, UserKind.EMPLOYER]
+
+    # Always put the oldest user (with the smallest pk) on the left side
+    to_user_pk, from_user_pk = sorted((user_1_pk, user_2_pk))
 
     to_user = get_object_or_404(User, pk=to_user_pk)
     from_user = get_object_or_404(User, pk=from_user_pk)
@@ -256,9 +260,16 @@ def merge_users_confirm(request, to_user_pk, from_user_pk, template_name="itou_s
         merge_allowed = True
         if request.method == "POST" and form.is_valid():
             try:
-                success_message = f"Fusion {to_user.email} ← {from_user.email} effectuée"
+                success_message = format_html(
+                    'Fusion {} & {} effectuée : (<a href="{}">admin</a>)',
+                    to_user.email,
+                    from_user.email,
+                    merge_utils.admin_url(to_user),
+                )
                 merge_utils.merge_users(
-                    to_user, from_user, update_personal_data=form.cleaned_data["update_personal_data"]
+                    to_user,
+                    from_user,
+                    update_personal_data=form.cleaned_data["user_to_keep"] == "from_user",
                 )
                 messages.success(request, success_message)
                 return HttpResponseRedirect(reverse("itou_staff_views:merge_users"))
@@ -267,7 +278,7 @@ def merge_users_confirm(request, to_user_pk, from_user_pk, template_name="itou_s
                 return HttpResponseRedirect(
                     reverse(
                         "itou_staff_views:merge_users_confirm",
-                        kwargs={"to_user_pk": to_user.pk, "from_user_pk": from_user.pk},
+                        kwargs={"user_1_pk": to_user.pk, "user_2_pk": from_user.pk},
                     )
                 )
 

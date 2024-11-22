@@ -145,7 +145,7 @@ def migrate_field(model, field_name, from_user, to_user):
 def merge_users(to_user, from_user, update_personal_data):
     assert to_user.kind in [UserKind.EMPLOYER, UserKind.PRESCRIBER]
     assert to_user.kind == from_user.kind
-    support_remark = f"{timezone.localdate()}: Fusion d'utilisateurs {to_user.email} ← {from_user.email}"
+    support_remark = f"{timezone.localdate()}: Fusion des utilisateurs {to_user.email} et {from_user.email}"
     for model, field_name in get_users_relations():
         migrate_field(model, field_name, from_user, to_user)
     if update_personal_data:

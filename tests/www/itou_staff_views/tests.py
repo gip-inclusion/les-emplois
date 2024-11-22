@@ -35,7 +35,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.test import assertSnapshotQueries
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
 class TestExportJobApplications:
@@ -251,31 +251,31 @@ class TestMergeUsers:
         client.force_login(ItouStaffFactory(is_superuser=True))
         url = reverse("itou_staff_views:merge_users")
 
-        response = client.post(url, data={"old_email": "", "new_email": ""})
+        response = client.post(url, data={"email_1": "", "email_2": ""})
         assert response.context["form"].errors == {
-            "old_email": ["Ce champ est obligatoire."],
-            "new_email": ["Ce champ est obligatoire."],
+            "email_1": ["Ce champ est obligatoire."],
+            "email_2": ["Ce champ est obligatoire."],
         }
 
-        response = client.post(url, data={"old_email": "one@mailinator.com", "new_email": "two@mailinator.com"})
+        response = client.post(url, data={"email_1": "one@mailinator.com", "email_2": "two@mailinator.com"})
         assert response.context["form"].errors == {
-            "old_email": ["Cet utilisateur n'existe pas."],
-            "new_email": ["Cet utilisateur n'existe pas."],
+            "email_1": ["Cet utilisateur n'existe pas."],
+            "email_2": ["Cet utilisateur n'existe pas."],
         }
 
         user_1 = PrescriberFactory(email="one@mailinator.com")
-        response = client.post(url, data={"old_email": "one@mailinator.com", "new_email": "two@mailinator.com"})
+        response = client.post(url, data={"email_1": "one@mailinator.com", "email_2": "two@mailinator.com"})
         assert response.context["form"].errors == {
-            "new_email": ["Cet utilisateur n'existe pas."],
+            "email_2": ["Cet utilisateur n'existe pas."],
         }
 
-        response = client.post(url, data={"old_email": "one@mailinator.com", "new_email": "one@mailinator.com"})
+        response = client.post(url, data={"email_1": "one@mailinator.com", "email_2": "one@mailinator.com"})
         assert response.context["form"].errors == {
             "__all__": ["Les deux adresses doivent être différentes."],
         }
 
         user_2 = PrescriberFactory(email="two@mailinator.com")
-        response = client.post(url, data={"old_email": "one@mailinator.com", "new_email": "two@mailinator.com"})
+        response = client.post(url, data={"email_1": "one@mailinator.com", "email_2": "two@mailinator.com"})
         assertRedirects(response, reverse("itou_staff_views:merge_users_confirm", args=(user_1.pk, user_2.pk)))
 
     def test_check_user_kind(self, client, mocker):
@@ -324,10 +324,64 @@ class TestMergeUsers:
         response = client.get(url)
         assertContains(response, BUTTON_TXT)
         assertContains(response, DATA_TITLE)
-        response = client.post(url, data={"update_personal_data": "True"}, follow=True)
+        response = client.post(url, data={"user_to_keep": "from_user"}, follow=True)
         assert merge_users_mock.call_count == 1
-        assertContains(response, f"Fusion {employer.email} ← {other_employer.email} effectuée")
+        assertContains(response, f"Fusion {employer.email} & {other_employer.email} effectuée")
         assertRedirects(response, reverse("itou_staff_views:merge_users"))
+
+    def test_merge_order(self, client, snapshot):
+        # always merge into the user with the smallest pk
+        client.force_login(ItouStaffFactory(is_superuser=True))
+
+        prescriber_1 = PrescriberFactory(
+            first_name="Pierre",
+            last_name="Dupont",
+            email="pierre.dupont@test.local",
+            username="8487651a-a6c8-4a57-9663-64fadf1dc764",
+        )
+        prescriber_2 = PrescriberFactory(
+            first_name="Jean",
+            last_name="Laurent",
+            email="jean.laurent@test.local",
+            username="471d1de6-e1ff-4cd2-be2e-61f603c04687",
+        )
+        assert prescriber_1.pk < prescriber_2.pk
+
+        url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_1.pk, prescriber_2.pk))
+        response = client.get(url)
+        assert str(
+            parse_response_to_soup(
+                response,
+                "#users_info",
+                replace_in_attr=[
+                    ("href", f"/admin/users/user/{prescriber_1.pk}", "/admin/users/user/[PK of User_1]"),
+                    ("href", f"/admin/users/user/{prescriber_2.pk}", "/admin/users/user/[PK of User_2]"),
+                ],
+            )
+        ) == snapshot(name="same_order")
+        client.post(url, data={"user_to_keep": "from_user"})
+        assert User.objects.filter(pk=prescriber_1.pk).exists()
+        assert not User.objects.filter(pk=prescriber_2.pk).exists()
+
+        # reset accounts
+        prescriber_1.save()
+        prescriber_2.save()
+
+        url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_2.pk, prescriber_1.pk))
+        response = client.get(url)
+        assert str(
+            parse_response_to_soup(
+                response,
+                "#users_info",
+                replace_in_attr=[
+                    ("href", f"/admin/users/user/{prescriber_1.pk}", "/admin/users/user/[PK of User_1]"),
+                    ("href", f"/admin/users/user/{prescriber_2.pk}", "/admin/users/user/[PK of User_2]"),
+                ],
+            )
+        ) == snapshot(name="same_order")
+        client.post(url, data={"user_to_keep": "from_user"})
+        assert User.objects.filter(pk=prescriber_1.pk).exists()
+        assert not User.objects.filter(pk=prescriber_2.pk).exists()
 
     @freeze_time("2024-11-19")
     def test_merge_personnal_data(self, client, caplog):
@@ -337,7 +391,7 @@ class TestMergeUsers:
         client.force_login(ItouStaffFactory(is_superuser=True))
 
         url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_1.pk, prescriber_2.pk))
-        client.post(url, data={"update_personal_data": "True"})
+        client.post(url, data={"user_to_keep": "from_user"})
         merged_user = User.objects.get(pk=prescriber_1.pk)
         assert not User.objects.filter(pk=prescriber_2.pk).exists()
         assert merged_user.email == prescriber_2.email
@@ -356,7 +410,7 @@ class TestMergeUsers:
             content_type=ContentType.objects.get_for_model(prescriber_1), object_id=prescriber_1.pk
         )
         assert admin_remark.remark == (
-            f"2024-11-19: Fusion d'utilisateurs {prescriber_1.email} ← {prescriber_2.email} "
+            f"2024-11-19: Fusion des utilisateurs {prescriber_1.email} et {prescriber_2.email} "
             "en mettant à jour les infos personnelles"
         )
         admin_remark.delete()
@@ -365,7 +419,7 @@ class TestMergeUsers:
         prescriber_1.save()
         prescriber_2.save()
         url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_1.pk, prescriber_2.pk))
-        client.post(url, data={"update_personal_data": "False"})
+        client.post(url, data={"user_to_keep": "to_user"})
         merged_user = User.objects.get(pk=prescriber_1.pk)
         assert not User.objects.filter(pk=prescriber_2.pk).exists()
         assert merged_user.email == prescriber_1.email
@@ -382,7 +436,9 @@ class TestMergeUsers:
         admin_remark = PkSupportRemark.objects.get(
             content_type=ContentType.objects.get_for_model(prescriber_1), object_id=prescriber_1.pk
         )
-        assert admin_remark.remark == f"2024-11-19: Fusion d'utilisateurs {prescriber_1.email} ← {prescriber_2.email}"
+        assert (
+            admin_remark.remark == f"2024-11-19: Fusion des utilisateurs {prescriber_1.email} et {prescriber_2.email}"
+        )
 
     def test_merge_prescriber_memberships(self, client, caplog):
         prescriber_1 = PrescriberFactory()
@@ -397,7 +453,7 @@ class TestMergeUsers:
         with freeze_time() as frozen_now:
             client.force_login(ItouStaffFactory(is_superuser=True))
             url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_1.pk, prescriber_2.pk))
-            client.post(url, data={"update_personal_data": "False"})
+            client.post(url, data={"user_to_keep": "to_user"})
             membership = PrescriberMembership.objects.get()
             assert membership.user == prescriber_1
             assert membership.is_admin is True
@@ -427,7 +483,7 @@ class TestMergeUsers:
         with freeze_time() as frozen_now:
             client.force_login(ItouStaffFactory(is_superuser=True))
             url = reverse("itou_staff_views:merge_users_confirm", args=(employer_1.pk, employer_2.pk))
-            client.post(url, data={"update_personal_data": "False"})
+            client.post(url, data={"user_to_keep": "to_user"})
             membership = CompanyMembership.objects.get()
             assert membership.user == employer_1
             assert membership.is_admin is True
@@ -479,7 +535,7 @@ class TestMergeUsers:
 
         client.force_login(ItouStaffFactory(is_superuser=True))
         url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_1.pk, prescriber_2.pk))
-        client.post(url, data={"update_personal_data": "False"})
+        client.post(url, data={"user_to_keep": "to_user"})
 
         job_app.refresh_from_db()
         assert job_app.sender == prescriber_1

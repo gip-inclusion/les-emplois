@@ -48,14 +48,12 @@ class ItouStaffExportJobApplicationForm(forms.Form):
 
 
 class MergeUserForm(forms.Form):
-    old_email = forms.EmailField(
-        label="Ancien e-mail",
-        help_text="Email du compte à conserver.",
+    email_1 = forms.EmailField(
+        label="E-mail du premier compte",
         widget=forms.TextInput(attrs={"autocomplete": "off"}),
     )
-    new_email = forms.EmailField(
-        label="Nouvel e-mail",
-        help_text="Email du compte dont on va migrer les relations, et les informations personnelles.",
+    email_2 = forms.EmailField(
+        label="E-mail du second compte",
         widget=forms.TextInput(attrs={"autocomplete": "off"}),
     )
 
@@ -65,23 +63,28 @@ class MergeUserForm(forms.Form):
             raise ValidationError("Cet utilisateur n'existe pas.")
         return user
 
-    def clean_old_email(self):
-        self.old_user = self._check_email_exists(self.cleaned_data["old_email"])
+    def clean_email_1(self):
+        self.user_1 = self._check_email_exists(self.cleaned_data["email_1"])
 
-    def clean_new_email(self):
-        self.new_user = self._check_email_exists(self.cleaned_data["new_email"])
+    def clean_email_2(self):
+        self.user_2 = self._check_email_exists(self.cleaned_data["email_2"])
 
     def clean(self):
         cleaned_data = super().clean()
-        new_user = getattr(self, "new_user", None)
-        old_user = getattr(self, "old_user", None)
-        if old_user and new_user and old_user == new_user:
+        user_1 = getattr(self, "user_1", None)
+        user_2 = getattr(self, "user_2", None)
+        if user_2 and user_1 and user_2 == user_1:
             raise ValidationError("Les deux adresses doivent être différentes.")
         return cleaned_data
 
 
 class MergeUserConfirmForm(forms.Form):
-    update_personal_data = forms.TypedChoiceField(
-        coerce=lambda v: v == "True",
-        choices=((False, "False"), (True, "True")),
+    user_to_keep = forms.ChoiceField(
+        choices=(("to_user", "to_user"), ("from_user", "from_user")),
     )
+
+    def clean(self) -> None:
+        cleaned_data = super().clean()
+        if self.errors:
+            self.add_error(None, "Vous devez choisir l'identité à conserver")
+        return cleaned_data

@@ -15,7 +15,7 @@ urlpatterns = [
     path("export-cta", views.export_cta, name="export_cta"),
     path("merge-users", views.merge_users, name="merge_users"),
     path(
-        "merge-users/<int:to_user_pk>/<int:from_user_pk>",
+        "merge-users/<int:user_1_pk>/<int:user_2_pk>",
         views.merge_users_confirm,
         name="merge_users_confirm",
     ),

@@ -2456,3 +2456,76 @@
     ),
   ])
 # ---
+# name: TestMergeUsers.test_merge_order[same_order]
+  '''
+  <div class="row mb-5" id="users_info">
+                      <div class="col">
+                          <div class="c-box" id="left_user_box">
+                              <ul class="list-unstyled">
+                                  <li>
+                                      <a href="/admin/users/user/[PK of User_1]/change/">Lien vers l'admin</a>
+                                  </li>
+                                  <li>
+                                      Adresse e-mail : <strong>pierre.dupont@test.local</strong>
+                                  </li>
+                                  <li>
+                                      Prénom : <strong>Pierre</strong>
+                                  </li>
+                                  <li>
+                                      Nom : <strong>DUPONT</strong>
+                                  </li>
+                                  <li>
+                                      Type : <strong>prescripteur</strong>
+                                  </li>
+                                  <li>
+                                      Connexion : <strong>Inclusion Connect</strong>
+                                  </li>
+                                  <li>
+                                      Identifiant unique (du SSO) : <strong>8487651a-a6c8-4a57-9663-64fadf1dc764</strong>
+                                  </li>
+                              </ul>
+                              
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_keep_to_user" name="user_to_keep" type="radio" value="to_user"/>
+                                      <label class="form-check-label" for="id_keep_to_user">Utiliser ce compte pour la connexion</label>
+  
+                                  </div>
+                              
+                          </div>
+                      </div>
+                      <div class="col">
+                          <div class="c-box" id="right_user_box">
+                              <ul class="list-unstyled">
+                                  <li>
+                                      <a href="/admin/users/user/[PK of User_2]/change/">Lien vers l'admin</a>
+                                  </li>
+                                  <li>
+                                      Adresse e-mail : <strong>jean.laurent@test.local</strong>
+                                  </li>
+                                  <li>
+                                      Prénom : <strong>Jean</strong>
+                                  </li>
+                                  <li>
+                                      Nom : <strong>LAURENT</strong>
+                                  </li>
+                                  <li>
+                                      Type : <strong>prescripteur</strong>
+                                  </li>
+                                  <li>
+                                      Connexion : <strong>Inclusion Connect</strong>
+                                  </li>
+                                  <li>
+                                      Identifiant unique (du SSO) : <strong>471d1de6-e1ff-4cd2-be2e-61f603c04687</strong>
+                                  </li>
+                              </ul>
+                              
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="id_keep_from_user" name="user_to_keep" type="radio" value="from_user"/>
+                                      <label class="form-check-label" for="id_keep_from_user">Utiliser ce compte pour la connexion</label>
+                                  </div>
+                              
+                          </div>
+                      </div>
+                  </div>
+  '''
+# ---

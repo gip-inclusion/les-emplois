@@ -30,7 +30,7 @@
                 </div>
 
                 <h2>Informations personnelles</h2>
-                <div class="row mb-5">
+                <div class="row mb-5" id="users_info">
                     <div class="col">
                         <div class="c-box {% if to_user_error %}bg-danger-lightest border-danger{% endif %}" id="left_user_box">
                             <ul class="list-unstyled">
@@ -60,17 +60,15 @@
                                 <p class="text-danger">{{ to_user_error }}</p>
                             {% else %}
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="update_personal_data" id="id_update_personal_data_0" value="False">
-                                    <label class="form-check-label" for="id_update_personal_data_0">Conserver ces informations personnelles</label>
+                                    <input class="form-check-input" type="radio" name="user_to_keep" id="id_keep_to_user" value="to_user">
+                                    <label class="form-check-label" for="id_keep_to_user">Utiliser ce compte pour la connexion</label>
+
                                 </div>
                             {% endif %}
                         </div>
                     </div>
-                    <div class="col-1 text-center d-flex justify-content-center align-items-center">
-                        <i class="ri-arrow-left-line ri-3x"></i>
-                    </div>
                     <div class="col">
-                        <div class="c-box {% if from_user_error %}bg-danger-lightest border-danger{% else %}bg-success-lightest border-success{% endif %}" id="right_user_box">
+                        <div class="c-box {% if from_user_error %}bg-danger-lightest border-danger{% endif %}" id="right_user_box">
                             <ul class="list-unstyled">
                                 <li>
                                     <a href="{{ from_user_admin_link }}">Lien vers l'admin</a>
@@ -98,10 +96,8 @@
                                 <p class="text-danger">{{ from_user_error }}</p>
                             {% else %}
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="update_personal_data" id="id_update_personal_data_1" value="True" checked="checked">
-                                    <label class="form-check-label" for="id_update_personal_data_1">
-                                        Mettre à jour avec ces informations personnelles
-                                    </label>
+                                    <input class="form-check-input" type="radio" name="user_to_keep" id="id_keep_from_user" value="from_user">
+                                    <label class="form-check-label" for="id_keep_from_user">Utiliser ce compte pour la connexion</label>
                                 </div>
                             {% endif %}
                         </div>
@@ -148,10 +144,10 @@
 
     <script nonce="{{ CSP_NONCE }}">
         htmx.onLoad(function() {
-            var left_user_box = $("#left_user_box");
-            var right_user_box = $("#right_user_box");
-            var left_user_choice = $("#id_update_personal_data_0");
-            var right_user_choice = $("#id_update_personal_data_1");
+            const left_user_box = $("#left_user_box");
+            const right_user_box = $("#right_user_box");
+            const left_user_choice = $("#id_keep_to_user");
+            const right_user_choice = $("#id_keep_from_user");
             left_user_choice.change(function() {
                 left_user_box.addClass("bg-success-lightest border-success")
                 right_user_box.removeClass("bg-success-lightest border-success")
