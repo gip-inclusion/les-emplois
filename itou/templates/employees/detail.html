@@ -29,8 +29,9 @@
                     <div class="c-box mb-3 mb-lg-5">
                         <h2>Candidatures de ce salarié</h2>
                         <hr>
+                        {% matomo_event "salaries" "clic" "voir-candidature-employeur" as matomo_event_attrs %}
                         {% for job_application_for_card in all_job_applications %}
-                            {% include "apply/includes/job_application_box_for_user.html" with job_application=job_application_for_card %}
+                            {% include "apply/includes/job_application_box_for_user.html" with job_application=job_application_for_card matomo_event_attrs=matomo_event_attrs %}
                         {% endfor %}
                     </div>
                 </div>
