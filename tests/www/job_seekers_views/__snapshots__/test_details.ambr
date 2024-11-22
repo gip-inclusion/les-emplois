@@ -222,6 +222,7 @@
                               <h2>Candidatures envoyées</h2>
                               <hr/>
                               
+                              
                                   <div class="c-box c-box--results my-3 my-md-4">
                                       <div class="c-box--results__body">
                                           <p class="mb-0">Aucune candidature envoyée.</p>
@@ -439,6 +440,7 @@
                               <h2>Candidatures envoyées</h2>
                               <hr/>
                               
+                              
                                   <div class="c-box c-box--results my-3 my-md-4">
                                       <div class="c-box--results__body">
                                           <p class="mb-0">Aucune candidature envoyée.</p>
@@ -615,6 +617,7 @@
                           <div aria-labelledby="job-applications-tab" class="tab-pane fade" id="candidatures" role="tabpanel">
                               <h2>Candidatures envoyées</h2>
                               <hr/>
+                              
                               
                                   <div class="c-box c-box--results my-3 my-md-4">
                                       <div class="c-box--results__body">
@@ -879,6 +882,7 @@
                               <h2>Candidatures envoyées</h2>
                               <hr/>
                               
+                              
                                   <div class="c-box c-box--results my-3 my-md-4">
                                       <div class="c-box--results__body">
                                           <p class="mb-0">Aucune candidature envoyée.</p>
@@ -901,9 +905,12 @@
                               <h2>Candidatures envoyées</h2>
                               <hr/>
                               
-                                  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-                                      <div class="c-box--results__header">
-                                          
+                              
+                                  
+                                  
+  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+      <div class="c-box--results__header">
+          
   
   <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
       <p class="fs-sm mb-0 flex-grow-1">
@@ -922,11 +929,11 @@
       <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></div>
   </div>
   
-                                      </div>
-                                      <hr class="m-0"/>
-                                      <div class="c-box--results__body">
-                                          <div class="c-box--results__list-data">
-                                              
+      </div>
+      <hr class="m-0"/>
+      <div class="c-box--results__body">
+          <div class="c-box--results__list-data">
+              
   
   
       
@@ -936,18 +943,21 @@
       
   
   
-                                          </div>
-                                      </div>
-                                      <div class="c-box--results__footer">
-                                          <div class="d-flex justify-content-end">
-                                              <a aria-label="Voir la candidature de Pierre DUPONT" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">Voir sa candidature</a>
-                                          </div>
-                                      </div>
-                                  </div>
+          </div>
+      </div>
+      <div class="c-box--results__footer">
+          <div class="d-flex justify-content-end">
+              <a aria-label="Voir la candidature de Pierre DUPONT" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">Voir sa candidature</a>
+          </div>
+      </div>
+  </div>
+  
                               
-                                  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-                                      <div class="c-box--results__header">
-                                          
+                                  
+                                  
+  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+      <div class="c-box--results__header">
+          
   
   <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
       <p class="fs-sm mb-0 flex-grow-1">
@@ -966,11 +976,11 @@
       <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-222222222222">Nouvelle candidature</span></div>
   </div>
   
-                                      </div>
-                                      <hr class="m-0"/>
-                                      <div class="c-box--results__body">
-                                          <div class="c-box--results__list-data">
-                                              
+      </div>
+      <hr class="m-0"/>
+      <div class="c-box--results__body">
+          <div class="c-box--results__list-data">
+              
   
   
       
@@ -980,14 +990,15 @@
       
   
   
-                                          </div>
-                                      </div>
-                                      <div class="c-box--results__footer">
-                                          <div class="d-flex justify-content-end">
-                                              <a aria-label="Voir la candidature de Pierre DUPONT" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature" href="/apply/11111111-1111-1111-1111-222222222222/prescriber/details?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">Voir sa candidature</a>
-                                          </div>
-                                      </div>
-                                  </div>
+          </div>
+      </div>
+      <div class="c-box--results__footer">
+          <div class="d-flex justify-content-end">
+              <a aria-label="Voir la candidature de Pierre DUPONT" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature" href="/apply/11111111-1111-1111-1111-222222222222/prescriber/details?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">Voir sa candidature</a>
+          </div>
+      </div>
+  </div>
+  
                               
                           </div>
   '''
@@ -2000,6 +2011,7 @@
                               <h2>Candidatures envoyées</h2>
                               <hr/>
                               
+                              
                                   <div class="c-box c-box--results my-3 my-md-4">
                                       <div class="c-box--results__body">
                                           <p class="mb-0">Aucune candidature envoyée.</p>
@@ -2221,6 +2233,7 @@
                               <h2>Candidatures envoyées</h2>
                               <hr/>
                               
+                              
                                   <div class="c-box c-box--results my-3 my-md-4">
                                       <div class="c-box--results__body">
                                           <p class="mb-0">Aucune candidature envoyée.</p>
@@ -2397,6 +2410,7 @@
                           <div aria-labelledby="job-applications-tab" class="tab-pane fade" id="candidatures" role="tabpanel">
                               <h2>Candidatures envoyées</h2>
                               <hr/>
+                              
                               
                                   <div class="c-box c-box--results my-3 my-md-4">
                                       <div class="c-box--results__body">
@@ -2617,6 +2631,7 @@
                               <h2>Candidatures envoyées</h2>
                               <hr/>
                               
+                              
                                   <div class="c-box c-box--results my-3 my-md-4">
                                       <div class="c-box--results__body">
                                           <p class="mb-0">Aucune candidature envoyée.</p>
@@ -2793,6 +2808,7 @@
                           <div aria-labelledby="job-applications-tab" class="tab-pane fade" id="candidatures" role="tabpanel">
                               <h2>Candidatures envoyées</h2>
                               <hr/>
+                              
                               
                                   <div class="c-box c-box--results my-3 my-md-4">
                                       <div class="c-box--results__body">
@@ -3020,6 +3036,7 @@
                           <div aria-labelledby="job-applications-tab" class="tab-pane fade" id="candidatures" role="tabpanel">
                               <h2>Candidatures envoyées</h2>
                               <hr/>
+                              
                               
                                   <div class="c-box c-box--results my-3 my-md-4">
                                       <div class="c-box--results__body">
