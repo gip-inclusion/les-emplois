@@ -1,5 +1,27 @@
 # Journal des modifications
 
+## 2024-11-25
+
+### Ajouté
+
+- [Candidature: ajout d'un lien vers la fiche structure pour les utilisateurs n'appartenant pas à la structure](https://github.com/gip-inclusion/les-emplois/pull/5131)
+- [Employeur : Historique des SIRET](https://github.com/gip-inclusion/les-emplois/pull/4945)
+
+### Modifié
+
+- [Candidature: suppression de liens vers la fiche candidat ou entreprise dans la vue liste des candidatures](https://github.com/gip-inclusion/les-emplois/pull/5132)
+- [GPS: Permettre aux orienteurs d’accéder à GPS sur leur dashboard](https://github.com/gip-inclusion/les-emplois/pull/5100)
+- [PASS IAE : Limiter la date de fin prévisionnelle aux dates enregistrées](https://github.com/gip-inclusion/les-emplois/pull/5121)
+- [PASS IAE: correction de la vue de détail pour d'anciens PASS liés à des candidatures acceptées sans date de début d'embauche](https://github.com/gip-inclusion/les-emplois/pull/5116)
+- [PASS IAE: utilisation du nouvel encart dans les candidatures](https://github.com/gip-inclusion/les-emplois/pull/5064)
+- [UX/UI : Amélioration de la navigation pour la gestion des annexes financières](https://github.com/gip-inclusion/les-emplois/pull/5048) 🖼
+- [UX/UI: Adaptation du graissage des icones](https://github.com/gip-inclusion/les-emplois/pull/5124)
+- [UX/UI: Ajouter la date d'émission de la candidature dans l'onglet d'infos générales](https://github.com/gip-inclusion/les-emplois/pull/5094)
+
+### Tech
+
+- [Versionner les fichiers du stockage S3](https://github.com/gip-inclusion/les-emplois/pull/5095)
+
 ## 2024-11-18
 
 ### Ajouté
