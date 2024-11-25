@@ -40,7 +40,6 @@ def test_get(client):
     client.force_login(job_application.sender)
 
     response = client.get(reverse("apply:list_prescriptions"))
-    assert_previous_step(response, reverse("dashboard:index"))
     # Has link to export with back_url set
     exports_link = unquote(
         add_url_params(reverse("apply:list_prescriptions_exports"), {"back_url": reverse("apply:list_prescriptions")})

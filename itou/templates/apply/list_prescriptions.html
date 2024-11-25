@@ -7,10 +7,6 @@
 
 {% block title %}Candidatures envoyées {{ block.super }}{% endblock %}
 
-{% block title_prevstep %}
-    {% include "layout/previous_step.html" with back_url=back_url only %}
-{% endblock %}
-
 {% block title_content %}
     <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
         {% include "apply/includes/list_job_applications_title.html" %}
