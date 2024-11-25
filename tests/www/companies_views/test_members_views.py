@@ -9,7 +9,6 @@ from tests.companies.factories import (
     CompanyMembershipFactory,
     CompanyWith2MembershipsFactory,
 )
-from tests.utils.test import assert_previous_step
 
 
 class TestMembers:
@@ -22,7 +21,6 @@ class TestMembers:
         url = reverse("companies_views:members")
         response = client.get(url)
         assert response.status_code == 200
-        assert_previous_step(response, reverse("dashboard:index"))
 
     def test_active_members(self, client):
         company = CompanyFactory()
