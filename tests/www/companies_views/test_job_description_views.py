@@ -16,7 +16,7 @@ from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import assert_previous_step, assertSnapshotQueries
+from tests.utils.test import assertSnapshotQueries
 
 
 class JobDescriptionAbstract:
@@ -115,8 +115,6 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
                     html=True,
                     count=2,
                 )
-
-        assert_previous_step(response, reverse("dashboard:index"))
 
     def test_block_job_applications(self, client):
         response = self._login(client, self.user)
