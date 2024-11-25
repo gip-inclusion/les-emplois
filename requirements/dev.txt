@@ -71,9 +71,9 @@ boto3==1.35.64 \
     --hash=sha256:bc3fc12b41fa2c91e51ab140f74fb1544408a2b1e00f88a4c2369a66d18ddf20 \
     --hash=sha256:cdacf03fc750caa3aa0dbf6158166def9922c9d67b4160999ff8fc350662facc
     # via -r requirements/test.txt
-botocore==1.35.65 \
-    --hash=sha256:46652f732f2b2fb395fffcc33cacb288d05ea283047c9a996fb59d6849464919 \
-    --hash=sha256:8fcaa82ab2338f412e1494449c4c57f9ca785623fb0303f6be5b279c4d27522c
+botocore==1.35.68 \
+    --hash=sha256:42c3700583a82f2b5316281a073d644a521d6358837e2b446dc458ba5d990fb4 \
+    --hash=sha256:599139d5564291f5be873800711f9e4e14a823395ae9ce7b142be775e9849b94
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -1608,12 +1608,6 @@ sentry-sdk==2.18.0 \
     --hash=sha256:0dc21febd1ab35c648391c664df96f5f79fb0d92d7d4225cd9832e53a617cafd \
     --hash=sha256:ee70e27d1bbe4cd52a38e1bd28a5fadb9b17bc29d91b5f2b97ae29c0a7610442
     # via -r requirements/test.txt
-setuptools==75.5.0 \
-    --hash=sha256:5c4ccb41111392671f02bb5f8436dfc5a9a7185e80500531b133f5775c4163ef \
-    --hash=sha256:87cb777c3b96d638ca02031192d40390e0ad97737e27b6b4fa831bea86f2f829
-    # via
-    #   -r requirements/test.txt
-    #   django-easymde
 shellcheck-py==0.10.0.1 \
     --hash=sha256:390826b340b8c19173922b0da5ef7b66ef34d4d087dc48aad3e01f7e77e164d9 \
     --hash=sha256:48f08965cafbb3363b265c4ef40628ffced19cb6fc7c4bb5ce72d32cbcfb4bb9 \
