@@ -706,6 +706,12 @@ API_DATADOG_BASE_URL = "https://api.datadoghq.eu/api/v2"
 API_DATADOG_API_KEY = os.getenv("API_DATADOG_API_KEY", None)
 API_DATADOG_APPLICATION_KEY = os.getenv("API_DATADOG_APPLICATION_KEY", None)
 
+# Sentry
+API_SENTRY_BASE_URL = "https://sentry.io/api/0"
+API_SENTRY_STATS_TOKEN = os.getenv("API_SENTRY_STATS_TOKEN")
+API_SENTRY_ORG_NAME = os.getenv("API_SENTRY_ORG_NAME")
+API_SENTRY_PROJECT_ID = os.getenv("API_SENTRY_PROJECT_ID")
+
 # RDV-I/S
 # ------------------------------------------------------------------------------
 RDV_SOLIDARITES_API_BASE_URL = os.getenv("RDV_SOLIDARITES_API_BASE_URL")

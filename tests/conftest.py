@@ -1,4 +1,5 @@
 import copy
+import datetime
 import io
 import os
 import socket
@@ -13,6 +14,7 @@ import patchy
 import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.gis.db.models.fields import get_srid_info
 from django.core import management
@@ -557,3 +559,52 @@ def profile_login(client):
             raise ValueError(f"Invalid profile: '{profile}'")
 
     return login
+
+
+## Mockers
+@pytest.fixture(name="sentry_respx_mock")
+def sentry_respx_mock_fixture(respx_mock):
+    json = {
+        "data": [
+            {
+                "tuple(('duration', 300))": [["duration", 300]],
+                "apdex()": 0.9556246545071905,
+                "failure_rate()": 0.08123341283760084,
+                "project_threshold_config": ["duration", 300],
+            }
+        ],
+        "meta": {
+            "fields": {
+                "tuple(('duration', 300))": "string",
+                "apdex()": "number",
+                "failure_rate()": "percentage",
+                "project_threshold_config": "string",
+            },
+            "units": {
+                "tuple(('duration', 300))": None,
+                "apdex()": None,
+                "failure_rate()": None,
+                "project_threshold_config": None,
+            },
+            "isMetricsData": False,
+            "isMetricsExtractedData": False,
+            "tips": {"query": None, "columns": None},
+            "datasetReason": "unchanged",
+            "dataset": "discover",
+        },
+    }
+
+    end = datetime.datetime(2024, 12, 3, 0, 0, 0, tzinfo=datetime.UTC)
+    start = end - relativedelta(days=1)
+    params = {
+        "query": '(event.type:"transaction")',
+        "project": settings.API_SENTRY_PROJECT_ID,
+        "field": ["apdex()", "failure_rate()"],
+        "start": start.isoformat(),
+        "end": end.isoformat(),
+    }
+
+    url = f"{settings.API_SENTRY_BASE_URL}/organizations/{settings.API_SENTRY_ORG_NAME}/events/"
+    return respx_mock.route(
+        method="GET", params=params, url=url, headers={"Authorization": f"Bearer {settings.API_SENTRY_STATS_TOKEN}"}
+    ).respond(json=json)

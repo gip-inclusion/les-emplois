@@ -45,6 +45,11 @@ API_DATADOG_APPLICATION_KEY = "fghij"
 API_PARTICULIER_BASE_URL = "https://fake-api-particulier.com/api/"
 API_PARTICULIER_TOKEN = "test"
 
+API_SENTRY_BASE_URL = "https://www.sinatra.com"
+API_SENTRY_STATS_TOKEN = "stry_xxx"
+API_SENTRY_ORG_ID = "gip"
+
+
 if os.getenv("DEBUG_SQL_SNAPSHOT"):
     # Mandatory to have detailed stacktrace inside templates
     TEMPLATES[0]["OPTIONS"]["debug"] = True  # noqa: F405
