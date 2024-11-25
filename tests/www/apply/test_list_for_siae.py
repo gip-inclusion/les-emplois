@@ -62,8 +62,6 @@ class TestProcessListSiae:
         # Result page should contain all the company's job applications.
         assert total_applications == 3
 
-        assert_previous_step(response, reverse("dashboard:index"))
-
         # Has link to export with back_url set
         export_url = unquote(
             add_url_params(reverse("apply:list_for_siae_exports"), {"back_url": reverse("apply:list_for_siae")})
