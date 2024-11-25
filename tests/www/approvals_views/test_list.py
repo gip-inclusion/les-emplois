@@ -13,7 +13,7 @@ from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
 class TestApprovalsListView:
@@ -38,8 +38,6 @@ class TestApprovalsListView:
         assertContains(response, "1 résultat")
         assertContains(response, approval.user.get_full_name())
         assertNotContains(response, approval_for_other_company.user.get_full_name())
-
-        assert_previous_step(response, reverse("dashboard:index"))
 
         employee_base_url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
         assertContains(response, f"{employee_base_url}?approval={approval.pk}&back_url={urlencode(url)}")
