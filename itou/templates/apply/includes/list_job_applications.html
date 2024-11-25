@@ -56,7 +56,7 @@
     {% else %}
         {% for job_application in job_applications_page %}
             <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-                {% if request.user.is_job_seeker %}
+                {% if job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %}
                     {% include "apply/includes/list_card_body_jobseeker.html" %}
                 {% else %}
                     {% include "apply/includes/list_card_body_company.html" %}
