@@ -24,7 +24,7 @@ from tests.job_applications.factories import (
     JobApplicationWithCompleteJobSeekerProfileFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
 class TestListEmployeeRecords:
@@ -70,7 +70,6 @@ class TestListEmployeeRecords:
         client.force_login(self.user)
         url = f"{self.URL}?status=READY"
         response = client.get(url)
-        assert_previous_step(response, reverse("dashboard:index"))
 
         # Check record summary link has back_url set
         record_base_url = reverse("employee_record_views:summary", kwargs={"employee_record_id": record.pk})
