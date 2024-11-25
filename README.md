@@ -179,7 +179,7 @@ make test
 
 Lancer un test en particulier :
 ```sh
-pytest itou/utils/tests.py::JSONTest::test_encoder
+pytest tests/utils/tests.py::TestJSON::test_encoder
 ```
 
 ## Mettre à jour les dépendances Python
