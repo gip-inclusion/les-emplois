@@ -146,17 +146,17 @@ class TestRdvInsertionDisplay:
 
     @freeze_time("2024-08-01")
     @pytest.mark.parametrize(
-        "profile,view_name,template_name",
+        "profile,view_name",
         [
-            ("employer", "apply:list_for_siae", "list_card_body_company"),
-            ("job_seeker", "apply:list_for_job_seeker", "list_card_body_jobseeker"),
+            ("employer", "apply:list_for_siae"),
+            ("job_seeker", "apply:list_for_job_seeker"),
         ],
     )
-    def test_list_no_upcoming_appointments(self, profile_login, client, profile, view_name, template_name):
+    def test_list_no_upcoming_appointments(self, profile_login, client, profile, view_name):
         self.participation.appointment.delete()
         profile_login(profile, self.job_application)
         response = client.get(reverse(view_name))
-        assertTemplateUsed(response, f"apply/includes/{template_name}.html")
+        assertTemplateUsed(response, "apply/includes/list_card_body.html")
         assertTemplateUsed(response, "apply/includes/next_appointment.html")
         assertNotContains(response, self.NEXT_APPOINTMENT_LABEL)
         assertNotContains(response, self.OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL)
@@ -164,16 +164,16 @@ class TestRdvInsertionDisplay:
 
     @freeze_time("2024-08-01")
     @pytest.mark.parametrize(
-        "profile,view_name,template_name",
+        "profile,view_name",
         [
-            ("employer", "apply:list_for_siae", "list_card_body_company"),
-            ("job_seeker", "apply:list_for_job_seeker", "list_card_body_jobseeker"),
+            ("employer", "apply:list_for_siae"),
+            ("job_seeker", "apply:list_for_job_seeker"),
         ],
     )
-    def test_list_with_one_upcoming_appointment(self, profile_login, client, profile, view_name, template_name):
+    def test_list_with_one_upcoming_appointment(self, profile_login, client, profile, view_name):
         profile_login(profile, self.job_application)
         response = client.get(reverse(view_name))
-        assertTemplateUsed(response, f"apply/includes/{template_name}.html")
+        assertTemplateUsed(response, "apply/includes/list_card_body.html")
         assertTemplateUsed(response, "apply/includes/next_appointment.html")
         assertContains(response, self.NEXT_APPOINTMENT_LABEL)
         assertNotContains(response, self.OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL)
@@ -181,13 +181,13 @@ class TestRdvInsertionDisplay:
 
     @freeze_time("2024-08-01")
     @pytest.mark.parametrize(
-        "profile,view_name,template_name",
+        "profile,view_name",
         [
-            ("employer", "apply:list_for_siae", "list_card_body_company"),
-            ("job_seeker", "apply:list_for_job_seeker", "list_card_body_jobseeker"),
+            ("employer", "apply:list_for_siae"),
+            ("job_seeker", "apply:list_for_job_seeker"),
         ],
     )
-    def test_list_with_many_upcoming_appointments(self, profile_login, client, profile, view_name, template_name):
+    def test_list_with_many_upcoming_appointments(self, profile_login, client, profile, view_name):
         profile_login(profile, self.job_application)
 
         ParticipationFactory(
@@ -198,7 +198,7 @@ class TestRdvInsertionDisplay:
             appointment__start_at=datetime.datetime(2024, 9, 2, 8, 0, tzinfo=datetime.UTC),
         )
         response = client.get(reverse(view_name))
-        assertTemplateUsed(response, f"apply/includes/{template_name}.html")
+        assertTemplateUsed(response, "apply/includes/list_card_body.html")
         assertTemplateUsed(response, "apply/includes/next_appointment.html")
         assertContains(response, self.NEXT_APPOINTMENT_LABEL)
         assertContains(response, self.OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL)
@@ -212,7 +212,7 @@ class TestRdvInsertionDisplay:
             appointment__start_at=datetime.datetime(2024, 9, 3, 8, 0, tzinfo=datetime.UTC),
         )
         response = client.get(reverse(view_name))
-        assertTemplateUsed(response, f"apply/includes/{template_name}.html")
+        assertTemplateUsed(response, "apply/includes/list_card_body.html")
         assertTemplateUsed(response, "apply/includes/next_appointment.html")
         assertContains(response, self.NEXT_APPOINTMENT_LABEL)
         assertNotContains(response, self.OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL)

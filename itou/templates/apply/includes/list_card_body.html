@@ -1,0 +1,59 @@
+{% load badges %}
+{% load i18n %}
+{% load str_filters %}
+
+<div class="c-box--results__header">
+    {% include "approvals/includes/job_description_creation.html" with job_application=job_application %}
+    <div class="c-box--results__summary">
+        <i class="ri-user-line" aria-hidden="true"></i>
+        <div>
+            {% if job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %}
+                <span>{{ job_application.to_company.get_kind_display }}</span>
+                <h3>{{ job_application.to_company.display_name }}</h3>
+                {% include "apply/includes/next_appointment.html" with job_application=job_application only %}
+            {% else %}
+                <h3>{{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}</h3>
+                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                    {% if job_application.job_seeker.city %}
+                        <span>
+                            <i class="ri-map-pin-2-line fw-normal me-1" aria-hidden="true"></i>
+                            {% if job_application.job_seeker.department %}{{ job_application.job_seeker.department }} -{% endif %}
+                            {{ job_application.job_seeker.city|title }}
+                        </span>
+                    {% endif %}
+                    {% if job_application.to_company.is_subject_to_eligibility_rules %}
+                        {% with approval=job_application.job_seeker.latest_common_approval %}
+                            {% if approval %}
+                                {% approval_state_badge approval span_extra_class="badge-xs" %}
+                            {% else %}
+                                {% if not job_application.jobseeker_valid_eligibility_diagnosis %}
+                                    {% iae_eligibility_badge is_eligible=False extra_class="badge-xs" %}
+                                {% else %}
+                                    {% iae_eligibility_badge is_eligible=True extra_class="badge-xs" %}
+                                {% endif %}
+                            {% endif %}
+                        {% endwith %}
+                    {% endif %}
+                    {% include "apply/includes/next_appointment.html" with job_application=job_application only %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<hr class="m-0">
+<div class="c-box--results__body">
+    <div class="c-box--results__list-data">
+        {% if job_applications_list_kind is not JobApplicationsListKind.SENT_FOR_ME and job_application.preloaded_administrative_criteria %}
+            <p class="h5">Critères administratifs IAE</p>
+            <div class="mb-3 mb-md-4">
+                <ul>
+                    {% for criteria in job_application.preloaded_administrative_criteria %}<li>{{ criteria.name }}</li>{% endfor %}
+                </ul>
+                {% if job_application.preloaded_administrative_criteria_extra_nb %}
+                    <span>+ {{ job_application.preloaded_administrative_criteria_extra_nb }} autres critères</span>
+                {% endif %}
+            </div>
+        {% endif %}
+        {% include "approvals/includes/job_description_list.html" with job_application=job_application %}
+    </div>
+</div>

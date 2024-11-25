@@ -37,7 +37,7 @@ def get_request(path="/"):
 def test_job_application_multiple_jobs():
     create_test_romes_and_appellations(["M1805"], appellations_per_rome=3)
 
-    tmpl = load_template("apply/includes/list_card_body_company.html")
+    tmpl = load_template("apply/includes/list_card_body.html")
 
     job_application = JobApplicationSentByCompanyFactory(
         selected_jobs=Appellation.objects.all(),
@@ -74,7 +74,7 @@ def test_job_application_multiple_jobs():
 
 
 def test_job_application_auto_prescription_badge_in_list():
-    tmpl = load_template("apply/includes/list_card_body_company.html")
+    tmpl = load_template("apply/includes/list_card_body.html")
     job_application = JobApplicationSentByCompanyFactory()
     job_application.user_can_view_personal_information = True
     rendered = tmpl.render(
@@ -93,7 +93,7 @@ def test_job_application_auto_prescription_badge_in_list():
 
 
 def test_job_application_imported_from_pe_in_list():
-    tmpl = load_template("apply/includes/list_card_body_company.html")
+    tmpl = load_template("apply/includes/list_card_body.html")
     job_application = JobApplicationSentByCompanyFactory(origin=Origin.PE_APPROVAL)
     job_application.user_can_view_personal_information = True
     rendered = tmpl.render(
@@ -112,7 +112,7 @@ def test_job_application_imported_from_pe_in_list():
 
 
 def test_job_application_job_seeker_in_list():
-    tmpl = load_template("apply/includes/list_card_body_company.html")
+    tmpl = load_template("apply/includes/list_card_body.html")
     job_application = JobApplicationSentByJobSeekerFactory()
     job_application.user_can_view_personal_information = True
     rendered = tmpl.render(

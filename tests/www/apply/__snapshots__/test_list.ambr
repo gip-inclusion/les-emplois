@@ -6,7 +6,7 @@
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
-                      
+  
   
   
   <div class="c-box--results__header">
@@ -31,8 +31,12 @@
       <div class="c-box--results__summary">
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
-              <span>Entreprise d'insertion</span>
-              <h3>Hit pit</h3>
+              
+                  <span>Entreprise d'insertion</span>
+                  <h3>Hit pit</h3>
+                  
+  
+  
               
           </div>
       </div>
@@ -40,6 +44,7 @@
   <hr class="m-0"/>
   <div class="c-box--results__body">
       <div class="c-box--results__list-data">
+          
           
   
   
@@ -53,7 +58,6 @@
       </div>
   </div>
   
-                  
                   <div class="c-box--results__footer">
                       <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
@@ -68,7 +72,7 @@
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
-                      
+  
   
   
   <div class="c-box--results__header">
@@ -93,8 +97,12 @@
       <div class="c-box--results__summary">
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
-              <span>Entreprise d'insertion</span>
-              <h3>Hit pit</h3>
+              
+                  <span>Entreprise d'insertion</span>
+                  <h3>Hit pit</h3>
+                  
+  
+  
               
           </div>
       </div>
@@ -102,6 +110,7 @@
   <hr class="m-0"/>
   <div class="c-box--results__body">
       <div class="c-box--results__list-data">
+          
           
   
   
@@ -115,7 +124,6 @@
       </div>
   </div>
   
-                  
                   <div class="c-box--results__footer">
                       <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
@@ -135,7 +143,7 @@
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
-                      
+  
   
   
   <div class="c-box--results__header">
@@ -160,8 +168,12 @@
       <div class="c-box--results__summary">
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
-              <span>Entreprise d'insertion</span>
-              <h3>Hit pit</h3>
+              
+                  <span>Entreprise d'insertion</span>
+                  <h3>Hit pit</h3>
+                  
+  
+  
               
           </div>
       </div>
@@ -169,6 +181,7 @@
   <hr class="m-0"/>
   <div class="c-box--results__body">
       <div class="c-box--results__list-data">
+          
           
   
   
@@ -182,7 +195,6 @@
       </div>
   </div>
   
-                  
                   <div class="c-box--results__footer">
                       <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
@@ -215,7 +227,6 @@
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
-                      
   
   
   
@@ -242,23 +253,27 @@
       <div class="c-box--results__summary">
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
-              <h3>J… H…</h3>
-              <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                  
-                  
+              
+                  <h3>J… H…</h3>
+                  <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                      
                       
                           
                               
-                                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                  
+                                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
+                                  
                               
                           
                       
-                  
-                  
-              </div>
+                      
+  
+  
+                  </div>
+              
           </div>
       </div>
   </div>
@@ -279,7 +294,6 @@
       </div>
   </div>
   
-                  
                   <div class="c-box--results__footer">
                       <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
@@ -294,7 +308,6 @@
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
-                      
   
   
   
@@ -321,23 +334,27 @@
       <div class="c-box--results__summary">
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
-              <h3>J… H…</h3>
-              <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                  
-                  
+              
+                  <h3>J… H…</h3>
+                  <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                      
                       
                           
                               
-                                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                  
+                                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
+                                  
                               
                           
                       
-                  
-                  
-              </div>
+                      
+  
+  
+                  </div>
+              
           </div>
       </div>
   </div>
@@ -358,7 +375,6 @@
       </div>
   </div>
   
-                  
                   <div class="c-box--results__footer">
                       <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
@@ -378,7 +394,6 @@
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
-                      
   
   
   
@@ -405,23 +420,27 @@
       <div class="c-box--results__summary">
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
-              <h3>J… H…</h3>
-              <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                  
-                  
+              
+                  <h3>J… H…</h3>
+                  <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                      
                       
                           
                               
-                                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                  
+                                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
+                                  
                               
                           
                       
-                  
-                  
-              </div>
+                      
+  
+  
+                  </div>
+              
           </div>
       </div>
   </div>
@@ -442,7 +461,6 @@
       </div>
   </div>
   
-                  
                   <div class="c-box--results__footer">
                       <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
@@ -475,7 +493,6 @@
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
-                      
   
   
   
@@ -501,23 +518,27 @@
       <div class="c-box--results__summary">
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
-              <h3>Jacques HENRY</h3>
-              <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                  
-                  
+              
+                  <h3>Jacques HENRY</h3>
+                  <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                      
                       
                           
                               
-                                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                  
+                                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
+                                  
                               
                           
                       
-                  
-                  
-              </div>
+                      
+  
+  
+                  </div>
+              
           </div>
       </div>
   </div>
@@ -538,7 +559,6 @@
       </div>
   </div>
   
-                  
                   <div class="c-box--results__footer">
                       <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
@@ -552,7 +572,6 @@
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
-                      
   
   
   
@@ -578,23 +597,27 @@
       <div class="c-box--results__summary">
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
-              <h3>Jacques HENRY</h3>
-              <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                  
-                  
+              
+                  <h3>Jacques HENRY</h3>
+                  <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                      
                       
                           
                               
-                                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                  
+                                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
+                                  
                               
                           
                       
-                  
-                  
-              </div>
+                      
+  
+  
+                  </div>
+              
           </div>
       </div>
   </div>
@@ -615,7 +638,6 @@
       </div>
   </div>
   
-                  
                   <div class="c-box--results__footer">
                       <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
@@ -634,7 +656,6 @@
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
-                      
   
   
   
@@ -660,23 +681,27 @@
       <div class="c-box--results__summary">
           <i aria-hidden="true" class="ri-user-line"></i>
           <div>
-              <h3>Jacques HENRY</h3>
-              <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                  
-                  
+              
+                  <h3>Jacques HENRY</h3>
+                  <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                      
                       
                           
                               
-                                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                  
+                                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
+                                  
                               
                           
                       
-                  
-                  
-              </div>
+                      
+  
+  
+                  </div>
+              
           </div>
       </div>
   </div>
@@ -697,7 +722,6 @@
       </div>
   </div>
   
-                  
                   <div class="c-box--results__footer">
                       <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                           
