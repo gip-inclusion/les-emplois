@@ -201,6 +201,9 @@ class JobSeekerBaseView(LoginRequiredMixin, TemplateView):
         if not self.job_seeker_session.exists():
             raise Http404
         self.is_gps = "gps" in request.GET and request.GET["gps"] == "true"
+        # TODO(ewen): temporary condition to fill self.company when not using the new session system
+        if company_pk := kwargs.get("company_pk"):
+            self.job_seeker_session.set("apply", {"company_pk": company_pk} | self.job_seeker_session.get("apply", {}))
         if company_pk := self.job_seeker_session.get("apply", {}).get("company_pk"):
             self.company = (
                 get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
@@ -516,18 +519,6 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, JobSeekerForSend
         self.form = JobSeekerExistsForm(
             is_gps=self.is_gps, initial=self.job_seeker_session.get("user", {}), data=request.POST or None
         )
-        # TODO(ewen): temporary condition to fill self.company when not using the new session system
-        if company_pk := kwargs.get("company_pk"):
-            self.job_seeker_session.set("apply", {"company_pk": company_pk} | self.job_seeker_session.get("apply", {}))
-        if self.company is None:
-            self.company = (
-                get_object_or_404(
-                    Company.objects.with_has_active_members(),
-                    pk=self.job_seeker_session.get("apply").get("company_pk"),
-                )
-                if not self.is_gps
-                else Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
-            )
 
     def post(self, request, *args, **kwargs):
         can_add_nir = False
