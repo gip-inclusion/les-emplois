@@ -26,11 +26,7 @@
                             {% if approval %}
                                 {% approval_state_badge approval span_extra_class="badge-xs" %}
                             {% else %}
-                                {% if not job_application.jobseeker_valid_eligibility_diagnosis %}
-                                    {% iae_eligibility_badge is_eligible=False extra_class="badge-xs" %}
-                                {% else %}
-                                    {% iae_eligibility_badge is_eligible=True extra_class="badge-xs" %}
-                                {% endif %}
+                                {% iae_eligibility_badge is_eligible=job_application.jobseeker_valid_eligibility_diagnosis extra_class="badge-xs" %}
                             {% endif %}
                         {% endwith %}
                     {% endif %}
