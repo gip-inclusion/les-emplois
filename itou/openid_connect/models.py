@@ -3,6 +3,7 @@ import logging
 from typing import ClassVar
 from urllib.parse import unquote
 
+from allauth.account.models import EmailAddress
 from django.core import signing
 from django.db import models
 from django.utils import crypto, timezone
@@ -162,14 +163,14 @@ class OIDConnectUserData:
         except User.DoesNotExist:
             try:
                 # A different user has already claimed this email address (we require emails to be unique)
-                user = User.objects.get(email=self.email)
+                user = EmailAddress.objects.get(email=self.email).user
                 if user.identity_provider == self.identity_provider:
                     if not self.allow_sub_update:
                         raise MultipleSubSameEmailException(user)
                 elif user.identity_provider not in self.allowed_identity_provider_migration:
                     self.check_valid_kind(user, user_data_dict, is_login)
                     raise EmailInUseException(user)
-            except User.DoesNotExist:
+            except EmailAddress.DoesNotExist:
                 # User.objects.create_user does the following:
                 # - set User.is_active to true,
                 # - call User.set_unusable_password() if no password is given.
@@ -183,7 +184,7 @@ class OIDConnectUserData:
                     user.jobseeker_profile.birthdate = birthdate
                     user.jobseeker_profile.save(update_fields={"birthdate"})
         else:
-            other_user = User.objects.exclude(pk=user.pk).filter(email=self.email).first()
+            other_user = EmailAddress.objects.exclude(user=user).filter(email=self.email).first()
             if other_user:
                 # We found a user with its sub, but there's another user using its email.
                 # This happens when the user tried to update its email with one already used by another account.
@@ -205,6 +206,9 @@ class OIDConnectUserData:
         for key, value in user_data_dict.items():
             user.update_external_data_source_history_field(provider=self.identity_provider, field=key, value=value)
         user.save()
+
+        # Cancel any ongoing email modifications for the user
+        EmailAddress.objects.filter(user=user).exclude(email=self.email).delete()
 
         return user, created
 

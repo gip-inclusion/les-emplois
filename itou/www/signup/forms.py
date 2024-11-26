@@ -1,5 +1,6 @@
 from allauth.account.adapter import get_adapter
 from allauth.account.forms import SignupForm
+from allauth.account.models import EmailAddress
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models.fields import BLANK_CHOICE_DASH
@@ -147,7 +148,7 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
             raise ValidationError("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
         if email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
             raise ValidationError("Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
-        if User.objects.filter(email=email).exists():
+        if EmailAddress.objects.filter(email=email).exists():
             raise ValidationError("Un autre utilisateur utilise déjà cette adresse e-mail.")
         return email
 

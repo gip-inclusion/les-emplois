@@ -7,6 +7,7 @@ from urllib.parse import quote, urlencode
 import httpx
 import pytest
 import respx
+from allauth.account.models import EmailAddress
 from django.contrib import auth, messages
 from django.contrib.auth import get_user
 from django.contrib.messages import Message
@@ -218,6 +219,29 @@ class TestProConnectModel:
         assert user.first_name == OIDC_USERINFO["given_name"]
         assert user.username == OIDC_USERINFO["sub"]
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
+
+    def test_get_existing_user_with_same_email_django_during_email_change(self):
+        """
+        A variation of the situation where a Django user has reserved the email ProConnect authorized.
+        The email in question is not (yet) the primary email of this user - they are in the process of verifying it.
+        """
+        pc_user_data = ProConnectPrescriberData.from_user_info(OIDC_USERINFO)
+        existing_user = PrescriberFactory(identity_provider=users_enums.IdentityProvider.DJANGO)
+        old_email = existing_user.email
+        existing_user.emailaddress_set.create(email=pc_user_data.email, primary=False, verified=False)
+        user, created = pc_user_data.create_or_update_user()
+        assert not created
+        assert user.last_name == OIDC_USERINFO["usual_name"]
+        assert user.first_name == OIDC_USERINFO["given_name"]
+        assert user.username == OIDC_USERINFO["sub"]
+        assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
+
+        # The user now has this email and only this email
+        # SSO users are not able to modify their email address via our site
+        assert user.email == pc_user_data.email
+        assert user.emailaddress_set.count() == 1
+        assert EmailAddress.objects.filter(email=pc_user_data.email, user=user).exists()
+        assert not EmailAddress.objects.filter(email=old_email).exists()
 
     def test_get_existing_user_with_same_email_IC(self):
         """

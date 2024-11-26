@@ -1,12 +1,12 @@
 import datetime
 
+from allauth.account.models import EmailAddress
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.utils import timezone
 
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.users.models import User
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -58,10 +58,10 @@ class MergeUserForm(forms.Form):
     )
 
     def _check_email_exists(self, email):
-        user = User.objects.filter(email=email).first()
-        if not user:
+        email_address = EmailAddress.objects.filter(email=email).first()
+        if not email_address:
             raise ValidationError("Cet utilisateur n'existe pas.")
-        return user
+        return email_address.user
 
     def clean_email_1(self):
         self.user_1 = self._check_email_exists(self.cleaned_data["email_1"])

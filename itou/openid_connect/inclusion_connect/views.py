@@ -3,6 +3,7 @@ import logging
 
 import httpx
 from allauth.account.adapter import get_adapter
+from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
@@ -14,7 +15,6 @@ from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider, UserKind
-from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.constants import ITOU_HELP_CENTER_URL
 from itou.utils.urls import add_url_params, get_absolute_url
@@ -173,12 +173,14 @@ def inclusion_connect_activate_account(request):
         return HttpResponseRedirect(params.get("previous_url", reverse("search:employers_home")))
 
     user_kind = params.get("user_kind")
-    user = User.objects.filter(email=email).first()
+    email_address = EmailAddress.objects.filter(email=email).first()
 
-    if not user:
+    if not email_address:
         params["register"] = True
         request.GET = params
         return inclusion_connect_authorize(request)
+
+    user = email_address.user
 
     if user.kind != user_kind:
         _add_user_kind_error_message(request, user, request.GET.get("user_kind"))
@@ -289,7 +291,7 @@ def inclusion_connect_callback(request):
     try:
         user, _ = ic_user_data.create_or_update_user(is_login=ic_state.data.get("is_login"))
     except InvalidKindException:
-        existing_user = User.objects.get(email=user_data["email"])
+        existing_user = EmailAddress.objects.get(email=user_data["email"]).user
         _add_user_kind_error_message(request, existing_user, user_kind)
         is_successful = False
     except MultipleSubSameEmailException as e:

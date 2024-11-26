@@ -3,6 +3,7 @@ import uuid
 from collections import Counter
 
 from allauth.account.forms import default_token_generator
+from allauth.account.models import EmailAddress
 from allauth.account.utils import user_pk_to_url_str
 from citext import CIEmailField
 from django.conf import settings
@@ -74,6 +75,11 @@ class ItouUserManager(UserManager):
             )
         )
         return queryset[:10]
+
+    def create_user(self, username, email=None, password=None, **extra_fields):
+        if email is not None and EmailAddress.objects.filter(email__icontains=email).exists():
+            raise ValidationError(User.ERROR_EMAIL_ALREADY_EXISTS)
+        return super().create_user(username, email, password, **extra_fields)
 
     def get_duplicated_pole_emploi_ids(self):
         """
@@ -713,7 +719,10 @@ class User(AbstractUser, AddressMixin):
         is case-insensitive. Consider toto@toto.com and TOTO@toto.com as
         the same email.
         """
-        queryset = cls.objects.filter(email__iexact=email)
+        # Uses EmailAddress to capture emails in-use but thus far unverified.
+        queryset = cls.objects.filter(
+            id__in=EmailAddress.objects.filter(email__iexact=email).values_list("user_id", flat=True)
+        )
         if exclude_pk:
             queryset = queryset.exclude(pk=exclude_pk)
         return queryset.exists()

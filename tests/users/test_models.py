@@ -182,6 +182,13 @@ class TestModel:
         with pytest.raises(ValidationError):
             User.create_job_seeker_by_proxy(proxy_user, **user_data)
 
+        # Variation on the error raised by existing email, non-primary email awaiting verification.
+        with pytest.raises(ValidationError):
+            new_email = "email@modification.org"
+            JobSeekerFactory().emailaddress_set.create(verified=False, email=new_email)
+            user_data["email"] = new_email
+            User.create_job_seeker_by_proxy(proxy_user, **user_data)
+
     def test_clean_pole_emploi_fields(self):
         # Both fields cannot be empty.
         job_seeker = JobSeekerFactory(

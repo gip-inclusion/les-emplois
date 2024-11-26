@@ -4,6 +4,7 @@ import logging
 import httpx
 import jwt
 from allauth.account.adapter import get_adapter
+from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
@@ -15,7 +16,6 @@ from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider, UserKind
-from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.constants import ITOU_HELP_CENTER_URL
 from itou.utils.urls import add_url_params, get_absolute_url
@@ -242,7 +242,7 @@ def pro_connect_callback(request):
     try:
         user, _ = pc_user_data.create_or_update_user(is_login=pro_connect_state.data.get("is_login"))
     except InvalidKindException:
-        existing_user = User.objects.get(email=user_data["email"])
+        existing_user = EmailAddress.objects.get(email=user_data["email"]).user
         _add_user_kind_error_message(request, existing_user, user_kind)
         is_successful = False
     except EmailInUseException as e:

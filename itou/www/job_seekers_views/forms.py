@@ -1,3 +1,4 @@
+from allauth.account.models import EmailAddress
 from django import forms
 from django.forms import ValidationError
 from django.utils.html import format_html
@@ -118,8 +119,9 @@ class JobSeekerExistsForm(forms.Form):
             raise ValidationError("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
         if email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
             raise ValidationError("Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
-        self.user = User.objects.filter(email__iexact=email).first()
-        if self.user:
+        email_address = EmailAddress.objects.filter(email__iexact=email).first()
+        if email_address:
+            self.user = email_address.user
             if not self.user.is_active:
                 error = "Vous ne pouvez pas postuler pour cet utilisateur car son compte a été désactivé."
                 raise forms.ValidationError(error)
