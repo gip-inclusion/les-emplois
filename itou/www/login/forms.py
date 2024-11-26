@@ -25,7 +25,7 @@ class ItouLoginForm(LoginForm):
 
     def clean(self):
         # Parent method performs authentication on form success.
-        user = User.objects.filter(email=self.data["login"]).first()
+        user = User.objects.filter(email__iexact=self.data["login"]).first()
         if (
             user
             and user.has_sso_provider

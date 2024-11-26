@@ -195,6 +195,17 @@ class TestInclusionConnectModel:
         assert user.username == OIDC_USERINFO["sub"]
         assert user.identity_provider == users_enums.IdentityProvider.INCLUSION_CONNECT
 
+    def test_get_existing_user_with_same_email_django_case_insensitive(self):
+        # Emails are case insensitive (RFC 5321 Part 2.4)
+        ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
+        PrescriberFactory(email=ic_user_data.email.upper(), identity_provider=users_enums.IdentityProvider.DJANGO)
+        user, created = ic_user_data.create_or_update_user()
+        assert not created
+        assert user.last_name == OIDC_USERINFO["family_name"]
+        assert user.first_name == OIDC_USERINFO["given_name"]
+        assert user.username == OIDC_USERINFO["sub"]
+        assert user.identity_provider == users_enums.IdentityProvider.INCLUSION_CONNECT
+
     def test_get_existing_user_with_same_email_IC(self):
         ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
         PrescriberFactory(

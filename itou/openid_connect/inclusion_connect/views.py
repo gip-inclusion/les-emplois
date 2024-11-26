@@ -173,7 +173,7 @@ def inclusion_connect_activate_account(request):
         return HttpResponseRedirect(params.get("previous_url", reverse("search:employers_home")))
 
     user_kind = params.get("user_kind")
-    email_address = EmailAddress.objects.filter(email=email).first()
+    email_address = EmailAddress.objects.filter(email__iexact=email).first()
 
     if not email_address:
         params["register"] = True
@@ -291,7 +291,7 @@ def inclusion_connect_callback(request):
     try:
         user, _ = ic_user_data.create_or_update_user(is_login=ic_state.data.get("is_login"))
     except InvalidKindException:
-        existing_user = EmailAddress.objects.get(email=user_data["email"]).user
+        existing_user = EmailAddress.objects.get(email__iexact=user_data["email"]).user
         _add_user_kind_error_message(request, existing_user, user_kind)
         is_successful = False
     except MultipleSubSameEmailException as e:

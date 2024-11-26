@@ -220,6 +220,17 @@ class TestProConnectModel:
         assert user.username == OIDC_USERINFO["sub"]
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
 
+    def test_get_existing_user_with_same_email_django_case_insensitive(self):
+        # Emails are case insensitive (RFC 5321 Part 2.4)
+        pc_user_data = ProConnectPrescriberData.from_user_info(OIDC_USERINFO)
+        PrescriberFactory(email=pc_user_data.email.upper(), identity_provider=users_enums.IdentityProvider.DJANGO)
+        user, created = pc_user_data.create_or_update_user()
+        assert not created
+        assert user.last_name == OIDC_USERINFO["usual_name"]
+        assert user.first_name == OIDC_USERINFO["given_name"]
+        assert user.username == OIDC_USERINFO["sub"]
+        assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
+
     def test_get_existing_user_with_same_email_django_during_email_change(self):
         """
         A variation of the situation where a Django user has reserved the email ProConnect authorized.

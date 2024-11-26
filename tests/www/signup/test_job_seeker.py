@@ -282,22 +282,28 @@ class TestJobSeekerSignup:
     def test_job_seeker_signup_with_existing_email(self, client):
         JobSeekerFactory(email="alice@evil.com")
         url = reverse("signup:job_seeker")
-        response = client.post(
-            url,
-            {
-                "title": "MME",
-                "first_name": "Alice",
-                "last_name": "Evil",
-                "email": "alice@evil.com",
-                "password1": "Véry_S3C®3T!",
-                "password2": "Véry_S3C®3T!",
-                "address_line_1": "Test address_line_1",
-                "address_line_2": "Test address_line_2",
-                "post_code": "87000",
-                "city_name": "Limoges",
-                "city": "limoges",
-            },
-        )
+        post_data = {
+            "title": "MME",
+            "first_name": "Alice",
+            "last_name": "Evil",
+            "email": "alice@evil.com",
+            "password1": "Véry_S3C®3T!",
+            "password2": "Véry_S3C®3T!",
+            "address_line_1": "Test address_line_1",
+            "address_line_2": "Test address_line_2",
+            "post_code": "87000",
+            "city_name": "Limoges",
+            "city": "limoges",
+        }
+        response = client.post(url, post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "email": ["Un autre utilisateur utilise déjà cette adresse e-mail."]
+        }
+
+        # Emails are case insensitive (RFC 5321 Part 2.4)
+        post_data["email"] = "ALICE@evil.com"
+        response = client.post(url, post_data)
         assert response.status_code == 200
         assert response.context["form"].errors == {
             "email": ["Un autre utilisateur utilise déjà cette adresse e-mail."]

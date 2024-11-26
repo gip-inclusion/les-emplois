@@ -150,7 +150,7 @@ class EditUserEmailForm(forms.Form):
         email = self.cleaned_data["email"]
         if email == self.user.email:
             raise ValidationError("Veuillez indiquer une adresse différente de l'actuelle.")
-        if EmailAddress.objects.exclude(user=self.user).filter(email=email).exists():
+        if EmailAddress.objects.exclude(user=self.user).filter(email__iexact=email).exists():
             raise ValidationError("Cette adresse est déjà utilisée par un autre utilisateur.")
         return email
 

@@ -58,7 +58,7 @@ class MergeUserForm(forms.Form):
     )
 
     def _check_email_exists(self, email):
-        email_address = EmailAddress.objects.filter(email=email).first()
+        email_address = EmailAddress.objects.filter(email__iexact=email).first()
         if not email_address:
             raise ValidationError("Cet utilisateur n'existe pas.")
         return email_address.user

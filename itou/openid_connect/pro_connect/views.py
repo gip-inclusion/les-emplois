@@ -242,7 +242,7 @@ def pro_connect_callback(request):
     try:
         user, _ = pc_user_data.create_or_update_user(is_login=pro_connect_state.data.get("is_login"))
     except InvalidKindException:
-        existing_user = EmailAddress.objects.get(email=user_data["email"]).user
+        existing_user = EmailAddress.objects.get(email__iexact=user_data["email"]).user
         _add_user_kind_error_message(request, existing_user, user_kind)
         is_successful = False
     except EmailInUseException as e:

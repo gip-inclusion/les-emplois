@@ -145,6 +145,14 @@ class TestChangeEmailView:
             "Cette adresse est déjà utilisée par un autre utilisateur."
         ]
 
+        # Email addresses are not case sensitive (RFC 5321 Part 2.4)
+        post_data = {"email": email_address.email.upper(), "email_confirmation": email_address.email.upper()}
+        response = client.post(url, data=post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors["email"] == [
+            "Cette adresse est déjà utilisée par un autre utilisateur."
+        ]
+
         # Nor can I request my own email address
         post_data = {"email": user.email, "email_confirmation": user.email}
         response = client.post(url, data=post_data)

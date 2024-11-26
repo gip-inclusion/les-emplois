@@ -163,7 +163,7 @@ class OIDConnectUserData:
         except User.DoesNotExist:
             try:
                 # A different user has already claimed this email address (we require emails to be unique)
-                user = EmailAddress.objects.get(email=self.email).user
+                user = EmailAddress.objects.get(email__iexact=self.email).user
                 if user.identity_provider == self.identity_provider:
                     if not self.allow_sub_update:
                         raise MultipleSubSameEmailException(user)
@@ -184,7 +184,7 @@ class OIDConnectUserData:
                     user.jobseeker_profile.birthdate = birthdate
                     user.jobseeker_profile.save(update_fields={"birthdate"})
         else:
-            other_user = EmailAddress.objects.exclude(user=user).filter(email=self.email).first()
+            other_user = EmailAddress.objects.exclude(user=user).filter(email__iexact=self.email).first()
             if other_user:
                 # We found a user with its sub, but there's another user using its email.
                 # This happens when the user tried to update its email with one already used by another account.
@@ -208,7 +208,7 @@ class OIDConnectUserData:
         user.save()
 
         # Cancel any ongoing email modifications for the user
-        EmailAddress.objects.filter(user=user).exclude(email=self.email).delete()
+        EmailAddress.objects.filter(user=user).exclude(email__iexact=self.email).delete()
 
         return user, created
 
