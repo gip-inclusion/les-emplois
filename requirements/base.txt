@@ -50,9 +50,9 @@ bleach[css]==6.2.0 \
     --hash=sha256:117d9c6097a7c3d22fd578fcd8d35ff1e125df6736f554da4e432fdd63f31e5e \
     --hash=sha256:123e894118b8a599fd80d3ec1a6d4cc7ce4e5882b1317a7e1ba69b56e95f991f
     # via django-markdownify
-boto3==1.35.64 \
-    --hash=sha256:bc3fc12b41fa2c91e51ab140f74fb1544408a2b1e00f88a4c2369a66d18ddf20 \
-    --hash=sha256:cdacf03fc750caa3aa0dbf6158166def9922c9d67b4160999ff8fc350662facc
+boto3==1.35.65 \
+    --hash=sha256:acbca38322b66516450f959c7874826267d431becdc2b080e331e56c2ebbe507 \
+    --hash=sha256:f6c266b4124b92b1603727bf1ed1917e0b74a899bd0e326f151d80c3eaed27a1
     # via -r requirements/base.in
 botocore==1.35.69 \
     --hash=sha256:cad8d9305f873404eee4b197d84e60a40975d43cbe1ab63abe893420ddfe6e3c \
