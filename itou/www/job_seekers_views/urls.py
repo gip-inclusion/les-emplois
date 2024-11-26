@@ -28,6 +28,27 @@ urlpatterns = [
         name="search_by_email_for_sender",
     ),
     path(
+        "<uuid:session_uuid>/sender/create/1",
+        views.CreateJobSeekerStep1ForSenderView.as_view(),
+        name="create_job_seeker_step_1_for_sender",
+    ),
+    path(
+        "<uuid:session_uuid>/sender/create/2",
+        views.CreateJobSeekerStep2ForSenderView.as_view(),
+        name="create_job_seeker_step_2_for_sender",
+    ),
+    path(
+        "<uuid:session_uuid>/sender/create/3",
+        views.CreateJobSeekerStep3ForSenderView.as_view(),
+        name="create_job_seeker_step_3_for_sender",
+    ),
+    path(
+        "<uuid:session_uuid>/sender/create/end",
+        views.CreateJobSeekerStepEndForSenderView.as_view(),
+        name="create_job_seeker_step_end_for_sender",
+    ),
+    # TODO(ewen): deprecated URLs
+    path(
         "<int:company_pk>/sender/create/<uuid:session_uuid>/1",
         views.CreateJobSeekerStep1ForSenderView.as_view(),
         name="create_job_seeker_step_1_for_sender",
@@ -73,6 +94,31 @@ urlpatterns = [
         name="search_by_email_for_hire",
         kwargs={"hire_process": True},
     ),
+    path(
+        "<uuid:session_uuid>/hire/create/1",
+        views.CreateJobSeekerStep1ForSenderView.as_view(),
+        name="create_job_seeker_step_1_for_hire",
+        kwargs={"hire_process": True},
+    ),
+    path(
+        "<uuid:session_uuid>/hire/create/2",
+        views.CreateJobSeekerStep2ForSenderView.as_view(),
+        name="create_job_seeker_step_2_for_hire",
+        kwargs={"hire_process": True},
+    ),
+    path(
+        "<uuid:session_uuid>/hire/create/3",
+        views.CreateJobSeekerStep3ForSenderView.as_view(),
+        name="create_job_seeker_step_3_for_hire",
+        kwargs={"hire_process": True},
+    ),
+    path(
+        "<uuid:session_uuid>/hire/create/end",
+        views.CreateJobSeekerStepEndForSenderView.as_view(),
+        name="create_job_seeker_step_end_for_hire",
+        kwargs={"hire_process": True},
+    ),
+    # TODO(ewen): deprecated URLs
     path(
         "<int:company_pk>/hire/create/<uuid:session_uuid>/1",
         views.CreateJobSeekerStep1ForSenderView.as_view(),

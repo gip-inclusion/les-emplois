@@ -544,9 +544,7 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, JobSeekerForSend
                 )
 
                 return HttpResponseRedirect(
-                    reverse(
-                        view_name, kwargs={"company_pk": self.company.pk, "session_uuid": self.job_seeker_session.name}
-                    )
+                    reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.name})
                     + ("?gps=true" if self.is_gps else "")
                 )
 
@@ -607,29 +605,25 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, JobSeekerForSend
         }
 
 
-class CreateJobSeekerForSenderBaseView(SessionNamespaceRequiredMixin, ApplyStepForSenderBaseView):
+class CreateJobSeekerForSenderBaseView(JobSeekerForSenderBaseView):
     required_session_namespaces = ["job_seeker_session"]
 
     def __init__(self):
         super().__init__()
         self.job_seeker_session = None
 
-    def setup(self, request, *args, **kwargs):
-        self.job_seeker_session = SessionNamespace(request.session, kwargs["session_uuid"])
-        super().setup(request, *args, **kwargs)
-
     def get_back_url(self):
         view_name = self.previous_hire_url if self.hire_process else self.previous_apply_url
         return reverse(
             view_name,
-            kwargs={"company_pk": self.company.pk, "session_uuid": self.job_seeker_session.name},
+            kwargs={"session_uuid": self.job_seeker_session.name},
         ) + ("?gps=true" if self.is_gps else "")
 
     def get_next_url(self):
         view_name = self.next_hire_url if self.hire_process else self.next_apply_url
         return reverse(
             view_name,
-            kwargs={"company_pk": self.company.pk, "session_uuid": self.job_seeker_session.name},
+            kwargs={"session_uuid": self.job_seeker_session.name},
         ) + ("?gps=true" if self.is_gps else "")
 
 
