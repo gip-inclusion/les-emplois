@@ -106,7 +106,7 @@ def test_create_job_seeker(_mock, client):
     next_url = (
         reverse(
             "job_seekers_views:create_job_seeker_step_1_for_sender",
-            kwargs={"company_pk": singleton.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"session_uuid": job_seeker_session_name},
         )
         + "?gps=true"
     )
@@ -153,7 +153,7 @@ def test_create_job_seeker(_mock, client):
     next_url = (
         reverse(
             "job_seekers_views:create_job_seeker_step_2_for_sender",
-            kwargs={"company_pk": singleton.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"session_uuid": job_seeker_session_name},
         )
         + "?gps=true"
     )
@@ -177,7 +177,7 @@ def test_create_job_seeker(_mock, client):
     next_url = (
         reverse(
             "job_seekers_views:create_job_seeker_step_3_for_sender",
-            kwargs={"company_pk": singleton.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"session_uuid": job_seeker_session_name},
         )
         + "?gps=true"
     )
@@ -211,7 +211,7 @@ def test_create_job_seeker(_mock, client):
     next_url = (
         reverse(
             "job_seekers_views:create_job_seeker_step_end_for_sender",
-            kwargs={"company_pk": singleton.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"session_uuid": job_seeker_session_name},
         )
         + "?gps=true"
     )
