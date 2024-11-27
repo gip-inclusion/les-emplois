@@ -2421,3 +2421,301 @@
       </div>
   '''
 # ---
+# name: test_list_snapshot[applications list]
+  '''
+  <section aria-labelledby="apply-list-count" id="job-applications-section">
+      
+          
+              
+  
+  
+  
+  
+  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+      <div class="c-box--results__header">
+          
+  
+  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+      <p class="fs-sm mb-0 flex-grow-1">
+          Émise le 27 novembre 2024 par
+          
+              <strong>Vous</strong>
+          
+          
+              chez
+              <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list">
+                  <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1"></i>
+                  <span>Acme inc.</span>
+              </a>
+          
+      </p>
+      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-danger" id="state_[PK of JobApplication]">Candidature déclinée</span></div>
+  </div>
+  
+          <div class="c-box--results__summary">
+              <i aria-hidden="true" class="ri-user-line"></i>
+              <div>
+                  
+                      <h3>J… D…</h3>
+                      <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                          
+                              <span>
+                                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1"></i>
+                                  35 -
+                                  Rennes
+                              </span>
+                          
+                          
+                              
+                                  
+                                              <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+              <i aria-hidden="true" class="ri-error-warning-line"></i>
+              Éligibilité IAE à valider
+          </span>
+                                  
+                              
+                          
+                          
+  
+  
+                      </div>
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      <div class="c-box--results__body">
+          <div class="c-box--results__list-data">
+              
+              
+  
+  
+      
+          <div class="c-info c-info--secondary">
+              <span class="c-info__summary">Candidature spontanée</span>
+          </div>
+      
+  
+  
+          </div>
+      </div>
+      <div class="c-box--results__footer">
+          <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
+              
+              
+                  <a aria-label="Gérer la candidature de J… D…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list">Voir sa candidature</a>
+              
+          </div>
+      </div>
+  </div>
+  
+          
+              
+  
+  
+  
+  
+  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+      <div class="c-box--results__header">
+          
+  
+  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+      <p class="fs-sm mb-0 flex-grow-1">
+          Émise le 27 novembre 2024 par
+          
+              <strong>Vous</strong>
+          
+          
+              chez
+              <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list">
+                  <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1"></i>
+                  <span>Acme inc.</span>
+              </a>
+          
+      </p>
+      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_[PK of JobApplication]">Nouvelle candidature</span></div>
+  </div>
+  
+          <div class="c-box--results__summary">
+              <i aria-hidden="true" class="ri-user-line"></i>
+              <div>
+                  
+                      <h3>J… D…</h3>
+                      <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                          
+                              <span>
+                                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1"></i>
+                                  35 -
+                                  Rennes
+                              </span>
+                          
+                          
+                              
+                                  
+                                              <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+              <i aria-hidden="true" class="ri-error-warning-line"></i>
+              Éligibilité IAE à valider
+          </span>
+                                  
+                              
+                          
+                          
+  
+  
+                      </div>
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      <div class="c-box--results__body">
+          <div class="c-box--results__list-data">
+              
+              
+  
+  
+      
+          <div class="c-info c-info--secondary">
+              <span class="c-info__summary">Candidature spontanée</span>
+          </div>
+      
+  
+  
+          </div>
+      </div>
+      <div class="c-box--results__footer">
+          <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
+              
+              
+                  <a aria-label="Gérer la candidature de J… D…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list">Voir sa candidature</a>
+              
+          </div>
+      </div>
+  </div>
+  
+          
+              
+  
+  
+  
+  
+  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+      <div class="c-box--results__header">
+          
+  
+  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+      <p class="fs-sm mb-0 flex-grow-1">
+          Émise le 27 novembre 2024 par
+          
+              <strong>Vous</strong>
+          
+          
+              chez
+              <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list">
+                  <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1"></i>
+                  <span>Acme inc.</span>
+              </a>
+          
+      </p>
+      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_[PK of JobApplication]">Candidature acceptée</span></div>
+  </div>
+  
+          <div class="c-box--results__summary">
+              <i aria-hidden="true" class="ri-user-line"></i>
+              <div>
+                  
+                      <h3>J… D…</h3>
+                      <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                          
+                              <span>
+                                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1"></i>
+                                  35 -
+                                  Rennes
+                              </span>
+                          
+                          
+                              
+                                  
+                                              <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+              <i aria-hidden="true" class="ri-error-warning-line"></i>
+              Éligibilité IAE à valider
+          </span>
+                                  
+                              
+                          
+                          
+  
+  
+                      </div>
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      <div class="c-box--results__body">
+          <div class="c-box--results__list-data">
+              
+              
+  
+  
+      
+          <div class="c-info c-info--secondary">
+              <span class="c-info__summary">Candidature spontanée</span>
+          </div>
+      
+  
+  
+          </div>
+      </div>
+      <div class="c-box--results__footer">
+          <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
+              
+              
+                  <a aria-label="Gérer la candidature de J… D…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list">Voir sa candidature</a>
+              
+          </div>
+      </div>
+  </div>
+  
+          
+          
+  
+  
+  
+      
+  </section>
+  '''
+# ---
+# name: test_list_snapshot[empty list]
+  '''
+  <section aria-labelledby="apply-list-count" id="job-applications-section">
+      
+          <div class="text-center my-3 my-md-4">
+              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-siae-card-no-result.svg"/>
+              <p class="mb-1 mt-3">
+                  <strong>
+                      
+                          Aucune candidature pour le moment
+                      
+                  </strong>
+              </p>
+              <p>
+                  <i>
+                      
+                          Vous trouverez ici les candidatures émises par votre organisation
+                          <br class="d-none d-lg-inline"/>
+                          pour les candidats.
+                      
+                  </i>
+              </p>
+              
+                  <a class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center" href="/search/employers/results">
+                      <i class="ri-user-follow-line ri-lg fw-normal"></i>
+                      <span>Postuler pour un candidat</span>
+                  </a>
+              
+          </div>
+      
+  </section>
+  '''
+# ---
