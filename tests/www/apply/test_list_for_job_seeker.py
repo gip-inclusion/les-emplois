@@ -26,6 +26,15 @@ def test_list_for_job_seeker(client):
     assert len(response.context["job_applications_page"].object_list) == 3
 
 
+def test_filters(client, snapshot):
+    client.force_login(JobSeekerFactory())
+
+    response = client.get(reverse("apply:list_for_job_seeker"))
+    assert response.status_code == 200
+    filter_form = parse_response_to_soup(response, "#offcanvasApplyFilters")
+    assert str(filter_form) == snapshot()
+
+
 def test_list_for_job_seeker_filtered_by_state(client):
     """
     Provide a list of job applications sent by a job seeker
