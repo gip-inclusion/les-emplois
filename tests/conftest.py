@@ -214,7 +214,8 @@ def failing_cache():
 
 @pytest.fixture
 def temporary_bucket():
-    with override_settings(AWS_STORAGE_BUCKET_NAME=f"tests-{uuid.uuid4()}"):
+    bucket_name = f"tests-{uuid.uuid4()}"
+    with override_settings(AWS_STORAGE_BUCKET_NAME=bucket_name, PILOTAGE_DATASTORE_S3_BUCKET_NAME=bucket_name):
         call_command("configure_bucket")
         yield
         client = s3_client()
