@@ -1,4 +1,5 @@
 import datetime
+import itertools
 from urllib.parse import unquote
 
 import factory
@@ -12,10 +13,14 @@ from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import Title
 from itou.utils.urls import add_url_params
-from tests.job_applications.factories import JobApplicationFactory
+from tests.companies.factories import CompanyFactory
+from tests.job_applications.factories import (
+    JobApplicationFactory,
+)
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationWith2MembershipFactory,
+    PrescriberOrganizationWithMembershipFactory,
 )
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
@@ -292,6 +297,65 @@ def test_htmx_filters(client):
     response = client.get(url, {"states": ["refused"]})
     fresh_page = parse_response_to_soup(response, selector="#main")
     assertSoupEqual(page, fresh_page)
+
+
+@freeze_time("2024-11-27", tick=True)
+def test_list_snapshot(client, snapshot):
+    prescriber_org = PrescriberOrganizationWithMembershipFactory(for_snapshot=True)
+    prescriber = prescriber_org.members.get()
+    client.force_login(prescriber)
+    url = reverse("apply:list_prescriptions")
+
+    response = client.get(url)
+    page = parse_response_to_soup(response, selector="#job-applications-section")
+    assert str(page) == snapshot(name="empty list")
+
+    job_seeker = JobSeekerFactory(for_snapshot=True)
+    company = CompanyFactory(for_snapshot=True, with_membership=True)
+    common_kwargs = {
+        "job_seeker": job_seeker,
+        "eligibility_diagnosis": None,
+        "to_company": company,
+        "sender_kind": SenderKind.PRESCRIBER,
+        "sender": prescriber,
+    }
+
+    job_applications = [
+        JobApplicationFactory(state=JobApplicationState.ACCEPTED, **common_kwargs),
+        JobApplicationFactory(
+            state=JobApplicationState.NEW,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.REFUSED,
+            **common_kwargs,
+        ),
+    ]
+
+    response = client.get(url)
+    page = parse_response_to_soup(
+        response,
+        selector="#job-applications-section",
+        replace_in_attr=itertools.chain(
+            [("href", f"/company/{company.pk}/card", "/company/[PK of Company]/card")],
+            *(
+                [
+                    (
+                        "href",
+                        f"/apply/{job_application.pk}/prescriber/details",
+                        "/apply/[PK of JobApplication]/prescriber/details",
+                    ),
+                    (
+                        "id",
+                        f"state_{job_application.pk}",
+                        "state_[PK of JobApplication]",
+                    ),
+                ]
+                for job_application in job_applications
+            ),
+        ),
+    )
+    assert str(page) == snapshot(name="applications list")
 
 
 def test_exports_without_organization(client):
