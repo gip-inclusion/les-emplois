@@ -598,6 +598,13 @@ ASP_EA2_UNZIP_PASSWORD = os.getenv("ASP_EA2_UNZIP_PASSWORD")
 AWS_S3_ACCESS_KEY_ID = os.getenv("CELLAR_ADDON_KEY_ID")
 AWS_S3_SECRET_ACCESS_KEY = os.getenv("CELLAR_ADDON_KEY_SECRET")
 AWS_STORAGE_BUCKET_NAME = os.getenv("S3_STORAGE_BUCKET_NAME")
+
+# S3 store for communicating with the Pilotage.
+PILOTAGE_DATASTORE_S3_ENDPOINT_URL = os.getenv("PILOTAGE_DATASTORE_S3_ENDPOINT_URL")
+PILOTAGE_DATASTORE_S3_ACCESS_KEY = os.getenv("PILOTAGE_DATASTORE_S3_ACCESS_KEY")
+PILOTAGE_DATASTORE_S3_SECRET_KEY = os.getenv("PILOTAGE_DATASTORE_S3_SECRET_KEY")
+PILOTAGE_DATASTORE_S3_BUCKET_NAME = os.getenv("PILOTAGE_DATASTORE_S3_BUCKET_NAME")
+
 # The maximum amount of memory (in bytes) a file can take up before being rolled over into a temporary file on disk.
 # Picked 5 MB, the max size for a resume. Keep it fast for files under that size, and avoid filling up the RAM.
 AWS_S3_MAX_MEMORY_SIZE = 5 * 1024 * 1024

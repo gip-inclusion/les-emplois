@@ -1,0 +1,11 @@
+# serializer version: 1
+# name: test_command_call
+  '''
+  Files in datastore's 'flux-iae/': []
+  Files in local's 'test_command_call0': ['fluxIAE_ITOU_.tar.gz']
+  Files to upload: ['fluxIAE_ITOU_.tar.gz']
+  Uploading 'fluxIAE_ITOU_.tar.gz'...
+  > fluxIAE_ITOU_.tar.gz: 11 octets/11 octets transferred (100%).
+  
+  '''
+# ---

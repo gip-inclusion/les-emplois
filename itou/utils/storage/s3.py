@@ -18,6 +18,16 @@ def s3_client():
     )
 
 
+def pilotage_s3_client():
+    """There is an S3 bucket dedicated to sharing files with Pilotage"""
+    return boto3.client(
+        "s3",
+        endpoint_url=settings.PILOTAGE_DATASTORE_S3_ENDPOINT_URL,
+        aws_access_key_id=settings.PILOTAGE_DATASTORE_S3_ACCESS_KEY,
+        aws_secret_access_key=settings.PILOTAGE_DATASTORE_S3_SECRET_KEY,
+    )
+
+
 class PublicStorage(S3Boto3Storage):
     # Not using the S3StaticStorage backend to ensure the listdir() operation remains forbidden.
     # Don’t sign URLs, objects are public.
