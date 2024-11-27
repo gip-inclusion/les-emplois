@@ -20,23 +20,6 @@ from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.apis.geocoding import get_geocoding_data
 
 
-def get_fluxiae_referential_filenames():
-    assert settings.ASP_FLUX_IAE_DIR is not None, "ASP_FLUX_IAE_DIR is not defined"
-
-    filename_prefixes = [
-        # Example of raw filename: fluxIAE_RefCategorieJuridique_29032021_090124.csv.gz
-        # Let's drop the digits and keep the first relevant part only.
-        "_".join(filename.split("_")[:2])
-        for filename in os.listdir(settings.ASP_FLUX_IAE_DIR)
-        if filename.startswith("fluxIAE_Ref")
-    ]
-
-    if len(filename_prefixes) != 29:
-        raise RuntimeError(f"Fatal error: 29 fluxIAE referentials expected but only {len(filename_prefixes)} found.")
-
-    return filename_prefixes
-
-
 def get_filename(filename_prefix, filename_extension, description=None):
     """
     Automatically detect the correct filename.

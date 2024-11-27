@@ -1,6 +1,5 @@
 """
-Helper methods for manipulating dataframes used by both populate_metabase_emplois and
-populate_metabase_fluxiae scripts.
+Helper methods for manipulating dataframes used by the populate_metabase_emplois script.
 """
 
 import numpy as np
