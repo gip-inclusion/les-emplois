@@ -64,6 +64,12 @@
             {% block global_messages %}
                 {% include "includes/demo_accounts.html" %}
             {% endblock %}
+            {% if user.is_authenticated and ITOU_ENVIRONMENT == "PROD" %}
+                <div class="alert alert-info alert-dismissible fade show" role="status">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                    <p class="mb-0">Maintenance prévue à 18h aujourd'hui. Le site sera indisponible durant environ 5 minutes.</p>
+                </div>
+            {% endif %}
         </div>
 
         {% if user.is_authenticated %}
