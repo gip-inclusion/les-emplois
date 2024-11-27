@@ -1,5 +1,5 @@
 """
-Helper methods for manipulating tables used by both populate_metabase_emplois and populate_metabase_fluxiae scripts.
+Helper methods for manipulating tables used by the populate_metabase_emplois script.
 """
 
 import copy
@@ -111,15 +111,6 @@ def build_dbt_daily():
     create_unversioned_tables_if_needed()
     httpx.post(
         urllib.parse.urljoin(settings.AIRFLOW_BASE_URL, "api/v1/dags/dbt_daily/dagRuns"),
-        json={"conf": {}},
-    ).raise_for_status()
-
-
-def build_dbt_weekly():
-    # FIXME(vperron): this has to be moved to DBT seeds.
-    create_unversioned_tables_if_needed()
-    httpx.post(
-        urllib.parse.urljoin(settings.AIRFLOW_BASE_URL, "api/v1/dags/dbt_weekly/dagRuns"),
         json={"conf": {}},
     ).raise_for_status()
 

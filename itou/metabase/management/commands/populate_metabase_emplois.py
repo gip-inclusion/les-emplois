@@ -1,8 +1,6 @@
 """
 Populate metabase database with transformed data from itou database.
 
-For fluxIAE data, see the other script `populate_metabase_fluxiae.py`.
-
 This script is launched by a github action every night on a fast machine, not production.
 
 This script reads data from the itou production database,

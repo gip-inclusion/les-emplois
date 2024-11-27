@@ -26,12 +26,10 @@ rename --last --no-overwrite '.gz' '.riae' "$FLUX_IAE_DIR"/*.csv.gz  # Use a cus
 
 # Create the logs directory
 OUTPUT_PATH="shared_bucket/imports-asp"
-mkdir -p "$OUTPUT_PATH/populate_metabase_fluxiae"
 mkdir -p "$OUTPUT_PATH/import_siae"
 
 # Perform the necessary data imports
 export ASP_FLUX_IAE_DIR="$FLUX_IAE_DIR"
-time ./manage.py populate_metabase_fluxiae --verbosity 2 |& tee -a "$OUTPUT_PATH/populate_metabase_fluxiae/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
 time ./manage.py import_siae --wet-run --verbosity=2 |& tee -a "$OUTPUT_PATH/import_siae/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
 
 # Destroy the data
