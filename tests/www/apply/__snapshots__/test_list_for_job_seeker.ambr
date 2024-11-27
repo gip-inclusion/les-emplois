@@ -117,3 +117,243 @@
       </div>
   '''
 # ---
+# name: test_list_snapshot[applications list]
+  '''
+  <section aria-labelledby="apply-list-count" id="job-applications-section">
+      
+          
+              
+  
+  
+  
+  
+  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+      <div class="c-box--results__header">
+          
+  
+  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+      <p class="fs-sm mb-0 flex-grow-1">
+          Émise le 27 novembre 2024 par
+          
+              
+                  <strong>Pres. Org.</strong>
+              
+              
+                  <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
+              
+          
+          
+      </p>
+      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-danger" id="state_[PK of JobApplication]">Candidature déclinée</span></div>
+  </div>
+  
+          <div class="c-box--results__summary">
+              <i aria-hidden="true" class="ri-user-line"></i>
+              <div>
+                  
+                      <span>Entreprise d'insertion</span>
+                      <h3>Acme inc.</h3>
+                      
+  
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      <div class="c-box--results__body">
+          <div class="c-box--results__list-data">
+              
+              
+  
+  
+      
+          <div class="c-info c-info--secondary">
+              <span class="c-info__summary">Candidature spontanée</span>
+          </div>
+      
+  
+  
+          </div>
+      </div>
+      <div class="c-box--results__footer">
+          <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
+              
+              
+                  <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list">
+                      Voir ma candidature
+                  </a>
+              
+          </div>
+      </div>
+  </div>
+  
+          
+              
+  
+  
+  
+  
+  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+      <div class="c-box--results__header">
+          
+  
+  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+      <p class="fs-sm mb-0 flex-grow-1">
+          Émise le 27 novembre 2024 par
+          
+              <strong>Acme inc.</strong>
+              
+                  <i aria-hidden="true" class="ri-community-line me-1"></i>Employeur
+              
+          
+          
+      </p>
+      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_[PK of JobApplication]">Nouvelle candidature</span></div>
+  </div>
+  
+          <div class="c-box--results__summary">
+              <i aria-hidden="true" class="ri-user-line"></i>
+              <div>
+                  
+                      <span>Entreprise d'insertion</span>
+                      <h3>Acme inc.</h3>
+                      
+  
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      <div class="c-box--results__body">
+          <div class="c-box--results__list-data">
+              
+              
+  
+  
+      
+          <div class="c-info c-info--secondary">
+              <span class="c-info__summary">Candidature spontanée</span>
+          </div>
+      
+  
+  
+          </div>
+      </div>
+      <div class="c-box--results__footer">
+          <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
+              
+              
+                  <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list">
+                      Voir ma candidature
+                  </a>
+              
+          </div>
+      </div>
+  </div>
+  
+          
+              
+  
+  
+  
+  
+  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+      <div class="c-box--results__header">
+          
+  
+  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+      <p class="fs-sm mb-0 flex-grow-1">
+          Émise le 27 novembre 2024 par
+          
+              <strong>Vous</strong>
+          
+          
+      </p>
+      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_[PK of JobApplication]">Candidature acceptée</span></div>
+  </div>
+  
+          <div class="c-box--results__summary">
+              <i aria-hidden="true" class="ri-user-line"></i>
+              <div>
+                  
+                      <span>Entreprise d'insertion</span>
+                      <h3>Acme inc.</h3>
+                      
+  
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      <div class="c-box--results__body">
+          <div class="c-box--results__list-data">
+              
+              
+  
+  
+      
+          <div class="c-info c-info--secondary">
+              <span class="c-info__summary">Candidature spontanée</span>
+          </div>
+      
+  
+  
+          </div>
+      </div>
+      <div class="c-box--results__footer">
+          <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
+              
+              
+                  <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list">
+                      Voir ma candidature
+                  </a>
+              
+          </div>
+      </div>
+  </div>
+  
+          
+          
+  
+  
+  
+      
+  </section>
+  '''
+# ---
+# name: test_list_snapshot[empty list]
+  '''
+  <section aria-labelledby="apply-list-count" id="job-applications-section">
+      
+          <div class="text-center my-3 my-md-4">
+              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-siae-card-no-result.svg"/>
+              <p class="mb-1 mt-3">
+                  <strong>
+                      
+                          Aucune candidature pour le moment
+                      
+                  </strong>
+              </p>
+              <p>
+                  <i>
+                      
+                          Vous trouverez ici vos candidatures, émises par un prescripteur
+                          <br class="d-none d-lg-inline"/>
+                          ou par vous même.
+                      
+                  </i>
+              </p>
+              
+                  <a class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center" href="/search/employers">
+                      <i class="ri-briefcase-line ri-lg fw-normal"></i>
+                      <span>Rechercher un emploi inclusif</span>
+                  </a>
+              
+          </div>
+      
+  </section>
+  '''
+# ---
