@@ -1,4 +1,5 @@
 import datetime
+import itertools
 from urllib.parse import unquote
 
 import pytest
@@ -10,7 +11,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertQuery
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria
-from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.utils.urls import add_url_params
@@ -24,6 +25,8 @@ from tests.job_applications.factories import (
     JobApplicationSentByJobSeekerFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import (
     assert_previous_step,
@@ -658,6 +661,63 @@ def test_list_for_siae_htmx_filters(client):
     response = client.get(url, {"states": ["refused"]})
     fresh_page = parse_response_to_soup(response, selector="#main")
     assertSoupEqual(page, fresh_page)
+
+
+@freeze_time("2024-11-27", tick=True)
+def test_list_snapshot(client, snapshot):
+    company = CompanyFactory(with_membership=True)
+    client.force_login(company.members.get())
+    url = reverse("apply:list_for_siae")
+
+    response = client.get(url)
+    page = parse_response_to_soup(response, selector="#job-applications-section")
+    assert str(page) == snapshot(name="empty list")
+
+    job_seeker = JobSeekerFactory(for_snapshot=True)
+    common_kwargs = {"job_seeker": job_seeker, "to_company": company}
+    prescriber_org = PrescriberOrganizationWithMembershipFactory(for_snapshot=True)
+
+    job_applications = [
+        JobApplicationFactory(sender_kind=SenderKind.JOB_SEEKER, state=JobApplicationState.ACCEPTED, **common_kwargs),
+        JobApplicationFactory(
+            sender_kind=SenderKind.EMPLOYER,
+            sender=company.members.first(),
+            sender_company=company,
+            state=JobApplicationState.NEW,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            sender_kind=SenderKind.PRESCRIBER,
+            sender=prescriber_org.members.first(),
+            sender_prescriber_organization=prescriber_org,
+            state=JobApplicationState.REFUSED,
+            **common_kwargs,
+        ),
+    ]
+
+    response = client.get(url)
+    page = parse_response_to_soup(
+        response,
+        selector="#job-applications-section",
+        replace_in_attr=itertools.chain(
+            *(
+                [
+                    (
+                        "href",
+                        f"/apply/{job_application.pk}/siae/details",
+                        "/apply/[PK of JobApplication]/siae/details",
+                    ),
+                    (
+                        "id",
+                        f"state_{job_application.pk}",
+                        "state_[PK of JobApplication]",
+                    ),
+                ]
+                for job_application in job_applications
+            )
+        ),
+    )
+    assert str(page) == snapshot(name="applications list")
 
 
 def test_list_for_siae_exports(client, snapshot):
