@@ -12,6 +12,7 @@ from itertools import chain
 import openpyxl
 import sqlparse
 from bs4 import BeautifulSoup
+from bs4.formatter import HTMLFormatter
 from django.conf import Path, settings
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.backends.utils import CursorDebugWrapper
@@ -37,6 +38,10 @@ KNOWN_SESSION_KEYS = {
     "current_organization",
     "_csrftoken",
 }
+
+
+def pretty_indented(soup, indent=4):
+    return soup.prettify(formatter=HTMLFormatter(indent=indent))
 
 
 def pprint_html(response, **selectors):
