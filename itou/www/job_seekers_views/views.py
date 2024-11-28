@@ -626,6 +626,11 @@ class CreateJobSeekerForSenderBaseView(JobSeekerForSenderBaseView):
             kwargs={"session_uuid": self.job_seeker_session.name},
         ) + ("?gps=true" if self.is_gps else "")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["update_job_seeker"] = False
+        return context
+
 
 class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
     template_name = "job_seekers_views/create_or_update_job_seeker/step_1.html"
