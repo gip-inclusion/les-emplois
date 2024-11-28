@@ -67,8 +67,7 @@ class TestCreateForJobSeeker:
 class TestCreateForSender:
     def test_check_nir_with_session(self, client):
         company = CompanyFactory(with_membership=True)
-        user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
-        client.force_login(user)
+        client.force_login(company.members.get())
 
         # Init session
         start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
@@ -76,7 +75,7 @@ class TestCreateForSender:
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
 
         response = client.get(
-            reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name})
+            reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
         )
 
         assertContains(response, company.display_name)
