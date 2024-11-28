@@ -2,10 +2,12 @@ import os
 
 import markdown
 from django.conf import settings
+from django.contrib.auth.decorators import login_not_required
 from django.shortcuts import render
 from django.utils.html import mark_safe
 
 
+@login_not_required
 def releases(request, template_name="releases/list.html"):
     """
     Render our CHANGELOG.md file in HTML

@@ -1213,9 +1213,14 @@ class TestProConnectPrescribersViewsExceptions:
             reverse("signup:prescriber_check_pe_email"),
             reverse("signup:prescriber_pole_emploi_user"),
             reverse("signup:prescriber_user"),
-            reverse("signup:prescriber_join_org"),
         ]
         for url in urls:
             with subtests.test(url=url):
                 response = client.get(url)
                 assert response.status_code == 403
+        # This view requires to be logged in
+        url = reverse("signup:prescriber_join_org")
+        with subtests.test(url=url):
+            client.force_login(PrescriberFactory())
+            response = client.get(url)
+            assert response.status_code == 403

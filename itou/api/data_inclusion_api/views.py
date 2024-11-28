@@ -5,6 +5,7 @@ from rest_framework import authentication, exceptions, generics
 from itou.api.data_inclusion_api import enums, serializers
 from itou.companies.models import Company
 from itou.prescribers.models import PrescriberOrganization
+from itou.utils.auth import LoginNotRequiredMixin
 
 
 @extend_schema(
@@ -18,7 +19,7 @@ from itou.prescribers.models import PrescriberOrganization
         many=True,
     )
 )
-class DataInclusionStructureView(generics.ListAPIView):
+class DataInclusionStructureView(LoginNotRequiredMixin, generics.ListAPIView):
     """
     # API au format data.inclusion
 

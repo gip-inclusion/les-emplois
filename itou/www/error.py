@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponseServerError
 from django.template import TemplateDoesNotExist, engines, loader
 from django.views.decorators.csrf import requires_csrf_token
@@ -7,6 +8,7 @@ from django.views.defaults import ERROR_500_TEMPLATE_NAME, ERROR_PAGE_TEMPLATE
 
 
 @requires_csrf_token
+@login_not_required
 def server_error(request, template_name=ERROR_500_TEMPLATE_NAME):
     try:
         template = loader.get_template(template_name)

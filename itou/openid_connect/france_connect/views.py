@@ -5,6 +5,7 @@ import httpx
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.utils import crypto
@@ -35,6 +36,7 @@ def _redirect_to_job_seeker_login_on_error(error_msg, request=None, extra_tags="
     return HttpResponseRedirect(reverse("login:job_seeker"))
 
 
+@login_not_required
 def france_connect_authorize(request):
     # The redirect_uri should be defined in the FC settings to be allowed
     # NB: the integration platform allows "http://127.0.0.1:8000/franceconnect/callback"
@@ -53,6 +55,7 @@ def france_connect_authorize(request):
     return HttpResponseRedirect(f"{url}?{urlencode(data)}")
 
 
+@login_not_required
 def france_connect_callback(request):
     code = request.GET.get("code")
     if code is None:
@@ -157,6 +160,7 @@ def france_connect_callback(request):
     return HttpResponseRedirect(next_url)
 
 
+@login_not_required
 def france_connect_logout(request):
     # The user can be authentified on FC w/o a session on itou.
     # https://partenaires.franceconnect.gouv.fr/fcp/fournisseur-service#sign_out

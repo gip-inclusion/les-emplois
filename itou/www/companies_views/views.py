@@ -3,7 +3,7 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_not_required, login_required
 from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
@@ -23,6 +23,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiException
 from itou.utils.apis.exceptions import GeocodingDataError
+from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
@@ -123,7 +124,7 @@ def overview(request, template_name="companies/overview.html"):
 ### Job description views
 
 
-class JobDescriptionCardView(ApplyForJobSeekerMixin, TemplateView):
+class JobDescriptionCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, TemplateView):
     template_name = "companies/job_description_card.html"
 
     def setup(self, request, job_description_id, *args, **kwargs):
@@ -459,7 +460,7 @@ def select_financial_annex(request, template_name="companies/select_financial_an
 ### Company CRUD views
 
 
-class CompanyCardView(ApplyForJobSeekerMixin, TemplateView):
+class CompanyCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, TemplateView):
     template_name = "companies/card.html"
 
     def setup(self, request, siae_id, *args, **kwargs):
@@ -680,6 +681,7 @@ def update_admin_role(request, action, user_id, template_name="companies/update_
     return render(request, template_name, context)
 
 
+@login_not_required
 def hx_dora_services(request, code_insee, template_name="companies/hx_dora_services.html"):
     context = {
         "data_inclusion_services": get_data_inclusion_services(code_insee),
@@ -688,6 +690,7 @@ def hx_dora_services(request, code_insee, template_name="companies/hx_dora_servi
     return render(request, template_name, context)
 
 
+@login_not_required
 def dora_service_redirect(request, source: str, service_id: str) -> HttpResponseRedirect:
     client = DataInclusionApiClient(
         settings.API_DATA_INCLUSION_BASE_URL,

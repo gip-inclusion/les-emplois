@@ -5,6 +5,7 @@ import json
 import logging
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_not_required
 from django.db import transaction
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -32,6 +33,7 @@ class UnsupportedEvent(Warning):
 
 @require_POST
 @csrf_exempt
+@login_not_required
 def webhook(request):
     try:
         # FIXME: RDV-I encodings should be consistent

@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_not_required
 from django.urls import path, re_path
 from django.views.generic import TemplateView
 
@@ -23,7 +24,7 @@ urlpatterns = [
     ),
     path(
         "job_seeker/situation_not_eligible",
-        TemplateView.as_view(template_name="signup/job_seeker_situation_not_eligible.html"),
+        login_not_required(TemplateView.as_view(template_name="signup/job_seeker_situation_not_eligible.html")),
         name="job_seeker_situation_not_eligible",
     ),
     path(

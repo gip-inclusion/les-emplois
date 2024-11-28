@@ -10,6 +10,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.job_applications.enums import JobApplicationState, Prequalification, ProfessionalSituationExperience
 from itou.job_applications.models import JobApplication, PriorAction
+from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.validators import validate_siren
 
 from .serializers import GeiqJobApplicationSerializer
@@ -41,7 +42,7 @@ class InvalidSirenError(exceptions.APIException):
     status_code = status.HTTP_400_BAD_REQUEST
 
 
-class GeiqJobApplicationListView(generics.ListAPIView):
+class GeiqJobApplicationListView(LoginNotRequiredMixin, generics.ListAPIView):
     authentication_classes = (
         GeiqApiAuthentication,
         authentication.SessionAuthentication,

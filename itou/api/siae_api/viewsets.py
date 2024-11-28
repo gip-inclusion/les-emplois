@@ -14,6 +14,7 @@ from itou.api.auth import DepartmentTokenAuthentication
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.companies.models import Company, JobDescription
+from itou.utils.auth import LoginNotRequiredMixin
 
 from .serializers import SiaeSerializer
 
@@ -119,7 +120,7 @@ class RestrictedUserRateThrottle(UserRateThrottle):
     rate = "12/minute"
 
 
-class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
+class SiaeViewSet(LoginNotRequiredMixin, viewsets.ReadOnlyModelViewSet):
     """
     # Liste des SIAE
 

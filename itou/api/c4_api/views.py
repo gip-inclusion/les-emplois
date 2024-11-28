@@ -6,6 +6,7 @@ from rest_framework import authentication, exceptions, generics
 from itou.api.c4_api.serializers import C4CompanySerializer
 from itou.companies.enums import COMPANY_KIND_RESERVED
 from itou.companies.models import Company, CompanyMembership
+from itou.utils.auth import LoginNotRequiredMixin
 
 
 class C4APIUser(AnonymousUser):
@@ -27,7 +28,7 @@ class C4Authentication(authentication.TokenAuthentication):
         return C4APIUser(), None
 
 
-class C4CompanyView(generics.ListAPIView):
+class C4CompanyView(LoginNotRequiredMixin, generics.ListAPIView):
     """API pour le Marché de l'inclusion"""
 
     authentication_classes = [C4Authentication]

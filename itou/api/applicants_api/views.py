@@ -8,12 +8,13 @@ from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.auth import LoginNotRequiredMixin
 
 from .perms import ApplicantsAPIPermission
 from .serializers import APIParametersSerializer, ApplicantSerializer
 
 
-class ApplicantsView(generics.ListAPIView):
+class ApplicantsView(LoginNotRequiredMixin, generics.ListAPIView):
     authentication_classes = (
         authentication.TokenAuthentication,
         authentication.SessionAuthentication,

@@ -6,6 +6,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 
 from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
+from itou.utils.auth import LoginNotRequiredMixin
 
 
 logger = logging.getLogger(__name__)
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 TOKEN_ID_STR = "__token__"
 
 
-class ObtainAuthToken(drf_authtoken_views.ObtainAuthToken):
+class ObtainAuthToken(LoginNotRequiredMixin, drf_authtoken_views.ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         if request.data.get("username") == TOKEN_ID_STR:
             password = request.data.get("password")
