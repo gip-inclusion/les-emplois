@@ -826,9 +826,7 @@ class TestApplyAsJobSeeker:
         assertContains(response, expected_html, html=True)
 
 
-@pytest.mark.ignore_unknown_variable_template_error(
-    "confirmation_needed", "job_seeker", "readonly_form", "update_job_seeker"
-)
+@pytest.mark.ignore_unknown_variable_template_error("confirmation_needed", "job_seeker", "readonly_form")
 class TestApplyAsAuthorizedPrescriber:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings, mocker):
@@ -1609,9 +1607,7 @@ class TestApplyAsPrescriber:
             ),
         )
 
-    @pytest.mark.ignore_unknown_variable_template_error(
-        "confirmation_needed", "job_seeker", "readonly_form", "update_job_seeker"
-    )
+    @pytest.mark.ignore_unknown_variable_template_error("confirmation_needed", "job_seeker", "readonly_form")
     def test_apply_as_prescriber(self, client, pdf_file):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
@@ -2562,9 +2558,7 @@ class TestApplyAsCompany:
         response = client.get(next_url)
         assert response.status_code == 200
 
-    @pytest.mark.ignore_unknown_variable_template_error(
-        "confirmation_needed", "job_seeker", "readonly_form", "update_job_seeker"
-    )
+    @pytest.mark.ignore_unknown_variable_template_error("confirmation_needed", "job_seeker", "readonly_form")
     def test_apply_as_employer(self, client, pdf_file):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
         employer = company.members.first()
@@ -2580,9 +2574,7 @@ class TestApplyAsCompany:
         )
         self._test_apply_as_company(client, employer, company, dummy_job_seeker, pdf_file)
 
-    @pytest.mark.ignore_unknown_variable_template_error(
-        "confirmation_needed", "job_seeker", "readonly_form", "update_job_seeker"
-    )
+    @pytest.mark.ignore_unknown_variable_template_error("confirmation_needed", "job_seeker", "readonly_form")
     def test_apply_as_another_employer(self, client, pdf_file):
         company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
         employer = EmployerFactory(with_company=True)
@@ -2734,7 +2726,7 @@ class TestDirectHireFullProcess:
         )
 
     @pytest.mark.ignore_unknown_variable_template_error(
-        "confirmation_needed", "is_subject_to_eligibility_rules", "job_seeker", "readonly_form", "update_job_seeker"
+        "confirmation_needed", "is_subject_to_eligibility_rules", "job_seeker", "readonly_form"
     )
     def test_hire_as_company(self, client):
         """Apply as company (and create new job seeker)"""
@@ -4300,9 +4292,7 @@ class TestUpdateJobSeekerStep3View:
         )
 
 
-@pytest.mark.ignore_unknown_variable_template_error(
-    "confirmation_needed", "job_seeker", "readonly_form", "update_job_seeker"
-)
+@pytest.mark.ignore_unknown_variable_template_error("confirmation_needed", "job_seeker", "readonly_form")
 def test_detect_existing_job_seeker(client):
     company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
@@ -4931,9 +4921,7 @@ class TestCheckPreviousApplicationsView:
         assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
 
-@pytest.mark.ignore_unknown_variable_template_error(
-    "confirmation_needed", "job_seeker", "readonly_form", "update_job_seeker"
-)
+@pytest.mark.ignore_unknown_variable_template_error("confirmation_needed", "job_seeker", "readonly_form")
 class TestFindJobSeekerForHireView:
     @pytest.fixture(autouse=True)
     def setup_method(self):

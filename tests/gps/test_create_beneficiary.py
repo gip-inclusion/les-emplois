@@ -28,9 +28,7 @@ from tests.users.factories import (
 from tests.utils.test import KNOWN_SESSION_KEYS
 
 
-@pytest.mark.ignore_unknown_variable_template_error(
-    "confirmation_needed", "job_seeker", "readonly_form", "update_job_seeker"
-)
+@pytest.mark.ignore_unknown_variable_template_error("confirmation_needed", "job_seeker", "readonly_form")
 @override_settings(API_BAN_BASE_URL="http://ban-api")
 @mock.patch(
     "itou.utils.apis.geocoding.get_geocoding_data",
