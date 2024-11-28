@@ -24,7 +24,7 @@ from pytest_django.asserts import (
 )
 
 from itou.approvals.models import Approval, Suspension
-from itou.asp.models import Commune
+from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AuthorKind
@@ -49,7 +49,7 @@ from tests.approvals.factories import (
     ApprovalFactory,
     SuspensionFactory,
 )
-from tests.asp.factories import CommuneFactory, CountryFranceFactory
+from tests.asp.factories import CommuneFactory, CountryEuropeFactory, CountryFranceFactory
 from tests.cities.factories import create_test_cities
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
@@ -2737,6 +2737,57 @@ class TestProcessAcceptViews:
         # test that fixing the birthdate fixes the form submission
         post_data["birthdate"] = birth_place.start_date + datetime.timedelta(days=1)
         response, _ = self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
+
+    @freeze_time("2024-09-11")
+    def test_accept_born_in_france_no_birth_place(self, client, mocker):
+        birthdate = datetime.date(1995, 12, 27)
+        job_application = self.create_job_application(
+            with_certifiable_criteria=True,
+            job_seeker__jobseeker_profile__birthdate=birthdate,
+        )
+        client.force_login(job_application.to_company.members.get())
+        post_data = self._accept_view_post_data(job_application=job_application)
+        post_data["birth_country"] = Country.objects.get(code=Country.INSEE_CODE_FRANCE).pk
+        del post_data["birth_place"]
+        response = client.post(
+            reverse("apply:accept", kwargs={"job_application_id": job_application.pk}),
+            headers={"hx-request": "true"},
+            data=post_data,
+        )
+        assertContains(
+            response,
+            """
+            <div class="alert alert-danger" role="alert">
+            Si le pays de naissance est la France, la commune de naissance est obligatoire.
+            </div>""",
+            html=True,
+            count=1,
+        )
+
+    @freeze_time("2024-09-11")
+    def test_accept_born_outside_of_france_specifies_birth_place(self, client, mocker):
+        birthdate = datetime.date(1995, 12, 27)
+        job_application = self.create_job_application(
+            with_certifiable_criteria=True,
+            job_seeker__jobseeker_profile__birthdate=birthdate,
+        )
+        client.force_login(job_application.to_company.members.get())
+        post_data = self._accept_view_post_data(job_application=job_application)
+        post_data["birth_country"] = CountryEuropeFactory().pk
+        response = client.post(
+            reverse("apply:accept", kwargs={"job_application_id": job_application.pk}),
+            headers={"hx-request": "true"},
+            data=post_data,
+        )
+        assertContains(
+            response,
+            """
+            <div class="alert alert-danger" role="alert">
+            Il n'est pas possible de saisir une commune de naissance hors de France.
+            </div>""",
+            html=True,
+            count=1,
+        )
 
 
 class TestProcessTemplates:
