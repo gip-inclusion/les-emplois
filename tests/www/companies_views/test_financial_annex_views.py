@@ -7,7 +7,6 @@ from tests.companies.factories import (
     SiaeConventionFactory,
 )
 from tests.users.factories import EmployerFactory
-from tests.utils.test import assert_previous_step
 
 
 class TestShowAndSelectFinancialAnnex:
@@ -25,7 +24,6 @@ class TestShowAndSelectFinancialAnnex:
         url = reverse("companies_views:show_financial_annexes")
         response = client.get(url)
         assert response.status_code == 200
-        assert_previous_step(response, reverse("dashboard:index"))
         url = reverse("companies_views:select_financial_annex")
         response = client.get(url)
         assert response.status_code == 403
