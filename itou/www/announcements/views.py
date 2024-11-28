@@ -5,11 +5,12 @@ from django.views.generic import TemplateView
 
 from itou.communications.models import AnnouncementCampaign, AnnouncementItem
 from itou.users.enums import UserKind
+from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.pagination import pager
 from itou.utils.urls import get_safe_url
 
 
-class NewsView(TemplateView):
+class NewsView(LoginNotRequiredMixin, TemplateView):
     template_name = "announcements/news.html"
 
     def get_context_data(self):

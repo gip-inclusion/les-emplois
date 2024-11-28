@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_not_required, login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import default_storage
 from django.db.models import Q
@@ -744,5 +744,6 @@ def view_proof(request, evaluated_administrative_criteria_id):
     return HttpResponseRedirect(default_storage.url(criteria.proof_id))
 
 
+@login_not_required
 def sanctions_helper_view(request):
     return render(request, "siae_evaluations/sanctions_helper.html")

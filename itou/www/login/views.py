@@ -10,11 +10,12 @@ from django.urls import reverse
 from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
 from itou.users.enums import MATOMO_ACCOUNT_TYPE, IdentityProvider, UserKind
 from itou.users.models import User
+from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.urls import add_url_params, get_safe_url, get_url_param_value
 from itou.www.login.forms import ItouLoginForm
 
 
-class ItouLoginView(LoginView):
+class ItouLoginView(LoginNotRequiredMixin, LoginView):
     """
     Generic authentication entry point.
     This view is used only in one case:

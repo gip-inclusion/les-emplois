@@ -3,7 +3,7 @@ from urllib.parse import urlencode
 from allauth.account.adapter import get_adapter
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_not_required, login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import formats, safestring
@@ -72,6 +72,7 @@ def handle_invited_user_registration_with_inclusion_or_pro_connect(request, invi
     return render(request, "invitations_views/new_ic_user.html", context=context)
 
 
+@login_not_required
 def new_user(request, invitation_type, invitation_id):
     if invitation_type not in [KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_EMPLOYER]:
         messages.error(request, "Cette invitation n'est plus valide.")

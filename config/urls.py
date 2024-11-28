@@ -1,6 +1,7 @@
 from anymail.webhooks.mailjet import MailjetTrackingWebhookView
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth.decorators import login_not_required
 from django.urls import include, path, re_path, register_converter
 from django.views.generic import TemplateView
 
@@ -88,13 +89,29 @@ urlpatterns = [
     path("versions/", include("itou.www.releases.urls")),
     # Enable Mailjet status tracking
     # https://anymail.readthedocs.io/en/stable/esps/mailjet/#status-tracking-webhooks
-    path("webhooks/anymail/mailjet/tracking/", MailjetTrackingWebhookView.as_view()),
+    path("webhooks/anymail/mailjet/tracking/", login_not_required(MailjetTrackingWebhookView.as_view())),
     path("welcoming_tour/", include("itou.www.welcoming_tour.urls")),
     # Static pages.
-    path("accessibility/", TemplateView.as_view(template_name="static/accessibility.html"), name="accessibility"),
-    path("legal/notice/", TemplateView.as_view(template_name="static/legal/notice.html"), name="legal-notice"),
-    path("legal/privacy/", TemplateView.as_view(template_name="static/legal/privacy.html"), name="legal-privacy"),
-    path("legal/terms/", TemplateView.as_view(template_name="static/legal/terms.html"), name="legal-terms"),
+    path(
+        "accessibility/",
+        login_not_required(TemplateView.as_view(template_name="static/accessibility.html")),
+        name="accessibility",
+    ),
+    path(
+        "legal/notice/",
+        login_not_required(TemplateView.as_view(template_name="static/legal/notice.html")),
+        name="legal-notice",
+    ),
+    path(
+        "legal/privacy/",
+        login_not_required(TemplateView.as_view(template_name="static/legal/privacy.html")),
+        name="legal-privacy",
+    ),
+    path(
+        "legal/terms/",
+        login_not_required(TemplateView.as_view(template_name="static/legal/terms.html")),
+        name="legal-terms",
+    ),
     path("", include("itou.www.security.urls")),
     path("gps/", include("itou.www.gps.urls")),
     path("rdvi/", include("itou.www.rdv_insertion.urls")),

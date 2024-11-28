@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_not_required
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView
 from rest_framework import routers
@@ -41,7 +42,7 @@ urlpatterns = [
     # OAS 3 YAML schema (downloadable)
     path(
         "oas3/",
-        SpectacularAPIView.as_view(),
+        login_not_required(SpectacularAPIView.as_view()),
         name="openapi_schema",
     ),
     path(

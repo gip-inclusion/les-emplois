@@ -9,7 +9,7 @@ from allauth.account.views import PasswordResetFromKeyView, PasswordResetView, S
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth import REDIRECT_FIELD_NAME, login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_not_required, login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import Error, transaction
@@ -28,6 +28,7 @@ from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.adapter import UserAdapter
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, MATOMO_ACCOUNT_TYPE, UserKind
 from itou.utils import constants as global_constants
+from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.tokens import company_signup_token_generator
 from itou.utils.urls import get_safe_url
@@ -82,6 +83,7 @@ class ItouPasswordResetFromKeyView(PasswordResetFromKeyView):
         return super().get_success_url()
 
 
+@login_not_required
 @require_GET
 def signup(request, template_name="signup/signup.html"):
     """
@@ -94,7 +96,7 @@ def signup(request, template_name="signup/signup.html"):
     return render(request, template_name, context)
 
 
-class ChooseUserKindSignupView(FormView):
+class ChooseUserKindSignupView(LoginNotRequiredMixin, FormView):
     template_name = "signup/choose_user_kind.html"
     form_class = forms.ChooseUserKindSignupForm
 
@@ -107,6 +109,7 @@ class ChooseUserKindSignupView(FormView):
         return HttpResponseRedirect(urls[form.cleaned_data["kind"]])
 
 
+@login_not_required
 def job_seeker_situation(request, template_name="signup/job_seeker_situation.html"):
     """
     Second step of the signup process for jobseeker.
@@ -136,6 +139,7 @@ def job_seeker_situation(request, template_name="signup/job_seeker_situation.htm
     return render(request, template_name, context)
 
 
+@login_not_required
 def job_seeker_signup_info(request, template_name="signup/job_seeker_signup.html"):
     form_class = forms.JobSeekerSignupWithOptionalNirForm if "skip" in request.POST else forms.JobSeekerSignupForm
     form = form_class(data=request.POST or None)
@@ -169,7 +173,7 @@ def job_seeker_signup_info(request, template_name="signup/job_seeker_signup.html
     return render(request, template_name, context)
 
 
-class JobSeekerCredentialsSignupView(SignupView):
+class JobSeekerCredentialsSignupView(LoginNotRequiredMixin, SignupView):
     form_class = forms.JobSeekerCredentialsSignupForm
     template_name = "signup/job_seeker_signup_credentials.html"
 
@@ -200,6 +204,7 @@ class JobSeekerCredentialsSignupView(SignupView):
 # ------------------------------------------------------------------------------------------
 
 
+@login_not_required
 def company_select(request, template_name="signup/company_select.html"):
     """
     Entry point of the signup process for SIAEs which consists of 2 steps.
@@ -282,7 +287,7 @@ class CompanyBaseView(View):
         return super().dispatch(request, *args, **kwargs)
 
 
-class CompanyUserView(CompanyBaseView, TemplateView):
+class CompanyUserView(LoginNotRequiredMixin, CompanyBaseView, TemplateView):
     """
     Display Inclusion Connect button.
     This page is also shown if an error is detected during
@@ -349,6 +354,7 @@ def valid_prescriber_signup_session_required(function=None):
     return decorated
 
 
+@login_not_required
 def prescriber_check_already_exists(request, template_name="signup/prescriber_check_already_exists.html"):
     """
 
@@ -418,6 +424,7 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
     return render(request, template_name, context)
 
 
+@login_not_required
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_request_invitation(request, membership_id, template_name="signup/prescriber_request_invitation.html"):
@@ -453,6 +460,7 @@ def prescriber_request_invitation(request, membership_id, template_name="signup/
     return render(request, template_name, context)
 
 
+@login_not_required
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_choose_org(request, siret, template_name="signup/prescriber_choose_org.html"):
@@ -498,6 +506,7 @@ def prescriber_choose_org(request, siret, template_name="signup/prescriber_choos
     return render(request, template_name, context)
 
 
+@login_not_required
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind.html"):
@@ -542,6 +551,7 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
     return render(request, template_name, context)
 
 
+@login_not_required
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_confirm_authorization(request, template_name="signup/prescriber_confirm_authorization.html"):
@@ -576,6 +586,7 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
     return render(request, template_name, context)
 
 
+@login_not_required
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_pole_emploi_safir_code.html"):
@@ -608,6 +619,7 @@ def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_
     return render(request, template_name, context)
 
 
+@login_not_required
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_check_pe_email(request, template_name="signup/prescriber_check_pe_email.html"):
@@ -637,6 +649,7 @@ def prescriber_check_pe_email(request, template_name="signup/prescriber_check_pe
     return render(request, template_name, context)
 
 
+@login_not_required
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_emploi_user.html"):
@@ -676,6 +689,7 @@ def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_e
     return render(request, template_name, context)
 
 
+@login_not_required
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_user(request, template_name="signup/prescriber_user.html"):
@@ -846,6 +860,7 @@ class FacilitatorBaseMixin:
         )
 
 
+@login_not_required
 def facilitator_search(request, template_name="signup/facilitator_search.html"):
     form = forms.FacilitatorSearchForm(data=request.POST or None)
     if request.method == "POST" and form.is_valid():
@@ -859,7 +874,7 @@ def facilitator_search(request, template_name="signup/facilitator_search.html"):
     return render(request, template_name, context)
 
 
-class FacilitatorUserView(FacilitatorBaseMixin, TemplateView):
+class FacilitatorUserView(LoginNotRequiredMixin, FacilitatorBaseMixin, TemplateView):
     """
     Display Inclusion Connect button.
     This page is also shown if an error is detected during
@@ -890,7 +905,7 @@ class FacilitatorUserView(FacilitatorBaseMixin, TemplateView):
         }
 
 
-class FacilitatorJoinView(FacilitatorBaseMixin, View):
+class FacilitatorJoinView(LoginNotRequiredMixin, FacilitatorBaseMixin, View):
     def get(self, request, *args, **kwargs):
         self.company_to_create.auth_email = request.user.email
         self.company_to_create.created_by = request.user

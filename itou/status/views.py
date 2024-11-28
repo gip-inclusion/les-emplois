@@ -1,8 +1,10 @@
+from django.contrib.auth.decorators import login_not_required
 from django.shortcuts import render
 
 from . import models, probes
 
 
+@login_not_required
 def index(request):
     probes_classes = sorted(probes.get_probes_classes(), key=lambda p: p.name)
     probes_status_by_name = {ps.name: ps for ps in models.ProbeStatus.objects.all()}

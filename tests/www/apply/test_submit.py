@@ -3793,15 +3793,15 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
 
     def test_anonymous_step_2(self, client):
         response = client.get(self.step_2_url)
-        assert response.status_code == 403
+        assertRedirects(response, reverse("account_login") + f"?next={self.step_2_url}")
 
     def test_anonymous_step_3(self, client):
         response = client.get(self.step_3_url)
-        assert response.status_code == 403
+        assertRedirects(response, reverse("account_login") + f"?next={self.step_3_url}")
 
     def test_anonymous_step_end(self, client):
         response = client.get(self.step_end_url)
-        assert response.status_code == 403
+        assertRedirects(response, reverse("account_login") + f"?next={self.step_end_url}")
 
     def test_as_job_seeker(self, client):
         self._check_nothing_permitted(client, self.job_seeker)
@@ -3948,15 +3948,15 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
 
     def test_anonymous_step_2(self, client):
         response = client.get(self.step_2_url)
-        assert response.status_code == 403
+        assertRedirects(response, reverse("account_login") + f"?next={self.step_2_url}")
 
     def test_anonymous_step_3(self, client):
         response = client.get(self.step_3_url)
-        assert response.status_code == 403
+        assertRedirects(response, reverse("account_login") + f"?next={self.step_3_url}")
 
     def test_anonymous_step_end(self, client):
         response = client.get(self.step_end_url)
-        assert response.status_code == 403
+        assertRedirects(response, reverse("account_login") + f"?next={self.step_end_url}")
 
     def test_as_job_seeker(self, client):
         self._check_nothing_permitted(client, self.job_seeker)

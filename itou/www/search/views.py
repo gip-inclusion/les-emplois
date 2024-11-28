@@ -1,6 +1,7 @@
 from collections import defaultdict, namedtuple
 from urllib.parse import urlencode
 
+from django.contrib.auth.decorators import login_not_required
 from django.contrib.gis.db.models.functions import Distance
 from django.db.models import Case, F, Prefetch, Q, When
 from django.shortcuts import render
@@ -12,6 +13,7 @@ from itou.companies.enums import CompanyKind, ContractNature, JobSource
 from itou.companies.models import Company, JobDescription
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
+from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.pagination import pager
 from itou.utils.urls import add_url_params
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
@@ -25,12 +27,13 @@ INSEE_CODES_WITH_DISTRICTS = {"13055", "75056", "69123"}
 PageAndCounts = namedtuple("PageAndCounts", ("results_page", "siaes_count", "job_descriptions_count"))
 
 
+@login_not_required
 def employer_search_home(request, template_name="search/siaes_search_home.html"):
     context = {"siae_search_form": SiaeSearchForm()}
     return render(request, template_name, context)
 
 
-class EmployerSearchBaseView(ApplyForJobSeekerMixin, FormView):
+class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, FormView):
     form_class = SiaeSearchForm
     initial = {"distance": SiaeSearchForm.DISTANCE_DEFAULT}
 
@@ -276,6 +279,7 @@ class JobDescriptionSearchView(EmployerSearchBaseView):
         )
 
 
+@login_not_required
 def search_prescribers_home(request, template_name="search/prescribers_search_home.html"):
     """
     The search home page has a different design from the results page.
@@ -285,6 +289,7 @@ def search_prescribers_home(request, template_name="search/prescribers_search_ho
     return render(request, template_name, context)
 
 
+@login_not_required
 def search_prescribers_results(request, template_name="search/prescribers_search_results.html"):
     city = None
     distance = None

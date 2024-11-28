@@ -7,6 +7,7 @@ from allauth.account.adapter import get_adapter
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import crypto
@@ -109,6 +110,7 @@ def _add_user_kind_error_message(request, existing_user, new_user_kind):
     )
 
 
+@login_not_required
 def pro_connect_authorize(request):
     # Start a new session.
     user_kind = request.GET.get("user_kind")
@@ -185,6 +187,7 @@ def _get_user_info(request, access_token):
     return decoded_id_token, None
 
 
+@login_not_required
 def pro_connect_callback(request):
     code = request.GET.get("code")
     state = request.GET.get("state")
@@ -307,6 +310,7 @@ def pro_connect_callback(request):
     return HttpResponseRedirect(next_url)
 
 
+@login_not_required
 def pro_connect_logout(request):
     token = request.GET.get("token")
     post_logout_redirect_url = reverse("pro_connect:logout_callback")
@@ -330,6 +334,7 @@ def pro_connect_logout(request):
     return HttpResponseRedirect(complete_url)
 
 
+@login_not_required
 def pro_connect_logout_callback(request):
     state = request.GET.get("state")
     if state is None:

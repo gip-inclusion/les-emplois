@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_not_required, login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
@@ -16,6 +16,7 @@ from itou.utils.urls import get_safe_url
 from itou.www.prescribers_views.forms import EditPrescriberOrganizationForm
 
 
+@login_not_required
 def card(request, org_id, template_name="prescribers/card.html"):
     prescriber_org = get_object_or_404(PrescriberOrganization, pk=org_id, is_authorized=True)
     back_url = get_safe_url(request, "back_url")

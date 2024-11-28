@@ -15,7 +15,7 @@ make sure that the correct filters are "Verrouillé".
 """
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_not_required, login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render
@@ -175,6 +175,7 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
     return render(request, template_name, base_context)
 
 
+@login_not_required
 def stats_public(request):
     """
     Public basic stats (signed and embedded version)

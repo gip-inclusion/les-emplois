@@ -5,6 +5,7 @@ import httpx
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -39,6 +40,7 @@ def _redirect_to_job_seeker_login_on_error(error_msg, request=None, extra_tags="
     return HttpResponseRedirect(reverse("login:job_seeker"))
 
 
+@login_not_required
 def pe_connect_authorize(request):
     # The redirect_uri should be defined in the PEAMU settings to be allowed
     # NB: the integration platform allows "http://127.0.0.1:8000/pe_connect/callback"
@@ -57,6 +59,7 @@ def pe_connect_authorize(request):
     return HttpResponseRedirect(f"{url}?{urlencode(data)}")
 
 
+@login_not_required
 def pe_connect_callback(request):
     code = request.GET.get("code")
     if code is None:
@@ -180,10 +183,12 @@ def pe_connect_callback(request):
     return HttpResponseRedirect(next_url)
 
 
+@login_not_required
 def pe_connect_no_email(request, template_name="account/peamu_no_email.html"):
     return render(request, template_name)
 
 
+@login_not_required
 def pe_connect_logout(request):
     id_token = request.GET.get("id_token")
 
