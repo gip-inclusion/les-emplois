@@ -81,7 +81,7 @@ class TestCreateForSender:
         assertContains(response, company.display_name)
 
     # TODO(ewen): to be removed after migration is complete
-    @pytest.mark.ignore_unknown_variable_template_error("job_seeker", "readonly_form", "confirmation_needed")
+    @pytest.mark.ignore_unknown_variable_template_error("job_seeker", "confirmation_needed")
     def test_company_in_searchbyemail_after_deprecated_checknir(self, client):
         company = CompanyFactory(with_membership=True)
         user = PrescriberFactory(membership=True)
