@@ -232,6 +232,38 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
 
         assertRedirects(response, target_url)
 
+    def test_born_in_france_no_birthplace(self, client):
+        client.force_login(self.user)
+        client.get(self.url)
+        data = _get_user_form_data(self.job_seeker)
+        del data["birth_place"]
+        response = client.post(self.url, data=data)
+        assertContains(
+            response,
+            """
+            <div class="alert alert-danger" role="alert">
+            Si le pays de naissance est la France, la commune de naissance est obligatoire.
+            </div>""",
+            html=True,
+            count=1,
+        )
+
+    def test_born_outside_of_france_specifies_birthplace(self, client):
+        client.force_login(self.user)
+        client.get(self.url)
+        data = _get_user_form_data(self.job_seeker)
+        data["birth_country"] = CountryOutsideEuropeFactory().pk
+        response = client.post(self.url, data=data)
+        assertContains(
+            response,
+            """
+            <div class="alert alert-danger" role="alert">
+            Il n'est pas possible de saisir une commune de naissance hors de France.
+            </div>""",
+            html=True,
+            count=1,
+        )
+
     def test_pass_step_1_without_geolocated_address(self, client):
         # Do not mess with job seeker profile and geolocation at step 1
         # just check user model info
