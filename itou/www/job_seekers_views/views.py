@@ -289,6 +289,9 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
     def get(self, request, *args, **kwargs):
         # The NIR already exists, go to next step
         if self.job_seeker.jobseeker_profile.nir:
+            # TODO(ewen): check_job_seeker_info doesn't use the session yet,
+            # so we delete the session here.
+            self.job_seeker_session.delete()
             return HttpResponseRedirect(
                 reverse(
                     "job_seekers_views:check_job_seeker_info",
@@ -303,6 +306,9 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
             self.job_seeker.jobseeker_profile.nir = self.form.cleaned_data["nir"]
             self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
             self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
+            # TODO(ewen): check_job_seeker_info doesn't use the session yet,
+            # so we delete the session here.
+            self.job_seeker_session.delete()
             return self.redirect_to_check_infos(self.job_seeker.public_id)
         else:
             next_url = reverse(
