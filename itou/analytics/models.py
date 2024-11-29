@@ -48,11 +48,15 @@ class DatumCode(models.TextChoices):
     # Tech metrics
     TECH_SENTRY_APDEX = "SENTRY-001", "Apdex"
     TECH_SENTRY_FAILURE_RATE = "SENTRY-002", "Taux de requêtes en échec"
+    TECH_UPDOWN_UPTIME = "UPDOWN-001", "Taux de disponibilité"
+    TECH_UPDOWN_APDEX = "UPDOWN-002", "Apdex"
 
 
 PERCENTAGE_DATUM = [
     DatumCode.TECH_SENTRY_APDEX,
     DatumCode.TECH_SENTRY_FAILURE_RATE,
+    DatumCode.TECH_UPDOWN_UPTIME,
+    DatumCode.TECH_UPDOWN_APDEX,
 ]
 
 

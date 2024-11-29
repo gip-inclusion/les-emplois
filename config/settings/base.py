@@ -712,6 +712,11 @@ API_SENTRY_STATS_TOKEN = os.getenv("API_SENTRY_STATS_TOKEN")
 API_SENTRY_ORG_NAME = os.getenv("API_SENTRY_ORG_NAME")
 API_SENTRY_PROJECT_ID = os.getenv("API_SENTRY_PROJECT_ID")
 
+# Updown
+API_UPDOWN_TOKEN = os.getenv("API_UPDOWN_TOKEN")
+API_UPDOWN_BASE_URL = "https://updown.io/api"
+API_UPDOWN_CHECK_ID = os.getenv("API_UPDOWN_CHECK_ID")
+
 # RDV-I/S
 # ------------------------------------------------------------------------------
 RDV_SOLIDARITES_API_BASE_URL = os.getenv("RDV_SOLIDARITES_API_BASE_URL")
