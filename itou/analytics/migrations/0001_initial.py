@@ -52,6 +52,8 @@ class Migration(migrations.Migration):
                             ("API-012", "API structures : total d'appels reçus"),
                             ("SENTRY-001", "Apdex"),
                             ("SENTRY-002", "Taux de requêtes en échec"),
+                            ("UPDOWN-001", "Taux de disponibilité"),
+                            ("UPDOWN-002", "Apdex"),
                         ]
                     ),
                 ),

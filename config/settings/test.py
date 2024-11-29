@@ -49,6 +49,8 @@ API_SENTRY_BASE_URL = "https://www.sinatra.com"
 API_SENTRY_STATS_TOKEN = "stry_xxx"
 API_SENTRY_ORG_ID = "gip"
 
+API_UPDOWN_TOKEN = "ro-XXXXXXXX"
+API_UPDOWN_CHECK_ID = "blabla"
 
 if os.getenv("DEBUG_SQL_SNAPSHOT"):
     # Mandatory to have detailed stacktrace inside templates

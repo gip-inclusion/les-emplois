@@ -633,3 +633,42 @@ def detect_silent_date_cast():
         return original_pre_save(self, model_instance, add)
 
     DateField.pre_save = strict_pre_save
+
+
+@pytest.fixture(name="updown_respx_mock")
+def updown_respx_mock_fixture(respx_mock):
+    json = {
+        "uptime": 100.0,
+        "apdex": 0.986,
+        "timings": {"redirect": 148, "namelookup": 1, "connection": 22, "handshake": 25, "response": 99, "total": 295},
+        "requests": {
+            "samples": 44214,
+            "failures": 12,
+            "satisfied": 43256,
+            "tolerated": 664,
+            "by_response_time": {
+                "under125": 42383,
+                "under250": 42874,
+                "under500": 43256,
+                "under1000": 43620,
+                "under2000": 43920,
+                "under4000": 44100,
+                "under8000": 44183,
+                "under16000": 44201,
+                "under32000": 44202,
+            },
+        },
+    }
+    end = datetime.datetime(2024, 12, 3, 0, 0, 0, tzinfo=datetime.UTC)
+    start = end - relativedelta(days=1)
+    params = {
+        "api-key": settings.API_UPDOWN_TOKEN,
+        "from": start.isoformat(),
+        "to": end.isoformat(),
+    }
+    headers = {
+        "Content-Type": "application/json",
+    }
+
+    url = f"{settings.API_UPDOWN_BASE_URL}/checks/{settings.API_UPDOWN_CHECK_ID}/metrics/"
+    return respx_mock.route(headers=headers, method="GET", params=params, url=url).respond(json=json)
