@@ -1156,8 +1156,8 @@
       }),
       dict({
         'origin': list([
-          'IfNode[approvals/includes/job_description_creation.html]',
-          'IfNode[approvals/includes/job_description_creation.html]',
+          'IfNode[apply/includes/job_application_creation_info.html]',
+          'IfNode[apply/includes/job_application_creation_info.html]',
           'IncludeNode[apply/includes/job_application_box_for_user.html]',
           'IncludeNode[employees/detail.html]',
           'ForNode[employees/detail.html]',
@@ -1203,8 +1203,8 @@
       }),
       dict({
         'origin': list([
-          'IfNode[approvals/includes/job_description_creation.html]',
-          'IfNode[approvals/includes/job_description_creation.html]',
+          'IfNode[apply/includes/job_application_creation_info.html]',
+          'IfNode[apply/includes/job_application_creation_info.html]',
           'IncludeNode[apply/includes/job_application_box_for_user.html]',
           'IncludeNode[employees/detail.html]',
           'ForNode[employees/detail.html]',
