@@ -1,7 +1,7 @@
 {% load str_filters %}
 <div class="c-box c-box--results has-links-inside my-3 my-md-4">
     <div class="c-box--results__header">
-        {% include "approvals/includes/job_description_creation.html" with job_application=job_application %}
+        {% include "apply/includes/job_application_creation_info.html" with job_application=job_application request=request SenderKind=SenderKind JobApplicationOrigin=JobApplicationOrigin only %}
     </div>
     <hr class="m-0">
     <div class="c-box--results__body">
