@@ -221,7 +221,7 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
     - social allowances
     """
 
-    pole_emploi = forms.BooleanField(required=False, label="Inscrit à France Travail ?")
+    pole_emploi = forms.BooleanField(required=False, label="Inscrit à France Travail")
     pole_emploi_id = forms.CharField(
         label="Identifiant France Travail",
         required=False,
@@ -236,18 +236,25 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
     )
     ass_allocation = forms.BooleanField(
         required=False,
-        label="Bénéficiaire de l'ASS ?",
+        label="Bénéficiaire de l'ASS",
         help_text="Allocation de solidarité spécifique",
     )
     aah_allocation = forms.BooleanField(
         required=False,
-        label="Bénéficiaire de l'AAH ?",
+        label="Bénéficiaire de l'AAH",
         help_text="Allocation aux adultes handicapés",
     )
-    unemployed = forms.BooleanField(required=False, label="Sans emploi à l'embauche ?")
+    unemployed = forms.BooleanField(required=False, label="Sans emploi à l'embauche")
 
     # This field is a subset of the possible choices of `has_rsa_allocation` model field
     rsa_markup = forms.ChoiceField(required=False, label="Majoration du RSA", choices=RSAAllocation.choices[1:])
+
+    COLLAPSIBLE_SINCE_FIELDS = ["unemployed", "rsa_allocation", "ass_allocation", "aah_allocation"]
+    COLLAPSIBLE_SINCE_FIELDS_ERRORS = {
+        "unemployed": "La période sans emploi est obligatoire",
+        "ass_allocation": "La durée d'allocation de l'ASS est obligatoire",
+        "aah_allocation": "La durée d'allocation de l'AAH est obligatoire",
+    }
 
     class Meta:
         model = JobSeekerProfile
@@ -264,9 +271,9 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
         ]
         labels = {
             "education_level": "Niveau de formation",
-            "resourceless": "Sans ressource ?",
+            "resourceless": "Sans ressource",
             "pole_emploi_since": "Inscrit depuis",
-            "has_rsa_allocation": "Bénéficiaire du RSA ?",
+            "has_rsa_allocation": "Bénéficiaire du RSA",
         }
 
     def __init__(self, *args, **kwargs):
@@ -275,7 +282,7 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
         # Collapsible sections:
         # If these non-model fields are checked, matching model fields are updatable
         # otherwise model fields reset to empty value ("")
-        for field in ["unemployed", "rsa_allocation", "ass_allocation", "aah_allocation"]:
+        for field in self.COLLAPSIBLE_SINCE_FIELDS:
             self.initial[field] = getattr(self.instance, field + "_since")
 
         # Pôle emploi (collapsible section)
@@ -321,13 +328,7 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
             self.instance.has_rsa_allocation = RSAAllocation.NO
 
         # Collapsible blocks field validation
-        collapsible_errors = {
-            "unemployed": "La période sans emploi est obligatoire",
-            "ass_allocation": "La durée d'allocation de l'ASS est obligatoire",
-            "aah_allocation": "La durée d'allocation de l'AAH est obligatoire",
-        }
-
-        for collapsible_field, error_message in collapsible_errors.items():
+        for collapsible_field, error_message in self.COLLAPSIBLE_SINCE_FIELDS_ERRORS.items():
             inner_field_name = collapsible_field + "_since"
             if self.cleaned_data[collapsible_field]:
                 if not self.cleaned_data[inner_field_name]:
@@ -344,6 +345,51 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
             self.instance.user.jobseeker_profile.pole_emploi_id = self.cleaned_data["pole_emploi_id"]
 
         super().save(*args, **kwargs)
+
+
+class NewEmployeeRecordStep3ForEITIForm(NewEmployeeRecordStep3Form):
+    are_allocation = forms.BooleanField(
+        required=False,
+        label="Bénéficiaire de l'ARE",
+        help_text="Allocation d'aide au retour à l'emploi",
+    )
+    activity_bonus = forms.BooleanField(
+        required=False,
+        label="Bénéficiaire de la prime d'activité",
+    )
+
+    COLLAPSIBLE_SINCE_FIELDS = NewEmployeeRecordStep3Form.COLLAPSIBLE_SINCE_FIELDS + [
+        "are_allocation",
+        "activity_bonus",
+    ]
+    COLLAPSIBLE_SINCE_FIELDS_ERRORS = {
+        **NewEmployeeRecordStep3Form.COLLAPSIBLE_SINCE_FIELDS_ERRORS,
+        "are_allocation": "La durée de l'ARE est obligatoire",
+        "activity_bonus": "La durée de la prime d'activité est obligatoire",
+    }
+
+    class Meta(NewEmployeeRecordStep3Form.Meta):
+        fields = NewEmployeeRecordStep3Form.Meta.fields + [
+            "are_allocation_since",
+            "activity_bonus_since",
+            "cape_freelance",
+            "cesa_freelance",
+            "actor_met_for_business_creation",
+            "mean_monthly_income_before_process",
+            "eiti_contributions",
+        ]
+        help_texts = {
+            "cape_freelance": "Contrat d'Appui au Projet Entreprise",
+            "cesa_freelance": "Contrat Entrepreneur Salarié Associé",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["actor_met_for_business_creation"].required = True
+        self.fields["mean_monthly_income_before_process"].required = True
+        self.fields["mean_monthly_income_before_process"].widget.attrs |= {"step": "any"}
+        self.fields["eiti_contributions"].required = True
 
 
 class NewEmployeeRecordStep4(forms.Form):

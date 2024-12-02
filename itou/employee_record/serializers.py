@@ -3,12 +3,12 @@ import re
 from rest_framework import serializers
 from unidecode import unidecode
 
-from itou.asp.models import AllocationDuration, EducationLevel, LaneExtension, LaneType, SiaeMeasure
+from itou.asp.models import AllocationDuration, EducationLevel, EITIContributions, LaneExtension, LaneType, SiaeMeasure
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from itou.employee_record.typing import CodeComInsee
 from itou.users.enums import Title
 from itou.users.models import User
-from itou.utils.serializers import NullField, NullIfEmptyCharField, NullIfEmptyChoiceField
+from itou.utils.serializers import DefaultIfEmptyChoiceField, NullField, NullIfEmptyCharField, NullIfEmptyChoiceField
 
 
 class _PersonSerializer(serializers.Serializer):
@@ -170,7 +170,9 @@ class _SituationSerializer(serializers.Serializer):
     salarieRQTH = serializers.BooleanField(
         source="job_application.job_seeker.jobseeker_profile.rqth_employee"
     )  # Required
-    salarieOETH = serializers.SerializerMethodField()  # Required
+    salarieOETH = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.oeth_employee"
+    )  # Required
     salarieAideSociale = serializers.BooleanField(
         source="job_application.job_seeker.jobseeker_profile.has_social_allowance"
     )  # Required
@@ -207,10 +209,64 @@ class _SituationSerializer(serializers.Serializer):
         source="job_application.job_seeker.jobseeker_profile.ata_allocation_since",
     )  # Required if he has ATA allocation
 
-    def get_salarieOETH(self, obj: EmployeeRecord) -> bool:
-        if obj.asp_siae_type is SiaeMeasure.EITI:
-            return False
-        return obj.job_application.job_seeker.jobseeker_profile.oeth_employee
+    salarieBenefARE = NullField()  # Required for EITI, "null" for others
+    salarieBenefAREDepuis = NullField()  # Required for EITI, "null" for others
+    salarieBenefPrimeActivite = NullField()  # Required for EITI, "null" for others
+    salarieBenefPrimeActiviteDepuis = NullField()  # Required for EITI, "null" for others
+    salarieBenefCAPE = NullField()  # Required for EITI, "null" for others
+    salarieBenefCESA = NullField()  # Required for EITI, "null" for others
+    nomActeurCreationEntr = NullField()  # Required for EITI, "null" for others
+    revenuMensuelMoyenTI = NullField()  # Required for EITI, "null" for others
+    cotisationsTI = NullField()  # Required for EITI, "null" for others
+
+
+class _SituationForEITISerializer(_SituationSerializer):
+    salarieOETH = serializers.ReadOnlyField(default=False)  # Always "false" for EITI
+
+    salarieBenefARE = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.has_are_allocation"
+    )  # Required for EITI
+    salarieBenefAREDepuis = NullIfEmptyChoiceField(
+        choices=AllocationDuration.choices,
+        source="job_application.job_seeker.jobseeker_profile.are_allocation_since",
+    )  # Required for EITI if he has ARE allocation
+
+    salarieBenefPrimeActivite = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.has_activity_bonus"
+    )  # Required for EITI
+    salarieBenefPrimeActiviteDepuis = NullIfEmptyChoiceField(
+        choices=AllocationDuration.choices,
+        source="job_application.job_seeker.jobseeker_profile.activity_bonus_since",
+    )  # Required for EITI if he has activity bonus
+
+    salarieBenefCAPE = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.cape_freelance"
+    )  # Required for EITI
+
+    salarieBenefCESA = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.cesa_freelance"
+    )  # Required for EITI
+
+    nomActeurCreationEntr = serializers.SerializerMethodField()  # Required
+
+    revenuMensuelMoyenTI = serializers.DecimalField(
+        max_digits=7,
+        decimal_places=2,
+        localize=True,
+        source="job_application.job_seeker.jobseeker_profile.mean_monthly_income_before_process",
+    )  # Required for EITI
+
+    cotisationsTI = DefaultIfEmptyChoiceField(
+        choices=EITIContributions.choices,
+        default=EITIContributions.UNDETERMINED,
+        source="job_application.job_seeker.jobseeker_profile.eiti_contributions",
+    )  # Required for EITI
+
+    def get_nomActeurCreationEntr(self, obj: EmployeeRecord) -> str:
+        value = unidecode(obj.job_application.job_seeker.jobseeker_profile.actor_met_for_business_creation).upper()
+        if len(value) > 100:
+            return value[:100].rsplit(" ", 1)[0]
+        return value
 
 
 class _StaticSituationSerializer(_SituationSerializer):
@@ -219,6 +275,17 @@ class _StaticSituationSerializer(_SituationSerializer):
     inscritPoleEmploi = serializers.ReadOnlyField(default=False)  # Required
     inscritPoleEmploiDepuis = NullField()  # Required if registered with France Travail
     numeroIDE = NullField()  # Required if registered with France Travail
+
+
+class _StaticSituationForEITISerializer(_SituationForEITISerializer):
+    niveauFormation = serializers.ReadOnlyField(default=EducationLevel.NON_CERTIFYING_QUALICATIONS.value)  # Required
+
+    inscritPoleEmploi = serializers.ReadOnlyField(default=False)  # Required
+    inscritPoleEmploiDepuis = NullField()  # Required if registered with France Travail
+    numeroIDE = NullField()  # Required if registered with France Travail
+
+    revenuMensuelMoyenTI = serializers.ReadOnlyField(default="0,0")  # Required for EITI
+    nomActeurCreationEntr = serializers.ReadOnlyField(default="INCONNU")  # Required for EITI
 
 
 class EmployeeRecordSerializer(serializers.Serializer):
@@ -230,11 +297,17 @@ class EmployeeRecordSerializer(serializers.Serializer):
     # See : http://www.tomchristie.com/rest-framework-2-docs/api-guide/fields
     personnePhysique = _PersonSerializer(source="*")  # Required
     adresse = _AddressSerializer(source="job_application.job_seeker")  # Required
-    situationSalarie = _SituationSerializer(source="*")  # Required
+    situationSalarie = serializers.SerializerMethodField()  # Required
 
     # These fields are null at the beginning of the ASP processing
     codeTraitement = serializers.CharField(source="asp_processing_code", allow_blank=True, allow_null=True)
     libelleTraitement = serializers.CharField(source="asp_processing_label", allow_blank=True, allow_null=True)
+
+    def get_situationSalarie(self, obj: EmployeeRecord):
+        serializer_class = (
+            _SituationForEITISerializer if obj.asp_siae_type is SiaeMeasure.EITI else _SituationSerializer
+        )
+        return serializer_class(obj).data
 
 
 class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
@@ -274,18 +347,25 @@ class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
         return _AddressSerializer(obj.employee_record.job_application.job_seeker).data
 
     def get_situationSalarie(self, obj: EmployeeRecordUpdateNotification):
+        is_eiti = obj.employee_record.asp_siae_type is SiaeMeasure.EITI
+
         required_fields = {"education_level"}
         if obj.employee_record.job_application.job_seeker.jobseeker_profile.pole_emploi_id:
             required_fields.add("pole_emploi_since")
+        if is_eiti:
+            required_fields.update({"mean_monthly_income_before_process", "actor_met_for_business_creation"})
         is_missing_required_fields = not all(
             [
                 getattr(obj.employee_record.job_application.job_seeker.jobseeker_profile, field)
                 for field in required_fields
             ]
         )
+
         if is_missing_required_fields:
-            return _StaticSituationSerializer(obj.employee_record).data
-        return _SituationSerializer(obj.employee_record).data
+            serializer_class = _StaticSituationForEITISerializer if is_eiti else _StaticSituationSerializer
+        else:
+            serializer_class = _SituationForEITISerializer if is_eiti else _SituationSerializer
+        return serializer_class(obj.employee_record).data
 
 
 class EmployeeRecordBatchSerializer(serializers.Serializer):

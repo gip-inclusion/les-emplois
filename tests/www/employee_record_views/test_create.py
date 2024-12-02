@@ -1,11 +1,13 @@
 import datetime
+import random
 
 import pytest
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from itou.asp.models import Commune
+from itou.asp.models import Commune, EITIContributions
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.users.enums import LackOfNIRReason
@@ -35,10 +37,12 @@ def _get_user_form_data(user):
 
 
 class CreateEmployeeRecordTestMixin:
+    SIAE_KIND = random.choice(SIAE_WITH_CONVENTION_KINDS)
+
     @pytest.fixture(autouse=True)
     def abstract_setup_method(self, mocker):
         self.company = CompanyWithMembershipAndJobsFactory(
-            name="Evil Corp.", membership__user__first_name="Elliot", kind="EI"
+            name="Evil Corp.", membership__user__first_name="Elliot", kind=self.SIAE_KIND
         )
         self.company_without_perms = CompanyWithMembershipAndJobsFactory(
             kind="EI", name="A-Team", membership__user__first_name="Hannibal"
@@ -90,20 +94,21 @@ class CreateEmployeeRecordTestMixin:
 
         assert response.status_code == 200
 
+    def _default_step_3_data(self):
+        return {
+            "education_level": "00",
+            # Factory user is register to Pôle emploi: all fields must be filled
+            "pole_emploi_since": "02",
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
+            "pole_emploi": True,
+        }
+
     def pass_step_3(self, client):
         self.pass_step_2(client)
         url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
         client.get(url)
 
-        data = {
-            "education_level": "00",
-            # Factory user is registed to Pôle emploi: all fields must be filled
-            "pole_emploi_since": "02",
-            # "pole_emploi_id": "1234567X",
-            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
-            "pole_emploi": True,
-        }
-        response = client.post(url, data)
+        response = client.post(url, self._default_step_3_data())
 
         assert response.status_code == 302
 
@@ -146,6 +151,18 @@ class CreateEmployeeRecordTestMixin:
         response = client.get(self.url)
 
         assertContains(response, "régulariser le numéro de sécurité sociale", status_code=403)
+
+
+class CreateEmployeeRecordForEITITestMixin(CreateEmployeeRecordTestMixin):
+    SIAE_KIND = CompanyKind.EITI
+
+    def _default_step_3_data(self):
+        return {
+            **super()._default_step_3_data(),
+            "actor_met_for_business_creation": "Actor inc",
+            "mean_monthly_income_before_process": "42.21",
+            "eiti_contributions": EITIContributions.UNDETERMINED,
+        }
 
 
 class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
@@ -477,6 +494,8 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
     Employee situation and social allowances
     """
 
+    SIAE_KIND = random.choice(list(set(SIAE_WITH_CONVENTION_KINDS) - {CompanyKind.EITI}))
+
     @pytest.fixture(autouse=True)
     def setup_method(self, client):
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
@@ -510,10 +529,10 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
         # Fill other mandatory field from fold
         # POST will fail because if education_level is not filled
         data = {
+            **self._default_step_3_data(),
             "pole_emploi": True,
             "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
             "pole_emploi_since": "01",
-            "education_level": "00",
         }
         response = client.post(self.url, data)
 
@@ -532,12 +551,10 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
 
         # Fill other mandatory field from fold
         data = {
+            **self._default_step_3_data(),
             "unemployed": True,
             "unemployed_since": "02",
             "education_level": "00",
-            "pole_emploi": True,
-            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
-            "pole_emploi_since": "01",
         }
         response = client.post(self.url, data)
 
@@ -556,13 +573,10 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
 
         # Fill other mandatory field from fold
         data = {
+            **self._default_step_3_data(),
             "rsa_allocation": True,
             "rsa_allocation_since": "02",
             "rsa_markup": "OUI-M",
-            "education_level": "00",
-            "pole_emploi": True,
-            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
-            "pole_emploi_since": "01",
         }
         response = client.post(self.url, data)
 
@@ -581,12 +595,9 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
 
         # Fill other mandatory field from fold
         data = {
+            **self._default_step_3_data(),
             "ass_allocation": True,
             "ass_allocation_since": "03",
-            "education_level": "00",
-            "pole_emploi": True,
-            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
-            "pole_emploi_since": "01",
         }
         response = client.post(self.url, data)
 
@@ -603,17 +614,7 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
         url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
         client.get(url)
 
-        # Correct data :
-        data = {
-            "education_level": "00",
-            # Factory user is registed to Pôle emploi: all fields must be filled
-            "pole_emploi_since": "02",
-            # "pole_emploi_id": "1234567X",
-            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
-            "pole_emploi": True,
-        }
-
-        # but incorrect context :
+        # Incorrect context:
         # create another employee record with similar features
         dup_job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
@@ -633,11 +634,62 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
         employee_record = EmployeeRecord.from_job_application(dup_job_application)
         employee_record.save()
 
-        response = client.post(url, data)
+        # But correct data:
+        response = client.post(url, self._default_step_3_data())
         assertContains(
             response,
             "Il est impossible de créer cette fiche salarié pour la raison suivante",
         )
+
+
+class TestCreateEmployeeRecordStep3ForEITI(CreateEmployeeRecordForEITITestMixin, TestCreateEmployeeRecordStep3):
+    """
+    Employee situation and social allowances
+    """
+
+    def test_fold_are_allocation(self, client):
+        assert self.SIAE_KIND == "EITI"
+        assert self.company.kind == "EITI"
+        response = client.get(self.url)
+        form = response.context["form"]
+
+        # Checkbox must not pre-checked: this value is unknown at this stage
+        assert not form.initial["are_allocation"]
+
+        # Fill other mandatory field from fold
+        data = {
+            **self._default_step_3_data(),
+            "are_allocation": True,
+            "are_allocation_since": "03",
+        }
+        response = client.post(self.url, data)
+
+        assertRedirects(response, self.target_url)
+
+        self.profile.refresh_from_db()
+
+        assert "03" == self.profile.are_allocation_since
+
+    def test_fold_activity_bonus(self, client):
+        response = client.get(self.url)
+        form = response.context["form"]
+
+        # Checkbox must not pre-checked: this value is unknown at this stage
+        assert not form.initial["activity_bonus"]
+
+        # Fill other mandatory field from fold
+        data = {
+            **self._default_step_3_data(),
+            "activity_bonus": True,
+            "activity_bonus_since": "03",
+        }
+        response = client.post(self.url, data)
+
+        assertRedirects(response, self.target_url)
+
+        self.profile.refresh_from_db()
+
+        assert "03" == self.profile.activity_bonus_since
 
 
 class TestCreateEmployeeRecordStep4(CreateEmployeeRecordTestMixin):
@@ -673,6 +725,8 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
     """
     Check summary of employee record and validation
     """
+
+    SIAE_KIND = random.choice(list(set(SIAE_WITH_CONVENTION_KINDS) - {CompanyKind.EITI}))
 
     @pytest.fixture(autouse=True)
     def setup_method(self, client):
@@ -713,6 +767,39 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
 
         response = client.get(self.url)
         assert response.context["employee_record"] == recent_employee_record
+
+    def test_eiti_fields_display(self, client):
+        response = client.get(self.url)
+        assertNotContains(response, "Bénéficiaire de l'ARE depuis")
+        assertNotContains(response, "Bénéficiaire de la prime d'activité depuis")
+        assertNotContains(response, "Bénéficiaire CAPE")
+        assertNotContains(response, "Bénéficiaire CESA")
+        assertNotContains(response, "Acteur rencontré : ")
+        assertNotContains(response, "Revenu brut mensuel moyen : ")
+        assertNotContains(response, "Taux de cotisation : ")
+
+
+class TestCreateEmployeeRecordStep5ForEITI(CreateEmployeeRecordForEITITestMixin, TestCreateEmployeeRecordStep5):
+    def _default_step_3_data(self):
+        return {
+            **super()._default_step_3_data(),
+            "are_allocation": True,
+            "are_allocation_since": "03",
+            "activity_bonus": True,
+            "activity_bonus_since": "03",
+            "cape_freelance": True,
+            "cesa_freelance": True,
+        }
+
+    def test_eiti_fields_display(self, client):
+        response = client.get(self.url)
+        assertContains(response, "Bénéficiaire de l'ARE depuis")
+        assertContains(response, "Bénéficiaire de la prime d'activité depuis")
+        assertContains(response, "Bénéficiaire CAPE")
+        assertContains(response, "Bénéficiaire CESA")
+        assertContains(response, "Acteur rencontré : ")
+        assertContains(response, "Revenu brut mensuel moyen : ")
+        assertContains(response, "Taux de cotisation : ")
 
 
 class TestUpdateRejectedEmployeeRecord(CreateEmployeeRecordTestMixin):

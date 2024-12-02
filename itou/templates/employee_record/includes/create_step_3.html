@@ -3,6 +3,7 @@
 {% load static %}
 {% load theme_inclusion %}
 {% load url_add_query %}
+{% load wording %}
 
 <div class="row">
     <div class="col-12 col-lg-8">
@@ -10,7 +11,7 @@
             <form method="post" class="js-prevent-multiple-submit">
                 {% csrf_token %}
                 <fieldset>
-                    <legend>Situation du salarié</legend>
+                    <legend>Situation du {{ request.current_organization|worker_denomination }}</legend>
                     {% bootstrap_form_errors form type="all" %}
 
                     {% bootstrap_field form.education_level %}
@@ -54,6 +55,24 @@
                     <div id="collapse_aah_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.aah_allocation.value %} show{% endif %}">
                         {% bootstrap_field form.aah_allocation_since %}
                     </div>
+
+                    {% if request.current_organization.kind == CompanyKind.EITI %}
+                        {% collapse_field form.are_allocation target_id="collapse_are_allocation" %}
+                        <div id="collapse_are_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.are_allocation.value %} show{% endif %}">
+                            {% bootstrap_field form.are_allocation_since %}
+                        </div>
+
+                        {% collapse_field form.activity_bonus target_id="collapse_activity_bonus" %}
+                        <div id="collapse_activity_bonus" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.activity_bonus.value %} show{% endif %}">
+                            {% bootstrap_field form.activity_bonus_since %}
+                        </div>
+
+                        {% bootstrap_field form.cape_freelance %}
+                        {% bootstrap_field form.cesa_freelance %}
+                        {% bootstrap_field form.actor_met_for_business_creation %}
+                        {% bootstrap_field form.mean_monthly_income_before_process %}
+                        {% bootstrap_field form.eiti_contributions %}
+                    {% endif %}
                 </fieldset>
 
                 {% url "employee_record_views:create_step_2" job_application.id as secondary_url %}

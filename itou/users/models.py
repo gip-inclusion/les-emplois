@@ -10,7 +10,7 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.postgres.indexes import OpClass
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
-from django.core.validators import MinLengthValidator
+from django.core.validators import MaxLengthValidator, MinLengthValidator, RegexValidator
 from django.db import models
 from django.db.models import Count, Exists, OuterRef, Q
 from django.db.models.functions import Upper
@@ -26,6 +26,7 @@ from itou.asp.models import (
     Commune,
     Country,
     EducationLevel,
+    EITIContributions,
     LaneExtension,
     LaneType,
     RSAAllocation,
@@ -936,6 +937,59 @@ class JobSeekerProfile(models.Model):
         choices=AllocationDuration.choices,
     )
 
+    # Fields specifics to the EITI
+    are_allocation_since = models.CharField(
+        max_length=2,
+        verbose_name="allocataire de l'ARE depuis",
+        blank=True,
+        choices=AllocationDuration.choices,
+    )
+
+    activity_bonus_since = models.CharField(
+        max_length=2,
+        verbose_name="allocataire de la prime d'activité depuis",
+        blank=True,
+        choices=AllocationDuration.choices,
+    )
+
+    cape_freelance = models.BooleanField(
+        verbose_name="bénéficiaire CAPE",
+        default=False,
+    )
+
+    cesa_freelance = models.BooleanField(
+        verbose_name="bénéficiaire CESA",
+        default=False,
+    )
+
+    actor_met_for_business_creation = models.CharField(
+        verbose_name="acteur rencontré",
+        help_text="Nom de l’acteur de la création d’entreprise rencontré dans le cadre d'une convention de partenariat / hors convention de partenariat",  # noqa: E501
+        blank=True,
+        validators=[
+            MaxLengthValidator(100),
+            RegexValidator(
+                "^[a-zA-Z -]*$", "Seuls les caractères alphabétiques, le tiret et l'espace sont autorisés."
+            ),
+        ],
+    )
+
+    mean_monthly_income_before_process = models.DecimalField(
+        max_digits=7,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="revenu net mensuel moyen",
+        help_text="Revenu net mensuel moyen du travailleur indépendant sur l’année précédant son entrée en parcours",
+    )
+
+    eiti_contributions = models.CharField(
+        max_length=2,
+        verbose_name="taux de cotisation du travailleur indépendant",
+        blank=True,
+        choices=EITIContributions.choices,
+    )
+
     # Jobseeker address in Hexa format
 
     hexa_lane_number = models.CharField(max_length=10, verbose_name="numéro de la voie", blank=True, default="")
@@ -1230,6 +1284,14 @@ class JobSeekerProfile(models.Model):
     @property
     def has_ata_allocation(self):
         return bool(self.ata_allocation_since)
+
+    @property
+    def has_are_allocation(self):
+        return bool(self.are_allocation_since)
+
+    @property
+    def has_activity_bonus(self):
+        return bool(self.activity_bonus_since)
 
     @property
     def has_social_allowance(self):
