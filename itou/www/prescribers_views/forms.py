@@ -2,7 +2,7 @@ from django import forms
 
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
-from itou.utils.widgets import EasyMDEEditorWithConfig
+from itou.utils.widgets import EasyMDEEditor
 
 
 class EditPrescriberOrganizationForm(forms.ModelForm):
@@ -56,7 +56,7 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
             for field in self.fields.values():
                 field.disabled = True
         else:
-            self.fields["description"].widget = EasyMDEEditorWithConfig()
+            self.fields["description"].widget = EasyMDEEditor()
 
     def clean_siret(self):
         siret = self.cleaned_data["siret"]

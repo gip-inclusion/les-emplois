@@ -76,6 +76,21 @@ ASSET_INFOS = {
             ],
         },
     },
+    "easymde": {
+        "download": {
+            "url": "https://registry.npmjs.org/easymde/-/easymde-2.18.0.tgz",
+            "sha256": "8b2747047c8381f1eade4533bcb67ad70daf98b6bcf5ca5ac3514ecde0f6552d",
+        },
+        "extract": {
+            "origin": "package",
+            "destination": "vendor/easymde",
+            "files": [
+                "LICENSE",
+                ("dist/easymde.min.js", "easymde.min.js"),
+                ("dist/easymde.min.css", "easymde.min.css"),
+            ],
+        },
+    },
     "tiny-slider": {
         "download": {
             "url": "https://github.com/ganlanyuan/tiny-slider/archive/refs/tags/v2.9.4.zip",

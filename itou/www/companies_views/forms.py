@@ -10,7 +10,7 @@ from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.jobs.models import Appellation
 from itou.utils.urls import get_external_link_markup
-from itou.utils.widgets import EasyMDEEditorWithConfig, RemoteAutocompleteSelect2Widget
+from itou.utils.widgets import EasyMDEEditor, RemoteAutocompleteSelect2Widget
 
 
 class CreateCompanyForm(forms.ModelForm):
@@ -39,7 +39,7 @@ class CreateCompanyForm(forms.ModelForm):
             "description": "Texte de présentation de votre structure.",
         }
         widgets = {
-            "description": EasyMDEEditorWithConfig,
+            "description": EasyMDEEditor,
         }
 
     def __init__(self, current_company, current_user, *args, **kwargs):
@@ -151,8 +151,8 @@ class EditSiaeDescriptionForm(forms.ModelForm):
         }
 
         widgets = {
-            "description": EasyMDEEditorWithConfig,
-            "provided_support": EasyMDEEditorWithConfig,
+            "description": EasyMDEEditor,
+            "provided_support": EasyMDEEditor,
         }
 
     def __init__(self, *args, **kwargs):
@@ -353,8 +353,8 @@ class EditJobDescriptionDetailsForm(forms.ModelForm):
             "bénéficier en priorité aux publics résidant en Quartier Prioritaire de la Ville.",
         }
         widgets = {
-            "description": EasyMDEEditorWithConfig,
-            "profile_description": EasyMDEEditorWithConfig,
+            "description": EasyMDEEditor,
+            "profile_description": EasyMDEEditor,
         }
 
     def __init__(self, current_company: Company, *args, **kwargs):

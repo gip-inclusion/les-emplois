@@ -4,8 +4,6 @@
 
 {% block title %}Modifier cette organisation {{ block.super }}{% endblock %}
 
-{% block extra_head %}{{ block.super }}{{ form.media.css }}{% endblock %}
-
 {% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
@@ -45,9 +43,4 @@
             </div>
         </div>
     </section>
-{% endblock %}
-
-{% block script %}
-    {{ block.super }}
-    {{ form.media.js }}
 {% endblock %}
