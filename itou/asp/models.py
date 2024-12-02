@@ -542,3 +542,12 @@ class RSAAllocation(models.TextChoices):
     NO = "NON", "Non bénéficiaire du RSA"
     YES_WITH_MARKUP = "OUI-M", "Bénéficiaire du RSA et majoré"
     YES_WITHOUT_MARKUP = "OUI-NM", "Bénéficiaire du RSA et non-majoré"
+
+
+class EITIContributions(models.TextChoices):
+    RETAIL = "01", "Achat/revente de marchandises"
+    TRADE_AND_CRAFT_SERVICES = "02", "Prestations de services commerciales et artisanales"
+    OTHER_SERVICES = "03", "Autres prestations de services"
+    REGULATED_CIPAV = "04", "Professions libérales règlementées relevant de la Cipav"
+    FURNISHED_ACCOMMODATION_RENTAL = "05", "Locations de meublés de tourisme classés"
+    UNDETERMINED = "06", "Non déterminé (contrat établi avant 2025)"

@@ -3,7 +3,8 @@ from datetime import timedelta
 import pytest
 from django.utils import timezone
 
-from itou.asp.models import EducationLevel, SiaeMeasure
+from itou.asp.models import AllocationDuration, EducationLevel, EITIContributions, SiaeMeasure
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdateNotification
@@ -208,6 +209,30 @@ def test_update_notification_use_static_serializers_on_missing_pole_emploi_since
     assert data["situationSalarie"] == snapshot()
 
 
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("mean_monthly_income_before_process", None),
+        ("mean_monthly_income_before_process", 0.0),
+        ("actor_met_for_business_creation", ""),
+    ],
+)
+def test_update_notification_use_static_serializers_on_missing_eiti_fields(snapshot, field, value):
+    factory_profile_path = "employee_record__job_application__job_seeker__jobseeker_profile"
+    notification = EmployeeRecordUpdateNotificationFactory(
+        employee_record__job_application__for_snapshot=True,
+        employee_record__job_application__to_company__kind=CompanyKind.EITI,
+        **{
+            f"{factory_profile_path}__actor_met_for_business_creation": "Actor Étude",
+            f"{factory_profile_path}__mean_monthly_income_before_process": 12345.67,
+            f"{factory_profile_path}__{field}": value,
+        },
+    )
+
+    data = EmployeeRecordUpdateNotificationSerializer(notification).data
+    assert data["situationSalarie"] == snapshot()
+
+
 @pytest.mark.parametrize("kind", Company.ASP_EMPLOYEE_RECORD_KINDS)
 def test_situation_salarie_serializer_with_empty_fields(snapshot, kind):
     employee_record = EmployeeRecordWithProfileFactory(
@@ -233,6 +258,13 @@ def test_situation_salarie_serializer_with_eiti_fields_filled(snapshot, kind):
         job_application__to_company__kind=kind,
         # EITI fields
         job_application__job_seeker__jobseeker_profile__oeth_employee=True,
+        job_application__job_seeker__jobseeker_profile__are_allocation_since=AllocationDuration.LESS_THAN_6_MONTHS,
+        job_application__job_seeker__jobseeker_profile__activity_bonus_since=AllocationDuration.FROM_6_TO_11_MONTHS,
+        job_application__job_seeker__jobseeker_profile__cape_freelance=True,
+        job_application__job_seeker__jobseeker_profile__cesa_freelance=True,
+        job_application__job_seeker__jobseeker_profile__actor_met_for_business_creation="Actor Étude",
+        job_application__job_seeker__jobseeker_profile__mean_monthly_income_before_process=12345.67,
+        job_application__job_seeker__jobseeker_profile__eiti_contributions=EITIContributions.OTHER_SERVICES,
         # Force some fields for snapshots
         job_application__job_seeker__jobseeker_profile__education_level=EducationLevel.NO_SCHOOLING,
     )

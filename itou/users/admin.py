@@ -812,6 +812,20 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
             },
         ),
         (
+            "Champs pour les EITI",
+            {
+                "fields": (
+                    "are_allocation_since",
+                    "activity_bonus_since",
+                    "cape_freelance",
+                    "cesa_freelance",
+                    "actor_met_for_business_creation",
+                    "mean_monthly_income_before_process",
+                    "eiti_contributions",
+                )
+            },
+        ),
+        (
             "Adresse salarié au format Hexa",
             {
                 "fields": (

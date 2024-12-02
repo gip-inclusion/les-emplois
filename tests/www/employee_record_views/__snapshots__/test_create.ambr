@@ -346,3 +346,6 @@
 # name: TestCreateEmployeeRecordStep5.test_employee_record_status
   Message(level=25, message="La création de cette fiche salariée est terminée||Vous pouvez suivre l'avancement de son traitement par l'ASP en sélectionnant les différents statuts.", extra_tags='toast')
 # ---
+# name: TestCreateEmployeeRecordStep5ForEITI.test_employee_record_status
+  Message(level=25, message="La création de cette fiche salariée est terminée||Vous pouvez suivre l'avancement de son traitement par l'ASP en sélectionnant les différents statuts.", extra_tags='toast')
+# ---

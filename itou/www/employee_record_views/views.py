@@ -25,11 +25,13 @@ from itou.www.employee_record_views.forms import (
     EmployeeRecordFilterForm,
     NewEmployeeRecordStep1Form,
     NewEmployeeRecordStep2Form,
+    NewEmployeeRecordStep3ForEITIForm,
     NewEmployeeRecordStep3Form,
     NewEmployeeRecordStep4,
     SelectEmployeeRecordStatusForm,
 )
 
+from ...companies.enums import CompanyKind
 from ...users.models import User
 from .enums import EmployeeRecordOrder
 
@@ -324,7 +326,11 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
     if not profile.hexa_address_filled:
         raise PermissionDenied
 
-    form = NewEmployeeRecordStep3Form(data=request.POST or None, instance=profile)
+    if request.current_organization.kind == CompanyKind.EITI:
+        form_class = NewEmployeeRecordStep3ForEITIForm
+    else:
+        form_class = NewEmployeeRecordStep3Form
+    form = form_class(data=request.POST or None, instance=profile)
 
     if request.method == "POST" and form.is_valid():
         form.save()

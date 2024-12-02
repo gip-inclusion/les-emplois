@@ -1,3 +1,5 @@
+{% load wording %}
+
 {% with profile=employee_record.job_application.job_seeker.jobseeker_profile employee=employee_record.job_application.job_seeker %}
     <div>
         <p>
@@ -20,7 +22,7 @@
 
         <hr class="my-3 my-md-5">
         <p>
-            <strong>Situation du salarié</strong>
+            <strong>Situation du {{ request.current_organization|worker_denomination }}</strong>
         </p>
         <ul class="list-unstyled">
             <li>{{ profile.get_education_level_display }}</li>
@@ -29,9 +31,13 @@
                     Inscrit à France Travail depuis {{ profile.get_pole_emploi_since_display|lower }} ({{ employee.jobseeker_profile.pole_emploi_id }})
                 </li>
             {% endif %}
-            {% if profile.resourceless %}<li>Le salarié ne dispose d'aucune ressource</li>{% endif %}
+            {% if profile.resourceless %}
+                <li>Le {{ request.current_organization|worker_denomination }} ne dispose d'aucune ressource</li>
+            {% endif %}
             {% if profile.unemployed_since %}
-                <li>Salarié sans emploi depuis {{ profile.get_unemployed_since_display|lower }}</li>
+                <li>
+                    {{ request.current_organization|worker_denomination|capfirst }} sans emploi depuis {{ profile.get_unemployed_since_display|lower }}
+                </li>
             {% endif %}
             {% if profile.oeth_employee %}<li>Bénéficiaire de la loi handicap (OETH)</li>{% endif %}
             {% if profile.rqth_employee %}<li>Titulaire de la RQTH</li>{% endif %}
@@ -39,10 +45,29 @@
                 <li>{{ profile.get_has_rsa_allocation_display }} (depuis {{ profile.get_rsa_allocation_since_display|lower }})</li>
             {% endif %}
             {% if profile.ass_allocation_since %}
-                <li>Bénéficiaire de l'ASS depuis (depuis {{ profile.get_ass_allocation_since_display|lower }})</li>
+                <li>Bénéficiaire de l'ASS depuis {{ profile.get_ass_allocation_since_display|lower }}</li>
             {% endif %}
             {% if profile.aah_allocation_since %}
-                <li>Bénéficiaire de l'AAH depuis (depuis {{ profile.get_aah_allocation_since_display|lower }})</li>
+                <li>Bénéficiaire de l'AAH depuis {{ profile.get_aah_allocation_since_display|lower }}</li>
+            {% endif %}
+            {% if request.current_organization.kind == CompanyKind.EITI %}
+                {% if profile.are_allocation_since %}
+                    <li>Bénéficiaire de l'ARE depuis {{ profile.get_are_allocation_since_display|lower }}</li>
+                {% endif %}
+                {% if profile.activity_bonus_since %}
+                    <li>Bénéficiaire de la prime d'activité depuis {{ profile.get_activity_bonus_since_display|lower }}</li>
+                {% endif %}
+                {% if profile.cape_freelance %}<li>Bénéficiaire CAPE</li>{% endif %}
+                {% if profile.cesa_freelance %}<li>Bénéficiaire CESA</li>{% endif %}
+                {% if profile.actor_met_for_business_creation %}
+                    <li>Acteur rencontré : {{ profile.actor_met_for_business_creation }}</li>
+                {% endif %}
+                {% if profile.actor_met_for_business_creation %}
+                    <li>Revenu brut mensuel moyen : {{ profile.mean_monthly_income_before_process }}</li>
+                {% endif %}
+                {% if profile.eiti_contributions %}
+                    <li>Taux de cotisation : {{ profile.get_eiti_contributions_display|lower }}</li>
+                {% endif %}
             {% endif %}
         </ul>
 
