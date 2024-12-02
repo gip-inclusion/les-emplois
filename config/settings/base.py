@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     "citext",
     "django_bootstrap5",
     "django_select2",
-    "easymde",
     "formtools",
     "huey.contrib.djhuey",
     "markdownify",
