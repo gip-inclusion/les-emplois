@@ -35,27 +35,6 @@ urlpatterns = [
         views.CreateJobSeekerStepEndForSenderView.as_view(),
         name="create_job_seeker_step_end_for_sender",
     ),
-    # TODO(ewen): deprecated URLs
-    path(
-        "<int:company_pk>/sender/create/<uuid:session_uuid>/1",
-        views.CreateJobSeekerStep1ForSenderView.as_view(),
-        name="create_job_seeker_step_1_for_sender",
-    ),
-    path(
-        "<int:company_pk>/sender/create/<uuid:session_uuid>/2",
-        views.CreateJobSeekerStep2ForSenderView.as_view(),
-        name="create_job_seeker_step_2_for_sender",
-    ),
-    path(
-        "<int:company_pk>/sender/create/<uuid:session_uuid>/3",
-        views.CreateJobSeekerStep3ForSenderView.as_view(),
-        name="create_job_seeker_step_3_for_sender",
-    ),
-    path(
-        "<int:company_pk>/sender/create/<uuid:session_uuid>/end",
-        views.CreateJobSeekerStepEndForSenderView.as_view(),
-        name="create_job_seeker_step_end_for_sender",
-    ),
     # Direct hire process
     path(
         "<uuid:session_uuid>/hire/check-nir",
@@ -89,31 +68,6 @@ urlpatterns = [
     ),
     path(
         "<uuid:session_uuid>/hire/create/end",
-        views.CreateJobSeekerStepEndForSenderView.as_view(),
-        name="create_job_seeker_step_end_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    # TODO(ewen): deprecated URLs
-    path(
-        "<int:company_pk>/hire/create/<uuid:session_uuid>/1",
-        views.CreateJobSeekerStep1ForSenderView.as_view(),
-        name="create_job_seeker_step_1_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/create/<uuid:session_uuid>/2",
-        views.CreateJobSeekerStep2ForSenderView.as_view(),
-        name="create_job_seeker_step_2_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/create/<uuid:session_uuid>/3",
-        views.CreateJobSeekerStep3ForSenderView.as_view(),
-        name="create_job_seeker_step_3_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/create/<uuid:session_uuid>/end",
         views.CreateJobSeekerStepEndForSenderView.as_view(),
         name="create_job_seeker_step_end_for_hire",
         kwargs={"hire_process": True},
