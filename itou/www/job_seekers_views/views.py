@@ -28,7 +28,7 @@ from itou.utils.emails import redact_email_address
 from itou.utils.pagination import ItouPaginator
 from itou.utils.session import SessionNamespace, SessionNamespaceRequiredMixin
 from itou.utils.urls import get_safe_url
-from itou.www.apply.views.submit_views import ApplicationBaseView, ApplyStepBaseView, ApplyStepForSenderBaseView
+from itou.www.apply.views.submit_views import ApplicationBaseView, ApplyStepBaseView
 
 from .forms import (
     CheckJobSeekerInfoForm,
@@ -274,59 +274,6 @@ class JobSeekerForSenderBaseView(JobSeekerBaseView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class DeprecatedCheckNIRForJobSeekerView(ApplyStepBaseView):
-    template_name = "job_seekers_views/step_check_job_seeker_nir.html"
-
-    def __init__(self):
-        super().__init__()
-        self.job_seeker = None
-        self.form = None
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.job_seeker = request.user
-        self.form = CheckJobSeekerNirForm(job_seeker=self.job_seeker, data=request.POST or None)
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and not self.job_seeker.is_job_seeker:
-            logger.info(f"dispatch ({request.path}) : {request.user.kind} in jobseeker tunnel")
-            return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.company.pk}))
-        return super().dispatch(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        # The NIR already exists, go to next step
-        if self.job_seeker.jobseeker_profile.nir:
-            return HttpResponseRedirect(
-                reverse(
-                    "job_seekers_views:check_job_seeker_info",
-                    kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-                )
-            )
-
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        next_url = reverse(
-            "job_seekers_views:check_job_seeker_info",
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-        )
-        if self.form.is_valid():
-            self.job_seeker.jobseeker_profile.nir = self.form.cleaned_data["nir"]
-            self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
-            self.job_seeker.jobseeker_profile.save()
-            return HttpResponseRedirect(next_url)
-        else:
-            kwargs["temporary_nir_url"] = next_url
-
-        return self.render_to_response(self.get_context_data(**kwargs))
-
-    def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {
-            "form": self.form,
-            "preview_mode": False,
-        }
-
-
 class CheckNIRForJobSeekerView(JobSeekerBaseView):
     template_name = "job_seekers_views/step_check_job_seeker_nir.html"
 
@@ -376,71 +323,6 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
-            "preview_mode": False,
-        }
-
-
-class DeprecatedCheckNIRForSenderView(ApplyStepForSenderBaseView):
-    template_name = "job_seekers_views/step_check_job_seeker_nir.html"
-
-    def __init__(self):
-        super().__init__()
-        self.form = None
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.form = CheckJobSeekerNirForm(job_seeker=None, data=request.POST or None, is_gps=self.is_gps)
-
-    def search_by_email_url(self, session_uuid):
-        view_name = (
-            "job_seekers_views:search_by_email_for_hire"
-            if self.hire_process
-            else "job_seekers_views:search_by_email_for_sender"
-        )
-        return reverse(view_name, kwargs={"company_pk": self.company.pk, "session_uuid": session_uuid}) + (
-            "?gps=true" if self.is_gps else ""
-        )
-
-    def post(self, request, *args, **kwargs):
-        context = {}
-        if self.form.is_valid():
-            job_seeker = self.form.get_job_seeker()
-
-            # No user found with that NIR, save the NIR in the session and redirect to search by e-mail address.
-            if not job_seeker:
-                job_seeker_session = SessionNamespace.create_uuid_namespace(
-                    request.session, data={"profile": {"nir": self.form.cleaned_data["nir"]}}
-                )
-                return HttpResponseRedirect(self.search_by_email_url(job_seeker_session.name))
-
-            # The NIR we found is correct
-            if self.form.data.get("confirm"):
-                if self.is_gps:
-                    FollowUpGroup.objects.follow_beneficiary(
-                        beneficiary=job_seeker, user=request.user, is_referent=True
-                    )
-                    return HttpResponseRedirect(reverse("gps:my_groups"))
-                else:
-                    return self.redirect_to_check_infos(job_seeker.public_id)
-
-            context = {
-                # Ask the sender to confirm the NIR we found is associated to the correct user
-                "preview_mode": bool(self.form.data.get("preview")),
-                "job_seeker": job_seeker,
-                "can_view_personal_information": self.sender.can_view_personal_information(job_seeker),
-            }
-        else:
-            # Require at least one attempt with an invalid NIR to access the search by email feature.
-            # The goal is to prevent users from skipping the search by NIR and creating duplicates.
-            job_seeker_session = SessionNamespace.create_uuid_namespace(request.session, data={})
-            context["temporary_nir_url"] = self.search_by_email_url(job_seeker_session.name)
-
-        return self.render_to_response(self.get_context_data(**kwargs) | context)
-
-    def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {
-            "form": self.form,
-            "job_seeker": None,
             "preview_mode": False,
         }
 

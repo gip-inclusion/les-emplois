@@ -1,13 +1,11 @@
 import datetime
 
-import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects
 
 from tests.companies.factories import CompanyFactory
 from tests.users.factories import (
     JobSeekerFactory,
-    PrescriberFactory,
 )
 from tests.utils.test import KNOWN_SESSION_KEYS
 
@@ -79,132 +77,3 @@ class TestCreateForSender:
         )
 
         assertContains(response, company.display_name)
-
-    # TODO(ewen): to be removed after migration is complete
-    @pytest.mark.ignore_unknown_variable_template_error("job_seeker", "confirmation_needed")
-    def test_company_in_searchbyemail_after_deprecated_checknir(self, client):
-        company = CompanyFactory(with_membership=True)
-        user = PrescriberFactory(membership=True)
-        client.force_login(user)
-
-        # Check NIR.
-        # ----------------------------------------------------------------------
-        deprecated_checknir_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"company_pk": company.pk})
-        nir = "141068078200557"
-        post_data = {"nir": nir, "confirm": 1}
-        response = client.post(deprecated_checknir_url, data=post_data)
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
-        deprecated_email_url = reverse(
-            "job_seekers_views:search_by_email_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
-        )
-        expected_job_seeker_session = {
-            "profile": {
-                "nir": nir,
-            },
-        }
-
-        assert response.url == deprecated_email_url
-        assert client.session[job_seeker_session_name] == expected_job_seeker_session
-        assertRedirects(response, deprecated_email_url)
-
-        # Search by email
-        # ----------------------------------------------------------------------
-        response = client.get(deprecated_email_url)
-        new_checknir_url = reverse(
-            "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}
-        )
-        expected_job_seeker_session |= {"profile": {"nir": nir}, "apply": {"company_pk": company.pk}}
-        assertContains(response, f"<h3>{company.display_name}</h3>", html=True)
-        assertContains(
-            response,
-            f"""<a href="{new_checknir_url}"
-                class="btn btn-block btn-outline-primary"
-                aria-label="Retourner à l’étape précédente">
-                    <span>Retour</span>
-                </a>""",
-            html=True,
-        )
-        assert client.session[job_seeker_session_name] == expected_job_seeker_session
-
-        email = "jean_dujardain@email.com"
-        post_data = {"email": email, "confirm": 1}
-        response = client.post(deprecated_email_url, data=post_data)
-        create_url = reverse(
-            "job_seekers_views:create_job_seeker_step_1_for_sender",
-            kwargs={"session_uuid": job_seeker_session_name},
-        )
-        expected_job_seeker_session |= {"user": {"email": email}}
-
-        assert response.url == create_url
-        assert client.session[job_seeker_session_name] == expected_job_seeker_session
-        assertRedirects(response, create_url)
-
-        # Create job seeker step 1.
-        # ----------------------------------------------------------------------
-        response = client.get(create_url)
-        new_email_url = reverse(
-            "job_seekers_views:search_by_email_for_sender", kwargs={"session_uuid": job_seeker_session_name}
-        )
-        assert response.status_code == 200
-        assertContains(
-            response,
-            f"""<a href="{new_email_url}"
-                class="btn btn-block btn-outline-primary"
-                aria-label="Retourner à l’étape précédente">
-                    <span>Retour</span>
-                </a>""",
-            html=True,
-        )
-
-        # Create job seeker step 1, without company_pk in session (if user arrived at this step before migration)
-        # ----------------------------------------------------------------------
-        del expected_job_seeker_session["apply"]
-        client.session[job_seeker_session_name] = expected_job_seeker_session
-        deprecated_create_url = reverse(
-            "job_seekers_views:create_job_seeker_step_1_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
-        )
-
-        response = client.get(deprecated_create_url)
-        expected_job_seeker_session |= {"apply": {"company_pk": company.pk}}
-        assert client.session[job_seeker_session_name] == expected_job_seeker_session
-
-        # Create job seeker step 2, without company_pk in session (if user arrived at this step before migration)
-        # ----------------------------------------------------------------------
-        del expected_job_seeker_session["apply"]
-        client.session[job_seeker_session_name] = expected_job_seeker_session
-        deprecated_create2_url = reverse(
-            "job_seekers_views:create_job_seeker_step_2_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
-        )
-
-        response = client.get(deprecated_create2_url)
-        expected_job_seeker_session |= {"apply": {"company_pk": company.pk}}
-        assert client.session[job_seeker_session_name] == expected_job_seeker_session
-
-        # Create job seeker step 3, without company_pk in session (if user arrived at this step before migration)
-        # ----------------------------------------------------------------------
-        del expected_job_seeker_session["apply"]
-        client.session[job_seeker_session_name] = expected_job_seeker_session
-        deprecated_create3_url = reverse(
-            "job_seekers_views:create_job_seeker_step_3_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
-        )
-
-        response = client.get(deprecated_create3_url)
-        expected_job_seeker_session |= {"apply": {"company_pk": company.pk}}
-        assert client.session[job_seeker_session_name] == expected_job_seeker_session
-
-        # Create job seeker step end, without company_pk in session (if user arrived at this step before migration)
-        # ----------------------------------------------------------------------
-        del expected_job_seeker_session["apply"]
-        client.session[job_seeker_session_name] = expected_job_seeker_session
-        deprecated_createend_url = reverse(
-            "job_seekers_views:create_job_seeker_step_3_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
-        )
-
-        response = client.get(deprecated_createend_url)
-        expected_job_seeker_session |= {"apply": {"company_pk": company.pk}}
-        assert client.session[job_seeker_session_name] == expected_job_seeker_session

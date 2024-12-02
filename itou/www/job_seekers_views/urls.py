@@ -8,22 +8,10 @@ app_name = "job_seekers_views"
 urlpatterns = [
     path("details/<uuid:public_id>", views.JobSeekerDetailView.as_view(), name="details"),
     path("list", views.JobSeekerListView.as_view(), name="list"),
-    # TODO(ewen): this URLs will change to new ones without company_pk
     # For sender
     path("<uuid:session_uuid>/sender/check-nir", views.CheckNIRForSenderView.as_view(), name="check_nir_for_sender"),
     path(
-        "<int:company_pk>/sender/check-nir",
-        views.DeprecatedCheckNIRForSenderView.as_view(),
-        name="check_nir_for_sender",
-    ),
-    path(
         "<uuid:session_uuid>/sender/search-by-email",
-        views.SearchByEmailForSenderView.as_view(),
-        name="search_by_email_for_sender",
-    ),
-    # TODO(ewen): deprecated URL
-    path(
-        "<int:company_pk>/sender/search-by-email/<uuid:session_uuid>",
         views.SearchByEmailForSenderView.as_view(),
         name="search_by_email_for_sender",
     ),
@@ -70,12 +58,6 @@ urlpatterns = [
     ),
     # Direct hire process
     path(
-        "<int:company_pk>/hire/check-nir",
-        views.DeprecatedCheckNIRForSenderView.as_view(),
-        name="check_nir_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
         "<uuid:session_uuid>/hire/check-nir",
         views.CheckNIRForSenderView.as_view(),
         name="check_nir_for_hire",
@@ -83,13 +65,6 @@ urlpatterns = [
     ),
     path(
         "<uuid:session_uuid>/hire/search-by-email",
-        views.SearchByEmailForSenderView.as_view(),
-        name="search_by_email_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    # TODO(ewen): deprecated URL
-    path(
-        "<int:company_pk>/hire/search-by-email/<uuid:session_uuid>",
         views.SearchByEmailForSenderView.as_view(),
         name="search_by_email_for_hire",
         kwargs={"hire_process": True},
@@ -174,11 +149,6 @@ urlpatterns = [
         kwargs={"hire_process": True},
     ),
     # For job seeker
-    path(
-        "<int:company_pk>/job-seeker/check-nir",
-        views.DeprecatedCheckNIRForJobSeekerView.as_view(),
-        name="check_nir_for_job_seeker",
-    ),
     path(
         "<uuid:session_uuid>/job-seeker/check-nir",
         views.CheckNIRForJobSeekerView.as_view(),
