@@ -1239,9 +1239,9 @@ pypdf==5.1.0 \
     --hash=sha256:3bd4f503f4ebc58bae40d81e81a9176c400cbbac2ba2d877367595fb524dfdfc \
     --hash=sha256:425a129abb1614183fd1aca6982f650b47f8026867c0ce7c4b9f281c443d2740
     # via -r requirements/test.txt
-pytest==8.3.3 \
-    --hash=sha256:70b98107bd648308a7952b06e6ca9a50bc660be218d53c257cc1fc94fda10181 \
-    --hash=sha256:a6853c7375b2663155079443d2e45de913a911a11d669df02a50814944db57b2
+pytest==8.3.4 \
+    --hash=sha256:50e16d954148559c9a74109af1eaf0c945ba2d8f30f0a3d3335edde19788b6f6 \
+    --hash=sha256:965370d062bce11e73868e0335abac31b4d3de0e82f4007408d242b4f8610761
     # via
     #   -r requirements/test.txt
     #   pytest-django
