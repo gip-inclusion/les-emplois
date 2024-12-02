@@ -1,5 +1,23 @@
 # Journal des modifications
 
+## 2024-12-02
+
+### Ajouté
+
+- [Ajout de RDV-Insertion à l'admin Django](https://github.com/gip-inclusion/les-emplois/pull/5135)
+- [Mesurer l’usage de la fonctionnalité RDV-Insertion (Matomo)](https://github.com/gip-inclusion/les-emplois/pull/5136)
+- [UX/UI: Mise en avant du bouton "Postuler pour ce candidat"](https://github.com/gip-inclusion/les-emplois/pull/5096)
+
+### Modifié
+
+- [Ajout d'une bannière temporaire pour avertir de l'indisponibilité](https://github.com/gip-inclusion/les-emplois/pull/5166) 🖼
+- [UX/UI: ajustement de l'UI de copy to clipboard](https://github.com/gip-inclusion/les-emplois/pull/5164)
+- [UX/UI: Ajustements des templates GPS](https://github.com/gip-inclusion/les-emplois/pull/5141) 🖼
+
+### Supprimé
+
+- [UX/UI: Retrait des boutons “retour” sur les pages de niveau zéro](https://github.com/gip-inclusion/les-emplois/pull/5157)
+
 ## 2024-11-25
 
 ### Ajouté
