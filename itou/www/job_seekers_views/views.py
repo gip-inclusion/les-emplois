@@ -201,9 +201,6 @@ class JobSeekerBaseView(LoginRequiredMixin, TemplateView):
         if not self.job_seeker_session.exists():
             raise Http404
         self.is_gps = "gps" in request.GET and request.GET["gps"] == "true"
-        # TODO(ewen): temporary condition to fill self.company when not using the new session system
-        if company_pk := kwargs.get("company_pk"):
-            self.job_seeker_session.set("apply", {"company_pk": company_pk} | self.job_seeker_session.get("apply", {}))
         if company_pk := self.job_seeker_session.get("apply", {}).get("company_pk"):
             self.company = (
                 get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
@@ -577,14 +574,6 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
                 return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(context)
-
-    # TODO(ewen): remove this method overloading when migration is over
-    def get_back_url(self):
-        view_name = self.previous_hire_url if self.hire_process else self.previous_apply_url
-        kwargs = {"session_uuid": self.job_seeker_session.name}
-        if not self.job_seeker_session.get("apply", {}).get("company_pk"):
-            kwargs["company_pk"] = self.company.pk
-        return reverse(view_name, kwargs=kwargs)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
