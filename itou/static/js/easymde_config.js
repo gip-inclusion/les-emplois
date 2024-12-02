@@ -4,7 +4,7 @@ let textareas = document.querySelectorAll(".easymde-box");
 textareas.forEach((textarea) => {
   new EasyMDE({
     element: textarea,
-    autoDownloadFontAwesome: true,
+    autoDownloadFontAwesome: false,
     toolbar: [
       {
         name: "bold",
