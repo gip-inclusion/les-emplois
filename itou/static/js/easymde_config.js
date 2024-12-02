@@ -2,7 +2,7 @@
 let textareas = document.querySelectorAll(".easymde-box");
 
 textareas.forEach((textarea) => {
-  const easyMDE = new EasyMDE({
+  new EasyMDE({
     element: textarea,
     autoDownloadFontAwesome: true,
     toolbar: [
