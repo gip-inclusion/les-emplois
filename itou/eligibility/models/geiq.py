@@ -198,6 +198,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
             author_kind=author_kind,
             author_prescriber_organization=author_org,
             author_geiq=author_geiq,
+            expires_at=timezone.localdate() + relativedelta(months=cls.EXPIRATION_DELAY_MONTHS),
         )
 
         if administrative_criteria:

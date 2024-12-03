@@ -2,12 +2,14 @@ import datetime
 import random
 
 import factory
+from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from faker import Faker
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility import models
 from itou.eligibility.enums import AdministrativeCriteriaAnnex, AuthorKind
+from itou.eligibility.models.common import AbstractEligibilityDiagnosisModel
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
@@ -42,6 +44,10 @@ class AbstractEligibilityDiagnosisModelFactory(factory.django.DjangoModelFactory
         )
 
     created_at = factory.LazyFunction(timezone.now)
+    expires_at = factory.LazyAttribute(
+        lambda obj: timezone.localdate(obj.created_at)
+        + relativedelta(months=AbstractEligibilityDiagnosisModel.EXPIRATION_DELAY_MONTHS)
+    )
     job_seeker = factory.SubFactory(JobSeekerFactory)
 
 

@@ -180,6 +180,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
             author_kind=author.kind,
             author_siae=author_organization if author.is_employer else None,
             author_prescriber_organization=author_organization if author.is_prescriber else None,
+            expires_at=timezone.localdate() + relativedelta(months=cls.EXPIRATION_DELAY_MONTHS),
         )
         if administrative_criteria:
             diagnosis.administrative_criteria.add(*administrative_criteria)

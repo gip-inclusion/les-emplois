@@ -1,7 +1,6 @@
 import datetime
 import logging
 
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -77,11 +76,6 @@ class AbstractEligibilityDiagnosisModel(models.Model):
 
     def __str__(self):
         return str(self.pk)
-
-    def save(self, *args, **kwargs):
-        if not self.expires_at:
-            self.expires_at = timezone.localdate(self.created_at) + relativedelta(months=self.EXPIRATION_DELAY_MONTHS)
-        return super().save(*args, **kwargs)
 
     @property
     def is_valid(self):
