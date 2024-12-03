@@ -1,4 +1,5 @@
 from itou.employee_record.mocks.asp_test_siaes import get_staging_siret_from_kind
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import (
     EmployeeRecordBatchSerializer,
     EmployeeRecordSerializer,
@@ -7,7 +8,7 @@ from itou.employee_record.serializers import (
 
 
 class TestEmployeeRecordSerializer(EmployeeRecordSerializer):
-    def to_representation(self, instance):
+    def to_representation(self, instance: EmployeeRecord):
         """
         Test version of the employee record serializer
 
@@ -28,7 +29,7 @@ class TestEmployeeRecordBatchSerializer(EmployeeRecordBatchSerializer):
 
 
 class TestEmployeeRecordUpdateNotificationSerializer(EmployeeRecordUpdateNotificationSerializer):
-    def to_representation(self, instance):
+    def to_representation(self, instance: EmployeeRecordUpdateNotification):
         """
         Test version of the employee record notification serializer
 
@@ -40,7 +41,7 @@ class TestEmployeeRecordUpdateNotificationSerializer(EmployeeRecordUpdateNotific
 
         # Map test fields / values
         result["siret"] = get_staging_siret_from_kind(
-            instance.employee_record.job_application.to_company.kind, instance.siret
+            instance.employee_record.job_application.to_company.kind, instance.employee_record.siret
         )
 
         return result
