@@ -551,6 +551,10 @@ SPECTACULAR_SETTINGS = {
     # Allows to document the choices of a field even if the serializer has allow_null=True.
     # cf. https://github.com/tfranzel/drf-spectacular/issues/235
     "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,
+    "AUTHENTICATION_WHITELIST": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ],
 }
 
 # Requests default timeout is None... See https://blog.mathieu-leplatre.info/handling-requests-timeout-in-python.html
