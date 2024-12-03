@@ -27,8 +27,9 @@ def get_staging_data():
     data = collections.defaultdict(set)
 
     for line in csv.reader(io.StringIO(STAGING_DATA.strip()), delimiter=";"):
-        kind = re.match(r"^[ACEIT]{2,}", line[2]).group(0)
-        data[kind].add(line[0])
+        for annex in line[2:]:
+            kind = re.match(r"^[ACEIT]{2,}", annex).group(0)
+            data[kind].add(line[0])
 
     return {k: list(sorted(v)) for k, v in data.items()}
 
