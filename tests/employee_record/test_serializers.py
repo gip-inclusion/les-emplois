@@ -3,8 +3,7 @@ from datetime import timedelta
 import pytest
 from django.utils import timezone
 
-from itou.asp.models import SiaeMeasure
-from itou.companies.enums import CompanyKind
+from itou.asp.models import EducationLevel, SiaeMeasure
 from itou.companies.models import Company
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdateNotification
@@ -113,31 +112,6 @@ class TestEmployeeRecordAddressSerializer:
         }
 
 
-class TestEmployeeRecordSerializer:
-    def test_oeth_employee_for_eiti(self):
-        employee_record = EmployeeRecordWithProfileFactory(
-            status=Status.PROCESSED,
-            job_application__to_company__kind=CompanyKind.EITI,
-        )
-        employee_record.job_application.job_seeker.jobseeker_profile.oeth_employee = True
-        data = EmployeeRecordSerializer(employee_record).data
-
-        assert data["mesure"] == "EITI_DC"
-        assert data["situationSalarie"]["salarieOETH"] is False
-
-    @pytest.mark.parametrize("kind", set(Company.ASP_EMPLOYEE_RECORD_KINDS) - {CompanyKind.EITI})
-    def test_oeth_employee_for_non_eiti(self, kind):
-        employee_record = EmployeeRecordWithProfileFactory(
-            status=Status.PROCESSED,
-            job_application__to_company__kind=kind,
-        )
-        employee_record.job_application.job_seeker.jobseeker_profile.oeth_employee = True
-        data = EmployeeRecordSerializer(employee_record).data
-
-        assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
-        assert data["situationSalarie"]["salarieOETH"] is True
-
-
 class TestEmployeeRecordUpdateNotificationSerializer:
     def test_notification_serializer(self):
         # High-level : just check basic information
@@ -222,3 +196,42 @@ def test_update_notification_use_static_serializers_on_missing_fields(snapshot, 
 
     data = EmployeeRecordUpdateNotificationSerializer(notification).data
     assert data[key] == snapshot()
+
+
+@pytest.mark.parametrize("kind", Company.ASP_EMPLOYEE_RECORD_KINDS)
+def test_situation_salarie_serializer_with_empty_fields(snapshot, kind):
+    employee_record = EmployeeRecordWithProfileFactory(
+        status=Status.PROCESSED,
+        job_application__to_company__kind=kind,
+        job_application__job_seeker__jobseeker_profile__education_level="",
+    )
+    notification = EmployeeRecordUpdateNotification(employee_record=employee_record)
+
+    data = EmployeeRecordSerializer(employee_record).data
+    assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
+    assert data["situationSalarie"] == snapshot(name="employee record")
+
+    data = EmployeeRecordUpdateNotificationSerializer(notification).data
+    assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
+    assert data["situationSalarie"] == snapshot(name="employee record update notification")
+
+
+@pytest.mark.parametrize("kind", Company.ASP_EMPLOYEE_RECORD_KINDS)
+def test_situation_salarie_serializer_with_eiti_fields_filled(snapshot, kind):
+    employee_record = EmployeeRecordWithProfileFactory(
+        status=Status.PROCESSED,
+        job_application__to_company__kind=kind,
+        # EITI fields
+        job_application__job_seeker__jobseeker_profile__oeth_employee=True,
+        # Force some fields for snapshots
+        job_application__job_seeker__jobseeker_profile__education_level=EducationLevel.NO_SCHOOLING,
+    )
+    notification = EmployeeRecordUpdateNotification(employee_record=employee_record)
+
+    data = EmployeeRecordSerializer(employee_record).data
+    assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
+    assert data["situationSalarie"] == snapshot(name="employee record")
+
+    data = EmployeeRecordUpdateNotificationSerializer(notification).data
+    assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
+    assert data["situationSalarie"] == snapshot(name="employee record update notification")
