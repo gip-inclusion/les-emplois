@@ -3,7 +3,7 @@
   ReturnDict({
     'inscritPoleEmploi': False,
     'inscritPoleEmploiDepuis': None,
-    'niveauFormation': '00',
+    'niveauFormation': '01',
     'numeroIDE': None,
     'orienteur': '08',
     'salarieAideSociale': False,
@@ -51,7 +51,7 @@
   ReturnDict({
     'inscritPoleEmploi': False,
     'inscritPoleEmploiDepuis': None,
-    'niveauFormation': '00',
+    'niveauFormation': '01',
     'numeroIDE': None,
     'orienteur': '08',
     'salarieAideSociale': False,
@@ -99,7 +99,7 @@
   ReturnDict({
     'inscritPoleEmploi': False,
     'inscritPoleEmploiDepuis': None,
-    'niveauFormation': '00',
+    'niveauFormation': '01',
     'numeroIDE': None,
     'orienteur': '08',
     'salarieAideSociale': False,
@@ -147,7 +147,7 @@
   ReturnDict({
     'inscritPoleEmploi': False,
     'inscritPoleEmploiDepuis': None,
-    'niveauFormation': '00',
+    'niveauFormation': '01',
     'numeroIDE': None,
     'orienteur': '08',
     'salarieAideSociale': False,
@@ -195,7 +195,7 @@
   ReturnDict({
     'inscritPoleEmploi': False,
     'inscritPoleEmploiDepuis': None,
-    'niveauFormation': '00',
+    'niveauFormation': '01',
     'numeroIDE': None,
     'orienteur': '08',
     'salarieAideSociale': False,
@@ -595,7 +595,7 @@
     'codetypevoie': 'AV',
   })
 # ---
-# name: test_update_notification_use_static_serializers_on_missing_fields[pole_emploi_since--situationSalarie]
+# name: test_update_notification_use_static_serializers_on_missing_pole_emploi_since_fields
   ReturnDict({
     'inscritPoleEmploi': False,
     'inscritPoleEmploiDepuis': None,

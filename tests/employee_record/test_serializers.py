@@ -185,7 +185,6 @@ class TestEmployeeRecordUpdateNotificationSerializer:
         ("hexa_post_code", "", "adresse"),
         ("hexa_commune", None, "adresse"),
         ("education_level", "", "situationSalarie"),
-        ("pole_emploi_since", "", "situationSalarie"),
     ],
 )
 def test_update_notification_use_static_serializers_on_missing_fields(snapshot, field, value, key):
@@ -196,6 +195,17 @@ def test_update_notification_use_static_serializers_on_missing_fields(snapshot, 
 
     data = EmployeeRecordUpdateNotificationSerializer(notification).data
     assert data[key] == snapshot()
+
+
+def test_update_notification_use_static_serializers_on_missing_pole_emploi_since_fields(snapshot):
+    notification = EmployeeRecordUpdateNotificationFactory(
+        employee_record__job_application__for_snapshot=True,
+        employee_record__job_application__job_seeker__jobseeker_profile__pole_emploi_id="1234567U",
+        employee_record__job_application__job_seeker__jobseeker_profile__pole_emploi_since="",
+    )
+
+    data = EmployeeRecordUpdateNotificationSerializer(notification).data
+    assert data["situationSalarie"] == snapshot()
 
 
 @pytest.mark.parametrize("kind", Company.ASP_EMPLOYEE_RECORD_KINDS)

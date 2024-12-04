@@ -274,10 +274,13 @@ class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
         return _AddressSerializer(obj.employee_record.job_application.job_seeker).data
 
     def get_situationSalarie(self, obj: EmployeeRecordUpdateNotification):
+        required_fields = {"education_level"}
+        if obj.employee_record.job_application.job_seeker.jobseeker_profile.pole_emploi_id:
+            required_fields.add("pole_emploi_since")
         is_missing_required_fields = not all(
             [
                 getattr(obj.employee_record.job_application.job_seeker.jobseeker_profile, field)
-                for field in {"education_level", "pole_emploi_since"}
+                for field in required_fields
             ]
         )
         if is_missing_required_fields:
