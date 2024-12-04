@@ -6,7 +6,7 @@ import httpx
 import sentry_sdk
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
@@ -30,6 +30,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow,
 from itou.rdv_insertion.api import get_api_credentials, get_invitation_status
 from itou.rdv_insertion.models import Invitation, InvitationRequest, Participation
 from itou.users.enums import Title
+from itou.utils.auth import check_user
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
@@ -273,11 +274,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
 
 
 @login_required
-@user_passes_test(
-    lambda u: u.is_prescriber or u.is_employer,
-    login_url=reverse_lazy("search:employers_home"),
-    redirect_field_name=None,
-)
+@check_user(lambda u: u.is_prescriber or u.is_employer)
 def details_for_prescriber(request, job_application_id, template_name="apply/process_details.html"):
     """
     Detail of an application for an SIAE with the ability:

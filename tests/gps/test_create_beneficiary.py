@@ -408,7 +408,7 @@ def test_creation_by_user_kind(client, UserFactory, factory_args, expected_acces
     if expected_access:
         assertContains(response, create_beneficiary_url)
     else:
-        assertRedirects(response, reverse("dashboard:index"))
+        assert response.status_code == 403
 
     response = client.get(create_beneficiary_url)
     [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]

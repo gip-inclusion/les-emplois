@@ -318,17 +318,17 @@ def test_geiq_list_no_access(client, snapshot):
     # JobSeeker
     client.force_login(JobSeekerFactory())
     response = client.get(url)
-    assertRedirects(response, reverse("account_login"), fetch_redirect_response=False)
+    assert response.status_code == 403
 
     # Prescriber
     client.force_login(PrescriberMembershipFactory(organization__authorized=True).user)
     response = client.get(url)
-    assertRedirects(response, reverse("account_login"), fetch_redirect_response=False)
+    assert response.status_code == 403
 
     # Employer
     client.force_login(CompanyMembershipFactory(company__kind=CompanyKind.GEIQ, company__department=29).user)
     response = client.get(url)
-    assertRedirects(response, reverse("account_login"), fetch_redirect_response=False)
+    assert response.status_code == 403
 
 
 def test_state_snapshot(client, snapshot):

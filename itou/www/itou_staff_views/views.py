@@ -4,11 +4,11 @@ import io
 
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import FileResponse, Http404, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.http import content_disposition_header
@@ -19,6 +19,7 @@ from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.auth import check_user
 from itou.utils.db import or_queries
 from itou.utils.export import generate_excel_sheet
 from itou.www.itou_staff_views import merge_utils
@@ -206,11 +207,7 @@ def export_cta(request):
 
 
 @login_required
-@user_passes_test(
-    lambda u: u.is_superuser,
-    login_url=reverse_lazy("dashboard:index"),
-    redirect_field_name=None,
-)
+@check_user(lambda u: u.is_superuser)
 def merge_users(request, template_name="itou_staff_views/merge_users.html"):
     form = MergeUserForm(data=request.POST or None)
 
@@ -226,11 +223,7 @@ def merge_users(request, template_name="itou_staff_views/merge_users.html"):
 
 
 @login_required
-@user_passes_test(
-    lambda u: u.is_superuser,
-    login_url=reverse_lazy("dashboard:index"),
-    redirect_field_name=None,
-)
+@check_user(lambda u: u.is_superuser)
 def merge_users_confirm(request, user_1_pk, user_2_pk, template_name="itou_staff_views/merge_users_confirm.html"):
     ALLOWED_USER_KINDS = [UserKind.PRESCRIBER, UserKind.EMPLOYER]
 

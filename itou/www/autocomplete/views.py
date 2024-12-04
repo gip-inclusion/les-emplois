@@ -1,16 +1,16 @@
 from datetime import datetime
 
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.db.models import F, Q, Value
 from django.db.models.functions import Least, Lower, NullIf, StrIndex
 from django.http import JsonResponse
-from django.urls import reverse_lazy
 from unidecode import unidecode
 
 from itou.asp.models import Commune
 from itou.cities.models import City
 from itou.jobs.models import Appellation
 from itou.users.models import User
+from itou.utils.auth import check_user
 from itou.www.gps.views import is_allowed_to_use_gps_advanced_features
 
 
@@ -124,11 +124,7 @@ def communes_autocomplete(request):
 
 
 @login_required
-@user_passes_test(
-    is_allowed_to_use_gps_advanced_features,
-    login_url=reverse_lazy("dashboard:index"),
-    redirect_field_name=None,
-)
+@check_user(is_allowed_to_use_gps_advanced_features)
 def gps_users_autocomplete(request):
     """
     Returns JSON data compliant with Select2

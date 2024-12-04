@@ -226,11 +226,11 @@ class TestMergeUsers:
     @pytest.mark.parametrize(
         "factory,factory_kwargs,expected_status",
         [
-            (JobSeekerFactory, {"for_snapshot": True}, 302),
-            (EmployerFactory, {"with_company": True}, 302),
-            (PrescriberFactory, {}, 302),
-            (LaborInspectorFactory, {"membership": True}, 302),
-            (ItouStaffFactory, {}, 302),
+            (JobSeekerFactory, {"for_snapshot": True}, 403),
+            (EmployerFactory, {"with_company": True}, 403),
+            (PrescriberFactory, {}, 403),
+            (LaborInspectorFactory, {"membership": True}, 403),
+            (ItouStaffFactory, {}, 403),
             (ItouStaffFactory, {"is_superuser": True}, 200),
         ],
     )
@@ -238,15 +238,9 @@ class TestMergeUsers:
         user = factory(**factory_kwargs)
         client.force_login(user)
         response = client.get(reverse("itou_staff_views:merge_users"))
-        if expected_status == 302:
-            assertRedirects(response, reverse("dashboard:index"))
-        else:
-            assert response.status_code == expected_status
+        assert response.status_code == expected_status
         response = client.get(reverse("itou_staff_views:merge_users_confirm", args=(user.pk, user.pk)))
-        if expected_status == 302:
-            assertRedirects(response, reverse("dashboard:index"))
-        else:
-            assert response.status_code == expected_status
+        assert response.status_code == expected_status
 
     def test_merge_users(self, client):
         client.force_login(ItouStaffFactory(is_superuser=True))
