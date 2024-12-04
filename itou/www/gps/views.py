@@ -1,10 +1,11 @@
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.utils.auth import check_user
 from itou.utils.pagination import pager
 from itou.utils.urls import get_safe_url
 from itou.www.gps.forms import GpsUserSearchForm, MembershipsFiltersForm
@@ -19,11 +20,7 @@ def is_allowed_to_use_gps_advanced_features(user):
 
 
 @login_required
-@user_passes_test(
-    is_allowed_to_use_gps,
-    login_url=reverse_lazy("dashboard:index"),
-    redirect_field_name=None,
-)
+@check_user(is_allowed_to_use_gps)
 def my_groups(request, template_name="gps/my_groups.html"):
     memberships = (
         FollowUpGroupMembership.objects.filter(member=request.user)
@@ -51,11 +48,7 @@ def my_groups(request, template_name="gps/my_groups.html"):
 
 
 @login_required
-@user_passes_test(
-    is_allowed_to_use_gps_advanced_features,
-    login_url=reverse_lazy("dashboard:index"),
-    redirect_field_name=None,
-)
+@check_user(is_allowed_to_use_gps_advanced_features)
 def join_group(request, template_name="gps/join_group.html"):
     form = GpsUserSearchForm(data=request.POST or None)
 
@@ -79,11 +72,7 @@ def join_group(request, template_name="gps/join_group.html"):
 
 
 @login_required
-@user_passes_test(
-    is_allowed_to_use_gps,
-    login_url=reverse_lazy("dashboard:index"),
-    redirect_field_name=None,
-)
+@check_user(is_allowed_to_use_gps)
 def leave_group(request, group_id):
     membership = (
         FollowUpGroupMembership.objects.filter(member=request.user).filter(follow_up_group__id=group_id).first()
@@ -97,11 +86,7 @@ def leave_group(request, group_id):
 
 
 @login_required
-@user_passes_test(
-    is_allowed_to_use_gps,
-    login_url=reverse_lazy("dashboard:index"),
-    redirect_field_name=None,
-)
+@check_user(is_allowed_to_use_gps)
 def toggle_referent(request, group_id):
     membership = (
         FollowUpGroupMembership.objects.filter(member=request.user).filter(follow_up_group__id=group_id).first()

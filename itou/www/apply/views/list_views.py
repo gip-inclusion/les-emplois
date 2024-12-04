@@ -2,11 +2,11 @@ import enum
 from collections import defaultdict
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.db.models import Count, Exists, F, OuterRef, Q, Subquery
 from django.shortcuts import render
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -15,6 +15,7 @@ from itou.eligibility.models import SelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.rdv_insertion.models import InvitationRequest, Participation
+from itou.utils.auth import check_user
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.urls import get_safe_url
@@ -84,7 +85,7 @@ def _add_administrative_criteria(job_applications):
 
 
 @login_required
-@user_passes_test(lambda u: u.is_job_seeker, login_url=reverse_lazy("search:employers_home"), redirect_field_name=None)
+@check_user(lambda u: u.is_job_seeker)
 def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html"):
     """
     List of applications for a job seeker.
@@ -155,11 +156,7 @@ def annotate_title(base_title, archived_choice):
 
 
 @login_required
-@user_passes_test(
-    lambda u: u.is_prescriber or u.is_employer,
-    login_url=reverse_lazy("search:employers_home"),
-    redirect_field_name=None,
-)
+@check_user(lambda u: u.is_prescriber or u.is_employer)
 def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
     List of applications for a prescriber.
@@ -201,11 +198,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
 
 
 @login_required
-@user_passes_test(
-    lambda u: u.is_prescriber or u.is_employer,
-    login_url=reverse_lazy("search:employers_home"),
-    redirect_field_name=None,
-)
+@check_user(lambda u: u.is_prescriber or u.is_employer)
 def list_prescriptions_exports(request, template_name="apply/list_of_available_exports.html"):
     """
     List of applications for a prescriber, sorted by month, displaying the count of applications per month
@@ -226,11 +219,7 @@ def list_prescriptions_exports(request, template_name="apply/list_of_available_e
 
 
 @login_required
-@user_passes_test(
-    lambda u: u.is_prescriber or u.is_employer,
-    login_url=reverse_lazy("search:employers_home"),
-    redirect_field_name=None,
-)
+@check_user(lambda u: u.is_prescriber or u.is_employer)
 def list_prescriptions_exports_download(request, month_identifier=None):
     """
     List of applications for a prescriber for a given month identifier (YYYY-mm),

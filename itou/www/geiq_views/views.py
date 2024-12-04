@@ -3,7 +3,7 @@ import enum
 import logging
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage
 from django.db.models import Count, F, OuterRef, Prefetch, Q, Subquery, Sum
@@ -27,6 +27,7 @@ from itou.geiq.sync import sync_employee_and_contracts
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.utils.apis import geiq_label
+from itou.utils.auth import check_user
 from itou.utils.emails import send_email_messages
 from itou.utils.pagination import pager
 from itou.utils.urls import get_safe_url
@@ -65,9 +66,7 @@ def _get_assessments_for_labor_inspector(request):
 
 
 @login_required
-@user_passes_test(
-    lambda user: user.is_active and (user.is_employer or user.is_labor_inspector), redirect_field_name=None
-)
+@check_user(lambda user: user.is_active and (user.is_employer or user.is_labor_inspector))
 def assessment_info(request, assessment_pk):
     if request.user.is_employer:
         return _assessment_info_for_employer(request, assessment_pk)
@@ -133,7 +132,7 @@ def _assessment_info_for_labor_inspector(
 
 
 @login_required
-@user_passes_test(lambda user: user.is_active and user.is_labor_inspector, redirect_field_name=None)
+@check_user(lambda user: user.is_active and user.is_labor_inspector)
 def assessment_review(request, assessment_pk, template_name="geiq/assessment_review.html"):
     assessment = get_object_or_404(_get_assessments_for_labor_inspector(request), pk=assessment_pk)
     back_url = reverse("geiq:assessment_info", kwargs={"assessment_pk": assessment.pk})
@@ -156,9 +155,7 @@ def assessment_review(request, assessment_pk, template_name="geiq/assessment_rev
 
 
 @login_required
-@user_passes_test(
-    lambda user: user.is_active and (user.is_employer or user.is_labor_inspector), redirect_field_name=None
-)
+@check_user(lambda user: user.is_active and (user.is_employer or user.is_labor_inspector))
 def employee_list(request, assessment_pk, info_type):
     try:
         info_type = InfoType(info_type)
@@ -253,7 +250,7 @@ def _lock_assessment_and_sync(assessment):
 
 @login_required
 @require_POST
-@user_passes_test(lambda user: user.is_active and user.is_employer, redirect_field_name=None)
+@check_user(lambda user: user.is_active and user.is_employer)
 def label_sync(request, assessment_pk):
     assessment = get_object_or_404(
         ImplementationAssessment.objects.filter(
@@ -273,9 +270,7 @@ def label_sync(request, assessment_pk):
 
 @login_required
 @require_safe
-@user_passes_test(
-    lambda user: user.is_active and (user.is_employer or user.is_labor_inspector), redirect_field_name=None
-)
+@check_user(lambda user: user.is_active and (user.is_employer or user.is_labor_inspector))
 def employee_details(request, employee_pk):
     if request.user.is_labor_inspector:
         assessments = _get_assessments_for_labor_inspector(request)
@@ -303,7 +298,7 @@ def employee_details(request, employee_pk):
 
 
 @login_required
-@user_passes_test(lambda user: user.is_active and user.is_labor_inspector, redirect_field_name=None)
+@check_user(lambda user: user.is_active and user.is_labor_inspector)
 def geiq_list(request, institution_pk, year=None, template_name="geiq/geiq_list.html"):
     institution = get_object_or_404(
         Institution.objects.filter(
@@ -342,9 +337,7 @@ def geiq_list(request, institution_pk, year=None, template_name="geiq/geiq_list.
 
 @require_safe
 @login_required
-@user_passes_test(
-    lambda user: user.is_active and (user.is_employer or user.is_labor_inspector), redirect_field_name=None
-)
+@check_user(lambda user: user.is_active and (user.is_employer or user.is_labor_inspector))
 def assessment_report(request, assessment_pk):
     if request.user.is_labor_inspector:
         assessments = (

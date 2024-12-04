@@ -3,7 +3,7 @@ from functools import partial
 import freezegun
 import pytest
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
 from itou.users.models import User
@@ -31,7 +31,7 @@ def test_job_seeker_cannot_use_gps(client):
         ("gps:toggle_referent", {"group_id": group.pk}),
     ]:
         response = client.get(reverse(route, kwargs=kwargs))
-        assertRedirects(response, reverse("dashboard:index"), fetch_redirect_response=False)
+        assert response.status_code == 403
     response = client.get(reverse("users:details", kwargs={"public_id": job_seeker.public_id}))
     assert response.status_code == 403
 
@@ -186,7 +186,7 @@ def test_gps_access(client, factory, access):
     FEATURE_INVITE = "<span>Inviter un partenaire</span>"
     FEATURE_ADD = "<span>Ajouter un bénéficiaire</span>"
     if access is None:
-        assertRedirects(response, reverse("dashboard:index"))
+        assert response.status_code == 403
     elif access == "partial":
         assertContains(response, FEATURE_INVITE)
         assertNotContains(response, FEATURE_ADD)
@@ -196,7 +196,7 @@ def test_gps_access(client, factory, access):
 
     response = client.get(reverse("gps:join_group"))
     if access is None or access == "partial":
-        assertRedirects(response, reverse("dashboard:index"))
+        assert response.status_code == 403
     else:
         assert response.status_code == 200
 
