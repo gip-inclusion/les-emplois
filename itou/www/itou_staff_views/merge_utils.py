@@ -6,6 +6,7 @@ from allauth.account.models import EmailAddress
 from django.db import transaction
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
+from rest_framework.authtoken.models import Token
 
 from itou.communications.models import NotificationSettings
 from itou.companies.models import CompanyMembership
@@ -81,6 +82,13 @@ def handle_membership(model, from_user, to_user, org_field_name=None):
     return len(from_user_memberships)
 
 
+def handle_token(model, from_user, to_user):
+    if Token.objects.filter(user=to_user).exists():
+        # We can't have more than one token per user so there's nothing to do
+        return
+    Token.objects.filter(user=from_user).update(user=to_user)
+
+
 def noop(*args):
     return 0
 
@@ -91,6 +99,7 @@ MODEL_MAPPING = {
     (InstitutionMembership, "user"): noop,
     (EmailAddress, "user"): noop,
     (NotificationSettings, "user"): noop,
+    (Token, "user"): handle_token,
 }
 
 MODEL_REPR_MAPPING = {
@@ -168,6 +177,7 @@ def merge_users(to_user, from_user, update_personal_data):
         "communications.NotificationSettings",
         "prescribers.PrescriberMembership",
         "companies.CompanyMembership",
+        "authtoken.Token",
     }:
         raise Exception(f"Forbidden models deleted : {forbidden_models}")
     to_user.save()
