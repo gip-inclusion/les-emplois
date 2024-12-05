@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from rest_framework.authtoken.models import Token
 
 from itou.companies.models import CompanyMembership
 from itou.job_applications.enums import JobApplicationState
@@ -593,5 +594,22 @@ class TestMergeUsers:
             f"{prefix}itou.job_applications.models.JobApplicationTransitionLog.user : [{log.pk}]",
             f"{prefix}itou.users.models.User.created_by : [{job_seeker.pk}]",
             f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — Done !",
+            "HTTP 302 Found",
+        ]
+
+    def test_merge_tokens(self, client, caplog):
+        employer_1 = EmployerFactory()
+        Token.objects.create(user=employer_1)
+
+        employer_2 = EmployerFactory()
+        Token.objects.create(user=employer_2)
+
+        client.force_login(ItouStaffFactory(is_superuser=True))
+        url = reverse("itou_staff_views:merge_users_confirm", args=(employer_1.pk, employer_2.pk))
+        client.post(url, data={"user_to_keep": "to_user"})
+        assert not User.objects.filter(pk=employer_2.pk).exists()
+
+        assert caplog.messages == [
+            f"Fusion utilisateurs {employer_1.pk} ← {employer_2.pk} — Done !",
             "HTTP 302 Found",
         ]

@@ -278,7 +278,7 @@ def merge_users_confirm(request, user_1_pk, user_2_pk, template_name="itou_staff
                 return HttpResponseRedirect(
                     reverse(
                         "itou_staff_views:merge_users_confirm",
-                        kwargs={"user_1_pk": to_user.pk, "user_2_pk": from_user.pk},
+                        kwargs={"user_1_pk": to_user_pk, "user_2_pk": from_user_pk},
                     )
                 )
 
