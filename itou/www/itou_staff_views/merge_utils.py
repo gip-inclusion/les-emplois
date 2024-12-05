@@ -44,7 +44,7 @@ def get_users_relations():
 
 def admin_url(obj):
     try:
-        return reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_change", args=[obj.id])
+        return reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_change", args=[obj.pk])
     except NoReverseMatch:
         pass
 
