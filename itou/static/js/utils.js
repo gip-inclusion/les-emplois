@@ -1,8 +1,4 @@
 htmx.onLoad((target) => {
-  $(".js-prevent-default", target).on("click", (event) => {
-    event.preventDefault();
-  });
-
   /**
    * Force select2 initialization after htmx swaps
    * select2-hidden-accessible detection skips already initialized widgets like in the case of document.ready
