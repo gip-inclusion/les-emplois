@@ -11,7 +11,7 @@
         <h1>{{ beneficiary.get_full_name }}</h1>
         <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le bénéficiaire">
             {% url 'gps:leave_group' group_id=beneficiary.follow_up_group.id as leave_group_url %}
-            <a href="{% url 'users:details' public_id=beneficiary.public_id %}"
+            <a href="{% url 'gps:user_details' public_id=beneficiary.public_id %}"
                class="btn btn-link btn-block w-100 w-md-auto btn-ico"
                aria-label="Ne plus suivre {{ beneficiary.get_full_name }}"
                data-bs-toggle="modal"
@@ -26,7 +26,7 @@
 
             {% if is_referent %}
                 {% url 'gps:toggle_referent' group_id=beneficiary.follow_up_group.id as remove_referent_url %}
-                <a href="{% url 'users:details' public_id=beneficiary.public_id %}"
+                <a href="{% url 'gps:user_details' public_id=beneficiary.public_id %}"
                    class="btn btn-outline-primary btn-block w-100 w-md-auto btn-ico"
                    aria-label="Ne plus être référent de {{ beneficiary.get_full_name }}"
                    data-bs-toggle="modal"
@@ -43,7 +43,7 @@
             {% if not is_referent %}
                 {% url 'gps:toggle_referent' group_id=beneficiary.follow_up_group.id as add_referent_url %}
 
-                <a href="{% url 'users:details' public_id=beneficiary.public_id %}"
+                <a href="{% url 'gps:user_details' public_id=beneficiary.public_id %}"
                    class="btn btn-outline-primary btn-block w-100 w-md-auto btn-ico"
                    aria-label="Devenir référent de {{ beneficiary.get_full_name }}"
                    data-bs-toggle="modal"

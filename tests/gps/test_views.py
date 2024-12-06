@@ -32,7 +32,7 @@ def test_job_seeker_cannot_use_gps(client):
     ]:
         response = client.get(reverse(route, kwargs=kwargs))
         assert response.status_code == 403
-    response = client.get(reverse("users:details", kwargs={"public_id": job_seeker.public_id}))
+    response = client.get(reverse("gps:user_details", kwargs={"public_id": job_seeker.public_id}))
     assert response.status_code == 403
 
 
@@ -302,7 +302,7 @@ def test_beneficiary_details(client, snapshot):
 
     client.force_login(prescriber)
 
-    user_details_url = reverse("users:details", kwargs={"public_id": beneficiary.public_id})
+    user_details_url = reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id})
     response = client.get(user_details_url)
     html_details = parse_response_to_soup(response, selector="#beneficiary_details_container")
     assert str(html_details) == snapshot
@@ -323,7 +323,7 @@ def test_remove_members_from_group(client):
     beneficiary = JobSeekerFactory()
     my_group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=4, memberships__member=prescriber)
     my_groups_url = reverse("gps:my_groups")
-    user_details_url = reverse("users:details", kwargs={"public_id": beneficiary.public_id})
+    user_details_url = reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id})
 
     client.force_login(prescriber)
 
@@ -419,7 +419,7 @@ def test_contact_information_display(client, snapshot):
 
     beneficiary = JobSeekerFactory(for_snapshot=True)
     FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
-    user_details_url = reverse("users:details", kwargs={"public_id": beneficiary.public_id})
+    user_details_url = reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id})
     client.force_login(prescriber)
 
     # no contact information to display
@@ -461,7 +461,7 @@ def test_contact_information_display_not_live(client, snapshot):
     )
 
     client.force_login(prescriber)
-    response = client.get(reverse("users:details", kwargs={"public_id": beneficiary.public_id}))
+    response = client.get(reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id}))
     assert response.status_code == 200
     assert not response.context["render_advisor_matomo_option"]
     assert str(parse_response_to_soup(response, selector="#advisor-info-details-collapsable")) == snapshot(

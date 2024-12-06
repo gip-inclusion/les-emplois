@@ -11,4 +11,5 @@ urlpatterns = [
     path("groups/join", views.join_group, name="join_group"),
     path("groups/<int:group_id>/leave", views.leave_group, name="leave_group"),
     path("groups/<int:group_id>/toggle_referent", views.toggle_referent, name="toggle_referent"),
+    path("details/<uuid:public_id>", views.UserDetailsView.as_view(), name="user_details"),
 ]
