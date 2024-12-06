@@ -348,8 +348,7 @@ def test_remove_members_from_group(client):
     assert len(groups.object_list) == 0
 
     response = client.get(user_details_url)
-    members = response.context["gps_memberships"]
-    assert members.count() == 3
+    assert response.status_code == 403
 
 
 def test_groups_pagination_and_name_filter(client):

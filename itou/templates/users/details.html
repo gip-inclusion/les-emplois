@@ -1,11 +1,65 @@
 {% extends "layout/base.html" %}
+{% load static %}
 {% load matomo %}
 {% load str_filters %}
 {% load format_filters %}
 
 {% block title %}GPS - Profil de {{ beneficiary.get_full_name }} {{ block.super }}{% endblock %}
 
-{% block title_content %}<h1>{{ beneficiary.get_full_name }}</h1>{% endblock %}
+{% block title_content %}
+    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+        <h1>{{ beneficiary.get_full_name }}</h1>
+        <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le bénéficiaire">
+            {% url 'gps:leave_group' group_id=beneficiary.follow_up_group.id as leave_group_url %}
+            <a href="{% url 'users:details' public_id=beneficiary.public_id %}"
+               class="btn btn-link btn-block w-100 w-md-auto btn-ico"
+               aria-label="Ne plus suivre {{ beneficiary.get_full_name }}"
+               data-bs-toggle="modal"
+               data-bs-target="#confirm_modal"
+               data-bs-title="Êtes-vous sûr de ne plus vouloir suivre {{ beneficiary.get_full_name }} ?"
+               data-bs-body="Vous pourrez toujours suivre ce bénéficiaire de nouveau plus tard."
+               data-bs-confirm-text="Ne plus suivre"
+               data-bs-confirm-url="{{ leave_group_url }}">
+                <i class="ri-user-unfollow-line fw-medium" aria-hidden="true"></i>
+                <span>Ne plus suivre</span>
+            </a>
+
+            {% if is_referent %}
+                {% url 'gps:toggle_referent' group_id=beneficiary.follow_up_group.id as remove_referent_url %}
+                <a href="{% url 'users:details' public_id=beneficiary.public_id %}"
+                   class="btn btn-outline-primary btn-block w-100 w-md-auto btn-ico"
+                   aria-label="Ne plus être référent de {{ beneficiary.get_full_name }}"
+                   data-bs-toggle="modal"
+                   data-bs-target="#confirm_modal"
+                   data-bs-title="Êtes-vous sûr de ne plus vouloir être référent de {{ beneficiary.get_full_name }} ?"
+                   data-bs-body="Vous pourrez toujours devenir référent de ce bénéficiaire plus tard."
+                   data-bs-confirm-text="Ne plus être référent"
+                   data-bs-confirm-url="{{ remove_referent_url }}">
+                    <i class="ri-map-pin-user-line fw-medium" aria-hidden="true"></i>
+                    <span>Ne plus être référent</span>
+                </a>
+            {% endif %}
+
+            {% if not is_referent %}
+                {% url 'gps:toggle_referent' group_id=beneficiary.follow_up_group.id as add_referent_url %}
+
+                <a href="{% url 'users:details' public_id=beneficiary.public_id %}"
+                   class="btn btn-outline-primary btn-block w-100 w-md-auto btn-ico"
+                   aria-label="Devenir référent de {{ beneficiary.get_full_name }}"
+                   data-bs-toggle="modal"
+                   data-bs-target="#confirm_modal"
+                   data-bs-title="Êtes-vous sûr de vouloir devenir référent de {{ beneficiary.get_full_name }} ?"
+                   data-bs-body="Vous pourrez toujours ne plus être référent de ce bénéficiaire plus tard."
+                   data-bs-confirm-text="Devenir référent"
+                   data-bs-confirm-url="{{ add_referent_url }}">
+                    <i class="ri-map-pin-user-line fw-medium" aria-hidden="true"></i>
+                    <span>Devenir référent</span>
+                </a>
+
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
 
 {% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
@@ -191,4 +245,54 @@
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block modals %}
+    <div id="confirm_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title"></h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                    <a href="" class="modal-confirm btn btn-sm btn-primary"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block script %}
+    {{ block.super }}
+    <script src='{% static "js/htmx_compat.js" %}'></script>
+
+    <script nonce="{{ CSP_NONCE }}">
+        htmx.onLoad((target) => {
+
+            var confirmModal = document.getElementById('confirm_modal');
+            confirmModal.addEventListener('show.bs.modal', function(event) {
+                // Button that triggered the modal
+                var button = event.relatedTarget
+                // Extract info from data-bs-* attributes
+                var title = button.getAttribute('data-bs-title');
+                var body = button.getAttribute('data-bs-body');
+                var confirmText = button.getAttribute('data-bs-confirm-text');
+                var confirmUrl = button.getAttribute('data-bs-confirm-url');
+
+                // Update the modal's content.
+                var modalTitle = confirmModal.querySelector('.modal-title');
+                var modalBody = confirmModal.querySelector('.modal-body');
+                var modalConfirm = confirmModal.querySelector('.modal-confirm');
+
+                modalTitle.textContent = title;
+                modalBody.textContent = body;
+                modalConfirm.textContent = confirmText;
+                modalConfirm.href = confirmUrl;
+            })
+        });
+    </script>
 {% endblock %}
