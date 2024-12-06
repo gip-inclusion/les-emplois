@@ -18,6 +18,6 @@ def test_collect_tech_metrics_return_all_codes(sentry_respx_mock):
 def test_collect_tech_metrics_with_data(sentry_respx_mock):
     now = timezone.now()
     assert tech.collect_analytics_data(before=now) == {
-        models.DatumCode.TECH_SENTRY_APDEX: 0.9556246545071905,
-        models.DatumCode.TECH_SENTRY_FAILURE_RATE: 0.08123341283760084,
+        models.DatumCode.TECH_SENTRY_APDEX: 96,
+        models.DatumCode.TECH_SENTRY_FAILURE_RATE: 8,
     }
