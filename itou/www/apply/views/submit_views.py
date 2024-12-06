@@ -535,19 +535,19 @@ class ApplicationEligibilityView(RequireApplySessionMixin, ApplicationBaseView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_context_data(self, **kwargs):
-        new_expires_at_if_updated = timezone.now() + relativedelta(months=EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS)
-
-        return super().get_context_data(**kwargs) | {
-            "form": self.form,
-            "new_expires_at_if_updated": new_expires_at_if_updated,
-            "progress": 50,
-            "job_seeker": self.job_seeker,
-            "back_url": reverse(
-                "apply:application_jobs",
-                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-            ),
-            "full_content_width": True,
-        }
+        context = super().get_context_data(**kwargs)
+        context["form"] = self.form
+        context["progress"] = 50
+        context["job_seeker"] = self.job_seeker
+        context["back_url"] = reverse(
+            "apply:application_jobs",
+            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+        )
+        context["full_content_width"] = True
+        context["new_expires_at_if_updated"] = timezone.now() + relativedelta(
+            months=EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS
+        )
+        return context
 
 
 class ApplicationGEIQEligibilityView(RequireApplySessionMixin, ApplicationBaseView):
