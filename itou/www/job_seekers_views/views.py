@@ -525,9 +525,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        session_birthdate = self.job_seeker_session.get("profile", {}).get(
-            "birthdate", self.job_seeker_session.get("user", {}).get("birthdate")
-        )  # TODO(xfernandez): drop fallback on self.job_seeker_session["user"] in a week
+        session_birthdate = self.job_seeker_session.get("profile", {}).get("birthdate")
         session_nir = self.job_seeker_session.get("profile", {}).get("nir")
         session_lack_of_nir_reason = self.job_seeker_session.get("profile", {}).get("lack_of_nir_reason")
         session_birth_place = self.job_seeker_session.get("profile", {}).get("birth_place")
@@ -671,8 +669,6 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 "fill_mode",
                 "address_for_autocomplete",
                 "insee_code",
-                # TODO(xfernandez): remove birthdate in a week
-                "birthdate",
             ]
         }
 
@@ -691,18 +687,10 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             "birth_country",
         ]
 
-        birth_data = {
+        return {
             "birth_place_id": self.job_seeker_session.get("profile", {}).get("birth_place"),
             "birth_country_id": self.job_seeker_session.get("profile", {}).get("birth_country"),
-        }
-
-        # TODO(xfernandez): remove user session birthdate handling in a week
-        if birthdate_from_user_session := self.job_seeker_session.get("user", {}).get("birthdate"):
-            birth_data |= {"birthdate": birthdate_from_user_session}
-
-        return birth_data | {
-            k: v for k, v in self.job_seeker_session.get("profile").items() if k not in fields_to_exclude
-        }
+        } | {k: v for k, v in self.job_seeker_session.get("profile").items() if k not in fields_to_exclude}
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
