@@ -6,7 +6,7 @@
       "author_prescriber_organization": null,
       "author_siae": 3850,
       "created_at": "2022-02-08T10:57:46.994Z",
-      "expires_at": "2022-08-08T10:57:46.994Z",
+      "expires_at": "2022-08-08",
       "job_seeker": 21,
       "updated_at": "2022-02-08T10:57:47.028Z"
     },
@@ -20,7 +20,7 @@
       "author_prescriber_organization": 996,
       "author_siae": 3850,
       "created_at": "2022-02-08T10:59:58.777Z",
-      "expires_at": "2022-06-08T10:59:58.777Z",
+      "expires_at": "2022-06-08",
       "job_seeker": 20,
       "updated_at": "2022-02-08T10:59:58.818Z"
     },
@@ -34,7 +34,7 @@
       "author_prescriber_organization": 903,
       "author_siae": 3850,
       "created_at": "2022-02-08T11:00:49.078Z",
-      "expires_at": "2022-06-08T11:00:49.078Z",
+      "expires_at": "2022-06-08",
       "job_seeker": 19,
       "updated_at": "2022-02-08T11:00:49.108Z"
     },
@@ -48,7 +48,7 @@
       "author_prescriber_organization": 996,
       "author_siae": 3850,
       "created_at": "2022-02-08T11:01:48.331Z",
-      "expires_at": "2022-06-08T11:01:48.331Z",
+      "expires_at": "2022-06-08",
       "job_seeker": 18,
       "updated_at": "2022-02-08T11:01:48.364Z"
     },
@@ -62,7 +62,7 @@
       "author_prescriber_organization": 952,
       "author_siae": 3850,
       "created_at": "2022-02-08T11:02:28.172Z",
-      "expires_at": "2022-06-08T11:02:28.172Z",
+      "expires_at": "2022-06-08",
       "job_seeker": 17,
       "updated_at": "2022-02-08T11:02:28.202Z"
     },

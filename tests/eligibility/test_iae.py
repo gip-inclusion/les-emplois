@@ -323,7 +323,7 @@ class TestEligibilityDiagnosisModel:
         assert new_diagnosis.administrative_criteria.count() == 0
 
         # And the old diagnosis should now be expired (thus considered invalid)
-        assert current_diagnosis.expires_at == new_diagnosis.created_at
+        assert current_diagnosis.expires_at == timezone.localdate(new_diagnosis.created_at)
         assert not current_diagnosis.is_valid
         assert new_diagnosis.is_valid
 
@@ -342,7 +342,7 @@ class TestEligibilityDiagnosisModel:
             is first_diagnosis
         )
         first_diagnosis.refresh_from_db()
-        assert first_diagnosis.expires_at > previous_expires_at
+        assert first_diagnosis.expires_at >= previous_expires_at
 
         criteria = [
             AdministrativeCriteria.objects.get(level=AdministrativeCriteriaLevel.LEVEL_1, name="Bénéficiaire du RSA"),
@@ -357,7 +357,7 @@ class TestEligibilityDiagnosisModel:
         first_diagnosis.refresh_from_db()
 
         assert second_diagnosis is not first_diagnosis
-        assert first_diagnosis.expires_at == second_diagnosis.created_at
+        assert first_diagnosis.expires_at == timezone.localdate(second_diagnosis.created_at)
         assert second_diagnosis.expires_at > first_diagnosis.expires_at
 
         # Different author, same criteria
@@ -371,7 +371,7 @@ class TestEligibilityDiagnosisModel:
         second_diagnosis.refresh_from_db()
 
         assert second_diagnosis is not third_diagnosis
-        assert second_diagnosis.expires_at == third_diagnosis.created_at
+        assert second_diagnosis.expires_at == timezone.localdate(third_diagnosis.created_at)
         assert third_diagnosis.expires_at > second_diagnosis.expires_at
 
     def test_is_valid(self):

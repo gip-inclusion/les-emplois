@@ -66,7 +66,11 @@ class AbstractEligibilityDiagnosisModel(models.Model):
     )
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now, db_index=True)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, db_index=True)
-    expires_at = models.DateTimeField(verbose_name="date d'expiration", db_index=True)
+    expires_at = models.DateField(
+        verbose_name="date d'expiration",
+        db_index=True,
+        help_text="Diagnosic expiré à compter de ce jour",
+    )
 
     class Meta:
         abstract = True
@@ -76,12 +80,12 @@ class AbstractEligibilityDiagnosisModel(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.expires_at:
-            self.expires_at = self.created_at + relativedelta(months=self.EXPIRATION_DELAY_MONTHS)
+            self.expires_at = timezone.localdate(self.created_at) + relativedelta(months=self.EXPIRATION_DELAY_MONTHS)
         return super().save(*args, **kwargs)
 
     @property
     def is_valid(self):
-        return self.expires_at > timezone.now()
+        return self.expires_at > timezone.localdate()
 
     @property
     def is_from_employer(self):

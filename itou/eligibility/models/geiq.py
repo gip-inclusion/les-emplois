@@ -140,7 +140,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
                 )
             )
 
-            obsolete_geiq_diagnoses.update(expires_at=self.created_at)
+            obsolete_geiq_diagnoses.update(expires_at=timezone.localdate(self.created_at))
 
     def save(self, *args, **kwargs):
         self.clean()
@@ -215,7 +215,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
             raise ValueError("Impossible de modifier un diagnostic GEIQ expiré")
 
         diagnosis.author = author
-        diagnosis.expires_at = timezone.now() + relativedelta(months=cls.EXPIRATION_DELAY_MONTHS)
+        diagnosis.expires_at = timezone.localdate() + relativedelta(months=cls.EXPIRATION_DELAY_MONTHS)
         diagnosis.save()
 
         # Differences with IAE diagnosis model update:
