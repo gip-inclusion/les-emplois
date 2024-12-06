@@ -39,11 +39,6 @@ class AbstractEligibilityDiagnosisModelFactory(factory.django.DjangoModelFactory
     job_seeker = factory.SubFactory(JobSeekerFactory)
 
 
-def _get_geiq_administrative_criteria(self, create, extracted, **kwargs):
-    qs = models.GEIQAdministrativeCriteria.objects
-    _add_administrative_criteria(self, create, extracted, qs, **kwargs)
-
-
 def _get_geiq_certifiable_criteria(self, create, extracted, **kwargs):
     qs = models.GEIQAdministrativeCriteria.objects.exclude(annex=AdministrativeCriteriaAnnex.NO_ANNEX).certifiable()
     _add_administrative_criteria(self, create, extracted, qs, **kwargs)
@@ -73,11 +68,6 @@ class GEIQEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
         )
         with_certifiable_criteria = factory.Trait(romes=factory.PostGeneration(_get_geiq_certifiable_criteria))
         with_not_certifiable_criteria = factory.Trait(romes=factory.PostGeneration(_get_geiq_not_certifiable_criteria))
-
-
-def _get_iae_administrative_criteria(self, create, extracted, **kwargs):
-    qs = models.AdministrativeCriteria.objects
-    _add_administrative_criteria(self, create, extracted, qs, **kwargs)
 
 
 def _get_iae_certifiable_criteria(self, create, extracted, **kwargs):
