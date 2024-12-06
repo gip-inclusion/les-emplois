@@ -89,11 +89,14 @@ def leave_group(request, group_id):
 @check_user(is_allowed_to_use_gps)
 def toggle_referent(request, group_id):
     membership = (
-        FollowUpGroupMembership.objects.filter(member=request.user).filter(follow_up_group__id=group_id).first()
+        FollowUpGroupMembership.objects.filter(member=request.user)
+        .filter(follow_up_group__id=group_id)
+        .select_related("follow_up_group__beneficiary")
+        .first()
     )
 
     if membership:
         membership.is_referent = not membership.is_referent
         membership.save()
 
-    return HttpResponseRedirect(reverse("gps:my_groups"))
+    return HttpResponseRedirect(reverse("users:details", args=(membership.follow_up_group.beneficiary.public_id,)))

@@ -243,44 +243,27 @@
                   </div>
                   <hr class="m-0"/>
                   <div class="c-box--results__body">
-                      
-                          <p>
+                      <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
+                          <div>
                               
+                                  <p>
+                                      
                                   
-                              Vous avez ajouté ce bénéficiaire le <strong>21/06/2024</strong>.
+                                      Vous avez ajouté ce bénéficiaire le <strong>21/06/2024</strong>.
+                                      
+                                          1 autre professionnel
+                                          est
+                                          intervenu auprès de ce bénéficiaire.
+                                      
+                                  </p>
                               
-                                  1 autre professionnel
-                                  est
-                                  intervenu auprès de ce bénéficiaire.
-                              
-                          </p>
-                      
-                  </div>
-                  <div class="c-box--results__footer">
-                      <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                          
-                              
-                              <a aria-label="Ne plus suivre Jane DOE" class="btn btn-link btn-block w-100 w-md-auto btn-ico" data-bs-body="Vous pourrez toujours suivre ce bénéficiaire de nouveau plus tard." data-bs-confirm-text="Ne plus suivre" data-bs-confirm-url="/gps/groups/[PK of Group]/leave" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de ne plus vouloir suivre Jane DOE ?" data-bs-toggle="modal" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
-                                  <i aria-hidden="true" class="ri-user-unfollow-line fw-medium"></i>
-                                  <span>Ne plus suivre</span>
-                              </a>
-  
-                              
-  
-                              
-                                  
-  
-                                  <a aria-label="Devenir référent de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto btn-ico" data-bs-body="Vous pourrez toujours ne plus être référent de ce bénéficiaire plus tard." data-bs-confirm-text="Devenir référent" data-bs-confirm-url="/gps/groups/[PK of Group]/toggle_referent" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de vouloir devenir référent de Jane DOE ?" data-bs-toggle="modal" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
-                                      <i aria-hidden="true" class="ri-map-pin-user-line fw-medium"></i>
-                                      <span>Devenir référent</span>
-                                  </a>
-  
-                              
+                          </div>
+                          <div>
                               <a aria-label="Consulter la fiche de Jane DOE" class="btn btn-primary btn-block btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/gps/groups">
                                   <i aria-hidden="true" class="ri-eye-line ri-xl fw-medium"></i>
                                   <span>Consulter la fiche</span>
                               </a>
-                          
+                          </div>
                       </div>
                   </div>
               </div>

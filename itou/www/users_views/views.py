@@ -20,7 +20,14 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
     context_object_name = "beneficiary"
 
     def setup(self, request, *args, **kwargs):
-        if request.user.is_authenticated and not is_allowed_to_use_gps(request.user):
+        if request.user.is_authenticated and not (
+            is_allowed_to_use_gps(request.user)
+            and FollowUpGroupMembership.objects.filter(
+                follow_up_group__beneficiary__public_id=kwargs["public_id"],
+                member=request.user,
+                is_active=True,
+            ).exists()
+        ):
             raise PermissionDenied("Votre utilisateur n'est pas autorisé à accéder à ces informations.")
         super().setup(request, *args, **kwargs)
 
@@ -45,9 +52,12 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
         matomo_option = org_department if org_department in self.get_live_department_codes() else None
         back_url = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("gps:my_groups"))
 
+        membership = next(m for m in gps_memberships if m.member == self.request.user)
+
         context = context | {
             "back_url": back_url,
             "gps_memberships": gps_memberships,
+            "is_referent": membership.is_referent,
             "matomo_custom_title": "Profil GPS",
             "profile": self.object.jobseeker_profile,
             "render_advisor_matomo_option": matomo_option,
