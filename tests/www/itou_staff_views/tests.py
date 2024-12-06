@@ -58,14 +58,14 @@ class TestExportJobApplications:
         assert response.status_code == expected_status
 
     @pytest.mark.parametrize(
-        "start,end,expected_queries",
+        "start,end",
         [
-            pytest.param("2024-05-09", "2024-05-09", 5, id="before"),
-            pytest.param("2024-05-10", "2024-05-10", 10, id="contains"),
-            pytest.param("2024-05-11", "2024-05-11", 5, id="after"),
+            pytest.param("2024-05-09", "2024-05-09", id="before"),
+            pytest.param("2024-05-10", "2024-05-10", id="contains"),
+            pytest.param("2024-05-11", "2024-05-11", id="after"),
         ],
     )
-    def test_export(self, client, start, end, expected_queries, snapshot):
+    def test_export(self, client, start, end, snapshot):
         client.force_login(ItouStaffFactory(is_superuser=True))
         siae = CompanyFactory(for_snapshot=True, with_membership=True, siret="32112345600020", naf="1234Z")
         with freeze_time("2024-05-10T11:11:11+02:00"):
