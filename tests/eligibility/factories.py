@@ -1,8 +1,9 @@
+import datetime
 import random
 
 import factory
-from dateutil.relativedelta import relativedelta
 from django.utils import timezone
+from faker import Faker
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility import models
@@ -18,6 +19,9 @@ def _add_administrative_criteria(self, create, extracted, qs, **kwargs):
     self.administrative_criteria.add(*criteria)
 
 
+faker = Faker()
+
+
 class AbstractEligibilityDiagnosisModelFactory(factory.django.DjangoModelFactory):
     class Meta:
         abstract = True
@@ -31,8 +35,10 @@ class AbstractEligibilityDiagnosisModelFactory(factory.django.DjangoModelFactory
             author=factory.LazyAttribute(lambda obj: obj.author_prescriber_organization.members.first()),
         )
         expired = factory.Trait(
-            expires_at=factory.LazyFunction(timezone.now),
-            created_at=factory.LazyAttribute(lambda obj: obj.expires_at - relativedelta(months=6)),
+            expires_at=factory.LazyFunction(lambda: timezone.localdate() - datetime.timedelta(days=1)),
+            created_at=factory.LazyAttribute(
+                lambda obj: timezone.make_aware(faker.date_time(end_datetime=obj.expires_at))
+            ),
         )
 
     created_at = factory.LazyFunction(timezone.now)

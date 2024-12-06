@@ -194,7 +194,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
             set(eligibility_diagnosis.administrative_criteria.all()) == set(administrative_criteria),
         ]
         if all(extend_conditions):
-            eligibility_diagnosis.expires_at = timezone.now() + relativedelta(
+            eligibility_diagnosis.expires_at = timezone.localdate() + relativedelta(
                 months=EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS
             )
             eligibility_diagnosis.save(update_fields=["expires_at"])
@@ -208,7 +208,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
             administrative_criteria=administrative_criteria,
         )
         # and mark the current one as expired
-        eligibility_diagnosis.expires_at = new_eligibility_diagnosis.created_at
+        eligibility_diagnosis.expires_at = timezone.localdate(new_eligibility_diagnosis.created_at)
         eligibility_diagnosis.save(update_fields=["expires_at"])
         return new_eligibility_diagnosis
 

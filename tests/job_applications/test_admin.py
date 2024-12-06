@@ -256,7 +256,7 @@ def test_create_then_accept_job_application(admin_client):
 def test_accept_job_application_with_old_eligibility_diagnosis(admin_client):
     job_application = factories.JobApplicationFactory(
         sent_by_another_employer=True,
-        eligibility_diagnosis__expires_at=timezone.now() - timezone.timedelta(days=1),
+        eligibility_diagnosis__expires_at=timezone.localdate() - timezone.timedelta(days=1),
     )
     old_diag = job_application.eligibility_diagnosis
     other_job_seeker_diag = IAEEligibilityDiagnosisFactory(from_employer=True)

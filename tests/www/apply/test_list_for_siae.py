@@ -418,7 +418,9 @@ class TestProcessListSiae:
         assert response.context["job_applications_page"].object_list == [job_app]
 
         # Make sure the diagnostic expired - it should be ignored
-        diagnosis.expires_at = timezone.now() - datetime.timedelta(days=diagnosis.EXPIRATION_DELAY_MONTHS * 31 + 1)
+        diagnosis.expires_at = timezone.localdate() - datetime.timedelta(
+            days=diagnosis.EXPIRATION_DELAY_MONTHS * 31 + 1
+        )
         diagnosis.save(update_fields=("expires_at",))
         response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
         assert response.context["job_applications_page"].object_list == []

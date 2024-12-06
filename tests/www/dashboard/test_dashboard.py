@@ -754,7 +754,7 @@ class TestDashboardView:
             assertNotContains(response, WAITING_PERIOD_WITH_VALID_DIAGNOSIS, html=True)
 
             # Make sure the diag is still valid
-            diag.expires_at = timezone.now() + timedelta(days=1)
+            diag.expires_at = timezone.localdate() + timedelta(days=1)
             diag.save(update_fields=("expires_at",))
             assert diag.is_valid
             response = client.get(url)
