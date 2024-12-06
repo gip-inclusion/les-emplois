@@ -1,4 +1,12 @@
 htmx.onLoad((target) => {
+  function querySelectorAllIncludingTarget(target, selector) {
+    const results = Array.from(target.querySelectorAll(selector))
+    if (target.matches(selector)) {
+      results.push(target)
+    }
+    return results
+  }
+
   /**
    * Force select2 initialization after htmx swaps
    * select2-hidden-accessible detection skips already initialized widgets like in the case of document.ready
@@ -55,7 +63,7 @@ htmx.onLoad((target) => {
     }
     $(targetId).attr("disabled", isSet);
   }
-  target.querySelectorAll('select[data-disable-target]').forEach(function (selectFieldWithDisable) {
+  querySelectorAllIncludingTarget(target, 'select[data-disable-target]').forEach(function (selectFieldWithDisable) {
     toggleDisableAndSetValue.call(selectFieldWithDisable);
     $(selectFieldWithDisable).change(toggleDisableAndSetValue);
   });
@@ -126,7 +134,7 @@ htmx.onLoad((target) => {
     container.addEventListener("drop", handleDrop);
     container.querySelector(".file-dropzone-clear").addEventListener("click", handleFileClear);
   }
-  target.querySelectorAll(".file-dropzone").forEach(initDropZone);
+  querySelectorAllIncludingTarget(target, ".file-dropzone").forEach(initDropZone);
 
   /**
    * JS to add the birthdate parameter when querying Commune for birthplace
