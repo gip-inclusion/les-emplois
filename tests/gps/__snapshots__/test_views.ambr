@@ -243,27 +243,25 @@
                   </div>
                   <hr class="m-0"/>
                   <div class="c-box--results__body">
-                      <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
-                          <div>
+                      
+                          <p class="mb-0">
                               
-                                  <p>
-                                      
-                                  
-                                      Vous avez ajouté ce bénéficiaire le <strong>21/06/2024</strong>.
-                                      
-                                          1 autre professionnel
-                                          est
-                                          intervenu auprès de ce bénéficiaire.
-                                      
-                                  </p>
+                          
+                              Vous avez ajouté ce bénéficiaire le <strong>21/06/2024</strong>.
                               
-                          </div>
-                          <div>
-                              <a aria-label="Consulter la fiche de Jane DOE" class="btn btn-primary btn-block btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/gps/groups">
-                                  <i aria-hidden="true" class="ri-eye-line ri-xl fw-medium"></i>
-                                  <span>Consulter la fiche</span>
-                              </a>
-                          </div>
+                                  1 autre professionnel
+                                  est
+                                  intervenu auprès de ce bénéficiaire.
+                              
+                          </p>
+                      
+                  </div>
+                  <div class="c-box--results__footer">
+                      <div class="d-flex justify-content-md-end">
+                          <a aria-label="Consulter la fiche de Jane DOE" class="btn btn-primary btn-block btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/gps/groups">
+                              <i aria-hidden="true" class="ri-eye-line ri-xl fw-medium"></i>
+                              <span>Consulter la fiche</span>
+                          </a>
                       </div>
                   </div>
               </div>
