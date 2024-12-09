@@ -68,8 +68,10 @@
     <li>
         <small>Numéro de sécurité sociale</small>
         {% if job_seeker.jobseeker_profile.nir %}
-            <strong>{{ job_seeker.jobseeker_profile.nir|format_nir }}</strong>
-            {% include 'includes/copy_to_clipboard.html' with content=job_seeker.jobseeker_profile.nir css_classes="btn-link" only_icon=True %}
+            <strong>{{ job_seeker.jobseeker_profile.nir|mask_unless:can_view_personal_information|format_nir }}</strong>
+            {% if can_view_personal_information %}
+                {% include 'includes/copy_to_clipboard.html' with content=job_seeker.jobseeker_profile.nir css_classes="btn-link" only_icon=True %}
+            {% endif %}
         {% elif job_seeker.jobseeker_profile.lack_of_nir_reason %}
             <strong>{{ job_seeker.jobseeker_profile.get_lack_of_nir_reason_display }}</strong>
             {% include 'includes/copy_to_clipboard.html' with content=job_seeker.jobseeker_profile.get_lack_of_nir_reason_display css_classes="btn-link" only_icon=True %}
