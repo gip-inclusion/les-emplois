@@ -22,6 +22,7 @@ from itou.siae_evaluations.models import (
     EvaluationCampaign,
     Sanctions,
 )
+from itou.utils.auth import check_user
 from itou.utils.emails import send_email_messages
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
@@ -38,6 +39,7 @@ from itou.www.siae_evaluations_views.forms import (
 
 
 @login_required
+@check_user(lambda user: user.is_labor_inspector)
 def samples_selection(request, template_name="siae_evaluations/samples_selection.html"):
     institution = get_current_institution_or_404(request)
     evaluation_campaign = get_object_or_404(
@@ -86,6 +88,7 @@ def campaign_calendar(request, evaluation_campaign_pk, template_name="siae_evalu
 
 
 @login_required
+@check_user(lambda user: user.is_labor_inspector)
 def institution_evaluated_siae_list(
     request, evaluation_campaign_pk, template_name="siae_evaluations/institution_evaluated_siae_list.html"
 ):
@@ -117,14 +120,13 @@ def institution_evaluated_siae_list(
 
 
 @login_required
+@check_user(lambda user: user.is_labor_inspector or user.is_employer)
 def evaluated_siae_detail(request, evaluated_siae_pk, template_name="siae_evaluations/evaluated_siae_detail.html"):
     owner_data = {}
     if request.user.is_labor_inspector:
         owner_data["evaluation_campaign__institution"] = get_current_institution_or_404(request)
     elif request.user.is_employer:
         owner_data["siae"] = get_current_company_or_404(request)
-    else:
-        raise Http404(request.user.kind)
 
     evaluated_siae = get_object_or_404(
         EvaluatedSiae.objects.viewable()
@@ -347,6 +349,7 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
 
 
 @login_required
+@check_user(lambda user: user.is_labor_inspector or user.is_employer)
 def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
     allowed_viewers = {
         "institution": (get_current_institution_or_404, "evaluation_campaign__institution"),

@@ -513,6 +513,7 @@
       dict({
         'origin': list([
           'evaluated_siae_detail[www/siae_evaluations_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -591,6 +592,7 @@
       dict({
         'origin': list([
           'evaluated_siae_detail[www/siae_evaluations_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -605,6 +607,7 @@
       dict({
         'origin': list([
           'evaluated_siae_detail[www/siae_evaluations_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
@@ -635,6 +638,7 @@
       dict({
         'origin': list([
           'evaluated_siae_detail[www/siae_evaluations_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -700,6 +704,7 @@
       dict({
         'origin': list([
           'evaluated_siae_detail[www/siae_evaluations_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -737,6 +742,7 @@
       dict({
         'origin': list([
           'evaluated_siae_detail[www/siae_evaluations_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -998,6 +1004,7 @@
       dict({
         'origin': list([
           'institution_evaluated_siae_list[www/siae_evaluations_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluationcampaign"."id",
@@ -1022,6 +1029,7 @@
       dict({
         'origin': list([
           'institution_evaluated_siae_list[www/siae_evaluations_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -1098,6 +1106,7 @@
       dict({
         'origin': list([
           'institution_evaluated_siae_list[www/siae_evaluations_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -1122,6 +1131,7 @@
       dict({
         'origin': list([
           'institution_evaluated_siae_list[www/siae_evaluations_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
