@@ -37,6 +37,7 @@ from itou.utils.admin import (
     PkSupportRemarkInline,
     add_support_remark_to_obj,
     get_admin_view_link,
+    get_company_view_link,
 )
 
 
@@ -83,7 +84,7 @@ class CompanyMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
     extra = 0
     raw_id_fields = ("company",)
     readonly_fields = (
-        "company_id_link",
+        "company_siret_link",
         "joined_at",
         "is_admin",
         "is_active",
@@ -103,8 +104,9 @@ class CompanyMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
     def has_add_permission(self, request, obj=None):
         return True
 
-    def company_id_link(self, obj):
-        return get_admin_view_link(obj.company)
+    @admin.display(description="Entreprise")
+    def company_siret_link(self, obj):
+        return get_company_view_link(obj.company)
 
 
 class PrescriberMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
