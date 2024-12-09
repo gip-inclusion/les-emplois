@@ -7,12 +7,12 @@
 {% block title %}GPS - Profil de {{ beneficiary.get_full_name }} {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-        <h1>{{ beneficiary.get_full_name }}</h1>
+    <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
+        <h1 class="m-0">{{ beneficiary.get_full_name }}</h1>
         <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le bénéficiaire">
             {% url 'gps:leave_group' group_id=beneficiary.follow_up_group.id as leave_group_url %}
             <a href="{% url 'gps:user_details' public_id=beneficiary.public_id %}"
-               class="btn btn-link btn-block w-100 w-md-auto btn-ico"
+               class="btn btn-lg btn-outline-primary btn-ico"
                aria-label="Ne plus suivre {{ beneficiary.get_full_name }}"
                data-bs-toggle="modal"
                data-bs-target="#confirm_modal"
@@ -27,7 +27,7 @@
             {% if is_referent %}
                 {% url 'gps:toggle_referent' group_id=beneficiary.follow_up_group.id as remove_referent_url %}
                 <a href="{% url 'gps:user_details' public_id=beneficiary.public_id %}"
-                   class="btn btn-outline-primary btn-block w-100 w-md-auto btn-ico"
+                   class="btn btn-lg btn-primary btn-ico"
                    aria-label="Ne plus être référent de {{ beneficiary.get_full_name }}"
                    data-bs-toggle="modal"
                    data-bs-target="#confirm_modal"
@@ -42,9 +42,8 @@
 
             {% if not is_referent %}
                 {% url 'gps:toggle_referent' group_id=beneficiary.follow_up_group.id as add_referent_url %}
-
                 <a href="{% url 'gps:user_details' public_id=beneficiary.public_id %}"
-                   class="btn btn-outline-primary btn-block w-100 w-md-auto btn-ico"
+                   class="btn btn-lg btn-primary btn-ico"
                    aria-label="Devenir référent de {{ beneficiary.get_full_name }}"
                    data-bs-toggle="modal"
                    data-bs-target="#confirm_modal"
@@ -55,7 +54,6 @@
                     <i class="ri-map-pin-user-line fw-medium" aria-hidden="true"></i>
                     <span>Devenir référent</span>
                 </a>
-
             {% endif %}
         </div>
     </div>
