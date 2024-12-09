@@ -43,11 +43,11 @@ class TestExportJobApplications:
     @pytest.mark.parametrize(
         "factory,factory_kwargs,expected_status",
         [
-            (JobSeekerFactory, {}, 404),
-            (EmployerFactory, {"with_company": True}, 404),
-            (PrescriberFactory, {}, 404),
-            (LaborInspectorFactory, {"membership": True}, 404),
-            (ItouStaffFactory, {}, 404),
+            (JobSeekerFactory, {}, 403),
+            (EmployerFactory, {"with_company": True}, 403),
+            (PrescriberFactory, {}, 403),
+            (LaborInspectorFactory, {"membership": True}, 403),
+            (ItouStaffFactory, {}, 403),
             (ItouStaffFactory, {"is_superuser": True}, 200),
         ],
     )
@@ -140,11 +140,11 @@ class TestExportPEApiRejections:
     @pytest.mark.parametrize(
         "factory,factory_kwargs,expected_status",
         [
-            (JobSeekerFactory, {}, 404),
-            (EmployerFactory, {"with_company": True}, 404),
-            (PrescriberFactory, {}, 404),
-            (LaborInspectorFactory, {"membership": True}, 404),
-            (ItouStaffFactory, {}, 404),
+            (JobSeekerFactory, {}, 403),
+            (EmployerFactory, {"with_company": True}, 403),
+            (PrescriberFactory, {}, 403),
+            (LaborInspectorFactory, {"membership": True}, 403),
+            (ItouStaffFactory, {}, 403),
             (ItouStaffFactory, {"is_superuser": True}, 302),  # redirects to dashboard if no file
         ],
     )
@@ -192,11 +192,11 @@ class TestExportCTA:
     @pytest.mark.parametrize(
         "factory,factory_kwargs,expected_status",
         [
-            (JobSeekerFactory, {}, 404),
-            (EmployerFactory, {"with_company": True}, 404),
-            (PrescriberFactory, {}, 404),
-            (LaborInspectorFactory, {"membership": True}, 404),
-            (ItouStaffFactory, {}, 404),
+            (JobSeekerFactory, {}, 403),
+            (EmployerFactory, {"with_company": True}, 403),
+            (PrescriberFactory, {}, 403),
+            (LaborInspectorFactory, {"membership": True}, 403),
+            (ItouStaffFactory, {}, 403),
             (ItouStaffFactory, {"is_superuser": True}, 200),
         ],
     )
