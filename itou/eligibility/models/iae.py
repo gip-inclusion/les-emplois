@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from dateutil.relativedelta import relativedelta
@@ -164,6 +165,16 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         return self.expires_at
 
     @classmethod
+    def _expiration_date(cls, author):
+        now = timezone.localdate()
+        if author.is_employer:
+            # For siae_evaluations, employers must provide a proof for administrative criteria
+            # supporting the hire. A proof is valid for 3 months, align employer diagnosis
+            # duration with proof validity duration.
+            return now + datetime.timedelta(days=92)
+        return now + relativedelta(months=cls.EXPIRATION_DELAY_MONTHS)
+
+    @classmethod
     @transaction.atomic()
     def create_diagnosis(cls, job_seeker, *, author, author_organization, administrative_criteria=None):
         """
@@ -180,7 +191,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
             author_kind=author.kind,
             author_siae=author_organization if author.is_employer else None,
             author_prescriber_organization=author_organization if author.is_prescriber else None,
-            expires_at=timezone.localdate() + relativedelta(months=cls.EXPIRATION_DELAY_MONTHS),
+            expires_at=cls._expiration_date(author),
         )
         if administrative_criteria:
             diagnosis.administrative_criteria.add(*administrative_criteria)
@@ -195,9 +206,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
             set(eligibility_diagnosis.administrative_criteria.all()) == set(administrative_criteria),
         ]
         if all(extend_conditions):
-            eligibility_diagnosis.expires_at = timezone.localdate() + relativedelta(
-                months=EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS
-            )
+            eligibility_diagnosis.expires_at = cls._expiration_date(author)
             eligibility_diagnosis.save(update_fields=["expires_at"])
             return eligibility_diagnosis
 

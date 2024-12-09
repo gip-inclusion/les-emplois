@@ -260,7 +260,8 @@ class TestEligibilityDiagnosisManager:
 
 
 class TestEligibilityDiagnosisModel:
-    def test_create_diagnosis(self):
+    @freeze_time("2024-12-03")
+    def test_create_diagnosis_employer(self):
         job_seeker = JobSeekerFactory()
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
@@ -273,6 +274,27 @@ class TestEligibilityDiagnosisModel:
         assert diagnosis.author_siae == company
         assert diagnosis.author_prescriber_organization is None
         assert diagnosis.administrative_criteria.count() == 0
+        assert diagnosis.expires_at == datetime.date(2025, 3, 5)
+
+    @freeze_time("2024-12-03")
+    def test_create_diagnosis_prescriber(self):
+        job_seeker = JobSeekerFactory()
+        organization = PrescriberOrganizationWithMembershipFactory()
+        prescriber = organization.members.first()
+
+        diagnosis = EligibilityDiagnosis.create_diagnosis(
+            job_seeker,
+            author=prescriber,
+            author_organization=organization,
+        )
+
+        assert diagnosis.job_seeker == job_seeker
+        assert diagnosis.author == prescriber
+        assert diagnosis.author_kind == AuthorKind.PRESCRIBER
+        assert diagnosis.author_siae is None
+        assert diagnosis.author_prescriber_organization == organization
+        assert diagnosis.administrative_criteria.count() == 0
+        assert diagnosis.expires_at == datetime.date(2025, 6, 3)
 
     def test_create_diagnosis_with_administrative_criteria(self):
         job_seeker = JobSeekerFactory()
@@ -304,6 +326,7 @@ class TestEligibilityDiagnosisModel:
         assert criteria2 in administrative_criteria
         assert criteria3 in administrative_criteria
 
+    @freeze_time("2024-12-03")
     def test_update_diagnosis(self):
         company = CompanyFactory(with_membership=True)
 
@@ -321,6 +344,7 @@ class TestEligibilityDiagnosisModel:
         assert new_diagnosis.author_siae == company
         assert new_diagnosis.author_prescriber_organization is None
         assert new_diagnosis.administrative_criteria.count() == 0
+        assert new_diagnosis.expires_at == datetime.date(2025, 3, 5)
 
         # And the old diagnosis should now be expired (thus considered invalid)
         assert current_diagnosis.expires_at == timezone.localdate(new_diagnosis.created_at)

@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.core.files.storage import storages
 from django.urls import resolve, reverse
 from django.utils import timezone
+from freezegun import freeze_time
 from pytest_django.asserts import (
     assertContains,
     assertMessages,
@@ -1093,6 +1094,7 @@ class TestApplyAsAuthorizedPrescriber:
         response = client.get(next_url)
         assert response.status_code == 200
 
+    @freeze_time()
     def test_apply_as_authorized_prescriber(self, client, pdf_file):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
@@ -1325,7 +1327,9 @@ class TestApplyAsAuthorizedPrescriber:
 
         response = client.post(next_url, {"level_1_1": True})
         assert response.status_code == 302
-        assert EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=company)
+        diag = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=new_job_seeker, for_siae=company)
+        assert diag.is_valid is True
+        assert diag.expires_at == timezone.localdate() + relativedelta(months=6)
 
         next_url = reverse(
             "apply:application_resume",
@@ -2561,6 +2565,7 @@ class TestDirectHireFullProcess:
     @pytest.mark.ignore_unknown_variable_template_error(
         "confirmation_needed", "is_subject_to_eligibility_rules", "job_seeker"
     )
+    @freeze_time()
     def test_hire_as_company(self, client):
         """Apply as company (and create new job seeker)"""
 
@@ -2812,6 +2817,8 @@ class TestDirectHireFullProcess:
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assert response.url == next_url
+        diag = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=new_job_seeker, for_siae=company)
+        assert diag.expires_at == timezone.localdate() + datetime.timedelta(days=92)
 
         # Hire confirmation
         # ----------------------------------------------------------------------
@@ -2879,6 +2886,7 @@ class TestDirectHireFullProcess:
         assertTemplateUsed(response, "approvals/includes/box.html")
         assert response.status_code == 200
 
+    @freeze_time()
     def test_hire_as_geiq(self, client):
         """Apply as GEIQ with pre-existing job seeker without previous application"""
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"), kind=CompanyKind.GEIQ)
@@ -2967,6 +2975,8 @@ class TestDirectHireFullProcess:
             },
         )
         assertRedirects(response, confirmation_url)
+        diag = GEIQEligibilityDiagnosis.objects.get(job_seeker=job_seeker)
+        assert diag.expires_at == timezone.localdate() + relativedelta(months=6)
 
         # Hire confirmation
         # ----------------------------------------------------------------------
