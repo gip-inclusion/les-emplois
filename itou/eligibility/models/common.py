@@ -81,7 +81,7 @@ class AbstractEligibilityDiagnosisModel(models.Model):
 
     @property
     def is_valid(self):
-        return bool(self.expires_at and self.expires_at > timezone.now())
+        return self.expires_at > timezone.now()
 
     @property
     def is_from_employer(self):
