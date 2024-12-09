@@ -145,6 +145,7 @@ MIDDLEWARE = [
     # Itou specific
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
     "itou.www.middleware.never_cache",
+    "itou.openid_connect.pro_connect.middleware.ProConnectLoginMiddleware",
     # Final logger
     "django_datadog_logger.middleware.request_log.RequestLoggingMiddleware",
 ]
