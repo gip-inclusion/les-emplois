@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.http import FileResponse, Http404, HttpResponseRedirect, StreamingHttpResponse
+from django.http import FileResponse, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
@@ -39,6 +39,7 @@ class Echo:
 
 
 @login_required
+@check_user(lambda user: user.is_superuser)
 def export_job_applications_unknown_to_ft(
     request,
     *args,
@@ -48,9 +49,6 @@ def export_job_applications_unknown_to_ft(
     """
     Internal self-service to export job applications of job seekers unknown to France Travail.
     """
-    if not request.user.is_superuser:
-        raise Http404
-
     form = ItouStaffExportJobApplicationForm(data=request.POST or None)
     if request.method == "POST" and form.is_valid():
         departments = form.cleaned_data["departments"]
@@ -114,10 +112,8 @@ def export_job_applications_unknown_to_ft(
 
 
 @login_required
+@check_user(lambda user: user.is_superuser)
 def export_ft_api_rejections(request):
-    if not request.user.is_superuser:
-        raise Http404
-
     first_day_of_month = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     rejected_approvals = (
         Approval.objects.filter(
@@ -179,10 +175,8 @@ def export_ft_api_rejections(request):
 
 
 @login_required
+@check_user(lambda user: user.is_superuser)
 def export_cta(request):
-    if not request.user.is_superuser:
-        raise Http404
-
     employees_qs = CompanyMembership.objects.active().select_related("company", "user")
     prescribers_qs = PrescriberMembership.objects.active().select_related("organization", "user")
 
@@ -207,7 +201,7 @@ def export_cta(request):
 
 
 @login_required
-@check_user(lambda u: u.is_superuser)
+@check_user(lambda user: user.is_superuser)
 def merge_users(request, template_name="itou_staff_views/merge_users.html"):
     form = MergeUserForm(data=request.POST or None)
 
@@ -223,7 +217,7 @@ def merge_users(request, template_name="itou_staff_views/merge_users.html"):
 
 
 @login_required
-@check_user(lambda u: u.is_superuser)
+@check_user(lambda user: user.is_superuser)
 def merge_users_confirm(request, user_1_pk, user_2_pk, template_name="itou_staff_views/merge_users_confirm.html"):
     ALLOWED_USER_KINDS = [UserKind.PRESCRIBER, UserKind.EMPLOYER]
 
