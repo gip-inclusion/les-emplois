@@ -8,6 +8,7 @@ import pytest
 from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
+from django.db.models import Exists, OuterRef, Q
 from django.template.defaultfilters import urlencode as urlencode_filter
 from django.urls import reverse
 from django.utils import timezone
@@ -2706,9 +2707,26 @@ class TestProcessAcceptViews:
         employer = self.company.members.first()
         client.force_login(employer)
 
-        birth_place = Commune.objects.filter(start_date__gt=datetime.date(1901, 12, 1)).first()
-        assert birth_place is not None  # required by test
-
+        birthdate = self.job_seeker.jobseeker_profile.birthdate
+        birth_place = (
+            Commune.objects.filter(
+                # The birthdate must be >= 1900-01-01, and we’re removing 1 day from start_date.
+                Q(start_date__gt=datetime.date(1900, 1, 1)),
+                # Must be a valid choice for the user current birthdate.
+                Q(start_date__lte=birthdate),
+                Q(end_date__gte=birthdate) | Q(end_date=None),
+            )
+            .exclude(
+                Exists(
+                    # The same code must not exists at the early_date.
+                    Commune.objects.exclude(pk=OuterRef("pk")).filter(
+                        code=OuterRef("code"),
+                        start_date__lt=OuterRef("start_date"),
+                    )
+                )
+            )
+            .first()
+        )
         early_date = birth_place.start_date - datetime.timedelta(days=1)
         post_data = {
             "birth_place": birth_place.pk,
