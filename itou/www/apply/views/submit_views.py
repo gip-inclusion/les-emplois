@@ -544,9 +544,8 @@ class ApplicationEligibilityView(RequireApplySessionMixin, ApplicationBaseView):
             kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
         )
         context["full_content_width"] = True
-        context["new_expires_at_if_updated"] = timezone.now() + relativedelta(
-            months=EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS
-        )
+        if self.eligibility_diagnosis:
+            context["new_expires_at_if_updated"] = self.eligibility_diagnosis._expiration_date(self.request.user)
         return context
 
 
