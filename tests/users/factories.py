@@ -342,7 +342,8 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
     advisor_information = factory.Maybe(
         "with_contact", factory.RelatedFactory("tests.gps.factories.FranceTravailContactFactory", "jobseeker_profile")
     )
-    birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
+    # Limit the upper value to 1999-12-31 so we don't exclude 36995 (of 76777) `Commune()` with a "1999-12-31" end date
+    birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(1999, 12, 31))
 
     education_level = factory.fuzzy.FuzzyChoice(EducationLevel.values + [""])
 
