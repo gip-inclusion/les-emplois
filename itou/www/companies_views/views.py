@@ -116,7 +116,6 @@ def overview(request, template_name="companies/overview.html"):
     context = {
         "company": company,
         "can_show_financial_annexes": company.convention_can_be_accessed_by(request.user),
-        "back_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
 
