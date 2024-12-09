@@ -1,6 +1,5 @@
 import collections
 import csv
-import functools
 import io
 import re
 
@@ -24,7 +23,6 @@ STAGING_DATA = """
 """
 
 
-@functools.cache
 def get_staging_data():
     data = collections.defaultdict(set)
 
