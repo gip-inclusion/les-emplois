@@ -20,6 +20,15 @@ def get_admin_view_link(obj, *, content=None, view="change"):
     return format_html('<a href="{}">{}</a>', url, content or obj.pk)
 
 
+def get_company_view_link(company):
+    return format_html(
+        "{} — SIRET : {} ({})",
+        get_admin_view_link(company, content=company.display_name),
+        company.siret,
+        company.kind,
+    )
+
+
 class AbstractSupportRemarkInline(GenericStackedInline):
     min_num = 0
     max_num = 1

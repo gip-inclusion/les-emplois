@@ -20,6 +20,7 @@ from itou.utils.admin import (
     ItouTabularInline,
     PkSupportRemarkInline,
     get_admin_view_link,
+    get_company_view_link,
 )
 from itou.utils.templatetags.str_filters import pluralizefr
 
@@ -59,12 +60,7 @@ class JobApplicationInline(ItouStackedInline):
 
     @admin.display(description="Entreprises destinataire")
     def to_company_link(self, obj):
-        return format_html(
-            "{} — SIRET : {} ({})",
-            get_admin_view_link(obj.to_company, content=obj.to_company.display_name),
-            obj.to_company.siret,
-            obj.to_company.kind,
-        )
+        return get_company_view_link(obj.to_company)
 
     # Custom read-only fields as workaround :
     # there is no direct relation between approvals and employee records
