@@ -1,5 +1,12 @@
 # Journal des modifications
 
+## 2024-12-09
+
+### Modifié
+
+- [Corriger le message d’erreur des champs commune de naissance et pays de naissance](https://github.com/gip-inclusion/les-emplois/pull/5173)
+- [UX/UI: Ajout de la page "Présentation" de ma structure](https://github.com/gip-inclusion/les-emplois/pull/5138)
+
 ## 2024-12-02
 
 ### Ajouté
