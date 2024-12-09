@@ -143,7 +143,7 @@ NAV_ENTRIES = {
     ),
     "employer-employee-records": NavItem(
         label="Fiches salarié ASP",
-        target=f"{reverse('employee_record_views:list')}?status=NEW",
+        target=f"{reverse('employee_record_views:list')}",
         active_view_names=["employee_record_views:list"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
