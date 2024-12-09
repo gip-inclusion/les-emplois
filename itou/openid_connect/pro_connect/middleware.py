@@ -27,7 +27,7 @@ class ProConnectLoginMiddleware(MiddlewareMixin):
         try:
             user = User.objects.get(username=username[0], identity_provider=IdentityProvider.PRO_CONNECT.value)
             return HttpResponseRedirect(
-                reverse("pro_connect:authorize") + f"?user_kind={user.kind}&previous_url={new_url}"
+                reverse("pro_connect:authorize") + f"?user_kind={user.kind}&next_url={new_url}"
             )
         except User.DoesNotExist:
-            return HttpResponseRedirect(reverse("signup:choose_user_kind") + f"?previous_url={new_url}")
+            return HttpResponseRedirect(reverse("signup:choose_user_kind") + f"?next_url={new_url}")
