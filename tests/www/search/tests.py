@@ -383,9 +383,9 @@ class TestSearchCompany:
 
     def test_is_searchable(self, client):
         city = create_city_saint_andre()
-        searchable_company = CompanyFactory(department="44", coords=city.coords, post_code="44117")
+        searchable_company = CompanyFactory(name="Lycos", department="44", coords=city.coords, post_code="44117")
         unsearchable_company = CompanyFactory(
-            department="44", coords=city.coords, post_code="44117", is_searchable=False
+            name="Altavista", department="44", coords=city.coords, post_code="44117", is_searchable=False
         )
 
         # A searchable company (default) should appear in the results
