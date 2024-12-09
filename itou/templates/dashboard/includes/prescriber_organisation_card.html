@@ -44,15 +44,14 @@
                 {% endif %}
             </ul>
             {% if request.current_organization.is_authorized %}
-                <hr>
-                <ul class="list-unstyled mb-lg-5">
-                    <li class="mb-2">
-                        <span class="fs-sm">
-                            <i class="ri-award-line ri-lg ri-lg fw-normal me-1"></i>
-                            {{ request.current_organization.display_name }} est une organisation habilitée. Vous pouvez réaliser le <a href="https://communaute.inclusion.beta.gouv.fr/surveys/dsp/create/" target="_blank" aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
-                        </span>
-                    </li>
-                </ul>
+                <hr class="mb-3">
+                <p class="fs-sm mb-lg-5">
+                    <i class="ri-award-line ri-lg fw-normal me-1" aria-hidden="true"></i>
+                    {{ request.current_organization.display_name }} est une organisation habilitée. Vous pouvez réaliser le <a href="https://communaute.inclusion.beta.gouv.fr/surveys/dsp/create/"
+    target="_blank"
+    class="has-external-link"
+    aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
+                </p>
             {% endif %}
         </div>
     </div>
