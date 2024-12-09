@@ -37,7 +37,7 @@
                                     {% matomo_event "gps" "clic" "copied_member_phone" as matomo_event_attrs %}
                                     {% include 'includes/copy_to_clipboard.html' with content=membership.member.phone css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
                                 {% else %}
-                                    <span class="text-disabled">Téléphone non renseigné</span>
+                                    <i class="text-disabled">Téléphone non renseigné</i>
                                 {% endif %}
                             </li>
                             <li class="py-1">

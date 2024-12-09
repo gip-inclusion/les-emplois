@@ -3,7 +3,9 @@
 
 <section aria-labelledby="results" id="follow-up-groups-section">
     {% if not memberships_page %}
-        <div class="my-3 my-md-4 px-3 s-box__row row membership-card">Aucun résultat.</div>
+        <div class="c-box my-3 my-md-4">
+            <p class="mb-0">Aucun résultat.</p>
+        </div>
     {% else %}
         {% for membership in memberships_page %}
             <div class="c-box c-box--results has-links-inside my-3 my-md-4 membership-card">
@@ -16,34 +18,32 @@
                         </div>
                     </div>
                 </div>
-                <hr class="m-0" />
+                <hr class="m-0">
                 <div class="c-box--results__body">
-                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
-                        <div>
-                            {% with membership.nb_members|add:"-1" as counter %}
-                                <p>
-                                    {# djlint:off #}
-                                {# Don't let djlint add a newline before the . or it will add a space after référent and . #}
-                                    Vous avez ajouté ce bénéficiaire le <strong>{{ membership.created_at|date:"d/m/Y" }}</strong>{% if membership.is_referent %} et êtes <strong>référent</strong>{% endif %}.{# djlint:on #}
-                                    {% if counter < 1 %}
-                                        Aucun autre professionnel que vous n'est intervenu auprès de ce bénéficiaire.
-                                    {% else %}
-                                        {{ counter }} autre{{ counter|pluralizefr }} professionnel{{ counter|pluralizefr }}
-                                        {{ counter|pluralize:"est,sont" }}
-                                        intervenu{{ counter|pluralizefr }} auprès de ce bénéficiaire.
-                                    {% endif %}
-                                </p>
-                            {% endwith %}
-                        </div>
-                        <div>
-                            <a href="{% url 'gps:user_details' public_id=membership.follow_up_group.beneficiary.public_id %}?back_url={{ request.get_full_path|urlencode }}"
-                               class="btn btn-primary btn-block btn-ico w-100 w-md-auto"
-                               aria-label="Consulter la fiche de {{ membership.follow_up_group.beneficiary.get_full_name }}"
-                               {% matomo_event "GPS_liste_groupes" "clic" "consulter_fiche_candidat" %}>
-                                <i class="ri-eye-line ri-xl fw-medium" aria-hidden="true"></i>
-                                <span>Consulter la fiche</span>
-                            </a>
-                        </div>
+                    {% with membership.nb_members|add:"-1" as counter %}
+                        <p class="mb-0">
+                            {# djlint:off #}
+                        {# Don't let djlint add a newline before the . or it will add a space after référent and . #}
+                            Vous avez ajouté ce bénéficiaire le <strong>{{ membership.created_at|date:"d/m/Y" }}</strong>{% if membership.is_referent %} et êtes <strong>référent</strong>{% endif %}.{# djlint:on #}
+                            {% if counter < 1 %}
+                                Aucun autre professionnel que vous n'est intervenu auprès de ce bénéficiaire.
+                            {% else %}
+                                {{ counter }} autre{{ counter|pluralizefr }} professionnel{{ counter|pluralizefr }}
+                                {{ counter|pluralize:"est,sont" }}
+                                intervenu{{ counter|pluralizefr }} auprès de ce bénéficiaire.
+                            {% endif %}
+                        </p>
+                    {% endwith %}
+                </div>
+                <div class="c-box--results__footer">
+                    <div class="d-flex justify-content-md-end">
+                        <a href="{% url 'gps:user_details' public_id=membership.follow_up_group.beneficiary.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                           class="btn btn-primary btn-block btn-ico w-100 w-md-auto"
+                           aria-label="Consulter la fiche de {{ membership.follow_up_group.beneficiary.get_full_name }}"
+                           {% matomo_event "GPS_liste_groupes" "clic" "consulter_fiche_candidat" %}>
+                            <i class="ri-eye-line ri-xl fw-medium" aria-hidden="true"></i>
+                            <span>Consulter la fiche</span>
+                        </a>
                     </div>
                 </div>
             </div>
