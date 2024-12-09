@@ -351,16 +351,7 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     background-image: url("../img/dashboard/card-header-bg-dora.png");
     background-repeat: no-repeat;
     background-position: center right;
-    background-size: 100% auto;
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
-}
-
-.c-box__header--gps {
-    background-image: url("../img/dashboard/card-header-bg-gps.png");
-    background-repeat: no-repeat;
-    background-position: center right;
-    background-size: 100% auto;
+    background-size: contain;
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
 }
@@ -369,23 +360,16 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     background-image: url("../img/dashboard/card-header-bg-diagoriente.png");
     background-repeat: no-repeat;
     background-position: center right;
-    background-size: 100% auto;
+    background-size: contain;
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
-}
-
-.c-banner--pilotage {
-    background-image: url("../img/dashboard/banner-statistiques-pilotage-bg.jpg");
-    background-repeat: no-repeat;
-    background-position: center right;
-    background-size: cover;
 }
 
 .c-box__header--gps {
     background-image: url("../img/dashboard/card-header-bg-gps.png");
     background-repeat: no-repeat;
     background-position: center right;
-    background-size: 100% auto;
+    background-size: contain;
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
 }
@@ -395,9 +379,16 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     background-image: url("../img/dashboard/card-header-bg-immersion-facile.png");
     background-repeat: no-repeat;
     background-position: center right;
-    background-size: cover;
+    background-size: contain;
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
+}
+
+.c-banner--pilotage {
+    background-image: url("../img/dashboard/banner-statistiques-pilotage-bg.jpg");
+    background-repeat: no-repeat;
+    background-position: center right;
+    background-size: cover;
 }
 
 /* Fix for form.company and form.job_seeker width */
