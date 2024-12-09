@@ -1,6 +1,8 @@
 import datetime
 from collections import Counter
 
+from django.utils import timezone
+
 from itou.asp.models import Commune
 
 
@@ -62,14 +64,14 @@ class TestCommuneModel:
         old_commune = Commune(
             code=99999,
             name="ENNUI-SUR-BLASÉ",
-            start_date=datetime.datetime(1940, 1, 1),
-            end_date=datetime.datetime(2021, 12, 31),
+            start_date=datetime.date(1940, 1, 1),
+            end_date=datetime.date(2021, 12, 31),
         )
-        new_commune = Commune(code=99999, name="ENNUI-SUR-BLASÉ", start_date=datetime.datetime(2022, 1, 1))
+        new_commune = Commune(code=99999, name="ENNUI-SUR-BLASÉ", start_date=datetime.date(2022, 1, 1))
         Commune.objects.bulk_create([old_commune, new_commune])
 
-        result = Commune.objects.by_insee_code_and_period(99999, datetime.datetime(1988, 4, 28))
-        assert old_commune == result
+        for period in [old_commune.start_date, datetime.date(1988, 4, 28), old_commune.end_date]:
+            assert Commune.objects.by_insee_code_and_period(99999, period) == old_commune
 
-        result = Commune.objects.by_insee_code_and_period(99999, datetime.datetime(2022, 11, 28))
-        assert new_commune == result
+        for period in [new_commune.start_date, datetime.date(2022, 11, 28), timezone.localdate()]:
+            assert Commune.objects.by_insee_code_and_period(99999, period) == new_commune

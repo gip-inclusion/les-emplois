@@ -371,7 +371,7 @@ class CommuneQuerySet(PeriodQuerySet):
         "Lookup a Commune object by INSEE code and valid at the given period"
         return (
             self.filter(code=insee_code, start_date__lte=period)
-            .filter(Q(end_date=None) | Q(end_date__gt=period))
+            .filter(Q(end_date=None) | Q(end_date__gte=period))
             .get()
         )
 
