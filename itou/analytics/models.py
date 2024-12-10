@@ -49,6 +49,12 @@ class DatumCode(models.TextChoices):
     TECH_SENTRY_FAILURE_RATE = "SENTRY-002", "Taux de requêtes en échec"
 
 
+PERCENTAGE_DATUM = [
+    DatumCode.TECH_SENTRY_APDEX,
+    DatumCode.TECH_SENTRY_FAILURE_RATE,
+]
+
+
 class Datum(models.Model):
     """Store an aggregated `value` of the `code` data point for the specified `bucket`."""
 
@@ -64,6 +70,15 @@ class Datum(models.Model):
         verbose_name_plural = "data"
         unique_together = ["code", "bucket"]
         indexes = [models.Index(fields=["measured_at", "code"])]
+
+    def get_value_display(self):
+        """
+        `value` column being an integer, it's impossible to store percentage values without lowering its accuracy.
+        So, store the original value multiplied by 10,000 and display it divided by 100.
+        """
+        if self.code in PERCENTAGE_DATUM:
+            return self.value / 100
+        return self.value
 
 
 class StatsDashboardVisit(models.Model):

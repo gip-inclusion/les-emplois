@@ -6,8 +6,9 @@ from .models import Datum, StatsDashboardVisit
 
 @admin.register(Datum)
 class DatumAdmin(ItouModelAdmin):
-    list_display = ["pk", "code", "bucket", "value", "measured_at"]
+    list_display = ["pk", "code", "bucket", "get_value_display", "measured_at"]
     list_filter = ["code"]
+    fields = ["code", "bucket", "get_value_display", "measured_at"]
     ordering = ["-measured_at", "code"]
     date_hierarchy = "measured_at"
 
@@ -19,6 +20,10 @@ class DatumAdmin(ItouModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    @admin.display(description="value")
+    def get_value_display(self, obj):
+        return obj.get_value_display()
 
 
 @admin.register(StatsDashboardVisit)
