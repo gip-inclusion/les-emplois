@@ -88,9 +88,6 @@ job_app_export_spec = {
     "job_seeker_aah_allocation_since": (
         lambda job_app: job_app.job_seeker.jobseeker_profile.get_aah_allocation_since_display()
     ),
-    "job_seeker_ata_allocation_since": (
-        lambda job_app: job_app.job_seeker.jobseeker_profile.get_ata_allocation_since_display()
-    ),
     "application_eligibility_diagnosis_author_kind": lambda job_app: _getattrs(
         job_app, "eligibility_diagnosis", "author_kind"
     ),

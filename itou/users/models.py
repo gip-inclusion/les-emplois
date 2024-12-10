@@ -931,13 +931,6 @@ class JobSeekerProfile(models.Model):
         choices=AllocationDuration.choices,
     )
 
-    ata_allocation_since = models.CharField(
-        max_length=2,
-        verbose_name="allocataire de l'ATA depuis",
-        blank=True,
-        choices=AllocationDuration.choices,
-    )
-
     # Fields specifics to the EITI
     are_allocation_since = models.CharField(
         max_length=2,
@@ -1283,10 +1276,6 @@ class JobSeekerProfile(models.Model):
         return bool(self.aah_allocation_since)
 
     @property
-    def has_ata_allocation(self):
-        return bool(self.ata_allocation_since)
-
-    @property
     def has_are_allocation(self):
         return bool(self.are_allocation_since)
 
@@ -1296,12 +1285,7 @@ class JobSeekerProfile(models.Model):
 
     @property
     def has_social_allowance(self):
-        return bool(
-            self.has_rsa_allocation != RSAAllocation.NO
-            or self.has_ass_allocation
-            or self.has_aah_allocation
-            or self.has_ata_allocation
-        )
+        return bool(self.has_rsa_allocation != RSAAllocation.NO or self.has_ass_allocation or self.has_aah_allocation)
 
     @property
     def hexa_address_filled(self):
