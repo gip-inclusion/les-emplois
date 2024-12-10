@@ -808,7 +808,6 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
                     "rsa_allocation_since",
                     "ass_allocation_since",
                     "aah_allocation_since",
-                    "ata_allocation_since",
                 )
             },
         ),

@@ -156,12 +156,9 @@ class _API_SituationSerializer(serializers.Serializer):
         source="job_application.job_seeker.jobseeker_profile.aah_allocation_since", allow_blank=True
     )
 
-    salarieBenefATA = serializers.BooleanField(
-        source="job_application.job_seeker.jobseeker_profile.has_ata_allocation"
-    )
-    salarieBenefATADepuis = NullIfEmptyCharField(
-        source="job_application.job_seeker.jobseeker_profile.ata_allocation_since", allow_blank=True
-    )
+    # ATA fields are outdated and have not been displayed or filled since a7fb1cb36bb942d660bf082ac22ed2367320a1f9
+    salarieBenefATA = serializers.CharField(read_only=True, default=False)
+    salarieBenefATADepuis = serializers.CharField(read_only=True, default=None)
 
     # There is a clear lack of knowledge of ASP business rules on this point.
     # Without any satisfactory answer, it has been decided to obfuscate / mock these fields.

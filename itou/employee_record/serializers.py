@@ -201,13 +201,9 @@ class _SituationSerializer(serializers.Serializer):
         source="job_application.job_seeker.jobseeker_profile.aah_allocation_since",
     )  # Required if he has AAH allocation
 
-    salarieBenefATA = serializers.BooleanField(
-        source="job_application.job_seeker.jobseeker_profile.has_ata_allocation"
-    )  # Required
-    salarieBenefATADepuis = NullIfEmptyChoiceField(
-        choices=AllocationDuration.choices,
-        source="job_application.job_seeker.jobseeker_profile.ata_allocation_since",
-    )  # Required if he has ATA allocation
+    # ATA fields are outdated and have not been displayed or filled since a7fb1cb36bb942d660bf082ac22ed2367320a1f9
+    salarieBenefATA = serializers.ReadOnlyField(default=False)  # Required
+    salarieBenefATADepuis = serializers.ReadOnlyField(default=None)  # Required if he has ATA allocation
 
     salarieBenefARE = NullField()  # Required for EITI, "null" for others
     salarieBenefAREDepuis = NullField()  # Required for EITI, "null" for others
