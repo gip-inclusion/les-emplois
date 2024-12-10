@@ -54,35 +54,7 @@
         </div>
     {% else %}
         {% if display_kind.is_table %}
-            <div class="table-responsive mt-3 mt-md-4">
-                <table class="table table-hover">
-                    <caption class="visually-hidden">Liste des candidatures</caption>
-                    <thead>
-                        <tr>
-                            {% if job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %}
-                                <th scope="col">Candidature chez</th>
-                            {% else %}
-                                <th scope="col">Candidature de</th>
-                            {% endif %}
-                            <th scope="col">Émise le</th>
-                            <th scope="col">Statut</th>
-                            {% if job_applications_list_kind is JobApplicationsListKind.SENT %}<th scope="col">Employeur</th>{% endif %}
-                            <th scope="col">Poste</th>
-                            <th scope="col">Emetteur</th>
-                            {% if job_applications_list_kind is JobApplicationsListKind.SENT or job_applications_list_kind is JobApplicationsListKind.RECEIVED and request.current_organization.is_subject_to_eligibility_rules %}
-                                {# prescription or received by IAE employer #}
-                                <th scope="col" class="text-nowrap">Critères administratifs IAE</th>
-                            {% endif %}
-                            <th scope="col" class="text-end w-50px"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for job_application in job_applications_page %}
-                            {% include "apply/includes/list_tr.html" %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            <div class="table-responsive mt-3 mt-md-4">{% include "apply/includes/list_table.html" %}</div>
 
         {% elif display_kind.is_list %}
             {% for job_application in job_applications_page %}
