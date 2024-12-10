@@ -1,7 +1,7 @@
 import pytest
 from django import forms
 from django.template import Context, Template
-from django.urls import reverse
+from django.urls import URLPattern, URLResolver, get_resolver
 
 from itou.utils.templatetags.nav import NAV_ENTRIES
 
@@ -79,10 +79,118 @@ class TestButtonsForm:
 
 
 class TestNav:
-    def test_active_view_names(self):
+    @pytest.fixture(scope="class")
+    def named_urls(self):
+        resolver = get_resolver()
+        known_urls = set()
+        for resolver in resolver.url_patterns:
+            if isinstance(resolver, URLResolver):
+                prefix = f"{resolver.namespace}:" if resolver.namespace else ""
+                for urlname in resolver.reverse_dict:
+                    if isinstance(urlname, str):
+                        qualname = f"{prefix}{urlname}"
+                        known_urls.add(qualname)
+            elif isinstance(resolver, URLPattern):
+                if resolver.name:
+                    known_urls.add(resolver.name)
+            else:
+                raise ValueError
+        return frozenset(known_urls)
+
+    def test_active_view_names(self, named_urls):
         for entry in NAV_ENTRIES.values():
-            for view_name in entry.active_view_names:
-                reverse(view_name)
+            for urlname in entry.active_view_names:
+                assert urlname in named_urls
+
+    def test_all_urls_registered(self, named_urls):
+        # - External apps
+        # - Apps without HTML pages
+        # - HTML pages for anonymous users
+        # - HTML pages for which there is no menu entry (yet).
+        excluded_namespaces = {
+            "admin",
+            "announcements",
+            "anymail",
+            "api",
+            "autocomplete",
+            "dashboard",
+            "france_connect",
+            "geiq",
+            "gps",
+            "hijack",
+            "home",  # The dashboard index is used instead.
+            "inclusion_connect",
+            "itou_staff_views",
+            "login",
+            "pe_connect",
+            "pro_connect",
+            "rdv_insertion",
+            "releases",
+            "siae_evaluations_views",
+            "signup",
+            "stats",
+            "status",
+            "users",  # GPS
+            "v1",  # API
+            "welcoming_tour",
+        }
+        not_html_urlnames = {
+            # HTMX fragments
+            "apply:add_prior_action",
+            "apply:delete_prior_action",
+            "apply:geiq_eligibility_criteria",
+            "apply:modify_prior_action",
+            "apply:rdv_insertion_invite",
+            "apply:rdv_insertion_invite_for_detail",
+            "apply:reload_contract_type_and_options",
+            "apply:reload_job_description_fields",
+            "apply:reload_qualification_fields",
+            "approvals:check_contact_details",
+            "approvals:check_prescriber_email",
+            "approvals:prolongation_form_for_reason",
+            # Redirect only views
+            "apply:archive",
+            "apply:cancel",
+            "apply:send_diagoriente_invite",
+            "apply:start",
+            "apply:unarchive",
+            "approvals:prolongation_request_deny",
+            "approvals:prolongation_request_grant",
+            "approvals:redirect_to_employee",
+            "companies_views:dora_service_redirect",
+            "companies_views:hx_dora_services",
+            "invitations_views:join_company",
+            "invitations_views:join_institution",
+            "invitations_views:join_prescriber_organization",
+            # Exports
+            "apply:list_for_siae_exports_download",
+            "apply:list_prescriptions_exports_download",
+            "approvals:prolongation_request_report_file",
+            # Do not highlight Métiers when viewing company cards:
+            # users are likely not viewing their company.
+            "companies_views:card",
+            "companies_views:job_description_card",
+            # Not listed in the menu (yet)
+            "prescribers_views:list_accredited_organizations",
+            # Anonymous views
+            "invitations_views:new_user",
+        }
+        excluded_urlnames = {
+            "accessibility",
+            "legal-notice",
+            "legal-privacy",
+            "legal-terms",
+        }
+        excluded_namespace_urls = set()
+        for namespaced_url in [url for url in named_urls if ":" in url]:
+            namespace, _name = namespaced_url.split(":", maxsplit=1)
+            if namespace not in excluded_namespaces:
+                excluded_namespace_urls.add(namespaced_url)
+        expected_urlnames_in_nav = excluded_namespace_urls - not_html_urlnames - excluded_urlnames
+        nav_urlnames = {
+            active_view_name for entry in NAV_ENTRIES.values() for active_view_name in entry.active_view_names
+        }
+        assert set(expected_urlnames_in_nav) - set(nav_urlnames) == set()
 
 
 class TestThemeInclusion:
