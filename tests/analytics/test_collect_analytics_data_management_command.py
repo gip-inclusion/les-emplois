@@ -114,6 +114,23 @@ def test_save_data_with_an_integrity_error(command):
     assert command.stdout.getvalue() == "Successfully saved code=CODE-002 bucket=2021-12-31 value=21.\n"
 
 
+def test_save_data_with_a_float(command):
+    command.save_data(
+        {CodeTest.CODE_001: 42.5, CodeTest.CODE_002: 21},
+        datetime.datetime(2022, 1, 1, tzinfo=datetime.UTC),
+    )
+    objects = Datum.objects.order_by("code").all()
+    assert len(objects) == 1
+    assert objects[0].code == CodeTest.CODE_002
+    assert objects[0].value == 21
+    assert command.stderr.getvalue().split("\n") == [
+        "Saving analytics data in bucket '2021-12-31'.",
+        "Failed to save code=CODE-001 for bucket=2021-12-31 because of a ValidationError: 42.5 is not an integer.",
+        "",
+    ]
+    assert command.stdout.getvalue() == "Successfully saved code=CODE-002 bucket=2021-12-31 value=21.\n"
+
+
 @freeze_time("2024-12-03")
 def test_management_command_name_and_that_all_codes_are_saved(datadog_client, sentry_respx_mock):
     call_command("collect_analytics_data", save=True)

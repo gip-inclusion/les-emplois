@@ -1,7 +1,9 @@
 import datetime
 
+import sentry_sdk
 from django import db
 from django.db import transaction
+from django.forms import models
 from django.utils import timezone
 
 from itou.utils.command import BaseCommand
@@ -58,5 +60,12 @@ class Command(BaseCommand):
                     datum.save()
             except db.IntegrityError:
                 self.stderr.write(f"Failed to save code={code.value} for bucket={bucket} because it already exists.")
+            except models.ValidationError as error:
+                message = (
+                    f"Failed to save code={code.value} for bucket={bucket} because of a ValidationError: "
+                    f"{error.message}"
+                )
+                sentry_sdk.capture_message(message, "error")
+                self.stderr.write(message)
             else:
                 self.stdout.write(f"Successfully saved code={code.value} bucket={bucket} value={value}.")

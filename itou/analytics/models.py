@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from django.forms import ValidationError
 from django.utils import timezone
 
 from itou.common_apps.address.departments import DEPARTMENTS
@@ -79,6 +80,14 @@ class Datum(models.Model):
         if self.code in PERCENTAGE_DATUM:
             return self.value / 100
         return self.value
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        if not isinstance(self.value, int):
+            raise ValidationError(f"{self.value} is not an integer.")
 
 
 class StatsDashboardVisit(models.Model):
