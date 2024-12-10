@@ -1,11 +1,10 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
 
 from itou.www.logout.enums import LogoutWarning
 
 
-class LogoutWarningView(LoginRequiredMixin, TemplateView):
+class LogoutWarningView(TemplateView):
     """
     Logout view used when the perms middleware detects an issue
     """

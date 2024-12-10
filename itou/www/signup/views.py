@@ -10,7 +10,6 @@ from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth import REDIRECT_FIELD_NAME, login
 from django.contrib.auth.decorators import login_not_required, login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import Error, transaction
 from django.http import HttpResponseRedirect
@@ -318,7 +317,7 @@ class CompanyUserView(LoginNotRequiredMixin, CompanyBaseView, TemplateView):
         }
 
 
-class CompanyJoinView(LoginRequiredMixin, CompanyBaseView):
+class CompanyJoinView(CompanyBaseView):
     def get(self, request, *args, **kwargs):
         if not request.user.is_employer:
             logger.error("A non staff user tried to join a company")

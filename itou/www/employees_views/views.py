@@ -1,7 +1,6 @@
 import contextlib
 import logging
 
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Exists, OuterRef, Prefetch
 from django.urls import reverse_lazy
@@ -23,7 +22,7 @@ from itou.utils.urls import get_safe_url
 logger = logging.getLogger(__name__)
 
 
-class EmployeeDetailView(LoginRequiredMixin, DetailView):
+class EmployeeDetailView(DetailView):
     model = User
     queryset = User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile")
     template_name = "employees/detail.html"
@@ -33,11 +32,10 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        if request.user.is_authenticated:
-            self.siae = get_current_company_or_404(request)
+        self.siae = get_current_company_or_404(request)
 
-            if not self.siae.is_subject_to_eligibility_rules:
-                raise PermissionDenied
+        if not self.siae.is_subject_to_eligibility_rules:
+            raise PermissionDenied
 
     def get_queryset(self):
         return (

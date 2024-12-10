@@ -398,7 +398,7 @@ class RefuseViewStep(enum.StrEnum):
     do_not_call_in_templates = enum.nonmember(True)
 
 
-class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
+class JobApplicationRefuseView(NamedUrlSessionWizardView):
     template_name = "apply/process_refuse.html"
     form_list = [
         (RefuseViewStep.REASON, JobApplicationRefusalReasonForm),
@@ -412,11 +412,10 @@ class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        if request.user.is_authenticated:
-            self.job_application = get_object_or_404(
-                JobApplication.objects.is_active_company_member(request.user).select_related("job_seeker"),
-                pk=kwargs["job_application_id"],
-            )
+        self.job_application = get_object_or_404(
+            JobApplication.objects.is_active_company_member(request.user).select_related("job_seeker"),
+            pk=kwargs["job_application_id"],
+        )
 
     def check_wizard_state(self, *args, **kwargs):
         # Redirect to job application details if the state is not refusable
@@ -754,20 +753,19 @@ class ApplicationOverrideMixin:
     additionnal_related_models = []
 
     def setup(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            self.job_application = get_object_or_404(
-                JobApplication.objects.is_active_company_member(request.user).select_related(
-                    "job_seeker", "to_company", *self.additionnal_related_models
-                ),
-                pk=kwargs["job_application_id"],
-            )
-            kwargs["job_seeker_public_id"] = self.job_application.job_seeker.public_id
+        self.job_application = get_object_or_404(
+            JobApplication.objects.is_active_company_member(request.user).select_related(
+                "job_seeker", "to_company", *self.additionnal_related_models
+            ),
+            pk=kwargs["job_application_id"],
+        )
+        kwargs["job_seeker_public_id"] = self.job_application.job_seeker.public_id
         return super().setup(request, *args, **kwargs)
 
 
 class JobApplicationExternalTransferStep2View(ApplicationOverrideMixin, ApplicationJobsView):
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and self.company in request.organizations:
+        if self.company in request.organizations:
             # This is not an external transfer
             url = reverse(
                 "apply:job_application_internal_transfer",
@@ -812,7 +810,7 @@ class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, Applicat
     form_class = TransferJobApplicationForm
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and not self.apply_session.exists():
+        if not self.apply_session.exists():
             return HttpResponseRedirect(
                 reverse(
                     "apply:job_application_external_transfer_step_2",
@@ -868,11 +866,7 @@ class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, Applicat
 
 class JobApplicationExternalTransferStepEndView(ApplicationEndView):
     def setup(self, request, *args, **kwargs):
-        job_app_qs = JobApplication.objects.all()
-        if request.user.is_authenticated:
-            # Only check the user's ownership if he's authenticated
-            # because if he's not he will be redirected to login so we don't care
-            job_app_qs = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
+        job_app_qs = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
 
         job_application = get_object_or_404(job_app_qs, pk=kwargs["job_application_id"])
 
@@ -890,20 +884,17 @@ class JobApplicationExternalTransferStepEndView(ApplicationEndView):
         }
 
 
-class JobApplicationInternalTranferView(LoginRequiredMixin, TemplateView):
+class JobApplicationInternalTranferView(TemplateView):
     template_name = "apply/process_internal_transfer.html"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        if request.user.is_authenticated:
-            self.job_application = get_object_or_404(
-                JobApplication.objects.is_active_company_member(request.user).select_related(
-                    "job_seeker", "to_company"
-                ),
-                pk=kwargs["job_application_id"],
-            )
-            self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
+        self.job_application = get_object_or_404(
+            JobApplication.objects.is_active_company_member(request.user).select_related("job_seeker", "to_company"),
+            pk=kwargs["job_application_id"],
+        )
+        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {

@@ -1,6 +1,5 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Count
 from django.http.response import HttpResponseRedirect
@@ -66,7 +65,7 @@ def _show_add_choose_approval_form(wizard):
     return bool(cleaned_data.get("employee"))
 
 
-class AddView(LoginRequiredMixin, NamedUrlSessionWizardView):
+class AddView(NamedUrlSessionWizardView):
     template_name = "employee_record/add.html"
     form_list = [
         ("choose-employee", AddEmployeeRecordChooseEmployeeForm),
@@ -77,10 +76,6 @@ class AddView(LoginRequiredMixin, NamedUrlSessionWizardView):
     }
 
     def dispatch(self, request, *args, **kwargs):
-        # Do LoginRequiredMixin.dispatch() here so we get the 404 and the redirect before the PermissionDenied
-        if not request.user.is_authenticated:
-            return self.handle_no_permission()
-
         self.company = get_current_company_or_404(request)
         if not self.company.can_use_employee_record:
             raise PermissionDenied

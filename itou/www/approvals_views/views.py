@@ -5,7 +5,7 @@ from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
 from django.db import IntegrityError
@@ -53,7 +53,7 @@ from itou.www.approvals_views.forms import (
 logger = logging.getLogger(__name__)
 
 
-class ApprovalBaseViewMixin(LoginRequiredMixin):
+class ApprovalBaseViewMixin:
     model = Approval
 
     def __init__(self):
@@ -62,11 +62,10 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        if request.user.is_authenticated:
-            self.siae = get_current_company_or_404(request)
+        self.siae = get_current_company_or_404(request)
 
-            if not self.siae.is_subject_to_eligibility_rules:
-                raise PermissionDenied
+        if not self.siae.is_subject_to_eligibility_rules:
+            raise PermissionDenied
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -126,7 +125,7 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
         return context
 
 
-class ApprovalDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+class ApprovalDetailView(UserPassesTestMixin, DetailView):
     model = Approval
     queryset = Approval.objects.select_related("user__jobseeker_profile").prefetch_related(
         # Useful for get_suspensions method and the approval remainder field
@@ -138,10 +137,8 @@ class ApprovalDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     template_name = "approvals/details.html"
 
     def test_func(self):
-        return self.request.user.is_authenticated and (
-            # More checks are performed in get_context_data method
-            self.request.user.is_prescriber or self.request.user.is_employer or self.request.user.is_job_seeker
-        )
+        # More checks are performed in get_context_data method
+        return self.request.user.is_prescriber or self.request.user.is_employer or self.request.user.is_job_seeker
 
     def get_prolongation_and_requests(self, approval):
         def _format_for_template(user, org):
@@ -406,11 +403,10 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
     def setup(self, request, approval_id, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        if request.user.is_authenticated:
-            self.siae = get_current_company_or_404(request)
-            if not self.siae.is_subject_to_eligibility_rules:
-                raise PermissionDenied()
-            self.approval = get_object_or_404(Approval, pk=approval_id)
+        self.siae = get_current_company_or_404(request)
+        if not self.siae.is_subject_to_eligibility_rules:
+            raise PermissionDenied()
+        self.approval = get_object_or_404(Approval, pk=approval_id)
 
         if not self.approval.can_be_prolonged:
             raise PermissionDenied()
@@ -507,20 +503,17 @@ def prolongation_request_report_file(request, prolongation_request_id):
     return HttpResponseRedirect(default_storage.url(prolongation_request.report_file_id))
 
 
-class ProlongationRequestViewMixin(LoginRequiredMixin):
+class ProlongationRequestViewMixin:
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        if request.user.is_authenticated:
-            self.prolongation_request = get_object_or_404(
-                ProlongationRequest.objects.filter(
-                    prescriber_organization=get_current_org_or_404(request)
-                ).select_related(
-                    "approval__user",
-                    "deny_information",
-                ),
-                pk=kwargs["prolongation_request_id"],
-            )
+        self.prolongation_request = get_object_or_404(
+            ProlongationRequest.objects.filter(prescriber_organization=get_current_org_or_404(request)).select_related(
+                "approval__user",
+                "deny_information",
+            ),
+            pk=kwargs["prolongation_request_id"],
+        )
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
