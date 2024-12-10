@@ -58,7 +58,7 @@ class JobApplicationInline(ItouStackedInline):
     def has_add_permission(self, request, obj=None):
         return False
 
-    @admin.display(description="Entreprises destinataire")
+    @admin.display(description="Entreprise destinataire")
     def to_company_link(self, obj):
         return get_company_view_link(obj.to_company)
 
