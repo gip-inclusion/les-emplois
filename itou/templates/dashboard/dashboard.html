@@ -170,6 +170,30 @@
                 <div class="col-12">
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="ensemble" role="tabpanel" aria-labelledby="ensemble-tab">
+                            {% if user.is_prescriber and request.current_organization and request.current_organization.is_authorized %}
+                                <div id="maze-prescriber-evolutions" class="alert alert-important alert-dismissible-once fade d-none show" role="status">
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                                    <div class="row">
+                                        <div class="col-auto pe-0">
+                                            <i class="ri-information-line ri-xl text-important" aria-hidden="true"></i>
+                                        </div>
+                                        <div class="col">
+                                            <p class="mb-2">
+                                                <strong>Votre avis nous intéresse !</strong>
+                                            </p>
+                                            <p class="mb-0">Prenez quelques minutes pour réagir à nos suggestions d’évolution des Emplois de l’inclusion.</p>
+                                        </div>
+                                        <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                                            <a class="btn btn-sm btn-primary has-external-link"
+                                               href="https://t.maze.co/317741928"
+                                               target="_blank"
+                                               rel="noopener"
+                                               aria-label="Donner votre avis sur les suggestions d’évolution des Emplois de l’inclusion (ouverture dans un nouvel onglet)">Donnez votre avis
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
                             <h2>Vue d’ensemble</h2>
                             <form method="get" action="{% url "search:employers_results" %}" role="search" class="mt-3 mt-md-4">
                                 {% include "search/includes/siaes_search_form.html" with form=siae_search_form is_home=False only %}
