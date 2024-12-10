@@ -56,7 +56,11 @@
         {% if display_kind.is_table %}
             <div class="table-responsive mt-3 mt-md-4">
                 {% if job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
-                    <form hx-get="{% url 'apply:list_for_siae_actions' %}?list_url={{ request.get_full_path|urlencode }}" hx-trigger="change delay:.5" hx-swap="none" hx-indicator="#batch-action-box">
+                    <form hx-get="{% url 'apply:list_for_siae_actions' %}?list_url={{ request.get_full_path|urlencode }}"
+                          hx-trigger="change delay:.5"
+                          hx-swap="none"
+                          hx-indicator=".selection-indicator"
+                          data-emplois-elements-visibility-on-selection-controller="selected-application">
                         {% include "apply/includes/list_table.html" %}
                     </form>
                 {% else %}
@@ -68,7 +72,7 @@
                 {% include "apply/includes/list_card_body.html" %}
             {% endfor %}
         {% endif %}
-        {% include "includes/pagination.html" with page=job_applications_page boost=True boost_target="#job-applications-section" boost_indicator="#job-applications-section" %}
+        {% include "includes/pagination.html" with page=job_applications_page boost=True boost_target="#job-applications-section" boost_indicator="#job-applications-section" extra_attributes='data-emplois-elements-visibility-on-selection="hidden"' %}
     {% endif %}
 </section>
 

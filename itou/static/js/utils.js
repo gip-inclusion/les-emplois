@@ -202,6 +202,23 @@ htmx.onLoad((target) => {
         }
       })
     });
-
   })
+
+  /**
+   * JS to hide/unhide UI elements
+   **/
+  querySelectorAllIncludingTarget(target, "form[data-emplois-elements-visibility-on-selection-controller]").forEach((form) => {
+    const checkBoxInputName = form.getAttribute("data-emplois-elements-visibility-on-selection-controller")
+    form.addEventListener("change", function() {
+      const attribute = "data-emplois-elements-visibility-on-selection"
+      if (Array.from(form.elements).some((input) => input.name == checkBoxInputName && input.checked)) {
+        document.querySelectorAll(`[${attribute}="hidden"]`).forEach((element) => element.classList.add("d-none"))
+        document.querySelectorAll(`[${attribute}="shown"]`).forEach((element) => element.classList.remove("d-none"))
+      } else {
+        document.querySelectorAll(`[${attribute}="shown"]`).forEach((element) => element.classList.add("d-none"))
+        document.querySelectorAll(`[${attribute}="hidden"]`).forEach((element) => element.classList.remove("d-none"))
+      }
+    })
+  })
+
 });

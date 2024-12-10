@@ -2684,7 +2684,7 @@
           
               <div class="table-responsive mt-3 mt-md-4">
                   
-                      <form hx-get="/apply/siae/list/actions?list_url=/apply/siae/list%3Fdisplay%3Dtable" hx-indicator="#batch-action-box" hx-swap="none" hx-trigger="change delay:.5">
+                      <form data-emplois-elements-visibility-on-selection-controller="selected-application" hx-get="/apply/siae/list/actions?list_url=/apply/siae/list%3Fdisplay%3Dtable" hx-indicator=".selection-indicator" hx-swap="none" hx-trigger="change delay:.5">
                           <table class="table table-hover">
       <caption class="visually-hidden">Liste des candidatures</caption>
       <thead>
