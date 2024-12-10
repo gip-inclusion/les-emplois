@@ -9,7 +9,7 @@
 {% block title_content %}
     <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
         {% include "apply/includes/list_job_applications_title.html" %}
-        <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur les candidatures">
+        <div class="d-flex flex-column flex-md-row gap-3" data-emplois-elements-visibility-on-selection="hidden" role="group" aria-label="Actions sur les candidatures">
             {% include "apply/includes/job_applications_export_button.html" %}
             {% if can_apply %}
                 <a href="{% url 'apply:start' company_pk=request.current_organization.pk %}" class="btn btn-lg btn-primary btn-ico" {% matomo_event "employeurs" "clic" "enregistrer-candidature" %}>
@@ -36,7 +36,7 @@
             {% include "apply/includes/selected_job_applications.html" with selected_nb=0 request=request only %}
             <div class="s-section__row row">
                 <div class="col-12">
-                    <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4" data-emplois-elements-visibility-on-selection="hidden">
                         <div class="flex-md-grow-1">{% include "apply/includes/list_counter.html" %}</div>
                         <div class="flex-column flex-md-row mt-3 mt-md-0">
                             {% bootstrap_field filters_form.job_seeker wrapper_class="w-lg-400px" show_label=False %}

@@ -14,7 +14,8 @@
                 {# Don’t specify a default for boost_target and boost_indicator, keeping them required when boost. #}
                 {% if boost_target %}hx-target="{{ boost_target }}"{% endif %}
                 {% if boost_indicator %}hx-indicator="{{ boost_indicator }}"{% endif %}
-            {% endif %}>
+            {% endif %}
+            {% if extra_attributes|default:"" %}{{ extra_attributes }}{% endif %}>
             {# Pagination is not responsive by default https://github.com/twbs/bootstrap/issues/23504 #}
             <ul class="pagination flex-wrap justify-content-center">
                 {# First page. #}

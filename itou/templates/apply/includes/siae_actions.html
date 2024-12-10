@@ -1,9 +1,9 @@
 {% if batch_mode %}
-    <div id="batch-action-box" class="c-box c-box--action" {% if request.htmx %}hx-swap-oob="true"{% endif %}>
+    <div id="batch-action-box" class="c-box c-box--action selection-indicator" data-emplois-elements-visibility-on-selection="shown" {% if request.htmx %}hx-swap-oob="true"{% endif %}>
         <h2 class="visually-hidden">Actions rapides</h2>
     </div>
 {% else %}
-    <div id="batch-action-box" {% if request.htmx %}hx-swap-oob="true"{% endif %}></div>
+    <div id="batch-action-box" class="selection-indicator" {% if request.htmx %}hx-swap-oob="true"{% endif %}></div>
 {% endif %}
 {% if request.htmx %}
     {% include "apply/includes/selected_job_applications.html" with selected_nb=selected_nb request=request only %}
