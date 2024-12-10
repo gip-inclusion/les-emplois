@@ -3,7 +3,6 @@ import uuid
 
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import storages
 from django.forms import ValidationError
@@ -81,7 +80,7 @@ def _get_job_seeker_to_apply_for(request):
     return job_seeker
 
 
-class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
+class ApplyStepBaseView(TemplateView):
     def __init__(self):
         super().__init__()
         self.company = None
@@ -100,36 +99,27 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
         )
         self.apply_session = SessionNamespace(request.session, f"job_application-{self.company.pk}")
         self.hire_process = kwargs.pop("hire_process", False)
-        self.prescription_process = (
-            not self.hire_process
-            and request.user.is_authenticated
-            and (
-                request.user.is_prescriber
-                or (request.user.is_employer and self.company != request.current_organization)
-            )
+        self.prescription_process = not self.hire_process and (
+            request.user.is_prescriber or (request.user.is_employer and self.company != request.current_organization)
         )
         self.auto_prescription_process = (
-            not self.hire_process
-            and request.user.is_authenticated
-            and request.user.is_employer
-            and self.company == request.current_organization
+            not self.hire_process and request.user.is_employer and self.company == request.current_organization
         )
 
         super().setup(request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
         if not self.is_gps:
-            if request.user.is_authenticated:
-                if self.hire_process and request.user.kind != UserKind.EMPLOYER:
-                    raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches")
-                elif self.hire_process and not self.company.has_member(request.user):
-                    raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
-                elif request.user.kind not in [
-                    UserKind.JOB_SEEKER,
-                    UserKind.PRESCRIBER,
-                    UserKind.EMPLOYER,
-                ]:
-                    raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
+            if self.hire_process and request.user.kind != UserKind.EMPLOYER:
+                raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches")
+            elif self.hire_process and not self.company.has_member(request.user):
+                raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
+            elif request.user.kind not in [
+                UserKind.JOB_SEEKER,
+                UserKind.PRESCRIBER,
+                UserKind.EMPLOYER,
+            ]:
+                raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
 
             if not self.company.has_active_members:
                 raise PermissionDenied(
@@ -191,9 +181,6 @@ class ApplicationBaseView(ApplyStepBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        if not request.user.is_authenticated:
-            # Do nothing, LoginRequiredMixin will raise in dispatch()
-            return
 
         self.job_seeker = get_object_or_404(
             User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=kwargs["job_seeker_public_id"]
@@ -352,10 +339,7 @@ class CheckPreviousApplications(ApplicationBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-
-        if request.user.is_authenticated:
-            # Otherwise LoginRequiredMixin will raise in dispatch()
-            self.previous_applications = self.get_previous_applications_queryset()
+        self.previous_applications = self.get_previous_applications_queryset()
 
     def get_next_url(self):
         if self.hire_process:
@@ -452,7 +436,7 @@ class ApplicationJobsView(ApplicationBaseView):
 
 class RequireApplySessionMixin:
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and not self.apply_session.exists():
+        if not self.apply_session.exists():
             return HttpResponseRedirect(
                 reverse(
                     "apply:application_jobs",
@@ -495,22 +479,20 @@ class ApplicationEligibilityView(RequireApplySessionMixin, ApplicationBaseView):
         )
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            # Otherwise LoginRequiredMixin will raise in dispatch()
-            bypass_eligibility_conditions = [
-                # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
-                not self.company.is_subject_to_eligibility_rules,
-                # Only "authorized prescribers" can perform an eligibility diagnosis.
-                not (
-                    request.user.is_prescriber
-                    and request.current_organization
-                    and request.current_organization.is_authorized
-                ),
-                # No need for eligibility diagnosis if the job seeker already have a PASS IAE
-                self.job_seeker.has_valid_approval,
-            ]
-            if any(bypass_eligibility_conditions):
-                return HttpResponseRedirect(self.get_next_url())
+        bypass_eligibility_conditions = [
+            # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
+            not self.company.is_subject_to_eligibility_rules,
+            # Only "authorized prescribers" can perform an eligibility diagnosis.
+            not (
+                request.user.is_prescriber
+                and request.current_organization
+                and request.current_organization.is_authorized
+            ),
+            # No need for eligibility diagnosis if the job seeker already have a PASS IAE
+            self.job_seeker.has_valid_approval,
+        ]
+        if any(bypass_eligibility_conditions):
+            return HttpResponseRedirect(self.get_next_url())
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -559,10 +541,6 @@ class ApplicationGEIQEligibilityView(RequireApplySessionMixin, ApplicationBaseVi
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        if not request.user.is_authenticated:
-            # Do nothing, LoginRequiredMixin will raise in dispatch()
-            return
-
         if self.company.kind != CompanyKind.GEIQ:
             raise Http404("This form is only for GEIQ")
 
@@ -588,7 +566,7 @@ class ApplicationGEIQEligibilityView(RequireApplySessionMixin, ApplicationBaseVi
 
     def dispatch(self, request, *args, **kwargs):
         # GEIQ eligibility form during job application process is only available to authorized prescribers
-        if request.user.is_authenticated and not request.user.is_prescriber_with_authorized_org:
+        if not request.user.is_prescriber_with_authorized_org:
             return HttpResponseRedirect(self.get_next_url())
 
         return super().dispatch(request, *args, **kwargs)
@@ -651,11 +629,6 @@ class ApplicationResumeView(RequireApplySessionMixin, ApplicationBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-
-        if not request.user.is_authenticated:
-            # Do nothing, LoginRequiredMixin will raise in dispatch()
-            return
-
         self.form = self.form_class(**self.get_form_kwargs())
 
     def get_next_url(self, job_application):

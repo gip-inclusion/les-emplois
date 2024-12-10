@@ -1,6 +1,5 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required, login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
@@ -209,15 +208,14 @@ def evaluation_campaign_data_context(evaluated_siae):
     return context
 
 
-class InstitutionEvaluatedSiaeNotifyMixin(LoginRequiredMixin, SingleObjectMixin):
+class InstitutionEvaluatedSiaeNotifyMixin(SingleObjectMixin):
     model = EvaluatedSiae
     context_object_name = "evaluated_siae"
     pk_url_kwarg = "evaluated_siae_pk"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        if request.user.is_authenticated:
-            self.institution = get_current_institution_or_404(self.request)
+        self.institution = get_current_institution_or_404(self.request)
 
     def get_queryset(self):
         return (

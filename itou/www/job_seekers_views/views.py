@@ -1,7 +1,7 @@
 import logging
 
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Count, DateTimeField, Exists, IntegerField, Max, OuterRef, Subquery
@@ -44,7 +44,7 @@ from .forms import (
 logger = logging.getLogger(__name__)
 
 
-class JobSeekerDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+class JobSeekerDetailView(UserPassesTestMixin, DetailView):
     model = User
     queryset = User.objects.select_related("jobseeker_profile")
     template_name = "job_seekers_views/details.html"
@@ -53,9 +53,7 @@ class JobSeekerDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     context_object_name = "job_seeker"
 
     def test_func(self):
-        return self.request.user.is_authenticated and (
-            self.request.user.is_prescriber or self.request.user.is_employer
-        )
+        return self.request.user.is_prescriber or self.request.user.is_employer
 
     def get_context_data(self, **kwargs):
         geiq_eligibility_diagnosis = None
@@ -112,7 +110,7 @@ class JobSeekerDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         }
 
 
-class JobSeekerListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+class JobSeekerListView(UserPassesTestMixin, ListView):
     model = User
     queryset = (
         User.objects.filter(kind=UserKind.JOB_SEEKER).order_by("first_name", "last_name").prefetch_related("approvals")
@@ -133,7 +131,7 @@ class JobSeekerListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
             )
 
     def test_func(self):
-        return self.request.user.is_authenticated and self.request.user.is_prescriber
+        return self.request.user.is_prescriber
 
     def get_template_names(self):
         return ["job_seekers_views/includes/list_results.html" if self.request.htmx else "job_seekers_views/list.html"]
@@ -186,7 +184,7 @@ class JobSeekerListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return query
 
 
-class JobSeekerBaseView(LoginRequiredMixin, TemplateView):
+class JobSeekerBaseView(TemplateView):
     def __init__(self):
         super().__init__()
         self.company = None
@@ -211,7 +209,6 @@ class JobSeekerBaseView(LoginRequiredMixin, TemplateView):
         self.prescription_process = (
             not self.hire_process
             and not self.is_gps
-            and request.user.is_authenticated
             and (
                 request.user.is_prescriber
                 or (request.user.is_employer and self.company != request.current_organization)
@@ -220,7 +217,6 @@ class JobSeekerBaseView(LoginRequiredMixin, TemplateView):
         self.auto_prescription_process = (
             not self.hire_process
             and not self.is_gps
-            and request.user.is_authenticated
             and request.user.is_employer
             and self.company == request.current_organization
         )
@@ -285,7 +281,7 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
         self.form = CheckJobSeekerNirForm(job_seeker=self.job_seeker, data=request.POST or None)
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and not self.job_seeker.is_job_seeker:
+        if not self.job_seeker.is_job_seeker:
             logger.info(f"dispatch ({request.path}) : {request.user.kind} in jobseeker tunnel")
             return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.company.pk}))
         return super().dispatch(request, *args, **kwargs)
@@ -764,9 +760,7 @@ class UpdateJobSeekerBaseView(SessionNamespaceRequiredMixin, ApplyStepBaseView):
     def setup(self, request, *args, **kwargs):
         self.job_seeker = get_object_or_404(self.get_job_seeker_queryset(), public_id=kwargs["job_seeker_public_id"])
         self.job_seeker_session = SessionNamespace(request.session, f"job_seeker-{self.job_seeker.public_id}")
-        if request.user.is_authenticated and (
-            request.user.is_job_seeker or not request.user.can_view_personal_information(self.job_seeker)
-        ):
+        if request.user.is_job_seeker or not request.user.can_view_personal_information(self.job_seeker):
             # Since the link leading to this process isn't visible to those users, this should never happen
             raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de ce candidat")
         super().setup(request, *args, **kwargs)
@@ -824,9 +818,6 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        if not request.user.is_authenticated:
-            # Do nothing, LoginRequiredMixin will raise in dispatch()
-            return
         if not self.job_seeker_session.exists():
             self.job_seeker_session.init({"user": {}})
         session_nir = self.job_seeker_session.get("profile", {}).get("nir")

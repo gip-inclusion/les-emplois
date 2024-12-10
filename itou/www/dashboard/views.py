@@ -5,7 +5,6 @@ from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import F
 from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
@@ -390,11 +389,11 @@ def api_token(request, template_name="dashboard/api_token.html"):
     return render(request, template_name, context)
 
 
-class AccountMigrationView(LoginRequiredMixin, TemplateView):
+class AccountMigrationView(TemplateView):
     template_name = "account/activate_inclusion_connect_account.html"
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and request.user.kind not in MATOMO_ACCOUNT_TYPE:
+        if request.user.kind not in MATOMO_ACCOUNT_TYPE:
             return HttpResponseRedirect(reverse("dashboard:index"))
         return super().dispatch(request, *args, **kwargs)
 
