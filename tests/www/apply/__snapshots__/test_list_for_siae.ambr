@@ -2682,29 +2682,28 @@
   <section aria-labelledby="apply-list-count" id="job-applications-section">
       
           
-              <div class="table-responsive mt-3 mt-md-4">
-                  <table class="table table-hover">
-                      <caption class="visually-hidden">Liste des candidatures</caption>
-                      <thead>
-                          <tr>
-                              
-                                  <th scope="col">Candidature de</th>
-                              
-                              <th scope="col">Émise le</th>
-                              <th scope="col">Statut</th>
-                              
-                              <th scope="col">Poste</th>
-                              <th scope="col">Emetteur</th>
-                              
-                                  
-                                  <th class="text-nowrap" scope="col">Critères administratifs IAE</th>
-                              
-                              <th class="text-end w-50px" scope="col"></th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          
-                              
+              <div class="table-responsive mt-3 mt-md-4"><table class="table table-hover">
+      <caption class="visually-hidden">Liste des candidatures</caption>
+      <thead>
+          <tr>
+              
+                  <th scope="col">Candidature de</th>
+              
+              <th scope="col">Émise le</th>
+              <th scope="col">Statut</th>
+              
+              <th scope="col">Poste</th>
+              <th scope="col">Emetteur</th>
+              
+                  
+                  <th class="text-nowrap" scope="col">Critères administratifs IAE</th>
+              
+              <th class="text-end w-50px" scope="col"></th>
+          </tr>
+      </thead>
+      <tbody>
+          
+              
   
   
   
@@ -2774,8 +2773,8 @@
       </td>
   </tr>
   
-                          
-                              
+          
+              
   
   
   
@@ -2842,8 +2841,8 @@
       </td>
   </tr>
   
-                          
-                              
+          
+              
   
   
   
@@ -2910,10 +2909,10 @@
       </td>
   </tr>
   
-                          
-                      </tbody>
-                  </table>
-              </div>
+          
+      </tbody>
+  </table>
+  </div>
   
           
           
