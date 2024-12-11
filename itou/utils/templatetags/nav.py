@@ -88,7 +88,7 @@ NAV_ENTRIES = {
     ),
     "documents-search": NavItem(
         label="Une documentation",
-        target="https://communaute.inclusion.beta.gouv.fr/documentation/?proconnect_login=true",
+        target=f"{settings.COMMU_BASE_URL}/documentation/?proconnect_login=true",
         active_view_names=[],
     ),
     # Job seekers.

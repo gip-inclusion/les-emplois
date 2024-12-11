@@ -730,3 +730,7 @@ API_PARTICULIER_TOKEN = os.getenv("API_PARTICULIER_TOKEN")
 # Brevo
 # ------------------------------------------------------------------------------
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
+
+# la communaute de l'inclusion
+# ------------------------------------------------------------------------------
+COMMU_BASE_URL = os.getenv("COMMU_BASE_URL", "https://communaute.inclusion.beta.gouv.fr")
