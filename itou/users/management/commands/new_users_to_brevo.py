@@ -114,7 +114,9 @@ class Command(BaseCommand):
                         verified=True,
                     )
                 )
-                | Q(identity_provider=IdentityProvider.INCLUSION_CONNECT),  # IC verifies emails on its own
+                | Q(
+                    identity_provider__in=[IdentityProvider.INCLUSION_CONNECT, IdentityProvider.PRO_CONNECT]
+                ),  # the SSO verifies emails on its own
                 is_active=True,
             )
             .order_by("email")
