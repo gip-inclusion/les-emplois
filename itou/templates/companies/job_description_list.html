@@ -42,22 +42,20 @@
                         <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
                             <h2 class="mb-0">Métiers et recrutements</h2>
                             <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les candidatures">
-                                {% if job_pager %}
-                                    <form method="post" id="block_job_applications_form" hx-boost="true">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="block_job_applications" />
-                                        <input type="hidden" name="block_job_applications" value="{% if siae.block_job_applications %}false{% else %}true{% endif %}">
-                                        <button for="block_job_applications" class="d-block w-100 btn btn-secondary btn-ico">
-                                            {% if siae.block_job_applications %}
-                                                <i class="ri-lock-unlock-line ri-lg" aria-hidden="true"></i>
-                                                <span>Débloquer l'envoi de candidatures</span>
-                                            {% else %}
-                                                <i class="ri-lock-line ri-lg" aria-hidden="true"></i>
-                                                <span>Bloquer l'envoi de candidatures</span>
-                                            {% endif %}
-                                        </button>
-                                    </form>
-                                {% endif %}
+                                <form method="post" id="block_job_applications_form" hx-boost="true">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="block_job_applications" />
+                                    <input type="hidden" name="block_job_applications" value="{% if siae.block_job_applications %}false{% else %}true{% endif %}">
+                                    <button for="block_job_applications" class="d-block w-100 btn btn-secondary btn-ico">
+                                        {% if siae.block_job_applications %}
+                                            <i class="ri-lock-unlock-line ri-lg" aria-hidden="true"></i>
+                                            <span>Débloquer l'envoi de candidatures</span>
+                                        {% else %}
+                                            <i class="ri-lock-line ri-lg" aria-hidden="true"></i>
+                                            <span>Bloquer l'envoi de candidatures</span>
+                                        {% endif %}
+                                    </button>
+                                </form>
                                 <a class="btn btn-primary btn-ico" href="{% url "companies_views:edit_job_description" %}" {% matomo_event "employers" "clic" "creer-fiche-de-poste" %}>
                                     <i class="ri-add-line ri-lg" aria-hidden="true"></i>
                                     <span>Créer une nouvelle fiche de poste</span>
