@@ -117,21 +117,36 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
                 )
 
     def test_block_job_applications(self, client):
+        block_job_applications_button = "Bloquer l'envoi de candidatures"
+        unblock_job_applications_button = "Débloquer l'envoi de candidatures"
+
         response = self._login(client, self.user)
+        # Using `update_page_with_htmx`` is useless here because the HTTP request
+        # is initiated by HTMX but the response includes the full layout, not a fragment.
+        assertContains(response, block_job_applications_button)
+        assertNotContains(response, unblock_job_applications_button)
 
-        assert response.status_code == 200
-        post_data = {"action": "block_job_applications", "block_job_applications": "on"}
+        post_data = {"action": "block_job_applications", "block_job_applications": "true"}
+        response = client.post(self.url, data=post_data, follow=True)
+        assertNotContains(response, block_job_applications_button)
+        assertContains(response, unblock_job_applications_button)
+        self.company.refresh_from_db()
+        assert self.company.block_job_applications
 
-        response = client.post(self.url, data=post_data)
-
-        assertRedirects(response, self.url)
+        post_data = {"action": "block_job_applications", "block_job_applications": "false"}
+        response = client.post(self.url, data=post_data, follow=True)
+        assertContains(response, block_job_applications_button)
+        assertNotContains(response, unblock_job_applications_button)
+        self.company.refresh_from_db()
         assert not self.company.block_job_applications
 
-        response = client.post(self.url, data={})
+        # Test indempotency
+        post_data = {"action": "block_job_applications", "block_job_applications": "false"}
+        response = client.post(self.url, data=post_data, follow=True)
+        assertContains(response, block_job_applications_button)
+        assertNotContains(response, unblock_job_applications_button)
         self.company.refresh_from_db()
-
-        assertRedirects(response, self.url)
-        assert self.company.block_job_applications
+        assert not self.company.block_job_applications
 
     @freeze_time("2021-06-21 10:10:10.10")
     def test_toggle_job_description_activity(self, client):
