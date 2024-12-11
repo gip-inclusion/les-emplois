@@ -2,7 +2,6 @@ import logging
 import uuid
 
 from dateutil.relativedelta import relativedelta
-from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import storages
 from django.forms import ValidationError
@@ -781,7 +780,6 @@ class ApplicationEndView(ApplyStepBaseView):
         }
 
 
-@login_required
 def eligibility_for_hire(
     request,
     company_pk,
@@ -818,7 +816,6 @@ def eligibility_for_hire(
     )
 
 
-@login_required
 def geiq_eligibility_for_hire(
     request,
     company_pk,
@@ -855,7 +852,6 @@ def geiq_eligibility_for_hire(
     )
 
 
-@login_required
 def geiq_eligibility_criteria_for_hire(request, company_pk, job_seeker_public_id):
     company = get_object_or_404(
         Company.objects.filter(pk__in={org.pk for org in request.organizations}, kind=CompanyKind.GEIQ), pk=company_pk
@@ -868,7 +864,6 @@ def geiq_eligibility_criteria_for_hire(request, company_pk, job_seeker_public_id
     )
 
 
-@login_required
 def hire_confirmation(
     request,
     company_pk,

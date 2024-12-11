@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_not_required, login_required
+from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
@@ -28,7 +28,6 @@ def card(request, org_id, template_name="prescribers/card.html"):
     return render(request, template_name, context)
 
 
-@login_required
 def edit_organization(request, template_name="prescribers/edit_organization.html"):
     organization = get_current_org_or_404(request)
     if not organization.has_admin(request.user):
@@ -48,7 +47,6 @@ def edit_organization(request, template_name="prescribers/edit_organization.html
     return render(request, template_name, context)
 
 
-@login_required
 def member_list(request, template_name="prescribers/members.html"):
     """
     List members of a prescriber organization.
@@ -74,7 +72,6 @@ def member_list(request, template_name="prescribers/members.html"):
     return render(request, template_name, context)
 
 
-@login_required
 def deactivate_member(request, user_id, template_name="prescribers/deactivate_member.html"):
     organization = get_current_org_or_404(request)
     target_member = User.objects.get(pk=user_id)
@@ -90,7 +87,6 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
     return render(request, template_name, context)
 
 
-@login_required
 def update_admin_role(request, action, user_id, template_name="prescribers/update_admins.html"):
     organization = get_current_org_or_404(request)
     target_member = User.objects.get(pk=user_id)
@@ -107,7 +103,6 @@ def update_admin_role(request, action, user_id, template_name="prescribers/updat
     return render(request, template_name, context)
 
 
-@login_required
 def list_accredited_organizations(request, template_name="prescribers/list_accredited_organizations.html"):
     """
     List organizations accredited by a departmental council ("Conseil Départemental").

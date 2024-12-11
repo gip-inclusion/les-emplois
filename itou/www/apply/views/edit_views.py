@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -13,7 +12,6 @@ from itou.utils.auth import check_user
 from itou.www.apply.forms import EditHiringDateForm
 
 
-@login_required
 @check_user(lambda user: user.is_employer)
 def edit_contract_start_date(request, job_application_id, template_name="apply/edit_contract_start_date.html"):
     """
@@ -53,7 +51,6 @@ def edit_contract_start_date(request, job_application_id, template_name="apply/e
     return render(request, template_name, context)
 
 
-@login_required
 @require_POST
 @check_user(lambda user: user.is_employer)
 def archive_view(request, job_application_id, *, action):

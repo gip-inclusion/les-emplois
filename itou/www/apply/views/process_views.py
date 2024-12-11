@@ -7,7 +7,6 @@ import httpx
 import sentry_sdk
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
@@ -91,7 +90,6 @@ def job_application_sender_left_org(job_app):
     return False
 
 
-@login_required
 def details_for_jobseeker(request, job_application_id, template_name="apply/process_details.html"):
     """
     Detail of an application for a JOBSEEKER
@@ -170,7 +168,6 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
     return render(request, template_name, context)
 
 
-@login_required
 @check_user(lambda user: user.is_employer)
 def details_for_company(request, job_application_id, template_name="apply/process_details_company.html"):
     """
@@ -282,7 +279,6 @@ def details_for_company(request, job_application_id, template_name="apply/proces
     return render(request, template_name, context)
 
 
-@login_required
 @check_user(lambda u: u.is_prescriber or u.is_employer)
 def details_for_prescriber(request, job_application_id, template_name="apply/process_details.html"):
     """
@@ -365,7 +361,6 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     return render(request, template_name, context)
 
 
-@login_required
 @require_POST
 @check_user(lambda user: user.is_employer)
 def process(request, job_application_id):
@@ -517,7 +512,6 @@ class JobApplicationRefuseView(NamedUrlSessionWizardView):
         return reverse(f"apply:{self.url_name}", kwargs={"job_application_id": self.job_application.pk, "step": step})
 
 
-@login_required
 @check_user(lambda user: user.is_employer)
 def postpone(request, job_application_id, template_name="apply/process_postpone.html"):
     queryset = JobApplication.objects.is_active_company_member(request.user)
@@ -551,7 +545,6 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
     return render(request, template_name, context)
 
 
-@login_required
 @check_user(lambda user: user.is_employer)
 def accept(request, job_application_id, template_name="apply/process_accept.html"):
     """
@@ -620,7 +613,6 @@ class ReloadJobDescriptionFields(AcceptHTMXFragmentView):
     NO_ERROR_FIELDS = ("appellation", "location")
 
 
-@login_required
 @require_POST
 @check_user(lambda user: user.is_employer)
 def cancel(request, job_application_id):
@@ -645,7 +637,6 @@ def cancel(request, job_application_id):
     return HttpResponseRedirect(next_url)
 
 
-@login_required
 @check_user(lambda user: user.is_employer)
 def transfer(request, job_application_id):
     queryset = JobApplication.objects.is_active_company_member(request.user)
@@ -906,7 +897,6 @@ class JobApplicationInternalTranferView(TemplateView):
         }
 
 
-@login_required
 @require_POST
 @check_user(lambda user: user.is_employer)
 def send_diagoriente_invite(request, job_application_id):
@@ -928,7 +918,6 @@ def send_diagoriente_invite(request, job_application_id):
     return HttpResponseRedirect(redirect_url)
 
 
-@login_required
 @check_user(lambda user: user.is_employer)
 def eligibility(request, job_application_id, template_name="apply/process_eligibility.html"):
     """
@@ -952,7 +941,6 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
     )
 
 
-@login_required
 @check_user(lambda user: user.is_employer)
 def geiq_eligibility(request, job_application_id, template_name="apply/process_geiq_eligibility.html"):
     queryset = JobApplication.objects.is_active_company_member(request.user)
@@ -976,7 +964,6 @@ def geiq_eligibility(request, job_application_id, template_name="apply/process_g
     )
 
 
-@login_required
 @check_user(lambda user: user.is_employer)
 def geiq_eligibility_criteria(
     request,
@@ -1031,7 +1018,6 @@ def delete_prior_action(request, job_application_id, prior_action_id):
     return HttpResponse(content)
 
 
-@login_required
 @check_user(lambda user: user.is_employer)
 def add_or_modify_prior_action(request, job_application_id, prior_action_id=None):
     queryset = JobApplication.objects.is_active_company_member(request.user)
@@ -1132,7 +1118,6 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
     return render(request, "apply/includes/job_application_prior_action_form.html", context)
 
 
-@login_required
 @require_POST
 @check_user(lambda user: user.is_employer)
 def rdv_insertion_invite(request, job_application_id, for_detail=False):

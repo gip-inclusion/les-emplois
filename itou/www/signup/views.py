@@ -9,7 +9,7 @@ from allauth.account.views import PasswordResetFromKeyView, PasswordResetView, S
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth import REDIRECT_FIELD_NAME, login
-from django.contrib.auth.decorators import login_not_required, login_required
+from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import PermissionDenied
 from django.db import Error, transaction
 from django.http import HttpResponseRedirect
@@ -764,7 +764,6 @@ def prescriber_user(request, template_name="signup/prescriber_user.html"):
 
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-@login_required
 def prescriber_join_org(request):
     """
     User is redirected here after a successful oauth signup.

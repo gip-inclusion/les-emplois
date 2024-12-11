@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_not_required, login_required
+from django.contrib.auth.decorators import login_not_required
 from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
@@ -37,7 +37,6 @@ from itou.www.siae_evaluations_views.forms import (
 )
 
 
-@login_required
 @check_user(lambda user: user.is_labor_inspector)
 def samples_selection(request, template_name="siae_evaluations/samples_selection.html"):
     institution = get_current_institution_or_404(request)
@@ -72,7 +71,6 @@ def samples_selection(request, template_name="siae_evaluations/samples_selection
     return render(request, template_name, context)
 
 
-@login_required
 def campaign_calendar(request, evaluation_campaign_pk, template_name="siae_evaluations/campaign_calendar.html"):
     evaluation_campaign = get_object_or_404(
         EvaluationCampaign,
@@ -86,7 +84,6 @@ def campaign_calendar(request, evaluation_campaign_pk, template_name="siae_evalu
     return render(request, template_name, context)
 
 
-@login_required
 @check_user(lambda user: user.is_labor_inspector)
 def institution_evaluated_siae_list(
     request, evaluation_campaign_pk, template_name="siae_evaluations/institution_evaluated_siae_list.html"
@@ -118,7 +115,6 @@ def institution_evaluated_siae_list(
     return render(request, template_name, context)
 
 
-@login_required
 @check_user(lambda user: user.is_labor_inspector or user.is_employer)
 def evaluated_siae_detail(request, evaluated_siae_pk, template_name="siae_evaluations/evaluated_siae_detail.html"):
     owner_data = {}
@@ -346,7 +342,6 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
         )
 
 
-@login_required
 @check_user(lambda user: user.is_labor_inspector or user.is_employer)
 def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
     allowed_viewers = {
@@ -374,7 +369,6 @@ def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
     return render(request, "siae_evaluations/evaluated_siae_sanction.html", context)
 
 
-@login_required
 def evaluated_job_application(
     request, evaluated_job_application_pk, template_name="siae_evaluations/evaluated_job_application.html"
 ):
@@ -454,7 +448,6 @@ def evaluated_job_application(
     return render(request, template_name, context)
 
 
-@login_required
 @require_POST
 def institution_evaluated_administrative_criteria(request, evaluated_administrative_criteria_pk, action):
     institution = get_current_institution_or_404(request)
@@ -486,7 +479,6 @@ def institution_evaluated_administrative_criteria(request, evaluated_administrat
     )
 
 
-@login_required
 @require_POST
 def institution_evaluated_siae_validation(request, evaluated_siae_pk):
     institution = get_current_institution_or_404(request)
@@ -519,7 +511,6 @@ def institution_evaluated_siae_validation(request, evaluated_siae_pk):
     )
 
 
-@login_required
 def siae_job_applications_list(
     request,
     evaluated_siae_pk,
@@ -555,7 +546,6 @@ def siae_job_applications_list(
     return render(request, template_name, context)
 
 
-@login_required
 def siae_select_criteria(
     request, evaluated_job_application_pk, template_name="siae_evaluations/siae_select_criteria.html"
 ):
@@ -628,7 +618,6 @@ def siae_select_criteria(
     return render(request, template_name, context)
 
 
-@login_required
 def siae_upload_doc(
     request, evaluated_administrative_criteria_pk, template_name="siae_evaluations/siae_upload_doc.html"
 ):
@@ -676,7 +665,6 @@ def siae_upload_doc(
     return render(request, template_name, context)
 
 
-@login_required
 @require_POST
 def siae_submit_proofs(request, evaluated_siae_pk):
     evaluated_siae = get_object_or_404(
@@ -723,7 +711,6 @@ def siae_submit_proofs(request, evaluated_siae_pk):
     return HttpResponseRedirect(back_url)
 
 
-@login_required
 @require_safe
 def view_proof(request, evaluated_administrative_criteria_id):
     if request.user.is_employer:

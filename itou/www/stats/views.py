@@ -15,7 +15,7 @@ make sure that the correct filters are "Verrouillé".
 """
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_not_required, login_required
+from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render
@@ -187,7 +187,6 @@ def stats_public(request):
     return render_stats(request=request, context=context)
 
 
-@login_required
 def stats_redirect(request, dashboard_name):
     match request.user.kind:
         case UserKind.LABOR_INSPECTOR:
@@ -198,7 +197,6 @@ def stats_redirect(request, dashboard_name):
     return HttpResponseRedirect(reverse(f"stats:stats_{normalized_organization_kind}_{dashboard_name}"))
 
 
-@login_required
 def stats_siae_aci(request):
     """
     ACI stats shown to their own members.
@@ -219,7 +217,6 @@ def stats_siae_aci(request):
     )
 
 
-@login_required
 def stats_siae_etp(request):
     """
     SIAE stats shown to their own members.
@@ -247,7 +244,6 @@ def stats_siae_etp(request):
     )
 
 
-@login_required
 def stats_siae_orga_etp(request):
     """
     SIAE stats shown to their own members.
@@ -295,22 +291,18 @@ def render_stats_siae(request, page_title):
     )
 
 
-@login_required
 def stats_siae_hiring(request):
     return render_stats_siae(request=request, page_title="Données de candidatures de mes structures")
 
 
-@login_required
 def stats_siae_auto_prescription(request):
     return render_stats_siae(request=request, page_title="Focus auto-prescription")
 
 
-@login_required
 def stats_siae_follow_siae_evaluation(request):
     return render_stats_siae(request=request, page_title="Suivi du contrôle a posteriori")
 
 
-@login_required
 def stats_siae_hiring_report(request):
     return render_stats_siae(request=request, page_title="Déclaration d’embauche")
 
@@ -335,22 +327,18 @@ def render_stats_cd(request, page_title, *, params=None, extra_context=None):
     return render_stats(request=request, context=context, params=params)
 
 
-@login_required
 def stats_cd_iae(request):
     return render_stats_cd(request=request, page_title="Données IAE")
 
 
-@login_required
 def stats_cd_hiring(request):
     return render_stats_cd(request=request, page_title="Facilitation des embauches en IAE")
 
 
-@login_required
 def stats_cd_brsa(request):
     return render_stats_cd(request=request, page_title="Suivi des prescriptions des accompagnateurs des publics bRSA")
 
 
-@login_required
 def stats_cd_aci(request):
     current_org = get_current_org_or_404(request)
     if not utils.can_view_stats_cd_aci(request):
@@ -363,7 +351,6 @@ def stats_cd_aci(request):
     )
 
 
-@login_required()
 def stats_cd_orga_etp(request):
     get_current_org_or_404(request)
     if not utils.can_view_stats_cd_orga_etp(request):
@@ -421,7 +408,6 @@ def render_stats_ft(request, page_title, extra_params=None):
     return render_stats(request=request, context=context, params=params)
 
 
-@login_required
 def stats_ft_delay_main(request):
     return render_stats_ft(
         request=request,
@@ -432,7 +418,6 @@ def stats_ft_delay_main(request):
     )
 
 
-@login_required
 def stats_ft_delay_raw(request):
     return render_stats_ft(
         request=request,
@@ -441,7 +426,6 @@ def stats_ft_delay_raw(request):
     )
 
 
-@login_required
 def stats_ft_conversion_main(request):
     return render_stats_ft(
         request=request,
@@ -452,7 +436,6 @@ def stats_ft_conversion_main(request):
     )
 
 
-@login_required
 def stats_ft_conversion_raw(request):
     return render_stats_ft(
         request=request,
@@ -463,7 +446,6 @@ def stats_ft_conversion_raw(request):
     )
 
 
-@login_required
 def stats_ft_state_main(request):
     return render_stats_ft(
         request=request,
@@ -474,7 +456,6 @@ def stats_ft_state_main(request):
     )
 
 
-@login_required
 def stats_ft_state_raw(request):
     return render_stats_ft(
         request=request,
@@ -485,7 +466,6 @@ def stats_ft_state_raw(request):
     )
 
 
-@login_required
 def stats_ft_tension(request):
     return render_stats_ft(
         request=request,
@@ -515,7 +495,6 @@ def render_stats_ph(request, page_title, *, extra_params=None, extra_context=Non
     return render_stats(request=request, context=context, params=params)
 
 
-@login_required
 def stats_ph_state_main(request):
     if not utils.can_view_stats_ph(request):
         raise PermissionDenied
@@ -576,37 +555,30 @@ def render_stats_ddets_iae(request, page_title, extra_context=None, extend_stats
     )
 
 
-@login_required
 def stats_ddets_iae_auto_prescription(request):
     return render_stats_ddets_iae(request=request, page_title="Focus auto-prescription")
 
 
-@login_required
 def stats_ddets_iae_ph_prescription(request):
     return render_stats_ddets_iae(request=request, page_title="Suivi des prescriptions des prescripteurs habilités")
 
 
-@login_required
 def stats_ddets_iae_follow_siae_evaluation(request):
     return render_stats_ddets_iae(request=request, page_title="Suivi du contrôle à posteriori")
 
 
-@login_required
 def stats_ddets_iae_follow_prolongation(request):
     return render_stats_ddets_iae(request=request, page_title="Suivi des demandes de prolongation")
 
 
-@login_required
 def stats_ddets_iae_tension(request):
     return render_stats_ddets_iae(request=request, page_title="SIAE qui peinent à recruter sur le territoire")
 
 
-@login_required
 def stats_ddets_iae_iae(request):
     return render_stats_ddets_iae(request=request, page_title="Données IAE de mon département")
 
 
-@login_required
 def stats_ddets_iae_siae_evaluation(request):
     extra_context = {
         "back_url": reverse("siae_evaluations_views:samples_selection"),
@@ -617,7 +589,6 @@ def stats_ddets_iae_siae_evaluation(request):
     )
 
 
-@login_required
 def stats_ddets_iae_hiring(request):
     return render_stats_ddets_iae(
         request=request,
@@ -625,7 +596,6 @@ def stats_ddets_iae_hiring(request):
     )
 
 
-@login_required
 def stats_ddets_iae_state(request):
     return render_stats_ddets_iae(
         request=request,
@@ -634,7 +604,6 @@ def stats_ddets_iae_state(request):
     )
 
 
-@login_required
 def stats_ddets_iae_aci(request):
     current_org = get_current_institution_or_404(request)
     if not utils.can_view_stats_ddets_iae_aci(request):
@@ -647,7 +616,6 @@ def stats_ddets_iae_aci(request):
     )
 
 
-@login_required
 def stats_ddets_iae_orga_etp(request):
     if not utils.can_view_stats_ddets_iae_orga_etp(request):
         raise PermissionDenied
@@ -670,7 +638,6 @@ def render_stats_ddets_log(request, page_title, extend_stats_to_whole_region):
     )
 
 
-@login_required
 def stats_ddets_log_state(request):
     return render_stats_ddets_log(
         request=request,
@@ -691,32 +658,26 @@ def render_stats_dreets_iae(request, page_title, *, extra_context=None):
     return render_stats(request=request, context=context, params=params)
 
 
-@login_required
 def stats_dreets_iae_auto_prescription(request):
     return render_stats_dreets_iae(request=request, page_title="Focus auto-prescription")
 
 
-@login_required
 def stats_dreets_iae_ph_prescription(request):
     return render_stats_dreets_iae(request=request, page_title="Suivi des prescriptions des prescripteurs habilités")
 
 
-@login_required
 def stats_dreets_iae_follow_siae_evaluation(request):
     return render_stats_dreets_iae(request=request, page_title="Suivi du contrôle à posteriori")
 
 
-@login_required
 def stats_dreets_iae_follow_prolongation(request):
     return render_stats_dreets_iae(request=request, page_title="Suivi des demandes de prolongation")
 
 
-@login_required
 def stats_dreets_iae_tension(request):
     return render_stats_dreets_iae(request=request, page_title="SIAE qui peinent à recruter sur le territoire")
 
 
-@login_required
 def stats_dreets_iae_iae(request):
     return render_stats_dreets_iae(
         request=request,
@@ -724,7 +685,6 @@ def stats_dreets_iae_iae(request):
     )
 
 
-@login_required
 def stats_dreets_iae_hiring(request):
     return render_stats_dreets_iae(
         request=request,
@@ -732,7 +692,6 @@ def stats_dreets_iae_hiring(request):
     )
 
 
-@login_required
 def stats_dreets_iae_state(request):
     return render_stats_dreets_iae(
         request=request,
@@ -740,7 +699,6 @@ def stats_dreets_iae_state(request):
     )
 
 
-@login_required
 def stats_dreets_iae_orga_etp(request):
     if not utils.can_view_stats_dreets_iae_orga_etp(request):
         raise PermissionDenied
@@ -764,28 +722,24 @@ def render_stats_dgefp_iae(request, page_title, extra_params=None, extra_context
     return render_stats(request=request, context=context, params=extra_params)
 
 
-@login_required
 def stats_dgefp_iae_auto_prescription(request):
     return render_stats_dgefp_iae(
         request=request, page_title="Focus auto-prescription", extra_params=get_params_for_whole_country()
     )
 
 
-@login_required
 def stats_dgefp_iae_follow_siae_evaluation(request):
     return render_stats_dgefp_iae(
         request=request, page_title="Suivi du contrôle à posteriori", extra_params=get_params_for_whole_country()
     )
 
 
-@login_required
 def stats_dgefp_iae_follow_prolongation(request):
     return render_stats_dgefp_iae(
         request=request, page_title="Suivi des demandes de prolongation", extra_params=get_params_for_whole_country()
     )
 
 
-@login_required
 def stats_dgefp_iae_tension(request):
     return render_stats_dgefp_iae(
         request=request,
@@ -794,14 +748,12 @@ def stats_dgefp_iae_tension(request):
     )
 
 
-@login_required
 def stats_dgefp_iae_hiring(request):
     return render_stats_dgefp_iae(
         request=request, page_title="Données facilitation de l'embauche", extra_params=get_params_for_whole_country()
     )
 
 
-@login_required
 def stats_dgefp_iae_state(request):
     return render_stats_dgefp_iae(
         request=request,
@@ -810,14 +762,12 @@ def stats_dgefp_iae_state(request):
     )
 
 
-@login_required
 def stats_dgefp_iae_iae(request):
     return render_stats_dgefp_iae(
         request=request, page_title="Données des régions", extra_params=get_params_for_whole_country()
     )
 
 
-@login_required
 def stats_dgefp_iae_ph_prescription(request):
     return render_stats_dgefp_iae(
         request=request,
@@ -826,7 +776,6 @@ def stats_dgefp_iae_ph_prescription(request):
     )
 
 
-@login_required
 def stats_dgefp_iae_siae_evaluation(request):
     return render_stats_dgefp_iae(
         request=request,
@@ -836,12 +785,10 @@ def stats_dgefp_iae_siae_evaluation(request):
     )
 
 
-@login_required
 def stats_dgefp_iae_af(request):
     return render_stats_dgefp_iae(request=request, page_title="Annexes financières actives")
 
 
-@login_required
 def stats_dgefp_iae_orga_etp(request):
     return render_stats_dgefp_iae(
         request=request,
@@ -850,7 +797,6 @@ def stats_dgefp_iae_orga_etp(request):
     )
 
 
-@login_required
 def stats_dihal_state(request):
     get_current_institution_or_404(request)
     if not utils.can_view_stats_dihal(request):
@@ -861,7 +807,6 @@ def stats_dihal_state(request):
     return render_stats(request=request, context=context, params=get_params_for_whole_country())
 
 
-@login_required
 def stats_drihl_state(request):
     get_current_institution_or_404(request)
     if not utils.can_view_stats_drihl(request):
@@ -872,7 +817,6 @@ def stats_drihl_state(request):
     return render_stats(request=request, context=context, params=get_params_for_idf_region())
 
 
-@login_required
 def stats_iae_network_hiring(request):
     current_org = get_current_institution_or_404(request)
     if not utils.can_view_stats_iae_network(request):
@@ -887,7 +831,6 @@ def stats_iae_network_hiring(request):
     )
 
 
-@login_required
 def stats_convergence_prescription(request):
     get_current_institution_or_404(request)
     if not utils.can_view_stats_convergence(request):
@@ -900,7 +843,6 @@ def stats_convergence_prescription(request):
     )
 
 
-@login_required
 def stats_convergence_job_application(request):
     get_current_institution_or_404(request)
     if not utils.can_view_stats_convergence(request):
@@ -913,7 +855,6 @@ def stats_convergence_job_application(request):
     )
 
 
-@login_required
 def stats_staff_service_indicators(request):
     """Indicator statistics for Les Emplois staff"""
     if not utils.can_view_stats_staff(request):
