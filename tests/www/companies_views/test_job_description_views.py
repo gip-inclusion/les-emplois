@@ -85,6 +85,9 @@ class JobDescriptionAbstract:
 
 
 class TestJobDescriptionListView(JobDescriptionAbstract):
+    BLOCK_JOB_APPS_BTN = "Bloquer l'envoi de candidatures"
+    UNBLOCK_JOB_APPS_BTN = "Débloquer l'envoi de candidatures"
+
     @pytest.fixture(autouse=True)
     def setup_method(self):
         self.url = self.list_url + "?page=1"
@@ -116,35 +119,35 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
                     count=2,
                 )
 
-    def test_block_job_applications(self, client):
-        block_job_applications_button = "Bloquer l'envoi de candidatures"
-        unblock_job_applications_button = "Débloquer l'envoi de candidatures"
+    @pytest.mark.parametrize("no_job_descriptions", [True, False])
+    def test_block_job_applications(self, client, no_job_descriptions):
+        if no_job_descriptions:
+            self.company.job_description_through.all().delete()
+            assert self.company.jobs.count() == 0
 
         response = self._login(client, self.user)
-        # Using `update_page_with_htmx`` is useless here because the HTTP request
-        # is initiated by HTMX but the response includes the full layout, not a fragment.
-        assertContains(response, block_job_applications_button)
-        assertNotContains(response, unblock_job_applications_button)
+        assertContains(response, self.BLOCK_JOB_APPS_BTN)
+        assertNotContains(response, self.UNBLOCK_JOB_APPS_BTN)
 
         post_data = {"action": "block_job_applications", "block_job_applications": "true"}
         response = client.post(self.url, data=post_data, follow=True)
-        assertNotContains(response, block_job_applications_button)
-        assertContains(response, unblock_job_applications_button)
+        assertNotContains(response, self.BLOCK_JOB_APPS_BTN)
+        assertContains(response, self.UNBLOCK_JOB_APPS_BTN)
         self.company.refresh_from_db()
         assert self.company.block_job_applications
 
         post_data = {"action": "block_job_applications", "block_job_applications": "false"}
         response = client.post(self.url, data=post_data, follow=True)
-        assertContains(response, block_job_applications_button)
-        assertNotContains(response, unblock_job_applications_button)
+        assertContains(response, self.BLOCK_JOB_APPS_BTN)
+        assertNotContains(response, self.UNBLOCK_JOB_APPS_BTN)
         self.company.refresh_from_db()
         assert not self.company.block_job_applications
 
         # Test indempotency
         post_data = {"action": "block_job_applications", "block_job_applications": "false"}
         response = client.post(self.url, data=post_data, follow=True)
-        assertContains(response, block_job_applications_button)
-        assertNotContains(response, unblock_job_applications_button)
+        assertContains(response, self.BLOCK_JOB_APPS_BTN)
+        assertNotContains(response, self.UNBLOCK_JOB_APPS_BTN)
         self.company.refresh_from_db()
         assert not self.company.block_job_applications
 
