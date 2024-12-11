@@ -373,7 +373,7 @@ class TestCommandNewUsersToBrevo:
         # Job seekers are ignored.
         JobSeekerFactory(with_verified_email=True)
         for kind in set(CompanyKind) - set(SIAE_WITH_CONVENTION_KINDS):
-            CompanyMembershipFactory(company__kind=kind, user__identity_provider=IdentityProvider.INCLUSION_CONNECT)
+            CompanyMembershipFactory(company__kind=kind, user__identity_provider=IdentityProvider.PRO_CONNECT)
         # Missing verified email and not using IC
         CompanyMembershipFactory(company__kind=CompanyKind.EI, user__identity_provider=IdentityProvider.DJANGO)
         not_primary = CompanyMembershipFactory(
@@ -397,31 +397,31 @@ class TestCommandNewUsersToBrevo:
             first_name="Annie",
             last_name="Amma",
             email="annie.amma@mailinator.com",
-            identity_provider=IdentityProvider.INCLUSION_CONNECT,
+            identity_provider=IdentityProvider.PRO_CONNECT,
         )
         bob = EmployerFactory(
             first_name="Bob",
             last_name="Bailey",
             email="bob.bailey@mailinator.com",
-            identity_provider=IdentityProvider.INCLUSION_CONNECT,
+            identity_provider=IdentityProvider.PRO_CONNECT,
         )
         cindy = EmployerFactory(
             first_name="Cindy",
             last_name="Cinnamon",
             email="cindy.cinnamon@mailinator.com",
-            identity_provider=IdentityProvider.INCLUSION_CONNECT,
+            identity_provider=IdentityProvider.PRO_CONNECT,
         )
         dave = EmployerFactory(
             first_name="Dave",
             last_name="Doll",
             email="dave.doll@mailinator.com",
-            identity_provider=IdentityProvider.INCLUSION_CONNECT,
+            identity_provider=IdentityProvider.PRO_CONNECT,
         )
         eve = EmployerFactory(
             first_name="Eve",
             last_name="Ebi",
             email="eve.ebi@mailinator.com",
-            identity_provider=IdentityProvider.INCLUSION_CONNECT,
+            identity_provider=IdentityProvider.PRO_CONNECT,
         )
         CompanyMembershipFactory(user=annie, company__kind=CompanyKind.EI)
         CompanyMembershipFactory(user=bob, company__kind=CompanyKind.AI)
