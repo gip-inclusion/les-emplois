@@ -4,7 +4,6 @@ import urllib.parse
 from datetime import timedelta
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
@@ -74,7 +73,6 @@ class ApprovalBaseViewMixin:
 
 
 # TODO(xfernandez): remove this redirect view in a few weeks
-@login_required
 def approval_detail_redirect_to_employee_view(request, pk):
     siae = get_current_company_or_404(request)
 
@@ -308,7 +306,6 @@ def prolongation_back_url(request):
     return get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
 
-@login_required
 def declare_prolongation(request, approval_id, template_name="approvals/declare_prolongation.html"):
     """
     Declare a prolongation for the given approval.
@@ -468,7 +465,6 @@ class CheckContactDetailsView(DeclareProlongationHTMXFragmentView):
     clear_errors = ("contact_email", "contact_phone")
 
 
-@login_required
 def prolongation_requests_list(request, template_name="approvals/prolongation_requests/list.html"):
     current_organization = get_current_org_or_404(request)
     if not current_organization.is_authorized:
@@ -491,7 +487,6 @@ def prolongation_requests_list(request, template_name="approvals/prolongation_re
 
 
 @require_safe
-@login_required
 def prolongation_request_report_file(request, prolongation_request_id):
     prolongation_request = get_object_or_404(
         ProlongationRequest,
@@ -588,7 +583,6 @@ class ProlongationRequestDenyView(ProlongationRequestViewMixin, NamedUrlSessionW
         return reverse(self.url_name, kwargs={"prolongation_request_id": self.prolongation_request.pk, "step": step})
 
 
-@login_required
 def suspend(request, approval_id, template_name="approvals/suspend.html"):
     siae = get_current_company_or_404(request)
     approval = get_object_or_404(Approval, pk=approval_id)
@@ -623,7 +617,6 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
     return render(request, template_name, context)
 
 
-@login_required()
 def suspension_action_choice(request, suspension_id, template_name="approvals/suspension_action_choice.html"):
     siae = get_current_company_or_404(request)
     suspension = get_object_or_404(
@@ -666,7 +659,6 @@ def suspension_action_choice(request, suspension_id, template_name="approvals/su
     return render(request, template_name, context)
 
 
-@login_required
 def suspension_update(request, suspension_id, template_name="approvals/suspension_update.html"):
     """
     Edit the given suspension.
@@ -705,7 +697,6 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
     return render(request, template_name, context)
 
 
-@login_required()
 def suspension_update_enddate(request, suspension_id, template_name="approvals/suspension_update_enddate.html"):
     siae = get_current_company_or_404(request)
     suspension = get_object_or_404(
@@ -748,7 +739,6 @@ def suspension_update_enddate(request, suspension_id, template_name="approvals/s
     return render(request, template_name, context)
 
 
-@login_required
 def suspension_delete(request, suspension_id, template_name="approvals/suspension_delete.html"):
     """
     Delete the given suspension.

@@ -3,7 +3,7 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_not_required, login_required
+from django.contrib.auth.decorators import login_not_required
 from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
@@ -110,7 +110,6 @@ def report_tally_url(user, company, job_description=None):
 ### Main company view
 
 
-@login_required
 def overview(request, template_name="companies/overview.html"):
     company = get_current_company_or_404(request)
 
@@ -170,7 +169,6 @@ class JobDescriptionCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Temp
         }
 
 
-@login_required
 def job_description_list(request, template_name="companies/job_description_list.html"):
     company = get_current_company_or_404(request)
     job_descriptions = (
@@ -268,7 +266,6 @@ def _get_job_description(session_data):
     return None
 
 
-@login_required
 def edit_job_description(request, template_name="companies/edit_job_description.html"):
     company = get_current_company_or_404(request)
     session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY) or {}
@@ -285,7 +282,6 @@ def edit_job_description(request, template_name="companies/edit_job_description.
     return render(request, template_name, {"form": form})
 
 
-@login_required
 def edit_job_description_details(request, template_name="companies/edit_job_description_details.html"):
     company = get_current_company_or_404(request)
     session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
@@ -318,7 +314,6 @@ def edit_job_description_details(request, template_name="companies/edit_job_desc
     return render(request, template_name, context)
 
 
-@login_required
 def edit_job_description_preview(request, template_name="companies/edit_job_description_preview.html"):
     company = get_current_company_or_404(request)
     session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
@@ -359,7 +354,6 @@ def edit_job_description_preview(request, template_name="companies/edit_job_desc
     return render(request, template_name, context)
 
 
-@login_required
 def update_job_description(request, job_description_id):
     request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {"pk": job_description_id}
     return HttpResponseRedirect(reverse("companies_views:edit_job_description"))
@@ -368,7 +362,6 @@ def update_job_description(request, job_description_id):
 ### Financial annexes views
 
 
-@login_required
 def show_financial_annexes(request, template_name="companies/show_financial_annexes.html"):
     """
     Show a summary of the financial annexes of the convention to the siae admin user. Financial annexes are grouped
@@ -413,7 +406,6 @@ def show_financial_annexes(request, template_name="companies/show_financial_anne
     return render(request, template_name, context)
 
 
-@login_required
 def select_financial_annex(request, template_name="companies/select_financial_annex.html"):
     """
     Let siae admin user select a new convention via a financial annex number.
@@ -498,7 +490,6 @@ class CompanyCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, TemplateVie
         }
 
 
-@login_required
 def create_company(request, template_name="companies/create_siae.html"):
     current_compny = get_current_company_or_404(request)
     if not request.user.can_create_siae_antenna(parent_siae=current_compny):
@@ -523,7 +514,6 @@ def create_company(request, template_name="companies/create_siae.html"):
     return render(request, template_name, context)
 
 
-@login_required
 def edit_company_step_contact_infos(request, template_name="companies/edit_siae.html"):
     if ITOU_SESSION_EDIT_COMPANY_KEY not in request.session:
         request.session[ITOU_SESSION_EDIT_COMPANY_KEY] = {}
@@ -552,7 +542,6 @@ def edit_company_step_contact_infos(request, template_name="companies/edit_siae.
     return render(request, template_name, context)
 
 
-@login_required
 def edit_company_step_description(request, template_name="companies/edit_siae_description.html"):
     if ITOU_SESSION_EDIT_COMPANY_KEY not in request.session:
         return HttpResponseRedirect(reverse("companies_views:edit_company_step_contact_infos"))
@@ -574,7 +563,6 @@ def edit_company_step_description(request, template_name="companies/edit_siae_de
     return render(request, template_name, context)
 
 
-@login_required
 def edit_company_step_preview(request, template_name="companies/edit_siae_preview.html"):
     if ITOU_SESSION_EDIT_COMPANY_KEY not in request.session:
         return HttpResponseRedirect(reverse("companies_views:edit_company_step_contact_infos"))
@@ -624,7 +612,6 @@ def edit_company_step_preview(request, template_name="companies/edit_siae_previe
 ### Company memberships views
 
 
-@login_required
 def members(request, template_name="companies/members.html"):
     company = get_current_company_or_404(request)
     if not company.is_active:
@@ -648,7 +635,6 @@ def members(request, template_name="companies/members.html"):
     return render(request, template_name, context)
 
 
-@login_required
 def deactivate_member(request, user_id, template_name="companies/deactivate_member.html"):
     company = get_current_company_or_404(request)
     target_member = User.objects.get(pk=user_id)
@@ -664,7 +650,6 @@ def deactivate_member(request, user_id, template_name="companies/deactivate_memb
     return render(request, template_name, context)
 
 
-@login_required
 def update_admin_role(request, action, user_id, template_name="companies/update_admins.html"):
     company = get_current_company_or_404(request)
     target_member = User.objects.get(pk=user_id)

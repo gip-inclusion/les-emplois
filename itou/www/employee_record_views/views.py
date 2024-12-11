@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Count
 from django.http.response import HttpResponseRedirect
@@ -142,7 +141,6 @@ class AddView(NamedUrlSessionWizardView):
                 )
 
 
-@login_required
 @require_safe
 def list_employee_records(request, template_name="employee_record/list.html"):
     siae = get_current_company_or_404(request)
@@ -218,7 +216,6 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     return render(request, "employee_record/includes/list_results.html" if request.htmx else template_name, context)
 
 
-@login_required
 def create(request, job_application_id, template_name="employee_record/create.html"):
     """
     Create a new employee record from a given job application
@@ -247,7 +244,6 @@ def create(request, job_application_id, template_name="employee_record/create.ht
     return render(request, template_name, context)
 
 
-@login_required
 def create_step_2(request, job_application_id, template_name="employee_record/create.html"):
     """
     Create a new employee record from a given job application
@@ -301,7 +297,6 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
     return render(request, template_name, context)
 
 
-@login_required
 def create_step_3(request, job_application_id, template_name="employee_record/create.html"):
     """
     Create a new employee record from a given job application
@@ -364,7 +359,6 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
     return render(request, template_name, context)
 
 
-@login_required
 def create_step_4(request, job_application_id, template_name="employee_record/create.html"):
     """
     Create a new employee record from a given job application
@@ -401,7 +395,6 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
     return render(request, template_name, context)
 
 
-@login_required
 def create_step_5(request, job_application_id, template_name="employee_record/create.html"):
     """
     Create a new employee record from a given job application
@@ -440,7 +433,6 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     return render(request, template_name, context)
 
 
-@login_required
 def summary(request, employee_record_id, template_name="employee_record/summary.html"):
     siae = get_current_company_or_404(request)
 
@@ -462,7 +454,6 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
     return render(request, template_name, context)
 
 
-@login_required
 def disable(request, employee_record_id, template_name="employee_record/disable.html"):
     siae = get_current_company_or_404(request)
 
@@ -493,7 +484,6 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
     return render(request, template_name, context)
 
 
-@login_required
 def reactivate(request, employee_record_id, template_name="employee_record/reactivate.html"):
     siae = get_current_company_or_404(request)
 

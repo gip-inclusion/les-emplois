@@ -4,7 +4,6 @@ from allauth.account.views import PasswordChangeView
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import F
 from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
@@ -106,7 +105,6 @@ def _employer_dashboard_context(request):
     }
 
 
-@login_required
 def dashboard(request, template_name="dashboard/dashboard.html"):
     context = {
         "active_geiq_campaign": None,
@@ -158,7 +156,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     return render(request, template_name, context)
 
 
-@login_required
 def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
     if not stats_utils.can_view_stats_dashboard_widget(request):
         return HttpResponseForbidden()
@@ -205,10 +202,9 @@ class ItouPasswordChangeView(PasswordChangeView):
     success_url = reverse_lazy("dashboard:index")
 
 
-password_change = login_required(ItouPasswordChangeView.as_view())
+password_change = ItouPasswordChangeView.as_view()
 
 
-@login_required
 def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
     if request.user.has_sso_provider:
         return HttpResponseForbidden()
@@ -227,7 +223,6 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
     return render(request, template_name, context)
 
 
-@login_required
 def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     """
     Edit a user.
@@ -281,7 +276,6 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     return render(request, template_name, context)
 
 
-@login_required
 def edit_job_seeker_info(request, job_seeker_public_id, template_name="dashboard/edit_job_seeker_info.html"):
     job_seeker = get_object_or_404(
         User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile"),
@@ -318,7 +312,6 @@ def edit_job_seeker_info(request, job_seeker_public_id, template_name="dashboard
     return render(request, template_name, context)
 
 
-@login_required
 @require_POST
 def switch_organization(request):
     try:
@@ -337,7 +330,6 @@ def switch_organization(request):
     return HttpResponseRedirect(reverse("dashboard:index"))
 
 
-@login_required
 def edit_user_notifications(request, template_name="dashboard/edit_user_notifications.html"):
     if request.user.is_staff:
         raise Http404("L'utilisateur admin ne peut gérer ses notifications.")
@@ -367,7 +359,6 @@ def edit_user_notifications(request, template_name="dashboard/edit_user_notifica
     return render(request, template_name, context)
 
 
-@login_required
 def api_token(request, template_name="dashboard/api_token.html"):
     if not (request.user.is_employer and request.is_current_organization_admin):
         raise PermissionDenied

@@ -2,7 +2,6 @@ import enum
 from collections import defaultdict
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.db.models import Count, Exists, F, OuterRef, Q, Subquery
 from django.shortcuts import render
@@ -102,7 +101,6 @@ def _add_administrative_criteria(job_applications):
         job_application.preloaded_administrative_criteria_extra_nb = extra_nb
 
 
-@login_required
 @check_user(lambda u: u.is_job_seeker)
 def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html"):
     """
@@ -179,7 +177,6 @@ def annotate_title(base_title, archived_choice):
             raise ValueError(archived_choice)
 
 
-@login_required
 @check_user(lambda u: u.is_prescriber or u.is_employer)
 def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
@@ -227,7 +224,6 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     )
 
 
-@login_required
 @check_user(lambda u: u.is_prescriber or u.is_employer)
 def list_prescriptions_exports(request, template_name="apply/list_of_available_exports.html"):
     """
@@ -248,7 +244,6 @@ def list_prescriptions_exports(request, template_name="apply/list_of_available_e
     return render(request, template_name, context)
 
 
-@login_required
 @check_user(lambda u: u.is_prescriber or u.is_employer)
 def list_prescriptions_exports_download(request, month_identifier=None):
     """
@@ -267,7 +262,6 @@ def list_prescriptions_exports_download(request, month_identifier=None):
     return stream_xlsx_export(job_applications, filename, request_user=request.user)
 
 
-@login_required
 def list_for_siae(request, template_name="apply/list_for_siae.html"):
     """
     List of applications for an SIAE.
@@ -356,7 +350,6 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     )
 
 
-@login_required
 def list_for_siae_exports(request, template_name="apply/list_of_available_exports.html"):
     """
     List of applications for a SIAE, sorted by month, displaying the count of applications per month
@@ -378,7 +371,6 @@ def list_for_siae_exports(request, template_name="apply/list_of_available_export
     return render(request, template_name, context)
 
 
-@login_required
 def list_for_siae_exports_download(request, month_identifier=None):
     """
     List of applications for a SIAE for a given month identifier (YYYY-mm),

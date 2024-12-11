@@ -4,7 +4,6 @@ import io
 
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import FileResponse, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
@@ -38,7 +37,6 @@ class Echo:
         return value
 
 
-@login_required
 @check_user(lambda user: user.is_superuser)
 def export_job_applications_unknown_to_ft(
     request,
@@ -111,7 +109,6 @@ def export_job_applications_unknown_to_ft(
     return render(request, template_name, {"form": form})
 
 
-@login_required
 @check_user(lambda user: user.is_superuser)
 def export_ft_api_rejections(request):
     first_day_of_month = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -174,7 +171,6 @@ def export_ft_api_rejections(request):
     )
 
 
-@login_required
 @check_user(lambda user: user.is_superuser)
 def export_cta(request):
     employees_qs = CompanyMembership.objects.active().select_related("company", "user")
@@ -200,7 +196,6 @@ def export_cta(request):
     )
 
 
-@login_required
 @check_user(lambda user: user.is_superuser)
 def merge_users(request, template_name="itou_staff_views/merge_users.html"):
     form = MergeUserForm(data=request.POST or None)
@@ -216,7 +211,6 @@ def merge_users(request, template_name="itou_staff_views/merge_users.html"):
     return render(request, template_name, {"form": form})
 
 
-@login_required
 @check_user(lambda user: user.is_superuser)
 def merge_users_confirm(request, user_1_pk, user_2_pk, template_name="itou_staff_views/merge_users_confirm.html"):
     ALLOWED_USER_KINDS = [UserKind.PRESCRIBER, UserKind.EMPLOYER]

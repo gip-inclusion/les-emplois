@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.contrib.auth.decorators import login_not_required, login_required
+from django.contrib.auth.decorators import login_not_required
 from django.db.models import F, Q, Value
 from django.db.models.functions import Least, Lower, NullIf, StrIndex
 from django.http import JsonResponse
@@ -126,7 +126,6 @@ def communes_autocomplete(request):
     return JsonResponse({"results": communes}, safe=False)
 
 
-@login_required
 @check_user(is_allowed_to_use_gps_advanced_features)
 def gps_users_autocomplete(request):
     """

@@ -3,7 +3,7 @@ from urllib.parse import urlencode
 from allauth.account.adapter import get_adapter
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_not_required, login_required
+from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import formats, safestring
@@ -121,7 +121,6 @@ def new_user(request, invitation_type, invitation_id):
     return handle_registration(request, invitation, invitation_type)
 
 
-@login_required
 def invite_prescriber_with_org(request, template_name="invitations_views/create.html"):
     organization = get_current_org_or_404(request)
     form_kwargs = {"sender": request.user, "organization": organization}
@@ -180,7 +179,6 @@ def invite_prescriber_with_org(request, template_name="invitations_views/create.
     return render(request, template_name, context)
 
 
-@login_required
 def join_prescriber_organization(request, invitation_id):
     invitation = get_object_or_404(PrescriberWithOrgInvitation, pk=invitation_id)
     handle_prescriber_intivation(invitation, request)
@@ -189,7 +187,6 @@ def join_prescriber_organization(request, invitation_id):
     return HttpResponseRedirect(url)
 
 
-@login_required
 def invite_employer(request, template_name="invitations_views/create.html"):
     form_post_url = reverse("invitations_views:invite_employer")
     back_url = reverse("companies_views:members")
@@ -214,7 +211,6 @@ def invite_employer(request, template_name="invitations_views/create.html"):
     return render(request, template_name, context)
 
 
-@login_required
 def join_company(request, invitation_id):
     invitation = get_object_or_404(EmployerInvitation, pk=invitation_id)
     handle_employer_invitation(invitation, request)
@@ -223,7 +219,6 @@ def join_company(request, invitation_id):
     return HttpResponseRedirect(url)
 
 
-@login_required
 def invite_labor_inspector(request, template_name="invitations_views/create.html"):
     institution = get_current_institution_or_404(request)
     form_kwargs = {"sender": request.user, "institution": institution}
@@ -264,7 +259,6 @@ def invite_labor_inspector(request, template_name="invitations_views/create.html
     return render(request, template_name, context)
 
 
-@login_required
 def join_institution(request, invitation_id):
     invitation = get_object_or_404(LaborInspectorInvitation, pk=invitation_id)
     handle_labor_inspector_invitation(invitation, request)

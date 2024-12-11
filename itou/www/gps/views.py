@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
@@ -23,7 +22,6 @@ def is_allowed_to_use_gps_advanced_features(user):
     return user.is_employer or user.is_prescriber_with_authorized_org
 
 
-@login_required
 @check_user(is_allowed_to_use_gps)
 def my_groups(request, template_name="gps/my_groups.html"):
     memberships = (
@@ -51,7 +49,6 @@ def my_groups(request, template_name="gps/my_groups.html"):
     return render(request, "gps/includes/memberships_results.html" if request.htmx else template_name, context)
 
 
-@login_required
 @check_user(is_allowed_to_use_gps_advanced_features)
 def join_group(request, template_name="gps/join_group.html"):
     form = GpsUserSearchForm(data=request.POST or None)
@@ -75,7 +72,6 @@ def join_group(request, template_name="gps/join_group.html"):
     return render(request, template_name, context)
 
 
-@login_required
 @check_user(is_allowed_to_use_gps)
 def leave_group(request, group_id):
     membership = (
@@ -89,7 +85,6 @@ def leave_group(request, group_id):
     return HttpResponseRedirect(reverse("gps:my_groups"))
 
 
-@login_required
 @check_user(is_allowed_to_use_gps)
 def toggle_referent(request, group_id):
     membership = (

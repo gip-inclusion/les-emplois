@@ -3,7 +3,6 @@ import enum
 import logging
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage
 from django.db.models import Count, F, OuterRef, Prefetch, Q, Subquery, Sum
@@ -65,7 +64,6 @@ def _get_assessments_for_labor_inspector(request):
     )
 
 
-@login_required
 @check_user(lambda user: user.is_active and (user.is_employer or user.is_labor_inspector))
 def assessment_info(request, assessment_pk):
     if request.user.is_employer:
@@ -131,7 +129,6 @@ def _assessment_info_for_labor_inspector(
     return render(request, template_name, context)
 
 
-@login_required
 @check_user(lambda user: user.is_active and user.is_labor_inspector)
 def assessment_review(request, assessment_pk, template_name="geiq/assessment_review.html"):
     assessment = get_object_or_404(_get_assessments_for_labor_inspector(request), pk=assessment_pk)
@@ -154,7 +151,6 @@ def assessment_review(request, assessment_pk, template_name="geiq/assessment_rev
     return render(request, template_name, context)
 
 
-@login_required
 @check_user(lambda user: user.is_active and (user.is_employer or user.is_labor_inspector))
 def employee_list(request, assessment_pk, info_type):
     try:
@@ -248,7 +244,6 @@ def _lock_assessment_and_sync(assessment):
     return True
 
 
-@login_required
 @require_POST
 @check_user(lambda user: user.is_active and user.is_employer)
 def label_sync(request, assessment_pk):
@@ -268,7 +263,6 @@ def label_sync(request, assessment_pk):
     return render(request, "geiq/includes/last_synced_at.html", context)
 
 
-@login_required
 @require_safe
 @check_user(lambda user: user.is_active and (user.is_employer or user.is_labor_inspector))
 def employee_details(request, employee_pk):
@@ -297,7 +291,6 @@ def employee_details(request, employee_pk):
     return render(request, "geiq/employee_details.html", context)
 
 
-@login_required
 @check_user(lambda user: user.is_active and user.is_labor_inspector)
 def geiq_list(request, institution_pk, year=None, template_name="geiq/geiq_list.html"):
     institution = get_object_or_404(
@@ -336,7 +329,6 @@ def geiq_list(request, institution_pk, year=None, template_name="geiq/geiq_list.
 
 
 @require_safe
-@login_required
 @check_user(lambda user: user.is_active and (user.is_employer or user.is_labor_inspector))
 def assessment_report(request, assessment_pk):
     if request.user.is_labor_inspector:

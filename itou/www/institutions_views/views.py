@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -9,7 +8,6 @@ from itou.users.models import User
 from itou.utils.perms.institution import get_current_institution_or_404
 
 
-@login_required
 def member_list(request, template_name="institutions/members.html"):
     """
     List members of an institution.
@@ -39,7 +37,6 @@ def member_list(request, template_name="institutions/members.html"):
     return render(request, template_name, context)
 
 
-@login_required
 def deactivate_member(request, user_id, template_name="institutions/deactivate_member.html"):
     institution = get_current_institution_or_404(request)
     target_member = User.objects.get(pk=user_id)
@@ -55,7 +52,6 @@ def deactivate_member(request, user_id, template_name="institutions/deactivate_m
     return render(request, template_name, context)
 
 
-@login_required
 def update_admin_role(request, action, user_id, template_name="institutions/update_admins.html"):
     institution = get_current_institution_or_404(request)
     target_member = User.objects.get(pk=user_id)
