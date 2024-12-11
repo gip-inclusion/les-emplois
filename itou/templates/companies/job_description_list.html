@@ -46,7 +46,7 @@
                                     {% csrf_token %}
                                     <input type="hidden" name="action" value="block_job_applications" />
                                     <input type="hidden" name="block_job_applications" value="{% if siae.block_job_applications %}false{% else %}true{% endif %}">
-                                    <button for="block_job_applications" class="d-block w-100 btn btn-secondary btn-ico">
+                                    <button class="d-block w-100 btn btn-secondary btn-ico">
                                         {% if siae.block_job_applications %}
                                             <i class="ri-lock-unlock-line ri-lg" aria-hidden="true"></i>
                                             <span>Débloquer l'envoi de candidatures</span>
