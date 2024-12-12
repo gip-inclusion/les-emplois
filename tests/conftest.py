@@ -616,3 +616,20 @@ def sentry_respx_mock_fixture(respx_mock):
     return respx_mock.route(
         method="GET", params=params, url=url, headers={"Authorization": f"Bearer {settings.API_SENTRY_STATS_TOKEN}"}
     ).respond(json=json)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def detect_silent_date_cast():
+    from django.db.models import DateField
+
+    original_pre_save = DateField.pre_save
+
+    def strict_pre_save(self, model_instance, add):
+        # DateTimeField inherits DateField, hence the check on self.__class__
+        if self.__class__ is DateField and isinstance(getattr(model_instance, self.attname), datetime.datetime):
+            raise ValueError(
+                f"<{model_instance}>.{self.attname}={getattr(model_instance, self.attname)}" " needs to be a date"
+            )
+        return original_pre_save(self, model_instance, add)
+
+    DateField.pre_save = strict_pre_save
