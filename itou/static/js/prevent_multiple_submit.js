@@ -8,10 +8,10 @@ htmx.onLoad((target) => {
   // state of the button when clicking "Previous" in the browser, eventually
   // disabling moving forward afterwards !
 
-  $('form.js-prevent-multiple-submit', target).on('submit', function () {
-      $(':submit', this).on('click', function () {
-          return false
-      })
+  $('form.js-prevent-multiple-submit', target).on('submit', function() {
+    $(':submit', this).on('click', function() {
+      return false
+    })
   });
 
 })

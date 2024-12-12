@@ -26,8 +26,8 @@ htmx.onLoad((target) => {
     swap_elements.addClass('d-none').removeClass('d-block')
     swap_element_with.addClass('d-block').removeClass('d-none')
   }
-  $(".js-swap-elements", target).each(function () {
-    $(this).find("[data-swap-element]").each(function () {
+  $(".js-swap-elements", target).each(function() {
+    $(this).find("[data-swap-element]").each(function() {
       $(this).click(swapElements)
     })
   })
@@ -37,8 +37,8 @@ htmx.onLoad((target) => {
    */
   $("[data-shroud-input]", target).prop("disabled", true)
   $(".js-shroud", target).find("[data-shroud-input]").prop("disabled", false)
-  $("[data-shroud-clear]", target).each(function () {
-    $(this).click(function () {
+  $("[data-shroud-clear]", target).each(function() {
+    $(this).click(function() {
       $(".js-shroud").removeClass("js-shroud")
       $("[data-shroud-input]").prop("disabled", true)
     })
@@ -47,7 +47,7 @@ htmx.onLoad((target) => {
   /**
     * JS to disable/enable targeted field
     **/
-  $('input[type="checkbox"][data-disable-target]', target).change(function (e) {
+  $('input[type="checkbox"][data-disable-target]', target).change(function(e) {
     const target = this.getAttribute("data-disable-target")
     $(target).attr("disabled", this.checked)
   })
@@ -56,15 +56,17 @@ htmx.onLoad((target) => {
   * JS to disable/enable and set another select field value.
   **/
   function toggleDisableAndSetValue() {
+    if (this.disabled) {
+      return;
+    }
     const targetId = this.getAttribute("data-disable-target");
     const isSet = $(this).val().length > 0;
-    const isDisabled = $(this).attr("disabled") !== undefined;
     if (isSet) {
       $(targetId).val(this.getAttribute("data-target-value"));
     }
-    $(targetId).attr("disabled", isSet || isDisabled);
+    $(targetId).attr("disabled", isSet);
   }
-  querySelectorAllIncludingTarget(target, 'select[data-disable-target]').forEach(function (selectFieldWithDisable) {
+  querySelectorAllIncludingTarget(target, 'select[data-disable-target]').forEach(function(selectFieldWithDisable) {
     toggleDisableAndSetValue.call(selectFieldWithDisable);
     $(selectFieldWithDisable).change(toggleDisableAndSetValue);
   });
@@ -75,7 +77,7 @@ htmx.onLoad((target) => {
     * Typically useful when forms are available and you don't want the user
     * to be confused in which button to use or to forget to validate the editing form.
   **/
-  $('[data-disable-btn-if]', target).each(function () {
+  $('[data-disable-btn-if]', target).each(function() {
     const selector = this.getAttribute("data-disable-btn-if")
     $('.btn', this).toggleClass("disabled", $(selector).length !== 0)
     // null value removes the attribute altogether instead of having aria-disabled="false"
@@ -140,7 +142,7 @@ htmx.onLoad((target) => {
   /**
    * JS to add the birthdate parameter when querying Commune for birthplace
    **/
-  $('select[data-select2-link-with-birthdate]', target).each(function () {
+  $('select[data-select2-link-with-birthdate]', target).each(function() {
     const identifier = this.getAttribute("data-select2-link-with-birthdate")
     const birthdatePicker = document.querySelector('duet-date-picker[identifier="' + identifier + '"]')
 

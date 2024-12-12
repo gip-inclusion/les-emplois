@@ -1,4 +1,4 @@
-htmx.onLoad(function () {
+htmx.onLoad(function() {
   let autocompleteNbErrors = 0;
   let addressSearchInput = $("#id_address_for_autocomplete");
   let addressLine1Input = $("#id_address_line_1");
@@ -15,7 +15,7 @@ htmx.onLoad(function () {
     $(element).parent(".form-group").addClass("d-none");
   });
 
-  addressSearchInput.on("select2:select", function (e) {
+  addressSearchInput.on("select2:select", function(e) {
     addressLine1Input.val(e.params.data.name);
     postCodeInput.val(e.params.data.postcode);
     cityInput.val(e.params.data.city);
@@ -25,10 +25,10 @@ htmx.onLoad(function () {
   });
   addressSearchInput.select2({
     ajax: {
-      processResults: function (data) {
+      processResults: function(data) {
         // Reset debounce counter
         autocompleteNbErrors = 0;
-        var results = data.features.map(function (item, index) {
+        var results = data.features.map(function(item, index) {
           let prop = item.properties;
 
           // Without context it's impossible to know what city it is when you

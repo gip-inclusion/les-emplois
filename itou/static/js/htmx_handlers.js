@@ -1,6 +1,6 @@
 "use strict";
 
-(function () {
+(function() {
   htmx.on("htmx:beforeRequest", (e) => {
     const triggerElt = e.target;
     const swapElt = triggerElt.closest("[hx-swap]");

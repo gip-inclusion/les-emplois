@@ -1,6 +1,6 @@
 "use strict";
 
-htmx.onLoad(function (target) {
+htmx.onLoad(function(target) {
   function showEvent(e) {
     /**
       * Select2 events are jQuery events [1][2] and not standard JavaScript
@@ -23,7 +23,7 @@ htmx.onLoad(function (target) {
   // Init target tooltips
   Array.from(
     target.parentNode.querySelectorAll('[data-bs-toggle="tooltip"]')
-  ).map(function (tooltipTriggerEl) {
+  ).map(function(tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl);
   });
 });
@@ -34,10 +34,10 @@ htmx.onLoad(function (target) {
  *
  * Here, the dispose method hides and destroys elements tooltips before their swap
  */
-document.body.addEventListener("htmx:beforeSwap", function (evt) {
+document.body.addEventListener("htmx:beforeSwap", function(evt) {
   Array.from(
     evt.detail.target.querySelectorAll('[data-bs-toggle="tooltip"]')
-  ).forEach(function (tooltipTriggerEl) {
+  ).forEach(function(tooltipTriggerEl) {
     bootstrap.Tooltip.getOrCreateInstance(tooltipTriggerEl).dispose();
   });
 });

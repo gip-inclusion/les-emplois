@@ -1,6 +1,6 @@
 "use strict"
 
-const initDuetDatePicker = function () {
+const initDuetDatePicker = function() {
   document.querySelectorAll("duet-date-picker").forEach(pickerInstance => {
 
     pickerInstance.dateAdapter = {
