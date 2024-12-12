@@ -64,11 +64,11 @@ ASSET_INFOS = {
     },
     "bootstrap": {
         "download": {
-            "url": "https://github.com/twbs/bootstrap/archive/refs/tags/v5.3.2.zip",
-            "sha256": "5542fdffc10ab7590709c5cbb2a5f8c3e33af534db491bb9aab7e8c46573ce8f",
+            "url": "https://github.com/twbs/bootstrap/archive/refs/tags/v5.3.3.zip",
+            "sha256": "55d7f1ce795040afb8311df09d29d0d34648400c1eaabb2d0a2ed2216b3db05d",
         },
         "extract": {
-            "origin": "bootstrap-5.3.2/dist/js",
+            "origin": "bootstrap-5.3.3/dist/js",
             "destination": "vendor/bootstrap",
             "files": [
                 "bootstrap.min.js",
@@ -202,8 +202,8 @@ ASSET_INFOS = {
     },
     "tarteaucitronjs": {
         "download": {
-            "url": "https://registry.npmjs.org/tarteaucitronjs/-/tarteaucitronjs-1.14.0.tgz",
-            "sha256": "e7d635b081b165d297809e3e86077c4219b022105e3a0a6a25e3c1f9657a2231",
+            "url": "https://registry.npmjs.org/tarteaucitronjs/-/tarteaucitronjs-1.19.0.tgz",
+            "sha256": "01ecf4f76cc55a358905daa38f2f0bfbec13bc842e53a829800a06ced744abed",
         },
         "extract": {
             "origin": "package",
@@ -219,11 +219,11 @@ ASSET_INFOS = {
     },
     "theme-inclusion": {
         "download": {
-            "url": "https://github.com/gip-inclusion/itou-theme/archive/refs/tags/v2.5.0.zip",
-            "sha256": "319bba394d290ecd4cc1dd26b01ee9a0f0023ecf7832b5622772d02c814d06f3",
+            "url": "https://github.com/gip-inclusion/itou-theme/archive/refs/tags/v2.5.3.zip",
+            "sha256": "ae70bef451073d31f66496aef405942f615469476e978318a2f629661f7dff86",
         },
         "extract": {
-            "origin": "itou-theme-2.5.0/dist",
+            "origin": "itou-theme-2.5.3/dist",
             "destination": "vendor/theme-inclusion/",
             "files": [
                 "javascripts/app.js",
