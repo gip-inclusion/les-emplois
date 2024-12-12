@@ -51,10 +51,10 @@ class UserAdminForm(UserChangeForm):
                 try:
                     geocoding_data = api_geocoding.get_geocoding_data(posted_address)
                 except api_geocoding.GeocodingDataError:
-                    logger.error(
-                        "No geocoding data could be found for `%s - %s`",
-                        self.cleaned_data["address_line_1"],
-                        self.cleaned_data["post_code"],
+                    logger.info(
+                        "No geocoding data could be found for the address of <%s - pk=%s>",
+                        self.instance.__class__,
+                        self.instance.pk,
                     )
                 else:
                     self.instance.coords = coords_to_geometry(

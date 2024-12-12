@@ -267,7 +267,7 @@ class AddressMixin(models.Model):
         except GeocodingDataError as exc:
             # The coordinates are not erased because they are used in the search engine,
             # even if they no longer correspond to the address.
-            logger.error("No geocoding data could be found for `%s - %s`", self.geocoding_address, self.post_code)
+            logger.info("No geocoding data could be found for the address of <%s - pk=%s>", self.__class__, self.pk)
             raise AddressLookupError(
                 f"L'adresse '{self.geocoding_address}' - {self.post_code}"
                 " n'a pas été trouvée dans la Base Adresse Nationale."
