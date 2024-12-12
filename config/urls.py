@@ -1,3 +1,4 @@
+from anymail.webhooks.mailjet import MailjetTrackingWebhookView
 from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path, re_path, register_converter
@@ -86,9 +87,9 @@ urlpatterns = [
     path("users/", include("itou.www.users_views.urls")),
     path("announcements/", include("itou.www.announcements.urls")),
     path("versions/", include("itou.www.releases.urls")),
-    # Enable Anymail’s status tracking
+    # Enable Mailjet status tracking
     # https://anymail.readthedocs.io/en/stable/esps/mailjet/#status-tracking-webhooks
-    re_path(r"^webhooks/anymail/", include("anymail.urls")),
+    path("webhooks/anymail/mailjet/tracking/", MailjetTrackingWebhookView.as_view()),
     path("welcoming_tour/", include("itou.www.welcoming_tour.urls")),
     # Static pages.
     path("accessibility/", TemplateView.as_view(template_name="static/accessibility.html"), name="accessibility"),
