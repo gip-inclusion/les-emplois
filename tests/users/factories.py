@@ -8,7 +8,7 @@ from allauth.account import models as allauth_models
 from django.contrib.auth.hashers import make_password
 from django.utils.text import slugify
 
-from itou.asp.models import AllocationDuration, EducationLevel, LaneType
+from itou.asp.models import AllocationDuration, EducationLevel, EITIContributions, LaneType
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.communications.models import NotificationRecord, NotificationSettings
@@ -326,6 +326,11 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
             hexa_lane_name=factory.Faker("street_address", locale="fr_FR"),
             hexa_post_code=factory.Faker("postalcode"),
             hexa_commune=factory.SubFactory(CommuneFactory),
+        )
+        with_required_eiti_fields = factory.Trait(
+            actor_met_for_business_creation=factory.Faker("word", locale="en_GB"),  # To match validator
+            mean_monthly_income_before_process=factory.Faker("pydecimal", left_digits=5, right_digits=2),
+            eiti_contributions=factory.fuzzy.FuzzyChoice(EITIContributions.values),
         )
         for_snapshot = factory.Trait(
             birthdate=datetime.date(1990, 1, 1),
