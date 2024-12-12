@@ -261,8 +261,8 @@ class TestProcessViews:
     def test_details_for_company_with_expired_approval(self, client, subtests):
         # Expired but still retrieved by job_seerk.latest_common_approval
         approval = ApprovalFactory(
-            start_at=timezone.now() - datetime.timedelta(days=3 * 365),
-            end_at=timezone.now() - datetime.timedelta(days=365),
+            start_at=timezone.localdate() - datetime.timedelta(days=3 * 365),
+            end_at=timezone.localdate() - datetime.timedelta(days=365),
         )
         company = CompanyFactory(for_snapshot=True, with_membership=True)
         employer = company.members.first()

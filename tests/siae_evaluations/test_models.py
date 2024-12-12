@@ -161,7 +161,7 @@ class TestEvaluationCampaignQuerySet:
 def campaign_eligible_job_app_objects():
     company = CompanyWith2MembershipsFactory(department="14")
     job_seeker = JobSeekerFactory()
-    start = timezone.now() - relativedelta(months=2)
+    start = timezone.localdate() - relativedelta(months=2)
     approval = ApprovalFactory(user=job_seeker, start_at=start)
     diag = IAEEligibilityDiagnosisFactory(
         job_seeker=job_seeker,
@@ -231,7 +231,7 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
     def test_job_application_not_in_period(self, campaign_eligible_job_app_objects):
         evaluation_campaign = EvaluationCampaignFactory()
         job_app = campaign_eligible_job_app_objects["job_app"]
-        new_start = timezone.now() - relativedelta(months=10)
+        new_start = timezone.localdate() - relativedelta(months=10)
         job_app.hiring_start_at = new_start
         job_app.save(update_fields=["hiring_start_at"])
         job_app.approval.start_at = new_start
@@ -294,8 +294,8 @@ class TestEvaluationCampaignManager:
             evaluation_campaign.clean()
 
     def test_create_campaigns_and_calendar(self, subtests, django_capture_on_commit_callbacks, mailoutbox):
-        evaluated_period_start_at = timezone.now() - relativedelta(months=2)
-        evaluated_period_end_at = timezone.now() - relativedelta(months=1)
+        evaluated_period_start_at = timezone.localdate() - relativedelta(months=2)
+        evaluated_period_end_at = timezone.localdate() - relativedelta(months=1)
         adversarial_stage_start = timezone.localdate() + relativedelta(months=1)
 
         # not DDETS IAE
@@ -328,8 +328,8 @@ class TestEvaluationCampaignManager:
         assert len(email.to) == 2
 
     def test_create_campaigns_and_calendar_on_specific_DDETS_IAE(self):
-        evaluated_period_start_at = timezone.now() - relativedelta(months=2)
-        evaluated_period_end_at = timezone.now() - relativedelta(months=1)
+        evaluated_period_start_at = timezone.localdate() - relativedelta(months=2)
+        evaluated_period_end_at = timezone.localdate() - relativedelta(months=1)
         adversarial_stage_start = timezone.localdate() + relativedelta(months=1)
         institution_ids = [
             InstitutionWith2MembershipFactory(kind=InstitutionKind.DDETS_IAE, department="O1"),
@@ -354,7 +354,7 @@ class TestEvaluationCampaignManager:
             sender_company=company_1,
             eligibility_diagnosis__author_kind=AuthorKind.EMPLOYER,
             eligibility_diagnosis__author_siae=company_1,
-            hiring_start_at=timezone.now() - relativedelta(months=2),
+            hiring_start_at=timezone.localdate() - relativedelta(months=2),
         )
 
         # company_2 got 2 job applications

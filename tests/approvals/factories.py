@@ -43,8 +43,8 @@ class ApprovalFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
     class Params:
         # Use old (but realistic) dates so `expired` can be used anywhere without triggering specials cases
         expired = factory.Trait(
-            start_at=factory.Faker("date_time_between", start_date="-5y", end_date="-3y"),
-            end_at=factory.Faker("date_time_between", start_date="-3y", end_date="-2y"),
+            start_at=factory.Faker("date_between", start_date="-5y", end_date="-3y"),
+            end_at=factory.Faker("date_between", start_date="-3y", end_date="-2y"),
         )
         origin_pe_approval = factory.Trait(origin=Origin.PE_APPROVAL, eligibility_diagnosis=None)
         origin_ai_stock = factory.Trait(origin=Origin.AI_STOCK, eligibility_diagnosis=None)
