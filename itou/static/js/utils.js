@@ -56,6 +56,9 @@ htmx.onLoad((target) => {
   * JS to disable/enable and set another select field value.
   **/
   function toggleDisableAndSetValue() {
+    if (this.disabled) {
+      return;
+    }
     const targetId = this.getAttribute("data-disable-target");
     const isSet = $(this).val().length > 0;
     if (isSet) {
