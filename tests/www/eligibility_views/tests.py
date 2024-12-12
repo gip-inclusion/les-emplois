@@ -205,7 +205,7 @@ class TestAdministrativeCriteriaOfJobApplicationForm:
             to_company=company,
             sender_company=company,
             eligibility_diagnosis=eligibility_diagnosis,
-            hiring_start_at=timezone.now() - relativedelta(months=2),
+            hiring_start_at=timezone.localdate() - relativedelta(months=2),
         )
 
         form = AdministrativeCriteriaOfJobApplicationForm(user, company, job_application=job_application)
@@ -229,7 +229,7 @@ class TestAdministrativeCriteriaOfJobApplicationForm:
             with_approval=True,
             to_company=company,
             sender_company=company,
-            hiring_start_at=timezone.now() - relativedelta(months=2),
+            hiring_start_at=timezone.localdate() - relativedelta(months=2),
         )
         form = AdministrativeCriteriaOfJobApplicationForm(user, company, job_application=job_application)
 

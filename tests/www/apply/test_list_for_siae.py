@@ -359,8 +359,8 @@ class TestProcessListSiae:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
 
-        now = timezone.now()
-        yesterday = (now - timezone.timedelta(days=1)).date()
+        today = timezone.localdate()
+        yesterday = today - timezone.timedelta(days=1)
         client.force_login(employer)
 
         JobApplicationFactory(to_company=company)
@@ -392,7 +392,7 @@ class TestProcessListSiae:
         SuspensionFactory(
             approval=job_application.approval,
             start_at=yesterday,
-            end_at=now + timezone.timedelta(days=2),
+            end_at=today + timezone.timedelta(days=2),
         )
         response = client.get(reverse("apply:list_for_siae"), {"pass_iae_suspended": True})
         assert response.context["job_applications_page"].object_list == [job_application]

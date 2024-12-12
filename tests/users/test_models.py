@@ -1007,7 +1007,7 @@ class TestLatestApproval:
 
     def test_merge_approvals_pass_and_pe_valid(self):
         user = JobSeekerFactory()
-        start_at = timezone.now() - relativedelta(months=2)
+        start_at = timezone.localdate() - relativedelta(months=2)
         end_at = start_at + datetime.timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)
 
         # PASS IAE

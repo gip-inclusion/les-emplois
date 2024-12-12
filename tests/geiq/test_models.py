@@ -14,8 +14,8 @@ from .factories import EmployeeFactory, ImplementationAssessmentFactory, Prequal
 
 
 def test_campaign_review_after_submission_constraint():
-    june_1st = datetime.datetime(2024, 6, 1, tzinfo=datetime.UTC)
-    july_1st = datetime.datetime(2024, 7, 1, tzinfo=datetime.UTC)
+    june_1st = datetime.date(2024, 6, 1)
+    july_1st = datetime.date(2024, 7, 1)
     with pytest.raises(IntegrityError):
         with transaction.atomic():
             ImplementationAssessmentCampaign.objects.create(

@@ -2043,7 +2043,7 @@ def test_get_user_last_accepted_siae_job_application_full_ordering():
         to_company__subject_to_eligibility=True,
         origin=Origin.PE_APPROVAL,
         created_at=now,
-        hiring_start_at=now + relativedelta(days=1),
+        hiring_start_at=timezone.localdate(now) + relativedelta(days=1),
     )
 
     user = job_application_1.job_seeker
@@ -2054,7 +2054,7 @@ def test_get_user_last_accepted_siae_job_application_full_ordering():
         to_company__subject_to_eligibility=True,
         origin=Origin.PE_APPROVAL,
         created_at=now,
-        hiring_start_at=now,
+        hiring_start_at=timezone.localdate(now),
     )
 
     assert job_application_1 == get_user_last_accepted_siae_job_application(user)

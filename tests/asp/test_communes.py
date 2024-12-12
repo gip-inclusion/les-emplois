@@ -51,10 +51,10 @@ class TestCommuneModel:
         old_commune = Commune(
             code=99999,
             name="ENNUI-SUR-BLASÉ",
-            start_date=datetime.datetime(1940, 1, 1),
-            end_date=datetime.datetime(2021, 12, 31),
+            start_date=datetime.date(1940, 1, 1),
+            end_date=datetime.date(2021, 12, 31),
         )
-        new_commune = Commune(code=99999, name="ENNUI-SUR-BLASÉ", start_date=datetime.datetime(2022, 1, 1))
+        new_commune = Commune(code=99999, name="ENNUI-SUR-BLASÉ", start_date=datetime.date(2022, 1, 1))
         Commune.objects.bulk_create([old_commune, new_commune])
 
         result = Commune.objects.by_insee_code(99999)

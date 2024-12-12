@@ -47,7 +47,7 @@ def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_
         to_company=siae,
         sender_company=siae,
         eligibility_diagnosis=eligibility_diagnosis,
-        hiring_start_at=timezone.now() - relativedelta(months=2),
+        hiring_start_at=timezone.localdate() - relativedelta(months=2),
     )
 
     if institution:

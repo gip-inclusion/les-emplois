@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from functools import partial
 
 import pytest
@@ -729,7 +729,7 @@ class TestDashboardView:
         )
 
         user = JobSeekerFactory(with_address=True)
-        approval = ApprovalFactory(user=user, start_at=datetime(2022, 6, 21), end_at=datetime(2022, 12, 6))
+        approval = ApprovalFactory(user=user, start_at=date(2022, 6, 21), end_at=date(2022, 12, 6))
         client.force_login(user)
         url = reverse("dashboard:index")
         response = client.get(url)

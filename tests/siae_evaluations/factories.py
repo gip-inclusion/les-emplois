@@ -13,9 +13,8 @@ from tests.job_applications.factories import JobApplicationFactory
 def before_ended_at(**kwargs):
     def inner(obj):
         date = getattr(obj, "ended_at", None)
-        if date is None:
-            date = timezone.localdate()
-        return date - relativedelta(**kwargs)
+        # If date is None, localdate will default to now()
+        return timezone.localdate(date) - relativedelta(**kwargs)
 
     return inner
 

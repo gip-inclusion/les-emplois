@@ -64,7 +64,7 @@ class TestListEmployeeRecords:
         record = employee_record_factories.EmployeeRecordWithProfileFactory(
             job_application__to_company=self.company,
             job_application__job_seeker__last_name="Aaaaa",
-            job_application__hiring_start_at=timezone.now() - relativedelta(days=15),
+            job_application__hiring_start_at=timezone.localdate() - relativedelta(days=15),
         )
         record.update_as_ready()
         client.force_login(self.user)
@@ -320,12 +320,12 @@ class TestListEmployeeRecords:
         recordA = employee_record_factories.EmployeeRecordWithProfileFactory(
             job_application__to_company=self.company,
             job_application__job_seeker__last_name="Aaaaa",
-            job_application__hiring_start_at=timezone.now() - relativedelta(days=15),
+            job_application__hiring_start_at=timezone.localdate() - relativedelta(days=15),
         )
         recordZ = employee_record_factories.EmployeeRecordWithProfileFactory(
             job_application__to_company=self.company,
             job_application__job_seeker__last_name="Zzzzz",
-            job_application__hiring_start_at=timezone.now() - relativedelta(days=10),
+            job_application__hiring_start_at=timezone.localdate() - relativedelta(days=10),
         )
 
         # Zzzzz's hiring start is more recent
@@ -358,12 +358,12 @@ class TestListEmployeeRecords:
         recordA = employee_record_factories.EmployeeRecordWithProfileFactory(
             job_application__to_company=self.company,
             job_application__job_seeker__last_name="Aaaaa",
-            job_application__hiring_start_at=timezone.now() - relativedelta(days=15),
+            job_application__hiring_start_at=timezone.localdate() - relativedelta(days=15),
         )
         recordZ = employee_record_factories.EmployeeRecordWithProfileFactory(
             job_application__to_company=self.company,
             job_application__job_seeker__last_name="Zzzzz",
-            job_application__hiring_start_at=timezone.now() - relativedelta(days=10),
+            job_application__hiring_start_at=timezone.localdate() - relativedelta(days=10),
         )
         for i, record in enumerate((recordA, recordZ)):
             record.update_as_ready()
@@ -409,12 +409,12 @@ class TestListEmployeeRecords:
         recordA = employee_record_factories.EmployeeRecordWithProfileFactory(
             job_application__to_company=self.company,
             job_application__job_seeker__last_name="Aaaaa",
-            job_application__hiring_start_at=timezone.now() - relativedelta(days=15),
+            job_application__hiring_start_at=timezone.localdate() - relativedelta(days=15),
         )
         recordZ = employee_record_factories.EmployeeRecordWithProfileFactory(
             job_application__to_company=self.company,
             job_application__job_seeker__last_name="Zzzzz",
-            job_application__hiring_start_at=timezone.now() - relativedelta(days=10),
+            job_application__hiring_start_at=timezone.localdate() - relativedelta(days=10),
         )
         for record in (recordA, recordZ):
             record.update_as_ready()
