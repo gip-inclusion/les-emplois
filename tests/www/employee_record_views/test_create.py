@@ -807,11 +807,23 @@ class TestUpdateRejectedEmployeeRecord(CreateEmployeeRecordTestMixin):
     Check if update and resubmission is possible after employee record rejection
     """
 
+    def _default_step_3_data(self):
+        data = super()._default_step_3_data()
+        if self.company.kind == CompanyKind.EITI:
+            data.update(
+                actor_met_for_business_creation=self.job_application.job_seeker.jobseeker_profile.actor_met_for_business_creation,
+                mean_monthly_income_before_process=self.job_application.job_seeker.jobseeker_profile.mean_monthly_income_before_process,
+                eiti_contributions=self.job_application.job_seeker.jobseeker_profile.eiti_contributions,
+            )
+        return data
+
     @pytest.fixture(autouse=True)
     def setup_method(self, client):
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
-            job_seeker=JobSeekerFactory(born_in_france=True, with_mocked_address=True),
+            job_seeker=JobSeekerFactory(
+                born_in_france=True, with_mocked_address=True, jobseeker_profile__with_required_eiti_fields=True
+            ),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_5", args=(self.job_application.id,))
