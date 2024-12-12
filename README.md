@@ -203,3 +203,5 @@ Si les changements paraissent corrects, ils peuvent être ajoutés à `git` et
 - https://django-bootstrap5.readthedocs.io/en/latest/index.html
 
 - http://remixicon.com/
+
+written from mar
