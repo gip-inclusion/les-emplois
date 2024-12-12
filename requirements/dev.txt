@@ -1613,9 +1613,9 @@ shellcheck-py==0.10.0.1 \
     --hash=sha256:be73a16931c05f79643ff74b6519d1e1203b394583ab8c68a48a8e7f257d1090 \
     --hash=sha256:c1c266f7f54cd286057c592ead3095f93d123acdcabf048879a7d8900c3aac7b
     # via -r requirements/test.txt
-six==1.16.0 \
-    --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926 \
-    --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
+six==1.17.0 \
+    --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274 \
+    --hash=sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81
     # via
     #   -r requirements/test.txt
     #   cssbeautifier
