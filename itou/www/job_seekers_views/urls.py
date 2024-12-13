@@ -73,30 +73,6 @@ urlpatterns = [
         kwargs={"hire_process": True},
     ),
     path(
-        "<int:company_pk>/hire/update/<uuid:job_seeker_public_id>/1",
-        views.UpdateJobSeekerStep1View.as_view(),
-        name="update_job_seeker_step_1_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/update/<uuid:job_seeker_public_id>/2",
-        views.UpdateJobSeekerStep2View.as_view(),
-        name="update_job_seeker_step_2_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/update/<uuid:job_seeker_public_id>/3",
-        views.UpdateJobSeekerStep3View.as_view(),
-        name="update_job_seeker_step_3_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/update/<uuid:job_seeker_public_id>/end",
-        views.UpdateJobSeekerStepEndView.as_view(),
-        name="update_job_seeker_step_end_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
         "<int:company_pk>/hire/<uuid:job_seeker_public_id>/check-infos",
         views.CheckJobSeekerInformationsForHire.as_view(),
         name="check_job_seeker_info_for_hire",
@@ -110,22 +86,27 @@ urlpatterns = [
     ),
     # Job seeker check/updates
     path(
-        "<int:company_pk>/update/<uuid:job_seeker_public_id>/1",
+        "update/start",
+        views.UpdateJobSeekerStartView.as_view(),
+        name="update_job_seeker_start",
+    ),
+    path(
+        "update/<uuid:session_uuid>/1",
         views.UpdateJobSeekerStep1View.as_view(),
         name="update_job_seeker_step_1",
     ),
     path(
-        "<int:company_pk>/update/<uuid:job_seeker_public_id>/2",
+        "update/<uuid:session_uuid>/2",
         views.UpdateJobSeekerStep2View.as_view(),
         name="update_job_seeker_step_2",
     ),
     path(
-        "<int:company_pk>/update/<uuid:job_seeker_public_id>/3",
+        "update/<uuid:session_uuid>/3",
         views.UpdateJobSeekerStep3View.as_view(),
         name="update_job_seeker_step_3",
     ),
     path(
-        "<int:company_pk>/update/<uuid:job_seeker_public_id>/end",
+        "update/<uuid:session_uuid>/end",
         views.UpdateJobSeekerStepEndView.as_view(),
         name="update_job_seeker_step_end",
     ),

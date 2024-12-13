@@ -261,15 +261,13 @@ class TestHire:
         company = CompanyFactory(with_jobs=True, with_membership=True)
         prescriber = PrescriberFactory()
         client.force_login(company.members.first())
-        for viewname in (
-            "job_seekers_views:update_job_seeker_step_1_for_hire",
-            "job_seekers_views:update_job_seeker_step_2_for_hire",
-            "job_seekers_views:update_job_seeker_step_3_for_hire",
-            "job_seekers_views:update_job_seeker_step_end_for_hire",
-        ):
-            url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_public_id": prescriber.public_id})
-            response = client.get(url)
-            assert response.status_code == 404
+        params = {
+            "job_seeker": prescriber.public_id,
+            "company": company.pk,
+        }
+        url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+        response = client.get(url)
+        assert response.status_code == 404
 
     def test_404_when_trying_to_hire_a_prescriber(self, client):
         company = CompanyFactory(with_jobs=True, with_membership=True)
@@ -3415,11 +3413,12 @@ class TestLastCheckedAtView:
         response = client.get(url)
         assert response.status_code == 200
 
-        # Check the presence of the verify link
-        update_url = reverse(
-            "job_seekers_views:update_job_seeker_step_1",
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-        )
+        params = {
+            "job_seeker": self.job_seeker.public_id,
+            "company": self.company.pk,
+            "from_url": url,
+        }
+        update_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         link_check = assertContains if sees_verify_link else assertNotContains
         link_check(response, f'<a class="btn btn-link" href="{update_url}">Vérifier le profil</a>', html=True)
         # Check last_checked_at is shown
@@ -3464,26 +3463,19 @@ class UpdateJobSeekerTestMixin:
             jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
             title="M",
         )
-        self.step_1_url = reverse(
-            self.STEP_1_VIEW_NAME,
+        from_url = reverse(
+            self.FINAL_REDIRECT_VIEW_NAME,
             kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
         )
-        self.step_2_url = reverse(
-            self.STEP_2_VIEW_NAME,
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-        )
-        self.step_3_url = reverse(
-            self.STEP_3_VIEW_NAME,
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-        )
-        self.step_end_url = reverse(
-            self.STEP_END_VIEW_NAME,
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-        )
+        self.config = {
+            "apply": {"company_pk": self.company.pk},
+            "config": {"from_url": from_url},
+            "job_seeker_pk": self.job_seeker.pk,
+        }
+
         [self.city] = create_test_cities(["67"], num_per_department=1)
 
         self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT = "Informations modifiables par le candidat uniquement"
-        self.job_seeker_session_key = f"job_seeker-{self.job_seeker.public_id}"
 
         settings.API_BAN_BASE_URL = "http://ban-api"
         mocker.patch(
@@ -3491,28 +3483,46 @@ class UpdateJobSeekerTestMixin:
             side_effect=mock_get_first_geocoding_data,
         )
 
+        params = {
+            "job_seeker": self.job_seeker.public_id,
+            "company": self.company.pk,
+            "from_url": from_url,
+        }
+        self.start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+
+    def get_job_seeker_session_key(self, client):
+        [job_seeker_session_key] = [
+            k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
+        ] or [None]
+        return job_seeker_session_key
+
+    def get_step_url(self, step, client):
+        viewname = f"job_seekers_views:update_job_seeker_step_{step}"
+        return reverse(viewname, kwargs={"session_uuid": self.get_job_seeker_session_key(client)})
+
     def _check_nothing_permitted(self, client, user):
         client.force_login(user)
-        for url in [
-            self.step_1_url,
-            self.step_2_url,
-            self.step_3_url,
-            self.step_end_url,
-        ]:
-            response = client.get(url)
-            assert response.status_code == 403
+
+        response = client.get(self.start_url)
+        assert response.status_code == 403
 
     def _check_that_last_step_doesnt_crash_with_direct_access(self, client, user):
         client.force_login(user)
-        client.get(self.step_1_url)  # Setup job_seeker_session
-        client.get(self.step_end_url)  # Use partial job_seeker_session
+        client.get(self.start_url)  # Setup job_seeker_session
+        client.get(self.get_step_url("end", client))  # Use partial job_seeker_session
 
     def _check_everything_allowed(self, client, snapshot, user, extra_post_data_1=None):
         client.force_login(user)
 
+        # START
+        with assertSnapshotQueries(snapshot(name="queries - start")):
+            response = client.get(self.start_url)
+        assert client.session[self.get_job_seeker_session_key(client)] == self.config
+        assertRedirects(response, self.get_step_url("1", client))
+
         # STEP 1
         with assertSnapshotQueries(snapshot(name="queries - step 1")):
-            response = client.get(self.step_1_url)
+            response = client.get(self.get_step_url("1", client))
         assertContains(response, self.job_seeker.first_name)
         assertNotContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
 
@@ -3529,8 +3539,7 @@ class UpdateJobSeekerTestMixin:
                 "lack_of_nir": False,
                 "lack_of_nir_reason": "",
             }
-            response = client.post(self.step_1_url, data=post_data)
-            assert response.status_code == 200
+            response = client.post(self.get_step_url("1", client), data=post_data)
             assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE % "")
 
             post_data = {
@@ -3541,8 +3550,7 @@ class UpdateJobSeekerTestMixin:
                 "lack_of_nir": False,
                 "lack_of_nir_reason": "",
             }
-            response = client.post(self.step_1_url, data=post_data)
-            assert response.status_code == 200
+            response = client.post(self.get_step_url("1", client), data=post_data)
             assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
 
         # Resume to valid data and proceed with "normal" flow.
@@ -3561,8 +3569,8 @@ class UpdateJobSeekerTestMixin:
         }
         if extra_post_data_1 is not None:
             post_data.update(extra_post_data_1)
-        response = client.post(self.step_1_url, data=post_data)
-        assertRedirects(response, self.step_2_url, fetch_redirect_response=False)
+        response = client.post(self.get_step_url("1", client), data=post_data)
+        assertRedirects(response, self.get_step_url("2", client), fetch_redirect_response=False)
 
         # Data is stored in the session but user is untouched
         # (nir value is retrieved from the job_seeker and stored in the session)
@@ -3580,19 +3588,19 @@ class UpdateJobSeekerTestMixin:
                 "nir": nir or self.job_seeker.jobseeker_profile.nir,
                 "lack_of_nir_reason": lack_of_nir_reason,
             },
-        }
-        assert client.session[self.job_seeker_session_key] == expected_job_seeker_session
+        } | self.config
+        assert client.session[self.get_job_seeker_session_key(client)] == expected_job_seeker_session
         self.job_seeker.refresh_from_db()
         assert self.job_seeker.first_name != NEW_FIRST_NAME
 
         # If you go back to step 1, new data is shown
-        response = client.get(self.step_1_url)
+        response = client.get(self.get_step_url("1", client))
         assertContains(response, PROCESS_TITLE, html=True)
         assertContains(response, NEW_FIRST_NAME)
 
         # STEP 2
         with assertSnapshotQueries(snapshot(name="queries - step 2")):
-            response = client.get(self.step_2_url)
+            response = client.get(self.get_step_url("2", client))
         assertContains(response, PROCESS_TITLE, html=True)
         assertContains(response, self.job_seeker.phone)
         assertNotContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
@@ -3612,30 +3620,30 @@ class UpdateJobSeekerTestMixin:
             "fill_mode": "ban_api",
         }
 
-        response = client.post(self.step_2_url, data=post_data)
-        assertRedirects(response, self.step_3_url, fetch_redirect_response=False)
+        response = client.post(self.get_step_url("2", client), data=post_data)
+        assertRedirects(response, self.get_step_url("3", client), fetch_redirect_response=False)
 
         # Data is stored in the session but user is untouched
         expected_job_seeker_session["user"] |= post_data | {"address_line_2": "", "address_for_autocomplete": None}
-        assert client.session[self.job_seeker_session_key] == expected_job_seeker_session
+        assert client.session[self.get_job_seeker_session_key(client)] == expected_job_seeker_session
         self.job_seeker.refresh_from_db()
         assert self.job_seeker.address_line_1 != NEW_ADDRESS_LINE
 
         # If you go back to step 2, new data is shown
-        response = client.get(self.step_2_url)
+        response = client.get(self.get_step_url("2", client))
         assertContains(response, NEW_ADDRESS_LINE)
 
         # STEP 3
         with assertSnapshotQueries(snapshot(name="queries - step 3")):
-            response = client.get(self.step_3_url)
+            response = client.get(self.get_step_url("3", client))
         assertContains(response, PROCESS_TITLE, html=True)
         assertContains(response, "Niveau de formation")
 
         post_data = {
             "education_level": EducationLevel.BAC_LEVEL.value,
         }
-        response = client.post(self.step_3_url, data=post_data)
-        assertRedirects(response, self.step_end_url, fetch_redirect_response=False)
+        response = client.post(self.get_step_url("3", client), data=post_data)
+        assertRedirects(response, self.get_step_url("end", client), fetch_redirect_response=False)
 
         # Data is stored in the session but user & profiles are untouched
         expected_job_seeker_session["profile"] |= post_data | {
@@ -3657,15 +3665,15 @@ class UpdateJobSeekerTestMixin:
             "aah_allocation": False,
             "aah_allocation_since": "",
         }
-        assert client.session[self.job_seeker_session_key] == expected_job_seeker_session
+        assert client.session[self.get_job_seeker_session_key(client)] == expected_job_seeker_session
         self.job_seeker.refresh_from_db()
 
         # If you go back to step 3, new data is shown
-        response = client.get(self.step_3_url)
+        response = client.get(self.get_step_url("3", client))
         assertContains(response, '<option value="40" selected="">Formation de niveau BAC</option>', html=True)
 
         # Step END
-        response = client.get(self.step_end_url)
+        response = client.get(self.get_step_url("end", client))
         assertContains(response, PROCESS_TITLE, html=True)
         assertContains(response, NEW_FIRST_NAME.title())  # User.get_full_name() changes the firstname display
         assertContains(response, NEW_ADDRESS_LINE)
@@ -3674,7 +3682,7 @@ class UpdateJobSeekerTestMixin:
 
         previous_last_checked_at = self.job_seeker.last_checked_at
 
-        response = client.post(self.step_end_url)
+        response = client.post(self.get_step_url("end", client))
         assertRedirects(
             response,
             reverse(
@@ -3683,7 +3691,7 @@ class UpdateJobSeekerTestMixin:
             ),
             fetch_redirect_response=False,
         )
-        assert client.session.get(self.job_seeker_session_key) is None
+        assert client.session.get(self.get_job_seeker_session_key(client)) is None
 
         self.job_seeker.refresh_from_db()
         assert self.job_seeker.has_jobseeker_profile is True
@@ -3697,38 +3705,42 @@ class UpdateJobSeekerTestMixin:
     def _check_only_administrative_allowed(self, client, user):
         client.force_login(user)
 
+        # START
+        response = client.get(self.start_url)
+        expected_job_seeker_session = self.config
+        assert client.session[self.get_job_seeker_session_key(client)] == expected_job_seeker_session
+        assertRedirects(response, self.get_step_url("1", client))
+
         # STEP 1
-        response = client.get(self.step_1_url)
+        response = client.get(self.get_step_url("1", client))
         assertContains(response, self.job_seeker.first_name)
         assertContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
 
-        response = client.post(self.step_1_url)
-        assertRedirects(response, self.step_2_url, fetch_redirect_response=False)
-
-        # Session is created
-        expected_job_seeker_session = {"user": {}}
-        assert client.session[self.job_seeker_session_key] == expected_job_seeker_session
+        response = client.post(self.get_step_url("1", client))
+        assertRedirects(response, self.get_step_url("2", client), fetch_redirect_response=False)
+        expected_job_seeker_session |= {"user": {}}
+        assert client.session[self.get_job_seeker_session_key(client)] == expected_job_seeker_session
 
         # STEP 2
-        response = client.get(self.step_2_url)
+        response = client.get(self.get_step_url("2", client))
         assertContains(response, self.job_seeker.phone)
         assertContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
 
-        response = client.post(self.step_2_url)
-        assertRedirects(response, self.step_3_url, fetch_redirect_response=False)
+        response = client.post(self.get_step_url("2", client))
+        assertRedirects(response, self.get_step_url("3", client), fetch_redirect_response=False)
 
         # Data is stored in the session but user is untouched
-        assert client.session[self.job_seeker_session_key] == expected_job_seeker_session
+        assert client.session[self.get_job_seeker_session_key(client)] == expected_job_seeker_session
 
         # STEP 3
-        response = client.get(self.step_3_url)
+        response = client.get(self.get_step_url("3", client))
         assertContains(response, "Niveau de formation")
 
         post_data = {
             "education_level": EducationLevel.BAC_LEVEL.value,
         }
-        response = client.post(self.step_3_url, data=post_data)
-        assertRedirects(response, self.step_end_url, fetch_redirect_response=False)
+        response = client.post(self.get_step_url("3", client), data=post_data)
+        assertRedirects(response, self.get_step_url("end", client), fetch_redirect_response=False)
 
         # Data is stored in the session but user & profiles are untouched
         expected_job_seeker_session["profile"] = post_data | {
@@ -3750,20 +3762,20 @@ class UpdateJobSeekerTestMixin:
             "aah_allocation": False,
             "aah_allocation_since": "",
         }
-        assert client.session[self.job_seeker_session_key] == expected_job_seeker_session
+        assert client.session[self.get_job_seeker_session_key(client)] == expected_job_seeker_session
         self.job_seeker.refresh_from_db()
 
         # If you go back to step 3, new data is shown
-        response = client.get(self.step_3_url)
+        response = client.get(self.get_step_url("3", client))
         assertContains(response, '<option value="40" selected="">Formation de niveau BAC</option>', html=True)
 
         # Step END
-        response = client.get(self.step_end_url)
+        response = client.get(self.get_step_url("end", client))
         assertContains(response, "Formation de niveau BAC")
 
         previous_last_checked_at = self.job_seeker.last_checked_at
 
-        response = client.post(self.step_end_url)
+        response = client.post(self.get_step_url("end", client))
         assertRedirects(
             response,
             reverse(
@@ -3772,7 +3784,7 @@ class UpdateJobSeekerTestMixin:
             ),
             fetch_redirect_response=False,
         )
-        assert client.session.get(self.job_seeker_session_key) is None
+        assert client.session.get(self.get_job_seeker_session_key(client)) is None
 
         self.job_seeker.refresh_from_db()
         assert self.job_seeker.has_jobseeker_profile is True
@@ -3781,27 +3793,12 @@ class UpdateJobSeekerTestMixin:
 
 
 class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
-    STEP_1_VIEW_NAME = "job_seekers_views:update_job_seeker_step_1"
-    STEP_2_VIEW_NAME = "job_seekers_views:update_job_seeker_step_2"
-    STEP_3_VIEW_NAME = "job_seekers_views:update_job_seeker_step_3"
-    STEP_END_VIEW_NAME = "job_seekers_views:update_job_seeker_step_end"
+    TUNNEL = "apply"
     FINAL_REDIRECT_VIEW_NAME = "apply:application_jobs"
 
-    def test_anonymous_step_1(self, client):
-        response = client.get(self.step_1_url)
-        assertRedirects(response, reverse("account_login") + f"?next={self.step_1_url}")
-
-    def test_anonymous_step_2(self, client):
-        response = client.get(self.step_2_url)
-        assertRedirects(response, reverse("account_login") + f"?next={self.step_2_url}")
-
-    def test_anonymous_step_3(self, client):
-        response = client.get(self.step_3_url)
-        assertRedirects(response, reverse("account_login") + f"?next={self.step_3_url}")
-
-    def test_anonymous_step_end(self, client):
-        response = client.get(self.step_end_url)
-        assertRedirects(response, reverse("account_login") + f"?next={self.step_end_url}")
+    def test_anonymous_start(self, client):
+        response = client.get(self.start_url)
+        assertRedirects(response, add_url_params(reverse("account_login"), {"next": self.start_url}))
 
     def test_as_job_seeker(self, client):
         self._check_nothing_permitted(client, self.job_seeker)
@@ -3889,15 +3886,18 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
         self.job_seeker.save(update_fields=["last_login"])
         self._check_only_administrative_allowed(client, self.company.members.first())
 
-    def test_without_job_seeker_session(self, client):
+    def test_with_invalid_job_seeker_session(self, client):
         client.force_login(self.company.members.first())
+        invalid_session_name = uuid.uuid4()
+        kwargs = {"session_uuid": invalid_session_name}
         for url in [
-            self.step_2_url,
-            self.step_3_url,
-            self.step_end_url,
+            reverse("job_seekers_views:update_job_seeker_step_1", kwargs=kwargs),
+            reverse("job_seekers_views:update_job_seeker_step_2", kwargs=kwargs),
+            reverse("job_seekers_views:update_job_seeker_step_3", kwargs=kwargs),
+            reverse("job_seekers_views:update_job_seeker_step_end", kwargs=kwargs),
         ]:
             response = client.get(url)
-            assert response.status_code == 403
+            assert response.status_code == 404
 
     def test_with_job_seeker_without_nir(self, client, snapshot):
         # Make sure the job seeker does not manage its own account (and has no nir)
@@ -3936,27 +3936,12 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
 
 
 class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
-    STEP_1_VIEW_NAME = "job_seekers_views:update_job_seeker_step_1_for_hire"
-    STEP_2_VIEW_NAME = "job_seekers_views:update_job_seeker_step_2_for_hire"
-    STEP_3_VIEW_NAME = "job_seekers_views:update_job_seeker_step_3_for_hire"
-    STEP_END_VIEW_NAME = "job_seekers_views:update_job_seeker_step_end_for_hire"
+    TUNNEL = "hire"
     FINAL_REDIRECT_VIEW_NAME = "job_seekers_views:check_job_seeker_info_for_hire"
 
-    def test_anonymous_step_1(self, client):
-        response = client.get(self.step_1_url)
-        assertRedirects(response, reverse("account_login") + f"?next={self.step_1_url}")
-
-    def test_anonymous_step_2(self, client):
-        response = client.get(self.step_2_url)
-        assertRedirects(response, reverse("account_login") + f"?next={self.step_2_url}")
-
-    def test_anonymous_step_3(self, client):
-        response = client.get(self.step_3_url)
-        assertRedirects(response, reverse("account_login") + f"?next={self.step_3_url}")
-
-    def test_anonymous_step_end(self, client):
-        response = client.get(self.step_end_url)
-        assertRedirects(response, reverse("account_login") + f"?next={self.step_end_url}")
+    def test_anonymous_start(self, client):
+        response = client.get(self.start_url)
+        assertRedirects(response, add_url_params(reverse("account_login"), {"next": self.start_url}))
 
     def test_as_job_seeker(self, client):
         self._check_nothing_permitted(client, self.job_seeker)
@@ -3965,12 +3950,24 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
         self._check_nothing_permitted(client, prescriber)
 
-    def test_as_unauthorized_prescriber_that_created_proxied_job_seeker(self, client):
+    def test_as_unauthorized_prescriber_that_created_proxied_job_seeker(self, client, snapshot):
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
         self.job_seeker.created_by = prescriber
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
-        self._check_nothing_permitted(client, prescriber)
+
+        geispolsheim = create_city_geispolsheim()
+        birthdate = self.job_seeker.jobseeker_profile.birthdate
+
+        self._check_everything_allowed(
+            client,
+            snapshot,
+            prescriber,
+            extra_post_data_1={
+                "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+                "birth_country": Country.france_id,
+            },
+        )
 
     def test_as_unauthorized_prescriber_that_created_the_non_proxied_job_seeker(self, client):
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
@@ -3980,20 +3977,32 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_nothing_permitted(client, prescriber)
 
-    def test_as_authorized_prescriber_with_proxied_job_seeker(self, client):
+    def test_as_authorized_prescriber_with_proxied_job_seeker(self, client, snapshot):
         # Make sure the job seeker does not manage its own account
         self.job_seeker.created_by = PrescriberFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
-        self._check_nothing_permitted(client, authorized_prescriber)
+
+        geispolsheim = create_city_geispolsheim()
+        birthdate = self.job_seeker.jobseeker_profile.birthdate
+
+        self._check_everything_allowed(
+            client,
+            snapshot,
+            authorized_prescriber,
+            extra_post_data_1={
+                "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+                "birth_country": Country.france_id,
+            },
+        )
 
     def test_as_authorized_prescriber_with_non_proxied_job_seeker(self, client):
         # Make sure the job seeker does manage its own account
         self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
         self.job_seeker.save(update_fields=["last_login"])
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
-        self._check_nothing_permitted(client, authorized_prescriber)
+        self._check_only_administrative_allowed(client, authorized_prescriber)
 
     def test_as_company_with_proxied_job_seeker(self, client, snapshot):
         # Make sure the job seeker does not manage its own account
@@ -4020,15 +4029,18 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
         self.job_seeker.save(update_fields=["last_login"])
         self._check_only_administrative_allowed(client, self.company.members.first())
 
-    def test_without_job_seeker_session(self, client):
+    def test_with_invalid_job_seeker_session(self, client):
         client.force_login(self.company.members.first())
+        invalid_session_name = uuid.uuid4()
+        kwargs = {"session_uuid": invalid_session_name}
         for url in [
-            self.step_2_url,
-            self.step_3_url,
-            self.step_end_url,
+            reverse("job_seekers_views:update_job_seeker_step_1", kwargs=kwargs),
+            reverse("job_seekers_views:update_job_seeker_step_2", kwargs=kwargs),
+            reverse("job_seekers_views:update_job_seeker_step_3", kwargs=kwargs),
+            reverse("job_seekers_views:update_job_seeker_step_end", kwargs=kwargs),
         ]:
             response = client.get(url)
-            assert response.status_code == 403
+            assert response.status_code == 404
 
     def test_with_job_seeker_without_nir(self, client, snapshot):
         # Make sure the job seeker does not manage its own account (and has no nir)
@@ -4080,20 +4092,23 @@ class TestUpdateJobSeekerStep3View:
         )
         apply_session.save()
 
-        # STEP 1 to setup jobseeker session
-        response = client.get(
-            reverse(
-                "job_seekers_views:update_job_seeker_step_1",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
-            )
-        )
-        assert response.status_code == 200
+        # START to setup jobseeker session
+        params = {
+            "job_seeker": job_seeker.public_id,
+            "company": company.pk,
+        }
+        url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+        response = client.get(url)
+        assert response.status_code == 302
 
         # Go straight to STEP 3
+        [job_seeker_session_name] = [
+            k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
+        ]
         response = client.get(
             reverse(
                 "job_seekers_views:update_job_seeker_step_3",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+                kwargs={"session_uuid": job_seeker_session_name},
             )
         )
         assertContains(
@@ -4857,12 +4872,11 @@ class TestCheckJobSeekerInformationsForHire:
             jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
         )
         client.force_login(company.members.first())
-        response = client.get(
-            reverse(
-                "job_seekers_views:check_job_seeker_info_for_hire",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
-            )
+        url_check_infos = reverse(
+            "job_seekers_views:check_job_seeker_info_for_hire",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
+        response = client.get(url_check_infos)
         assertContains(
             response,
             '<h1>Informations personnelles de <span class="text-muted">Son Prénom Son Nom De Famille</span></h1>',
@@ -4870,13 +4884,16 @@ class TestCheckJobSeekerInformationsForHire:
         )
         assertTemplateNotUsed(response, "approvals/includes/box.html")
         assertContains(response, "Éligibilité IAE à valider")
-        assertContains(
-            response,
-            reverse(
-                "job_seekers_views:update_job_seeker_step_1_for_hire",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
-            ),
-        )
+        params = {
+            "job_seeker": job_seeker.public_id,
+            "company": company.pk,
+            "from_url": url_check_infos,
+        }
+        url_update = f"""
+        <a class="btn btn-outline-primary float-end"
+           href="{add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)}">Mettre à jour</a>
+        """
+        assertContains(response, url_update, html=True)
         assertContains(
             response,
             reverse(
@@ -4900,25 +4917,27 @@ class TestCheckJobSeekerInformationsForHire:
             jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
         )
         client.force_login(company.members.first())
-        response = client.get(
-            reverse(
-                "job_seekers_views:check_job_seeker_info_for_hire",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
-            )
+        url_check_infos = reverse(
+            "job_seekers_views:check_job_seeker_info_for_hire",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
+        response = client.get(url_check_infos)
         assertContains(
             response,
             '<h1>Informations personnelles de <span class="text-muted">Son Prénom Son Nom De Famille</span></h1>',
             html=True,
         )
         assertTemplateNotUsed(response, "approvals/includes/box.html")
-        assertContains(
-            response,
-            reverse(
-                "job_seekers_views:update_job_seeker_step_1_for_hire",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
-            ),
-        )
+        params = {
+            "job_seeker": job_seeker.public_id,
+            "company": company.pk,
+            "from_url": url_check_infos,
+        }
+        url_update = f"""
+        <a class="btn btn-outline-primary float-end"
+           href="{add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)}">Mettre à jour</a>
+        """
+        assertContains(response, url_update, html=True)
         assertContains(
             response,
             reverse(
