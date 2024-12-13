@@ -2,7 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.db import models
-from django.db.models import Prefetch, Q
+from django.db.models import Exists, OuterRef, Prefetch, Q
 from django.forms import ValidationError
 from django.utils import timezone
 
@@ -16,7 +16,16 @@ class OrganizationQuerySet(models.QuerySet):
     """
 
     def member_required(self, user):
-        return self.filter(members=user, members__is_active=True)
+        membership_model = self.model.members.through
+        # through_fields contains a tuple like ("company", "user")
+        structure_field, _user_field = self.model.members.rel.through_fields
+        return self.filter(
+            Exists(
+                membership_model.objects.filter(
+                    user=user, is_active=True, user__is_active=True, **{structure_field: OuterRef("pk")}
+                )
+            )
+        )
 
     def prefetch_active_memberships(self):
         membership_model = self.model.members.through

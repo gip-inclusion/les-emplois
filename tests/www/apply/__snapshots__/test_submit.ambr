@@ -210,11 +210,16 @@
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
-          INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
-          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_companymembership"."user_id" = %s
-                 AND "users_user"."is_active"
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+                    WHERE (U0."company_id" = ("companies_company"."id")
+                           AND U0."is_active"
+                           AND U0."user_id" = %s
+                           AND U2."is_active")
+                    LIMIT 1)
                  AND "companies_company"."id" = %s)
           LIMIT 21
         ''',

@@ -246,6 +246,22 @@ class TestPrescriberOrganizationModel:
         assert organization.is_head_office is True
 
 
+class TestPrescriberOrganizationQuerySet:
+    def test_member_required(self):
+        organization = PrescriberOrganizationFactory()
+        user = PrescriberFactory()
+        assert PrescriberOrganization.objects.member_required(user).count() == 0
+
+        organization.add_or_activate_member(user)
+        assert PrescriberOrganization.objects.member_required(user).get() == organization
+
+        membership = organization.memberships.get()
+        membership.is_active = False
+        membership.save(update_fields=("is_active",))
+
+        assert PrescriberOrganization.objects.member_required(user).count() == 0
+
+
 class TestPrescriberOrganizationAdmin:
     ACCEPT_BUTTON_LABEL = "Valider l'habilitation"
     REFUSE_BUTTON_LABEL = "Refuser l'habilitation"
