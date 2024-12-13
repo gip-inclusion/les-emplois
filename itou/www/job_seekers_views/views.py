@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
-from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic import DetailView, ListView, TemplateView, View
 
 from itou.companies import enums as companies_enums
 from itou.companies.enums import CompanyKind
@@ -26,9 +26,9 @@ from itou.users.models import JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.emails import redact_email_address
 from itou.utils.pagination import ItouPaginator
-from itou.utils.session import SessionNamespace, SessionNamespaceRequiredMixin
+from itou.utils.session import SessionNamespace
 from itou.utils.urls import get_safe_url
-from itou.www.apply.views.submit_views import ApplicationBaseView, ApplyStepBaseView
+from itou.www.apply.views.submit_views import ApplicationBaseView
 
 from .forms import (
     CheckJobSeekerInfoForm,
@@ -755,7 +755,45 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         return super().get_context_data(**kwargs) | {"profile": self.profile, "progress": "80"}
 
 
-class UpdateJobSeekerBaseView(SessionNamespaceRequiredMixin, ApplyStepBaseView):
+class UpdateJobSeekerStartView(View):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        try:
+            job_seeker = get_object_or_404(
+                User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=request.GET.get("job_seeker")
+            )
+        except ValidationError:
+            raise Http404("Aucun candidat n'a été trouvé")
+
+        try:
+            company = get_object_or_404(Company.objects.with_has_active_members(), pk=request.GET.get("company"))
+        except ValueError:
+            raise Http404("Aucune entreprise n'a été trouvée")
+
+        from_url = get_safe_url(request, "from_url", fallback_url=reverse("dashboard:index"))
+
+        if request.user.is_job_seeker or not request.user.can_view_personal_information(job_seeker):
+            raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de ce candidat")
+
+        self.job_seeker_session = SessionNamespace.create_uuid_namespace(
+            request.session,
+            data={
+                "config": {"from_url": from_url},
+                "job_seeker_pk": job_seeker.pk,
+                "apply": {"company_pk": company.pk},
+            },
+        )
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponseRedirect(
+            reverse(
+                "job_seekers_views:update_job_seeker_step_1", kwargs={"session_uuid": self.job_seeker_session.name}
+            )
+        )
+
+
+class UpdateJobSeekerBaseView(JobSeekerBaseView):
     def __init__(self):
         super().__init__()
         self.job_seeker_session = None
@@ -764,27 +802,23 @@ class UpdateJobSeekerBaseView(SessionNamespaceRequiredMixin, ApplyStepBaseView):
         return User.objects.filter(kind=UserKind.JOB_SEEKER)
 
     def setup(self, request, *args, **kwargs):
-        self.job_seeker = get_object_or_404(self.get_job_seeker_queryset(), public_id=kwargs["job_seeker_public_id"])
-        self.job_seeker_session = SessionNamespace(request.session, f"job_seeker-{self.job_seeker.public_id}")
+        super().setup(request, *args, **kwargs)
+        self.job_seeker = get_object_or_404(
+            self.get_job_seeker_queryset(), pk=self.job_seeker_session.get("job_seeker_pk")
+        )
         if request.user.is_job_seeker or not request.user.can_view_personal_information(self.job_seeker):
             # Since the link leading to this process isn't visible to those users, this should never happen
             raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de ce candidat")
-        super().setup(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "update_job_seeker": True,
             "job_seeker": self.job_seeker,
             "step_3_url": reverse(
-                "job_seekers_views:update_job_seeker_step_3_for_hire"
-                if self.hire_process
-                else "job_seekers_views:update_job_seeker_step_3",
-                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+                "job_seekers_views:update_job_seeker_step_3",
+                kwargs={"session_uuid": self.job_seeker_session.name},
             ),
-            "reset_url": reverse(
-                "apply:application_jobs",
-                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-            ),
+            "reset_url": self.get_reset_url(),
             "readonly_form": False,
         }
 
@@ -792,28 +826,26 @@ class UpdateJobSeekerBaseView(SessionNamespaceRequiredMixin, ApplyStepBaseView):
         for field in self.form:
             field.field.disabled = True
 
+    def get_reset_url(self):
+        return self.job_seeker_session.get("config").get("from_url")
+
     def get_back_url(self):
-        view_name = self.previous_hire_url if self.hire_process else self.previous_apply_url
         return reverse(
-            view_name,
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+            self.previous_url,
+            kwargs={"session_uuid": self.job_seeker_session.name},
         )
 
     def get_next_url(self):
-        view_name = self.next_hire_url if self.hire_process else self.next_apply_url
         return reverse(
-            view_name,
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+            self.next_url,
+            kwargs={"session_uuid": self.job_seeker_session.name},
         )
 
 
 class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
     template_name = "job_seekers_views/create_or_update_job_seeker/step_1.html"
 
-    previous_apply_url = "apply:application_jobs"
-    previous_hire_url = "job_seekers_views:check_job_seeker_info_for_hire"
-    next_apply_url = "job_seekers_views:update_job_seeker_step_2"
-    next_hire_url = "job_seekers_views:update_job_seeker_step_2_for_hire"
+    next_url = "job_seekers_views:update_job_seeker_step_2"
 
     def __init__(self):
         super().__init__()
@@ -824,8 +856,8 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        if not self.job_seeker_session.exists():
-            self.job_seeker_session.init({"user": {}})
+        if not self.job_seeker_session.get("user"):
+            self.job_seeker_session.set("user", {})
         session_nir = self.job_seeker_session.get("profile", {}).get("nir")
         session_lack_of_nir_reason = self.job_seeker_session.get("profile", {}).get("lack_of_nir_reason")
 
@@ -861,6 +893,9 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
+    def get_back_url(self):
+        return self.get_reset_url()
+
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "confirmation_needed": False,
@@ -873,12 +908,9 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
 
 class UpdateJobSeekerStep2View(UpdateJobSeekerBaseView):
     template_name = "job_seekers_views/create_or_update_job_seeker/step_2.html"
-    required_session_namespaces = ["job_seeker_session"] + UpdateJobSeekerBaseView.required_session_namespaces
 
-    previous_apply_url = "job_seekers_views:update_job_seeker_step_1"
-    previous_hire_url = "job_seekers_views:update_job_seeker_step_1_for_hire"
-    next_apply_url = "job_seekers_views:update_job_seeker_step_3"
-    next_hire_url = "job_seekers_views:update_job_seeker_step_3_for_hire"
+    previous_url = "job_seekers_views:update_job_seeker_step_1"
+    next_url = "job_seekers_views:update_job_seeker_step_3"
 
     def __init__(self):
         super().__init__()
@@ -913,12 +945,9 @@ class UpdateJobSeekerStep2View(UpdateJobSeekerBaseView):
 
 class UpdateJobSeekerStep3View(UpdateJobSeekerBaseView):
     template_name = "job_seekers_views/create_or_update_job_seeker/step_3.html"
-    required_session_namespaces = ["job_seeker_session"] + UpdateJobSeekerBaseView.required_session_namespaces
 
-    previous_apply_url = "job_seekers_views:update_job_seeker_step_2"
-    previous_hire_url = "job_seekers_views:update_job_seeker_step_2_for_hire"
-    next_apply_url = "job_seekers_views:update_job_seeker_step_end"
-    next_hire_url = "job_seekers_views:update_job_seeker_step_end_for_hire"
+    previous_url = "job_seekers_views:update_job_seeker_step_2"
+    next_url = "job_seekers_views:update_job_seeker_step_end"
 
     def __init__(self):
         super().__init__()
@@ -952,12 +981,8 @@ class UpdateJobSeekerStep3View(UpdateJobSeekerBaseView):
 
 class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
     template_name = "job_seekers_views/create_or_update_job_seeker/step_end.html"
-    required_session_namespaces = ["job_seeker_session"] + UpdateJobSeekerBaseView.required_session_namespaces
 
-    previous_apply_url = "job_seekers_views:update_job_seeker_step_3"
-    previous_hire_url = "job_seekers_views:update_job_seeker_step_3_for_hire"
-    next_apply_url = "apply:application_jobs"
-    next_hire_url = "job_seekers_views:check_job_seeker_info_for_hire"
+    previous_url = "job_seekers_views:update_job_seeker_step_3"
 
     def __init__(self):
         super().__init__()
@@ -1031,13 +1056,16 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
             messages.error(request, " ".join(e.messages))
             url = reverse(
                 "job_seekers_views:update_job_seeker_step_1",
-                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+                kwargs={"session_uuid": self.job_seeker_session.name},
             )
         else:
             self.profile.save()
-            self.job_seeker_session.delete()
             url = self.get_next_url()
+            self.job_seeker_session.delete()
         return HttpResponseRedirect(url)
+
+    def get_next_url(self):
+        return self.job_seeker_session.get("config").get("from_url")
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {"profile": self.profile, "progress": "80"}
