@@ -271,6 +271,20 @@ class TestCompanyModel:
 
 
 class TestCompanyQuerySet:
+    def test_member_required(self):
+        company = CompanyFactory()
+        user = EmployerFactory()
+        assert Company.objects.member_required(user).count() == 0
+
+        company.add_or_activate_member(user)
+        assert Company.objects.member_required(user).get() == company
+
+        membership = company.memberships.get()
+        membership.is_active = False
+        membership.save(update_fields=("is_active",))
+
+        assert Company.objects.member_required(user).count() == 0
+
     def test_with_count_recent_received_job_applications(self):
         company = CompanyFactory()
         model = JobApplicationFactory._meta.model
