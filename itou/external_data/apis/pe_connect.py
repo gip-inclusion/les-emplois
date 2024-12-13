@@ -4,6 +4,7 @@ import httpx
 from django.conf import settings
 from django.db import transaction
 from django.forms.models import model_to_dict
+from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
 from itou.external_data.models import ExternalDataImport, JobSeekerExternalData
@@ -209,7 +210,7 @@ def set_pe_data_import_from_user_data(pe_data_import, user, status, user_data):
 
         # User part:
         if k == "dateDeNaissance":
-            new_value = user.jobseeker_profile.birthdate or parse_datetime(v)
+            new_value = user.jobseeker_profile.birthdate or timezone.localdate(parse_datetime(v))
             user.jobseeker_profile.birthdate = new_value
             user.update_external_data_source_history_field(pe_connect_provider, "birthdate", new_value)
         elif k == "adresse4":
