@@ -1,3 +1,5 @@
+import argparse
+
 from django.conf import settings
 
 from itou.files.models import File
@@ -11,12 +13,26 @@ class Command(BaseCommand):
     # keeping individual query size manageable.
     BATCH_SIZE = 20_000
 
-    def handle(self, *args, **options):
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--check-existing",
+            action=argparse.BooleanOptionalAction,
+            default=False,
+            help="Check that all existing File objects reference existing bucket objects.",
+        )
+
+    def handle(self, *args, check_existing, **options):
         paginator = s3_client().get_paginator("list_objects_v2")
         page_iterator = paginator.paginate(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
         batch = []
         permanent_files_nb = 0
         temporary_files_nb = 0
+        known_permanent_files_nb = 0
+        if check_existing:
+            known_keys = set(File.objects.values_list("key", flat=True))
+            self.logger.info("Checking existing files: %d files in database before sync", len(known_keys))
+        else:
+            known_keys = set()
         for page in page_iterator:
             obj_summaries = page["Contents"]
             for obj_summary in obj_summaries:
@@ -24,6 +40,9 @@ class Command(BaseCommand):
                 if not key.startswith(f"{TEMPORARY_STORAGE_PREFIX}/"):
                     batch.append(File(key=key, last_modified=obj_summary["LastModified"]))
                     permanent_files_nb += 1
+                    if check_existing and key in known_keys:
+                        known_permanent_files_nb += 1
+                        known_keys.remove(key)
                 else:
                     temporary_files_nb += 1
             if len(batch) >= self.BATCH_SIZE:
@@ -35,6 +54,13 @@ class Command(BaseCommand):
             permanent_files_nb,
             temporary_files_nb,
         )
+        if check_existing:
+            self.logger.info("permanent=%d files already in database before sync", known_permanent_files_nb)
+            if known_keys:
+                # keys are present in database as File object but missing from our bucket
+                self.logger.error(
+                    "%d database files do not exist in the bucket: %s", len(known_keys), sorted(known_keys)
+                )
 
     @staticmethod
     def insert_or_update_files(files):
