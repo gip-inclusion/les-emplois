@@ -9,6 +9,7 @@ from pytest_django.asserts import assertQuerySetEqual
 
 from itou.files.models import File
 from itou.utils.storage.s3 import s3_client
+from tests.files.factories import FileFactory
 
 
 def test_sync_files_ignores_temporary_storage(temporary_bucket, caplog):
@@ -76,3 +77,35 @@ def test_deletion(temporary_bucket):
         )
     [page_after_deletion] = paginator.paginate(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
     assert page_after_deletion["KeyCount"] == 0
+
+
+def test_sync_files_check_existing(temporary_bucket, caplog):
+    client = s3_client()
+    for key in [
+        "resume/11111111-1111-1111-1111-111111111111.pdf",
+        "evaluations/test.xlsx",
+        "prolongation_report/test.xlsx",
+    ]:
+        with io.BytesIO() as content:
+            client.upload_fileobj(content, Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=key)
+    existing_file = FileFactory()
+    call_command("sync_s3_files", check_existing=True)
+    assertQuerySetEqual(
+        File.objects.values_list("key", flat=True),
+        [
+            "resume/11111111-1111-1111-1111-111111111111.pdf",
+            "evaluations/test.xlsx",
+            "prolongation_report/test.xlsx",
+            existing_file.key,
+        ],
+        ordered=False,
+    )
+    assert caplog.messages[:-1] == [
+        "Checking existing files: 1 files in database before sync",
+        "Completed bucket sync: found permanent=3 and temporary=0 files in the bucket",
+        "permanent=0 files already in database before sync",
+        f"1 database files do not exist in the bucket: [{existing_file.key!r}]",
+    ]
+    assert caplog.messages[-1].startswith(
+        "Management command itou.files.management.commands.sync_s3_files succeeded in"
+    )
