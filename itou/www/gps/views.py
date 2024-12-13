@@ -145,7 +145,7 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
             .select_related("follow_up_group", "member")
         )
 
-        org_department = self.request.current_organization.department
+        org_department = getattr(self.request.current_organization, "department", None)
         matomo_option = org_department if org_department in self.get_live_department_codes() else None
         back_url = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("gps:my_groups"))
 

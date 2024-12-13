@@ -467,3 +467,26 @@ def test_contact_information_display_not_live(client, snapshot):
     assert str(parse_response_to_soup(response, selector="#advisor-info-details-collapsable")) == snapshot(
         name="preview_displayed"
     )
+
+
+@pytest.mark.parametrize(
+    "UserFactory, factory_args",
+    [
+        (PrescriberFactory, {"membership": False}),
+        (PrescriberFactory, {"membership": True}),
+        (PrescriberFactory, {"membership__organization__authorized": True}),
+        (EmployerFactory, {"with_company": True}),
+    ],
+)
+def test_contact_information_access(client, UserFactory, factory_args):
+    user = UserFactory(**factory_args)
+    client.force_login(user)
+
+    beneficiary = JobSeekerFactory()
+
+    response = client.get(reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id}))
+    assert response.status_code == 403
+
+    FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=user)
+    response = client.get(reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id}))
+    assert response.status_code == 200
