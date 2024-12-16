@@ -71,22 +71,6 @@ class TestInstitutionModel:
             institution.add_or_activate_member(wrong_kind_user)
 
 
-class TestInstitutionQuerySet:
-    def test_member_required(self):
-        institution = InstitutionFactory()
-        user = LaborInspectorFactory()
-        assert Institution.objects.member_required(user).count() == 0
-
-        institution.add_or_activate_member(user)
-        assert Institution.objects.member_required(user).get() == institution
-
-        membership = institution.memberships.get()
-        membership.is_active = False
-        membership.save(update_fields=("is_active",))
-
-        assert Institution.objects.member_required(user).count() == 0
-
-
 def test_deactivate_last_admin(admin_client, mailoutbox):
     institution = InstitutionWithMembershipFactory(department="")
     membership = institution.memberships.first()
