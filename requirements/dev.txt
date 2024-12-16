@@ -415,9 +415,9 @@ django-markdownify==0.9.5 \
     --hash=sha256:2c4ae44e386c209453caf5e9ea1b74f64535985d338ad2d5ad5e7089cc94be86 \
     --hash=sha256:34c34eba4a797282a5c5bd97b13cec84d6a4c0673ad47ce1c1d000d74dd8d4ab
     # via -r requirements/test.txt
-django-pgtrigger==4.13.2 \
-    --hash=sha256:0f6abd76db30c05c16108f474011650448bd6129cf68e376ec7d40d72fea1c9a \
-    --hash=sha256:f4d906df3a6dde1abc42b88b351bd942c180fe28dfb664ff4e766ebe2bd8fd81
+django-pgtrigger==4.13.3 \
+    --hash=sha256:c525f9e81f120d166c4bd5fe8c3770640356f0644edf0fc2b7f6426008e52f77 \
+    --hash=sha256:d6e4d17021bbd5e425a308f07414b237b9b34423275d86ad756b90c307df3ca4
     # via -r requirements/test.txt
 django-redis==5.4.0 \
     --hash=sha256:6a02abaa34b0fea8bf9b707d2c363ab6adc7409950b2db93602e6cb292818c42 \
