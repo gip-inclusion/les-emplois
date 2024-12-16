@@ -1,11 +1,42 @@
 # Journal des modifications
 
+## 2024-12-16
+
+### Ajouté
+
+- [Ajout d'un middleware pour connecter automatiquement les utilisateurs pro_connect](https://github.com/gip-inclusion/les-emplois/pull/5237)
+- [Ajouter un lien vers la politique de confidentialité pour les utilisateurs connectés](https://github.com/gip-inclusion/les-emplois/pull/5206) 🖼
+- [Fiches salarié : Récolter et transmettre les informations spécifiques aux EITI](https://github.com/gip-inclusion/les-emplois/pull/5197) 🖼
+- [UX/UI: Demande de retours prescripteurs habilités sur une refonte de leur espace](https://github.com/gip-inclusion/les-emplois/pull/5244) 🖼
+- [UX/UI: Traitement par lot - Vue tableau des candidatures](https://github.com/gip-inclusion/les-emplois/pull/5089)
+
+### Modifié
+
+- [Affichage du bouton de blocage des candidature pour les employeurs sans fiches de poste](https://github.com/gip-inclusion/les-emplois/pull/5247) 🖼
+- [Admin: Utiliser le SIRET et le nom de l’entreprise pour identifier l’appartenance d’un employeur](https://github.com/gip-inclusion/les-emplois/pull/5235) 🖼
+- [Candidats: Ajout des champs commune et pays de naissance dans « Mon profil »](https://github.com/gip-inclusion/les-emplois/pull/5126) 🖼
+- [Contrôle a posteriori : Garder actives les campagnes en attente de sanctions](https://github.com/gip-inclusion/les-emplois/pull/5043)
+- [Demandeur d’emploi : Correction de la sélection de la commune de naissance pour les personnes nées le dernier jour de validité de la commune](https://github.com/gip-inclusion/les-emplois/pull/5227)
+- [GPS: Améliorations d'ergonomie](https://github.com/gip-inclusion/les-emplois/pull/5204) 🖼
+- [GPS: Correction de la page de détail des bénéficiaire pour les orienteurs sans organisation.](https://github.com/gip-inclusion/les-emplois/pull/5265)
+
+### Retiré
+
+- [Retirer l’affichage du NIR pour les orienteurs qui n’ont pas créé le compte du candidat](https://github.com/gip-inclusion/les-emplois/pull/5234) 🖼
+
+### Tech
+
+- [Vendor la dépendance easyMDE](https://github.com/gip-inclusion/les-emplois/pull/5196) 🖼
+
 ## 2024-12-09
+
+### Ajouté
+
+- [UX/UI: Ajout de la page "Présentation" de ma structure](https://github.com/gip-inclusion/les-emplois/pull/5138)
 
 ### Modifié
 
 - [Corriger le message d’erreur des champs commune de naissance et pays de naissance](https://github.com/gip-inclusion/les-emplois/pull/5173)
-- [UX/UI: Ajout de la page "Présentation" de ma structure](https://github.com/gip-inclusion/les-emplois/pull/5138)
 
 ## 2024-12-02
 
