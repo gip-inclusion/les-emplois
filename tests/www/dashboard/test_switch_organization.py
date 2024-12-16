@@ -106,6 +106,22 @@ class TestSwitchCompany:
         assert response.status_code == 200
         assert response.context["request"].current_organization == company
 
+    def test_bad_request(self, client):
+        url = reverse("dashboard:switch_organization")
+
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
+        client.force_login(user)
+
+        related_company = CompanyFactory(with_membership=True)
+        related_company.members.add(user)
+
+        response = client.post(url)
+        assert response.status_code == 400
+
+        response = client.post(url, data={"organization_id": "Une entreprise entière"})
+        assert response.status_code == 400
+
 
 class TestSwitchOrganization:
     def test_not_allowed_user(self, client):
@@ -141,6 +157,20 @@ class TestSwitchOrganization:
         response = client.get(reverse("dashboard:index"))
         assert response.status_code == 200
         assert response.context["request"].current_organization == orga2
+
+    def test_bad_request(self, client):
+        url = reverse("dashboard:switch_organization")
+
+        user = PrescriberFactory()
+        prescribers_factories.PrescriberMembershipFactory(user=user)
+        prescribers_factories.PrescriberMembershipFactory(user=user)
+        client.force_login(user)
+
+        response = client.post(url)
+        assert response.status_code == 400
+
+        response = client.post(url, data={"organization_id": "Une orga entière"})
+        assert response.status_code == 400
 
 
 class TestSwitchInstitution:
@@ -179,3 +209,17 @@ class TestSwitchInstitution:
         response = client.get(reverse("dashboard:index"))
         assert response.status_code == 200
         assert response.context["request"].current_organization == institution2
+
+    def test_bad_request(self, client):
+        url = reverse("dashboard:switch_organization")
+
+        user = LaborInspectorFactory()
+        InstitutionMembershipFactory(user=user).institution
+        InstitutionMembershipFactory(user=user).institution
+        client.force_login(user)
+
+        response = client.post(url)
+        assert response.status_code == 400
+
+        response = client.post(url, data={"organization_id": "Une institution entière"})
+        assert response.status_code == 400
