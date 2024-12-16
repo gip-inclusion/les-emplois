@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import F
-from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
+from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -321,7 +321,11 @@ def edit_job_seeker_info(request, job_seeker_public_id, template_name="dashboard
 @login_required
 @require_POST
 def switch_organization(request):
-    pk = request.POST["organization_id"]
+    try:
+        pk = int(request.POST["organization_id"])
+    except (KeyError, ValueError):
+        return HttpResponseBadRequest(b"organization_id key is missing")
+
     match request.user.kind:
         case UserKind.EMPLOYER:
             queryset = Company.objects.active_or_in_grace_period().member_required(request.user)
