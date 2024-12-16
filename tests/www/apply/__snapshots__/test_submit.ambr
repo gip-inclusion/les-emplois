@@ -211,15 +211,7 @@
                  "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
-                 AND EXISTS
-                   (SELECT %s AS "a"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = ("companies_company"."id")
-                           AND U0."is_active"
-                           AND U0."user_id" = %s
-                           AND U2."is_active")
-                    LIMIT 1)
+                 AND "companies_company"."id" IN (%s)
                  AND "companies_company"."id" = %s)
           LIMIT 21
         ''',

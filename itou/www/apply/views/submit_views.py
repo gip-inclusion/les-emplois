@@ -816,7 +816,9 @@ def eligibility_for_hire(
     job_seeker_public_id,
     template_name="apply/submit/eligibility_for_hire.html",
 ):
-    company = get_object_or_404(Company.objects.member_required(request.user), pk=company_pk)
+    company = get_object_or_404(
+        Company.objects.filter(pk__in={org.pk for org in request.organizations}), pk=company_pk
+    )
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id)
     _check_job_seeker_approval(request, job_seeker, company)
     next_url = reverse(
@@ -852,7 +854,7 @@ def geiq_eligibility_for_hire(
     template_name="apply/submit/geiq_eligibility_for_hire.html",
 ):
     company = get_object_or_404(
-        Company.objects.member_required(request.user).filter(kind=CompanyKind.GEIQ), pk=company_pk
+        Company.objects.filter(pk__in={org.pk for org in request.organizations}, kind=CompanyKind.GEIQ), pk=company_pk
     )
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id)
     next_url = reverse(
@@ -884,7 +886,7 @@ def geiq_eligibility_for_hire(
 @login_required
 def geiq_eligibility_criteria_for_hire(request, company_pk, job_seeker_public_id):
     company = get_object_or_404(
-        Company.objects.member_required(request.user).filter(kind=CompanyKind.GEIQ), pk=company_pk
+        Company.objects.filter(pk__in={org.pk for org in request.organizations}, kind=CompanyKind.GEIQ), pk=company_pk
     )
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id)
     return common_views._geiq_eligibility_criteria(
@@ -901,7 +903,9 @@ def hire_confirmation(
     job_seeker_public_id,
     template_name="apply/submit/hire_confirmation.html",
 ):
-    company = get_object_or_404(Company.objects.member_required(request.user), pk=company_pk)
+    company = get_object_or_404(
+        Company.objects.filter(pk__in={org.pk for org in request.organizations}), pk=company_pk
+    )
     job_seeker = get_object_or_404(
         User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile"),
         public_id=job_seeker_public_id,
