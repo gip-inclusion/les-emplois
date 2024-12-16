@@ -19,15 +19,12 @@ from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Company
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.geiq.models import ImplementationAssessmentCampaign
 from itou.institutions.enums import InstitutionKind
-from itou.institutions.models import Institution
 from itou.job_applications.enums import JobApplicationState
 from itou.openid_connect.inclusion_connect import constants as ic_constants
-from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.users.enums import MATOMO_ACCOUNT_TYPE, IdentityProvider, UserKind
 from itou.users.models import User
@@ -326,18 +323,14 @@ def switch_organization(request):
     except (KeyError, ValueError):
         return HttpResponseBadRequest(b"organization_id key is missing")
 
-    match request.user.kind:
-        case UserKind.EMPLOYER:
-            queryset = Company.objects.active_or_in_grace_period().member_required(request.user)
-        case UserKind.PRESCRIBER:
-            queryset = PrescriberOrganization.objects.member_required(request.user)
-        case UserKind.LABOR_INSPECTOR:
-            queryset = Institution.objects.member_required(request.user)
-        case _:
-            raise Http404()
+    if request.user.kind not in {
+        UserKind.EMPLOYER,
+        UserKind.PRESCRIBER,
+        UserKind.LABOR_INSPECTOR,
+    } or pk not in {organization.pk for organization in request.organizations}:
+        raise Http404()
 
-    organization = get_object_or_404(queryset, pk=pk)
-    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = organization.pk
+    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = pk
     return HttpResponseRedirect(reverse("dashboard:index"))
 
 
