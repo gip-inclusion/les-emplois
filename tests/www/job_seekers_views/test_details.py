@@ -218,13 +218,13 @@ def test_job_application_tab(client, snapshot):
         sender=prescriber_membership.user,
     )
     client.force_login(prescriber_membership.user)
-    url = reverse("job_seekers_views:details", kwargs={"public_id": job_application_1.job_seeker.public_id})
+    url = reverse("job_seekers_views:job_applications", kwargs={"public_id": job_application_1.job_seeker.public_id})
 
-    with assertSnapshotQueries(snapshot(name="job seeker details view with sent job applications")):
+    with assertSnapshotQueries(snapshot(name="job seeker job applications view with sent job applications")):
         response = client.get(url)
     soup = parse_response_to_soup(
         response,
-        selector="#candidatures",
+        selector="#main",
         replace_in_attr=[
             ("href", f"/company/{job_application_1.to_company.pk}/card", "/company/[PK of Company]/card"),
             ("href", f"/company/{job_application_2.to_company.pk}/card", "/company/[PK of Company]/card"),

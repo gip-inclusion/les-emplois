@@ -6,7 +6,16 @@ from . import views
 app_name = "job_seekers_views"
 
 urlpatterns = [
-    path("details/<uuid:public_id>", views.JobSeekerDetailView.as_view(), name="details"),
+    path(
+        "details/<uuid:public_id>",
+        views.JobSeekerDetailView.as_view(template_name="job_seekers_views/details.html"),
+        name="details",
+    ),
+    path(
+        "job_applications/<uuid:public_id>",
+        views.JobSeekerDetailView.as_view(template_name="job_seekers_views/job_applications.html"),
+        name="job_applications",
+    ),
     path("list", views.JobSeekerListView.as_view(), name="list"),
     path(
         "start",
