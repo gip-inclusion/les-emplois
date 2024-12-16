@@ -563,7 +563,9 @@ class AcceptHTMXFragmentView(TemplateView):
     def setup(self, request, company_pk=None, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        company = get_object_or_404(Company.objects.member_required(request.user), pk=company_pk)
+        company = get_object_or_404(
+            Company.objects.filter(pk__in={org.pk for org in request.organizations}), pk=company_pk
+        )
         self.form_accept = AcceptForm(company=company, data=request.POST or None)
 
     def get_context_data(self, **kwargs):
