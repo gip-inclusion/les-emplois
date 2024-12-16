@@ -37,10 +37,10 @@
                               
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
           <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="#informations" id="informations-tab" role="tab">Informations générales</a>
+              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
           </li>
           <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="#candidatures" id="job-applications-tab" role="tab">Candidatures</a>
+              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
           </li>
       </ul>
   
@@ -218,18 +218,6 @@
                                   
                               </div>
                           </div>
-                          <div aria-labelledby="job-applications-tab" class="tab-pane fade" id="candidatures" role="tabpanel">
-                              <h2>Candidatures envoyées</h2>
-                              <hr/>
-                              
-                              
-                                  <div class="c-box c-box--results my-3 my-md-4">
-                                      <div class="c-box--results__body">
-                                          <p class="mb-0">Aucune candidature envoyée.</p>
-                                      </div>
-                                  </div>
-                              
-                          </div>
                       </div>
                   </div>
               </div>
@@ -277,10 +265,10 @@
                               
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
           <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="#informations" id="informations-tab" role="tab">Informations générales</a>
+              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
           </li>
           <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="#candidatures" id="job-applications-tab" role="tab">Candidatures</a>
+              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
           </li>
       </ul>
   
@@ -436,18 +424,6 @@
                                   
                               </div>
                           </div>
-                          <div aria-labelledby="job-applications-tab" class="tab-pane fade" id="candidatures" role="tabpanel">
-                              <h2>Candidatures envoyées</h2>
-                              <hr/>
-                              
-                              
-                                  <div class="c-box c-box--results my-3 my-md-4">
-                                      <div class="c-box--results__body">
-                                          <p class="mb-0">Aucune candidature envoyée.</p>
-                                      </div>
-                                  </div>
-                              
-                          </div>
                       </div>
                   </div>
               </div>
@@ -495,10 +471,10 @@
                               
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
           <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="#informations" id="informations-tab" role="tab">Informations générales</a>
+              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
           </li>
           <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="#candidatures" id="job-applications-tab" role="tab">Candidatures</a>
+              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
           </li>
       </ul>
   
@@ -612,18 +588,6 @@
                                   
                               </div>
                           </div>
-                          <div aria-labelledby="job-applications-tab" class="tab-pane fade" id="candidatures" role="tabpanel">
-                              <h2>Candidatures envoyées</h2>
-                              <hr/>
-                              
-                              
-                                  <div class="c-box c-box--results my-3 my-md-4">
-                                      <div class="c-box--results__body">
-                                          <p class="mb-0">Aucune candidature envoyée.</p>
-                                      </div>
-                                  </div>
-                              
-                          </div>
                       </div>
                   </div>
               </div>
@@ -671,10 +635,10 @@
                               
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
           <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="#informations" id="informations-tab" role="tab">Informations générales</a>
+              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
           </li>
           <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="#candidatures" id="job-applications-tab" role="tab">Candidatures</a>
+              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
           </li>
       </ul>
   
@@ -878,18 +842,6 @@
                                   
                               </div>
                           </div>
-                          <div aria-labelledby="job-applications-tab" class="tab-pane fade" id="candidatures" role="tabpanel">
-                              <h2>Candidatures envoyées</h2>
-                              <hr/>
-                              
-                              
-                                  <div class="c-box c-box--results my-3 my-md-4">
-                                      <div class="c-box--results__body">
-                                          <p class="mb-0">Aucune candidature envoyée.</p>
-                                      </div>
-                                  </div>
-                              
-                          </div>
                       </div>
                   </div>
               </div>
@@ -901,7 +853,61 @@
 # ---
 # name: test_job_application_tab.1
   '''
-  <div aria-labelledby="job-applications-tab" class="tab-pane fade" id="candidatures" role="tabpanel">
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+  
+  
+                              
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <h1 class="mb-0">Candidat : Jane DOE</h1>
+          
+          
+              
+          
+          <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+              <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+              <span>Postuler pour ce candidat</span>
+          </a>
+      </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
+      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+          <li class="nav-item" role="presentation">
+              <a aria-controls="informations" aria-selected="true" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
+          </li>
+          <li class="nav-item" role="presentation">
+              <a aria-controls="candidatures" aria-selected="false" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
+          </li>
+      </ul>
+  
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="tab-content">
+                          <div aria-labelledby="job-applications-tab" class="tab-pane fade show active" id="candidatures" role="tabpanel">
                               <h2>Candidatures envoyées</h2>
                               <hr/>
                               
@@ -920,7 +926,7 @@
           
           
               chez
-              <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+              <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
                   <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1"></i>
                   <span>Acme inc.</span>
               </a>
@@ -947,7 +953,7 @@
       </div>
       <div class="c-box--results__footer">
           <div class="d-flex justify-content-end">
-              <a aria-label="Voir la candidature de Pierre DUPONT" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">Voir sa candidature</a>
+              <a aria-label="Voir la candidature de Pierre DUPONT" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">Voir sa candidature</a>
           </div>
       </div>
   </div>
@@ -967,7 +973,7 @@
           
           
               chez
-              <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+              <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
                   <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1"></i>
                   <span>Autre entreprise</span>
               </a>
@@ -994,18 +1000,25 @@
       </div>
       <div class="c-box--results__footer">
           <div class="d-flex justify-content-end">
-              <a aria-label="Voir la candidature de Pierre DUPONT" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature" href="/apply/11111111-1111-1111-1111-222222222222/prescriber/details?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">Voir sa candidature</a>
+              <a aria-label="Voir la candidature de Pierre DUPONT" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature" href="/apply/11111111-1111-1111-1111-222222222222/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">Voir sa candidature</a>
           </div>
       </div>
   </div>
   
                               
                           </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
   '''
 # ---
-# name: test_job_application_tab[job seeker details view with sent job applications]
+# name: test_job_application_tab[job seeker job applications view with sent job applications]
   dict({
-    'num_queries': 18,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -1570,36 +1583,9 @@
       }),
       dict({
         'origin': list([
-          'ForNode[job_seekers_views/includes/eligibility_diagnosis.html]',
-          'IncludeNode[job_seekers_views/details.html]',
-          'IfNode[job_seekers_views/details.html]',
+          'ForNode[job_seekers_views/job_applications.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/details.html]',
-        ]),
-        'sql': '''
-          SELECT "eligibility_administrativecriteria"."id",
-                 "eligibility_administrativecriteria"."kind",
-                 "eligibility_administrativecriteria"."level",
-                 "eligibility_administrativecriteria"."name",
-                 "eligibility_administrativecriteria"."desc",
-                 "eligibility_administrativecriteria"."written_proof",
-                 "eligibility_administrativecriteria"."written_proof_url",
-                 "eligibility_administrativecriteria"."written_proof_validity",
-                 "eligibility_administrativecriteria"."ui_rank",
-                 "eligibility_administrativecriteria"."created_at",
-                 "eligibility_administrativecriteria"."created_by_id"
-          FROM "eligibility_administrativecriteria"
-          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
-          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
-          ORDER BY "eligibility_administrativecriteria"."level" ASC,
-                   "eligibility_administrativecriteria"."ui_rank" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'ForNode[job_seekers_views/details.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/details.html]',
+          'ExtendsNode[job_seekers_views/job_applications.html]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -1729,9 +1715,9 @@
       }),
       dict({
         'origin': list([
-          'ForNode[job_seekers_views/details.html]',
+          'ForNode[job_seekers_views/job_applications.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/details.html]',
+          'ExtendsNode[job_seekers_views/job_applications.html]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
@@ -1835,10 +1821,10 @@
                               
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
           <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="#informations" id="informations-tab" role="tab">Informations générales</a>
+              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
           </li>
           <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="#candidatures" id="job-applications-tab" role="tab">Candidatures</a>
+              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
           </li>
       </ul>
   
@@ -2018,18 +2004,6 @@
                                   
                               </div>
                           </div>
-                          <div aria-labelledby="job-applications-tab" class="tab-pane fade" id="candidatures" role="tabpanel">
-                              <h2>Candidatures envoyées</h2>
-                              <hr/>
-                              
-                              
-                                  <div class="c-box c-box--results my-3 my-md-4">
-                                      <div class="c-box--results__body">
-                                          <p class="mb-0">Aucune candidature envoyée.</p>
-                                      </div>
-                                  </div>
-                              
-                          </div>
                       </div>
                   </div>
               </div>
@@ -2077,10 +2051,10 @@
                               
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
           <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="#informations" id="informations-tab" role="tab">Informations générales</a>
+              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
           </li>
           <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="#candidatures" id="job-applications-tab" role="tab">Candidatures</a>
+              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
           </li>
       </ul>
   
@@ -2240,18 +2214,6 @@
                                   
                               </div>
                           </div>
-                          <div aria-labelledby="job-applications-tab" class="tab-pane fade" id="candidatures" role="tabpanel">
-                              <h2>Candidatures envoyées</h2>
-                              <hr/>
-                              
-                              
-                                  <div class="c-box c-box--results my-3 my-md-4">
-                                      <div class="c-box--results__body">
-                                          <p class="mb-0">Aucune candidature envoyée.</p>
-                                      </div>
-                                  </div>
-                              
-                          </div>
                       </div>
                   </div>
               </div>
@@ -2299,10 +2261,10 @@
                               
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
           <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="#informations" id="informations-tab" role="tab">Informations générales</a>
+              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
           </li>
           <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="#candidatures" id="job-applications-tab" role="tab">Candidatures</a>
+              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
           </li>
       </ul>
   
@@ -2416,18 +2378,6 @@
                                   
                               </div>
                           </div>
-                          <div aria-labelledby="job-applications-tab" class="tab-pane fade" id="candidatures" role="tabpanel">
-                              <h2>Candidatures envoyées</h2>
-                              <hr/>
-                              
-                              
-                                  <div class="c-box c-box--results my-3 my-md-4">
-                                      <div class="c-box--results__body">
-                                          <p class="mb-0">Aucune candidature envoyée.</p>
-                                      </div>
-                                  </div>
-                              
-                          </div>
                       </div>
                   </div>
               </div>
@@ -2475,10 +2425,10 @@
                               
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
           <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="#informations" id="informations-tab" role="tab">Informations générales</a>
+              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
           </li>
           <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="#candidatures" id="job-applications-tab" role="tab">Candidatures</a>
+              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
           </li>
       </ul>
   
@@ -2636,18 +2586,6 @@
                                   
                               </div>
                           </div>
-                          <div aria-labelledby="job-applications-tab" class="tab-pane fade" id="candidatures" role="tabpanel">
-                              <h2>Candidatures envoyées</h2>
-                              <hr/>
-                              
-                              
-                                  <div class="c-box c-box--results my-3 my-md-4">
-                                      <div class="c-box--results__body">
-                                          <p class="mb-0">Aucune candidature envoyée.</p>
-                                      </div>
-                                  </div>
-                              
-                          </div>
                       </div>
                   </div>
               </div>
@@ -2695,10 +2633,10 @@
                               
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
           <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="#informations" id="informations-tab" role="tab">Informations générales</a>
+              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
           </li>
           <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="#candidatures" id="job-applications-tab" role="tab">Candidatures</a>
+              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
           </li>
       </ul>
   
@@ -2812,18 +2750,6 @@
                                   
                               </div>
                           </div>
-                          <div aria-labelledby="job-applications-tab" class="tab-pane fade" id="candidatures" role="tabpanel">
-                              <h2>Candidatures envoyées</h2>
-                              <hr/>
-                              
-                              
-                                  <div class="c-box c-box--results my-3 my-md-4">
-                                      <div class="c-box--results__body">
-                                          <p class="mb-0">Aucune candidature envoyée.</p>
-                                      </div>
-                                  </div>
-                              
-                          </div>
                       </div>
                   </div>
               </div>
@@ -2871,10 +2797,10 @@
                               
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
           <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="#informations" id="informations-tab" role="tab">Informations générales</a>
+              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
           </li>
           <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="#candidatures" id="job-applications-tab" role="tab">Candidatures</a>
+              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
           </li>
       </ul>
   
@@ -3037,18 +2963,6 @@
                                   
                               </div>
                           </div>
-                          <div aria-labelledby="job-applications-tab" class="tab-pane fade" id="candidatures" role="tabpanel">
-                              <h2>Candidatures envoyées</h2>
-                              <hr/>
-                              
-                              
-                                  <div class="c-box c-box--results my-3 my-md-4">
-                                      <div class="c-box--results__body">
-                                          <p class="mb-0">Aucune candidature envoyée.</p>
-                                      </div>
-                                  </div>
-                              
-                          </div>
                       </div>
                   </div>
               </div>
@@ -3060,7 +2974,7 @@
 # ---
 # name: test_with_approval[SQL queries]
   dict({
-    'num_queries': 17,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -3664,138 +3578,6 @@
                  AND "approvals_prolongationrequest"."status" = %s)
           ORDER BY "approvals_prolongationrequest"."created_at" DESC
           LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'ForNode[job_seekers_views/details.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/details.html]',
-        ]),
-        'sql': '''
-          SELECT "job_applications_jobapplication"."id",
-                 "job_applications_jobapplication"."job_seeker_id",
-                 "job_applications_jobapplication"."eligibility_diagnosis_id",
-                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
-                 "job_applications_jobapplication"."create_employee_record",
-                 "job_applications_jobapplication"."resume_link",
-                 "job_applications_jobapplication"."sender_id",
-                 "job_applications_jobapplication"."sender_kind",
-                 "job_applications_jobapplication"."sender_company_id",
-                 "job_applications_jobapplication"."sender_prescriber_organization_id",
-                 "job_applications_jobapplication"."to_company_id",
-                 "job_applications_jobapplication"."state",
-                 "job_applications_jobapplication"."archived_at",
-                 "job_applications_jobapplication"."archived_by_id",
-                 "job_applications_jobapplication"."hired_job_id",
-                 "job_applications_jobapplication"."message",
-                 "job_applications_jobapplication"."answer",
-                 "job_applications_jobapplication"."answer_to_prescriber",
-                 "job_applications_jobapplication"."refusal_reason",
-                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
-                 "job_applications_jobapplication"."hiring_start_at",
-                 "job_applications_jobapplication"."hiring_end_at",
-                 "job_applications_jobapplication"."hiring_without_approval",
-                 "job_applications_jobapplication"."origin",
-                 "job_applications_jobapplication"."approval_id",
-                 "job_applications_jobapplication"."approval_delivery_mode",
-                 "job_applications_jobapplication"."approval_number_sent_by_email",
-                 "job_applications_jobapplication"."approval_number_sent_at",
-                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
-                 "job_applications_jobapplication"."approval_manually_refused_by_id",
-                 "job_applications_jobapplication"."approval_manually_refused_at",
-                 "job_applications_jobapplication"."transferred_at",
-                 "job_applications_jobapplication"."transferred_by_id",
-                 "job_applications_jobapplication"."transferred_from_id",
-                 "job_applications_jobapplication"."created_at",
-                 "job_applications_jobapplication"."updated_at",
-                 "job_applications_jobapplication"."processed_at",
-                 "job_applications_jobapplication"."prehiring_guidance_days",
-                 "job_applications_jobapplication"."contract_type",
-                 "job_applications_jobapplication"."nb_hours_per_week",
-                 "job_applications_jobapplication"."contract_type_details",
-                 "job_applications_jobapplication"."qualification_type",
-                 "job_applications_jobapplication"."qualification_level",
-                 "job_applications_jobapplication"."planned_training_hours",
-                 "job_applications_jobapplication"."inverted_vae_contract",
-                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
-                 T3."id",
-                 T3."password",
-                 T3."last_login",
-                 T3."is_superuser",
-                 T3."username",
-                 T3."first_name",
-                 T3."last_name",
-                 T3."is_staff",
-                 T3."is_active",
-                 T3."date_joined",
-                 T3."address_line_1",
-                 T3."address_line_2",
-                 T3."post_code",
-                 T3."city",
-                 T3."department",
-                 T3."coords",
-                 T3."geocoding_score",
-                 T3."geocoding_updated_at",
-                 T3."ban_api_resolved_address",
-                 T3."insee_city_id",
-                 T3."title",
-                 T3."full_name_search_vector",
-                 T3."email",
-                 T3."phone",
-                 T3."kind",
-                 T3."identity_provider",
-                 T3."has_completed_welcoming_tour",
-                 T3."created_by_id",
-                 T3."external_data_source_history",
-                 T3."last_checked_at",
-                 T3."public_id",
-                 T3."address_filled_at",
-                 T3."first_login",
-                 "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "users_user" T3 ON ("job_applications_jobapplication"."sender_id" = T3."id")
-          INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
-          WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
-                 AND (("job_applications_jobapplication"."sender_id" = %s
-                       AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
-                      OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s))
-          ORDER BY "job_applications_jobapplication"."created_at" DESC
         ''',
       }),
       dict({

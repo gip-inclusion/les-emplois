@@ -47,7 +47,6 @@ logger = logging.getLogger(__name__)
 class JobSeekerDetailView(UserPassesTestMixin, DetailView):
     model = User
     queryset = User.objects.select_related("jobseeker_profile")
-    template_name = "job_seekers_views/details.html"
     slug_field = "public_id"
     slug_url_kwarg = "public_id"
     context_object_name = "job_seeker"

@@ -28,14 +28,14 @@
 {% block title_extra %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" role="tablist" data-it-sliding-tabs="true">
         <li class="nav-item" role="presentation">
-            <a class="nav-link active"
+            <a class="nav-link"
                href="{% url 'job_seekers_views:details' public_id=job_seeker.public_id %}?back_url={% url 'job_seekers_views:list' %}"
                aria-controls="informations"
                aria-selected="true"
                {% matomo_event "candidat" "clic-onglet" "informations candidat" %}>Informations générales</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link"
+            <a class="nav-link active"
                href="{% url 'job_seekers_views:job_applications' public_id=job_seeker.public_id %}?back_url={% url 'job_seekers_views:list' %}"
                aria-controls="candidatures"
                aria-selected="false"
@@ -53,26 +53,20 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12">
                     <div class="tab-content">
-                        <div class="tab-pane fade show active" id="informations" role="tabpanel" aria-labelledby="informations-tab">
-                            <div class="row">
-                                <div class="col-12 {% if approval %}col-lg-8 order-2 order-lg-1{% endif %}">
-                                    <h2>Informations</h2>
-                                    <div class="c-box mb-3 mb-lg-5">
-                                        {% include "apply/includes/job_seeker_info.html" with job_seeker=job_seeker job_application=None with_matomo_event=True can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request csrf_token=csrf_token SenderKind=SenderKind only %}
+                        <div class="tab-pane fade show active" id="candidatures" role="tabpanel" aria-labelledby="job-applications-tab">
+                            <h2>Candidatures envoyées</h2>
+                            <hr>
+                            {% matomo_event "candidat" "clic" "detail-candidature" as matomo_event_attrs %}
+                            {% for job_application in sent_job_applications %}
+                                {% url 'apply:details_for_prescriber' job_application_id=job_application.id as detail_url %}
+                                {% include "apply/includes/job_application_box_for_user.html" with job_application=job_application detail_url=detail_url matomo_event_attrs=matomo_event_attrs %}
+                            {% empty %}
+                                <div class="c-box c-box--results my-3 my-md-4">
+                                    <div class="c-box--results__body">
+                                        <p class="mb-0">Aucune candidature envoyée.</p>
                                     </div>
-                                    {% if iae_eligibility_diagnosis %}
-                                        {% include "job_seekers_views/includes/eligibility_diagnosis.html" with eligibility_diagnosis=iae_eligibility_diagnosis kind="IAE" request=request itou_help_center_url=ITOU_HELP_CENTER_URL only %}
-                                    {% endif %}
-                                    {% if geiq_eligibility_diagnosis %}
-                                        {% include "job_seekers_views/includes/eligibility_diagnosis.html" with eligibility_diagnosis=geiq_eligibility_diagnosis kind="GEIQ" with_allowance=request.user.is_employer request=request itou_help_center_url=ITOU_HELP_CENTER_URL only %}
-                                    {% endif %}
                                 </div>
-                                {% if approval %}
-                                    <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
-                                        {% include "approvals/includes/box.html" with approval=approval link_from_current_url=request.get_full_path extra_class='mb-3 mb-md-4' only %}
-                                    </div>
-                                {% endif %}
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
