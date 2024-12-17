@@ -1,5 +1,11 @@
+import pytest
+from django.urls import reverse
+
 from itou.users import admin
 from itou.users.models import JobSeekerProfile, User
+from tests.companies.factories import CompanyMembershipFactory
+from tests.institutions.factories import InstitutionMembershipFactory
+from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import JobSeekerFactory
 
 
@@ -108,3 +114,17 @@ def test_get_fields_to_transfer_for_job_seekers():
     # - either an existing relation has been dropped (and the relation can be removed from the relevant list)
     assert not fields_to_transfer & fields_to_ignore, fields_to_transfer & fields_to_ignore
     assert {f.name for f in relation_fields} == fields_to_transfer | fields_to_ignore
+
+
+@pytest.mark.parametrize(
+    "membership_factory",
+    [
+        PrescriberMembershipFactory,
+        CompanyMembershipFactory,
+        InstitutionMembershipFactory,
+    ],
+)
+def test_admin_membership(admin_client, membership_factory):
+    membership = membership_factory()
+    response = admin_client.get(reverse("admin:users_user_change", args=(membership.user_id,)))
+    assert response.status_code == 200
