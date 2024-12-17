@@ -130,6 +130,13 @@ class CreateEmployeeRecordTestMixin:
 
     # Perform check permissions for each step
 
+    def test_access_granted(self, client):
+        # Must have access
+        client.force_login(self.user)
+        response = client.get(self.url)
+
+        assert response.status_code == 200
+
     def test_access_denied_bad_permissions(self, client):
         # Must not have access
         client.force_login(self.user_without_perms)
@@ -180,13 +187,6 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
     @pytest.fixture(autouse=True)
     def setup_method(self):
         self.job_seeker = JobSeekerFactory.build(with_address=True, born_in_france=True)
-
-    def test_access_granted(self, client):
-        # Must have access
-        client.force_login(self.user)
-        response = client.get(self.url)
-
-        assert response.status_code == 200
 
     def test_title(self, client):
         # Job seeker / employee must have a title
@@ -313,12 +313,6 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
     @pytest.fixture(autouse=True)
     def setup_method(self, client):
         self.pass_step_1(client)
-
-    def test_access_granted(self, client):
-        self.pass_step_1(client)
-        response = client.get(self.url)
-
-        assert response.status_code == 200
 
     def test_job_seeker_without_address(self, client):
         # Job seeker has no address filled (which should not happen without admin operation)
