@@ -201,55 +201,6 @@
                       </div>
                   </div>
               </div>
-              <hr/>
-              <div class="row">
-                  <div class="col-12">
-                      <div class="c-box container">
-                          <div class="s-tabs-01__row row">
-                              <div class="s-tabs-01__col col-12">
-                                  <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="2">
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">
-                                              Informations personnelles
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/job-application">
-                                              Candidatures
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/support">
-                                              Accompagnements
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link active" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/contract">
-                                              Contrats
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/exit">
-                                              Sorties
-                                          </a>
-                                      </li>
-                                  </ul>
-                              </div>
-                          </div>
-                          
-                              <div class="text-center my-3 my-md-4">
-                                  <p class="mb-1 mt-3">
-                                      <strong>Aucune donnée pour le moment</strong>
-                                  </p>
-                              </div>
-                          
-                          
-  
-  
-  
-                      </div>
-                  </div>
-              </div>
           </div>
       </section>
   '''
@@ -280,55 +231,6 @@
                               <div class="col-5">Montant potentiel de l’aide à l’accompagnement</div>
                               <div class="col text-end fw-bold">-</div>
                           </div>
-                      </div>
-                  </div>
-              </div>
-              <hr/>
-              <div class="row">
-                  <div class="col-12">
-                      <div class="c-box container">
-                          <div class="s-tabs-01__row row">
-                              <div class="s-tabs-01__col col-12">
-                                  <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="2">
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">
-                                              Informations personnelles
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/job-application">
-                                              Candidatures
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/support">
-                                              Accompagnements
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/contract">
-                                              Contrats
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link active" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/exit">
-                                              Sorties
-                                          </a>
-                                      </li>
-                                  </ul>
-                              </div>
-                          </div>
-                          
-                              <div class="text-center my-3 my-md-4">
-                                  <p class="mb-1 mt-3">
-                                      <strong>Aucune donnée pour le moment</strong>
-                                  </p>
-                              </div>
-                          
-                          
-  
-  
-  
                       </div>
                   </div>
               </div>
@@ -365,55 +267,6 @@
                       </div>
                   </div>
               </div>
-              <hr/>
-              <div class="row">
-                  <div class="col-12">
-                      <div class="c-box container">
-                          <div class="s-tabs-01__row row">
-                              <div class="s-tabs-01__col col-12">
-                                  <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="2">
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">
-                                              Informations personnelles
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link active" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/job-application">
-                                              Candidatures
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/support">
-                                              Accompagnements
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/contract">
-                                              Contrats
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/exit">
-                                              Sorties
-                                          </a>
-                                      </li>
-                                  </ul>
-                              </div>
-                          </div>
-                          
-                              <div class="text-center my-3 my-md-4">
-                                  <p class="mb-1 mt-3">
-                                      <strong>Aucune donnée pour le moment</strong>
-                                  </p>
-                              </div>
-                          
-                          
-  
-  
-  
-                      </div>
-                  </div>
-              </div>
           </div>
       </section>
   '''
@@ -447,55 +300,6 @@
                       </div>
                   </div>
               </div>
-              <hr/>
-              <div class="row">
-                  <div class="col-12">
-                      <div class="c-box container">
-                          <div class="s-tabs-01__row row">
-                              <div class="s-tabs-01__col col-12">
-                                  <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="2">
-                                      <li class="nav-item">
-                                          <a class="nav-link active" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">
-                                              Informations personnelles
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/job-application">
-                                              Candidatures
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/support">
-                                              Accompagnements
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/contract">
-                                              Contrats
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/exit">
-                                              Sorties
-                                          </a>
-                                      </li>
-                                  </ul>
-                              </div>
-                          </div>
-                          
-                              <div class="text-center my-3 my-md-4">
-                                  <p class="mb-1 mt-3">
-                                      <strong>Aucune donnée pour le moment</strong>
-                                  </p>
-                              </div>
-                          
-                          
-  
-  
-  
-                      </div>
-                  </div>
-              </div>
           </div>
       </section>
   '''
@@ -526,55 +330,6 @@
                               <div class="col-5">Montant potentiel de l’aide à l’accompagnement</div>
                               <div class="col text-end fw-bold">-</div>
                           </div>
-                      </div>
-                  </div>
-              </div>
-              <hr/>
-              <div class="row">
-                  <div class="col-12">
-                      <div class="c-box container">
-                          <div class="s-tabs-01__row row">
-                              <div class="s-tabs-01__col col-12">
-                                  <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="2">
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">
-                                              Informations personnelles
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/job-application">
-                                              Candidatures
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link active" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/support">
-                                              Accompagnements
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/contract">
-                                              Contrats
-                                          </a>
-                                      </li>
-                                      <li class="nav-item">
-                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/exit">
-                                              Sorties
-                                          </a>
-                                      </li>
-                                  </ul>
-                              </div>
-                          </div>
-                          
-                              <div class="text-center my-3 my-md-4">
-                                  <p class="mb-1 mt-3">
-                                      <strong>Aucune donnée pour le moment</strong>
-                                  </p>
-                              </div>
-                          
-                          
-  
-  
-  
                       </div>
                   </div>
               </div>
@@ -692,173 +447,167 @@
           <div class="s-section__container container">
               <div class="row">
                   <div class="col-12">
-                      <div class="c-box container">
-                          <div class="s-tabs-01__row row">
-                              
-                                  <div class="tab-content" id="result_page">
-                                      <div class="table-responsive mt-3 mt-md-4">
-                                          <table class="table table-hover">
-                                              <caption class="visually-hidden">Liste des GEIQ</caption>
-                                              <thead>
-                                                  <tr>
-                                                      <th scope="col">Statut du bilan</th>
-                                                      <th scope="col">Nom</th>
-                                                      <th scope="col">Commune</th>
-                                                      <th scope="col">Dernier bilan</th>
-                                                      <th scope="col">Salariés éligibles à l’aide</th>
-                                                      <th scope="col">Financement accordé</th>
-                                                  </tr>
-                                              </thead>
-                                              <tbody>
+                      
+                          <div class="table-responsive mt-3 mt-md-4">
+                              <table class="table table-hover">
+                                  <caption class="visually-hidden">Liste des GEIQ</caption>
+                                  <thead>
+                                      <tr>
+                                          <th scope="col">Statut du bilan</th>
+                                          <th scope="col">Nom</th>
+                                          <th scope="col">Commune</th>
+                                          <th scope="col">Dernier bilan</th>
+                                          <th scope="col">Salariés éligibles à l’aide</th>
+                                          <th scope="col">Financement accordé</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      
+                                          <tr>
+                                              <td>
                                                   
-                                                      <tr>
-                                                          <td>
-                                                              
-      <span class="badge badge-sm rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
+      <span class="badge badge-xs rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
   
   
-                                                          </td>
-                                                          <td>
-                                                              <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine accepted</a>
-                                                          </td>
-                                                          <td>Rennes</td>
-                                                          <td>2023</td>
-                                                          <td>1</td>
-                                                          <td>
-                                                              
-                                                                  <span class="text-success">100%</span>
-                                                              
-                                                          </td>
-                                                      </tr>
+                                              </td>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine accepted</a>
+                                              </td>
+                                              <td>Rennes</td>
+                                              <td>2023</td>
+                                              <td>1</td>
+                                              <td>
                                                   
-                                                      <tr>
-                                                          <td>
-                                                              
-      <span class="badge badge-sm rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
-  
-  
-                                                          </td>
-                                                          <td>
-                                                              <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine full_refund</a>
-                                                          </td>
-                                                          <td>Rennes</td>
-                                                          <td>2023</td>
-                                                          <td>5</td>
-                                                          <td>
-                                                              
-                                                                  <span class="text-danger">0%</span>
-                                                              
-                                                          </td>
-                                                      </tr>
+                                                      <span class="text-success">100%</span>
                                                   
-                                                      <tr>
-                                                          <td>
-                                                              
-      <span class="badge badge-sm rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
-  
-  
-                                                          </td>
-                                                          <td>
-                                                              <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine partial_accepted</a>
-                                                          </td>
-                                                          <td>Rennes</td>
-                                                          <td>2023</td>
-                                                          <td>2</td>
-                                                          <td>
-                                                              
-                                                                  <span class="text-success">&gt;75%</span>
-                                                              
-                                                          </td>
-                                                      </tr>
+                                              </td>
+                                          </tr>
+                                      
+                                          <tr>
+                                              <td>
                                                   
-                                                      <tr>
-                                                          <td>
-                                                              
-      <span class="badge badge-sm rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
+      <span class="badge badge-xs rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
   
   
-                                                          </td>
-                                                          <td>
-                                                              <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine partial_refund</a>
-                                                          </td>
-                                                          <td>Rennes</td>
-                                                          <td>2023</td>
-                                                          <td>4</td>
-                                                          <td>
-                                                              
-                                                                  <span class="text-warning">&lt;75%</span>
-                                                              
-                                                          </td>
-                                                      </tr>
+                                              </td>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine full_refund</a>
+                                              </td>
+                                              <td>Rennes</td>
+                                              <td>2023</td>
+                                              <td>5</td>
+                                              <td>
                                                   
-                                                      <tr>
-                                                          <td>
-                                                              
-      <span class="badge badge-sm rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
-  
-  
-                                                          </td>
-                                                          <td>
-                                                              <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine remainder_refused</a>
-                                                          </td>
-                                                          <td>Rennes</td>
-                                                          <td>2023</td>
-                                                          <td>3</td>
-                                                          <td>
-                                                              
-                                                                  <span class="text-warning">75%</span>
-  
-                                                              
-                                                          </td>
-                                                      </tr>
+                                                      <span class="text-danger">0%</span>
                                                   
-                                                      <tr>
-                                                          <td>
-                                                              
-      <span class="badge badge-sm rounded-pill text-nowrap bg-info"><i class="ri-loader-2-line"></i>À valider</span>
-  
-  
-                                                          </td>
-                                                          <td>
-                                                              <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq du finistère avec bilan transmis</a>
-                                                          </td>
-                                                          <td>Porspoder</td>
-                                                          <td>2023</td>
-                                                          <td>0</td>
-                                                          <td>
-                                                              
-                                                                  -
-                                                              
-                                                          </td>
-                                                      </tr>
+                                              </td>
+                                          </tr>
+                                      
+                                          <tr>
+                                              <td>
                                                   
-                                                      <tr>
-                                                          <td>
-                                                              
-      <span class="badge badge-sm rounded-pill text-nowrap bg-warning"><i class="ri-close-line"></i>En attente</span>
+      <span class="badge badge-xs rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
   
   
-                                                          </td>
-                                                          <td>
-                                                              <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq du morbihan</a>
-                                                          </td>
-                                                          <td>Vannes (56)</td>
-                                                          <td>2023</td>
-                                                          <td>1</td>
-                                                          <td>
-                                                              
-                                                                  -
-                                                              
-                                                          </td>
-                                                      </tr>
+                                              </td>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine partial_accepted</a>
+                                              </td>
+                                              <td>Rennes</td>
+                                              <td>2023</td>
+                                              <td>2</td>
+                                              <td>
                                                   
-                                              </tbody>
-                                          </table>
-                                      </div>
-                                  </div>
-                              
+                                                      <span class="text-success">&gt;75%</span>
+                                                  
+                                              </td>
+                                          </tr>
+                                      
+                                          <tr>
+                                              <td>
+                                                  
+      <span class="badge badge-xs rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
+  
+  
+                                              </td>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine partial_refund</a>
+                                              </td>
+                                              <td>Rennes</td>
+                                              <td>2023</td>
+                                              <td>4</td>
+                                              <td>
+                                                  
+                                                      <span class="text-warning">&lt;75%</span>
+                                                  
+                                              </td>
+                                          </tr>
+                                      
+                                          <tr>
+                                              <td>
+                                                  
+      <span class="badge badge-xs rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
+  
+  
+                                              </td>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine remainder_refused</a>
+                                              </td>
+                                              <td>Rennes</td>
+                                              <td>2023</td>
+                                              <td>3</td>
+                                              <td>
+                                                  
+                                                      <span class="text-warning">75%</span>
+  
+                                                  
+                                              </td>
+                                          </tr>
+                                      
+                                          <tr>
+                                              <td>
+                                                  
+      <span class="badge badge-xs rounded-pill text-nowrap bg-info"><i class="ri-loader-2-line"></i>À valider</span>
+  
+  
+                                              </td>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq du finistère avec bilan transmis</a>
+                                              </td>
+                                              <td>Porspoder</td>
+                                              <td>2023</td>
+                                              <td>0</td>
+                                              <td>
+                                                  
+                                                      -
+                                                  
+                                              </td>
+                                          </tr>
+                                      
+                                          <tr>
+                                              <td>
+                                                  
+      <span class="badge badge-xs rounded-pill text-nowrap bg-warning"><i class="ri-close-line"></i>En attente</span>
+  
+  
+                                              </td>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq du morbihan</a>
+                                              </td>
+                                              <td>Vannes (56)</td>
+                                              <td>2023</td>
+                                              <td>1</td>
+                                              <td>
+                                                  
+                                                      -
+                                                  
+                                              </td>
+                                          </tr>
+                                      
+                                  </tbody>
+                              </table>
                           </div>
-                      </div>
+                      
                   </div>
               </div>
           </div>
@@ -871,17 +620,13 @@
           <div class="s-section__container container">
               <div class="row">
                   <div class="col-12">
-                      <div class="c-box container">
-                          <div class="s-tabs-01__row row">
-                              
-                                  <div class="text-center my-3 my-md-4">
-                                      <p class="mb-1 mt-3">
-                                          <strong>Aucun GEIQ</strong>
-                                      </p>
-                                  </div>
-                              
+                      
+                          <div class="text-center my-3 my-md-4">
+                              <p class="mb-1 mt-3">
+                                  <strong>Aucun GEIQ</strong>
+                              </p>
                           </div>
-                      </div>
+                      
                   </div>
               </div>
           </div>
@@ -893,7 +638,7 @@
   <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
-                  <div class="col-12 col-lg-8">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box">
                           
                               <h2>Dossier transmis par le GEIQ</h2>
@@ -906,9 +651,9 @@
                                       <h3>Document de synthèse</h3>
                                   </div>
                                   <div clas="text-center">
-                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                      <a class="btn btn-ico btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
                                           <span>Synthèse 2023.pdf</span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-medium"></i>
+                                          <i aria-hidden="true" class="ri-download-line fw-medium"></i>
                                       </a>
                                   </div>
                               </div>
@@ -917,7 +662,7 @@
                           <div class="d-flex flex-column flex-md-row justify-content-between">
                               <div>
                                   <h3>Données individuelles de parcours</h3>
-                                  <p id="label-last-synced-at">
+                                  <p class="mb-0" id="label-last-synced-at">
       Dernière synchronisation: 1 juin 2024 02:00
       
   </p>
@@ -929,10 +674,10 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col-12 col-lg-4">
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
                       
                           
-                              <div class="c-box mb-4 bg-warning-lightest border-warning">
+                              <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
                                   <span class="fs-sm">Financement</span>
                                   <h4>Demande de remboursement total</h4>
                                   <p>
@@ -946,7 +691,7 @@
                       
                       
   
-  <div class="c-box c-box--structure">
+  <div class="c-box c-box--structure mb-3 mb-md-4">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i class="ri-community-line"></i>
           <div>
@@ -1039,13 +784,17 @@
   
   
                               
-      <h1>Bilan d’exécution - 2023</h1>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <div class="d-xl-flex align-items-xl-center">
+              <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - 2023</h1>
+              
       
-      
-          <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Bilan validé : demande de remboursement total</span>
+          <span class="badge badge-base rounded-pill text-nowrap bg-warning">Bilan validé : demande de remboursement total</span>
       
   
   
+          </div>
+      </div>
   
                               
       
@@ -1090,7 +839,7 @@
   <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
-                  <div class="col-12 col-lg-8">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box">
                           
                               <h2>Le dossier transmis par Label a été envoyé</h2>
@@ -1101,23 +850,23 @@
                           <hr/>
                           <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
                               
-                                  <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
                                       <div>
                                           <h3>Document de synthèse</h3>
                                       </div>
                                       <div clas="text-center">
-                                          <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                          <a class="btn btn-ico btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
                                               <span>Synthèse 2023.pdf</span>
-                                              <i aria-hidden="true" class="ri-external-link-line fw-medium"></i>
+                                              <i aria-hidden="true" class="ri-download-line fw-medium"></i>
                                           </a>
                                       </div>
                                   </div>
                               
                               <hr/>
-                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                              <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
                                   <div>
                                       <h3>Données individuelles de parcours</h3>
-                                      <p id="label-last-synced-at">
+                                      <p class="mb-0" id="label-last-synced-at">
       Dernière synchronisation: 1 juin 2024 02:00
       
   </p>
@@ -1143,10 +892,10 @@
                           </form>
                       </div>
                   </div>
-                  <div class="col-12 col-lg-4">
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
                       
                           
-                              <div class="c-box mb-4 bg-warning-lightest border-warning">
+                              <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
                                   <span class="fs-sm">Financement</span>
                                   <h4>Demande de remboursement total</h4>
                                   <p>
@@ -1154,7 +903,7 @@
                                   </p>
                                   <strong>Commentaire de votre DDETS GEIQ</strong>
                                   <p>Non !</p>
-                                  <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                                  <p class="mb-0">Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
                               </div>
                           
                       
@@ -1189,12 +938,16 @@
   
   
                               
-      <h1>Bilan d’exécution - 2023</h1>
-      
-          
-              <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Financement : demande de remboursement total</span>
-          
-      
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <div class="d-xl-flex align-items-xl-center">
+              <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - 2023</h1>
+              
+                  
+                      <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : demande de remboursement total</span>
+                  
+              
+          </div>
+      </div>
   
                               
       
@@ -1239,7 +992,7 @@
   <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
-                  <div class="col-12 col-lg-8">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box">
                           
                               <h2>Dossier transmis par le GEIQ</h2>
@@ -1252,9 +1005,9 @@
                                       <h3>Document de synthèse</h3>
                                   </div>
                                   <div clas="text-center">
-                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                      <a class="btn btn-ico btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
                                           <span>Synthèse 2023.pdf</span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-medium"></i>
+                                          <i aria-hidden="true" class="ri-download-line fw-medium"></i>
                                       </a>
                                   </div>
                               </div>
@@ -1263,7 +1016,7 @@
                           <div class="d-flex flex-column flex-md-row justify-content-between">
                               <div>
                                   <h3>Données individuelles de parcours</h3>
-                                  <p id="label-last-synced-at">
+                                  <p class="mb-0" id="label-last-synced-at">
       Dernière synchronisation: 1 juin 2024 02:00
       
   </p>
@@ -1275,10 +1028,10 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col-12 col-lg-4">
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
                       
                           
-                              <div class="c-box mb-4 bg-success-lightest border-success">
+                              <div class="c-box mb-3 mb-md-4 bg-success-lightest border-success">
                                   <span class="fs-sm">Financement</span>
                                   <h4>Totalité de l’aide accordée</h4>
                                   <p>
@@ -1292,7 +1045,7 @@
                       
                       
   
-  <div class="c-box c-box--structure">
+  <div class="c-box c-box--structure mb-3 mb-md-4">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i class="ri-community-line"></i>
           <div>
@@ -1385,13 +1138,17 @@
   
   
                               
-      <h1>Bilan d’exécution - 2023</h1>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <div class="d-xl-flex align-items-xl-center">
+              <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - 2023</h1>
+              
       
-      
-          <span class="badge badge-sm rounded-pill text-nowrap bg-success">Bilan validé</span>
+          <span class="badge badge-base rounded-pill text-nowrap bg-success">Bilan validé</span>
       
   
   
+          </div>
+      </div>
   
                               
       
@@ -1436,7 +1193,7 @@
   <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
-                  <div class="col-12 col-lg-8">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box">
                           
                               <h2>Le dossier transmis par Label a été envoyé</h2>
@@ -1447,23 +1204,23 @@
                           <hr/>
                           <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
                               
-                                  <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
                                       <div>
                                           <h3>Document de synthèse</h3>
                                       </div>
                                       <div clas="text-center">
-                                          <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                          <a class="btn btn-ico btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
                                               <span>Synthèse 2023.pdf</span>
-                                              <i aria-hidden="true" class="ri-external-link-line fw-medium"></i>
+                                              <i aria-hidden="true" class="ri-download-line fw-medium"></i>
                                           </a>
                                       </div>
                                   </div>
                               
                               <hr/>
-                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                              <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
                                   <div>
                                       <h3>Données individuelles de parcours</h3>
-                                      <p id="label-last-synced-at">
+                                      <p class="mb-0" id="label-last-synced-at">
       Dernière synchronisation: 1 juin 2024 02:00
       
   </p>
@@ -1489,16 +1246,16 @@
                           </form>
                       </div>
                   </div>
-                  <div class="col-12 col-lg-4">
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
                       
                           
-                              <div class="c-box mb-4 bg-success-lightest border-success">
+                              <div class="c-box mb-3 mb-md-4 bg-success-lightest border-success">
                                   <span class="fs-sm">Financement</span>
                                   <h4>Totalité de l’aide accordée</h4>
                                   <p>La totalité de l’aide conventionnée a été validée par DDETS 75.</p>
                                   <strong>Commentaire de votre DDETS GEIQ</strong>
                                   <p>Bravo</p>
-                                  <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                                  <p class="mb-0">Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
                               </div>
                           
                       
@@ -1533,12 +1290,16 @@
   
   
                               
-      <h1>Bilan d’exécution - 2023</h1>
-      
-          
-              <span class="badge badge-sm rounded-pill text-nowrap bg-success">Financement : totalité de l’aide accordée</span>
-          
-      
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <div class="d-xl-flex align-items-xl-center">
+              <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - 2023</h1>
+              
+                  
+                      <span class="badge badge-base rounded-pill text-nowrap bg-success">Financement : totalité de l’aide accordée</span>
+                  
+              
+          </div>
+      </div>
   
                               
       
@@ -1583,7 +1344,7 @@
   <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
-                  <div class="col-12 col-lg-8">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box">
                           
                               <h2>Dossier transmis par le GEIQ</h2>
@@ -1596,9 +1357,9 @@
                                       <h3>Document de synthèse</h3>
                                   </div>
                                   <div clas="text-center">
-                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                      <a class="btn btn-ico btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
                                           <span>Synthèse 2023.pdf</span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-medium"></i>
+                                          <i aria-hidden="true" class="ri-download-line fw-medium"></i>
                                       </a>
                                   </div>
                               </div>
@@ -1607,7 +1368,7 @@
                           <div class="d-flex flex-column flex-md-row justify-content-between">
                               <div>
                                   <h3>Données individuelles de parcours</h3>
-                                  <p id="label-last-synced-at">
+                                  <p class="mb-0" id="label-last-synced-at">
       Dernière synchronisation: 1 juin 2024 02:00
       
   </p>
@@ -1619,10 +1380,10 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col-12 col-lg-4">
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
                       
                           
-                              <div class="c-box mb-4 bg-success-lightest border-success">
+                              <div class="c-box mb-3 mb-md-4 bg-success-lightest border-success">
                                   <span class="fs-sm">Financement</span>
                                   <h4>Solde partiellement accordé</h4>
                                   <p>
@@ -1636,7 +1397,7 @@
                       
                       
   
-  <div class="c-box c-box--structure">
+  <div class="c-box c-box--structure mb-3 mb-md-4">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i class="ri-community-line"></i>
           <div>
@@ -1729,13 +1490,17 @@
   
   
                               
-      <h1>Bilan d’exécution - 2023</h1>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <div class="d-xl-flex align-items-xl-center">
+              <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - 2023</h1>
+              
       
-      
-          <span class="badge badge-sm rounded-pill text-nowrap bg-success">Bilan validé : solde partiellement accordé</span>
+          <span class="badge badge-base rounded-pill text-nowrap bg-success">Bilan validé : solde partiellement accordé</span>
       
   
   
+          </div>
+      </div>
   
                               
       
@@ -1780,7 +1545,7 @@
   <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
-                  <div class="col-12 col-lg-8">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box">
                           
                               <h2>Le dossier transmis par Label a été envoyé</h2>
@@ -1791,23 +1556,23 @@
                           <hr/>
                           <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
                               
-                                  <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
                                       <div>
                                           <h3>Document de synthèse</h3>
                                       </div>
                                       <div clas="text-center">
-                                          <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                          <a class="btn btn-ico btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
                                               <span>Synthèse 2023.pdf</span>
-                                              <i aria-hidden="true" class="ri-external-link-line fw-medium"></i>
+                                              <i aria-hidden="true" class="ri-download-line fw-medium"></i>
                                           </a>
                                       </div>
                                   </div>
                               
                               <hr/>
-                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                              <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
                                   <div>
                                       <h3>Données individuelles de parcours</h3>
-                                      <p id="label-last-synced-at">
+                                      <p class="mb-0" id="label-last-synced-at">
       Dernière synchronisation: 1 juin 2024 02:00
       
   </p>
@@ -1833,10 +1598,10 @@
                           </form>
                       </div>
                   </div>
-                  <div class="col-12 col-lg-4">
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
                       
                           
-                              <div class="c-box mb-4 bg-success-lightest border-success">
+                              <div class="c-box mb-3 mb-md-4 bg-success-lightest border-success">
                                   <span class="fs-sm">Financement</span>
                                   <h4>Solde partiellement accordé</h4>
                                   <p>
@@ -1844,7 +1609,7 @@
                                   </p>
                                   <strong>Commentaire de votre DDETS GEIQ</strong>
                                   <p>Presque bravo</p>
-                                  <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                                  <p class="mb-0">Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
                               </div>
                           
                       
@@ -1879,12 +1644,16 @@
   
   
                               
-      <h1>Bilan d’exécution - 2023</h1>
-      
-          
-              <span class="badge badge-sm rounded-pill text-nowrap bg-success">Financement : solde partiellement accordé</span>
-          
-      
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <div class="d-xl-flex align-items-xl-center">
+              <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - 2023</h1>
+              
+                  
+                      <span class="badge badge-base rounded-pill text-nowrap bg-success">Financement : solde partiellement accordé</span>
+                  
+              
+          </div>
+      </div>
   
                               
       
@@ -1929,7 +1698,7 @@
   <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
-                  <div class="col-12 col-lg-8">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box">
                           
                               <h2>Dossier transmis par le GEIQ</h2>
@@ -1942,9 +1711,9 @@
                                       <h3>Document de synthèse</h3>
                                   </div>
                                   <div clas="text-center">
-                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                      <a class="btn btn-ico btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
                                           <span>Synthèse 2023.pdf</span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-medium"></i>
+                                          <i aria-hidden="true" class="ri-download-line fw-medium"></i>
                                       </a>
                                   </div>
                               </div>
@@ -1953,7 +1722,7 @@
                           <div class="d-flex flex-column flex-md-row justify-content-between">
                               <div>
                                   <h3>Données individuelles de parcours</h3>
-                                  <p id="label-last-synced-at">
+                                  <p class="mb-0" id="label-last-synced-at">
       Dernière synchronisation: 1 juin 2024 02:00
       
   </p>
@@ -1965,10 +1734,10 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col-12 col-lg-4">
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
                       
                           
-                              <div class="c-box mb-4 bg-warning-lightest border-warning">
+                              <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
                                   <span class="fs-sm">Financement</span>
                                   <h4>Demande de remboursement partiel</h4>
                                   <p>
@@ -1982,7 +1751,7 @@
                       
                       
   
-  <div class="c-box c-box--structure">
+  <div class="c-box c-box--structure mb-3 mb-md-4">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i class="ri-community-line"></i>
           <div>
@@ -2075,13 +1844,17 @@
   
   
                               
-      <h1>Bilan d’exécution - 2023</h1>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <div class="d-xl-flex align-items-xl-center">
+              <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - 2023</h1>
+              
       
-      
-          <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Bilan validé : demande de remboursement partiel</span>
+          <span class="badge badge-base rounded-pill text-nowrap bg-warning">Bilan validé : demande de remboursement partiel</span>
       
   
   
+          </div>
+      </div>
   
                               
       
@@ -2126,7 +1899,7 @@
   <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
-                  <div class="col-12 col-lg-8">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box">
                           
                               <h2>Le dossier transmis par Label a été envoyé</h2>
@@ -2137,23 +1910,23 @@
                           <hr/>
                           <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
                               
-                                  <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
                                       <div>
                                           <h3>Document de synthèse</h3>
                                       </div>
                                       <div clas="text-center">
-                                          <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                          <a class="btn btn-ico btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
                                               <span>Synthèse 2023.pdf</span>
-                                              <i aria-hidden="true" class="ri-external-link-line fw-medium"></i>
+                                              <i aria-hidden="true" class="ri-download-line fw-medium"></i>
                                           </a>
                                       </div>
                                   </div>
                               
                               <hr/>
-                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                              <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
                                   <div>
                                       <h3>Données individuelles de parcours</h3>
-                                      <p id="label-last-synced-at">
+                                      <p class="mb-0" id="label-last-synced-at">
       Dernière synchronisation: 1 juin 2024 02:00
       
   </p>
@@ -2179,10 +1952,10 @@
                           </form>
                       </div>
                   </div>
-                  <div class="col-12 col-lg-4">
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
                       
                           
-                              <div class="c-box mb-4 bg-warning-lightest border-warning">
+                              <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
                                   <span class="fs-sm">Financement</span>
                                   <h4>Demande de remboursement partiel</h4>
                                   <p>
@@ -2190,7 +1963,7 @@
                                   </p>
                                   <strong>Commentaire de votre DDETS GEIQ</strong>
                                   <p>Pas top</p>
-                                  <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                                  <p class="mb-0">Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
                               </div>
                           
                       
@@ -2225,12 +1998,16 @@
   
   
                               
-      <h1>Bilan d’exécution - 2023</h1>
-      
-          
-              <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Financement : demande de remboursement partiel</span>
-          
-      
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <div class="d-xl-flex align-items-xl-center">
+              <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - 2023</h1>
+              
+                  
+                      <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : demande de remboursement partiel</span>
+                  
+              
+          </div>
+      </div>
   
                               
       
@@ -2275,7 +2052,7 @@
   <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
-                  <div class="col-12 col-lg-8">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box">
                           
                               <h2>Dossier transmis par le GEIQ</h2>
@@ -2288,9 +2065,9 @@
                                       <h3>Document de synthèse</h3>
                                   </div>
                                   <div clas="text-center">
-                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                      <a class="btn btn-ico btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
                                           <span>Synthèse 2023.pdf</span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-medium"></i>
+                                          <i aria-hidden="true" class="ri-download-line fw-medium"></i>
                                       </a>
                                   </div>
                               </div>
@@ -2299,7 +2076,7 @@
                           <div class="d-flex flex-column flex-md-row justify-content-between">
                               <div>
                                   <h3>Données individuelles de parcours</h3>
-                                  <p id="label-last-synced-at">
+                                  <p class="mb-0" id="label-last-synced-at">
       Dernière synchronisation: 1 juin 2024 02:00
       
   </p>
@@ -2311,10 +2088,10 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col-12 col-lg-4">
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
                       
                           
-                              <div class="c-box mb-4 bg-warning-lightest border-warning">
+                              <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
                                   <span class="fs-sm">Financement</span>
                                   <h4>Complément d’aide refusé</h4>
                                   <p>
@@ -2328,7 +2105,7 @@
                       
                       
   
-  <div class="c-box c-box--structure">
+  <div class="c-box c-box--structure mb-3 mb-md-4">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i class="ri-community-line"></i>
           <div>
@@ -2421,13 +2198,17 @@
   
   
                               
-      <h1>Bilan d’exécution - 2023</h1>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <div class="d-xl-flex align-items-xl-center">
+              <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - 2023</h1>
+              
       
-      
-          <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Bilan validé : solde refusé</span>
+          <span class="badge badge-base rounded-pill text-nowrap bg-warning">Bilan validé : solde refusé</span>
       
   
   
+          </div>
+      </div>
   
                               
       
@@ -2472,7 +2253,7 @@
   <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
-                  <div class="col-12 col-lg-8">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box">
                           
                               <h2>Le dossier transmis par Label a été envoyé</h2>
@@ -2483,23 +2264,23 @@
                           <hr/>
                           <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
                               
-                                  <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
                                       <div>
                                           <h3>Document de synthèse</h3>
                                       </div>
                                       <div clas="text-center">
-                                          <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                          <a class="btn btn-ico btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
                                               <span>Synthèse 2023.pdf</span>
-                                              <i aria-hidden="true" class="ri-external-link-line fw-medium"></i>
+                                              <i aria-hidden="true" class="ri-download-line fw-medium"></i>
                                           </a>
                                       </div>
                                   </div>
                               
                               <hr/>
-                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                              <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
                                   <div>
                                       <h3>Données individuelles de parcours</h3>
-                                      <p id="label-last-synced-at">
+                                      <p class="mb-0" id="label-last-synced-at">
       Dernière synchronisation: 1 juin 2024 02:00
       
   </p>
@@ -2525,16 +2306,16 @@
                           </form>
                       </div>
                   </div>
-                  <div class="col-12 col-lg-4">
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
                       
                           
-                              <div class="c-box mb-4 bg-warning-lightest border-warning">
+                              <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
                                   <span class="fs-sm">Financement</span>
                                   <h4>Complément d’aide refusé</h4>
                                   <p>La totalité de l’aide conventionnée n’a pas été accordée par DDETS 75.</p>
                                   <strong>Commentaire de votre DDETS GEIQ</strong>
                                   <p>Mouais</p>
-                                  <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                                  <p class="mb-0">Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
                               </div>
                           
                       
@@ -2569,12 +2350,16 @@
   
   
                               
-      <h1>Bilan d’exécution - 2023</h1>
-      
-          
-              <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Financement : solde refusé</span>
-          
-      
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <div class="d-xl-flex align-items-xl-center">
+              <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - 2023</h1>
+              
+                  
+                      <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : solde refusé</span>
+                  
+              
+          </div>
+      </div>
   
                               
       
@@ -2619,7 +2404,7 @@
   <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
-                  <div class="col-12 col-lg-8">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box">
                           
                               <h2>Dossier transmis par le GEIQ</h2>
@@ -2632,9 +2417,9 @@
                                       <h3>Document de synthèse</h3>
                                   </div>
                                   <div clas="text-center">
-                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                      <a class="btn btn-ico btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
                                           <span>Synthèse 2023.pdf</span>
-                                          <i aria-hidden="true" class="ri-external-link-line fw-medium"></i>
+                                          <i aria-hidden="true" class="ri-download-line fw-medium"></i>
                                       </a>
                                   </div>
                               </div>
@@ -2643,7 +2428,7 @@
                           <div class="d-flex flex-column flex-md-row justify-content-between">
                               <div>
                                   <h3>Données individuelles de parcours</h3>
-                                  <p id="label-last-synced-at">
+                                  <p class="mb-0" id="label-last-synced-at">
       Dernière synchronisation: 1 juin 2024 02:00
       
   </p>
@@ -2655,9 +2440,9 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col-12 col-lg-4">
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
                       
-                          <div class="c-box mb-4 bg-info-lightest border-info">
+                          <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
                               <span class="fs-sm">Financement</span>
                               <h4>Bilan d’exécution à valider</h4>
                               <p>
@@ -2668,7 +2453,7 @@
                       
                       
   
-  <div class="c-box c-box--structure">
+  <div class="c-box c-box--structure mb-3 mb-md-4">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i class="ri-community-line"></i>
           <div>
@@ -2761,11 +2546,15 @@
   
   
                               
-      <h1>Bilan d’exécution - 2023</h1>
-      
-      <span class="badge badge-sm rounded-pill text-nowrap bg-info">Bilan à l’étude</span>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <div class="d-xl-flex align-items-xl-center">
+              <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - 2023</h1>
+              
+      <span class="badge badge-base rounded-pill text-nowrap bg-info">Bilan à l’étude</span>
   
   
+          </div>
+      </div>
   
                               
       
@@ -2810,7 +2599,7 @@
   <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
-                  <div class="col-12 col-lg-8">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box">
                           
                               <h2>Le dossier transmis par Label a été envoyé</h2>
@@ -2821,23 +2610,23 @@
                           <hr/>
                           <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
                               
-                                  <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
                                       <div>
                                           <h3>Document de synthèse</h3>
                                       </div>
                                       <div clas="text-center">
-                                          <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                          <a class="btn btn-ico btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
                                               <span>Synthèse 2023.pdf</span>
-                                              <i aria-hidden="true" class="ri-external-link-line fw-medium"></i>
+                                              <i aria-hidden="true" class="ri-download-line fw-medium"></i>
                                           </a>
                                       </div>
                                   </div>
                               
                               <hr/>
-                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                              <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
                                   <div>
                                       <h3>Données individuelles de parcours</h3>
-                                      <p id="label-last-synced-at">
+                                      <p class="mb-0" id="label-last-synced-at">
       Dernière synchronisation: 1 juin 2024 02:00
       
   </p>
@@ -2863,15 +2652,15 @@
                           </form>
                       </div>
                   </div>
-                  <div class="col-12 col-lg-4">
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
                       
-                          <div class="c-box mb-4 bg-info-lightest border-info">
+                          <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
                               <span class="fs-sm">Financement</span>
                               <h4>Bilan d’exécution à l’étude</h4>
                               <p class="mb-0">
                                   Votre bilan d’exécution a été transmis à votre DDETS. La décision relative au version de l’aide financière vous sera communiquée par mail.
                               </p>
-                              <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                              <p class="mb-0">Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
                           </div>
                       
                   </div>
@@ -2905,10 +2694,14 @@
   
   
                               
-      <h1>Bilan d’exécution - 2023</h1>
-      
-          <span class="badge badge-sm rounded-pill text-nowrap bg-info">Bilan à l’étude</span>
-      
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <div class="d-xl-flex align-items-xl-center">
+              <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - 2023</h1>
+              
+                  <span class="badge badge-base rounded-pill text-nowrap bg-info">Bilan à l’étude</span>
+              
+          </div>
+      </div>
   
                               
       
@@ -2953,7 +2746,7 @@
   <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
-                  <div class="col-12 col-lg-8">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box">
                           
                               <h2>En attente du dossier</h2>
@@ -2963,7 +2756,7 @@
                           <div class="d-flex flex-column flex-md-row justify-content-between">
                               <div>
                                   <h3>Données individuelles de parcours</h3>
-                                  <p id="label-last-synced-at">
+                                  <p class="mb-0" id="label-last-synced-at">
       Dernière synchronisation: -
       
   </p>
@@ -2975,9 +2768,9 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col-12 col-lg-4">
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
                       
-                          <div class="c-box mb-4 bg-warning-lightest border-warning">
+                          <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
                               <span class="fs-sm">Financement</span>
                               <h4>En attente du bilan d’exécution</h4>
                               <p class="mb-0">
@@ -2987,7 +2780,7 @@
                       
                       
   
-  <div class="c-box c-box--structure">
+  <div class="c-box c-box--structure mb-3 mb-md-4">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i class="ri-community-line"></i>
           <div>
@@ -3080,11 +2873,15 @@
   
   
                               
-      <h1>Bilan d’exécution - 2023</h1>
-      
-      <span class="badge badge-sm rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <div class="d-xl-flex align-items-xl-center">
+              <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - 2023</h1>
+              
+      <span class="badge badge-base rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>
   
   
+          </div>
+      </div>
   
                               
       
@@ -3129,7 +2926,7 @@
   <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
-                  <div class="col-12 col-lg-8">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
                       <div class="c-box">
                           
                               <h2>Compléter le dossier à transmettre à la DDETS/DREETS</h2>
@@ -3141,11 +2938,9 @@
                           <hr/>
                           <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
                               
-                                  <div class="d-flex flex-column flex-md-row justify-content-between">
-                                      <div>
-                                          <h3>Document de synthèse</h3>
-                                          <p>Veuillez importer ci-dessous votre synthèse PDF générée par l’interface du Label.</p>
-                                          <div class="form-group form-group-required"><label class="form-label" for="id_activity_report_file">Importer un fichier</label><div class="c-dropzone position-relative file-dropzone">
+                                  <h3>Document de synthèse</h3>
+                                  <p>Veuillez importer ci-dessous votre synthèse PDF générée par l’interface du Label.</p>
+                                  <div class="form-group form-group-required"><label class="form-label" for="id_activity_report_file">Importer un fichier</label><div class="c-dropzone position-relative file-dropzone">
       <input accept="application/pdf" aria-describedby="id_activity_report_file_helptext" class="form-control" id="id_activity_report_file" name="activity_report_file" required="" type="file"/>
   
   
@@ -3190,17 +2985,15 @@
                   </p>
                  </div>
   </div>
-                                      </div>
-                                  </div>
                               
                               <hr/>
-                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                              <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
                                   <div>
                                       <h3>Données individuelles de parcours</h3>
-                                      <p id="label-last-synced-at">
+                                      <p class="mb-0" id="label-last-synced-at">
       Dernière synchronisation: -
       
-          <button class="btn" hx-include="#label-sync-form" hx-post="/geiq/assessment/[PK of ImplementationAssessment]/label-sync" hx-swap="outerHTML" hx-target="#label-last-synced-at" type="button">
+          <button class="btn btn-link" hx-include="#label-sync-form" hx-post="/geiq/assessment/[PK of ImplementationAssessment]/label-sync" hx-swap="outerHTML" hx-target="#label-last-synced-at" type="button">
               Mettre à jour
           </button>
       
@@ -3227,15 +3020,15 @@
                           </form>
                       </div>
                   </div>
-                  <div class="col-12 col-lg-4">
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
                       
-                          <div class="c-box mb-4 bg-warning-lightest border-warning">
+                          <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
                               <span class="fs-sm">Financement</span>
                               <h4>En attente du bilan d’exécution</h4>
                               <p class="mb-0">
                                   Vous avez jusqu’au 01/07/2024 pour valider les informations de votre bilan d’exécution.
                               </p>
-                              <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                              <p class="mb-0">Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
                           </div>
                       
                   </div>
@@ -3273,10 +3066,14 @@
   
   
                               
-      <h1>Bilan d’exécution - 2023</h1>
-      
-          <span class="badge badge-sm rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>
-      
+      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+          <div class="d-xl-flex align-items-xl-center">
+              <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - 2023</h1>
+              
+                  <span class="badge badge-base rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>
+              
+          </div>
+      </div>
   
                               
       

@@ -13,13 +13,13 @@
             <ul class="list-unstyled mb-lg-5">
                 <li class="d-flex justify-content-between align-items-center mb-3">
                     <a href="{% url 'geiq:employee_list' assessment_pk=last_geiq_execution_assessment.pk info_type="personal-information" %}?back_url={% url 'dashboard:index' %}" class="btn-link btn-ico">
-                        <i class="ri-group-line ri-lg fw-normal align-self-start"></i>
+                        <i class="ri-group-line ri-lg fw-normal"></i>
                         <span>Mes salariés</span>
                     </a>
                 </li>
             </ul>
             {% if not last_geiq_execution_assessment.submitted_at %}
-                <div class="alert alert-info" role="status">
+                <div class="alert alert-info mt-lg-n3 mb-lg-5" role="status">
                     <div class="row">
                         <div class="col-auto pe-0">
                             <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>

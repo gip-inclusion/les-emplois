@@ -15,9 +15,7 @@ from itou.utils.apis import geiq_label
 from itou.utils.urls import get_absolute_url
 from itou.www.geiq_views.views import InfoType
 from tests.cities.factories import create_city_vannes
-from tests.companies.factories import (
-    CompanyMembershipFactory,
-)
+from tests.companies.factories import CompanyMembershipFactory
 from tests.files.factories import FileFactory
 from tests.geiq.factories import (
     EmployeeFactory,
@@ -64,7 +62,7 @@ def test_assessment_process_for_geiq(client, label_settings, mailoutbox, mocker,
     )
     assertContains(
         response,
-        '<span class="badge badge-sm rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>',
+        '<span class="badge badge-base rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>',
     )
     assertContains(response, "Importer un fichier")
     assertContains(response, "Dernière synchronisation: -")
@@ -127,7 +125,7 @@ def test_assessment_process_for_geiq(client, label_settings, mailoutbox, mocker,
     assert get_absolute_url(assessment_info_url) in institution_email.body
     assertContains(
         response,
-        '<span class="badge badge-sm rounded-pill text-nowrap bg-info">Bilan à l’étude</span>',
+        '<span class="badge badge-base rounded-pill text-nowrap bg-info">Bilan à l’étude</span>',
     )
     assessment.refresh_from_db()
     assert assessment.submitted_at is not None
@@ -159,7 +157,7 @@ def test_assessment_process_for_geiq(client, label_settings, mailoutbox, mocker,
     assertContains(
         response,
         (
-            '<span class="badge badge-sm rounded-pill text-nowrap bg-success">'
+            '<span class="badge badge-base rounded-pill text-nowrap bg-success">'
             "Financement : totalité de l’aide accordée</span>"
         ),
     )
