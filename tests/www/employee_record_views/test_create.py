@@ -37,6 +37,7 @@ def _get_user_form_data(user):
 
 
 class CreateEmployeeRecordTestMixin:
+    URL_NAME = None
     SIAE_KIND = random.choice(SIAE_WITH_CONVENTION_KINDS)
 
     @pytest.fixture(autouse=True)
@@ -57,11 +58,15 @@ class CreateEmployeeRecordTestMixin:
 
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
-            job_seeker_with_address=True,
+            job_seeker__with_mocked_address=True,
             job_seeker__born_in_france=True,
+            job_seeker__with_pole_emploi_id=True,
+            job_seeker__jobseeker_profile__with_required_eiti_fields=True,
         )
 
         self.job_seeker = self.job_application.job_seeker
+
+        self.url = reverse(self.URL_NAME, args=(self.job_application.pk,))
 
         mocker.patch(
             "itou.common_apps.address.format.get_geocoding_data",
@@ -170,12 +175,11 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
     Employee details form: title and birth place
     """
 
+    URL_NAME = "employee_record_views:create"
+
     @pytest.fixture(autouse=True)
     def setup_method(self):
         self.job_seeker = JobSeekerFactory.build(with_address=True, born_in_france=True)
-
-        self.url = reverse("employee_record_views:create", args=(self.job_application.pk,))
-        self.target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
 
     def test_access_granted(self, client):
         # Must have access
@@ -199,7 +203,7 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         data["title"] = "MME"
         response = client.post(self.url, data=data)
 
-        assertRedirects(response, self.target_url)
+        assertRedirects(response, reverse("employee_record_views:create_step_2", args=(self.job_application.pk,)))
 
     def test_bad_birthplace(self, client):
         # If birth country is France, a commune (INSEE) is mandatory
@@ -304,10 +308,11 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
     NO_ADDRESS_FILLED_IN = "Aucune adresse n'a été saisie sur les emplois de l'inclusion !"
     ADDRESS_COULD_NOT_BE_AUTO_CHECKED = "L'adresse du salarié n'a pu être vérifiée automatiquement."
 
+    URL_NAME = "employee_record_views:create_step_2"
+
     @pytest.fixture(autouse=True)
     def setup_method(self, client):
-        self.url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
-        client.force_login(self.user)
+        self.pass_step_1(client)
 
     def test_access_granted(self, client):
         self.pass_step_1(client)
@@ -317,10 +322,10 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
 
     def test_job_seeker_without_address(self, client):
         # Job seeker has no address filled (which should not happen without admin operation)
-        self.job_application = JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
+        job_application = JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
 
         response = client.get(self.url)
-        url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
+        url = reverse("employee_record_views:create_step_2", args=(job_application.pk,))
         response = client.get(url)
 
         assertContains(response, self.NO_ADDRESS_FILLED_IN)
@@ -367,15 +372,13 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
 
     def test_job_seeker_address_not_geolocated(self, client):
         # Job seeker has an address filled but can't be geolocated
-        self.job_application = JobApplicationWithApprovalNotCancellableFactory(
+        job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
             job_seeker=JobSeekerFactory(with_address=True),
         )
-        self.job_seeker = self.job_application.job_seeker
 
         # Changed job application: new URL
-        self.url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
-        response = client.get(self.url)
+        response = client.get(reverse(self.URL_NAME, args=(job_application.pk,)))
 
         # Check that when lookup fails, user is properly notified
         # to input employee address manually
@@ -383,8 +386,7 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
         assertNotContains(response, self.NO_ADDRESS_FILLED_IN)
 
         # Force the way without a profile should raise a PermissionDenied
-        url = reverse("employee_record_views:create_step_3", args=(self.job_application.pk,))
-        response = client.get(url)
+        response = client.get(reverse("employee_record_views:create_step_3", args=(job_application.pk,)))
 
         assert response.status_code == 403
 
@@ -494,21 +496,14 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
     Employee situation and social allowances
     """
 
+    URL_NAME = "employee_record_views:create_step_3"
     SIAE_KIND = random.choice(list(set(SIAE_WITH_CONVENTION_KINDS) - {CompanyKind.EITI}))
 
     @pytest.fixture(autouse=True)
     def setup_method(self, client):
-        self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_company=self.company,
-            job_seeker=JobSeekerFactory(born_in_france=True, with_pole_emploi_id=True, with_mocked_address=True),
-        )
-        self.job_seeker = self.job_application.job_seeker
-        self.url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
         self.target_url = reverse("employee_record_views:create_step_4", args=(self.job_application.id,))
 
         self.pass_step_2(client)
-
-        self.profile = self.job_seeker.jobseeker_profile
 
     # Most of coherence test are done in the model
 
@@ -538,9 +533,9 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
 
         assertRedirects(response, self.target_url)
 
-        self.profile.refresh_from_db()
+        self.job_seeker.jobseeker_profile.refresh_from_db()
 
-        assert "01" == self.profile.pole_emploi_since
+        assert "01" == self.job_seeker.jobseeker_profile.pole_emploi_since
 
     def test_fold_unemployed(self, client):
         response = client.get(self.url)
@@ -560,9 +555,9 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
 
         assertRedirects(response, self.target_url)
 
-        self.profile.refresh_from_db()
+        self.job_seeker.jobseeker_profile.refresh_from_db()
 
-        assert "02" == self.profile.unemployed_since
+        assert "02" == self.job_seeker.jobseeker_profile.unemployed_since
 
     def test_fold_rsa(self, client):
         response = client.get(self.url)
@@ -582,9 +577,9 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
 
         assertRedirects(response, self.target_url)
 
-        self.profile.refresh_from_db()
+        self.job_seeker.jobseeker_profile.refresh_from_db()
 
-        assert "OUI-M" == self.profile.has_rsa_allocation
+        assert "OUI-M" == self.job_seeker.jobseeker_profile.has_rsa_allocation
 
     def test_fold_ass(self, client):
         response = client.get(self.url)
@@ -603,9 +598,9 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
 
         assertRedirects(response, self.target_url)
 
-        self.profile.refresh_from_db()
+        self.job_seeker.jobseeker_profile.refresh_from_db()
 
-        assert "03" == self.profile.ass_allocation_since
+        assert "03" == self.job_seeker.jobseeker_profile.ass_allocation_since
 
     def test_fail_step_3(self, client):
         # If anything goes wrong during employee record creation,
@@ -666,9 +661,9 @@ class TestCreateEmployeeRecordStep3ForEITI(CreateEmployeeRecordForEITITestMixin,
 
         assertRedirects(response, self.target_url)
 
-        self.profile.refresh_from_db()
+        self.job_seeker.jobseeker_profile.refresh_from_db()
 
-        assert "03" == self.profile.are_allocation_since
+        assert "03" == self.job_seeker.jobseeker_profile.are_allocation_since
 
     def test_fold_activity_bonus(self, client):
         response = client.get(self.url)
@@ -687,9 +682,9 @@ class TestCreateEmployeeRecordStep3ForEITI(CreateEmployeeRecordForEITITestMixin,
 
         assertRedirects(response, self.target_url)
 
-        self.profile.refresh_from_db()
+        self.job_seeker.jobseeker_profile.refresh_from_db()
 
-        assert "03" == self.profile.activity_bonus_since
+        assert "03" == self.job_seeker.jobseeker_profile.activity_bonus_since
 
 
 class TestCreateEmployeeRecordStep4(CreateEmployeeRecordTestMixin):
@@ -697,15 +692,10 @@ class TestCreateEmployeeRecordStep4(CreateEmployeeRecordTestMixin):
     Selection of a financial annex
     """
 
+    URL_NAME = "employee_record_views:create_step_4"
+
     @pytest.fixture(autouse=True)
     def setup_method(self, client):
-        self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_company=self.company,
-            job_seeker=JobSeekerFactory(born_in_france=True, with_mocked_address=True),
-        )
-        self.job_seeker = self.job_application.job_seeker
-        self.url = reverse("employee_record_views:create_step_4", args=(self.job_application.id,))
-
         self.pass_step_3(client)
 
     def test_retrieved_employee_record_is_the_most_recent_one(self, client, faker):
@@ -726,17 +716,11 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
     Check summary of employee record and validation
     """
 
+    URL_NAME = "employee_record_views:create_step_5"
     SIAE_KIND = random.choice(list(set(SIAE_WITH_CONVENTION_KINDS) - {CompanyKind.EITI}))
 
     @pytest.fixture(autouse=True)
     def setup_method(self, client):
-        self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_company=self.company,
-            job_seeker=JobSeekerFactory(born_in_france=True, with_mocked_address=True),
-        )
-        self.job_seeker = self.job_application.job_seeker
-        self.url = reverse("employee_record_views:create_step_5", args=(self.job_application.id,))
-
         self.pass_step_4(client)
 
     def test_employee_record_status(self, client, snapshot):
@@ -807,6 +791,8 @@ class TestUpdateRejectedEmployeeRecord(CreateEmployeeRecordTestMixin):
     Check if update and resubmission is possible after employee record rejection
     """
 
+    URL_NAME = "employee_record_views:create_step_5"
+
     def _default_step_3_data(self):
         data = super()._default_step_3_data()
         if self.company.kind == CompanyKind.EITI:
@@ -819,36 +805,14 @@ class TestUpdateRejectedEmployeeRecord(CreateEmployeeRecordTestMixin):
 
     @pytest.fixture(autouse=True)
     def setup_method(self, client):
-        self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_company=self.company,
-            job_seeker=JobSeekerFactory(
-                born_in_france=True, with_mocked_address=True, jobseeker_profile__with_required_eiti_fields=True
-            ),
-        )
-        self.job_seeker = self.job_application.job_seeker
-        self.url = reverse("employee_record_views:create_step_5", args=(self.job_application.id,))
-
         self.pass_step_4(client)
-
-        client.post(self.url)
 
         # Reject employee record
-        employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
-
-        # Must change status twice (contrained lifecycle)
-        employee_record.update_as_sent("fooFileName.json", 1, None)
-        assert employee_record.status == Status.SENT
-
-        employee_record.update_as_rejected("0001", "Error message", None)
-
-        assert employee_record.status == Status.REJECTED
-
-        self.employee_record = employee_record
+        self.employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
+        self.employee_record.status = Status.REJECTED
+        self.employee_record.save(update_fields={"status"})
 
     def test_submit_after_rejection(self, client):
-        # Validation of update process after rejection by ASP
-        self.pass_step_4(client)
-
         client.post(self.url)
 
         self.employee_record.refresh_from_db()
