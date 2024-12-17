@@ -37,7 +37,7 @@ from itou.utils.admin import (
     PkSupportRemarkInline,
     add_support_remark_to_obj,
     get_admin_view_link,
-    get_company_view_link,
+    get_structure_view_link,
 )
 
 
@@ -106,7 +106,7 @@ class CompanyMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
 
     @admin.display(description="Entreprise")
     def company_siret_link(self, obj):
-        return get_company_view_link(obj.company)
+        return get_structure_view_link(obj.company)
 
 
 class PrescriberMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
@@ -134,7 +134,7 @@ class PrescriberMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
         return True
 
     def organization_id_link(self, obj):
-        return get_admin_view_link(obj.organization)
+        return get_structure_view_link(obj.organization)
 
 
 class InstitutionMembershipInline(ItouTabularInline):
@@ -165,7 +165,7 @@ class InstitutionMembershipInline(ItouTabularInline):
         return True
 
     def institution_id_link(self, obj):
-        return get_admin_view_link(obj.institution)
+        return get_structure_view_link(obj.institution)
 
 
 class JobApplicationInline(ItouTabularInline):

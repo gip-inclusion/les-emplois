@@ -20,13 +20,15 @@ def get_admin_view_link(obj, *, content=None, view="change"):
     return format_html('<a href="{}">{}</a>', url, content or obj.pk)
 
 
-def get_company_view_link(company):
-    return format_html(
-        "{} — SIRET : {} ({})",
-        get_admin_view_link(company, content=company.display_name),
-        company.siret,
-        company.kind,
-    )
+def get_structure_view_link(structure, display_attr="name"):
+    format_string = "{link}"
+    format_kwargs = {"link": get_admin_view_link(structure, content=getattr(structure, display_attr))}
+    if hasattr(structure, "siret"):
+        format_string += " — SIRET {siret}"
+        format_kwargs["siret"] = structure.siret
+    format_string += " ({kind})"
+    format_kwargs["kind"] = structure.kind
+    return format_html(format_string, **format_kwargs)
 
 
 class AbstractSupportRemarkInline(GenericStackedInline):
