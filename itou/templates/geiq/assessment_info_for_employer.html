@@ -8,24 +8,28 @@
 {% endblock %}
 
 {% block title_content %}
-    <h1>Bilan d’exécution - {{ assessment.campaign.year }}</h1>
-    {% if not assessment.submitted_at %}
-        <span class="badge badge-sm rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>
-    {% elif not assessment.reviewed_at %}
-        <span class="badge badge-sm rounded-pill text-nowrap bg-info">Bilan à l’étude</span>
-    {% else %}
-        {% if assessment.review_state == ReviewState.ACCEPTED %}
-            <span class="badge badge-sm rounded-pill text-nowrap bg-success">Financement : totalité de l’aide accordée</span>
-        {% elif assessment.review_state == ReviewState.PARTIAL_ACCEPTED %}
-            <span class="badge badge-sm rounded-pill text-nowrap bg-success">Financement : solde partiellement accordé</span>
-        {% elif assessment.review_state == ReviewState.REMAINDER_REFUSED %}
-            <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Financement : solde refusé</span>
-        {% elif assessment.review_state == ReviewState.PARTIAL_REFUND %}
-            <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Financement : demande de remboursement partiel</span>
-        {% elif assessment.review_state == ReviewState.FULL_REFUND %}
-            <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Financement : demande de remboursement total</span>
-        {% endif %}
-    {% endif %}
+    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+        <div class="d-xl-flex align-items-xl-center">
+            <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - {{ assessment.campaign.year }}</h1>
+            {% if not assessment.submitted_at %}
+                <span class="badge badge-base rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>
+            {% elif not assessment.reviewed_at %}
+                <span class="badge badge-base rounded-pill text-nowrap bg-info">Bilan à l’étude</span>
+            {% else %}
+                {% if assessment.review_state == ReviewState.ACCEPTED %}
+                    <span class="badge badge-base rounded-pill text-nowrap bg-success">Financement : totalité de l’aide accordée</span>
+                {% elif assessment.review_state == ReviewState.PARTIAL_ACCEPTED %}
+                    <span class="badge badge-base rounded-pill text-nowrap bg-success">Financement : solde partiellement accordé</span>
+                {% elif assessment.review_state == ReviewState.REMAINDER_REFUSED %}
+                    <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : solde refusé</span>
+                {% elif assessment.review_state == ReviewState.PARTIAL_REFUND %}
+                    <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : demande de remboursement partiel</span>
+                {% elif assessment.review_state == ReviewState.FULL_REFUND %}
+                    <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : demande de remboursement total</span>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
 
 {% block title_messages %}
@@ -37,7 +41,7 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
-                <div class="col-12 col-lg-8">
+                <div class="col-12 col-lg-8 order-2 order-lg-1">
                     <div class="c-box">
                         {% if not assessment.submitted_at %}
                             <h2>Compléter le dossier à transmettre à la DDETS/DREETS</h2>
@@ -54,28 +58,24 @@
                         <hr>
                         <form method="post" class="js-prevent-multiple-submit"{% if submission_form.is_multipart %} enctype="multipart/form-data"{% endif %}>
                             {% if assessment.activity_report_file %}
-                                <div class="d-flex flex-column flex-md-row justify-content-between">
+                                <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
                                     <div>
                                         <h3>Document de synthèse</h3>
                                     </div>
                                     <div clas="text-center">
-                                        <a class="btn btn-outline-primary" href="{% url 'geiq:assessment_report' assessment_pk=assessment.pk %}" rel="noopener" target="_blank">
+                                        <a class="btn btn-ico btn-outline-primary" href="{% url 'geiq:assessment_report' assessment_pk=assessment.pk %}" rel="noopener" target="_blank">
                                             <span>Synthèse {{ assessment.campaign.year }}.pdf</span>
-                                            <i class="ri-external-link-line fw-medium" aria-hidden="true"></i>
+                                            <i class="ri-download-line fw-medium" aria-hidden="true"></i>
                                         </a>
                                     </div>
                                 </div>
                             {% else %}
-                                <div class="d-flex flex-column flex-md-row justify-content-between">
-                                    <div>
-                                        <h3>Document de synthèse</h3>
-                                        <p>Veuillez importer ci-dessous votre synthèse PDF générée par l’interface du Label.</p>
-                                        {% bootstrap_field submission_form.activity_report_file %}
-                                    </div>
-                                </div>
+                                <h3>Document de synthèse</h3>
+                                <p>Veuillez importer ci-dessous votre synthèse PDF générée par l’interface du Label.</p>
+                                {% bootstrap_field submission_form.activity_report_file %}
                             {% endif %}
                             <hr>
-                            <div class="d-flex flex-column flex-md-row justify-content-between">
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-3">
                                 <div>
                                     <h3>Données individuelles de parcours</h3>
                                     {% include "geiq/includes/last_synced_at.html" with assessment=assessment allow_sync=True only %}
@@ -100,37 +100,37 @@
                         </form>
                     </div>
                 </div>
-                <div class="col-12 col-lg-4">
+                <div class="col-12 col-lg-4 order-1 order-lg-2">
                     {% if not assessment.submitted_at %}
-                        <div class="c-box mb-4 bg-warning-lightest border-warning">
+                        <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
                             <span class="fs-sm">Financement</span>
                             <h4>En attente du bilan d’exécution</h4>
                             <p class="mb-0">
                                 Vous avez jusqu’au {{ assessment.campaign.submission_deadline|date:"d/m/Y" }} pour valider les informations de votre bilan d’exécution.
                             </p>
-                            <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                            <p class="mb-0">Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
                         </div>
                     {% elif not assessment.reviewed_at %}
-                        <div class="c-box mb-4 bg-info-lightest border-info">
+                        <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
                             <span class="fs-sm">Financement</span>
                             <h4>Bilan d’exécution à l’étude</h4>
                             <p class="mb-0">
                                 Votre bilan d’exécution a été transmis à votre DDETS. La décision relative au version de l’aide financière vous sera communiquée par mail.
                             </p>
-                            <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                            <p class="mb-0">Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
                         </div>
                     {% else %}
                         {% if assessment.review_state == ReviewState.ACCEPTED %}
-                            <div class="c-box mb-4 bg-success-lightest border-success">
+                            <div class="c-box mb-3 mb-md-4 bg-success-lightest border-success">
                                 <span class="fs-sm">Financement</span>
                                 <h4>Totalité de l’aide accordée</h4>
                                 <p>La totalité de l’aide conventionnée a été validée par {{ assessment.review_institution.display_name }}.</p>
                                 <strong>Commentaire de votre {{ assessment.review_institution.kind }}</strong>
                                 {{ assessment.review_comment|linebreaks }}
-                                <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                                <p class="mb-0">Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
                             </div>
                         {% elif assessment.review_state == ReviewState.PARTIAL_ACCEPTED %}
-                            <div class="c-box mb-4 bg-success-lightest border-success">
+                            <div class="c-box mb-3 mb-md-4 bg-success-lightest border-success">
                                 <span class="fs-sm">Financement</span>
                                 <h4>Solde partiellement accordé</h4>
                                 <p>
@@ -138,19 +138,19 @@
                                 </p>
                                 <strong>Commentaire de votre {{ assessment.review_institution.kind }}</strong>
                                 {{ assessment.review_comment|linebreaks }}
-                                <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                                <p class="mb-0">Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
                             </div>
                         {% elif assessment.review_state == ReviewState.REMAINDER_REFUSED %}
-                            <div class="c-box mb-4 bg-warning-lightest border-warning">
+                            <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
                                 <span class="fs-sm">Financement</span>
                                 <h4>Complément d’aide refusé</h4>
                                 <p>La totalité de l’aide conventionnée n’a pas été accordée par {{ assessment.review_institution.display_name }}.</p>
                                 <strong>Commentaire de votre {{ assessment.review_institution.kind }}</strong>
                                 {{ assessment.review_comment|linebreaks }}
-                                <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                                <p class="mb-0">Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
                             </div>
                         {% elif assessment.review_state == ReviewState.PARTIAL_REFUND %}
-                            <div class="c-box mb-4 bg-warning-lightest border-warning">
+                            <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
                                 <span class="fs-sm">Financement</span>
                                 <h4>Demande de remboursement partiel</h4>
                                 <p>
@@ -158,10 +158,10 @@
                                 </p>
                                 <strong>Commentaire de votre {{ assessment.review_institution.kind }}</strong>
                                 {{ assessment.review_comment|linebreaks }}
-                                <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                                <p class="mb-0">Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
                             </div>
                         {% elif assessment.review_state == ReviewState.FULL_REFUND %}
-                            <div class="c-box mb-4 bg-warning-lightest border-warning">
+                            <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
                                 <span class="fs-sm">Financement</span>
                                 <h4>Demande de remboursement total</h4>
                                 <p>
@@ -169,7 +169,7 @@
                                 </p>
                                 <strong>Commentaire de votre {{ assessment.review_institution.kind }}</strong>
                                 {{ assessment.review_comment|linebreaks }}
-                                <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                                <p class="mb-0">Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
                             </div>
                         {% endif %}
                     {% endif %}

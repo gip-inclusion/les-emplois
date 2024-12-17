@@ -9,8 +9,12 @@
 {% endblock %}
 
 {% block title_content %}
-    <h1>Valider le bilan d’exécution - {{ assessment.campaign.year }}</h1>
-    {% include "geiq/includes/labor_inspector_assessment_state_badge.html" with assessment=assessment extra_class="" ReviewState=ReviewState only %}
+    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+        <div class="d-xl-flex align-items-xl-center">
+            <h1 class="mb-0 me-3 text-md-nowrap">Valider le bilan d’exécution - {{ assessment.campaign.year }}</h1>
+            {% include "geiq/includes/labor_inspector_assessment_state_badge.html" with assessment=assessment extra_class="" ReviewState=ReviewState only %}
+        </div>
+    </div>
 {% endblock %}
 
 {% block content %}
@@ -18,7 +22,7 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    <div class="c-box">
+                    <div class="c-form">
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
                             <p>

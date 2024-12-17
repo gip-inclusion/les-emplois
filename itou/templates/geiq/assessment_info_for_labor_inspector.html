@@ -8,8 +8,12 @@
 {% endblock %}
 
 {% block title_content %}
-    <h1>Bilan d’exécution - {{ assessment.campaign.year }}</h1>
-    {% include "geiq/includes/labor_inspector_assessment_state_badge.html" with assessment=assessment extra_class="" ReviewState=ReviewState only %}
+    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+        <div class="d-xl-flex align-items-xl-center">
+            <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - {{ assessment.campaign.year }}</h1>
+            {% include "geiq/includes/labor_inspector_assessment_state_badge.html" with assessment=assessment extra_class="" ReviewState=ReviewState only %}
+        </div>
+    </div>
 {% endblock %}
 
 {% block title_messages %}
@@ -21,7 +25,7 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
-                <div class="col-12 col-lg-8">
+                <div class="col-12 col-lg-8 order-2 order-lg-1">
                     <div class="c-box">
                         {% if not assessment.submitted_at %}
                             <h2>En attente du dossier</h2>
@@ -37,9 +41,9 @@
                                     <h3>Document de synthèse</h3>
                                 </div>
                                 <div clas="text-center">
-                                    <a class="btn btn-outline-primary" href="{% url 'geiq:assessment_report' assessment_pk=assessment.pk %}" rel="noopener" target="_blank">
+                                    <a class="btn btn-ico btn-outline-primary" href="{% url 'geiq:assessment_report' assessment_pk=assessment.pk %}" rel="noopener" target="_blank">
                                         <span>Synthèse {{ assessment.campaign.year }}.pdf</span>
-                                        <i class="ri-external-link-line fw-medium" aria-hidden="true"></i>
+                                        <i class="ri-download-line fw-medium" aria-hidden="true"></i>
                                     </a>
                                 </div>
                             </div>
@@ -56,9 +60,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-lg-4">
+                <div class="col-12 col-lg-4 order-1 order-lg-2">
                     {% if not assessment.submitted_at %}
-                        <div class="c-box mb-4 bg-warning-lightest border-warning">
+                        <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
                             <span class="fs-sm">Financement</span>
                             <h4>En attente du bilan d’exécution</h4>
                             <p class="mb-0">
@@ -66,7 +70,7 @@
                             </p>
                         </div>
                     {% elif not assessment.reviewed_at %}
-                        <div class="c-box mb-4 bg-info-lightest border-info">
+                        <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
                             <span class="fs-sm">Financement</span>
                             <h4>Bilan d’exécution à valider</h4>
                             <p>
@@ -76,7 +80,7 @@
                         </div>
                     {% else %}
                         {% if assessment.review_state == ReviewState.ACCEPTED %}
-                            <div class="c-box mb-4 bg-success-lightest border-success">
+                            <div class="c-box mb-3 mb-md-4 bg-success-lightest border-success">
                                 <span class="fs-sm">Financement</span>
                                 <h4>Totalité de l’aide accordée</h4>
                                 <p>
@@ -87,7 +91,7 @@
                                 <a href="{% url 'geiq:assessment_review' assessment_pk=assessment.pk %}" class="btn btn-primary btn-block">Corriger</a>
                             </div>
                         {% elif assessment.review_state == ReviewState.PARTIAL_ACCEPTED %}
-                            <div class="c-box mb-4 bg-success-lightest border-success">
+                            <div class="c-box mb-3 mb-md-4 bg-success-lightest border-success">
                                 <span class="fs-sm">Financement</span>
                                 <h4>Solde partiellement accordé</h4>
                                 <p>
@@ -98,7 +102,7 @@
                                 <a href="{% url 'geiq:assessment_review' assessment_pk=assessment.pk %}" class="btn btn-primary btn-block">Corriger</a>
                             </div>
                         {% elif assessment.review_state == ReviewState.REMAINDER_REFUSED %}
-                            <div class="c-box mb-4 bg-warning-lightest border-warning">
+                            <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
                                 <span class="fs-sm">Financement</span>
                                 <h4>Complément d’aide refusé</h4>
                                 <p>
@@ -109,7 +113,7 @@
                                 <a href="{% url 'geiq:assessment_review' assessment_pk=assessment.pk %}" class="btn btn-primary btn-block">Corriger</a>
                             </div>
                         {% elif assessment.review_state == ReviewState.PARTIAL_REFUND %}
-                            <div class="c-box mb-4 bg-warning-lightest border-warning">
+                            <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
                                 <span class="fs-sm">Financement</span>
                                 <h4>Demande de remboursement partiel</h4>
                                 <p>
@@ -120,7 +124,7 @@
                                 <a href="{% url 'geiq:assessment_review' assessment_pk=assessment.pk %}" class="btn btn-primary btn-block">Corriger</a>
                             </div>
                         {% elif assessment.review_state == ReviewState.FULL_REFUND %}
-                            <div class="c-box mb-4 bg-warning-lightest border-warning">
+                            <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
                                 <span class="fs-sm">Financement</span>
                                 <h4>Demande de remboursement total</h4>
                                 <p>
@@ -132,7 +136,7 @@
                             </div>
                         {% endif %}
                     {% endif %}
-                    {% include "companies/includes/_company_info.html" with company=assessment.company show=True show_cta=True only %}
+                    {% include "companies/includes/_company_info.html" with company=assessment.company show=True show_cta=True extra_box_class="mb-3 mb-md-4" only %}
                 </div>
             </div>
         </div>

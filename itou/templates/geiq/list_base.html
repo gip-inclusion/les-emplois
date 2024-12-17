@@ -49,57 +49,57 @@
                     </div>
                 </div>
             </div>
-            <hr>
-            <div class="row">
-                <div class="col-12">
-                    <div class="c-box container">
-                        <div class="s-tabs-01__row row">
-                            <div class="s-tabs-01__col col-12">
-                                <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="2">
-                                    <li class="nav-item">
-                                        <a class="nav-link{% if active_tab == InfoType.PERSONAL_INFORMATION %} active{% endif %}" href="{% url 'geiq:employee_list' assessment_pk=assessment.pk info_type=InfoType.PERSONAL_INFORMATION.value %}">
-                                            Informations personnelles
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link{% if active_tab == InfoType.JOB_APPLICATION %} active{% endif %}" href="{% url 'geiq:employee_list' assessment_pk=assessment.pk info_type=InfoType.JOB_APPLICATION %}">
-                                            Candidatures
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link{% if active_tab == InfoType.SUPPORT %} active{% endif %}" href="{% url 'geiq:employee_list' assessment_pk=assessment.pk info_type=InfoType.SUPPORT %}">
-                                            Accompagnements
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link{% if active_tab == InfoType.CONTRACT %} active{% endif %}" href="{% url 'geiq:employee_list' assessment_pk=assessment.pk info_type=InfoType.CONTRACT %}">
-                                            Contrats
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link{% if active_tab == InfoType.EXIT %} active{% endif %}" href="{% url 'geiq:employee_list' assessment_pk=assessment.pk info_type=InfoType.EXIT %}">
-                                            Sorties
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        {% if not data_page %}
-                            <div class="text-center my-3 my-md-4">
-                                <p class="mb-1 mt-3">
-                                    <strong>Aucune donnée pour le moment</strong>
-                                </p>
-                            </div>
-                        {% else %}
-                            {% block data_list %}{% endblock %}
-                        {% endif %}
-                        {% include "includes/pagination.html" with page=data_page %}
-                    </div>
-                </div>
-            </div>
         </div>
     </section>
+
+    <section class="s-tabs-01">
+        <div class="s-tabs-01__container container">
+            <div class="s-tabs-01__row row">
+                <div class="s-tabs-01__col col-12">
+                    <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true">
+                        <li class="nav-item">
+                            <a class="nav-link{% if active_tab == InfoType.PERSONAL_INFORMATION %} active{% endif %}" href="{% url 'geiq:employee_list' assessment_pk=assessment.pk info_type=InfoType.PERSONAL_INFORMATION.value %}">
+                                Informations personnelles
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link{% if active_tab == InfoType.JOB_APPLICATION %} active{% endif %}" href="{% url 'geiq:employee_list' assessment_pk=assessment.pk info_type=InfoType.JOB_APPLICATION %}">
+                                Candidatures
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link{% if active_tab == InfoType.SUPPORT %} active{% endif %}" href="{% url 'geiq:employee_list' assessment_pk=assessment.pk info_type=InfoType.SUPPORT %}">
+                                Accompagnements
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link{% if active_tab == InfoType.CONTRACT %} active{% endif %}" href="{% url 'geiq:employee_list' assessment_pk=assessment.pk info_type=InfoType.CONTRACT %}">
+                                Contrats
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link{% if active_tab == InfoType.EXIT %} active{% endif %}" href="{% url 'geiq:employee_list' assessment_pk=assessment.pk info_type=InfoType.EXIT %}">
+                                Sorties
+                            </a>
+                        </li>
+                    </ul>
+                    {% if not data_page %}
+                        <div class="text-center my-3 my-md-4">
+                            <p class="mb-1 mt-3">
+                                <strong>Aucune donnée pour le moment</strong>
+                            </p>
+                        </div>
+                    {% else %}
+                        {% block data_list %}{% endblock %}
+                    {% endif %}
+                </div>
+            </div>
+            {% include "includes/pagination.html" with page=data_page %}
+        </div>
+    </section>
+
 {% endblock %}
+
 {% block script %}
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js'%}"></script>
