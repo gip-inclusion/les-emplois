@@ -6,7 +6,7 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from itou.asp.models import Commune, EITIContributions
+from itou.asp.models import Commune
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -100,13 +100,20 @@ class CreateEmployeeRecordTestMixin:
         assert response.status_code == 200
 
     def _default_step_3_data(self):
-        return {
+        data = {
             "education_level": "00",
             # Factory user is register to Pôle emploi: all fields must be filled
             "pole_emploi_since": "02",
             "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
             "pole_emploi": True,
         }
+        if self.company.kind == CompanyKind.EITI:
+            data.update(
+                actor_met_for_business_creation=self.job_application.job_seeker.jobseeker_profile.actor_met_for_business_creation,
+                mean_monthly_income_before_process=self.job_application.job_seeker.jobseeker_profile.mean_monthly_income_before_process,
+                eiti_contributions=self.job_application.job_seeker.jobseeker_profile.eiti_contributions,
+            )
+        return data
 
     def pass_step_3(self, client):
         self.pass_step_2(client)
@@ -163,18 +170,6 @@ class CreateEmployeeRecordTestMixin:
         response = client.get(self.url)
 
         assertContains(response, "régulariser le numéro de sécurité sociale", status_code=403)
-
-
-class CreateEmployeeRecordForEITITestMixin(CreateEmployeeRecordTestMixin):
-    SIAE_KIND = CompanyKind.EITI
-
-    def _default_step_3_data(self):
-        return {
-            **super()._default_step_3_data(),
-            "actor_met_for_business_creation": "Actor inc",
-            "mean_monthly_income_before_process": "42.21",
-            "eiti_contributions": EITIContributions.UNDETERMINED,
-        }
 
 
 class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
@@ -631,14 +626,14 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
         )
 
 
-class TestCreateEmployeeRecordStep3ForEITI(CreateEmployeeRecordForEITITestMixin, TestCreateEmployeeRecordStep3):
+class TestCreateEmployeeRecordStep3ForEITI(TestCreateEmployeeRecordStep3):
     """
     Employee situation and social allowances
     """
 
+    SIAE_KIND = CompanyKind.EITI
+
     def test_fold_are_allocation(self, client):
-        assert self.SIAE_KIND == "EITI"
-        assert self.company.kind == "EITI"
         response = client.get(self.url)
         form = response.context["form"]
 
@@ -757,7 +752,9 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
         assertNotContains(response, "Taux de cotisation : ")
 
 
-class TestCreateEmployeeRecordStep5ForEITI(CreateEmployeeRecordForEITITestMixin, TestCreateEmployeeRecordStep5):
+class TestCreateEmployeeRecordStep5ForEITI(TestCreateEmployeeRecordStep5):
+    SIAE_KIND = CompanyKind.EITI
+
     def _default_step_3_data(self):
         return {
             **super()._default_step_3_data(),
