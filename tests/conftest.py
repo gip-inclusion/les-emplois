@@ -18,7 +18,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.gis.db.models.fields import get_srid_info
 from django.core import management
-from django.core.cache import cache
+from django.core.cache import caches
 from django.core.files.storage import default_storage, storages
 from django.core.management import call_command
 from django.db import connection
@@ -34,6 +34,7 @@ from pytest_django.plugin import INVALID_TEMPLATE_VARS_ENV
 pytest.register_assert_rewrite("tests.utils.test", "tests.utils.htmx.test")
 
 from itou.utils import faker_providers  # noqa: E402
+from itou.utils.cache import UnclearableCache  # noqa: E402
 from itou.utils.storage.s3 import s3_client  # noqa: E402
 from tests.utils.htmx.test import HtmxClient  # noqa: E402
 from tests.utils.test import ItouClient  # noqa: E402
@@ -182,17 +183,33 @@ def cached_announce_campaign():
     """
     from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY
 
-    cache.set(CACHE_ACTIVE_ANNOUNCEMENTS_KEY, None, None)
+    caches["failsafe"].set(CACHE_ACTIVE_ANNOUNCEMENTS_KEY, None, None)
     yield
-    cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
+    caches["failsafe"].delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
 
 
 @pytest.fixture
 def empty_active_announcements_cache(cached_announce_campaign):
     from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY
 
-    cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
+    caches["failsafe"].delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
     yield
+
+
+@pytest.fixture
+def failing_cache():
+    with socket.create_server(("localhost", 0)) as s:
+        empty_port = s.getsockname()[1]
+        s.close()
+        cache = UnclearableCache(
+            f"redis://localhost:{empty_port}",
+            {
+                "OPTIONS": {
+                    "CLIENT_CLASS": "itou.utils.cache.FailSafeRedisCacheClient",
+                },
+            },
+        )
+        yield cache
 
 
 @pytest.fixture
