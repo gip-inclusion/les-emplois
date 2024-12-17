@@ -1,13 +1,16 @@
 from datetime import date, timedelta
+from unittest import mock
 
 import pytest
-from django.core.cache import cache
+from django.core.cache import caches
+from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries
 
 from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY
 from itou.utils.context_processors import active_announcement_campaign
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
+from tests.users.factories import JobSeekerFactory
 
 
 class TestAnnouncementCampaignCache:
@@ -66,6 +69,31 @@ class TestAnnouncementCampaignCache:
             assert active_announcement_campaign(None)["active_campaign_announce"] == campaign
 
         # NOTE: this test requires that the cache client is Redis (for the ttl function)
-        cache_time_remaining = cache.ttl(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
+        cache_time_remaining = caches["failsafe"].ttl(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
         twenty_four_hours = 60 * 60 * 24
         assert cache_time_remaining == twenty_four_hours
+
+    @freeze_time("2024-01-31")
+    def test_cache_failsafe(self, client, failing_cache):
+        with mock.patch("itou.utils.cache.capture_exception") as sentry_mock:
+            # Cache connection fails.
+            caches["failsafe"] = failing_cache
+
+            # Creating campaign will try to update the cache, shouldn't crash.
+            campaign = AnnouncementCampaignFactory(start_date=date(2024, 1, 1), with_item=True)
+            sentry_mock.assert_called()
+            sentry_mock.reset_mock()
+
+            # Page should not crash.
+            client.force_login(JobSeekerFactory(with_address=True))
+            response = client.get(reverse("dashboard:index"))
+            assert response.status_code == 200
+            sentry_mock.assert_called()
+            sentry_mock.reset_mock()
+
+            # Active campaign should be available in context.
+            assert response.context["active_campaign_announce"] == campaign
+
+            # Deleting campaign will try to update the cache, shouldn't crash.
+            campaign.delete()
+            sentry_mock.assert_called()

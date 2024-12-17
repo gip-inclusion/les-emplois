@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from django.core.cache import cache
+from django.core.cache import caches
 from django.utils import timezone
 
 from itou.communications.models import AnnouncementCampaign
@@ -18,19 +18,19 @@ def update_active_announcement_cache():
     )
 
     if campaign is None:
-        cache.set(CACHE_ACTIVE_ANNOUNCEMENTS_KEY, None, None)
+        caches["failsafe"].set(CACHE_ACTIVE_ANNOUNCEMENTS_KEY, None, None)
     else:
         cache_exp = (
             datetime.combine(campaign.end_date, datetime.min.time()) + timedelta(days=1) - datetime.now()
         ).total_seconds()  # seconds until the end_date, 00:00
 
-        cache.set(CACHE_ACTIVE_ANNOUNCEMENTS_KEY, campaign, cache_exp)
+        caches["failsafe"].set(CACHE_ACTIVE_ANNOUNCEMENTS_KEY, campaign, cache_exp)
 
     return campaign
 
 
 def get_cached_active_announcement():
-    campaign = cache.get(CACHE_ACTIVE_ANNOUNCEMENTS_KEY, SENTINEL_ACTIVE_ANNOUNCEMENT)
-    if campaign == SENTINEL_ACTIVE_ANNOUNCEMENT:
-        return update_active_announcement_cache()
-    return campaign
+    active_announcement = caches["failsafe"].get(CACHE_ACTIVE_ANNOUNCEMENTS_KEY, SENTINEL_ACTIVE_ANNOUNCEMENT)
+    if active_announcement is SENTINEL_ACTIVE_ANNOUNCEMENT:
+        active_announcement = update_active_announcement_cache()
+    return active_announcement
