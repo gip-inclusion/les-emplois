@@ -1,6 +1,6 @@
 from functools import wraps
 
-from django_redis.cache import RedisCache
+from django_redis.cache import CONNECTION_INTERRUPTED, RedisCache
 from django_redis.client import DefaultClient
 from django_redis.exceptions import ConnectionInterrupted
 from redis import exceptions as redis_exceptions
@@ -44,8 +44,7 @@ class FailSafeRedisCacheClient(DefaultClient):
                     return attr_or_meth(*args, **kwargs)
                 except IGNORED_EXCEPTIONS as e:
                     capture_exception(e)
-                    # None is the return for a GET where the key does not exist.
-                    return None
+                    return CONNECTION_INTERRUPTED  # return for a GET where the key does not exist.
 
             return report_failure
         return attr_or_meth
