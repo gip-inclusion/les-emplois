@@ -1,3 +1,5 @@
+import uuid
+
 from allauth.account.views import PasswordChangeView
 from django.conf import settings
 from django.contrib import auth, messages
@@ -286,8 +288,10 @@ def edit_job_seeker_info(request, job_seeker_public_id, template_name="dashboard
         User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile"),
         public_id=job_seeker_public_id,
     )
-    from_application_uuid = request.GET.get("from_application")
-    tally_form_query = from_application_uuid and f"jobapplication={from_application_uuid}"
+    try:
+        from_application_uuid = uuid.UUID(request.GET.get("from_application"))
+    except (TypeError, ValueError):
+        from_application_uuid = None
     if not request.user.can_edit_personal_information(job_seeker):
         raise PermissionDenied
 
@@ -297,7 +301,7 @@ def edit_job_seeker_info(request, job_seeker_public_id, template_name="dashboard
         instance=job_seeker,
         editor=request.user,
         data=request.POST or None,
-        tally_form_query=tally_form_query,
+        tally_form_query=f"jobapplication={from_application_uuid}" if from_application_uuid else None,
     )
 
     if request.method == "POST" and form.is_valid():
