@@ -20,11 +20,11 @@
                             </div>
                         </div>
                         <p>
-                            {% if wizard.steps.current == "reason" %}
+                            {% if wizard.steps.current == RefuseViewStep.REASON %}
                                 <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Choix du motif de refus
-                            {% elif wizard.steps.current == "job-seeker-answer" %}
+                            {% elif wizard.steps.current == RefuseViewStep.JOB_SEEKER_ANSWER %}
                                 <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Message au candidat
-                            {% elif wizard.steps.current == "prescriber-answer" %}
+                            {% elif wizard.steps.current == RefuseViewStep.PRESCRIBER_ANSWER %}
                                 <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Message {{ job_application.is_sent_by_authorized_prescriber|yesno:"au prescripteur,à l’orienteur" }}
                             {% endif %}
                         </p>
@@ -34,7 +34,7 @@
                             {% csrf_token %}
                             {{ wizard.management_form }}
 
-                            {% if wizard.steps.current == "reason" %}
+                            {% if wizard.steps.current == RefuseViewStep.REASON %}
                                 <h2 class="mb-3 mb-md-4">Choix du motif de refus</h2>
                                 <p class="mb-3 mb-md-4">
                                     {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
@@ -43,7 +43,7 @@
                                         Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour le candidat.
                                     {% endif %}
                                 </p>
-                            {% elif wizard.steps.current == "job-seeker-answer" %}
+                            {% elif wizard.steps.current == RefuseViewStep.JOB_SEEKER_ANSWER %}
                                 <h2 class="mb-3 mb-md-4">Réponse au candidat</h2>
                                 <p class="mb-3 mb-md-4">
                                     {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
@@ -57,7 +57,7 @@
                                     {{ refusal_reason_label }}
                                     {% if not refusal_reason_shared_with_job_seeker %}<em>(Motif non communiqué au candidat)</em>{% endif %}
                                 </p>
-                            {% elif wizard.steps.current == "prescriber-answer" %}
+                            {% elif wizard.steps.current == RefuseViewStep.PRESCRIBER_ANSWER %}
                                 <h2 class="mb-3 mb-md-4">
                                     Réponse {{ job_application.is_sent_by_authorized_prescriber|yesno:"au prescripteur,à l’orienteur" }}
                                 </h2>
@@ -71,7 +71,7 @@
                                 </p>
                             {% endif %}
 
-                            {% if wizard.steps.current == "reason" %}
+                            {% if wizard.steps.current == RefuseViewStep.REASON %}
                                 <fieldset class="js-refusal-reasons form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %}">
                                     <legend class="fs-base fw-bold">
                                         {{ form.refusal_reason.label }} :
@@ -140,7 +140,7 @@
 
 {% block script %}
     {{ block.super }}
-    {% if wizard.steps.current == "reason" %}
+    {% if wizard.steps.current == RefuseViewStep.REASON %}
         <script nonce="{{ CSP_NONCE }}">
             function manageWarningSection(value) {
                 if (value === 'no_position') {

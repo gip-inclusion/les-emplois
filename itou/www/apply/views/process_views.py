@@ -1,4 +1,5 @@
 import datetime
+import enum
 import logging
 from urllib.parse import quote, urljoin
 
@@ -374,19 +375,27 @@ def _show_prescriber_answer_form(wizard):
     return wizard.job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER
 
 
-class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
-    STEP_REASON = "reason"
-    STEP_JOB_SEEKER_ANSWER = "job-seeker-answer"
-    STEP_PRESCRIBER_ANSWER = "prescriber-answer"
+class RefuseViewStep(enum.StrEnum):
+    REASON = "reason"
+    JOB_SEEKER_ANSWER = "job-seeker-answer"
+    PRESCRIBER_ANSWER = "prescriber-answer"
 
+    # Make the Enum work in Django's templates
+    # See :
+    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
+    # - https://github.com/django/django/pull/12304
+    do_not_call_in_templates = enum.nonmember(True)
+
+
+class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
     template_name = "apply/process_refuse.html"
     form_list = [
-        (STEP_REASON, JobApplicationRefusalReasonForm),
-        (STEP_JOB_SEEKER_ANSWER, JobApplicationRefusalJobSeekerAnswerForm),
-        (STEP_PRESCRIBER_ANSWER, JobApplicationRefusalPrescriberAnswerForm),
+        (RefuseViewStep.REASON, JobApplicationRefusalReasonForm),
+        (RefuseViewStep.JOB_SEEKER_ANSWER, JobApplicationRefusalJobSeekerAnswerForm),
+        (RefuseViewStep.PRESCRIBER_ANSWER, JobApplicationRefusalPrescriberAnswerForm),
     ]
     condition_dict = {
-        STEP_PRESCRIBER_ANSWER: _show_prescriber_answer_form,
+        RefuseViewStep.PRESCRIBER_ANSWER: _show_prescriber_answer_form,
     }
 
     def setup(self, request, *args, **kwargs):
@@ -409,10 +418,10 @@ class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
 
         # Redirect to first step if form data is not retrieved in session (eg. direct url access)
         if kwargs.get("step") in [
-            self.STEP_JOB_SEEKER_ANSWER,
-            self.STEP_PRESCRIBER_ANSWER,
-        ] and not self.get_cleaned_data_for_step(self.STEP_REASON):
-            return HttpResponseRedirect(self.get_step_url(self.STEP_REASON))
+            RefuseViewStep.JOB_SEEKER_ANSWER,
+            RefuseViewStep.PRESCRIBER_ANSWER,
+        ] and not self.get_cleaned_data_for_step(RefuseViewStep.REASON):
+            return HttpResponseRedirect(self.get_step_url(RefuseViewStep.REASON))
 
     def get(self, *args, **kwargs):
         if check_response := self.check_wizard_state(*args, **kwargs):
@@ -455,8 +464,8 @@ class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.steps.current != self.STEP_REASON:
-            cleaned_data = self.get_cleaned_data_for_step(self.STEP_REASON)
+        if self.steps.current != RefuseViewStep.REASON:
+            cleaned_data = self.get_cleaned_data_for_step(RefuseViewStep.REASON)
             context["refusal_reason_label"] = job_applications_enums.RefusalReason(
                 cleaned_data["refusal_reason"]
             ).label
@@ -467,10 +476,11 @@ class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
             "matomo_custom_title": "Candidature refusée",
             "matomo_event_name": f"refuse-application-{self.steps.current}-submit",
             "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.id}),
+            "RefuseViewStep": RefuseViewStep,
         }
 
     def get_form_kwargs(self, step=None):
-        if step in (self.STEP_REASON, self.STEP_PRESCRIBER_ANSWER):
+        if step in (RefuseViewStep.REASON, RefuseViewStep.PRESCRIBER_ANSWER):
             return {
                 "job_application": self.job_application,
             }
@@ -478,8 +488,8 @@ class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
 
     def get_form_initial(self, step):
         initial_data = self.initial_dict.get(step, {})
-        if step == self.STEP_JOB_SEEKER_ANSWER:
-            refusal_reason = self.get_cleaned_data_for_step(self.STEP_REASON).get("refusal_reason")
+        if step == RefuseViewStep.JOB_SEEKER_ANSWER:
+            refusal_reason = self.get_cleaned_data_for_step(RefuseViewStep.REASON).get("refusal_reason")
             if refusal_reason:
                 initial_data["job_seeker_answer"] = loader.render_to_string(
                     f"apply/refusal_messages/{refusal_reason}.txt",
