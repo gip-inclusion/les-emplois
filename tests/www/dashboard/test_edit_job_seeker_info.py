@@ -1,5 +1,6 @@
 import datetime
 import math
+from urllib.parse import quote
 
 import pytest
 from allauth.account.models import EmailAddress
@@ -537,3 +538,22 @@ class TestEditJobSeekerInfo:
         response = client.post(url, data=post_data)
         assertContains(response, "Ce champ est obligatoire.")
         assert response.context["form"].errors["address_for_autocomplete"] == ["Ce champ est obligatoire."]
+
+    @override_settings(TALLY_URL="https://tally.so")
+    def test_xss(self, client):
+        job_application = JobApplicationSentByPrescriberFactory(job_seeker__jobseeker_profile__nir="178122978200508")
+        user = job_application.to_company.members.first()
+
+        # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
+        job_application.job_seeker.created_by = user
+        job_application.job_seeker.save()
+
+        client.force_login(user)
+
+        url = reverse(
+            "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
+        )
+        url = f"{url}?from_application={quote('"></a><blink>foobar</blink><a href="')}"
+
+        response = client.get(url)
+        assertContains(response, "<blink>foobar</blink>", html=True)
