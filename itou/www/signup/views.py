@@ -137,12 +137,6 @@ def job_seeker_situation(request, template_name="signup/job_seeker_situation.htm
 
 
 def job_seeker_signup_info(request, template_name="signup/job_seeker_signup.html"):
-    # TODO(calum): temporary code for aiding the migration, remove in the week following deployment
-    # Restart the signup process if we encounter one ongoing with outdated code
-    if "job_seeker_nir" in request.session:
-        del request.session["job_seeker_nir"]
-        return HttpResponseRedirect(reverse("signup:job_seeker_situation"))
-
     form_class = forms.JobSeekerSignupWithOptionalNirForm if "skip" in request.POST else forms.JobSeekerSignupForm
     form = form_class(data=request.POST or None)
 
@@ -180,12 +174,6 @@ class JobSeekerCredentialsSignupView(SignupView):
     template_name = "signup/job_seeker_signup_credentials.html"
 
     def dispatch(self, request, *args, **kwargs):
-        # TODO(calum): temporary code for aiding the migration, remove in the week following deployment
-        # Restart the signup process if we encounter one ongoing with outdated code
-        if "job_seeker_nir" in request.session:
-            del request.session["job_seeker_nir"]
-            return HttpResponseRedirect(reverse("signup:job_seeker"))
-
         if global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY not in request.session:
             return HttpResponseRedirect(reverse("signup:job_seeker"))
         return super().dispatch(request, *args, **kwargs)

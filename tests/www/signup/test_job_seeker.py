@@ -580,35 +580,3 @@ class TestJobSeekerSignup:
             parse_response_to_soup(response, selector="#message-modal-1-label")
         )
         assertContains(response, reverse("login:existing_user", args=(existing_user.public_id,)))
-
-    # TODO(calum): temporary test relating to code migration, remove in the week following deployment
-    def test_job_seeker_signup_temporary_redirects(self, client):
-        response = client.get(reverse("signup:job_seeker_nir"))
-        assertRedirects(response, reverse("signup:job_seeker_situation"))
-
-        session = client.session
-        session["job_seeker_nir"] = "141068078200557"
-        session.save()
-
-        response = client.get(reverse("signup:job_seeker"))
-        assertRedirects(response, reverse("signup:job_seeker_situation"))
-
-        session["job_seeker_nir"] = "141068078200557"
-        session.save()
-        response = client.get(reverse("signup:job_seeker_credentials"))
-        assertRedirects(response, reverse("signup:job_seeker"))
-
-        # Can continue with the process on the redirected page
-        job_seeker_data = JobSeekerFactory.build()
-        post_data = {
-            "nir": "141068078200557",
-            "title": job_seeker_data.title,
-            "first_name": job_seeker_data.first_name,
-            "last_name": job_seeker_data.last_name,
-            "email": job_seeker_data.email,
-            "birthdate": job_seeker_data.jobseeker_profile.birthdate,
-        }
-
-        response = client.post(response.url, data=post_data)
-        assert client.session.get(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY)
-        assertRedirects(response, reverse("signup:job_seeker_credentials"))

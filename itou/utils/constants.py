@@ -14,8 +14,6 @@ FRANCE_TRAVAIL_EMAIL_SUFFIX = "@francetravail.fr"
 # when they do span multiple apps.
 ITOU_SESSION_CURRENT_ORGANIZATION_KEY = "current_organization"
 ITOU_SESSION_PRESCRIBER_SIGNUP_KEY = "prescriber_signup"
-# TODO(calum): job_seeker_nir is a depreciated cache key, remove the second condition in a few days
-ITOU_SESSION_NIR_KEY = "job_seeker_nir"
 ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY = "job_seeker_signup"
 
 MATOMO_SITE_PILOTAGE_ID = "146"
