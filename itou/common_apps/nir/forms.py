@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.forms import widgets
+from django.utils.html import format_html
 
 from itou.users.enums import LackOfNIRReason
 from itou.utils.urls import get_tally_form_url
@@ -50,9 +51,9 @@ class JobSeekerNIRUpdateMixin:
         tally_url = get_tally_form_url("wzxQlg")
         if tally_form_query is not None:
             tally_url += f"?{tally_form_query}"
-        tally_link = (
-            f'<a href="{tally_url}" target="_blank" rel="noopener">'
-            "Demander la correction du numéro de sécurité sociale</a>"
+        tally_link = format_html(
+            '<a href="{}" target="_blank" rel="noopener">Demander la correction du numéro de sécurité sociale</a>',
+            tally_url,
         )
 
         if self.initial.get("nir"):
