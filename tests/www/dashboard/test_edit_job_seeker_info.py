@@ -556,4 +556,4 @@ class TestEditJobSeekerInfo:
         url = f"{url}?from_application={quote('"></a><blink>foobar</blink><a href="')}"
 
         response = client.get(url)
-        assertContains(response, "<blink>foobar</blink>", html=True)
+        assertNotContains(response, "<blink>foobar</blink>", html=True)
