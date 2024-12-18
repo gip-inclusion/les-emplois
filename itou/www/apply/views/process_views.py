@@ -485,8 +485,10 @@ class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
                 initial_data["job_seeker_answer"] = loader.render_to_string(
                     f"apply/refusal_messages/{refusal_reason}.txt",
                     context={
-                        "job_application": self.job_application,
-                    },
+                        "to_company": self.job_application.to_company,
+                    }
+                    if refusal_reason == job_applications_enums.RefusalReason.NON_ELIGIBLE
+                    else {},
                     request=self.request,
                 )
 
