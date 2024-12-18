@@ -464,18 +464,11 @@ def stats_ft_conversion_raw(request):
 
 @login_required
 def stats_ft_state_main(request):
-    allowed_org_pks = list(
-        PrescriberOrganization.objects.filter(
-            kind=request.current_organization.kind,
-            department=request.current_organization.department,
-        ).values_list("pk", flat=True)
-    )
     return render_stats_ft(
         request=request,
         page_title="Etat des candidatures orientées",
         extra_params={
             mb.PRESCRIBER_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
-            mb.C1_PRESCRIBER_ORG_FILTER_KEY: allowed_org_pks,
         },
     )
 
