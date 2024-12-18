@@ -466,6 +466,7 @@ class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
             "can_view_personal_information": True,  # SIAE members have access to personal info
             "matomo_custom_title": "Candidature refusée",
             "matomo_event_name": f"refuse-application-{self.steps.current}-submit",
+            "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.id}),
         }
 
     def get_form_kwargs(self, step=None):
