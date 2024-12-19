@@ -40,9 +40,6 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         skip_postgeneration_save = True
 
     class Params:
-        job_seeker_with_address = factory.Trait(
-            job_seeker=factory.SubFactory(JobSeekerFactory, with_mocked_address=True)
-        )
         with_approval = factory.Trait(
             state=JobApplicationState.ACCEPTED,
             approval=factory.SubFactory(

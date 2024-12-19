@@ -82,7 +82,6 @@ def test_multiple(client, snapshot):
         job_seeker__first_name="David",
         job_seeker__last_name="Waterford",
         job_seeker__public_id="44444444-4444-4444-4444-444444444444",
-        job_seeker_with_address=False,
     )
     # Other app for which the current user cannot see the personal information
     unauthorized_prescriber = PrescriberFactory(membership=False)

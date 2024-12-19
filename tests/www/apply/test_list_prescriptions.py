@@ -76,18 +76,18 @@ def test_get(client):
 def test_as_unauthorized_prescriber(client, snapshot):
     prescriber = PrescriberFactory()
     JobApplicationFactory(
-        job_seeker_with_address=True,
         job_seeker__first_name="Supersecretname",
         job_seeker__last_name="Unknown",
         job_seeker__created_by=PrescriberFactory(),  # to check for useless queries
+        job_seeker__with_mocked_address=True,
         sender=prescriber,
         sender_kind=SenderKind.PRESCRIBER,
     )
     JobApplicationFactory(
-        job_seeker_with_address=True,
         job_seeker__first_name="Liz",
         job_seeker__last_name="Ible",
         job_seeker__created_by=prescriber,  # to check for useless queries
+        job_seeker__with_mocked_address=True,
         sender=prescriber,
         sender_kind=SenderKind.PRESCRIBER,
     )
