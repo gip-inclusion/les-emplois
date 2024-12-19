@@ -210,6 +210,9 @@ class EmployerSearchView(EmployerSearchBaseView):
                 )
             )
             .with_is_hiring()
+            .with_count_recent_received_job_apps()
+            .with_count_active_job_descriptions()
+            .with_computed_job_app_score()
             .with_has_active_members()
             # Split results into 4 buckets shown in the following order, each bucket being internally sorted
             # by job_app_score.
