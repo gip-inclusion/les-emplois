@@ -294,6 +294,45 @@ class TestJobSeekerSignup:
         response = client.get(reverse("signup:job_seeker_credentials"))
         assertRedirects(response, reverse("signup:job_seeker"))
 
+    def test_job_seeker_signup_weak_password(self, client, snapshot):
+        url = reverse("signup:job_seeker")
+        response = client.get(url)
+        assert response.status_code == 200
+
+        job_seeker_data = JobSeekerFactory.build(for_snapshot=True)
+        post_data = {
+            "nir": job_seeker_data.jobseeker_profile.nir,
+            "title": job_seeker_data.title,
+            "first_name": job_seeker_data.first_name,
+            "last_name": job_seeker_data.last_name,
+            "email": job_seeker_data.email,
+            "birthdate": job_seeker_data.jobseeker_profile.birthdate,
+        }
+
+        response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("signup:job_seeker_credentials"))
+        assert client.session.get(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY)
+
+        url = reverse("signup:job_seeker_credentials")
+        response = client.get(url)
+        assert response.status_code == 200
+
+        post_data = {
+            "password1": "weak_password",
+            "password2": "weak_password",
+        }
+        response = client.post(url, data=post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "password1": [
+                "Ce mot de passe est trop court. Il doit contenir au minimum 14 caractères.",
+                "Le mot de passe doit contenir au moins 3 des 4 types suivants : "
+                "majuscules, minuscules, chiffres, caractères spéciaux.",
+            ]
+        }
+        form = parse_response_to_soup(response, selector="form.js-prevent-multiple-submit")
+        assert str(form) == snapshot
+
     @respx.mock
     @override_settings(
         FRANCE_CONNECT_BASE_URL="https://france.connect.fake",

@@ -125,7 +125,7 @@ class TestPasswordChange:
         url = reverse("account_change_password")
         response = client.get(url)
         assert response.status_code == 200
-        new_password = "Mlkjhgf!sq2a"
+        new_password = "Mlkjhgf!sq2a'4"
         post_data = {"oldpassword": DEFAULT_PASSWORD, "password1": new_password, "password2": new_password}
         response = client.post(url, data=post_data)
         assert response.status_code == 302
