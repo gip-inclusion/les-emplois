@@ -297,6 +297,18 @@ def get_table():
                 "fn": lambda o: getattr(get_latest_diagnosis(o), "created_at", None),
             },
             {
+                "name": "date_expiration_diagnostic",
+                "type": "date",
+                "comment": "Date d'expiration du dernier diagnostic",
+                "fn": lambda o: getattr(get_latest_diagnosis(o), "expires_at", None),
+            },
+            {
+                "name": "diagnostic_valide",
+                "type": "boolean",
+                "comment": "Validité du dernier diagnostic au moment de l'import",
+                "fn": lambda o: getattr(get_latest_diagnosis(o), "is_valid", None),
+            },
+            {
                 "name": "id_auteur_diagnostic_prescripteur",
                 "type": "integer",
                 "comment": "ID auteur diagnostic si prescripteur",
