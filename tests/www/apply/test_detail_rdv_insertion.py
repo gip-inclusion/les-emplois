@@ -427,5 +427,5 @@ class TestRdvInsertionInvitationRequestsList:
             reverse("apply:rdv_insertion_invite_for_detail", kwargs={"job_application_id": self.job_application.pk}),
             follow=True,
         )
-        assert response.status_code == 404
+        assert response.status_code == 403
         assert InvitationRequest.objects.count() == 1

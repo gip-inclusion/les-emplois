@@ -384,7 +384,7 @@ class TestProcessViews:
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
-        assert response.status_code == 404
+        assert response.status_code == 403
 
     def test_details_for_prescriber(self, client):
         """As a prescriber, I can access the job_applications details for prescribers."""
@@ -1575,7 +1575,7 @@ class TestProcessViews:
         response = client.post(
             reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk})
         )
-        assert response.status_code == 404
+        assert response.status_code == 403
         assert len(mailoutbox) == 0
 
     def test_diagoriente_invite_as_job_prescriber(self, client, mailoutbox):
@@ -1590,7 +1590,7 @@ class TestProcessViews:
         response = client.post(
             reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk})
         )
-        assert response.status_code == 404
+        assert response.status_code == 403
         assert len(mailoutbox) == 0
 
     def test_diagoriente_invite_as_employee_for_authorized_prescriber(self, client, mailoutbox):
@@ -3156,7 +3156,7 @@ class TestProcessTransferJobApplication:
         post_data = {"target_company_id": other_company.pk}
         transfer_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
         response = client.post(transfer_url, data=post_data)
-        assert response.status_code == 404
+        assert response.status_code == 403
 
 
 @pytest.mark.parametrize("reason", ["prevent_objectives", "non_eligible"])

@@ -11,7 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Count, Exists, F, OuterRef, Q
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.urls import reverse, reverse_lazy
@@ -161,15 +161,13 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
 
 
 @login_required
+@check_user(lambda user: user.is_employer)
 def details_for_company(request, job_application_id, template_name="apply/process_details_company.html"):
     """
     Detail of an application for an SIAE with the ability:
     - to update start date of a contract (provided given date is in the future),
     - to give an answer.
     """
-    if not request.user.is_employer:
-        raise Http404()
-
     queryset = (
         JobApplication.objects.is_active_company_member(request.user)
         .select_related(
@@ -357,6 +355,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
 
 @login_required
 @require_POST
+@check_user(lambda user: user.is_employer)
 def process(request, job_application_id):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
@@ -498,6 +497,7 @@ class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
 
 
 @login_required
+@check_user(lambda user: user.is_employer)
 def postpone(request, job_application_id, template_name="apply/process_postpone.html"):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
@@ -531,6 +531,7 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
 
 
 @login_required
+@check_user(lambda user: user.is_employer)
 def accept(request, job_application_id, template_name="apply/process_accept.html"):
     """
     Trigger the `accept` transition.
@@ -600,6 +601,7 @@ class ReloadJobDescriptionFields(AcceptHTMXFragmentView):
 
 @login_required
 @require_POST
+@check_user(lambda user: user.is_employer)
 def cancel(request, job_application_id):
     """
     Trigger the `cancel` transition.
@@ -623,6 +625,7 @@ def cancel(request, job_application_id):
 
 
 @login_required
+@check_user(lambda user: user.is_employer)
 def transfer(request, job_application_id):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, pk=job_application_id)
@@ -892,6 +895,7 @@ class JobApplicationInternalTranferView(LoginRequiredMixin, TemplateView):
 
 @login_required
 @require_POST
+@check_user(lambda user: user.is_employer)
 def send_diagoriente_invite(request, job_application_id):
     """
     As a company member, I can send a Diagoriente invite to the prescriber or the job seeker.
@@ -912,6 +916,7 @@ def send_diagoriente_invite(request, job_application_id):
 
 
 @login_required
+@check_user(lambda user: user.is_employer)
 def eligibility(request, job_application_id, template_name="apply/process_eligibility.html"):
     """
     Check eligibility (as an SIAE).
@@ -935,6 +940,7 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
 
 
 @login_required
+@check_user(lambda user: user.is_employer)
 def geiq_eligibility(request, job_application_id, template_name="apply/process_geiq_eligibility.html"):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     # Check GEIQ eligibility during job application process
@@ -958,6 +964,7 @@ def geiq_eligibility(request, job_application_id, template_name="apply/process_g
 
 
 @login_required
+@check_user(lambda user: user.is_employer)
 def geiq_eligibility_criteria(
     request,
     job_application_id,
@@ -971,6 +978,7 @@ def geiq_eligibility_criteria(
 
 
 @require_POST
+@check_user(lambda user: user.is_employer)
 def delete_prior_action(request, job_application_id, prior_action_id):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(
@@ -1011,6 +1019,7 @@ def delete_prior_action(request, job_application_id, prior_action_id):
 
 
 @login_required
+@check_user(lambda user: user.is_employer)
 def add_or_modify_prior_action(request, job_application_id, prior_action_id=None):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(
@@ -1112,10 +1121,8 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
 
 @login_required
 @require_POST
+@check_user(lambda user: user.is_employer)
 def rdv_insertion_invite(request, job_application_id, for_detail=False):
-    if not request.user.is_employer:
-        raise Http404()
-
     if for_detail:
         template_name = "apply/includes/invitation_requests.html"
     else:
