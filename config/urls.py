@@ -2,8 +2,8 @@ from anymail.webhooks.mailjet import MailjetTrackingWebhookView
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.decorators import login_not_required
-from django.urls import include, path, re_path, register_converter
-from django.views.generic import TemplateView
+from django.urls import include, path, re_path, register_converter, reverse_lazy
+from django.views.generic import RedirectView, TemplateView
 
 from itou.utils import redirect_legacy_views
 from itou.utils.urls import SiretConverter
@@ -25,7 +25,9 @@ urlpatterns = [
     # /accounts/signup/ <=> account_signup
     # We don't want any user to be able to signup using the default allauth `signup` url
     # because we have multiple specific signup processes for different kind of users.
-    re_path(r"^accounts/signup/$", signup_views.signup),
+    re_path(
+        r"^accounts/signup/$", login_not_required(RedirectView.as_view(url=reverse_lazy("signup:choose_user_kind")))
+    ),
     # --------------------------------------------------------------------------------------
     # Override allauth `account_login` URL.
     # /accounts/login/ <=> account_login

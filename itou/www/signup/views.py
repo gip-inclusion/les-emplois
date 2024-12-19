@@ -16,7 +16,6 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import urlencode
-from django.views.decorators.http import require_GET
 from django.views.generic import FormView, TemplateView, View
 
 from itou.common_apps.address.models import lat_lon_to_coords
@@ -80,19 +79,6 @@ class ItouPasswordResetFromKeyView(PasswordResetFromKeyView):
             login(self.request, self.reset_user, backend="django.contrib.auth.backends.ModelBackend")
             return reverse("welcoming_tour:index")
         return super().get_success_url()
-
-
-@login_not_required
-@require_GET
-def signup(request, template_name="signup/signup.html"):
-    """
-    Override allauth `account_signup` URL
-    (the route is defined in config.urls).
-    """
-    context = {
-        "redirect_field_value": get_safe_url(request, REDIRECT_FIELD_NAME),
-    }
-    return render(request, template_name, context)
 
 
 class ChooseUserKindSignupView(LoginNotRequiredMixin, FormView):
