@@ -462,11 +462,11 @@ class TestProcessViews:
         """As an unauthorized prescriber I cannot access personnal information of arbitrary job seekers"""
         prescriber = PrescriberFactory()
         job_application = JobApplicationFactory(
-            job_seeker_with_address=True,
             job_seeker__first_name="Supersecretname",
             job_seeker__last_name="Unknown",
             job_seeker__jobseeker_profile__nir="11111111111111",
             job_seeker__post_code="59140",
+            job_seeker__with_mocked_address=True,
             sender=prescriber,
             sender_kind=job_applications_enums.SenderKind.PRESCRIBER,
         )
@@ -487,7 +487,7 @@ class TestProcessViews:
         """As a job seeker, I can access the job_applications details for job seekers."""
         job_seeker = JobSeekerFactory()
 
-        job_application = JobApplicationFactory(job_seeker=job_seeker, job_seeker_with_address=True)
+        job_application = JobApplicationFactory(job_seeker=job_seeker)
         job_application.process()
 
         client.force_login(job_seeker)

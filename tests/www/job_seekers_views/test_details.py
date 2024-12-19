@@ -239,8 +239,8 @@ def test_apply_for_button_as_authorized_prescriber(client):
 
     job_application = JobApplicationFactory(
         sender=authorized_prescriber,
-        job_seeker_with_address=True,
         created_at=timezone.now() + datetime.timedelta(seconds=10),  # Most recent, stabilize ordering.
+        job_seeker__with_mocked_address=True,
     )
     job_application_without_address = JobApplicationFactory(
         sender=authorized_prescriber,
@@ -290,8 +290,8 @@ def test_apply_for_button_as_unauthorized_prescriber(client):
 
     job_application = JobApplicationFactory(
         sender=unauthorized_prescriber,
-        job_seeker_with_address=True,
         created_at=timezone.now() + datetime.timedelta(seconds=10),  # Most recent, stabilize ordering.
+        job_seeker__with_mocked_address=True,
     )
     client.force_login(unauthorized_prescriber)
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_application.job_seeker.public_id})
