@@ -156,6 +156,7 @@ def test_populate_job_seekers():
     #  - job_application / approval from ai stock
     #  - created by an employer
     #  - outside QPV
+    #  - expired eligibility diagnosis
     user_2 = JobSeekerFactory(
         created_by=EmployerFactory(),
         jobseeker_profile__nir="271049232724647",
@@ -165,6 +166,7 @@ def test_populate_job_seekers():
     )
     job_application_2 = JobApplicationFactory(
         with_approval=True,
+        eligibility_diagnosis__expired=True,
         approval__eligibility_diagnosis=None,
         job_seeker=user_2,
         approval__origin=Origin.AI_STOCK,
@@ -280,6 +282,8 @@ def test_populate_job_seekers():
             None,
             None,
             None,
+            None,
+            None,
             0,
             timezone.localdate() - datetime.timedelta(days=1),
         ),
@@ -306,6 +310,8 @@ def test_populate_job_seekers():
             1,
             1,
             job_application_2.eligibility_diagnosis.created_at.date(),
+            job_application_2.eligibility_diagnosis.expires_at,
+            0,
             job_application_2.eligibility_diagnosis.author_prescriber_organization.id,
             None,
             "Prescripteur",
@@ -358,6 +364,8 @@ def test_populate_job_seekers():
             2,
             2,
             job_application_3.eligibility_diagnosis.created_at.date(),
+            job_application_3.eligibility_diagnosis.expires_at,
+            1,
             None,
             job_application_3.eligibility_diagnosis.author_siae.id,
             "Employeur",
