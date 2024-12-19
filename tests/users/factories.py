@@ -24,7 +24,7 @@ from tests.cities.factories import create_city_in_zrr, create_city_partially_in_
 from tests.geo.factories import QPVFactory, ZRRFactory
 
 
-DEFAULT_PASSWORD = "P4ssw0rd!***"
+DEFAULT_PASSWORD = "P4ssw0rd!*****"
 
 
 @functools.cache

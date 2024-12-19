@@ -10,7 +10,7 @@ class CnilCompositionPasswordValidator:
     CNIL guidelines regarding the use case "Avec restriction d'accès":
     https://www.cnil.fr/fr/authentification-par-mot-de-passe-les-mesures-de-securite-elementaires
 
-    - Minimum length: at least 8 characters (handled via `MinimumLengthValidator`)
+    - Minimum length: at least 14 characters (handled via `MinimumLengthValidator`)
     - Composition: password must include 3 of the 4 types of characters
         1) uppercase
         2) lowercase

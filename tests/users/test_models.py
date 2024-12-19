@@ -38,6 +38,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
 )
 from tests.users.factories import (
+    DEFAULT_PASSWORD,
     EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
@@ -172,7 +173,7 @@ class TestModel:
         # Test the link can be used to reset password and login directly
         response = client.get(password_change_url)
         password_change_url_with_hidden_key = response.url
-        post_data = {"password1": "newPassword1%", "password2": "newPassword1%"}
+        post_data = {"password1": DEFAULT_PASSWORD, "password2": DEFAULT_PASSWORD}
         response = client.post(password_change_url_with_hidden_key, data=post_data)
         assertRedirects(response, reverse("welcoming_tour:index"))
         assert user.has_verified_email

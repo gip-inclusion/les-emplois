@@ -1,5 +1,6 @@
 from allauth.account.forms import BaseSignupForm, SignupForm
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse
@@ -15,7 +16,6 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis import api_entreprise, geocoding as api_geocoding
 from itou.utils.apis.exceptions import GeocodingDataError
-from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.validators import validate_birthdate, validate_code_safir, validate_nir, validate_siren, validate_siret
 from itou.utils.widgets import DuetDatePickerWidget
 
@@ -196,10 +196,12 @@ class JobSeekerCredentialsSignupForm(SignupForm):
         self.fields["birthdate"].initial = prior_cleaned_data.get("birthdate")
         self.fields["nir"].initial = prior_cleaned_data.get("nir")
 
-        # self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
         for password_field in [self.fields["password1"], self.fields["password2"]]:
             password_field.widget.attrs["placeholder"] = "**********"
-        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
+        self.fields["password1"].help_text = (
+            f"Le mot de passe doit contenir au moins {settings.PASSWORD_MIN_LENGTH} caractères et 3 des 4 types "
+            "suivants : majuscules, minuscules, chiffres, caractères spéciaux."
+        )
 
     def save(self, request):
         # Avoid django-allauth to call its own often failing `generate_unique_username`
