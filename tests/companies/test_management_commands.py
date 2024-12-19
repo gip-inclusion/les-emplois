@@ -134,6 +134,24 @@ def test_update_companies_job_app_score():
 
     assert company_1.job_app_score is None
     assert company_2.job_app_score is not None
+    assert (
+        company_2.job_app_score
+        == company_2.job_applications_received.count() / company_2.job_description_through.count()
+    )
+
+    # Deleting job descriptions should bring score back to None.
+    for jd in company_2.job_description_through.all():
+        jd.delete()
+    stdout = io.StringIO()
+    management.call_command("update_companies_job_app_score", stdout=stdout)
+    # company_2 changed
+    assert "Updated 1 companies" in stdout.getvalue()
+
+    company_1.refresh_from_db()
+    company_2.refresh_from_db()
+
+    assert company_1.job_app_score is None
+    assert company_2.job_app_score is None
 
 
 @freeze_time("2023-05-01")
