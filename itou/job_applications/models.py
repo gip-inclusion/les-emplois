@@ -14,6 +14,7 @@ from xworkflows import before_transition
 from itou.approvals.models import Approval, Suspension
 from itou.approvals.notifications import PassAcceptedEmployerNotification
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType
+from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.job_applications.enums import (
@@ -134,7 +135,13 @@ class JobApplicationWorkflow(xwf_models.Workflow):
 
 class JobApplicationQuerySet(models.QuerySet):
     def is_active_company_member(self, user):
-        return self.filter(to_company__members=user, to_company__members__is_active=True)
+        return self.filter(
+            Exists(
+                CompanyMembership.objects.filter(
+                    user=user, is_active=True, user__is_active=True, company=OuterRef("to_company")
+                )
+            )
+        )
 
     def pending(self):
         return self.filter(state__in=JobApplicationWorkflow.PENDING_STATES)

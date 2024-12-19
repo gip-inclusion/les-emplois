@@ -166,6 +166,22 @@ class TestJobApplicationModel:
         assert "Un contrat associé à une VAE inversée n'est possible que pour les GEIQ" in str(excinfo.value)
 
 
+class TestJobApplicationQueryset:
+    def test_is_active_company_member(self):
+        job_application = JobApplicationFactory()
+        user = EmployerFactory()
+        assert JobApplication.objects.is_active_company_member(user).count() == 0
+
+        job_application.to_company.add_or_activate_member(user)
+        assert JobApplication.objects.is_active_company_member(user).get() == job_application
+
+        membership = job_application.to_company.memberships.filter(user=user).get()
+        membership.is_active = False
+        membership.save(update_fields=("is_active",))
+
+        assert JobApplication.objects.is_active_company_member(user).count() == 0
+
+
 def test_can_be_cancelled():
     assert JobApplicationFactory().can_be_cancelled is True
 
