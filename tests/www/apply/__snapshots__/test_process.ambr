@@ -172,6 +172,7 @@
       dict({
         'origin': list([
           'accept[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -305,6 +306,7 @@
         'origin': list([
           'check_waiting_period[www/apply/views/process_views.py]',
           'accept[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -357,6 +359,7 @@
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           'check_waiting_period[www/apply/views/process_views.py]',
           'accept[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -391,6 +394,7 @@
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           'check_waiting_period[www/apply/views/process_views.py]',
           'accept[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -527,6 +531,7 @@
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           'check_waiting_period[www/apply/views/process_views.py]',
           'accept[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_poleemploiapproval"."id",
@@ -569,6 +574,7 @@
           'User.has_valid_diagnosis[users/models.py]',
           'JobApplication.eligibility_diagnosis_by_siae_required[job_applications/models.py]',
           'accept[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -703,6 +709,7 @@
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
           '_accept[www/apply/views/common.py]',
           'accept[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -835,6 +842,7 @@
           'AcceptForm.__init__[www/apply/forms.py]',
           '_accept[www/apply/views/common.py]',
           'accept[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -894,6 +902,7 @@
           'ExtendsNode[apply/process_accept.html]',
           '_accept[www/apply/views/common.py]',
           'accept[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -1135,6 +1144,7 @@
       dict({
         'origin': list([
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -1679,6 +1689,7 @@
       dict({
         'origin': list([
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
@@ -1717,6 +1728,7 @@
       dict({
         'origin': list([
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
@@ -1739,6 +1751,7 @@
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.has_considered_valid[eligibility/models/iae.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_expired[eligibility/models/iae.py]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -1768,6 +1781,7 @@
         'origin': list([
           'JobApplication.can_be_cancelled[job_applications/models.py]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -1787,6 +1801,7 @@
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -1816,6 +1831,7 @@
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
@@ -1848,6 +1864,7 @@
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -1891,6 +1908,7 @@
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -1920,6 +1938,7 @@
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -1958,6 +1977,7 @@
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id",
@@ -1998,6 +2018,7 @@
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplicationtransitionlog"."id",
@@ -2254,6 +2275,7 @@
       dict({
         'origin': list([
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -2798,6 +2820,7 @@
       dict({
         'origin': list([
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
@@ -2836,6 +2859,7 @@
       dict({
         'origin': list([
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
@@ -2858,6 +2882,7 @@
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.has_considered_valid[eligibility/models/iae.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_expired[eligibility/models/iae.py]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -2887,6 +2912,7 @@
         'origin': list([
           'JobApplication.can_be_cancelled[job_applications/models.py]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -2906,6 +2932,7 @@
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -2935,6 +2962,7 @@
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
@@ -2967,6 +2995,7 @@
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -3010,6 +3039,7 @@
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -3039,6 +3069,7 @@
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -3077,6 +3108,7 @@
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id",
@@ -3117,6 +3149,7 @@
           'ExtendsNode[apply/process_base.html]',
           'ExtendsNode[apply/process_details_company.html]',
           'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplicationtransitionlog"."id",

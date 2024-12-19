@@ -421,7 +421,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         session.save()
         # Needed to setup session
         response = client.get(reverse("apply:geiq_eligibility", kwargs={"job_application_id": job_application.pk}))
-        assert response.status_code == 404
+        assert response.status_code == 403
         response = client.post(
             reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk}),
             data={
@@ -430,4 +430,4 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
             },
         )
         assert not job_application.job_seeker.geiq_eligibility_diagnoses.exists()
-        assert response.status_code == 404
+        assert response.status_code == 403

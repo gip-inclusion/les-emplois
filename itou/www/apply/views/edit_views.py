@@ -9,10 +9,12 @@ from django.views.decorators.http import require_POST
 
 from itou.job_applications.enums import ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL, JobApplicationState
 from itou.job_applications.models import JobApplication
+from itou.utils.auth import check_user
 from itou.www.apply.forms import EditHiringDateForm
 
 
 @login_required
+@check_user(lambda user: user.is_employer)
 def edit_contract_start_date(request, job_application_id, template_name="apply/edit_contract_start_date.html"):
     """
     Update contract start date:
@@ -53,6 +55,7 @@ def edit_contract_start_date(request, job_application_id, template_name="apply/e
 
 @login_required
 @require_POST
+@check_user(lambda user: user.is_employer)
 def archive_view(request, job_application_id, *, action):
     extra_filters = {}
     if action == "archive":

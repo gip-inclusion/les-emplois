@@ -272,16 +272,16 @@ class TestArchiveView:
         job_app.refresh_from_db()
         assert job_app.archived_at == archived_at
 
-        def assert_post_fails_for_user(user):
+        def assert_post_fails_for_user(user, status_code):
             client.force_login(user)
             response = client.post(url)
-            assert response.status_code == 404
+            assert response.status_code == status_code
             job_app.refresh_from_db()
             assert job_app.archived_at == archived_at
 
-        assert_post_fails_for_user(job_app.job_seeker)
-        assert_post_fails_for_user(job_app.sender)
-        assert_post_fails_for_user(other_company.members.get())
+        assert_post_fails_for_user(job_app.job_seeker, 403)
+        assert_post_fails_for_user(job_app.sender, 403)
+        assert_post_fails_for_user(other_company.members.get(), 404)
 
         client.force_login(job_app.to_company.members.get())
         response = client.post(url)

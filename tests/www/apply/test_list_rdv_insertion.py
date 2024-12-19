@@ -242,7 +242,7 @@ class TestRdvInsertionView:
             reverse("apply:rdv_insertion_invite", kwargs={"job_application_id": self.job_application.pk}),
             follow=True,
         )
-        assert response.status_code == 404
+        assert response.status_code == 403
         assert InvitationRequest.objects.count() == 0
         assert not respx.routes["rdv_solidarites_create_and_invite"].called
 
