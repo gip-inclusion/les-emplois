@@ -74,7 +74,7 @@ def get_permissions_dict():
             users_models.User: PERMS_ADD,
             users_models.JobSeekerProfile: PERMS_EDIT,
         },
-        "itou-support-externe": {
+        "itou-admin-readonly": {
             model: PERMS_READ
             for model in (
                 account_models.EmailAddress,
