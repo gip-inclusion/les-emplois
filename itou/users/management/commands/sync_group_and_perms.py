@@ -8,6 +8,7 @@ PERMS_ALL = {"add", "change", "delete", "view"}
 PERMS_DELETE = {"change", "delete", "view"}
 PERMS_ADD = {"add", "change", "view"}
 PERMS_EDIT = {"change", "view"}
+PERMS_HIJACK = {"view", "hijack"}
 PERMS_READ = {"view"}
 
 
@@ -23,6 +24,7 @@ def get_permissions_dict():
     import itou.companies.models as companies_models
     import itou.eligibility.models as eligibility_models
     import itou.employee_record.models as employee_record_models
+    import itou.gps.models as gps_models
     import itou.institutions.models as institution_models
     import itou.invitations.models as invitation_models
     import itou.job_applications.models as job_applications_models
@@ -75,6 +77,12 @@ def get_permissions_dict():
         users_models.User: PERMS_ADD,
         users_models.JobSeekerProfile: PERMS_EDIT,
     }
+    group_gps_admin_permissions = {
+        gps_models.FollowUpGroup: PERMS_ALL,
+        gps_models.FollowUpGroupMembership: PERMS_ALL,
+        users_models.User: PERMS_ADD | PERMS_HIJACK,
+        users_models.JobSeekerProfile: PERMS_EDIT,
+    }
 
     return {
         "itou-admin": {
@@ -84,6 +92,14 @@ def get_permissions_dict():
         "itou-admin-readonly": {
             **{model: PERMS_READ for model in group_itou_admin_permissions},
             **{model: PERMS_READ for model in always_read_only_models},
+        },
+        "gps-admin": {
+            **group_gps_admin_permissions,
+            **{model: PERMS_READ for model in always_read_only_models if model in group_gps_admin_permissions},
+        },
+        "gps-admin-readonly": {
+            **{model: PERMS_READ for model in group_gps_admin_permissions},
+            **{model: PERMS_READ for model in always_read_only_models if model in group_gps_admin_permissions},
         },
     }
 

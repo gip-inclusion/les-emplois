@@ -11,7 +11,7 @@ def test_command(snapshot):
     stdout = io.StringIO()
     call_command("sync_group_and_perms", stdout=stdout)
     assert stdout.getvalue() == snapshot(name="stdout")
-    assert Group.objects.all().count() == 2
+    assert Group.objects.all().count() == len(sync_group_and_perms.get_permissions_dict())
 
     for group in Group.objects.all():
         assert [perm.codename for perm in group.permissions.all()] == snapshot(name=group.name)
