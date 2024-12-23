@@ -1,4 +1,30 @@
 # serializer version: 1
+# name: test_command[gps-admin-readonly]
+  list([
+    'view_followupgroup',
+    'view_followupgroupmembership',
+    'view_jobseekerprofile',
+    'view_user',
+  ])
+# ---
+# name: test_command[gps-admin]
+  list([
+    'add_followupgroup',
+    'change_followupgroup',
+    'delete_followupgroup',
+    'view_followupgroup',
+    'add_followupgroupmembership',
+    'change_followupgroupmembership',
+    'delete_followupgroupmembership',
+    'view_followupgroupmembership',
+    'change_jobseekerprofile',
+    'view_jobseekerprofile',
+    'add_user',
+    'change_user',
+    'hijack_user',
+    'view_user',
+  ])
+# ---
 # name: test_command[itou-admin-readonly]
   list([
     'view_emailaddress',
@@ -137,6 +163,8 @@
 # ---
 # name: test_command[stdout]
   '''
+  group name=gps-admin created
+  group name=gps-admin-readonly created
   group name=itou-admin created
   group name=itou-admin-readonly created
   All done!
