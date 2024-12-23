@@ -309,7 +309,7 @@ def test_populate_job_seekers():
             1,
             1,
             1,
-            job_application_2.eligibility_diagnosis.created_at.date(),
+            timezone.localdate(job_application_2.eligibility_diagnosis.created_at, timezone=datetime.UTC),
             job_application_2.eligibility_diagnosis.expires_at,
             0,
             job_application_2.eligibility_diagnosis.author_prescriber_organization.id,
