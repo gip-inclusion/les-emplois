@@ -1,5 +1,23 @@
 # Journal des modifications
 
+## 2024-12-23
+
+### Modifié
+
+- [Admin: Clarifier les structures dont sont membres les utilisateurs](https://github.com/gip-inclusion/les-emplois/pull/5281) 🖼
+- [Candidature: vérifier que l'utilisateur est toujours un membre actif de l'entreprise](https://github.com/gip-inclusion/les-emplois/pull/5291)
+- [Connexion: Donner plus d'informations sur le choix du mot de passe pour un nouveau candidat](https://github.com/gip-inclusion/les-emplois/pull/5286)
+- [Inscription: Refonte de parcours pour les candidats](https://github.com/gip-inclusion/les-emplois/pull/4991)
+- [Pilotage: Correction des paramètres sur le TB Etat des candidatures orientées pour les prescripteurs FT](https://github.com/gip-inclusion/les-emplois/pull/5263)
+- [Profil salarié: Diminution de la taille du badge Certifié](https://github.com/gip-inclusion/les-emplois/pull/5243)
+- [UX/UI: Corrections interface GEIQ](https://github.com/gip-inclusion/les-emplois/pull/5284)
+- [UX/UI: Quelques améliorations pour faire plaisir a PageSpeed](https://github.com/gip-inclusion/les-emplois/pull/5294)
+
+### Tech
+-
+- [Page d’accueil: Éviter le plantage en cas de rupture de la connexion au cache](https://github.com/gip-inclusion/les-emplois/pull/5282)
+- [Retirer l’heure de fin des diagnostics d’éligibilité et utiliser uniquement la date](https://github.com/gip-inclusion/les-emplois/pull/5210)
+
 ## 2024-12-16
 
 ### Ajouté
