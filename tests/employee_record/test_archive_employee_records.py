@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from django.core.management import call_command
 
@@ -31,7 +33,7 @@ def test_management_command_wet_run(command, snapshot, caplog):
 
     assert employee_record.status == Status.ARCHIVED
     assert employee_record.archived_json is None
-    assert caplog.messages == snapshot
+    assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == snapshot()
 
 
 def test_management_command_name():

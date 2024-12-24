@@ -1,7 +1,16 @@
 # serializer version: 1
+# name: test_missed_notifications
+  list([
+    'found 1 missed employee records notifications',
+    '[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.unarchive_new (ARCHIVED -> NEW)',
+    '1/1 notifications created',
+  ])
+# ---
 # name: test_missed_notifications_limit
   list([
     'found 3 missed employee records notifications',
+    '[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.unarchive_new (ARCHIVED -> NEW)',
+    '[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.unarchive_new (ARCHIVED -> NEW)',
     '2/3 notifications created',
   ])
 # ---

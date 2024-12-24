@@ -1,19 +1,21 @@
 import contextlib
+import enum
 import json
 
+import xworkflows
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
-from django.db import models, transaction
+from django.db import models
 from django.db.models import Exists, OuterRef
 from django.db.models.manager import Manager
 from django.db.models.query import Q, QuerySet
 from django.utils import timezone
+from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval
 from itou.asp.models import EmployerType, PrescriberType, SiaeMeasure
 from itou.companies.models import Company, SiaeFinancialAnnex
 from itou.employee_record.enums import MovementType, NotificationStatus, Status
-from itou.employee_record.exceptions import InvalidStatusError
 from itou.job_applications.enums import SenderKind
 from itou.utils.validators import validate_siret
 
@@ -93,6 +95,39 @@ class ASPExchangeInformation(models.Model):
         self._set_archived_json(archive)
 
 
+class EmployeeRecordTransition(enum.StrEnum):
+    READY = "ready"
+    SENT = "sent"
+    REJECT = "reject"
+    PROCESS = "process"
+    DISABLE = "disable"
+    ENABLE = "enable"
+    ARCHIVE = "archive"
+    UNARCHIVE_NEW = "unarchive_new"
+    UNARCHIVE_PROCESSED = "unarchive_processed"
+    UNARCHIVE_REJECTED = "unarchive_rejected"
+
+
+class EmployeeRecordWorkflow(xwf_models.Workflow):
+    states = Status.choices
+    initial_state = Status.NEW
+
+    CAN_BE_DISABLED_STATES = [Status.NEW, Status.REJECTED, Status.PROCESSED]
+    CAN_BE_ARCHIVED_STATES = [Status.NEW, Status.READY, Status.REJECTED, Status.PROCESSED, Status.DISABLED]
+    transitions = (
+        (EmployeeRecordTransition.READY, [Status.NEW, Status.REJECTED, Status.DISABLED], Status.READY),
+        (EmployeeRecordTransition.SENT, Status.READY, Status.SENT),
+        (EmployeeRecordTransition.REJECT, Status.SENT, Status.REJECTED),
+        (EmployeeRecordTransition.PROCESS, Status.SENT, Status.PROCESSED),
+        (EmployeeRecordTransition.DISABLE, CAN_BE_DISABLED_STATES, Status.DISABLED),
+        (EmployeeRecordTransition.ENABLE, Status.DISABLED, Status.NEW),
+        (EmployeeRecordTransition.ARCHIVE, CAN_BE_ARCHIVED_STATES, Status.ARCHIVED),
+        (EmployeeRecordTransition.UNARCHIVE_NEW, Status.ARCHIVED, Status.NEW),
+        (EmployeeRecordTransition.UNARCHIVE_PROCESSED, Status.ARCHIVED, Status.PROCESSED),
+        (EmployeeRecordTransition.UNARCHIVE_REJECTED, Status.ARCHIVED, Status.REJECTED),
+    )
+
+
 class EmployeeRecordQuerySet(models.QuerySet):
     def full_fetch(self):
         return self.select_related(
@@ -137,7 +172,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
         )
 
 
-class EmployeeRecord(ASPExchangeInformation):
+class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
     """
     EmployeeRecord - Fiche salarié (FS for short)
 
@@ -152,14 +187,12 @@ class EmployeeRecord(ASPExchangeInformation):
 
     ERROR_NO_CONVENTION_AVAILABLE = "La structure actuelle ne dispose d'aucune convention"
 
-    CAN_BE_DISABLED_STATES = [Status.NEW, Status.REJECTED, Status.PROCESSED]
-
     ASP_MOVEMENT_TYPE = MovementType.CREATION
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
     processed_at = models.DateTimeField(verbose_name="date d'intégration", null=True)
-    status = models.CharField(max_length=10, verbose_name="statut", choices=Status.choices, default=Status.NEW)
+    status = xwf_models.StateField(EmployeeRecordWorkflow, verbose_name="statut", max_length=10)
 
     # Job application has references on many mandatory parts of the E.R.:
     # - SIAE / asp id
@@ -262,15 +295,11 @@ class EmployeeRecord(ASPExchangeInformation):
 
     # Business methods
 
+    @xwf_models.transition(EmployeeRecordTransition.READY)
     def update_as_ready(self):
         """
         Prepare the employee record for transmission
-
-        Status: NEW | REJECTED | DISABLED => READY
         """
-        if self.status not in [Status.NEW, Status.REJECTED, Status.DISABLED]:
-            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
-
         profile = self.job_application.job_seeker.jobseeker_profile
 
         if not profile.hexa_address_filled:
@@ -287,104 +316,77 @@ class EmployeeRecord(ASPExchangeInformation):
         # To prevent some ASP processing errors, we do a refresh on some mutable fields.
         self._fill_denormalized_fields()
 
-        # If we reach this point, the employee record is ready to be serialized
-        # and can be sent to ASP
-        self.status = Status.READY
-        self.save()
-
+    @xwf_models.transition(EmployeeRecordTransition.SENT)
     def update_as_sent(self, asp_filename, line_number, archive):
         """
         An employee record is sent to ASP via a JSON file,
         The file name is stored for further feedback processing (also done via a file)
-
-        Status: READY => SENT
         """
-        if not self.status == Status.READY:
-            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
-
         self.clean()
-        self.status = Status.SENT
         self.set_asp_batch_information(asp_filename, line_number, archive)
 
-        self.save()
-
+    @xwf_models.transition(EmployeeRecordTransition.REJECT)
     def update_as_rejected(self, code, label, archive):
         """
         Update status after an ASP rejection of the employee record
-
-        Status: SENT => REJECTED
         """
-        if not self.status == Status.SENT:
-            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
-
         self.clean()
-        self.status = Status.REJECTED
         self.set_asp_processing_information(code, label, archive)
 
-        self.save()
-
+    @xwf_models.transition(EmployeeRecordTransition.PROCESS)
     def update_as_processed(self, code, label, archive, *, as_duplicate=False):
-        if self.status != Status.SENT:
-            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
         if as_duplicate and code != self.ASP_DUPLICATE_ERROR_CODE:
             raise ValueError(f"Code needs to be {self.ASP_DUPLICATE_ERROR_CODE} and not {code} when {as_duplicate=}")
 
         self.clean()
-        self.status = Status.PROCESSED
         self.processed_at = timezone.now()
         self.processed_as_duplicate = as_duplicate
         self.set_asp_processing_information(
             code, label if not as_duplicate else "Statut forcé suite à doublon ASP", archive
         )
 
-        self.save()
-
+    @xwf_models.transition(EmployeeRecordTransition.DISABLE)
     def update_as_disabled(self):
-        if not self.can_be_disabled:
-            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+        pass
 
-        self.status = Status.DISABLED
-        self.save()
-
+    @xwf_models.transition(EmployeeRecordTransition.ENABLE)
     def update_as_new(self):
-        if self.status != Status.DISABLED:
-            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
-
         self._fill_denormalized_fields()
 
-        self.status = Status.NEW
-        self.save()
-
-    def update_as_archived(self):
+    @xworkflows.transition_check(EmployeeRecordTransition.ARCHIVE)
+    def check_archive(self):
         # We only archive an employee record when the job seeker's approval is expired and can no longer be prolonged
-        if self.job_application.approval.is_valid() or self.job_application.approval.can_be_prolonged:
-            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+        return not self.job_application.approval.is_valid() and not self.job_application.approval.can_be_prolonged
 
+    @xwf_models.transition(EmployeeRecordTransition.ARCHIVE)
+    def update_as_archived(self):
         # Remove proof of processing after delay
-        self.status = Status.ARCHIVED
         self.archived_json = None
 
-        with transaction.atomic():  # In case we failed a constraint (i.e: the unique one)
-            self.save()
+    @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_NEW)
+    def check_unarchive_new(self):
+        return not self.asp_processing_code
+
+    @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_PROCESSED)
+    def check_unarchive_processed(self):
+        return self.asp_processing_code in ["0000", "3436"]
+
+    @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_REJECTED)
+    def check_unarchive_rejected(self):
+        return self.asp_processing_code and self.asp_processing_code[:2] in ["32", "33", "34"]
 
     def unarchive(self):
+        for transition_name in [
+            EmployeeRecordTransition.UNARCHIVE_PROCESSED,
+            EmployeeRecordTransition.UNARCHIVE_REJECTED,
+            EmployeeRecordTransition.UNARCHIVE_NEW,
+        ]:
+            transition = getattr(self, transition_name)
+            if transition.is_available():
+                return transition()
+
         if self.status != Status.ARCHIVED:
-            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
-
-        match self.asp_processing_code:
-            case None:  # Acknowledgement never received, start anew
-                self.status = Status.NEW
-            case "0000" | "3436":
-                self.status = Status.PROCESSED
-            case code:
-                if code[:2] in ["32", "33", "34"]:
-                    self.status = Status.REJECTED
-
-        self.save(update_fields=["status"])
-
-    @property
-    def can_be_disabled(self):
-        return self.status in self.CAN_BE_DISABLED_STATES
+            raise xwf_models.InvalidTransitionError()
 
     @property
     def asp_employer_type(self):
@@ -549,14 +551,25 @@ class EmployeeRecordBatch:
         return separator.join([path.removesuffix(EmployeeRecordBatch.FEEDBACK_FILE_SUFFIX), ext])
 
 
+class EmployeeRecordUpdateNotificationWorkflow(xwf_models.Workflow):
+    states = NotificationStatus.choices
+    initial_state = Status.NEW
+
+    transitions = (
+        (EmployeeRecordTransition.SENT, NotificationStatus.NEW, NotificationStatus.SENT),
+        (EmployeeRecordTransition.REJECT, NotificationStatus.SENT, NotificationStatus.REJECTED),
+        (EmployeeRecordTransition.PROCESS, NotificationStatus.SENT, NotificationStatus.PROCESSED),
+    )
+
+
 class EmployeeRecordUpdateNotificationQuerySet(QuerySet):
     def find_by_batch(self, filename, line_number):
         return self.filter(asp_batch_file=filename, asp_batch_line_number=line_number)
 
 
-class EmployeeRecordUpdateNotification(ASPExchangeInformation):
+class EmployeeRecordUpdateNotification(ASPExchangeInformation, xwf_models.WorkflowEnabled):
     """
-    Notification of PROCESSED employee record updates.
+    Notification of employee record updates.
 
     Monitoring of approvals is done via a Postgres trigger (defined in `Approval` app migrations),
     at the moment, only the start and end dates are tracked.
@@ -566,12 +579,7 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation):
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
-    status = models.CharField(
-        verbose_name="statut",
-        max_length=10,
-        choices=NotificationStatus.choices,
-        default=NotificationStatus.NEW,
-    )
+    status = xwf_models.StateField(EmployeeRecordUpdateNotificationWorkflow, verbose_name="statut", max_length=10)
 
     employee_record = models.ForeignKey(
         EmployeeRecord,
@@ -597,29 +605,14 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation):
     def __repr__(self):
         return f"<{type(self).__name__} pk={self.pk}>"
 
+    @xwf_models.transition(EmployeeRecordTransition.SENT)
     def update_as_sent(self, filename, line_number, archive):
-        if self.status not in [NotificationStatus.NEW, NotificationStatus.REJECTED]:
-            raise ValidationError(f"Invalid status to update as SENT (currently: {self.status})")
-
-        self.status = NotificationStatus.SENT
         self.set_asp_batch_information(filename, line_number, archive)
 
-        self.save()
-
+    @xwf_models.transition(EmployeeRecordTransition.REJECT)
     def update_as_rejected(self, code, label, archive):
-        if not self.status == NotificationStatus.SENT:
-            raise ValidationError(f"Invalid status to update as REJECTED (currently: {self.status})")
-
-        self.status = NotificationStatus.REJECTED
         self.set_asp_processing_information(code, label, archive)
 
-        self.save()
-
+    @xwf_models.transition(EmployeeRecordTransition.PROCESS)
     def update_as_processed(self, code, label, archive):
-        if not self.status == NotificationStatus.SENT:
-            raise ValidationError(f"Invalid status to update as PROCESSED (currently: {self.status})")
-
-        self.status = NotificationStatus.PROCESSED
         self.set_asp_processing_information(code, label, archive)
-
-        self.save()

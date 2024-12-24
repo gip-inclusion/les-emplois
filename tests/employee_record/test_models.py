@@ -6,15 +6,14 @@ from datetime import timedelta
 from unittest import mock
 
 import pytest
+import xworkflows
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from pytest_django.asserts import assertRaisesMessage
 
 from itou.approvals.models import Approval
 from itou.companies.models import Company
 from itou.employee_record.enums import Status
-from itou.employee_record.exceptions import InvalidStatusError
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationWorkflow
@@ -219,9 +218,7 @@ class TestEmployeeRecordModel:
         for status in set(Status) - {Status.ARCHIVED}:
             with subtests.test(status=status.name):
                 employee_record = BareEmployeeRecordFactory(status=status)
-                with pytest.raises(
-                    InvalidStatusError, match="La fiche salarié n'est pas dans l'état requis pour cette action"
-                ):
+                with pytest.raises(xworkflows.InvalidTransitionError):
                     employee_record.unarchive()
 
     def test_unarchive(self, faker, subtests):
@@ -424,13 +421,13 @@ class TestEmployeeRecordLifeCycle:
 
     def test_state_disabled(self, faker):
         # Employee record in READY state can't be disabled
-        with assertRaisesMessage(InvalidStatusError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
+        with pytest.raises(xworkflows.InvalidTransitionError):
             self.employee_record.update_as_disabled()
         assert self.employee_record.status == Status.READY
 
         # Employee record in SENT state can't be disabled
         self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
-        with assertRaisesMessage(InvalidStatusError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
+        with pytest.raises(xworkflows.InvalidTransitionError):
             self.employee_record.update_as_disabled()
         assert self.employee_record.status == Status.SENT
 
@@ -518,7 +515,7 @@ class TestEmployeeRecordLifeCycle:
 
         # Can't archive while the approval is valid
         assert approval.is_valid()
-        with pytest.raises(InvalidStatusError):
+        with pytest.raises(xworkflows.ForbiddenTransition):
             self.employee_record.update_as_archived()
 
         # Make the approval expires
@@ -569,7 +566,7 @@ class TestEmployeeRecordLifeCycle:
                 as_duplicate=True,
             )
 
-        with pytest.raises(InvalidStatusError):
+        with pytest.raises(xworkflows.InvalidTransitionError):
             employee_record_other_status.update_as_processed(
                 employee_record_other_status.asp_processing_code,
                 employee_record_other_status.asp_processing_label,
