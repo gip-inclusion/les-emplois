@@ -1,5 +1,6 @@
 import datetime
 import io
+import re
 
 import pytest
 
@@ -42,7 +43,7 @@ def test_missing_approvals(command, caplog):
     ]
 
 
-def test_missed_notifications(command, faker, caplog):
+def test_missed_notifications(command, faker, caplog, snapshot):
     # Approval() updated after the last employee record snapshot are what we want
     employee_record_before_approval = factories.EmployeeRecordFactory(
         status=models.Status.ARCHIVED,
@@ -80,10 +81,7 @@ def test_missed_notifications(command, faker, caplog):
     assert employee_record_before_approval.update_notifications.count() == 1
     employee_record_before_approval.refresh_from_db()
     assert employee_record_before_approval.status != Status.ARCHIVED
-    assert caplog.messages == [
-        "found 1 missed employee records notifications",
-        "1/1 notifications created",
-    ]
+    assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == snapshot()
 
 
 def test_missed_notifications_limit(faker, mocker, snapshot, command, caplog):
@@ -100,4 +98,4 @@ def test_missed_notifications_limit(faker, mocker, snapshot, command, caplog):
     command._check_missed_notifications(dry_run=False)
 
     assert models.EmployeeRecordUpdateNotification.objects.count() == 2
-    assert caplog.messages == snapshot
+    assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == snapshot()

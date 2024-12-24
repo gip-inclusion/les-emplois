@@ -467,7 +467,7 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
 
     back_url = f"{reverse('employee_record_views:list')}?status={employee_record.status}"
 
-    if not employee_record.can_be_disabled:
+    if not employee_record.update_as_disabled.is_available():
         messages.error(request, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
         return HttpResponseRedirect(back_url)
 
