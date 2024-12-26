@@ -3,7 +3,7 @@ from django.db.models import F, Max
 from django.db.models.functions import Greatest
 from django.utils import timezone
 
-from itou.employee_record.enums import Status
+from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from itou.utils.command import BaseCommand
 
@@ -81,7 +81,7 @@ class Command(BaseCommand):
             for employee_record in employee_record_with_missing_notification[: self.MAX_MISSED_NOTIFICATIONS_CREATED]:
                 _, created = EmployeeRecordUpdateNotification.objects.update_or_create(
                     employee_record=employee_record,
-                    status=Status.NEW,
+                    status=NotificationStatus.NEW,
                     defaults={"updated_at": timezone.now},
                 )
                 total_created += int(created)

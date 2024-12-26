@@ -191,7 +191,7 @@ def test_duplicates_with_an_extension_generate_an_update_notification(sftp_direc
 
     command.handle(upload=False, download=True, preflight=False, wet_run=True)
     assert employee_record.update_notifications.count() == 1
-    assert employee_record.update_notifications.get().status == Status.NEW
+    assert employee_record.update_notifications.get().status == NotificationStatus.NEW
 
 
 @pytest.mark.parametrize("status", set(NotificationStatus) - {NotificationStatus.NEW})
@@ -208,7 +208,7 @@ def test_duplicates_with_an_extension_generate_a_pristine_update_notification(
 
     command.handle(upload=False, download=True, preflight=False, wet_run=True)
     assert employee_record.update_notifications.count() == 2
-    assert employee_record.update_notifications.latest("created_at").status == Status.NEW
+    assert employee_record.update_notifications.latest("created_at").status == NotificationStatus.NEW
 
 
 @pytest.mark.parametrize("extension_class", [ProlongationFactory, SuspensionFactory])
@@ -225,5 +225,5 @@ def test_duplicates_with_an_extension_update_the_existing_new_notification(sftp_
         command.handle(upload=False, download=True, preflight=False, wet_run=True)
     assert employee_record.update_notifications.count() == 1
     notification = employee_record.update_notifications.get()
-    assert notification.status == Status.NEW
+    assert notification.status == NotificationStatus.NEW
     assert notification.updated_at == expected_updated_at

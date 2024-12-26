@@ -5,7 +5,7 @@ import freezegun
 import pytest
 from django.test.utils import override_settings
 
-from itou.employee_record.enums import Status
+from itou.employee_record.enums import NotificationStatus
 from itou.employee_record.management.commands import transfer_employee_records_updates
 from itou.employee_record.models import EmployeeRecordBatch
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
@@ -60,7 +60,7 @@ def test_connection_error(mocker, command):
         command.handle(upload=True, download=False, preflight=False, wet_run=True)
 
     notification.refresh_from_db()
-    assert notification.status == Status.NEW
+    assert notification.status == NotificationStatus.NEW
     assert command.stdout.getvalue() == ""
 
 
@@ -97,7 +97,7 @@ def test_upload_file_error(faker, snapshot, sftp_directory, command):
     command.handle(upload=True, download=False, preflight=False, wet_run=True)
 
     notification.refresh_from_db()
-    assert notification.status == Status.NEW
+    assert notification.status == NotificationStatus.NEW
     assert command.stdout.getvalue() == snapshot
 
 
@@ -135,7 +135,7 @@ def test_dry_run_upload_and_download(command):
 
     command.handle(upload=True, download=True, preflight=False, wet_run=False)
     notification.refresh_from_db()
-    assert notification.status == Status.NEW
+    assert notification.status == NotificationStatus.NEW
 
 
 @freezegun.freeze_time("2021-09-27")
@@ -144,7 +144,7 @@ def test_upload_and_download(snapshot, sftp_directory, command):
 
     command.handle(upload=True, download=False, preflight=False, wet_run=True)
     notification.refresh_from_db()
-    assert notification.status == Status.SENT
+    assert notification.status == NotificationStatus.SENT
     assert notification.asp_batch_line_number == 1
     assert notification.asp_batch_file is not None
 
@@ -152,7 +152,7 @@ def test_upload_and_download(snapshot, sftp_directory, command):
 
     command.handle(upload=False, download=True, preflight=False, wet_run=True)
     notification.refresh_from_db()
-    assert notification.status == Status.PROCESSED
+    assert notification.status == NotificationStatus.PROCESSED
     assert notification.asp_processing_code == "0000"
     assert notification.archived_json.get("libelleTraitement") == "OK"
 

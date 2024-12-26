@@ -8,7 +8,6 @@ from django.utils.html import format_html
 
 import itou.employee_record.models as models
 from itou.companies import models as companies_models
-from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecordUpdateNotification
 from itou.utils.admin import ItouModelAdmin, ItouTabularInline, ReadonlyMixin, get_admin_view_link
 from itou.utils.templatetags.str_filters import pluralizefr
@@ -101,7 +100,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
         for employee_record in queryset:
             _, created = models.EmployeeRecordUpdateNotification.objects.update_or_create(
                 employee_record=employee_record,
-                status=Status.NEW,
+                status=models.NotificationStatus.NEW,
                 defaults={"updated_at": timezone.now},
             )
             total_created += int(created)
