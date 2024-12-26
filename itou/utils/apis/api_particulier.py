@@ -39,9 +39,7 @@ def _build_params_from(job_seeker):
 
 def _request(client, endpoint, job_seeker):
     params = _build_params_from(job_seeker=job_seeker)
-    response = client.get(endpoint, params=params)
-    response.raise_for_status()
-    return response.json()
+    return client.get(endpoint, params=params).raise_for_status().json()
 
 
 def has_required_info(job_seeker):

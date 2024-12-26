@@ -89,19 +89,21 @@ class PoleEmploiApiClient:
 
     def _refresh_token(self):
         scopes = " ".join(AUTHORIZED_SCOPES)
-        response = httpx.post(
-            f"{self.auth_base_url}/connexion/oauth2/access_token",
-            params={"realm": "/partenaire"},
-            data={
-                "client_id": self.key,
-                "client_secret": self.secret,
-                "grant_type": "client_credentials",
-                "scope": f"application_{self.key} {scopes}",
-            },
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        auth_data = (
+            httpx.post(
+                f"{self.auth_base_url}/connexion/oauth2/access_token",
+                params={"realm": "/partenaire"},
+                data={
+                    "client_id": self.key,
+                    "client_secret": self.secret,
+                    "grant_type": "client_credentials",
+                    "scope": f"application_{self.key} {scopes}",
+                },
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+            )
+            .raise_for_status()
+            .json()
         )
-        response.raise_for_status()
-        auth_data = response.json()
         token = f"{auth_data['token_type']} {auth_data['access_token']}"
         caches["failsafe"].set(
             CACHE_API_TOKEN_KEY,

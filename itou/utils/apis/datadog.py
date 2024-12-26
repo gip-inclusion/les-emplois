@@ -33,9 +33,7 @@ class DatadogApiClient:
 
     @tenacity.retry(wait=tenacity.wait_fixed(2), stop=tenacity.stop_after_attempt(8))
     def _request(self, data):
-        response = self.client.post("/logs/analytics/aggregate", content=json.dumps(data))
-        response.raise_for_status()
-        return response
+        return self.client.post("/logs/analytics/aggregate", content=json.dumps(data)).raise_for_status()
 
     def _get_data_from_datadog(self, data=None):
         response = self._request(data)

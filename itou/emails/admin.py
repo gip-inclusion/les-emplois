@@ -104,10 +104,12 @@ class EmailAdmin(admin.ModelAdmin):
 
     def mailjet_view(self, request, message_id, *args, **kwargs):
         # Proxy Mailjet API to avoid giving API credentials to clients.
-        response = httpx.get(
-            f"https://api.mailjet.com/v3/REST/messagehistory/{message_id}",
-            auth=(settings.ANYMAIL["MAILJET_API_KEY"], settings.ANYMAIL["MAILJET_SECRET_KEY"]),
-        )
-        response.raise_for_status()
         # Middlewares processing the response expect a Django response.
-        return JsonResponse(response.json())
+        return JsonResponse(
+            httpx.get(
+                f"https://api.mailjet.com/v3/REST/messagehistory/{message_id}",
+                auth=(settings.ANYMAIL["MAILJET_API_KEY"], settings.ANYMAIL["MAILJET_SECRET_KEY"]),
+            )
+            .raise_for_status()
+            .json()
+        )

@@ -26,13 +26,15 @@ class Etablissement:
 
 def get_access_token():
     try:
-        r = httpx.post(
-            f"{settings.API_INSEE_BASE_URL}/token",
-            data={"grant_type": "client_credentials"},
-            auth=(settings.API_INSEE_CONSUMER_KEY, settings.API_INSEE_CONSUMER_SECRET),
+        access_token = (
+            httpx.post(
+                f"{settings.API_INSEE_BASE_URL}/token",
+                data={"grant_type": "client_credentials"},
+                auth=(settings.API_INSEE_CONSUMER_KEY, settings.API_INSEE_CONSUMER_SECRET),
+            )
+            .raise_for_status()
+            .json()["access_token"]
         )
-        r.raise_for_status()
-        access_token = r.json()["access_token"]
     except Exception:
         logger.exception("Failed to retrieve an access token")
         return None
@@ -56,8 +58,7 @@ def etablissement_get_or_error(siret):
             url,
             headers={"Authorization": f"Bearer {access_token}"},
             params={"date": timezone.localdate().isoformat()},
-        )
-        r.raise_for_status()
+        ).raise_for_status()
     except httpx.RequestError:
         logger.exception("A request to the INSEE API failed")
         return None, "Problème de connexion à la base Sirene. Essayez ultérieurement."

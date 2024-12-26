@@ -109,21 +109,19 @@ def create_table(table_name: str, columns: list[str, str], reset=False):
 def build_dbt_daily():
     # FIXME(vperron): this has to be moved to DBT seeds.
     create_unversioned_tables_if_needed()
-    response = httpx.post(
+    httpx.post(
         urllib.parse.urljoin(settings.AIRFLOW_BASE_URL, "api/v1/dags/dbt_daily/dagRuns"),
         json={"conf": {}},
-    )
-    response.raise_for_status()
+    ).raise_for_status()
 
 
 def build_dbt_weekly():
     # FIXME(vperron): this has to be moved to DBT seeds.
     create_unversioned_tables_if_needed()
-    response = httpx.post(
+    httpx.post(
         urllib.parse.urljoin(settings.AIRFLOW_BASE_URL, "api/v1/dags/dbt_weekly/dagRuns"),
         json={"conf": {}},
-    )
-    response.raise_for_status()
+    ).raise_for_status()
 
 
 def create_unversioned_tables_if_needed():

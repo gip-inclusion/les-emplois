@@ -33,8 +33,7 @@ def get_api_credentials(refresh=False):
                         "email": settings.RDV_SOLIDARITES_EMAIL,
                         "password": settings.RDV_SOLIDARITES_PASSWORD,
                     },
-                )
-                response.raise_for_status()
+                ).raise_for_status()
                 api_credentials = {
                     "access-token": response.headers["access-token"],
                     "client": response.headers["client"],

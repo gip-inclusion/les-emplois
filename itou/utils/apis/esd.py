@@ -26,20 +26,22 @@ def get_access_token(scope):
             logger.debug("Found %s in cache. Expiration = %s, now = %s.", token.value, token.expiration, now)
             return token.value
 
-    auth_request = httpx.post(
-        f"{settings.API_ESD['AUTH_BASE_URL']}/connexion/oauth2/access_token",
-        params={"realm": "/partenaire"},
-        data={
-            "grant_type": "client_credentials",
-            "client_id": settings.API_ESD["KEY"],
-            "client_secret": settings.API_ESD["SECRET"],
-            "scope": f"application_{settings.API_ESD['KEY']} {scope}",
-        },
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    r = (
+        httpx.post(
+            f"{settings.API_ESD['AUTH_BASE_URL']}/connexion/oauth2/access_token",
+            params={"realm": "/partenaire"},
+            data={
+                "grant_type": "client_credentials",
+                "client_id": settings.API_ESD["KEY"],
+                "client_secret": settings.API_ESD["SECRET"],
+                "scope": f"application_{settings.API_ESD['KEY']} {scope}",
+            },
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+        .raise_for_status()
+        .json()
     )
-    auth_request.raise_for_status()
 
-    r = auth_request.json()
     value = f"{r['token_type']} {r['access_token']}"
     expiration = datetime.datetime.now() + datetime.timedelta(seconds=r["expires_in"])
     token = Token(value=value, expiration=expiration)

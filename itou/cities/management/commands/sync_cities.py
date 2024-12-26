@@ -24,9 +24,11 @@ def fetch_cities(districts_only=False):
     }
     if districts_only:
         params["type"] = "arrondissement-municipal"
-    response = httpx.get(urllib.parse.urljoin(settings.API_GEO_BASE_URL, f"communes?{urllib.parse.urlencode(params)}"))
-    response.raise_for_status()
-    answer = response.json()
+    answer = (
+        httpx.get(urllib.parse.urljoin(settings.API_GEO_BASE_URL, f"communes?{urllib.parse.urlencode(params)}"))
+        .raise_for_status()
+        .json()
+    )
     if districts_only:
         answer = [strip_arrondissement(raw_city) for raw_city in answer]
     return answer
