@@ -39,8 +39,7 @@ class DataInclusionApiClient:
                     "sources": settings.API_DATA_INCLUSION_SOURCES,
                     "thematiques": API_THEMATIQUES,
                 },
-            )
-            response.raise_for_status()
+            ).raise_for_status()
         except httpx.HTTPError as exc:
             logger.info("data.inclusion request error code_insee=%s error=%s", code_insee, exc)
             raise DataInclusionApiException()
@@ -53,12 +52,13 @@ class DataInclusionApiClient:
 
     def retrieve_service(self, source: str, id_: str) -> dict:
         try:
-            response = self.client.get(
-                f"/services/{source}/{id_}",
+            return (
+                self.client.get(
+                    f"/services/{source}/{id_}",
+                )
+                .raise_for_status()
+                .json()
             )
-            response.raise_for_status()
         except httpx.HTTPError as exc:
             logger.info("data.inclusion request error source=%s service_id=%s error=%s", source, id_, exc)
             raise DataInclusionApiException()
-
-        return response.json()

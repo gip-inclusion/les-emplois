@@ -91,9 +91,11 @@ def matomo_api_call(options):
     @tenacity.retry(stop=tenacity.stop_after_attempt(3), wait=tenacity.wait_fixed(30), after=log_retry_attempt)
     def get_csv_raw_data():
         url = urllib.parse.urljoin(settings.MATOMO_BASE_URL, "index.php")
-        response = client.get(f"{url}?{urllib.parse.urlencode(options)}", timeout=MATOMO_TIMEOUT)
-        response.raise_for_status()
-        return response.content.decode("utf-16")
+        return (
+            client.get(f"{url}?{urllib.parse.urlencode(options)}", timeout=MATOMO_TIMEOUT)
+            .raise_for_status()
+            .content.decode("utf-16")
+        )
 
     yield from csv.DictReader(io.StringIO(get_csv_raw_data()), dialect="excel")
 

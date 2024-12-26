@@ -28,9 +28,7 @@ class SentryApiClient:
             "end": end.isoformat(),
         }
 
-        response = self.client.get("/events/", params=params)
-        response.raise_for_status()
-        return response
+        return self.client.get("/events/", params=params).raise_for_status()
 
     def get_metrics(self, start, end):
         response = self._request(start=start, end=end)

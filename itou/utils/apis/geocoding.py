@@ -46,8 +46,7 @@ def call_ban_geocoding_api(address, post_code=None, limit=1):
     url = f"{api_url}?{query_string}"
 
     try:
-        r = httpx.get(url)
-        r.raise_for_status()
+        r = httpx.get(url).raise_for_status()
     except httpx.HTTPError as e:
         logger.info("Error while requesting `%s`: %s", url, e)
         return None

@@ -1215,8 +1215,7 @@ def rdv_insertion_invite(request, job_application_id, for_detail=False):
                 if response.status_code in (httpx.codes.UNAUTHORIZED, httpx.codes.FORBIDDEN):
                     headers = get_api_credentials(refresh=True)
                     response = httpx.post(url=url, headers=headers, json=data, timeout=10)
-                response.raise_for_status()
-                response_data = response.json()
+                response_data = response.raise_for_status().json()
 
                 invitation_request = InvitationRequest.objects.create(
                     job_seeker=job_application.job_seeker,

@@ -40,12 +40,14 @@ class LabelApiClient:
     def _command(self, command, **params):
         command = LabelCommand(command)
         try:
-            response = self.client.get(
-                f"rest/{command}",
-                params=params,
+            response_data = (
+                self.client.get(
+                    f"rest/{command}",
+                    params=params,
+                )
+                .raise_for_status()
+                .json()
             )
-            response.raise_for_status()
-            response_data = response.json()
         except (httpx.HTTPError, json.JSONDecodeError) as exc:
             raise LabelAPIError("Error requesting Label API") from exc
         if response_data.get("status") != "Success":

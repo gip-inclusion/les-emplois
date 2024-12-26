@@ -24,9 +24,7 @@ class UpdownApiClient:
             "from": start.isoformat(),
             "to": end.isoformat(),
         }
-        response = self.client.get(endpoint, params=params)
-        response.raise_for_status()
-        return response
+        return self.client.get(endpoint, params=params).raise_for_status()
 
     def get_metrics(self, start, end):
         endpoint = f"/checks/{settings.API_UPDOWN_CHECK_ID}/metrics/"
