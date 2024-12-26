@@ -295,8 +295,8 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
 
     # Business methods
 
-    @xwf_models.transition(EmployeeRecordTransition.READY)
-    def update_as_ready(self):
+    @xwf_models.transition()
+    def ready(self):
         """
         Prepare the employee record for transmission
         """
@@ -316,8 +316,8 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         # To prevent some ASP processing errors, we do a refresh on some mutable fields.
         self._fill_denormalized_fields()
 
-    @xwf_models.transition(EmployeeRecordTransition.SENT)
-    def update_as_sent(self, asp_filename, line_number, archive):
+    @xwf_models.transition()
+    def sent(self, asp_filename, line_number, archive):
         """
         An employee record is sent to ASP via a JSON file,
         The file name is stored for further feedback processing (also done via a file)
@@ -325,16 +325,16 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         self.clean()
         self.set_asp_batch_information(asp_filename, line_number, archive)
 
-    @xwf_models.transition(EmployeeRecordTransition.REJECT)
-    def update_as_rejected(self, code, label, archive):
+    @xwf_models.transition()
+    def reject(self, code, label, archive):
         """
         Update status after an ASP rejection of the employee record
         """
         self.clean()
         self.set_asp_processing_information(code, label, archive)
 
-    @xwf_models.transition(EmployeeRecordTransition.PROCESS)
-    def update_as_processed(self, code, label, archive, *, as_duplicate=False):
+    @xwf_models.transition()
+    def process(self, code, label, archive, *, as_duplicate=False):
         if as_duplicate and code != self.ASP_DUPLICATE_ERROR_CODE:
             raise ValueError(f"Code needs to be {self.ASP_DUPLICATE_ERROR_CODE} and not {code} when {as_duplicate=}")
 
@@ -345,12 +345,8 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
             code, label if not as_duplicate else "Statut forcé suite à doublon ASP", archive
         )
 
-    @xwf_models.transition(EmployeeRecordTransition.DISABLE)
-    def update_as_disabled(self):
-        pass
-
-    @xwf_models.transition(EmployeeRecordTransition.ENABLE)
-    def update_as_new(self):
+    @xwf_models.transition()
+    def enable(self):
         self._fill_denormalized_fields()
 
     @xworkflows.transition_check(EmployeeRecordTransition.ARCHIVE)
@@ -358,8 +354,8 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         # We only archive an employee record when the job seeker's approval is expired and can no longer be prolonged
         return not self.job_application.approval.is_valid() and not self.job_application.approval.can_be_prolonged
 
-    @xwf_models.transition(EmployeeRecordTransition.ARCHIVE)
-    def update_as_archived(self):
+    @xwf_models.transition()
+    def archive(self):
         # Remove proof of processing after delay
         self.archived_json = None
 
@@ -605,14 +601,14 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation, xwf_models.Workfl
     def __repr__(self):
         return f"<{type(self).__name__} pk={self.pk}>"
 
-    @xwf_models.transition(EmployeeRecordTransition.SENT)
-    def update_as_sent(self, filename, line_number, archive):
+    @xwf_models.transition()
+    def sent(self, filename, line_number, archive):
         self.set_asp_batch_information(filename, line_number, archive)
 
-    @xwf_models.transition(EmployeeRecordTransition.REJECT)
-    def update_as_rejected(self, code, label, archive):
+    @xwf_models.transition()
+    def reject(self, code, label, archive):
         self.set_asp_processing_information(code, label, archive)
 
-    @xwf_models.transition(EmployeeRecordTransition.PROCESS)
-    def update_as_processed(self, code, label, archive):
+    @xwf_models.transition()
+    def process(self, code, label, archive):
         self.set_asp_processing_information(code, label, archive)

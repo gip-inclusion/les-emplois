@@ -409,7 +409,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
 
     if request.method == "POST":
         back_url = f"{reverse('employee_record_views:list')}?status={employee_record.status}"
-        employee_record.update_as_ready()
+        employee_record.ready()
         toast_title, toast_message = (
             "La création de cette fiche salarié est terminée",
             "Vous pouvez suivre l'avancement de son traitement par l'ASP en sélectionnant les différents statuts.",
@@ -467,12 +467,12 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
 
     back_url = f"{reverse('employee_record_views:list')}?status={employee_record.status}"
 
-    if not employee_record.update_as_disabled.is_available():
+    if not employee_record.disable.is_available():
         messages.error(request, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
         return HttpResponseRedirect(back_url)
 
     if request.method == "POST" and request.POST.get("confirm") == "true":
-        employee_record.update_as_disabled()
+        employee_record.disable()
         messages.success(request, "La fiche salarié a bien été désactivée.", extra_tags="toast")
         return HttpResponseRedirect(back_url)
 
@@ -504,7 +504,7 @@ def reactivate(request, employee_record_id, template_name="employee_record/react
 
     if request.method == "POST" and request.POST.get("confirm") == "true":
         try:
-            employee_record.update_as_new()
+            employee_record.enable()
             messages.success(request, "La fiche salarié a bien été réactivée.")
             return HttpResponseRedirect(back_url)
         except ValidationError as ex:

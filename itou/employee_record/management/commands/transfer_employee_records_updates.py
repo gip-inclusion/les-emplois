@@ -62,9 +62,7 @@ class Command(EmployeeRecordTransferCommand):
 
             renderer = JSONRenderer()
             for idx, notification in enumerate(notifications, 1):
-                notification.update_as_sent(
-                    remote_path, idx, renderer.render(batch_data["lignesTelechargement"][idx - 1])
-                )
+                notification.sent(remote_path, idx, renderer.render(batch_data["lignesTelechargement"][idx - 1]))
 
     def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> None:
         """
@@ -102,12 +100,12 @@ class Command(EmployeeRecordTransferCommand):
             archived_json = JSONRenderer().render(employee_record)
             if processing_code == EmployeeRecordUpdateNotification.ASP_PROCESSING_SUCCESS_CODE:  # Processed by ASP
                 if not dry_run:
-                    notification.update_as_processed(processing_code, processing_label, archived_json)
+                    notification.process(processing_code, processing_label, archived_json)
                 else:
                     self.stdout.write(f"DRY-RUN: Processed {notification}, {processing_code=}, {processing_label=}")
             else:  # Rejected by ASP
                 if not dry_run:
-                    notification.update_as_rejected(processing_code, processing_label, archived_json)
+                    notification.reject(processing_code, processing_label, archived_json)
                 else:
                     self.stdout.write(f"DRY-RUN: Rejected {notification}: {processing_code=}, {processing_label=}")
 

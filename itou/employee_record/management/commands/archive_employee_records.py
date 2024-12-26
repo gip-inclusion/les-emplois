@@ -26,7 +26,7 @@ class Command(BaseCommand):
             self.logger.info(f"Archiving {employee_record.pk=}")
             if wet_run:
                 try:
-                    employee_record.update_as_archived()
+                    employee_record.archive()
                 except Exception as ex:
                     self.logger.warning("Can't archive employee_record=%d ex=%s", employee_record.pk, ex)
                 else:

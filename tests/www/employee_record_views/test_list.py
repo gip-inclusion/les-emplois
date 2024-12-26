@@ -66,7 +66,7 @@ class TestListEmployeeRecords:
             job_application__job_seeker__last_name="Aaaaa",
             job_application__hiring_start_at=timezone.localdate() - relativedelta(days=15),
         )
-        record.update_as_ready()
+        record.ready()
         client.force_login(self.user)
         url = f"{self.URL}?status=READY"
         response = client.get(url)
@@ -251,9 +251,9 @@ class TestListEmployeeRecords:
         client.force_login(self.user)
 
         record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_company=self.company)
-        record.update_as_ready()
-        record.update_as_sent(faker.asp_batch_filename(), 1, None)
-        record.update_as_rejected("0012", "JSON Invalide", None)
+        record.ready()
+        record.sent(faker.asp_batch_filename(), 1, None)
+        record.reject("0012", "JSON Invalide", None)
 
         response = client.get(self.URL, data={"status": Status.REJECTED})
         assertContains(response, "Erreur 0012")
@@ -292,7 +292,7 @@ class TestListEmployeeRecords:
         for err_code, err_message, custom_err_message in tests_specs:
             with subtests.test(err_code):
                 record.status = Status.SENT
-                record.update_as_rejected(err_code, err_message, "{}")
+                record.reject(err_code, err_message, "{}")
 
                 response = client.get(self.URL, data={"status": Status.REJECTED})
                 assertContains(response, f"Erreur {err_code}")
@@ -366,9 +366,9 @@ class TestListEmployeeRecords:
             job_application__hiring_start_at=timezone.localdate() - relativedelta(days=10),
         )
         for i, record in enumerate((recordA, recordZ)):
-            record.update_as_ready()
-            record.update_as_sent(f"RIAE_FS_2021041013000{i}.json", 1, None)
-            record.update_as_rejected("0012", "JSON Invalide", None)
+            record.ready()
+            record.sent(f"RIAE_FS_2021041013000{i}.json", 1, None)
+            record.reject("0012", "JSON Invalide", None)
 
         # Zzzzz's hiring start is more recent
         self._check_employee_record_order(
@@ -417,7 +417,7 @@ class TestListEmployeeRecords:
             job_application__hiring_start_at=timezone.localdate() - relativedelta(days=10),
         )
         for record in (recordA, recordZ):
-            record.update_as_ready()
+            record.ready()
 
         # Zzzzz's hiring start is more recent
         self._check_employee_record_order(
