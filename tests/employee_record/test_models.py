@@ -109,7 +109,7 @@ class TestEmployeeRecordModel:
         """
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application)
-        employee_record.update_as_ready()
+        employee_record.ready()
 
         job_seeker = job_application.job_seeker
         assert job_seeker.jobseeker_profile is not None
@@ -130,9 +130,9 @@ class TestEmployeeRecordModel:
 
         with pytest.raises(ValidationError):
             employee_record = EmployeeRecord.from_job_application(job_application)
-            employee_record.update_as_ready()
+            employee_record.ready()
 
-    def test_update_as_ready_fill_denormalized_fields(self):
+    def test_ready_fill_denormalized_fields(self):
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application)
 
@@ -147,7 +147,7 @@ class TestEmployeeRecordModel:
         assert employee_record.asp_id == old_siae.convention.asp_id
         assert employee_record.approval_number == old_approval.number
 
-        employee_record.update_as_ready()
+        employee_record.ready()
 
         employee_record.refresh_from_db()
         assert employee_record.siret == new_company.siret
@@ -340,7 +340,7 @@ class TestEmployeeRecordLifeCycle:
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application)
         self.employee_record = employee_record
-        self.employee_record.update_as_ready()
+        self.employee_record.ready()
 
     def test_state_ready(
         self,
@@ -348,29 +348,29 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.status == Status.READY
 
     def test_state_sent(self, faker):
-        self.employee_record.update_as_sent(faker.asp_batch_filename(), 42, "{}")
+        self.employee_record.sent(faker.asp_batch_filename(), 42, "{}")
 
         assert self.employee_record.status == Status.SENT
         assert self.employee_record.asp_batch_line_number == 42
         assert self.employee_record.archived_json == {}
 
     def test_state_rejected(self, faker):
-        self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
+        self.employee_record.sent(faker.asp_batch_filename(), 1, None)
 
-        self.employee_record.update_as_rejected("12", "JSON Invalide", "{}")
+        self.employee_record.reject("12", "JSON Invalide", "{}")
         assert self.employee_record.status == Status.REJECTED
         assert self.employee_record.asp_processing_code == "12"
         assert self.employee_record.asp_processing_label == "JSON Invalide"
         assert self.employee_record.archived_json == {}
 
     def test_state_processed(self, faker):
-        self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
+        self.employee_record.sent(faker.asp_batch_filename(), 1, None)
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
             "La ligne de la fiche salarié a été enregistrée avec succès.",
         )
-        self.employee_record.update_as_processed(process_code, process_message, "{}")
+        self.employee_record.process(process_code, process_message, "{}")
 
         assert self.employee_record.status == Status.PROCESSED
         assert self.employee_record.asp_processing_code == process_code
@@ -378,13 +378,13 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.archived_json == {}
 
     def test_state_processed_when_archive_is_none(self, faker):
-        self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
+        self.employee_record.sent(faker.asp_batch_filename(), 1, None)
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
             "La ligne de la fiche salarié a été enregistrée avec succès.",
         )
-        self.employee_record.update_as_processed(process_code, process_message, None)
+        self.employee_record.process(process_code, process_message, None)
 
         assert self.employee_record.status == Status.PROCESSED
         assert self.employee_record.asp_processing_code == process_code
@@ -392,13 +392,13 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.archived_json is None
 
     def test_state_processed_when_archive_is_empty(self, faker):
-        self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
+        self.employee_record.sent(faker.asp_batch_filename(), 1, None)
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
             "La ligne de la fiche salarié a été enregistrée avec succès.",
         )
-        self.employee_record.update_as_processed(process_code, process_message, "")
+        self.employee_record.process(process_code, process_message, "")
 
         assert self.employee_record.status == Status.PROCESSED
         assert self.employee_record.asp_processing_code == process_code
@@ -406,13 +406,13 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.archived_json == ""
 
     def test_state_processed_when_archive_is_not_json(self, faker):
-        self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
+        self.employee_record.sent(faker.asp_batch_filename(), 1, None)
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
             "La ligne de la fiche salarié a été enregistrée avec succès.",
         )
-        self.employee_record.update_as_processed(process_code, process_message, "whatever")
+        self.employee_record.process(process_code, process_message, "whatever")
 
         assert self.employee_record.status == Status.PROCESSED
         assert self.employee_record.asp_processing_code == process_code
@@ -422,13 +422,13 @@ class TestEmployeeRecordLifeCycle:
     def test_state_disabled(self, faker):
         # Employee record in READY state can't be disabled
         with pytest.raises(xworkflows.InvalidTransitionError):
-            self.employee_record.update_as_disabled()
+            self.employee_record.disable()
         assert self.employee_record.status == Status.READY
 
         # Employee record in SENT state can't be disabled
-        self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
+        self.employee_record.sent(faker.asp_batch_filename(), 1, None)
         with pytest.raises(xworkflows.InvalidTransitionError):
-            self.employee_record.update_as_disabled()
+            self.employee_record.disable()
         assert self.employee_record.status == Status.SENT
 
         # Employee record in ACCEPTED state can be disabled
@@ -436,8 +436,8 @@ class TestEmployeeRecordLifeCycle:
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
             "La ligne de la fiche salarié a été enregistrée avec succès.",
         )
-        self.employee_record.update_as_processed(process_code, process_message, "{}")
-        self.employee_record.update_as_disabled()
+        self.employee_record.process(process_code, process_message, "{}")
+        self.employee_record.disable()
         assert self.employee_record.status == Status.DISABLED
 
         # Employee record in DISABLED state block creating a new one
@@ -445,38 +445,38 @@ class TestEmployeeRecordLifeCycle:
             EmployeeRecord.from_job_application(self.employee_record.job_application)
 
         # Employee record in NEW state can be disabled
-        self.employee_record.update_as_new()
+        self.employee_record.enable()
         assert self.employee_record.status == Status.NEW
-        self.employee_record.update_as_disabled()
+        self.employee_record.disable()
         assert self.employee_record.status == Status.DISABLED
 
     def test_state_disabled_with_reject(self, faker):
-        self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
+        self.employee_record.sent(faker.asp_batch_filename(), 1, None)
 
-        self.employee_record.update_as_rejected("12", "JSON Invalide", None)
-        self.employee_record.update_as_disabled()
+        self.employee_record.reject("12", "JSON Invalide", None)
+        self.employee_record.disable()
         assert self.employee_record.status == Status.DISABLED
 
     def test_reactivate(self, faker):
-        self.employee_record.update_as_sent(faker.unique.asp_batch_filename(), 1, None)
+        self.employee_record.sent(faker.unique.asp_batch_filename(), 1, None)
         process_code = EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE
         process_message = "La ligne de la fiche salarié a été enregistrée avec succès."
         archive_first = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [1]."}'
-        self.employee_record.update_as_processed(process_code, process_message, archive_first)
-        self.employee_record.update_as_disabled()
+        self.employee_record.process(process_code, process_message, archive_first)
+        self.employee_record.disable()
         assert self.employee_record.status == Status.DISABLED
 
         # Employee record in DISABLE state can be reactivate (set state NEW)
-        self.employee_record.update_as_new()
+        self.employee_record.enable()
         assert self.employee_record.status == Status.NEW
 
         # Employee record can now be changed to the ready state
-        self.employee_record.update_as_ready()
+        self.employee_record.ready()
         assert self.employee_record.status == Status.READY
 
         filename_second = faker.unique.asp_batch_filename()
         archive_second = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [2]."}'
-        self.employee_record.update_as_sent(filename_second, 1, archive_second)
+        self.employee_record.sent(filename_second, 1, archive_second)
         assert self.employee_record.asp_batch_file == filename_second
         assert self.employee_record.archived_json == json.loads(archive_second)
 
@@ -485,7 +485,7 @@ class TestEmployeeRecordLifeCycle:
             "La ligne de la fiche salarié a été enregistrée avec succès.",
         )
         archive_third = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [3]."}'
-        self.employee_record.update_as_processed(process_code, process_message, archive_third)
+        self.employee_record.process(process_code, process_message, archive_third)
         assert self.employee_record.asp_batch_file == filename_second
         assert self.employee_record.archived_json == json.loads(archive_third)
 
@@ -496,16 +496,16 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.siret == old_company.siret
         assert self.employee_record.asp_id == old_company.convention.asp_id
 
-        self.employee_record.update_as_sent(faker.unique.asp_batch_filename(), 1, None)
-        self.employee_record.update_as_processed("", "", None)
-        self.employee_record.update_as_disabled()
+        self.employee_record.sent(faker.unique.asp_batch_filename(), 1, None)
+        self.employee_record.process("", "", None)
+        self.employee_record.disable()
 
         # Change SIAE
         self.employee_record.job_application.to_company = new_company
         self.employee_record.job_application.save()
         self.employee_record.refresh_from_db()
         # Reactivate the employee record
-        self.employee_record.update_as_new()
+        self.employee_record.enable()
 
         assert self.employee_record.siret == new_company.siret
         assert self.employee_record.asp_id == new_company.convention.asp_id
@@ -516,7 +516,7 @@ class TestEmployeeRecordLifeCycle:
         # Can't archive while the approval is valid
         assert approval.is_valid()
         with pytest.raises(xworkflows.ForbiddenTransition):
-            self.employee_record.update_as_archived()
+            self.employee_record.archive()
 
         # Make the approval expires
         approval.start_at = timezone.localdate() - timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)
@@ -524,7 +524,7 @@ class TestEmployeeRecordLifeCycle:
         approval.save()
         assert not approval.is_valid()
 
-        self.employee_record.update_as_archived()
+        self.employee_record.archive()
         # Check correct status and empty archived JSON
         assert self.employee_record.status == Status.ARCHIVED
         assert self.employee_record.archived_json is None
@@ -547,7 +547,7 @@ class TestEmployeeRecordLifeCycle:
             asp_processing_code="3436",
             asp_processing_label="Meh Meh Meh",
         )
-        employee_record_code_3436.update_as_processed(
+        employee_record_code_3436.process(
             employee_record_code_3436.asp_processing_code,
             employee_record_code_3436.asp_processing_label,
             '{"codeTraitement": "3436"}',
@@ -559,7 +559,7 @@ class TestEmployeeRecordLifeCycle:
         assert employee_record_code_3436.archived_json == {"codeTraitement": "3436"}
 
         with pytest.raises(ValueError, match="Code needs to be 3436 and not 3437 when as_duplicate=True"):
-            employee_record_other_code.update_as_processed(
+            employee_record_other_code.process(
                 employee_record_other_code.asp_processing_code,
                 employee_record_other_code.asp_processing_label,
                 None,
@@ -567,7 +567,7 @@ class TestEmployeeRecordLifeCycle:
             )
 
         with pytest.raises(xworkflows.InvalidTransitionError):
-            employee_record_other_status.update_as_processed(
+            employee_record_other_status.process(
                 employee_record_other_status.asp_processing_code,
                 employee_record_other_status.asp_processing_label,
                 None,
@@ -591,7 +591,7 @@ class TestEmployeeRecordJobApplicationConstraints:
 
         self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(hiring_start_at=hiring_date)
         self.employee_record = EmployeeRecord.from_job_application(self.job_application)
-        self.employee_record.update_as_ready()
+        self.employee_record.ready()
 
 
 class TestEmployeeRecordQueryset:

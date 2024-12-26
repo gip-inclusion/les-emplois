@@ -81,7 +81,7 @@ class TestEmployeeRecordAPIFetchList:
         # We only care about status filtering: no coherence check on ASP return values
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         self.employee_record = EmployeeRecord.from_job_application(job_application)
-        self.employee_record.update_as_ready()
+        self.employee_record.ready()
 
         self.siae = job_application.to_company
         self.employer = self.siae.members.first()
@@ -101,7 +101,7 @@ class TestEmployeeRecordAPIFetchList:
         # Get list without filtering by status (PROCESSED)
         # note: there is no way to create a processed employee record
         # (and this is perfectly normal)
-        self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
+        self.employee_record.sent(faker.asp_batch_filename(), 1, None)
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
 
         # There should be no result at this point
@@ -111,7 +111,7 @@ class TestEmployeeRecordAPIFetchList:
         result = response.json()
         assert len(result.get("results")) == 0
 
-        self.employee_record.update_as_processed(process_code, process_message, "{}")
+        self.employee_record.process(process_code, process_message, "{}")
         response = api_client.get(ENDPOINT_URL, format="json")
         assert response.status_code == 200
 
@@ -122,7 +122,7 @@ class TestEmployeeRecordAPIFetchList:
         # status = SENT
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_company=self.siae)
         employee_record_sent = EmployeeRecord.from_job_application(job_application=job_application)
-        employee_record_sent.update_as_ready()
+        employee_record_sent.ready()
 
         # There should be no result at this point
         response = api_client.get(ENDPOINT_URL + "?status=SENT", format="json")
@@ -131,7 +131,7 @@ class TestEmployeeRecordAPIFetchList:
         result = response.json()
         assert len(result.get("results")) == 0
 
-        employee_record_sent.update_as_sent(faker.asp_batch_filename(), 1, None)
+        employee_record_sent.sent(faker.asp_batch_filename(), 1, None)
         response = api_client.get(ENDPOINT_URL + "?status=SENT", format="json")
         assert response.status_code == 200
 
@@ -142,8 +142,8 @@ class TestEmployeeRecordAPIFetchList:
         # status = REJECTED
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_company=self.siae)
         employee_record_rejected = EmployeeRecord.from_job_application(job_application=job_application)
-        employee_record_rejected.update_as_ready()
-        employee_record_rejected.update_as_sent(faker.asp_batch_filename(), 1, None)
+        employee_record_rejected.ready()
+        employee_record_rejected.sent(faker.asp_batch_filename(), 1, None)
 
         # There should be no result at this point
         response = api_client.get(ENDPOINT_URL + "?status=REJECTED", format="json")
@@ -153,7 +153,7 @@ class TestEmployeeRecordAPIFetchList:
         assert len(result.get("results")) == 0
 
         err_code, err_message = "12", "JSON Invalide"
-        employee_record_rejected.update_as_rejected(err_code, err_message, None)
+        employee_record_rejected.reject(err_code, err_message, None)
 
         # Status case is not important
         response = api_client.get(ENDPOINT_URL + "?status=rEjEcTeD", format="json")
@@ -198,7 +198,7 @@ class TestEmployeeRecordAPIParameters:
         )
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application)
-        employee_record.update_as_ready()
+        employee_record.ready()
 
         member = employee_record.job_application.to_company.members.first()
         api_client.force_login(member)
@@ -223,14 +223,14 @@ class TestEmployeeRecordAPIParameters:
         )
         job_application_1 = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application_1)
-        employee_record.update_as_ready()
+        employee_record.ready()
 
         job_application_2 = JobApplicationWithCompleteJobSeekerProfileFactory(
             to_company=employee_record.job_application.to_company
         )
         employee_record = EmployeeRecord.from_job_application(job_application_2)
-        employee_record.update_as_ready()
-        employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
+        employee_record.ready()
+        employee_record.sent(faker.asp_batch_filename(), 1, None)
 
         member = employee_record.job_application.to_company.members.first()
         api_client.force_login(member)
@@ -345,7 +345,7 @@ class TestEmployeeRecordAPIParameters:
         job_application_2 = JobApplicationWithCompleteJobSeekerProfileFactory(to_company=job_application_1.to_company)
         employee_record_2 = EmployeeRecord.from_job_application(job_application_2)
         employee_record_2.created_at = ancient_ts
-        employee_record_2.update_as_ready()
+        employee_record_2.ready()
 
         member = employee_record_1.job_application.to_company.members.first()
 
