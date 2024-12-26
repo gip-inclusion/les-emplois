@@ -607,19 +607,19 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation):
         self.save()
 
     def update_as_rejected(self, code, label, archive):
-        if not self.status == Status.SENT:
+        if not self.status == NotificationStatus.SENT:
             raise ValidationError(f"Invalid status to update as REJECTED (currently: {self.status})")
 
-        self.status = Status.REJECTED
+        self.status = NotificationStatus.REJECTED
         self.set_asp_processing_information(code, label, archive)
 
         self.save()
 
     def update_as_processed(self, code, label, archive):
-        if not self.status == Status.SENT:
+        if not self.status == NotificationStatus.SENT:
             raise ValidationError(f"Invalid status to update as PROCESSED (currently: {self.status})")
 
-        self.status = Status.PROCESSED
+        self.status = NotificationStatus.PROCESSED
         self.set_asp_processing_information(code, label, archive)
 
         self.save()

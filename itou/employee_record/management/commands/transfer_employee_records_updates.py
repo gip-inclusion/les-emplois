@@ -6,7 +6,7 @@ from rest_framework.renderers import JSONRenderer
 from sentry_sdk.crons import monitor
 
 from itou.employee_record.common_management import EmployeeRecordTransferCommand, IgnoreFile
-from itou.employee_record.enums import MovementType, NotificationStatus, Status
+from itou.employee_record.enums import MovementType, NotificationStatus
 from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordUpdateNotificationBatchSerializer
 from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdateNotification
@@ -92,10 +92,10 @@ class Command(EmployeeRecordTransferCommand):
                 )
                 # Do not count as an error
                 continue
-            if notification.status in [Status.PROCESSED, Status.REJECTED]:
+            if notification.status in [NotificationStatus.PROCESSED, NotificationStatus.REJECTED]:
                 self.stdout.write(f"Skipping, employee record notification is already {notification.status}")
                 continue
-            if notification.status != Status.SENT:
+            if notification.status != NotificationStatus.SENT:
                 self.stdout.write(f"Skipping, incoherent status for {notification=}")
                 continue
 

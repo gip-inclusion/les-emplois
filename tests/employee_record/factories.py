@@ -83,4 +83,4 @@ class EmployeeRecordUpdateNotificationFactory(BareEmployeeRecordUpdateNotificati
     employee_record = factory.SubFactory(EmployeeRecordWithProfileFactory)
 
     class Params:
-        ready_for_transfer = factory.Trait(status=Status.NEW)
+        ready_for_transfer = factory.Trait(status=NotificationStatus.NEW)

@@ -22,12 +22,12 @@ def test_schedule_approval_update_notification_when_notification_do_not_exists(a
     )
     notification = models.EmployeeRecordUpdateNotification.objects.latest("created_at")
     assert notification.employee_record == employee_record
-    assert notification.status == models.Status.NEW
+    assert notification.status == models.NotificationStatus.NEW
     assertMessages(response, [messages.Message(messages.SUCCESS, "1 notification planifiée")])
 
 
 def test_schedule_approval_update_notification_when_new_notification_already_exists(admin_client):
-    notification = factories.BareEmployeeRecordUpdateNotificationFactory(status=models.Status.NEW)
+    notification = factories.BareEmployeeRecordUpdateNotificationFactory(status=models.NotificationStatus.NEW)
     save_updated_at = notification.updated_at
 
     response = admin_client.post(
@@ -42,7 +42,7 @@ def test_schedule_approval_update_notification_when_new_notification_already_exi
     assertMessages(response, [messages.Message(messages.SUCCESS, "1 notification mise à jour")])
 
 
-@pytest.mark.parametrize("status", [status for status in models.Status if status != models.Status.NEW])
+@pytest.mark.parametrize("status", set(models.NotificationStatus) - {models.NotificationStatus.NEW})
 def test_schedule_approval_update_notification_when_other_than_new_notification_already_exists(admin_client, status):
     notification = factories.BareEmployeeRecordUpdateNotificationFactory(status=status)
     save_updated_at = notification.updated_at
@@ -59,7 +59,7 @@ def test_schedule_approval_update_notification_when_other_than_new_notification_
     created_notification = models.EmployeeRecordUpdateNotification.objects.latest("created_at")
     assert created_notification != notification
     assert created_notification.employee_record == notification.employee_record
-    assert created_notification.status == models.Status.NEW
+    assert created_notification.status == models.NotificationStatus.NEW
     assertMessages(response, [messages.Message(messages.SUCCESS, "1 notification planifiée")])
 
 
