@@ -181,6 +181,14 @@ class ReadonlyMixin:
         return False
 
 
+class CreatedOrUpdatedByMixin:
+    def save_model(self, request, obj, form, change):
+        attr = "updated_by" if change else "created_by"
+        if hasattr(obj, attr):
+            setattr(obj, attr, request.user)
+        super().save_model(request, obj, form, change)
+
+
 class ChooseFieldsToTransfer(forms.Form):
     fields_to_transfer = forms.MultipleChoiceField(
         choices=[],

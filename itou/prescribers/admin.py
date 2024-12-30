@@ -7,7 +7,7 @@ from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline
 from itou.prescribers.admin_forms import PrescriberOrganizationAdminForm
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
-from itou.utils.admin import ItouGISMixin, PkSupportRemarkInline
+from itou.utils.admin import CreatedOrUpdatedByMixin, ItouGISMixin, PkSupportRemarkInline
 from itou.utils.apis.exceptions import GeocodingDataError
 
 
@@ -74,7 +74,7 @@ class PrescriberOrganizationMembersInline(MembersInline):
 
 
 @admin.register(PrescriberOrganization)
-class PrescriberOrganizationAdmin(ItouGISMixin, OrganizationAdmin):
+class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
     class Media:
         css = {"all": ("css/itou-admin.css",)}
 
@@ -171,7 +171,6 @@ class PrescriberOrganizationAdmin(ItouGISMixin, OrganizationAdmin):
 
     def save_model(self, request, obj, form, change):
         if not change:
-            obj.created_by = request.user
             if not obj.geocoding_score and obj.geocoding_address:
                 try:
                     # Set geocoding.
