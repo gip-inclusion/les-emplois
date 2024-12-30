@@ -11,13 +11,19 @@ def has_hijack_perm(*, hijacker, hijacked):
     if not hijacker.is_active or not hijacked.is_active:
         return False
 
+    # Staff members (especially superusers) shouldn't be hijacked
+    if hijacked.is_staff or hijacked.is_superuser:
+        return False
+
+    # Superusers can do (almost) anything
     if hijacker.is_superuser:
         return True
 
-    if not hijacker.is_staff:
-        return False
+    # Only whitelisted staff members can hijack other accounts
+    if hijacker.is_staff and hijacker.email.lower() in settings.HIJACK_ALLOWED_USER_EMAILS:
+        return True
 
-    return hijacker.email.lower() in settings.HIJACK_ALLOWED_USER_EMAILS
+    return False
 
 
 def hijack_started_signal(sender, hijacker, hijacked, request, **kwargs):
