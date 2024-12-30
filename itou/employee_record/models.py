@@ -317,13 +317,13 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         self._fill_denormalized_fields()
 
     @xwf_models.transition()
-    def wait_for_asp_response(self, asp_filename, line_number, archive):
+    def wait_for_asp_response(self, file, line_number, archive):
         """
         An employee record is sent to ASP via a JSON file,
         The file name is stored for further feedback processing (also done via a file)
         """
         self.clean()
-        self.set_asp_batch_information(asp_filename, line_number, archive)
+        self.set_asp_batch_information(file, line_number, archive)
 
     @xwf_models.transition()
     def reject(self, code, label, archive):
@@ -602,8 +602,8 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation, xwf_models.Workfl
         return f"<{type(self).__name__} pk={self.pk}>"
 
     @xwf_models.transition()
-    def wait_for_asp_response(self, filename, line_number, archive):
-        self.set_asp_batch_information(filename, line_number, archive)
+    def wait_for_asp_response(self, file, line_number, archive):
+        self.set_asp_batch_information(file, line_number, archive)
 
     @xwf_models.transition()
     def reject(self, code, label, archive):
