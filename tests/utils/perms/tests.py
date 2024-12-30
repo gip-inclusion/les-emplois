@@ -62,6 +62,15 @@ class TestUserHijackPerm:
             response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
             assert response.status_code == 403
 
+    @pytest.mark.parametrize("param", ["is_active", "is_superuser", "is_staff"])
+    def test_disallowed_hijacked(self, client, param):
+        hijacker = ItouStaffFactory(is_superuser=True)
+        client.force_login(hijacker)
+
+        hijacked = ItouStaffFactory(**{param: True})
+        response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
+        assert response.status_code == 403
+
     def test_allowed_staff_hijacker(self, client, caplog, settings):
         settings.HIJACK_ALLOWED_USER_EMAILS = ["foo@test.com", "bar@baz.org"]
         hijacked = PrescriberFactory()
