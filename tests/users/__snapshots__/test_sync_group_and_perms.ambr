@@ -161,12 +161,57 @@
     'view_user',
   ])
 # ---
+# name: test_command[pilotage-admin-readonly]
+  list([
+    'view_statsdashboardvisit',
+    'view_approval',
+    'view_cancelledapproval',
+    'view_poleemploiapproval',
+    'view_prolongation',
+    'view_suspension',
+    'view_company',
+    'view_companymembership',
+    'view_institution',
+    'view_institutionmembership',
+    'view_jobapplication',
+    'view_jobapplicationtransitionlog',
+    'view_prescribermembership',
+    'view_prescriberorganization',
+    'view_user',
+  ])
+# ---
+# name: test_command[pilotage-admin]
+  list([
+    'view_statsdashboardvisit',
+    'view_approval',
+    'view_cancelledapproval',
+    'view_poleemploiapproval',
+    'view_prolongation',
+    'view_suspension',
+    'view_company',
+    'view_companymembership',
+    'add_institution',
+    'change_institution',
+    'view_institution',
+    'add_institutionmembership',
+    'change_institutionmembership',
+    'view_institutionmembership',
+    'view_jobapplication',
+    'view_jobapplicationtransitionlog',
+    'view_prescribermembership',
+    'view_prescriberorganization',
+    'hijack_user',
+    'view_user',
+  ])
+# ---
 # name: test_command[stdout]
   '''
   group name=gps-admin created
   group name=gps-admin-readonly created
   group name=itou-admin created
   group name=itou-admin-readonly created
+  group name=pilotage-admin created
+  group name=pilotage-admin-readonly created
   All done!
   
   '''

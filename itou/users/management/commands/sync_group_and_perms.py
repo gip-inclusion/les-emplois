@@ -83,6 +83,23 @@ def get_permissions_dict():
         users_models.User: PERMS_ADD | PERMS_HIJACK,
         users_models.JobSeekerProfile: PERMS_EDIT,
     }
+    group_pilotage_admin_permissions = {
+        analytics_models.StatsDashboardVisit: PERMS_READ,
+        approvals_models.Approval: PERMS_READ,
+        approvals_models.CancelledApproval: PERMS_READ,
+        approvals_models.PoleEmploiApproval: PERMS_READ,
+        approvals_models.Prolongation: PERMS_READ,
+        approvals_models.Suspension: PERMS_READ,
+        companies_models.Company: PERMS_READ,
+        companies_models.CompanyMembership: PERMS_READ,
+        institution_models.Institution: PERMS_ADD,
+        institution_models.InstitutionMembership: PERMS_ADD,
+        job_applications_models.JobApplication: PERMS_READ,
+        job_applications_models.JobApplicationTransitionLog: PERMS_READ,
+        prescribers_models.PrescriberOrganization: PERMS_READ,
+        prescribers_models.PrescriberMembership: PERMS_READ,
+        users_models.User: PERMS_HIJACK,
+    }
 
     return {
         "itou-admin": {
@@ -100,6 +117,14 @@ def get_permissions_dict():
         "gps-admin-readonly": {
             **{model: PERMS_READ for model in group_gps_admin_permissions},
             **{model: PERMS_READ for model in always_read_only_models if model in group_gps_admin_permissions},
+        },
+        "pilotage-admin": {
+            **group_pilotage_admin_permissions,
+            **{model: PERMS_READ for model in always_read_only_models if model in group_pilotage_admin_permissions},
+        },
+        "pilotage-admin-readonly": {
+            **{model: PERMS_READ for model in group_pilotage_admin_permissions},
+            **{model: PERMS_READ for model in always_read_only_models if model in group_pilotage_admin_permissions},
         },
     }
 
