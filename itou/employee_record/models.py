@@ -317,7 +317,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         self._fill_denormalized_fields()
 
     @xwf_models.transition()
-    def wait_for_asp_response(self, file, line_number, archive):
+    def wait_for_asp_response(self, *, file, line_number, archive):
         """
         An employee record is sent to ASP via a JSON file,
         The file name is stored for further feedback processing (also done via a file)
@@ -326,7 +326,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         self.set_asp_batch_information(file, line_number, archive)
 
     @xwf_models.transition()
-    def reject(self, code, label, archive):
+    def reject(self, *, code, label, archive):
         """
         Update status after an ASP rejection of the employee record
         """
@@ -334,7 +334,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         self.set_asp_processing_information(code, label, archive)
 
     @xwf_models.transition()
-    def process(self, code, label, archive, *, as_duplicate=False):
+    def process(self, *, code, label, archive, as_duplicate=False):
         if as_duplicate and code != self.ASP_DUPLICATE_ERROR_CODE:
             raise ValueError(f"Code needs to be {self.ASP_DUPLICATE_ERROR_CODE} and not {code} when {as_duplicate=}")
 
@@ -602,13 +602,13 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation, xwf_models.Workfl
         return f"<{type(self).__name__} pk={self.pk}>"
 
     @xwf_models.transition()
-    def wait_for_asp_response(self, file, line_number, archive):
+    def wait_for_asp_response(self, *, file, line_number, archive):
         self.set_asp_batch_information(file, line_number, archive)
 
     @xwf_models.transition()
-    def reject(self, code, label, archive):
+    def reject(self, *, code, label, archive):
         self.set_asp_processing_information(code, label, archive)
 
     @xwf_models.transition()
-    def process(self, code, label, archive):
+    def process(self, *, code, label, archive):
         self.set_asp_processing_information(code, label, archive)

@@ -101,7 +101,7 @@ class TestEmployeeRecordAPIFetchList:
         # Get list without filtering by status (PROCESSED)
         # note: there is no way to create a processed employee record
         # (and this is perfectly normal)
-        self.employee_record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
+        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
 
         # There should be no result at this point
@@ -111,7 +111,7 @@ class TestEmployeeRecordAPIFetchList:
         result = response.json()
         assert len(result.get("results")) == 0
 
-        self.employee_record.process(process_code, process_message, "{}")
+        self.employee_record.process(code=process_code, label=process_message, archive="{}")
         response = api_client.get(ENDPOINT_URL, format="json")
         assert response.status_code == 200
 
@@ -131,7 +131,7 @@ class TestEmployeeRecordAPIFetchList:
         result = response.json()
         assert len(result.get("results")) == 0
 
-        employee_record_sent.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
+        employee_record_sent.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
         response = api_client.get(ENDPOINT_URL + "?status=SENT", format="json")
         assert response.status_code == 200
 
@@ -143,7 +143,7 @@ class TestEmployeeRecordAPIFetchList:
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_company=self.siae)
         employee_record_rejected = EmployeeRecord.from_job_application(job_application=job_application)
         employee_record_rejected.ready()
-        employee_record_rejected.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
+        employee_record_rejected.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
 
         # There should be no result at this point
         response = api_client.get(ENDPOINT_URL + "?status=REJECTED", format="json")
@@ -153,7 +153,7 @@ class TestEmployeeRecordAPIFetchList:
         assert len(result.get("results")) == 0
 
         err_code, err_message = "12", "JSON Invalide"
-        employee_record_rejected.reject(err_code, err_message, None)
+        employee_record_rejected.reject(code=err_code, label=err_message, archive=None)
 
         # Status case is not important
         response = api_client.get(ENDPOINT_URL + "?status=rEjEcTeD", format="json")
@@ -230,7 +230,7 @@ class TestEmployeeRecordAPIParameters:
         )
         employee_record = EmployeeRecord.from_job_application(job_application_2)
         employee_record.ready()
-        employee_record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
+        employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
 
         member = employee_record.job_application.to_company.members.first()
         api_client.force_login(member)
