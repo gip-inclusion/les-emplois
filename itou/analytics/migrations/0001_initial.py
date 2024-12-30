@@ -54,6 +54,7 @@ class Migration(migrations.Migration):
                             ("SENTRY-002", "Taux de requêtes en échec"),
                             ("UPDOWN-001", "Taux de disponibilité"),
                             ("UPDOWN-002", "Apdex"),
+                            ("GITHUB-001", "Total des PR de correctifs fusionnées aujourd'hui"),
                         ]
                     ),
                 ),

@@ -745,8 +745,10 @@ API_PARTICULIER_TOKEN = os.getenv("API_PARTICULIER_TOKEN")
 # ------------------------------------------------------------------------------
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 
-
 # Pilotage
 # ------------------------------------------------------------------------------
 
 PILOTAGE_SHOW_STATS_WEBINAR = os.getenv("PILOTAGE_SHOW_STATS_WEBINAR", True) in [True, "True", "true"]
+
+# Github
+API_GITHUB_BASE_URL = "https://api.github.com"

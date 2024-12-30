@@ -1,6 +1,7 @@
 import copy
 import datetime
 import io
+import json
 import os
 import socket
 import threading
@@ -690,3 +691,26 @@ def updown_respx_mock_fixture(respx_mock):
 
     url = f"{settings.API_UPDOWN_BASE_URL}/checks/{settings.API_UPDOWN_CHECK_ID}/metrics/"
     return respx_mock.route(headers=headers, method="GET", params=params, url=url).respond(json=json)
+
+
+@pytest.fixture(name="github_respx_mock")
+def github_respx_mock_fixture(respx_mock):
+    with open(os.path.join(settings.ROOT_DIR, "tests", "data", "github.json")) as file:
+        resp_json = json.load(file)
+
+    start = datetime.datetime(2024, 12, 2, tzinfo=datetime.UTC)
+    params = {
+        "labels": ["bug"],
+        "state": "closed",
+        "pulls": True,
+        "per_page": 100,
+        "since": start.isoformat(),  # The GH API does not allow an end date.
+    }
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+    url = f"{settings.API_GITHUB_BASE_URL}/repos/gip-inclusion/les-emplois/issues"
+    return respx_mock.route(headers=headers, method="GET", params=params, url=url).respond(json=resp_json)
