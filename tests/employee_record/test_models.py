@@ -348,29 +348,29 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.status == Status.READY
 
     def test_state_sent(self, faker):
-        self.employee_record.wait_for_asp_response(faker.asp_batch_filename(), 42, "{}")
+        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=42, archive="{}")
 
         assert self.employee_record.status == Status.SENT
         assert self.employee_record.asp_batch_line_number == 42
         assert self.employee_record.archived_json == {}
 
     def test_state_rejected(self, faker):
-        self.employee_record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
+        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
 
-        self.employee_record.reject("12", "JSON Invalide", "{}")
+        self.employee_record.reject(code="12", label="JSON Invalide", archive="{}")
         assert self.employee_record.status == Status.REJECTED
         assert self.employee_record.asp_processing_code == "12"
         assert self.employee_record.asp_processing_label == "JSON Invalide"
         assert self.employee_record.archived_json == {}
 
     def test_state_processed(self, faker):
-        self.employee_record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
+        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
             "La ligne de la fiche salarié a été enregistrée avec succès.",
         )
-        self.employee_record.process(process_code, process_message, "{}")
+        self.employee_record.process(code=process_code, label=process_message, archive="{}")
 
         assert self.employee_record.status == Status.PROCESSED
         assert self.employee_record.asp_processing_code == process_code
@@ -378,13 +378,13 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.archived_json == {}
 
     def test_state_processed_when_archive_is_none(self, faker):
-        self.employee_record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
+        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
             "La ligne de la fiche salarié a été enregistrée avec succès.",
         )
-        self.employee_record.process(process_code, process_message, None)
+        self.employee_record.process(code=process_code, label=process_message, archive=None)
 
         assert self.employee_record.status == Status.PROCESSED
         assert self.employee_record.asp_processing_code == process_code
@@ -392,13 +392,13 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.archived_json is None
 
     def test_state_processed_when_archive_is_empty(self, faker):
-        self.employee_record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
+        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
             "La ligne de la fiche salarié a été enregistrée avec succès.",
         )
-        self.employee_record.process(process_code, process_message, "")
+        self.employee_record.process(code=process_code, label=process_message, archive="")
 
         assert self.employee_record.status == Status.PROCESSED
         assert self.employee_record.asp_processing_code == process_code
@@ -406,13 +406,13 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.archived_json == ""
 
     def test_state_processed_when_archive_is_not_json(self, faker):
-        self.employee_record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
+        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
             "La ligne de la fiche salarié a été enregistrée avec succès.",
         )
-        self.employee_record.process(process_code, process_message, "whatever")
+        self.employee_record.process(code=process_code, label=process_message, archive="whatever")
 
         assert self.employee_record.status == Status.PROCESSED
         assert self.employee_record.asp_processing_code == process_code
@@ -426,7 +426,7 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.status == Status.READY
 
         # Employee record in SENT state can't be disabled
-        self.employee_record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
+        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
         with pytest.raises(xworkflows.InvalidTransitionError):
             self.employee_record.disable()
         assert self.employee_record.status == Status.SENT
@@ -436,7 +436,7 @@ class TestEmployeeRecordLifeCycle:
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
             "La ligne de la fiche salarié a été enregistrée avec succès.",
         )
-        self.employee_record.process(process_code, process_message, "{}")
+        self.employee_record.process(code=process_code, label=process_message, archive="{}")
         self.employee_record.disable()
         assert self.employee_record.status == Status.DISABLED
 
@@ -451,18 +451,18 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.status == Status.DISABLED
 
     def test_state_disabled_with_reject(self, faker):
-        self.employee_record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
+        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
 
-        self.employee_record.reject("12", "JSON Invalide", None)
+        self.employee_record.reject(code="12", label="JSON Invalide", archive=None)
         self.employee_record.disable()
         assert self.employee_record.status == Status.DISABLED
 
     def test_reactivate(self, faker):
-        self.employee_record.wait_for_asp_response(faker.unique.asp_batch_filename(), 1, None)
+        self.employee_record.wait_for_asp_response(file=faker.unique.asp_batch_filename(), line_number=1, archive=None)
         process_code = EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE
         process_message = "La ligne de la fiche salarié a été enregistrée avec succès."
         archive_first = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [1]."}'
-        self.employee_record.process(process_code, process_message, archive_first)
+        self.employee_record.process(code=process_code, label=process_message, archive=archive_first)
         self.employee_record.disable()
         assert self.employee_record.status == Status.DISABLED
 
@@ -476,7 +476,7 @@ class TestEmployeeRecordLifeCycle:
 
         filename_second = faker.unique.asp_batch_filename()
         archive_second = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [2]."}'
-        self.employee_record.wait_for_asp_response(filename_second, 1, archive_second)
+        self.employee_record.wait_for_asp_response(file=filename_second, line_number=1, archive=archive_second)
         assert self.employee_record.asp_batch_file == filename_second
         assert self.employee_record.archived_json == json.loads(archive_second)
 
@@ -485,7 +485,7 @@ class TestEmployeeRecordLifeCycle:
             "La ligne de la fiche salarié a été enregistrée avec succès.",
         )
         archive_third = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [3]."}'
-        self.employee_record.process(process_code, process_message, archive_third)
+        self.employee_record.process(code=process_code, label=process_message, archive=archive_third)
         assert self.employee_record.asp_batch_file == filename_second
         assert self.employee_record.archived_json == json.loads(archive_third)
 
@@ -496,8 +496,8 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.siret == old_company.siret
         assert self.employee_record.asp_id == old_company.convention.asp_id
 
-        self.employee_record.wait_for_asp_response(faker.unique.asp_batch_filename(), 1, None)
-        self.employee_record.process("", "", None)
+        self.employee_record.wait_for_asp_response(file=faker.unique.asp_batch_filename(), line_number=1, archive=None)
+        self.employee_record.process(code="", label="", archive=None)
         self.employee_record.disable()
 
         # Change SIAE
@@ -548,9 +548,9 @@ class TestEmployeeRecordLifeCycle:
             asp_processing_label="Meh Meh Meh",
         )
         employee_record_code_3436.process(
-            employee_record_code_3436.asp_processing_code,
-            employee_record_code_3436.asp_processing_label,
-            '{"codeTraitement": "3436"}',
+            code=employee_record_code_3436.asp_processing_code,
+            label=employee_record_code_3436.asp_processing_label,
+            archive='{"codeTraitement": "3436"}',
             as_duplicate=True,
         )
         assert employee_record_code_3436.processed_as_duplicate
@@ -560,17 +560,17 @@ class TestEmployeeRecordLifeCycle:
 
         with pytest.raises(ValueError, match="Code needs to be 3436 and not 3437 when as_duplicate=True"):
             employee_record_other_code.process(
-                employee_record_other_code.asp_processing_code,
-                employee_record_other_code.asp_processing_label,
-                None,
+                code=employee_record_other_code.asp_processing_code,
+                label=employee_record_other_code.asp_processing_label,
+                archive=None,
                 as_duplicate=True,
             )
 
         with pytest.raises(xworkflows.InvalidTransitionError):
             employee_record_other_status.process(
-                employee_record_other_status.asp_processing_code,
-                employee_record_other_status.asp_processing_label,
-                None,
+                code=employee_record_other_status.asp_processing_code,
+                label=employee_record_other_status.asp_processing_label,
+                archive=None,
                 as_duplicate=True,
             )
 

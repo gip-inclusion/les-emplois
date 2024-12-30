@@ -254,8 +254,8 @@ class TestListEmployeeRecords:
 
         record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_company=self.company)
         record.ready()
-        record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
-        record.reject("0012", "JSON Invalide", None)
+        record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
+        record.reject(code="0012", label="JSON Invalide", archive=None)
 
         response = client.get(self.URL, data={"status": Status.REJECTED})
         assertContains(response, "Erreur 0012")
@@ -294,7 +294,7 @@ class TestListEmployeeRecords:
         for err_code, err_message, custom_err_message in tests_specs:
             with subtests.test(err_code):
                 record.status = Status.SENT
-                record.reject(err_code, err_message, "{}")
+                record.reject(code=err_code, label=err_message, archive="{}")
 
                 response = client.get(self.URL, data={"status": Status.REJECTED})
                 assertContains(response, f"Erreur {err_code}")
@@ -369,8 +369,8 @@ class TestListEmployeeRecords:
         )
         for i, record in enumerate((recordA, recordZ)):
             record.ready()
-            record.wait_for_asp_response(f"RIAE_FS_2021041013000{i}.json", 1, None)
-            record.reject("0012", "JSON Invalide", None)
+            record.wait_for_asp_response(file=f"RIAE_FS_2021041013000{i}.json", line_number=1, archive=None)
+            record.reject(code="0012", label="JSON Invalide", archive=None)
 
         # Zzzzz's hiring start is more recent
         self._check_employee_record_order(

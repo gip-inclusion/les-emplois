@@ -59,7 +59,9 @@ class Command(EmployeeRecordTransferCommand):
             renderer = JSONRenderer()
             for idx, employee_record in enumerate(employee_records, 1):
                 employee_record.wait_for_asp_response(
-                    remote_path, idx, renderer.render(batch_data["lignesTelechargement"][idx - 1])
+                    file=remote_path,
+                    line_number=idx,
+                    archive=renderer.render(batch_data["lignesTelechargement"][idx - 1]),
                 )
 
     def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> None:
@@ -99,7 +101,7 @@ class Command(EmployeeRecordTransferCommand):
             archived_json = JSONRenderer().render(raw_employee_record)
             if processing_code == EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE:  # Processed by ASP
                 if not dry_run:
-                    employee_record.process(processing_code, processing_label, archived_json)
+                    employee_record.process(code=processing_code, label=processing_label, archive=archived_json)
                 else:
                     self.logger.info(f"DRY-RUN: Accepted {employee_record=}, {processing_code=}, {processing_label=}")
             else:  # Rejected by ASP
@@ -107,7 +109,9 @@ class Command(EmployeeRecordTransferCommand):
                     # One special case added for support concerns:
                     # 3436 processing code are automatically converted as PROCESSED
                     if processing_code == EmployeeRecord.ASP_DUPLICATE_ERROR_CODE:
-                        employee_record.process(processing_code, processing_label, archived_json, as_duplicate=True)
+                        employee_record.process(
+                            code=processing_code, label=processing_label, archive=archived_json, as_duplicate=True
+                        )
 
                         # If the ASP mark the employee record as duplicate,
                         # and there is a suspension or a prolongation for the associated approval,
@@ -127,7 +131,7 @@ class Command(EmployeeRecordTransferCommand):
 
                         continue
 
-                    employee_record.reject(processing_code, processing_label, archived_json)
+                    employee_record.reject(code=processing_code, label=processing_label, archive=archived_json)
                 else:
                     self.logger.info(f"DRY-RUN: Rejected {employee_record=}, {processing_code=}, {processing_label=}")
 
