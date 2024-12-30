@@ -31,6 +31,7 @@ from itou.users.admin_forms import (
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils.admin import (
     ChooseFieldsToTransfer,
+    CreatedOrUpdatedByMixin,
     InconsistencyCheckMixin,
     ItouModelAdmin,
     ItouTabularInline,
@@ -298,7 +299,7 @@ def get_fields_to_transfer_for_job_seekers():
 
 
 @admin.register(models.User)
-class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
+class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin):
     class Media:
         css = {"all": ("css/itou-admin.css",)}
 
