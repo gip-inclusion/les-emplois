@@ -15,6 +15,7 @@ from itou.companies import enums, models, transfer
 from itou.companies.admin_forms import CompanyChooseFieldsToTransfer, SelectTargetCompanyForm
 from itou.siae_evaluations.models import EvaluatedSiae
 from itou.utils.admin import (
+    CreatedOrUpdatedByMixin,
     ItouGISMixin,
     ItouModelAdmin,
     ItouTabularInline,
@@ -115,7 +116,7 @@ def _companies_serializer(queryset):
 
 
 @admin.register(models.Company)
-class CompanyAdmin(ItouGISMixin, OrganizationAdmin):
+class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
     @admin.action(description="Exporter les entreprises selectionnées")
     def export(self, request, queryset):
         export_qs = queryset.select_related("created_by")
@@ -223,7 +224,6 @@ class CompanyAdmin(ItouGISMixin, OrganizationAdmin):
 
     def save_model(self, request, obj, form, change):
         if not change:
-            obj.created_by = request.user
             obj.source = models.Company.SOURCE_STAFF_CREATED
             if not obj.geocoding_score and obj.geocoding_address:
                 try:

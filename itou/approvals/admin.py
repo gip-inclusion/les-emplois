@@ -14,6 +14,7 @@ from itou.employee_record.constants import get_availability_date_for_kind
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.utils.admin import (
+    CreatedOrUpdatedByMixin,
     InconsistencyCheckMixin,
     ItouModelAdmin,
     ItouStackedInline,
@@ -184,7 +185,7 @@ class StartDateFilter(admin.SimpleListFilter):
 
 
 @admin.register(models.Approval)
-class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
+class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelAdmin):
     form = ApprovalAdminForm
     list_display = (
         "pk",
@@ -325,7 +326,6 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if not change:
-            obj.created_by = request.user
             obj.origin = Origin.ADMIN
 
         # Prevent the approval modification when an employee record exists and is READY, SENT, or PROCESSED
@@ -455,7 +455,7 @@ class FromProlongationRequest(admin.SimpleListFilter):
 
 
 @admin.register(models.Suspension)
-class SuspensionAdmin(ItouModelAdmin):
+class SuspensionAdmin(CreatedOrUpdatedByMixin, ItouModelAdmin):
     list_display = (
         "pk",
         "approval",
@@ -483,13 +483,8 @@ class SuspensionAdmin(ItouModelAdmin):
     def is_in_progress(self, obj):
         return obj.is_in_progress
 
-    def save_model(self, request, obj, form, change):
-        if not change:
-            obj.created_by = request.user
-        super().save_model(request, obj, form, change)
 
-
-class ProlongationCommonAdmin(ItouModelAdmin):
+class ProlongationCommonAdmin(CreatedOrUpdatedByMixin, ItouModelAdmin):
     list_display = (
         "pk",
         "approval",
@@ -537,13 +532,6 @@ class ProlongationCommonAdmin(ItouModelAdmin):
             default_storage.url(obj.report_file.key),
             obj.report_file.key,
         )
-
-    def save_model(self, request, obj, form, change):
-        if change:
-            obj.updated_by = request.user
-        else:
-            obj.created_by = request.user
-        super().save_model(request, obj, form, change)
 
 
 @admin.register(models.ProlongationRequest)
