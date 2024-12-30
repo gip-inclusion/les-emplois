@@ -1,6 +1,7 @@
 from functools import partial
 
 import pytest
+from django.contrib.auth.models import Permission
 from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
@@ -75,6 +76,23 @@ class TestUserHijackPerm:
         settings.HIJACK_ALLOWED_USER_EMAILS = ["foo@test.com", "bar@baz.org"]
         hijacked = PrescriberFactory()
         hijacker = ItouStaffFactory(email="bar@baz.org")
+        client.force_login(hijacker)
+
+        response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
+        assert response.status_code == 302
+        assert response["Location"] == "/foo/"
+        assert caplog.records[0].message == f"admin={hijacker} has started impersonation of user={hijacked}"
+        caplog.clear()
+
+        response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk, "next": "/bar/"})
+        assert response.status_code == 302
+        assert response["Location"] == "/bar/"
+        assert caplog.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
+
+    def test_permission_staff_hijacker(self, client, caplog):
+        hijacked = PrescriberFactory()
+        hijacker = ItouStaffFactory(is_staff=True)
+        hijacker.user_permissions.add(Permission.objects.get(codename="hijack_user"))
         client.force_login(hijacker)
 
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
