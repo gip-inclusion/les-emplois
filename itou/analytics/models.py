@@ -50,6 +50,7 @@ class DatumCode(models.TextChoices):
     TECH_SENTRY_FAILURE_RATE = "SENTRY-002", "Taux de requêtes en échec"
     TECH_UPDOWN_UPTIME = "UPDOWN-001", "Taux de disponibilité"
     TECH_UPDOWN_APDEX = "UPDOWN-002", "Apdex"
+    TECH_GH_TOTAL_BUGS = "GITHUB-001", "Total des PR de correctifs fusionnées aujourd'hui"
 
 
 PERCENTAGE_DATUM = [
