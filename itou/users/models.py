@@ -283,6 +283,7 @@ class User(AbstractUser, AddressMixin):
                 ),
             ),
         ]
+        permissions = [("hijack_user", "Can impersonate (hijack) other accounts")]
 
     def __init__(self, *args, _auto_create_job_seeker_profile=True, **kwargs):
         super().__init__(*args, **kwargs)
