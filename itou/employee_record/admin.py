@@ -67,10 +67,6 @@ class ASPExchangeInformationAdminMixin:
         if not obj.archived_json:
             return self.get_empty_value_display()
 
-        # Handle older data serialized from the JSON as string
-        if not isinstance(obj.archived_json, dict):
-            obj._set_archived_json(obj.archived_json)
-
         siret = obj.archived_json["siret"]
         measure = obj.archived_json["mesure"]
         return f"{siret} ({measure})"
@@ -79,10 +75,6 @@ class ASPExchangeInformationAdminMixin:
     def user_data_sent(self, obj):
         if not obj.archived_json:
             return self.get_empty_value_display()
-
-        # Handle older data serialized from the JSON as string
-        if not isinstance(obj.archived_json, dict):
-            obj._set_archived_json(obj.archived_json)
 
         firstname = obj.archived_json["personnePhysique"]["prenom"]
         lastname = obj.archived_json["personnePhysique"]["nomUsage"]
@@ -93,10 +85,6 @@ class ASPExchangeInformationAdminMixin:
     def approval_data_sent(self, obj):
         if not obj.archived_json:
             return self.get_empty_value_display()
-
-        # Handle older data serialized from the JSON as string
-        if not isinstance(obj.archived_json, dict):
-            obj._set_archived_json(obj.archived_json)
 
         number = obj.archived_json["personnePhysique"]["passIae"]
         start = obj.archived_json["personnePhysique"]["passDateDeb"]
