@@ -605,7 +605,6 @@ AWS_S3_REGION_NAME = "eu-west-3"
 AWS_S3_ENDPOINT_URL = f"https://{os.getenv('CELLAR_ADDON_HOST')}/"
 
 HIJACK_PERMISSION_CHECK = "itou.utils.perms.user.has_hijack_perm"
-HIJACK_ALLOWED_USER_EMAILS = [s.lower() for s in os.getenv("HIJACK_ALLOWED_USER_EMAILS", "").split(",") if s]
 # Replaced by ACCOUNT_ADAPTER (see above) for general purpose. We still need it to redirect after hijack
 LOGIN_REDIRECT_URL = "/dashboard/"
 
