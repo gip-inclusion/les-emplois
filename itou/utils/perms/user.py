@@ -1,6 +1,5 @@
 import logging
 
-from django.conf import settings
 from hijack import signals
 
 
@@ -20,9 +19,7 @@ def has_hijack_perm(*, hijacker, hijacked):
         return True
 
     # Only whitelisted staff members can hijack other accounts
-    if hijacker.is_staff and (
-        hijacker.has_perm("users.hijack_user") or hijacker.email.lower() in settings.HIJACK_ALLOWED_USER_EMAILS
-    ):
+    if hijacker.is_staff and hijacker.has_perm("users.hijack_user"):
         return True
 
     return False

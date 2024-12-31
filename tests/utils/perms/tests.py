@@ -2,7 +2,6 @@ from functools import partial
 
 import pytest
 from django.contrib.auth.models import Permission
-from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
@@ -56,13 +55,6 @@ class TestUserHijackPerm:
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assert response.status_code == 403
 
-        with override_settings(HIJACK_ALLOWED_USER_EMAILS=["foo@test.com", "bar@baz.org"]):
-            # active staff but not superuser and email not in the whitelist
-            hijacker = ItouStaffFactory(email="not@inthelist.com")
-            client.force_login(hijacker)
-            response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
-            assert response.status_code == 403
-
     @pytest.mark.parametrize("param", ["is_active", "is_superuser", "is_staff"])
     def test_disallowed_hijacked(self, client, param):
         hijacker = ItouStaffFactory(is_superuser=True)
@@ -71,23 +63,6 @@ class TestUserHijackPerm:
         hijacked = ItouStaffFactory(**{param: True})
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assert response.status_code == 403
-
-    def test_allowed_staff_hijacker(self, client, caplog, settings):
-        settings.HIJACK_ALLOWED_USER_EMAILS = ["foo@test.com", "bar@baz.org"]
-        hijacked = PrescriberFactory()
-        hijacker = ItouStaffFactory(email="bar@baz.org")
-        client.force_login(hijacker)
-
-        response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
-        assert response.status_code == 302
-        assert response["Location"] == "/foo/"
-        assert caplog.records[0].message == f"admin={hijacker} has started impersonation of user={hijacked}"
-        caplog.clear()
-
-        response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk, "next": "/bar/"})
-        assert response.status_code == 302
-        assert response["Location"] == "/bar/"
-        assert caplog.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
 
     def test_permission_staff_hijacker(self, client, caplog):
         hijacked = PrescriberFactory()
@@ -107,9 +82,8 @@ class TestUserHijackPerm:
         assert caplog.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
 
     def test_allowed_django_prescriber(self, client, caplog, settings):
-        settings.HIJACK_ALLOWED_USER_EMAILS = ["foo@test.com", "bar@baz.org"]
         hijacked = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
-        hijacker = ItouStaffFactory(email="bar@baz.org")
+        hijacker = ItouStaffFactory(is_superuser=True)
         client.force_login(hijacker)
 
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
