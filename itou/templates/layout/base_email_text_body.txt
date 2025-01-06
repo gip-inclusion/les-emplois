@@ -1,5 +1,11 @@
 {% autoescape off %}
 
+{% if forward_from_user|default:False %}
+Vous recevez cet e-mail parce que l'utilisateur {{ forward_from_user.get_full_name }} ({{ forward_from_user.email}}) ne fait plus partie de votre organisation.
+
+-----
+{% endif %}
+
 {% block body %}{% endblock %}
 
 {% include "layout/base_email_signature.txt" %}

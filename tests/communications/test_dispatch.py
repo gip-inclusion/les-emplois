@@ -14,6 +14,7 @@ from itou.communications.dispatch.utils import (
     WithStructureMixin,
 )
 from itou.communications.models import NotificationRecord, NotificationSettings
+from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 
 
@@ -166,8 +167,15 @@ class TestBaseNotification:
         assert not manageable_non_applicable_notification(self.user, self.organization).should_send()
 
     def test_method_get_context(self):
-        assert BaseNotification(self.user, self.organization).get_context() == {}
+        assert BaseNotification(self.user, self.organization).get_context() == {
+            "user": self.user,
+            "structure": self.organization,
+            "forward_from_user": None,
+        }
         assert BaseNotification(self.user, self.organization, kw1=1, kw2=2).get_context() == {
+            "user": self.user,
+            "structure": self.organization,
+            "forward_from_user": None,
             "kw1": 1,
             "kw2": 2,
         }
@@ -208,6 +216,42 @@ class TestEmailNotification:
         assert len(mailoutbox) == 1
         assert mailoutbox[0].to == [self.user.email]
         assert "Cet email est envoyé depuis un environnement de démonstration" in mailoutbox[0].body
+
+    def test_method_send_for_prescriber_that_left_his_org(
+        self, email_notification, django_capture_on_commit_callbacks, mailoutbox, caplog
+    ):
+        self.user.prescribermembership_set.update(is_active=False)
+
+        admin_1 = PrescriberMembershipFactory(
+            user=PrescriberFactory(),
+            organization=self.organization,
+            is_admin=True,
+        ).user
+        admin_2 = PrescriberMembershipFactory(
+            user=PrescriberFactory(),
+            organization=self.organization,
+            is_admin=True,
+        ).user
+        PrescriberMembershipFactory(
+            user=PrescriberFactory(),
+            organization=self.organization,
+            is_admin=False,
+        )
+
+        with django_capture_on_commit_callbacks(execute=True):
+            email_notification(self.user, self.organization).send()
+
+        assert caplog.messages == ["Send email copy to admin, admin_count=2"]
+        assert len(mailoutbox) == 2
+        assert set(mailoutbox[0].to + mailoutbox[1].to) == {admin_1.email, admin_2.email}
+        assert (
+            f"Vous recevez cet e-mail parce que l'utilisateur {self.user.get_full_name()} ({self.user.email})"
+            " ne fait plus partie de votre organisation" in mailoutbox[0].body
+        )
+        assert (
+            f"Vous recevez cet e-mail parce que l'utilisateur {self.user.get_full_name()} ({self.user.email})"
+            " ne fait plus partie de votre organisation" in mailoutbox[1].body
+        )
 
 
 class TestProfiledNotification:
