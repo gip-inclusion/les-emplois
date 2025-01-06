@@ -2569,7 +2569,7 @@ class TestProcessAcceptViews:
             assert criterion.certified
             assert criterion.data_returned_by_api == rsa_certified_mocker()
             assert criterion.certification_period == InclusiveDateRange(
-                datetime.date(2024, 8, 1), datetime.date(2024, 10, 31)
+                datetime.date(2024, 8, 1), datetime.date(2024, 12, 12)
             )
             assert criterion.certified_at
 
@@ -2634,7 +2634,7 @@ class TestProcessAcceptViews:
             assert criterion.certified
             assert criterion.data_returned_by_api == rsa_certified_mocker()
             assert criterion.certification_period == InclusiveDateRange(
-                datetime.date(2024, 8, 1), datetime.date(2024, 10, 31)
+                datetime.date(2024, 8, 1), datetime.date(2024, 12, 12)
             )
             assert criterion.certified_at
 

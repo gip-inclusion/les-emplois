@@ -36,6 +36,7 @@ def geiq_eligibility_factory():
     ],
 )
 class TestCertifyCriteria:
+    @freeze_time("2025-01-06")
     def test_queue_task(self, factory, respx_mock):
         eligibility_diagnosis = factory()
         respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
@@ -54,7 +55,7 @@ class TestCertifyCriteria:
         assert criterion.certified_at is not None
         assert criterion.data_returned_by_api == rsa_certified_mocker()
         assert criterion.certification_period == InclusiveDateRange(
-            datetime.date(2024, 8, 1), datetime.date(2024, 10, 31)
+            datetime.date(2024, 8, 1), datetime.date(2025, 4, 8)
         )
 
     def test_retry_task_rate_limits(self, factory, respx_mock):

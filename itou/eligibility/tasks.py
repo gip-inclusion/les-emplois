@@ -1,3 +1,4 @@
+import datetime
 import logging
 from json import JSONDecodeError
 
@@ -77,8 +78,11 @@ def certify_criteria(eligibility_diagnosis):
                     criterion.certified_at = timezone.now()
                     criterion.data_returned_by_api = data["raw_response"]
                     criterion.certification_period = None
-                    start_at, end_at = data["start_at"], data["end_at"]
-                    if start_at and end_at:
+                    if criterion.certified:
+                        start_at = data["start_at"]
+                        end_at = timezone.localdate(criterion.certified_at) + datetime.timedelta(
+                            days=criterion.CERTIFICATION_GRACE_PERIOD_DAYS
+                        )
                         criterion.certification_period = InclusiveDateRange(start_at, end_at)
     SelectedAdministrativeCriteria.objects.bulk_update(
         criteria,

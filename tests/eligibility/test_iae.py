@@ -557,7 +557,7 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
     assert criterion.certified is True
     assert criterion.certified_at == timezone.now()
     assert criterion.data_returned_by_api == rsa_certified_mocker()
-    assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 10, 31))
+    assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13))
 
 
 @pytest.mark.parametrize(
@@ -589,7 +589,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
         pytest.param(
             partial(IAEEligibilityDiagnosisFactory, from_employer=True),
             {
-                "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 10, 31)),
+                "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13)),
                 "certified": True,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
                 "data_returned_by_api": rsa_certified_mocker(),
@@ -601,7 +601,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
         pytest.param(
             partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
             {
-                "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 10, 31)),
+                "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13)),
                 "certified": True,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
                 "data_returned_by_api": rsa_certified_mocker(),
