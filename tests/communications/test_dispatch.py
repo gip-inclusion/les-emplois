@@ -14,6 +14,7 @@ from itou.communications.dispatch.utils import (
     WithStructureMixin,
 )
 from itou.communications.models import NotificationRecord, NotificationSettings
+from tests.companies.factories import CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 
@@ -246,11 +247,49 @@ class TestEmailNotification:
         assert set(mailoutbox[0].to + mailoutbox[1].to) == {admin_1.email, admin_2.email}
         assert (
             f"Vous recevez cet e-mail parce que l'utilisateur {self.user.get_full_name()} ({self.user.email})"
-            " ne fait plus partie de votre organisation" in mailoutbox[0].body
+            " ne fait plus partie de votre organisation." in mailoutbox[0].body
         )
         assert (
             f"Vous recevez cet e-mail parce que l'utilisateur {self.user.get_full_name()} ({self.user.email})"
-            " ne fait plus partie de votre organisation" in mailoutbox[1].body
+            " ne fait plus partie de votre organisation." in mailoutbox[1].body
+        )
+
+    def test_method_send_for_employer_that_left_his_company(
+        self, email_notification, django_capture_on_commit_callbacks, mailoutbox, caplog
+    ):
+        user = EmployerFactory(with_company=True)
+        company = user.companymembership_set.first().company
+        user.companymembership_set.update(is_active=False)
+
+        admin_1 = CompanyMembershipFactory(
+            user=EmployerFactory(),
+            company=company,
+            is_admin=True,
+        ).user
+        admin_2 = CompanyMembershipFactory(
+            user=EmployerFactory(),
+            company=company,
+            is_admin=True,
+        ).user
+        CompanyMembershipFactory(
+            user=EmployerFactory(),
+            company=company,
+            is_admin=False,
+        )
+
+        with django_capture_on_commit_callbacks(execute=True):
+            email_notification(user, company).send()
+
+        assert caplog.messages == ["Send email copy to admin, admin_count=2"]
+        assert len(mailoutbox) == 2
+        assert set(mailoutbox[0].to + mailoutbox[1].to) == {admin_1.email, admin_2.email}
+        assert (
+            f"Vous recevez cet e-mail parce que l'utilisateur {user.get_full_name()} ({user.email})"
+            " ne fait plus partie de votre structure." in mailoutbox[0].body
+        )
+        assert (
+            f"Vous recevez cet e-mail parce que l'utilisateur {user.get_full_name()} ({user.email})"
+            " ne fait plus partie de votre structure." in mailoutbox[1].body
         )
 
 

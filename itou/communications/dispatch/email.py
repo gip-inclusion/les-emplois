@@ -1,5 +1,6 @@
 import logging
 
+from itou.companies.models import CompanyMembership
 from itou.prescribers.models import PrescriberMembership
 from itou.utils.emails import get_email_message
 
@@ -26,12 +27,15 @@ class EmailNotification(BaseNotification):
             not self.forward_from_user
             # Don't use should_send() if the user left the org because we don't want to use his settings
             and self.is_applicable()
-            and self.user.is_prescriber
             and self.structure
+            and (self.user.is_prescriber or self.user.is_employer)
         ):
-            memberships = (
-                PrescriberMembership.objects.active().filter(organization=self.structure).select_related("user")
-            )
+            if self.user.is_prescriber:
+                memberships = (
+                    PrescriberMembership.objects.active().filter(organization=self.structure).select_related("user")
+                )
+            elif self.user.is_employer:
+                memberships = CompanyMembership.objects.active().filter(company=self.structure).select_related("user")
             members = [m.user for m in memberships]
             if self.user not in members:
                 admins = [m.user for m in memberships if m.is_admin]
