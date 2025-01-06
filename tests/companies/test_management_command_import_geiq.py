@@ -132,6 +132,26 @@ def test_get_geiq_df(sftp_directory, faker):
     with pytest.raises(AssertionError):
         df, info_stats = get_geiq_df(file_path)
 
+    # Missing some sirets
+    rows = 185
+    rows_with_empty_siret = 20
+    rows_with_empty_email = 0
+    data = generate_data(
+        rows=rows, rows_with_empty_siret=rows_with_empty_siret, rows_with_empty_email=rows_with_empty_email
+    )
+    file_path = sftp_directory.joinpath(faker.geiq_filename())
+    with open(file_path, "wb") as xlsxfile:
+        workbook = generate_excel_sheet(FILE_HEADERS, data)
+        workbook.save(xlsxfile)
+    df, info_stats = get_geiq_df(file_path)
+    assert df.shape == (rows - rows_with_empty_siret, 8)
+    assert info_stats == {
+        "rows_in_file": rows,
+        "rows_with_a_siret": rows - rows_with_empty_siret,
+        "rows_after_deduplication": rows - rows_with_empty_siret,
+        "rows_with_empty_email": 0,
+    }
+
     # Duplicated rows
     rows = 250
     rows_with_empty_siret = 0
