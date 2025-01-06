@@ -2,6 +2,7 @@ import datetime
 import random
 
 from django.contrib.gis.geos import Point
+from django.utils import timezone
 from faker.providers import BaseProvider
 
 
@@ -12,6 +13,12 @@ class ItouProvider(BaseProvider):
     def asp_ea2_filename(self, date: datetime.date = None) -> str:
         date_part = random.randint(0, 99999999) if date is None else date.strftime("%Y%m%d")
         return f"FLUX_EA2_ITOU_{date_part}.zip"
+
+    def geiq_filename(self, date: datetime.date = None) -> str:
+        if date is None:
+            date = timezone.localdate()
+        date_part = date.strftime("%Y-%m-%d")
+        return f"{date_part} - Export BDD FFGEIQ.xls"
 
     def geopoint(self) -> Point:
         return Point(
