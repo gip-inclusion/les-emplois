@@ -80,6 +80,8 @@ def get_permissions_dict():
     group_gps_admin_permissions = {
         gps_models.FollowUpGroup: PERMS_ALL,
         gps_models.FollowUpGroupMembership: PERMS_ALL,
+        job_applications_models.JobApplication: PERMS_READ,
+        job_applications_models.JobApplicationTransitionLog: PERMS_READ,
         users_models.User: PERMS_ADD | PERMS_HIJACK,
         users_models.JobSeekerProfile: PERMS_EDIT,
     }
