@@ -3,9 +3,10 @@ class BaseNotification:
 
     can_be_disabled = True
 
-    def __init__(self, user, structure=None, /, **kwargs):
+    def __init__(self, user, structure=None, forward_from_user=None, /, **kwargs):
         self.user = user
         self.structure = structure
+        self.forward_from_user = forward_from_user
         self.context = kwargs
 
     def __repr__(self):
@@ -29,7 +30,11 @@ class BaseNotification:
         return True
 
     def get_context(self):
-        return self.validate_context()
+        return self.validate_context() | {
+            "user": self.user,
+            "structure": self.structure,
+            "forward_from_user": self.forward_from_user,
+        }
 
     def validate_context(self):
         return self.context

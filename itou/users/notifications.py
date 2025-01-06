@@ -12,11 +12,6 @@ class OrganizationActiveMembersReminderNotification(
     body_template = "users/emails/check_authorized_members_email_body.txt"
     can_be_disabled = False
 
-    def get_context(self):
-        context = super().get_context()
-        context["structure"] = self.structure
-        return context
-
 
 @notifications_registry.register
 class JobSeekerCreatedByProxyNotification(EmailNotification):
