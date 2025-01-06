@@ -249,9 +249,7 @@ class JobDescriptionSearchView(EmployerSearchBaseView):
         pass
 
     def get_results_page_and_counts(self, siaes, job_descriptions):
-        job_descriptions = job_descriptions.order_by(
-            F("source_kind").asc(nulls_first=True), "-updated_at", "-created_at"
-        )
+        job_descriptions = job_descriptions.order_by(F("source_kind").asc(nulls_first=True), "-updated_at")
 
         page = pager(job_descriptions, self.request.GET.get("page"), items_per_page=10)
         # Prefer a prefetch_related over annotating the entire queryset with_annotation_is_popular().
