@@ -3480,7 +3480,7 @@ class UpdateJobSeekerTestMixin:
         )
         self.config = {
             "apply": {"company_pk": self.company.pk},
-            "config": {"from_url": from_url},
+            "config": {"from_url": from_url, "session_kind": "job-seeker-update"},
             "job_seeker_pk": self.job_seeker.pk,
         }
         self.step_1_url = reverse(
