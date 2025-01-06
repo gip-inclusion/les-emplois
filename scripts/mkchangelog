@@ -135,16 +135,18 @@ def main(publish):
                     )
                 log_entries[pr_changelog_labels.pop()].append(title)
 
-            if any(log_entries.values()):
-                # Changelog entries are up to the next Monday (excluded).
-                new_changelog.write(f"## {sprint_end + datetime.timedelta(days=1)}\n\n")
+            # Changelog entries are up to the next Monday (excluded).
+            new_changelog.write(f"## {sprint_end + datetime.timedelta(days=1)}\n\n")
 
-            for label, label_title in LABEL_TITLES.items():
-                if log_entries[label]:
-                    new_changelog.write(f"### {label_title}\n\n")
-                    for title in ci_sort(log_entries[label]):
-                        new_changelog.write(f"- {title}\n")
-                    new_changelog.write("\n")
+            if any(log_entries.values()):
+                for label, label_title in LABEL_TITLES.items():
+                    if log_entries[label]:
+                        new_changelog.write(f"### {label_title}\n\n")
+                        for title in ci_sort(log_entries[label]):
+                            new_changelog.write(f"- {title}\n")
+                        new_changelog.write("\n")
+            else:
+                new_changelog.write("Rien à signaler cette semaine\n\n")
 
             # Don’t forget the previous header.
             new_changelog.write(last_entry_header)
