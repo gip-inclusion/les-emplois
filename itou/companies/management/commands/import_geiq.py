@@ -34,6 +34,9 @@ def get_geiq_df(filename):
     }
     df = remap_columns(df, column_mapping=column_mapping)
 
+    # Force siret type to integer, otherwise replacing NaN elements to None blindly converts them to float.
+    df["siret"] = df["siret"].astype("Int64")
+
     # Replace NaN elements with None.
     df = df.replace({np.nan: None})
 
