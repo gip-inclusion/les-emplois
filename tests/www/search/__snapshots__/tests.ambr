@@ -187,8 +187,7 @@
                  AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
           ORDER BY "companies_jobdescription"."source_kind" ASC NULLS FIRST,
-                   "companies_jobdescription"."updated_at" DESC,
-                   "companies_jobdescription"."created_at" DESC
+                   "companies_jobdescription"."updated_at" DESC
           LIMIT 1
         ''',
       }),
@@ -502,8 +501,7 @@
                  AND "companies_company"."is_searchable"
                  AND NOT ("companies_company"."block_job_applications"))
           ORDER BY "companies_jobdescription"."source_kind" ASC NULLS FIRST,
-                   "companies_jobdescription"."updated_at" DESC,
-                   "companies_jobdescription"."created_at" DESC
+                   "companies_jobdescription"."updated_at" DESC
           LIMIT 1
         ''',
       }),
