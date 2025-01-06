@@ -83,6 +83,14 @@ def _get_geiq_eligibility_diagnosis(job_application, only_prescriber):
     ).first()
 
 
+def job_application_sender_left_org(job_app):
+    if org_id := job_app.sender_prescriber_organization_id:
+        return not job_app.sender.prescribermembership_set.active().filter(organization_id=org_id).exists()
+    if company_id := job_app.sender_company_id:
+        return not job_app.sender.companymembership_set.active().filter(company_id=company_id).exists()
+    return False
+
+
 @login_required
 def details_for_jobseeker(request, job_application_id, template_name="apply/process_details.html"):
     """
@@ -156,6 +164,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
         "transition_logs": transition_logs,
         "back_url": back_url,
         "matomo_custom_title": "Candidature",
+        "job_application_sender_left_org": job_application_sender_left_org(job_application),
     }
 
     return render(request, template_name, context)
@@ -267,6 +276,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
             PriorActionForm(action_only=True) if job_application.can_change_prior_actions else None
         ),
         "matomo_custom_title": "Candidature",
+        "job_application_sender_left_org": job_application_sender_left_org(job_application),
     }
 
     return render(request, template_name, context)
@@ -349,6 +359,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "refused_by": refused_by,
         "refusal_contact_email": refusal_contact_email,
         "with_job_seeker_detail_url": True,
+        "job_application_sender_left_org": job_application_sender_left_org(job_application),
     }
 
     return render(request, template_name, context)
