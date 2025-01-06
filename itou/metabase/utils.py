@@ -1,6 +1,18 @@
+import datetime
+
+from django.utils import timezone
+
+
 def convert_boolean_to_int(b):
     # True => 1, False => 0, None => None.
     return None if b is None else int(b)
+
+
+def convert_datetime_to_local_date(dt):
+    if isinstance(dt, datetime.datetime):
+        # Datetimes are stored in UTC.
+        return timezone.localdate(dt)
+    return dt
 
 
 def compose(f, g):

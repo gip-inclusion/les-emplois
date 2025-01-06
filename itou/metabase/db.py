@@ -13,7 +13,7 @@ from django.conf import settings
 from django.utils import timezone
 from psycopg import sql
 
-from itou.metabase.utils import chunked_queryset, compose, convert_boolean_to_int
+from itou.metabase.utils import chunked_queryset, compose, convert_boolean_to_int, convert_datetime_to_local_date
 
 
 class MetabaseDatabaseCursor:
@@ -249,7 +249,7 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
                 "comment": "Date de dernière mise à jour de Metabase",
                 # As metabase daily updates run typically every night after midnight, the last day with
                 # complete data is yesterday, not today.
-                "fn": lambda o: timezone.now() + timezone.timedelta(days=-1),
+                "fn": lambda o: timezone.localdate() + timezone.timedelta(days=-1),
             },
         ]
     )
@@ -260,6 +260,8 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
         if c["type"] == "boolean":
             c["type"] = "integer"
             c["fn"] = compose(convert_boolean_to_int, c["fn"])
+        if c["type"] == "date":
+            c["fn"] = compose(convert_datetime_to_local_date, c["fn"])
 
     print(f"Injecting {total_rows} rows with {len(table.columns)} columns into table {table_name}:")
 
