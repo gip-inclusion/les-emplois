@@ -1,7 +1,7 @@
 {% autoescape off %}
 
 {% if forward_from_user|default:False %}
-Vous recevez cet e-mail parce que l'utilisateur {{ forward_from_user.get_full_name }} ({{ forward_from_user.email}}) ne fait plus partie de votre organisation.
+Vous recevez cet e-mail parce que l'utilisateur {{ forward_from_user.get_full_name }} ({{ forward_from_user.email}}) ne fait plus partie de votre {{ forward_from_user.is_employer|yesno:"structure,organisation" }}.
 
 -----
 {% endif %}
