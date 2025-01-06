@@ -7,12 +7,13 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
+from itou.asp.forms import BirthPlaceAndCountryMixin
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.prescribers.enums import CHOOSABLE_PRESCRIBER_KINDS
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import Title, UserKind
 from itou.users.forms import validate_francetravail_email
-from itou.users.models import User
+from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.apis import api_entreprise, geocoding as api_geocoding
 from itou.utils.apis.exceptions import GeocodingDataError
@@ -100,7 +101,7 @@ class JobSeekerSituationForm(forms.Form):
     )
 
 
-class JobSeekerSignupForm(FullnameFormMixin, BaseSignupForm):
+class JobSeekerSignupForm(BirthPlaceAndCountryMixin, FullnameFormMixin, BaseSignupForm):
     birthdate = forms.DateField(
         label="Date de naissance",
         required=True,
@@ -135,6 +136,10 @@ class JobSeekerSignupForm(FullnameFormMixin, BaseSignupForm):
         self.fields["first_name"].widget.attrs["placeholder"] = "Dominique"
         self.fields["last_name"].widget.attrs["placeholder"] = "Durand"
         self.fields["last_name"].label = "Nom de famille"
+        self.fields["birth_place"].help_text = (
+            "La commune de naissance est obligatoire lorsque vous êtes né en France. "
+            "Elle ne doit pas être renseignée si vous êtes né à l'étranger."
+        )
 
     def clean_email(self):
         email = super().clean_email()
@@ -195,6 +200,12 @@ class JobSeekerCredentialsSignupForm(SignupForm):
         self.fields["last_name"].initial = prior_cleaned_data.get("last_name")
         self.fields["birthdate"].initial = prior_cleaned_data.get("birthdate")
         self.fields["nir"].initial = prior_cleaned_data.get("nir")
+        birth_location_fields = forms.fields_for_model(JobSeekerProfile, fields=["birth_place", "birth_country"])
+        for fieldname, field in birth_location_fields.items():
+            field.disabled = True
+            field.initial = prior_cleaned_data[fieldname]
+            field.queryset = field.queryset.filter(pk=field.initial)
+        self.fields.update(birth_location_fields)
 
         for password_field in [self.fields["password1"], self.fields["password2"]]:
             password_field.widget.attrs["placeholder"] = "**********"
@@ -216,6 +227,8 @@ class JobSeekerCredentialsSignupForm(SignupForm):
         user.save()
         user.jobseeker_profile.nir = self.prior_cleaned_data["nir"]
         user.jobseeker_profile.birthdate = self.prior_cleaned_data["birthdate"]
+        user.jobseeker_profile.birth_place_id = self.prior_cleaned_data["birth_place"]
+        user.jobseeker_profile.birth_country_id = self.prior_cleaned_data["birth_country"]
         user.jobseeker_profile.save()
 
         return user

@@ -250,7 +250,7 @@ class TestPoleEmploiConnect:
     def test_callback_with_nir(self, client):
         # Complete signup with NIR is tested in JobSeekerSignupTest.test_job_seeker_nir
         nir = "141068078200557"
-        job_seeker_data = JobSeekerFactory.build()
+        job_seeker_data = JobSeekerFactory.build(born_in_france=True)
         post_data = {
             "nir": nir,
             "title": job_seeker_data.title,
@@ -258,6 +258,8 @@ class TestPoleEmploiConnect:
             "last_name": job_seeker_data.last_name,
             "email": job_seeker_data.email,
             "birthdate": job_seeker_data.jobseeker_profile.birthdate,
+            "birth_place": job_seeker_data.jobseeker_profile.birth_place_id,
+            "birth_country": job_seeker_data.jobseeker_profile.birth_country_id,
         }
         response = client.post(reverse("signup:job_seeker"), data=post_data)
         assertRedirects(response, reverse("signup:job_seeker_credentials"))

@@ -8,7 +8,7 @@ from itou.utils.validators import validate_birth_location
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
 
-class BirthPlaceAndCountryMixin(forms.ModelForm):
+class BirthPlaceAndCountryMixin(forms.Form):
     with_birthdate_field = None
 
     birth_country = forms.ModelChoiceField(Country.objects, label="Pays de naissance", required=False)
@@ -59,10 +59,16 @@ class BirthPlaceAndCountryMixin(forms.ModelForm):
             # That's also why we can't make it mandatory.
             # See utils.js > toggleDisableAndSetValue
             if birth_place:
-                self.cleaned_data["birth_country"] = Country.objects.get(code=Country.INSEE_CODE_FRANCE)
+                birth_country = Country.objects.get(code=Country.INSEE_CODE_FRANCE)
+                self.cleaned_data["birth_country"] = birth_country
             else:
                 # Display the error above the field instead of top of page.
                 self.add_error("birth_country", "Le pays de naissance est obligatoire.")
+
+        try:
+            validate_birth_location(birth_country, birth_place)
+        except ValidationError as e:
+            self.add_error(None, e)
 
         # Country coherence is done at model level (users.User)
         # Here we must add coherence between birthdate and communes
@@ -77,10 +83,3 @@ class BirthPlaceAndCountryMixin(forms.ModelForm):
                     f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {birth_date:%d/%m/%Y}"
                 )
                 self.add_error("birth_place", msg)
-
-    def _post_clean(self):
-        super()._post_clean()
-        try:
-            validate_birth_location(self.cleaned_data.get("birth_country"), self.cleaned_data.get("birth_place"))
-        except ValidationError as e:
-            self._update_errors(e)

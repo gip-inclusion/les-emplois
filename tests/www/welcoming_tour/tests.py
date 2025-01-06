@@ -28,7 +28,7 @@ def verify_email(client, email, request):
 
 class TestWelcomingTour:
     def test_new_job_seeker_sees_welcoming_tour_test(self, client):
-        job_seeker = JobSeekerFactory.build()
+        job_seeker = JobSeekerFactory.build(born_in_france=True)
 
         # First signup step: job seeker personal info.
         url = reverse("signup:job_seeker")
@@ -38,6 +38,8 @@ class TestWelcomingTour:
             "first_name": job_seeker.first_name,
             "last_name": job_seeker.last_name,
             "birthdate": job_seeker.jobseeker_profile.birthdate,
+            "birth_place": job_seeker.jobseeker_profile.birth_place_id,
+            "birth_country": job_seeker.jobseeker_profile.birth_country_id,
             "email": job_seeker.email,
         }
         client.post(url, data=post_data)
@@ -92,7 +94,7 @@ class TestWelcomingTour:
 class TestWelcomingTourExceptions:
     def test_new_job_seeker_is_redirected_after_welcoming_tour_test(self, client, mailoutbox):
         company = CompanyFactory(with_membership=True)
-        job_seeker = JobSeekerFactory.build()
+        job_seeker = JobSeekerFactory.build(born_in_france=True)
 
         # First signup step: job seeker personal info.
         next_to = reverse("apply:start", kwargs={"company_pk": company.pk})
@@ -104,6 +106,8 @@ class TestWelcomingTourExceptions:
             "last_name": job_seeker.last_name,
             "email": job_seeker.email,
             "birthdate": job_seeker.jobseeker_profile.birthdate,
+            "birth_place": job_seeker.jobseeker_profile.birth_place_id,
+            "birth_country": job_seeker.jobseeker_profile.birth_country_id,
         }
         response = client.post(url, data=post_data)
         assert response.status_code == 302  # Destination verified in signup tests

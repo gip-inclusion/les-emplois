@@ -19,6 +19,35 @@
           <div class="form-group form-group-required"><label class="form-label" for="id_last_name">Nom de famille</label><input class="form-control" id="id_last_name" maxlength="150" name="last_name" placeholder="Durand" required="" type="text"/></div>
           <div class="form-group form-group-required"><label class="form-label" for="id_first_name">Prénom</label><input class="form-control" id="id_first_name" maxlength="150" name="first_name" placeholder="Dominique" required="" type="text"/></div>
           <div class="form-group form-group-required"><label class="form-label" for="id_birthdate">Date de naissance</label><duet-date-picker class="" identifier="id_birthdate" max="2008-10-23" min="1900-01-01" name="birthdate" placeholder="Date de naissance" required=""></duet-date-picker></div>
+          <div class="form-group"><label class="form-label" for="id_birth_place">Commune de naissance</label><select aria-describedby="id_birth_place_helptext" class="form-select django-select2" data-ajax--cache="true" data-ajax--type="GET" data-ajax--url="/autocomplete/communes" data-allow-clear="true" data-disable-target="#id_birth_country" data-minimum-input-length="1" data-placeholder="Nom de la commune" data-select2-link-with-birthdate="id_birthdate" data-target-value="91" data-theme="bootstrap-5" id="id_birth_place" lang="fr" name="birth_place">
+    <option value=""></option>
+  
+  </select><div class="form-text">La commune de naissance est obligatoire lorsque vous êtes né en France. Elle ne doit pas être renseignée si vous êtes né à l'étranger.</div>
+  </div>
+          <div class="form-group"><label class="form-label" for="id_birth_country">Pays de naissance</label><select class="form-select" id="id_birth_country" name="birth_country">
+    <option selected="" value="">---------</option>
+  
+    <option value="152">AFGHANISTAN</option>
+  
+    <option value="301">BAHAMAS</option>
+  
+    <option value="12">BORA-BORA</option>
+  
+    <option value="102">BULGARIE</option>
+  
+    <option value="214">CONGO (REPUBLIQUE DEMOCRATIQUE)</option>
+  
+    <option value="92">DANEMARK</option>
+  
+    <option value="91">FRANCE</option>
+  
+    <option value="68">KOUMAC</option>
+  
+    <option value="126">PAYS-BAS</option>
+  
+    <option value="35">PUKAPUKA</option>
+  
+  </select></div>
   
           <div class="form-group mb-1 form-group-required">
               <label class="form-label" for="id_email">Adresse e-mail</label>
@@ -158,6 +187,18 @@
           <div class="form-group"><label class="form-label" for="id_last_name">Nom</label><input class="form-control" disabled="" id="id_last_name" name="last_name" placeholder="Nom" type="text" value="Doe"/></div>
           <div class="form-group"><label class="form-label" for="id_first_name">Prénom</label><input class="form-control" disabled="" id="id_first_name" name="first_name" placeholder="Prénom" type="text" value="Jane"/></div>
           <div class="form-group"><label class="form-label" for="id_birthdate">Date de naissance</label><input class="form-control" disabled="" id="id_birthdate" name="birthdate" placeholder="Date de naissance" type="text" value="01/01/1990"/></div>
+          <div class="form-group"><label class="form-label" for="id_birth_place">Commune de naissance</label><select class="form-select" disabled="" id="id_birth_place" name="birth_place">
+    <option value="">---------</option>
+  
+    <option selected="" value="57089">GEISPOLSHEIM</option>
+  
+  </select></div>
+          <div class="form-group"><label class="form-label" for="id_birth_country">Pays de naissance</label><select class="form-select" disabled="" id="id_birth_country" name="birth_country">
+    <option value="">---------</option>
+  
+    <option selected="" value="91">FRANCE</option>
+  
+  </select></div>
           <div class="form-group"><label class="form-label" for="id_nir">Numéro de sécurité sociale</label><input class="form-control" disabled="" id="id_nir" name="nir" placeholder="Numéro de sécurité sociale" type="text" value="290010101010125"/></div>
           <div class="form-group"><label class="form-label" for="id_email">Adresse e-mail</label><input class="form-control" disabled="" id="id_email" maxlength="320" name="email" placeholder="Adresse e-mail" type="email" value="jane.doe@test.local"/></div>
   
