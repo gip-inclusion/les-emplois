@@ -15,12 +15,6 @@ def client():
     )
 
 
-def _parse_date(date: str) -> datetime.date | None:
-    if date:
-        return datetime.date.fromisoformat(date)
-    return None
-
-
 def _build_params_from(job_seeker):
     jobseeker_profile = job_seeker.jobseeker_profile
     params = {
@@ -58,9 +52,10 @@ def has_required_info(job_seeker):
 
 def revenu_solidarite_active(client, job_seeker):
     response = _request(client, "/v2/revenu-solidarite-active", job_seeker)
+    certified = response["status"] == "beneficiaire"
     return {
-        "start_at": _parse_date(response["dateDebut"]),
-        "end_at": _parse_date(response["dateFin"]),
-        "is_certified": response["status"] == "beneficiaire",
+        "start_at": datetime.date.fromisoformat(response["dateDebut"]) if certified else None,
+        # Do not expose end_at, it’s always null.
+        "is_certified": certified,
         "raw_response": response,
     }
