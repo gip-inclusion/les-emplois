@@ -647,9 +647,9 @@ httpx==0.28.1 \
 huey==2.5.2 \
     --hash=sha256:df33db474c05414ed40ee2110e9df692369871734da22d74ffb035a4bd74047f
     # via -r requirements/test.txt
-identify==2.6.4 \
-    --hash=sha256:285a7d27e397652e8cafe537a6cc97dd470a970f48fb2e9d979aa38eae5513ac \
-    --hash=sha256:993b0f01b97e0568c179bb9196391ff391bfb88a99099dbf5ce392b68f42d0af
+identify==2.6.5 \
+    --hash=sha256:14181a47091eb75b337af4c23078c9d09225cd4c48929f521f3bf16b09d02566 \
+    --hash=sha256:c10b33f250e5bba374fae86fb57f3adcebf1161bce7cdf92031915fd480c13bc
     # via pre-commit
 idna==3.10 \
     --hash=sha256:12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9 \
