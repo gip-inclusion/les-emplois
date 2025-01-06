@@ -39,7 +39,7 @@ class AbstractEligibilityDiagnosisModelFactory(factory.django.DjangoModelFactory
         expired = factory.Trait(
             expires_at=factory.LazyFunction(lambda: timezone.localdate() - datetime.timedelta(days=1)),
             created_at=factory.LazyAttribute(
-                lambda obj: timezone.make_aware(faker.date_time(end_datetime=obj.expires_at))
+                lambda obj: faker.date_time(tzinfo=timezone.get_current_timezone(), end_datetime=obj.expires_at)
             ),
         )
 
