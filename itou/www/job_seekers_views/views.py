@@ -185,6 +185,8 @@ class JobSeekerListView(UserPassesTestMixin, ListView):
 
 
 class JobSeekerBaseView(TemplateView):
+    EXPECTED_SESSION_KIND = None
+
     def __init__(self):
         super().__init__()
         self.company = None
@@ -197,6 +199,11 @@ class JobSeekerBaseView(TemplateView):
     def setup(self, request, *args, session_uuid, hire_process=False, **kwargs):
         self.job_seeker_session = SessionNamespace(request.session, session_uuid)
         if not self.job_seeker_session.exists():
+            raise Http404
+        # Ensure we are performing the action (update, create…) the session was created for.
+        if (
+            session_kind := self.job_seeker_session.get("config").get("session_kind")
+        ) and session_kind != self.EXPECTED_SESSION_KIND:
             raise Http404
         self.is_gps = "gps" in request.GET and request.GET["gps"] == "true"
         if company_pk := self.job_seeker_session.get("apply", {}).get("company_pk"):
@@ -269,6 +276,7 @@ class JobSeekerForSenderBaseView(JobSeekerBaseView):
 
 class CheckNIRForJobSeekerView(JobSeekerBaseView):
     template_name = "job_seekers_views/step_check_job_seeker_nir.html"
+    EXPECTED_SESSION_KIND = "job-seeker-get-or-create-job-seeker"
 
     def __init__(self):
         super().__init__()
@@ -328,6 +336,7 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
 
 class CheckNIRForSenderView(JobSeekerForSenderBaseView):
     template_name = "job_seekers_views/step_check_job_seeker_nir.html"
+    EXPECTED_SESSION_KIND = "job-seeker-get-or-create-sender"
 
     def __init__(self):
         super().__init__()
@@ -779,7 +788,7 @@ class UpdateJobSeekerStartView(View):
         self.job_seeker_session = SessionNamespace.create_uuid_namespace(
             request.session,
             data={
-                "config": {"from_url": from_url},
+                "config": {"from_url": from_url, "session_kind": "job-seeker-update"},
                 "job_seeker_pk": job_seeker.pk,
                 "apply": {"company_pk": company.pk},
             },
@@ -794,6 +803,8 @@ class UpdateJobSeekerStartView(View):
 
 
 class UpdateJobSeekerBaseView(JobSeekerBaseView):
+    EXPECTED_SESSION_KIND = "job-seeker-update"
+
     def __init__(self):
         super().__init__()
         self.job_seeker_session = None
@@ -803,6 +814,7 @@ class UpdateJobSeekerBaseView(JobSeekerBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+
         self.job_seeker = get_object_or_404(
             self.get_job_seeker_queryset(), pk=self.job_seeker_session.get("job_seeker_pk")
         )

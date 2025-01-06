@@ -7,8 +7,10 @@ from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.asp.models import Commune, Country
 from itou.users.enums import Title
+from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params
 from tests.companies.factories import CompanyFactory
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import KNOWN_SESSION_KEYS
 
@@ -188,6 +190,30 @@ class TestCreateForSender:
             html=True,
             count=1,
         )
+
+
+class TestUpdateJobSeeker:
+    def test_update_with_wrong_tunnel_in_session(self, client):
+        job_seeker = JobSeekerFactory()
+        company = CompanyFactory(with_membership=True)
+        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        client.force_login(prescriber)
+
+        # Create a session with a wrong tunnel key
+        job_seeker_session = SessionNamespace.create_uuid_namespace(
+            client.session,
+            data={
+                "config": {"from_url": reverse("dashboard:index"), "session_kind": "job-seeker-get-or-create-sender"},
+                "job_seeker_pk": job_seeker.pk,
+                "apply": {"company_pk": company.pk},
+            },
+        )
+        job_seeker_session.save()
+
+        url = reverse("job_seekers_views:update_job_seeker_step_1", kwargs={"session_uuid": job_seeker_session.name})
+        response = client.get(url)
+
+        assert response.status_code == 404
 
 
 class TestUpdateJobSeekerStart:
