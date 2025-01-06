@@ -9,13 +9,15 @@ from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertFormError, assertMessages, assertRedirects
 
+from itou.asp.models import Commune
 from itou.openid_connect.france_connect import constants as fc_constants
-from itou.users.enums import UserKind
+from itou.users.enums import Title, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.signup.forms import JobSeekerSituationForm
-from tests.cities.factories import create_test_cities
+from tests.asp.factories import CountryEuropeFactory, CountryFranceFactory
+from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from tests.utils.test import parse_response_to_soup, reload_module
@@ -87,7 +89,7 @@ class TestJobSeekerSignup:
         response = client.get(url)
         assert response.status_code == 200
 
-        job_seeker_data = JobSeekerFactory.build()
+        job_seeker_data = JobSeekerFactory.build(born_in_france=True)
         post_data = {
             "nir": nir,
             "title": job_seeker_data.title,
@@ -95,6 +97,8 @@ class TestJobSeekerSignup:
             "last_name": job_seeker_data.last_name,
             "email": job_seeker_data.email,
             "birthdate": job_seeker_data.jobseeker_profile.birthdate,
+            "birth_place": job_seeker_data.jobseeker_profile.birth_place_id,
+            "birth_country": job_seeker_data.jobseeker_profile.birth_country_id,
             **extra_signup_kwargs,
         }
 
@@ -243,7 +247,7 @@ class TestJobSeekerSignup:
     def test_job_seeker_signup_temporary_nir_invalid_birthdate(self, client):
         nir = "1234567895GHTUI"
 
-        job_seeker_data = JobSeekerFactory.build()
+        job_seeker_data = JobSeekerFactory.build(born_in_france=True)
         post_data = {
             "nir": nir,
             "title": job_seeker_data.title,
@@ -251,6 +255,8 @@ class TestJobSeekerSignup:
             "last_name": job_seeker_data.last_name,
             "email": job_seeker_data.email,
             "birthdate": "Invalid birthdate",
+            "birth_place": job_seeker_data.jobseeker_profile.birth_place_id,
+            "birth_country": job_seeker_data.jobseeker_profile.birth_country_id,
         }
 
         url = reverse("signup:job_seeker")
@@ -270,7 +276,7 @@ class TestJobSeekerSignup:
         }
 
     def test_job_seeker_signup_with_existing_email(self, client):
-        alice = JobSeekerFactory(email="alice@evil.com")
+        alice = JobSeekerFactory(email="alice@evil.com", born_in_france=True)
         url = reverse("signup:job_seeker")
         response = client.post(
             url,
@@ -280,6 +286,8 @@ class TestJobSeekerSignup:
                 "last_name": "Evil",
                 "email": "alice@evil.com",
                 "birthdate": alice.jobseeker_profile.birthdate,
+                "birth_place": alice.jobseeker_profile.birth_place_id,
+                "birth_country": alice.jobseeker_profile.birth_country_id,
                 "nir": "141068078200557",
             },
         )
@@ -300,13 +308,18 @@ class TestJobSeekerSignup:
         assert response.status_code == 200
 
         job_seeker_data = JobSeekerFactory.build(for_snapshot=True)
+        birth_country = CountryFranceFactory()
+        geispolsheim = create_city_geispolsheim()
+        birthdate = job_seeker_data.jobseeker_profile.birthdate
         post_data = {
             "nir": job_seeker_data.jobseeker_profile.nir,
             "title": job_seeker_data.title,
             "first_name": job_seeker_data.first_name,
             "last_name": job_seeker_data.last_name,
             "email": job_seeker_data.email,
-            "birthdate": job_seeker_data.jobseeker_profile.birthdate,
+            "birthdate": birthdate,
+            "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+            "birth_country": birth_country.pk,
         }
 
         response = client.post(url, data=post_data)
@@ -333,6 +346,147 @@ class TestJobSeekerSignup:
         form = parse_response_to_soup(response, selector="form.js-prevent-multiple-submit")
         assert str(form) == snapshot
 
+    def test_born_in_france_shows_in_job_seeker_credentials(self, client):
+        job_seeker_data = JobSeekerFactory.build()
+        geispolsheim = create_city_geispolsheim()
+        birthdate = job_seeker_data.jobseeker_profile.birthdate
+        birth_place = Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate)
+        birth_country = CountryFranceFactory()
+        response = client.post(
+            reverse("signup:job_seeker"),
+            {
+                "nir": job_seeker_data.jobseeker_profile.nir,
+                "title": job_seeker_data.title,
+                "first_name": job_seeker_data.first_name,
+                "last_name": job_seeker_data.last_name,
+                "email": job_seeker_data.email,
+                "birthdate": birthdate,
+                "birth_place": birth_place.pk,
+                "birth_country": birth_country.pk,
+            },
+        )
+        assertRedirects(response, reverse("signup:job_seeker_credentials"), fetch_redirect_response=False)
+        response = client.get(response.url)
+        assertContains(
+            response,
+            # <select> are disabled, the whole queryset for birth_place isn’t sent.
+            """
+            <div class="form-group">
+            <label class="form-label" for="id_birth_place">Commune de naissance</label>
+            <select name="birth_place" class="form-select" disabled id="id_birth_place">
+                <option value="">---------</option>
+                <option value="57089" selected>GEISPOLSHEIM</option>
+            </select>
+            </div>
+            <div class="form-group">
+            <label class="form-label" for="id_birth_country">Pays de naissance</label>
+            <select name="birth_country" class="form-select" disabled id="id_birth_country">
+                <option value="">---------</option>
+                <option value="91" selected>FRANCE</option>
+            </select>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        response = client.post(
+            reverse("signup:job_seeker_credentials"),
+            {
+                # Changes for disabled fields are ignored.
+                "nir": "111111111111120",
+                "title": Title.M,
+                "first_name": "Léon",
+                "last_name": "Nettoyeur",
+                "email": "leon@w3.blizz",
+                "birthdate": "1911-11-02",
+                "birth_place": Commune.objects.exclude(code=geispolsheim.code_insee).first().pk,
+                "birth_country": CountryEuropeFactory().pk,
+                # Actual payload.
+                "password1": DEFAULT_PASSWORD,
+                "password2": DEFAULT_PASSWORD,
+            },
+        )
+        assertRedirects(response, reverse("account_email_verification_sent"), fetch_redirect_response=False)
+        user = User.objects.select_related("jobseeker_profile").get()
+        assert user.title == job_seeker_data.title
+        assert user.first_name == job_seeker_data.first_name
+        assert user.last_name == job_seeker_data.last_name
+        assert user.email == job_seeker_data.email
+        assert user.jobseeker_profile.nir == job_seeker_data.jobseeker_profile.nir
+        assert user.jobseeker_profile.birthdate == job_seeker_data.jobseeker_profile.birthdate
+        assert user.jobseeker_profile.birth_place_id == birth_place.pk
+        assert user.jobseeker_profile.birth_country_id == birth_country.pk
+
+    def test_born_in_france_no_birthplace(self, client):
+        job_seeker_data = JobSeekerFactory.build(born_in_france=True)
+        response = client.post(
+            reverse("signup:job_seeker"),
+            {
+                "nir": job_seeker_data.jobseeker_profile.nir,
+                "title": job_seeker_data.title,
+                "first_name": job_seeker_data.first_name,
+                "last_name": job_seeker_data.last_name,
+                "email": job_seeker_data.email,
+                "birthdate": job_seeker_data.jobseeker_profile.birthdate,
+                # Missing birth_place.
+                "birth_country": job_seeker_data.jobseeker_profile.birth_country_id,
+            },
+        )
+        assertContains(
+            response,
+            """<div class="form-text">
+                La commune de naissance est obligatoire lorsque vous êtes né en France.
+                Elle ne doit pas être renseignée si vous êtes né à l'étranger.
+            </div>""",
+            html=True,
+            count=1,
+        )
+        assertContains(
+            response,
+            """
+            <div class="alert alert-danger" role="alert">
+            Si le pays de naissance est la France, la commune de naissance est obligatoire.
+            </div>""",
+            html=True,
+            count=1,
+        )
+
+    def test_born_outside_of_france_specifies_birth_place(self, client, mocker):
+        job_seeker_data = JobSeekerFactory.build()
+        geispolsheim = create_city_geispolsheim()
+        birthdate = job_seeker_data.jobseeker_profile.birthdate
+        response = client.post(
+            reverse("signup:job_seeker"),
+            {
+                "nir": job_seeker_data.jobseeker_profile.nir,
+                "title": job_seeker_data.title,
+                "first_name": job_seeker_data.first_name,
+                "last_name": job_seeker_data.last_name,
+                "email": job_seeker_data.email,
+                "birthdate": birthdate,
+                "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).pk,
+                "birth_country": CountryEuropeFactory().pk,
+            },
+        )
+        assertContains(
+            response,
+            """<div class="form-text">
+                La commune de naissance est obligatoire lorsque vous êtes né en France.
+                Elle ne doit pas être renseignée si vous êtes né à l'étranger.
+            </div>""",
+            html=True,
+            count=1,
+        )
+        assertContains(
+            response,
+            """
+            <div class="alert alert-danger" role="alert">
+            Il n'est pas possible de saisir une commune de naissance hors de France.
+            </div>""",
+            html=True,
+            count=1,
+        )
+
     @respx.mock
     @override_settings(
         FRANCE_CONNECT_BASE_URL="https://france.connect.fake",
@@ -344,7 +498,7 @@ class TestJobSeekerSignup:
         # NIR is set on a previous step and tested separately.
         # See self.test_job_seeker_signup
         nir = "141068078200557"
-        job_seeker_data = JobSeekerFactory.build()
+        job_seeker_data = JobSeekerFactory.build(born_in_france=True)
         post_data = {
             "nir": nir,
             "title": job_seeker_data.title,
@@ -352,6 +506,8 @@ class TestJobSeekerSignup:
             "last_name": job_seeker_data.last_name,
             "email": job_seeker_data.email,
             "birthdate": job_seeker_data.jobseeker_profile.birthdate,
+            "birth_place": job_seeker_data.jobseeker_profile.birth_place_id,
+            "birth_country": job_seeker_data.jobseeker_profile.birth_country_id,
         }
         response = client.post(reverse("signup:job_seeker"), data=post_data)
         assertRedirects(response, reverse("signup:job_seeker_credentials"))
@@ -384,7 +540,7 @@ class TestJobSeekerSignup:
         # See self.test_job_seeker_temporary_nir
 
         nir = ""
-        job_seeker_data = JobSeekerFactory.build()
+        job_seeker_data = JobSeekerFactory.build(born_in_france=True)
         post_data = {
             "nir": nir,
             "title": job_seeker_data.title,
@@ -392,6 +548,8 @@ class TestJobSeekerSignup:
             "last_name": job_seeker_data.last_name,
             "email": job_seeker_data.email,
             "birthdate": job_seeker_data.jobseeker_profile.birthdate,
+            "birth_place": job_seeker_data.jobseeker_profile.birth_place_id,
+            "birth_country": job_seeker_data.jobseeker_profile.birth_country_id,
             "skip": 1,
         }
         response = client.post(reverse("signup:job_seeker"), data=post_data)
@@ -511,7 +669,7 @@ class TestJobSeekerSignup:
         assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
 
     def test_job_seeker_signup_birth_fields_conflict_temporary_nir(self, client, snapshot):
-        existing_user = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="")
+        existing_user = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="", born_in_france=True)
 
         post_data = {
             "nir": "1234567895GHTUI",
@@ -520,6 +678,8 @@ class TestJobSeekerSignup:
             "last_name": existing_user.last_name,
             "email": "afreshemail@adomain.org",  # no email conflict
             "birthdate": str(existing_user.jobseeker_profile.birthdate),
+            "birth_place": existing_user.jobseeker_profile.birth_place_id,
+            "birth_country": existing_user.jobseeker_profile.birth_country_id,
             "skip": 1,
         }
 
@@ -534,7 +694,7 @@ class TestJobSeekerSignup:
         assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
 
     def test_job_seeker_signup_birth_fields_conflict_redefine_nir(self, client, snapshot):
-        existing_user = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="")
+        existing_user = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="", born_in_france=True)
 
         post_data = {
             "nir": "141068078200557",
@@ -543,6 +703,8 @@ class TestJobSeekerSignup:
             "last_name": existing_user.last_name,
             "email": "afreshemail@adomain.org",  # no email conflict
             "birthdate": str(existing_user.jobseeker_profile.birthdate),
+            "birth_place": existing_user.jobseeker_profile.birth_place_id,
+            "birth_country": existing_user.jobseeker_profile.birth_country_id,
         }
 
         response = client.post(reverse("signup:job_seeker"), post_data, follow=True)
