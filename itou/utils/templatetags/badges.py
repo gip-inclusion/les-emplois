@@ -56,7 +56,7 @@ def approval_state_badge(
         }[approval_state]
     else:
         span_class = {
-            ApprovalStatus.EXPIRED: "bg-emploi-light text-primary",
+            ApprovalStatus.EXPIRED: "bg-danger-lighter text-danger",
             ApprovalStatus.FUTURE: "bg-success-lighter text-success",
             ApprovalStatus.SUSPENDED: "bg-success-lighter text-success",
             ApprovalStatus.VALID: "bg-success-lighter text-success",

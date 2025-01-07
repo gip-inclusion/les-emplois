@@ -227,7 +227,7 @@ class TestApprovalsListView:
         )
         assertContains(
             response,
-            """<span class="badge badge-sm text-wrap rounded-pill bg-emploi-light text-primary">
+            """<span class="badge badge-sm text-wrap rounded-pill bg-danger-lighter text-danger">
                 <i class="ri-pass-expired-line ri-xl" aria-hidden="true"></i>
                 PASS IAE expiré
             </span>""",
