@@ -251,16 +251,6 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     margin: 0 auto;
 }
 
-.s-section-twocolumns {
-    height: 100%;
-}
-
-@media (min-width: 992px) {
-    .s-section-twocolumns .w-md-auto {
-        width: auto !important;
-    }
-}
-
 .approval-left-border {
     border-left-width: 3px !important;
 }
