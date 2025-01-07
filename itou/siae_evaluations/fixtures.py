@@ -104,6 +104,8 @@ def load_data():
                 author_siae=controlled_siae,
                 job_seeker=job_seeker,
                 created_at=datetime_within_period_range,
+                expires_at=timezone.localdate(datetime_within_period_range)
+                + EligibilityDiagnosis.EMPLOYER_DIAGNOSIS_VALIDITY_TIMEDELTA,
             )
             for criterion_pk in pks_list:
                 eligibility_diagnosis.administrative_criteria.add(criterion_pk)
