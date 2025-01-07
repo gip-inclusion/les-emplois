@@ -202,9 +202,6 @@ class ItouPasswordChangeView(PasswordChangeView):
     success_url = reverse_lazy("dashboard:index")
 
 
-password_change = ItouPasswordChangeView.as_view()
-
-
 def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
     if request.user.has_sso_provider:
         return HttpResponseForbidden()

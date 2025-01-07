@@ -35,7 +35,7 @@ urlpatterns = [
     # Override allauth `account_change_password` URL.
     # /accounts/password/change/ <=> account_change_password
     # https://github.com/pennersr/django-allauth/issues/468
-    re_path(r"^accounts/password/change/$", dashboard_views.password_change),
+    re_path(r"^accounts/password/change/$", dashboard_views.ItouPasswordChangeView.as_view()),
     # --------------------------------------------------------------------------------------
     # Override allauth `account_reset_password` URL.
     # Avoid user enumeration via password reset page.
