@@ -1,5 +1,16 @@
 # Journal des modifications
 
+## 2025-01-06
+
+### Ajouté
+
+- [Permissions : Création de groupes pour l'administration de GPS et Pilotage](https://github.com/gip-inclusion/les-emplois/pull/5309) 🖼
+
+### Modifié
+
+- [Admin : Renseigner le champ `User.created_by` lors de la création](https://github.com/gip-inclusion/les-emplois/pull/5321)
+- [CGU : Changement de l'adresse de contact du DPO](https://github.com/gip-inclusion/les-emplois/pull/5325)
+
 ## 2024-12-30
 
 Rien à signaler cette semaine
