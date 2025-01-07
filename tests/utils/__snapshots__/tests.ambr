@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_approval_state_badge[expired]
   '''
-              <span class="badge badge-sm rounded-pill bg-emploi-light text-primary">
+              <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger">
                   <i class="ri-pass-expired-line" aria-hidden="true"></i>
                   PASS IAE expiré
               </span>
