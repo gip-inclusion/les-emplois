@@ -60,9 +60,9 @@ def test_normalize_field_to_field_name():
     assert Client._normalize_field_to_field_name("42", columns_metadata) == "foo"
     assert Client._normalize_field_to_field_name(42, columns_metadata) == "foo"
     with pytest.raises(RuntimeError, match="field_id=21 was not found in columns metadata"):
-        assert Client._normalize_field_to_field_name(21, columns_metadata) is None
+        Client._normalize_field_to_field_name(21, columns_metadata)
     with pytest.raises(RuntimeError, match="field_id=21 was not found in columns metadata"):
-        assert Client._normalize_field_to_field_name("21", columns_metadata) is None
+        Client._normalize_field_to_field_name("21", columns_metadata)
 
 
 def test_transform_metabase_results_shortcut():
@@ -70,17 +70,8 @@ def test_transform_metabase_results_shortcut():
     assert Client.transform_metabase_results({"rows": None}) == []
     # Single value
     assert Client.transform_metabase_results({"rows": [["Value 1"]]}, single_value=True) == "Value 1"
-    # Single value, single group by
-    results = {
-        "rows": [
-            ["Value 1", 1],
-            ["Value 2", 2],
-        ],
-    }
-    assert Client.transform_metabase_results(results, single_value=True, group_by=[None]) == {
-        "Value 1": 1,
-        "Value 2": 2,
-    }
+    # Single value, no rows
+    assert Client.transform_metabase_results({"rows": None}, single_value=True) is None
 
 
 def test_transform_metabase_results(data_results):
@@ -91,6 +82,10 @@ def test_transform_metabase_results(data_results):
     assert Client.transform_metabase_results(data_results, group_by=[1]) == {
         "Value 1": {"Col 1": "Value 1", "Col 2": 1, "Col 3": 1.0},
         "Value 2": {"Col 1": "Value 2", "Col 2": 2, "Col 3": 2.0},
+    }
+    assert Client.transform_metabase_results(data_results, group_by=["Col 2"], single_value=True) == {
+        1: 1.0,
+        2: 2.0,
     }
     assert Client.transform_metabase_results(data_results, group_by=[1, "Col 2"]) == {
         ("Value 1", 1): {"Col 1": "Value 1", "Col 2": 1, "Col 3": 1.0},

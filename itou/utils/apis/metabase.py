@@ -373,11 +373,9 @@ class Client:
     @staticmethod
     def transform_metabase_results(results, group_by=None, *, single_value=False):
         if not results["rows"]:
-            return []
+            return None if single_value else []
         if single_value and not group_by:
             return results["rows"][0][0]
-        if single_value and len(group_by) == 1:
-            return dict(results["rows"])
 
         column_names = [col["name"] for col in results["cols"]]
         transformed_results = [dict(zip(column_names, row)) for row in results["rows"]]
