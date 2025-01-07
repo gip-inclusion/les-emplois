@@ -361,6 +361,10 @@ ITOU_EMAIL_CONTACT = os.getenv("ITOU_EMAIL_CONTACT", "assistance@inclusion.beta.
 API_EMAIL_CONTACT = os.getenv("API_EMAIL_CONTACT", "api.emplois@inclusion.gouv.fr")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@inclusion.beta.gouv.fr")
 
+EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
+EMAIL_ADDRESS_MAX_LENGTH = 254
+EMAIL_CONFIRMATION_SALT = os.getenv("EMAIL_CONFIRMATION_SALT", "account")
+
 # Sentry
 # Expose the value through the settings_viewer app.
 SENTRY_DSN = os.getenv("SENTRY_DSN")

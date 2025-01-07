@@ -11,7 +11,8 @@ from django.urls import path
 from django.utils.html import format_html
 from django.utils.text import Truncator
 
-from itou.emails.models import Email
+from itou.emails import models
+from itou.utils.admin import ItouModelAdmin
 
 
 class EmailStatusFilter(admin.SimpleListFilter):
@@ -33,7 +34,7 @@ class EmailStatusFilter(admin.SimpleListFilter):
         return queryset
 
 
-@admin.register(Email)
+@admin.register(models.Email)
 class EmailAdmin(admin.ModelAdmin):
     class Media:
         css = {"all": ("css/itou-admin.css",)}
@@ -113,3 +114,17 @@ class EmailAdmin(admin.ModelAdmin):
             .raise_for_status()
             .json()
         )
+
+
+@admin.register(models.EmailAddress)
+class EmailAddressAdmin(ItouModelAdmin):
+    list_display = ["email", "user", "verified"]
+    list_filter = ["verified"]
+    search_fields = ["email", "user__first_name", "user__last_name"]
+    raw_id_fields = ["user"]
+    actions = ["make_verified"]
+
+    def make_verified(self, request, queryset):
+        queryset.update(verified=True)
+
+    make_verified.short_description = "Marquer les adresses e-mail sélectionnées comme vérifiées"  # type: ignore[attr-defined]
