@@ -1,5 +1,9 @@
 # Journal des modifications
 
+## 2024-12-30
+
+Rien à signaler cette semaine
+
 ## 2024-12-23
 
 ### Modifié
