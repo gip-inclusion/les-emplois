@@ -243,8 +243,8 @@ class TestEmailNotification:
             email_notification(self.user, self.organization).send()
 
         assert caplog.messages == ["Send email copy to admin, admin_count=2"]
-        assert len(mailoutbox) == 2
-        assert set(mailoutbox[0].to + mailoutbox[1].to) == {admin_1.email, admin_2.email}
+        assert len(mailoutbox) == 3
+        assert set(sum((mail.to for mail in mailoutbox), [])) == {admin_1.email, admin_2.email, self.user.email}
         assert (
             f"Vous recevez cet e-mail parce que l'utilisateur {self.user.get_full_name()} ({self.user.email})"
             " ne fait plus partie de votre organisation." in mailoutbox[0].body
@@ -281,8 +281,8 @@ class TestEmailNotification:
             email_notification(user, company).send()
 
         assert caplog.messages == ["Send email copy to admin, admin_count=2"]
-        assert len(mailoutbox) == 2
-        assert set(mailoutbox[0].to + mailoutbox[1].to) == {admin_1.email, admin_2.email}
+        assert len(mailoutbox) == 3
+        assert set(sum((mail.to for mail in mailoutbox), [])) == {admin_1.email, admin_2.email, user.email}
         assert (
             f"Vous recevez cet e-mail parce que l'utilisateur {user.get_full_name()} ({user.email})"
             " ne fait plus partie de votre structure." in mailoutbox[0].body

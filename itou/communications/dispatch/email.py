@@ -42,6 +42,5 @@ class EmailNotification(BaseNotification):
                 logger.info("Send email copy to admin, admin_count=%d", len(admins))
                 for admin in admins:
                     self.__class__(admin, self.structure, self.user, **self.context).send()
-                return
         if self.should_send():
             self.build().send()
