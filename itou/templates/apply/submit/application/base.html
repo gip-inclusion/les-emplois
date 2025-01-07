@@ -30,19 +30,17 @@
 
 {% block title_content %}
     {% if not job_app_to_transfer|default:False %}
-        <div class="w-100 w-lg-66">
-            <div class="d-flex align-items-center">
-                <h1 class="flex-grow-1">{% include 'apply/includes/_submit_title.html' %}</h1>
-                <div>{% include 'apply/includes/eligibility_badge.html' %}</div>
-            </div>
-            <p>
-                Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}
-                {% if can_view_personal_information and not request.user.is_job_seeker %}
-                    <a class="btn btn-link" href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker=job_seeker.public_id company=siae.pk from_url=request.get_full_path|urlencode %}">Vérifier le profil</a>
-                {% endif %}
-                {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning"></i>{% endif %}
-            </p>
+        <div class="d-xl-flex align-items-xl-center">
+            <h1 class="mb-0 me-3 text-md-nowrap">{% include 'apply/includes/_submit_title.html' %}</h1>
+            {% include 'apply/includes/eligibility_badge.html' %}
         </div>
+        <p>
+            Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}
+            {% if can_view_personal_information and not request.user.is_job_seeker %}
+                <a class="btn-link ms-3" href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker=job_seeker.public_id company=siae.pk from_url=request.get_full_path|urlencode %}">Vérifier le profil</a>
+            {% endif %}
+            {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning"></i>{% endif %}
+        </p>
     {% endif %}
 {% endblock %}
 
@@ -73,14 +71,10 @@
                 </div>
             {% endif %}
             <div class="row">
-                <div class="col-12{% if not full_content_width %} col-lg-8{% endif %}">
+                <div class="col-12 col-lg-8">
                     <div class="c-form">
-                        <div class="col-12 p-0 {% if full_content_width %}col-lg-8 pe-lg-4{% endif %}">
-                            {% include "companies/includes/_company_info.html" with company=siae show_cta=True extra_box_class="mb-3 mb-lg-5" open_in_tab=True only %}
-                        </div>
-                        <div class="col-12 p-0 {% if full_content_width %}col-lg-8 pe-lg-4{% endif %}">
-                            {% block pre_step_title %}{% endblock %}
-                        </div>
+                        {% include "companies/includes/_company_info.html" with company=siae show_cta=True extra_box_class="mb-3 mb-lg-5" open_in_tab=True only %}
+                        {% block pre_step_title %}{% endblock %}
                         <h2>
                             {% block step_title %}{% endblock %}
                         </h2>

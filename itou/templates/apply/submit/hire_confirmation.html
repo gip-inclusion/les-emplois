@@ -3,8 +3,10 @@
 {% load static %}
 
 {% block title_content %}
-    {{ block.super }}
-    <div>{% include 'apply/includes/eligibility_badge.html' %}</div>
+    <div class="d-md-flex align-items-center mb-3">
+        <h1 class="mb-1 mb-md-0 me-3">{% include 'apply/includes/_submit_title.html' %}</h1>
+        {% include 'apply/includes/eligibility_badge.html' %}
+    </div>
 {% endblock %}
 
 {% block content_extend %}

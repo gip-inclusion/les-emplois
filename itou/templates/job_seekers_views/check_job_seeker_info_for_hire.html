@@ -3,10 +3,10 @@
 {% load buttons_form %}
 
 {% block title_content %}
-    <h1>
-        Informations personnelles de <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>
-    </h1>
-    <div>{% include 'apply/includes/eligibility_badge.html' %}</div>
+    <div class="d-xl-flex align-items-xl-center">
+        <h1 class="mb-0 me-3 text-md-nowrap">Informations personnelles de {{ job_seeker.get_full_name|title }}</h1>
+        {% include 'apply/includes/eligibility_badge.html' %}
+    </div>
     <p>Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}</p>
 {% endblock %}
 
