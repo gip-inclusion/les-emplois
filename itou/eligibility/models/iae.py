@@ -114,6 +114,8 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
     Store the eligibility diagnosis (IAE) of a job seeker.
     """
 
+    EMPLOYER_DIAGNOSIS_VALIDITY_TIMEDELTA = datetime.timedelta(days=92)
+
     # Not in abstract model to avoid 'related_name' clashing (and ugly auto-naming)
     job_seeker = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -171,7 +173,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
             # For siae_evaluations, employers must provide a proof for administrative criteria
             # supporting the hire. A proof is valid for 3 months, align employer diagnosis
             # duration with proof validity duration.
-            return now + datetime.timedelta(days=92)
+            return now + cls.EMPLOYER_DIAGNOSIS_VALIDITY_TIMEDELTA
         return now + relativedelta(months=cls.EXPIRATION_DELAY_MONTHS)
 
     @classmethod

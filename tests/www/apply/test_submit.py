@@ -2818,7 +2818,7 @@ class TestDirectHireFullProcess:
         )
         assert response.url == next_url
         diag = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=new_job_seeker, for_siae=company)
-        assert diag.expires_at == timezone.localdate() + datetime.timedelta(days=92)
+        assert diag.expires_at == timezone.localdate() + EligibilityDiagnosis.EMPLOYER_DIAGNOSIS_VALIDITY_TIMEDELTA
 
         # Hire confirmation
         # ----------------------------------------------------------------------
