@@ -4,59 +4,45 @@
     <div class="s-section__container container">
         <div class="row">
             <div class="col-12 col-lg-8">
-                <div class="c-stepper col-12">
+                <div class="c-stepper mb-4">
                     <div class="progress progress--emploi mb-2">{% include "apply/includes/geiq/progress_bar.html" %}</div>
                     <span>Embauche - Eligibilité GEIQ</span>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+        <div class="row">
+            <div class="col-12 col-lg-8">
+                <div class="c-box">
+                    {% include "companies/includes/_company_info.html" with company=siae show_cta=True extra_box_class="mb-3 mb-lg-5" only %}
 
-<section class="s-section">
-    <div class="s-section__container container">
-        <div class="c-box">
-            <div class="col-12 ps-lg-0">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-7 pt-4">
-                            {% block siae_card %}
-                                {% include "apply/includes/siae_card.html" with siae=siae full_content_width=False only %}
-                            {% endblock %}
-                        </div>
-                    </div>
-                    <div class="row pt-4">
-                        <div class="col-7">
-                            <h2>Souhaitez-vous préciser la situation administrative du candidat ?</h2>
-                            <p>
-                                Si vous souhaitez bénéficier de l’aide à l’accompagnement, veuillez renseigner les critères du candidat ci-dessous et vous assurer de pouvoir fournir les justificatifs associés.
-                            </p>
-                            <form id="check_geiq_eligibility" hx-target="#geiq_form">
-                                {% csrf_token %}
-                                {% bootstrap_field form.choice form_check_class="form-check-inline me-4" show_label=False %}
-                            </form>
-                        </div>
-                        <div class="col">{% include "apply/includes/geiq/legislative_text_link.html" %}</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-7">
-                            <div id="form_errors"></div>
-                            <form action="{{ geiq_criteria_form_url }}" method="post" hx-target="#geiq_form">
-                                {% csrf_token %}
-                                <div id="geiq_form">
-                                    <hr class="mb-3">
-                                    <div class="form-row align-items-center justify-content-end gx-3">
-                                        <div class="form-group col-12 col-lg order-3 order-lg-1">
-                                            <a href="{{ back_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
-                                                <i class="ri-close-line ri-lg" aria-hidden="true"></i>
-                                                <span>Annuler</span>
-                                            </a>
-                                        </div>
+                    <h2>Souhaitez-vous préciser la situation administrative du candidat ?</h2>
+                    <p>
+                        Si vous souhaitez bénéficier de l’aide à l’accompagnement, veuillez renseigner les critères du candidat ci-dessous et vous assurer de pouvoir fournir les justificatifs associés.
+                    </p>
+                    <form id="check_geiq_eligibility" hx-target="#geiq_form">
+                        {% csrf_token %}
+                        {% bootstrap_field form.choice form_check_class="form-check-inline me-4" show_label=False %}
+                    </form>
+                    {% include "apply/includes/geiq/legislative_text_link.html" %}
+
+                    <div class="mt-4">
+                        <div id="form_errors"></div>
+                        <form action="{{ geiq_criteria_form_url }}" method="post" hx-target="#geiq_form">
+                            {% csrf_token %}
+                            <div id="geiq_form">
+                                <hr class="mb-3">
+                                <div class="form-row align-items-center justify-content-end gx-3">
+                                    <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                        <a href="{{ back_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
+                                            <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                                            <span>Annuler</span>
+                                        </a>
                                     </div>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
+
                 </div>
             </div>
         </div>

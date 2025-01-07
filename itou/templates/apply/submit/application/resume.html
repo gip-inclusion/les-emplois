@@ -116,122 +116,115 @@
 {% endblock %}
 
 {% block form_content %}
-    <div class="row">
-        <div class="col-12 col-lg-8">{% bootstrap_field form.message %}</div>
-        <div class="col-12 col-lg-4">
-            <div class="c-form-conseil">
-                <div>
+    {% bootstrap_field form.message %}
+    <div class="c-info mb-4">
+        <span class="c-info__summary">Bon à savoir</span>
+        <div class="c-info__detail">
+            {% if auto_prescription_process %}
+                <p class="mb-0">Précisez dans le message :</p>
+                <ul class="mb-0">
+                    <li>les motivations du candidat,</li>
+                    <li>ses compétences,</li>
+                    <li>ses disponibilités</li>
+                </ul>
+            {% elif request.user.is_job_seeker %}
+                <p class="mb-0">
+                    Pour retenir l’attention du recruteur, décrivez votre situation,
+                    votre parcours, vos compétences et expliquez les freins socio-professionnels rencontrés.
+                </p>
+                {% if is_subject_to_eligibility_rules %}
                     <p class="mb-0">
-                        <i class="ri-lightbulb-line ri-lg me-1"></i><strong>Bon à savoir</strong>
+                        Vous pouvez vous appuyer sur le document
+                        <a class="has-external-link"
+                           href="https://communaute.inclusion.beta.gouv.fr/surveys/dsp/create/"
+                           target="_blank"
+                           rel="noreferrer noopener"
+                           aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
                     </p>
-                    {% if auto_prescription_process %}
-                        <p class="mb-0">Précisez dans le message :</p>
-                        <ul class="mb-0">
-                            <li>les motivations du candidat,</li>
-                            <li>ses compétences,</li>
-                            <li>ses disponibilités</li>
-                        </ul>
-                    {% elif request.user.is_job_seeker %}
-                        <p class="mb-0">
-                            Pour retenir l’attention du recruteur, décrivez votre situation,
-                            votre parcours, vos compétences et expliquez les freins socio-professionnels rencontrés.
-                        </p>
-                        {% if is_subject_to_eligibility_rules %}
-                            <p class="mb-0">
-                                Vous pouvez vous appuyer sur le document
-                                <a class="text-important"
-                                   href="https://communaute.inclusion.beta.gouv.fr/surveys/dsp/create/"
-                                   target="_blank"
-                                   rel="noreferrer noopener"
-                                   aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
-                            </p>
-                        {% elif is_subject_to_geiq_eligibility_rules %}
-                            <p class="mb-0">
-                                Vous pouvez vous appuyer sur les conseils donnés sur
-                                <a href="https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire"
-                                   target="_blank"
-                                   rel="noreferrer noopener"
-                                   aria-label="Orienter un candidat vers un Geiq de votre territoire (ouverture dans un nouvel onglet)">https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire</a>.
-                            </p>
-                        {% endif %}
-                        <p class="mb-0">Précisez également dans le message, vos motivations, vos compétences ainsi que vos disponibilités.</p>
-                    {% elif is_subject_to_eligibility_rules or is_subject_to_geiq_eligibility_rules %}
-                        <p class="mb-0">
-                            Pour retenir l’attention du recruteur, décrivez la situation actuelle du candidat,
-                            son parcours, ses compétences et expliquez les freins socio-professionnels rencontrés.
-                        </p>
-                        {% if is_subject_to_eligibility_rules %}
-                            <p class="mb-0">
-                                Vous pouvez vous appuyer sur le document
-                                <a class="text-important"
-                                   href="https://communaute.inclusion.beta.gouv.fr/surveys/dsp/create/"
-                                   target="_blank"
-                                   rel="noreferrer noopener"
-                                   aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
-                            </p>
-                        {% elif is_subject_to_geiq_eligibility_rules %}
-                            <p class="mb-0">
-                                Vous pouvez vous appuyer sur les conseils donnés sur
-                                <a href="https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire"
-                                   target="_blank"
-                                   rel="noreferrer noopener"
-                                   aria-label="Orienter un candidat vers un Geiq de votre territoire (ouverture dans un nouvel onglet)">https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire</a>.
-                            </p>
-                        {% endif %}
-                        <p class="mb-0">Précisez également dans le message, ses motivations, ses compétences, ainsi que ses disponibilités.</p>
-                    {% else %}
-                        <p class="mb-0">Précisez dans le message :</p>
-                        <ul class="mb-0">
-                            <li>les motivations du candidat,</li>
-                            <li>ses compétences,</li>
-                            <li>ses disponibilités</li>
-                        </ul>
-                    {% endif %}
+                {% elif is_subject_to_geiq_eligibility_rules %}
+                    <p class="mb-0">
+                        Vous pouvez vous appuyer sur les conseils donnés sur
+                        <a class="has-external-link"
+                           href="https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire"
+                           target="_blank"
+                           rel="noreferrer noopener"
+                           aria-label="Orienter un candidat vers un Geiq de votre territoire (ouverture dans un nouvel onglet)">https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire</a>.
+                    </p>
+                {% endif %}
+                <p class="mb-0">Précisez également dans le message, vos motivations, vos compétences ainsi que vos disponibilités.</p>
+            {% elif is_subject_to_eligibility_rules or is_subject_to_geiq_eligibility_rules %}
+                <p class="mb-0">
+                    Pour retenir l’attention du recruteur, décrivez la situation actuelle du candidat,
+                    son parcours, ses compétences et expliquez les freins socio-professionnels rencontrés.
+                </p>
+                {% if is_subject_to_eligibility_rules %}
+                    <p class="mb-0">
+                        Vous pouvez vous appuyer sur le document
+                        <a class="has-external-link"
+                           href="https://communaute.inclusion.beta.gouv.fr/surveys/dsp/create/"
+                           target="_blank"
+                           rel="noreferrer noopener"
+                           aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+                    </p>
+                {% elif is_subject_to_geiq_eligibility_rules %}
+                    <p class="mb-0">
+                        Vous pouvez vous appuyer sur les conseils donnés sur
+                        <a class="has-external-link"
+                           href="https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire"
+                           target="_blank"
+                           rel="noreferrer noopener"
+                           aria-label="Orienter un candidat vers un Geiq de votre territoire (ouverture dans un nouvel onglet)">https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire</a>.
+                    </p>
+                {% endif %}
+                <p class="mb-0">Précisez également dans le message, ses motivations, ses compétences, ainsi que ses disponibilités.</p>
+            {% else %}
+                <p class="mb-0">Précisez dans le message :</p>
+                <ul class="mb-0">
+                    <li>les motivations du candidat,</li>
+                    <li>ses compétences,</li>
+                    <li>ses disponibilités</li>
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+
+    {% block form_resume_field %}
+        {% bootstrap_field form.resume %}
+    {% endblock %}
+    {% if prescription_process or request.user.is_job_seeker %}
+        <div class="c-info p-3 mb-4">
+            {% if prescription_process %}
+                <p class="fw-bold fs-sm mb-1">Ce candidat n’a pas encore de CV ?</p>
+                <p class="fs-sm mb-2">Accompagnez-le dans la création de son CV grâce à notre partenaire Diagoriente.</p>
+            {% else %}
+                <p class="fw-bold fs-sm mb-1">Vous n’avez pas de CV ?</p>
+                <p class="fs-sm mb-2">Créez-en un grâce à notre partenaire Diagoriente.</p>
+            {% endif %}
+            <a href="https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-{{ request.user.is_job_seeker|yesno:"candidat,prescripteur" }}"
+               rel="noopener"
+               target="_blank"
+               aria-label="Créer un CV avec Diagoriente (ouverture dans un nouvel onglet)"
+               class="btn btn-partner btn-partner--diagoriente fs-sm"
+               {% matomo_event "partners" "clic" "open_diagoriente" %}>Créer un CV avec Diagoriente</a>
+        </div>
+    {% endif %}
+    {% if resume_is_recommended %}
+        <div class="alert alert-warning" role="alert">
+            <div class="row">
+                <div class="col-auto pe-0">
+                    <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-2">
+                        <strong>Le CV est fortement recommandé</strong>
+                    </p>
+                    <p class="mb-0">
+                        L’ajout du Curriculum Vitae (CV) est fortement recommandé pour que la candidature soit étudiée par ce recruteur.
+                    </p>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-12 col-lg-8">
-            {% block form_resume_field %}
-                {% bootstrap_field form.resume %}
-            {% endblock %}
-            {% if prescription_process or request.user.is_job_seeker %}
-                <div class="c-info p-3 mb-4">
-                    {% if prescription_process %}
-                        <p class="fw-bold fs-sm mb-1">Ce candidat n’a pas encore de CV ?</p>
-                        <p class="fs-sm mb-2">Accompagnez-le dans la création de son CV grâce à notre partenaire Diagoriente.</p>
-                    {% else %}
-                        <p class="fw-bold fs-sm mb-1">Vous n’avez pas de CV ?</p>
-                        <p class="fs-sm mb-2">Créez-en un grâce à notre partenaire Diagoriente.</p>
-                    {% endif %}
-                    <a href="https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-{{ request.user.is_job_seeker|yesno:"candidat,prescripteur" }}"
-                       rel="noopener"
-                       target="_blank"
-                       aria-label="Créer un CV avec Diagoriente (ouverture dans un nouvel onglet)"
-                       class="btn btn-partner btn-partner--diagoriente fs-sm"
-                       {% matomo_event "partners" "clic" "open_diagoriente" %}>Créer un CV avec Diagoriente</a>
-                </div>
-            {% endif %}
-            {% if resume_is_recommended %}
-                <div class="alert alert-warning" role="alert">
-                    <div class="row">
-                        <div class="col-auto pe-0">
-                            <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-                        </div>
-                        <div class="col">
-                            <p class="mb-2">
-                                <strong>Le CV est fortement recommandé</strong>
-                            </p>
-                            <p class="mb-0">
-                                L’ajout du Curriculum Vitae (CV) est fortement recommandé pour que la candidature soit étudiée par ce recruteur.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-    </div>
+    {% endif %}
 {% endblock %}
 
 {% block form_submit_button %}

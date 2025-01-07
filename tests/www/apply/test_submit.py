@@ -3431,7 +3431,7 @@ class TestLastCheckedAtView:
         }
         update_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         link_check = assertContains if sees_verify_link else assertNotContains
-        link_check(response, f'<a class="btn btn-link" href="{update_url}">Vérifier le profil</a>', html=True)
+        link_check(response, f'<a class="btn-link ms-3" href="{update_url}">Vérifier le profil</a>', html=True)
         # Check last_checked_at is shown
         assertContains(response, "Dernière actualisation du profil : ")
         assertNotContains(response, "Merci de vérifier la validité des informations")
@@ -3441,7 +3441,7 @@ class TestLastCheckedAtView:
         response = client.get(url)
         warning_check = assertContains if sees_warning else assertNotContains
         warning_check(response, "Merci de vérifier la validité des informations")
-        link_check(response, f'<a class="btn btn-link" href="{update_url}">Vérifier le profil</a>', html=True)
+        link_check(response, f'<a class="btn-link ms-3" href="{update_url}">Vérifier le profil</a>', html=True)
 
     def test_company_employee(self, client):
         self._check_last_checked_at(client, self.company.members.first(), sees_warning=True, sees_verify_link=True)
@@ -5422,7 +5422,7 @@ class TestCheckJobSeekerInformationsForHire:
         response = client.get(url_check_infos)
         assertContains(
             response,
-            '<h1>Informations personnelles de <span class="text-muted">Son Prénom Son Nom De Famille</span></h1>',
+            '<h1 class="mb-0 me-3 text-md-nowrap">Informations personnelles de Son Prénom Son Nom De Famille</h1>',
             html=True,
         )
         assertTemplateNotUsed(response, "approvals/includes/box.html")
@@ -5467,7 +5467,7 @@ class TestCheckJobSeekerInformationsForHire:
         response = client.get(url_check_infos)
         assertContains(
             response,
-            '<h1>Informations personnelles de <span class="text-muted">Son Prénom Son Nom De Famille</span></h1>',
+            '<h1 class="mb-0 me-3 text-md-nowrap">Informations personnelles de Son Prénom Son Nom De Famille</h1>',
             html=True,
         )
         assertTemplateNotUsed(response, "approvals/includes/box.html")
