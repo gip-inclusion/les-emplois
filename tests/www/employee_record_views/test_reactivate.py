@@ -23,7 +23,7 @@ class TestReactivateEmployeeRecords:
 
     def test_reactivate_employee_record(self, client, faker):
         self.employee_record.ready()
-        self.employee_record.sent(faker.asp_batch_filename(), 1, None)
+        self.employee_record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
         self.employee_record.process(process_code, process_message, "{}")
         self.employee_record.disable()

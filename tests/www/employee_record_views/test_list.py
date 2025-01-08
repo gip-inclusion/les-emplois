@@ -252,7 +252,7 @@ class TestListEmployeeRecords:
 
         record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_company=self.company)
         record.ready()
-        record.sent(faker.asp_batch_filename(), 1, None)
+        record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
         record.reject("0012", "JSON Invalide", None)
 
         response = client.get(self.URL, data={"status": Status.REJECTED})
@@ -367,7 +367,7 @@ class TestListEmployeeRecords:
         )
         for i, record in enumerate((recordA, recordZ)):
             record.ready()
-            record.sent(f"RIAE_FS_2021041013000{i}.json", 1, None)
+            record.wait_for_asp_response(f"RIAE_FS_2021041013000{i}.json", 1, None)
             record.reject("0012", "JSON Invalide", None)
 
         # Zzzzz's hiring start is more recent

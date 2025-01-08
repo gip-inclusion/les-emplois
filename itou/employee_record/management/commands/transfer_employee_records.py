@@ -56,7 +56,9 @@ class Command(EmployeeRecordTransferCommand):
             # and store in which file they have been sent
             renderer = JSONRenderer()
             for idx, employee_record in enumerate(employee_records, 1):
-                employee_record.sent(remote_path, idx, renderer.render(batch_data["lignesTelechargement"][idx - 1]))
+                employee_record.wait_for_asp_response(
+                    remote_path, idx, renderer.render(batch_data["lignesTelechargement"][idx - 1])
+                )
 
     def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> None:
         """

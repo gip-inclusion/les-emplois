@@ -40,7 +40,7 @@ class TestSummaryEmployeeRecords:
         assertNotContains(response, HORODATAGE)
 
         self.employee_record.ready()
-        self.employee_record.sent("RIAE_FS_20210410130000.json", 1, None)
+        self.employee_record.wait_for_asp_response("RIAE_FS_20210410130000.json", 1, None)
 
         response = client.get(self.url)
         assertContains(response, HORODATAGE)

@@ -101,7 +101,7 @@ class TestEmployeeRecordAPIFetchList:
         # Get list without filtering by status (PROCESSED)
         # note: there is no way to create a processed employee record
         # (and this is perfectly normal)
-        self.employee_record.sent(faker.asp_batch_filename(), 1, None)
+        self.employee_record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
 
         # There should be no result at this point
@@ -131,7 +131,7 @@ class TestEmployeeRecordAPIFetchList:
         result = response.json()
         assert len(result.get("results")) == 0
 
-        employee_record_sent.sent(faker.asp_batch_filename(), 1, None)
+        employee_record_sent.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
         response = api_client.get(ENDPOINT_URL + "?status=SENT", format="json")
         assert response.status_code == 200
 
@@ -143,7 +143,7 @@ class TestEmployeeRecordAPIFetchList:
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_company=self.siae)
         employee_record_rejected = EmployeeRecord.from_job_application(job_application=job_application)
         employee_record_rejected.ready()
-        employee_record_rejected.sent(faker.asp_batch_filename(), 1, None)
+        employee_record_rejected.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
 
         # There should be no result at this point
         response = api_client.get(ENDPOINT_URL + "?status=REJECTED", format="json")
@@ -230,7 +230,7 @@ class TestEmployeeRecordAPIParameters:
         )
         employee_record = EmployeeRecord.from_job_application(job_application_2)
         employee_record.ready()
-        employee_record.sent(faker.asp_batch_filename(), 1, None)
+        employee_record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
 
         member = employee_record.job_application.to_company.members.first()
         api_client.force_login(member)

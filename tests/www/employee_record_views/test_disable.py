@@ -55,7 +55,7 @@ class TestDisableEmployeeRecords:
 
     def test_disable_employee_record_sent(self, client, faker):
         self.employee_record.ready()
-        self.employee_record.sent(faker.asp_batch_filename(), 1, None)
+        self.employee_record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
 
         self.employee_record.refresh_from_db()
         assert self.employee_record.status == Status.SENT
@@ -70,7 +70,7 @@ class TestDisableEmployeeRecords:
 
     def test_disable_employee_record_rejected(self, client, faker):
         self.employee_record.ready()
-        self.employee_record.sent(faker.asp_batch_filename(), 1, None)
+        self.employee_record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
         err_code, err_message = "12", "JSON Invalide"
         self.employee_record.reject(err_code, err_message, None)
 
@@ -89,7 +89,7 @@ class TestDisableEmployeeRecords:
 
     def test_disable_employee_record_completed(self, client, faker):
         self.employee_record.ready()
-        self.employee_record.sent(faker.asp_batch_filename(), 1, None)
+        self.employee_record.wait_for_asp_response(faker.asp_batch_filename(), 1, None)
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
         self.employee_record.process(process_code, process_message, "{}")
 
