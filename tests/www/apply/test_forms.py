@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 
@@ -8,9 +9,10 @@ from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, Contra
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType
 from itou.www.apply import forms as apply_forms
 from tests.cities.factories import create_test_cities
-from tests.companies.factories import JobDescriptionFactory
+from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
+from tests.users.factories import JobSeekerFactory
 
 
 class TestAcceptForm:
@@ -342,3 +344,68 @@ class TestJobApplicationAcceptFormWithGEIQFields:
         for kind in (CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS):
             assertNotContains(_response(kind), self.HELP_START_AT)
             assertNotContains(_response(kind), self.HELP_END_AT)
+
+
+class TestJobApplicationRefusalReasonForm:
+    @pytest.mark.parametrize(
+        "factory_kwargs,expected_reason_label",
+        [
+            ({}, "Choisir le motif de refus envoyé à l’orienteur"),
+            ({"sent_by_authorized_prescriber_organisation": True}, "Choisir le motif de refus envoyé au prescripteur"),
+            ({"sent_by_another_employer": True}, "Choisir le motif de refus"),
+        ],
+    )
+    def test_labels_single_app(self, factory_kwargs, expected_reason_label):
+        job_app = JobApplicationFactory(**factory_kwargs)
+        form = apply_forms.JobApplicationRefusalReasonForm([job_app])
+        assert (
+            form.fields["refusal_reason_shared_with_job_seeker"].label
+            == "J’accepte d’envoyer le motif de refus au candidat"
+        )
+        assert form.fields["refusal_reason"].label == expected_reason_label
+
+    def test_labels_mutiple_apps(self):
+        # Orienter only
+        company = CompanyFactory()
+        orienter_apps = JobApplicationFactory.create_batch(2, to_company=company)
+        form = apply_forms.JobApplicationRefusalReasonForm(orienter_apps)
+        assert (
+            form.fields["refusal_reason_shared_with_job_seeker"].label
+            == "J’accepte d’envoyer le motif de refus aux candidats"
+        )
+        assert form.fields["refusal_reason"].label == "Choisir le motif de refus envoyé aux orienteurs"
+
+        # Prescriber only
+        prescriber_apps_with_same_job_seeker = JobApplicationFactory.create_batch(
+            2, job_seeker=JobSeekerFactory(), to_company=company, sent_by_authorized_prescriber_organisation=True
+        )
+        form = apply_forms.JobApplicationRefusalReasonForm(prescriber_apps_with_same_job_seeker)
+        assert (
+            form.fields["refusal_reason_shared_with_job_seeker"].label
+            == "J’accepte d’envoyer le motif de refus au candidat"
+        )
+        assert form.fields["refusal_reason"].label == "Choisir le motif de refus envoyé aux prescripteurs"
+
+        # Mishmash
+        form = apply_forms.JobApplicationRefusalReasonForm(orienter_apps + prescriber_apps_with_same_job_seeker)
+        assert (
+            form.fields["refusal_reason_shared_with_job_seeker"].label
+            == "J’accepte d’envoyer le motif de refus aux candidats"
+        )
+        assert form.fields["refusal_reason"].label == "Choisir le motif de refus envoyé aux prescripteurs/orienteurs"
+
+
+class TestJobApplicationRefusalJobSeekerAnswerForm:
+    def test_labels(self):
+        job_app = JobApplicationFactory()
+        other_app = JobApplicationFactory()
+        same_job_seeker_app = JobApplicationFactory(job_seeker=job_app.job_seeker)
+
+        form = apply_forms.JobApplicationRefusalJobSeekerAnswerForm([job_app])
+        assert form.fields["job_seeker_answer"].label == "Commentaire envoyé au candidat"
+
+        form = apply_forms.JobApplicationRefusalJobSeekerAnswerForm([job_app, other_app])
+        assert form.fields["job_seeker_answer"].label == "Commentaire envoyé aux candidats"
+
+        form = apply_forms.JobApplicationRefusalJobSeekerAnswerForm([job_app, same_job_seeker_app])
+        assert form.fields["job_seeker_answer"].label == "Commentaire envoyé au candidat"

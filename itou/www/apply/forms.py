@@ -1,4 +1,5 @@
 import datetime
+import logging
 from operator import itemgetter
 
 import sentry_sdk
@@ -22,10 +23,13 @@ from itou.job_applications.models import JobApplication, PriorAction
 from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import JobSeekerProfile
 from itou.utils import constants as global_constants
-from itou.utils.templatetags.str_filters import mask_unless
+from itou.utils.templatetags.str_filters import mask_unless, pluralizefr
 from itou.utils.types import InclusiveDateRange
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.companies_views.forms import JobAppellationAndLocationMixin
+
+
+logger = logging.getLogger(__name__)
 
 
 class ApplicationJobsForm(forms.ModelForm):
@@ -122,26 +126,50 @@ class TransferJobApplicationForm(SubmitJobApplicationForm):
             del self.cleaned_data["resume"]
 
 
+def _get_orienter_and_prescriber_nb(job_applications):
+    orienters = set()
+    prescribers = set()
+    for job_application in job_applications:
+        if job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER:
+            if job_application.is_sent_by_authorized_prescriber:
+                prescribers.add(job_application.sender_id)
+            else:
+                orienters.add(job_application.sender_id)
+    return len(orienters), len(prescribers)
+
+
 class JobApplicationRefusalReasonForm(forms.Form):
     refusal_reason = forms.ChoiceField(
-        label="Choisir le motif de refus",
         widget=forms.RadioSelect,
         choices=job_applications_enums.RefusalReason.displayed_choices(),
     )
-    refusal_reason_shared_with_job_seeker = forms.BooleanField(
-        label="J’accepte d’envoyer le motif de refus au candidat",
-        required=False,
-    )
+    refusal_reason_shared_with_job_seeker = forms.BooleanField(required=False)
 
-    def __init__(self, job_application, *args, **kwargs):
+    def __init__(self, job_applications, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER:
-            if job_application.is_sent_by_authorized_prescriber:
-                label = "Choisir le motif de refus envoyé au prescripteur"
-            else:
-                label = "Choisir le motif de refus envoyé à l’orienteur"
-            self.fields["refusal_reason"].label = label
-        if job_application.to_company.kind == CompanyKind.GEIQ:
+        companies = set(job_application.to_company for job_application in job_applications)
+        assert len(companies) == 1, f"Cannot handle batch of applications from different companies: {companies}"
+        company = list(companies)[0]
+
+        job_seeker_nb = len(set(job_application.job_seeker_id for job_application in job_applications))
+        self.fields[
+            "refusal_reason_shared_with_job_seeker"
+        ].label = f"J’accepte d’envoyer le motif de refus {pluralizefr(job_seeker_nb, 'au candidat,aux candidats')}"
+
+        orienter_nb, prescriber_nb = _get_orienter_and_prescriber_nb(job_applications)
+        if orienter_nb and not prescriber_nb:
+            label = f"Choisir le motif de refus envoyé {pluralizefr(orienter_nb, 'à l’orienteur,aux orienteurs')}"
+        elif prescriber_nb and not orienter_nb:
+            label = (
+                f"Choisir le motif de refus envoyé {pluralizefr(prescriber_nb, 'au prescripteur,aux prescripteurs')}"
+            )
+        elif prescriber_nb and orienter_nb:
+            label = "Choisir le motif de refus envoyé aux prescripteurs/orienteurs"
+        else:
+            label = "Choisir le motif de refus"
+        self.fields["refusal_reason"].label = label
+
+        if company.kind == CompanyKind.GEIQ:
             self.fields["refusal_reason"].choices = job_applications_enums.RefusalReason.displayed_choices(
                 extra_exclude_enums=[
                     job_applications_enums.RefusalReason.PREVENT_OBJECTIVES,
@@ -157,6 +185,11 @@ class JobApplicationRefusalJobSeekerAnswerForm(forms.Form):
         strip=True,
     )
 
+    def __init__(self, job_applications, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if len(set(job_application.job_seeker_id for job_application in job_applications)) > 1:
+            self.fields["job_seeker_answer"].label = "Commentaire envoyé aux candidats"
+
 
 class JobApplicationRefusalPrescriberAnswerForm(forms.Form):
     prescriber_answer = forms.CharField(
@@ -164,17 +197,19 @@ class JobApplicationRefusalPrescriberAnswerForm(forms.Form):
         strip=True,
     )
 
-    def __init__(self, job_application, *args, **kwargs):
+    def __init__(self, job_applications, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER:
-            if job_application.is_sent_by_authorized_prescriber:
-                self.fields[
-                    "prescriber_answer"
-                ].label = "Commentaire envoyé au prescripteur (n’est pas communiqué au candidat)"
-            else:
-                self.fields[
-                    "prescriber_answer"
-                ].label = "Commentaire envoyé à l’orienteur (n’est pas communiqué au candidat)"
+        orienter_nb, prescriber_nb = _get_orienter_and_prescriber_nb(job_applications)
+        jobseeker_nb = len(set(job_application.job_seeker_id for job_application in job_applications))
+        if orienter_nb and not prescriber_nb:
+            label = f"Commentaire envoyé {pluralizefr(orienter_nb, 'à l’orienteur,aux orienteurs')}"
+        elif prescriber_nb and not orienter_nb:
+            label = f"Commentaire envoyé {pluralizefr(prescriber_nb, 'au prescripteur,aux prescripteurs')}"
+        else:
+            label = "Commentaire envoyé aux orienteurs/prescripteurs"
+        label += f" (n’est pas communiqué {pluralizefr(jobseeker_nb, 'au candidat,aux candidats')})"
+
+        self.fields["prescriber_answer"].label = label
 
 
 class AnswerForm(forms.Form):

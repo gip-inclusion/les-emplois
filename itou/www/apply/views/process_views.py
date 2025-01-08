@@ -486,11 +486,9 @@ class JobApplicationRefuseView(NamedUrlSessionWizardView):
         }
 
     def get_form_kwargs(self, step=None):
-        if step in (RefuseViewStep.REASON, RefuseViewStep.PRESCRIBER_ANSWER):
-            return {
-                "job_application": self.job_application,
-            }
-        return {}
+        return {
+            "job_applications": [self.job_application],
+        }
 
     def get_form_initial(self, step):
         initial_data = self.initial_dict.get(step, {})
