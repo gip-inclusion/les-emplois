@@ -2,7 +2,6 @@
 # name: test_beneficiary_details
   '''
   <div class="col-12" id="beneficiary_details_container">
-                      
                       <div class="c-box mb-3 mb-lg-5">
                           <h2>Données administratives</h2>
                           <hr/>
@@ -19,43 +18,31 @@
                                       </li>
                                       <li>
                                           <small>Date de naissance</small>
-                                          
                                               <strong>01/01/1990</strong>
-                                          
                                       </li>
                                       <li>
                                           <small>Adresse e-mail</small>
                                           <strong>jane.doe@test.local</strong>
-                                          
                                           <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
                                       </li>
                                       <li>
                                           <small>Téléphone</small>
-                                          
                                               <strong>06 12 34 56 78</strong>
-                                              
                                               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-                                          
                                       </li>
                                       <li>
                                           <small>Adresse</small>
-                                          
                                               <address>12 rue Georges Bizet, 35000 Rennes</address>
-                                          
                                       </li>
                                       <li>
                                           <small>Numéro de sécurité sociale</small>
-                                          
                                               <strong>290010101010125</strong>
-                                          
                                       </li>
                                   </ul>
                               </div>
@@ -63,24 +50,11 @@
                                   <ul class="list-data">
                                       <li>
                                           <small>Niveau de formation</small>
-                                          
                                               <strong>Formation de niveau BAC</strong>
-                                          
                                       </li>
-                                      
-                                      
-                                      
-                                      
-                                      
-                                      
-                                      
-                                      
                                       <li>
                                           <small>Identifiant France Travail (ex Pôle emploi)</small>
-  
-                                          
                                               <i class="text-disabled">Non renseigné</i>
-                                          
                                       </li>
                                       <li>
                                           <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
@@ -90,11 +64,9 @@
                                                   conseiller emploi France Travail</span>
                                               </button>
                                               <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
-                                                  
                                                       <p class="mb-0">
                                                           La fonctionnalité est en test dans deux départements et sera bientôt disponible pour votre territoire.
                                                       </p>
-                                                  
                                               </div>
                                           </div>
                                       </li>
@@ -102,14 +74,9 @@
                               </div>
                           </div>
                       </div>
-                      
-  
-  
-  
   <div class="c-box mb-3 mb-lg-5" id="gps_intervenants">
       <h2 class="border-bottom pb-3">Intervenant</h2>
       <ul class="list-unstyled p-0 m-0">
-          
               <li class="c-box--results__header px-0 gps_intervenant">
                   <div class="c-box--results__summary flex-grow-1">
                       <i aria-hidden="true" class="ri-user-line"></i>
@@ -117,52 +84,38 @@
                           <h3 class="mb-2">
                               Pierre DUPONT
                               <span class="fw-normal fs-6 fst-italic">
-                                  
-                                  
                                   (prescripteur pour Les Olivades)
-                                  
                               </span>
                           </h3>
-  
                           <ul class="list-unstyled">
                               <li class="py-1">
                                   <i aria-hidden="true" class="ri-mail-line fw-normal me-1"></i>
                                   <span>pierre.dupont@test.local</span>
-                                  
                                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dupont@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_member_email">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
                               </li>
                               <li class="py-1">
                                   <i aria-hidden="true" class="ri-phone-line fw-normal me-1"></i>
-                                  
                                       <span>06 12 34 56 78</span>
-                                      
                                       <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_member_phone">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-                                  
                               </li>
                               <li class="py-1">
                                   <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>Suivi depuis le <strong>21/06/2024</strong>
                               </li>
-                              
                                   <li class="py-1">
                                       <i aria-hidden="true" class="ri-map-pin-user-line fw-normal me-1"></i><strong>Référent</strong>
                                   </li>
-                              
                           </ul>
                       </div>
                   </div>
               </li>
-          
       </ul>
   </div>
-  
                   </div>
   '''
 # ---
@@ -175,7 +128,6 @@
                                                   conseiller emploi France Travail</span>
                                               </button>
                                               <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
-                                                  
                                                       <ul class="list-unstyled">
                                                           <li>
                                                               <i aria-hidden="true" class="ri-user-line fw-normal me-1"></i>Test MacTest
@@ -187,10 +139,8 @@
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
                                                           </li>
                                                       </ul>
-                                                  
                                               </div>
                                           </div>
   '''
@@ -204,9 +154,7 @@
                                                   conseiller emploi France Travail</span>
                                               </button>
                                               <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
-                                                  
                                                       <p class="mb-0">Le conseiller emploi France Travail de ce bénéficiaire n’est pas connu.</p>
-                                                  
                                               </div>
                                           </div>
   '''
@@ -220,48 +168,55 @@
                                                   conseiller emploi France Travail</span>
                                               </button>
                                               <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
-                                                  
                                                       <p class="mb-0">
                                                           La fonctionnalité est en test dans deux départements et sera bientôt disponible pour votre territoire.
                                                       </p>
-                                                  
                                               </div>
                                           </div>
   '''
 # ---
 # name: test_my_groups[test_my_groups__group_card]
   '''
-  <div class="c-box c-box--results has-links-inside my-3 my-md-4 membership-card">
-                  <div class="c-box--results__header">
-                      <div class="c-box--results__summary">
-                          <i aria-hidden="true" class="ri-user-line"></i>
-                          <div>
-                              <h3>Jane DOE</h3>
-                              <span>jane.doe@test.local</span>
-                          </div>
-                      </div>
-                  </div>
-                  <hr class="m-0"/>
-                  <div class="c-box--results__body">
+  <div aria-labelledby="results" class="mt-3 mt-md-4" id="follow-up-groups-section">
+      
+          <div class="table-responsive">
+              <table class="table table-hover">
+                  <caption class="visually-hidden">Liste des bénéficiaires</caption>
+                  <thead>
+                      <tr>
+                          <th scope="col">Prénom Nom</th>
+                          <th scope="col">Suivi depuis</th>
+                          <th scope="col">Référent⸱e</th>
+                          <th scope="col">Nbr d'intervenants</th>
+                      </tr>
+                  </thead>
+                  <tbody>
                       
-                          <p class="mb-0">
-                              
-                          
-                              Vous avez ajouté ce bénéficiaire le <strong>21/06/2024</strong>.
-                              
-                                  1 autre professionnel est intervenu auprès de ce bénéficiaire.
-                              
-                          </p>
+                          <tr>
+                              <td>
+                                  <a aria-label="Consulter la fiche de Jane DOE" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/gps/groups">
+                                      Jane DOE
+                                  </a>
+                              </td>
+                              <td>21/06/2024</td>
+                              <td>
+                                  
+                                      John DOE
+                                  
+                              </td>
+                              <td>2</td>
+                          </tr>
                       
-                  </div>
-                  <div class="c-box--results__footer">
-                      <div class="d-flex justify-content-md-end">
-                          <a aria-label="Consulter la fiche de Jane DOE" class="btn btn-primary btn-block btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/gps/groups">
-                              <i aria-hidden="true" class="ri-eye-line ri-xl fw-medium"></i>
-                              <span>Consulter la fiche</span>
-                          </a>
-                      </div>
-                  </div>
-              </div>
+                  </tbody>
+              </table>
+          </div>
+  
+          
+  
+  
+  
+  
+      
+  </div>
   '''
 # ---
