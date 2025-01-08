@@ -97,7 +97,7 @@ class ASPExchangeInformation(models.Model):
 
 class EmployeeRecordTransition(enum.StrEnum):
     READY = "ready"
-    SENT = "sent"
+    WAIT_FOR_ASP_RESPONSE = "wait_for_asp_response"
     REJECT = "reject"
     PROCESS = "process"
     DISABLE = "disable"
@@ -116,7 +116,7 @@ class EmployeeRecordWorkflow(xwf_models.Workflow):
     CAN_BE_ARCHIVED_STATES = [Status.NEW, Status.READY, Status.REJECTED, Status.PROCESSED, Status.DISABLED]
     transitions = (
         (EmployeeRecordTransition.READY, [Status.NEW, Status.REJECTED, Status.DISABLED], Status.READY),
-        (EmployeeRecordTransition.SENT, Status.READY, Status.SENT),
+        (EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE, Status.READY, Status.SENT),
         (EmployeeRecordTransition.REJECT, Status.SENT, Status.REJECTED),
         (EmployeeRecordTransition.PROCESS, Status.SENT, Status.PROCESSED),
         (EmployeeRecordTransition.DISABLE, CAN_BE_DISABLED_STATES, Status.DISABLED),
@@ -317,7 +317,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         self._fill_denormalized_fields()
 
     @xwf_models.transition()
-    def sent(self, asp_filename, line_number, archive):
+    def wait_for_asp_response(self, asp_filename, line_number, archive):
         """
         An employee record is sent to ASP via a JSON file,
         The file name is stored for further feedback processing (also done via a file)
@@ -552,7 +552,7 @@ class EmployeeRecordUpdateNotificationWorkflow(xwf_models.Workflow):
     initial_state = Status.NEW
 
     transitions = (
-        (EmployeeRecordTransition.SENT, NotificationStatus.NEW, NotificationStatus.SENT),
+        (EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE, NotificationStatus.NEW, NotificationStatus.SENT),
         (EmployeeRecordTransition.REJECT, NotificationStatus.SENT, NotificationStatus.REJECTED),
         (EmployeeRecordTransition.PROCESS, NotificationStatus.SENT, NotificationStatus.PROCESSED),
     )
@@ -602,7 +602,7 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation, xwf_models.Workfl
         return f"<{type(self).__name__} pk={self.pk}>"
 
     @xwf_models.transition()
-    def sent(self, filename, line_number, archive):
+    def wait_for_asp_response(self, filename, line_number, archive):
         self.set_asp_batch_information(filename, line_number, archive)
 
     @xwf_models.transition()

@@ -62,7 +62,9 @@ class Command(EmployeeRecordTransferCommand):
 
             renderer = JSONRenderer()
             for idx, notification in enumerate(notifications, 1):
-                notification.sent(remote_path, idx, renderer.render(batch_data["lignesTelechargement"][idx - 1]))
+                notification.wait_for_asp_response(
+                    remote_path, idx, renderer.render(batch_data["lignesTelechargement"][idx - 1])
+                )
 
     def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> None:
         """
