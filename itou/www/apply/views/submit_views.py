@@ -33,6 +33,7 @@ from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForm
 from itou.www.job_seekers_views.forms import (
     CreateOrUpdateJobSeekerStep2Form,
 )
+from itou.www.job_seekers_views.views import JobSeekerSession
 
 
 logger = logging.getLogger(__name__)
@@ -146,14 +147,11 @@ class ApplyStepBaseView(TemplateView):
         return reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description})
 
     def init_job_seeker_session(self, request):
-        job_seeker_session = SessionNamespace.create_uuid_namespace(
-            request.session,
-            data={
-                "config": {
-                    "reset_url": self.get_reset_url(),
-                },
-                "apply": {"company_pk": self.company.pk},
-            },
+        job_seeker_session = JobSeekerSession.init(
+            request,
+            from_url=self.get_reset_url(),
+            session_kind="job-seeker-get-or-create",
+            apply={"company_pk": self.company.pk},
         )
         return job_seeker_session
 
@@ -305,7 +303,9 @@ class StartView(ApplyStepBaseView):
         job_seeker_session = self.init_job_seeker_session(request)
 
         return HttpResponseRedirect(
-            reverse(f"job_seekers_views:check_nir_for_{tunnel}", kwargs={"session_uuid": job_seeker_session.name})
+            reverse(
+                f"job_seekers_views:check_nir_for_{tunnel}", kwargs={"session_uuid": job_seeker_session.session_uuid}
+            )
             + ("?gps=true" if self.is_gps else "")
         )
 
@@ -317,7 +317,7 @@ class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
         super().setup(request, *args, **kwargs)
         self.job_seeker_session = self.init_job_seeker_session(request)
         self.next_url = reverse(
-            "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": self.job_seeker_session.name}
+            "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": self.job_seeker_session.session_uuid}
         )
 
     def get_context_data(self, **kwargs):
