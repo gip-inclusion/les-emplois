@@ -632,7 +632,7 @@ def sentry_respx_mock_fixture(respx_mock):
     }
 
     url = f"{settings.API_SENTRY_BASE_URL}/organizations/{settings.API_SENTRY_ORG_NAME}/events/"
-    return respx_mock.route(
+    return start, respx_mock.route(
         method="GET", params=params, url=url, headers={"Authorization": f"Bearer {settings.API_SENTRY_STATS_TOKEN}"}
     ).respond(json=json)
 
@@ -690,7 +690,7 @@ def updown_respx_mock_fixture(respx_mock):
     }
 
     url = f"{settings.API_UPDOWN_BASE_URL}/checks/{settings.API_UPDOWN_CHECK_ID}/metrics/"
-    return respx_mock.route(headers=headers, method="GET", params=params, url=url).respond(json=json)
+    return start, respx_mock.route(headers=headers, method="GET", params=params, url=url).respond(json=json)
 
 
 @pytest.fixture(name="github_respx_mock")
@@ -713,4 +713,4 @@ def github_respx_mock_fixture(respx_mock):
     }
 
     url = f"{settings.API_GITHUB_BASE_URL}/repos/gip-inclusion/les-emplois/issues"
-    return respx_mock.route(headers=headers, method="GET", params=params, url=url).respond(json=resp_json)
+    return start, respx_mock.route(headers=headers, method="GET", params=params, url=url).respond(json=resp_json)
