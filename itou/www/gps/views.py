@@ -2,7 +2,7 @@ import urllib.parse
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count
+from django.db.models import Count, Prefetch
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
@@ -32,14 +32,20 @@ def my_groups(request, template_name="gps/my_groups.html"):
         .annotate(nb_members=Count("follow_up_group__members"))
         .order_by("-created_at")
         .select_related("follow_up_group", "follow_up_group__beneficiary", "member")
-        .prefetch_related("follow_up_group__members")
+        .prefetch_related(
+            Prefetch(
+                "follow_up_group__memberships",
+                queryset=FollowUpGroupMembership.objects.filter(is_referent=True)[:1],
+                to_attr="referent",
+            ),
+        )
     )
     filters_form = MembershipsFiltersForm(memberships_qs=memberships, data=request.GET or None)
 
     if filters_form.is_valid():
         memberships = filters_form.filter()
 
-    memberships_page = pager(memberships, request.GET.get("page"), items_per_page=10)
+    memberships_page = pager(memberships, request.GET.get("page"), items_per_page=50)
 
     context = {
         "back_url": reverse("dashboard:index"),

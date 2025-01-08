@@ -6,7 +6,7 @@ from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
-from tests.gps.factories import FollowUpGroupFactory
+from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -212,7 +212,13 @@ def test_my_groups(snapshot, client):
 
     # Nominal case
     # Groups created latelly should come first.
-    group = FollowUpGroupFactory(memberships=1, for_snapshot=True)
+    group = FollowUpGroupFactory(for_snapshot=True)
+    FollowUpGroupMembershipFactory(
+        follow_up_group=group,
+        is_referent=True,
+        member__first_name="John",
+        member__last_name="Doe",
+    )
     FollowUpGroup.objects.follow_beneficiary(beneficiary=group.beneficiary, user=user)
 
     response = client.get(reverse("gps:my_groups"))
@@ -222,18 +228,14 @@ def test_my_groups(snapshot, client):
         replace_in_attr=[
             ("data-bs-confirm-url", f"/gps/groups/{group.pk}", "/gps/groups/[PK of Group]"),
         ],
-    ).select(".membership-card")
-    assert len(groups) == 1
-    assert str(groups[0]) == snapshot(name="test_my_groups__group_card")
+    )
+    assert str(groups) == snapshot(name="test_my_groups__group_card")
 
     # Test `is_referent` display.
     group = FollowUpGroupFactory(memberships=1, beneficiary__first_name="Janis", beneficiary__last_name="Joplin")
     FollowUpGroup.objects.follow_beneficiary(beneficiary=group.beneficiary, user=user, is_referent=True)
     response = client.get(reverse("gps:my_groups"))
-    groups = parse_response_to_soup(response, selector="#follow-up-groups-section").select(".membership-card")
-    assert len(groups) == 2
-    assert "Janis" in str(groups[0])
-    assert "et êtes <strong>référent</strong>" in str(groups[0])
+    assertContains(response, "vous êtes référent")
 
 
 def test_my_groups_as_non_authorized_precriber(client):
@@ -366,12 +368,12 @@ def test_remove_members_from_group(client):
 
 def test_groups_pagination_and_name_filter(client):
     prescriber = PrescriberFactory(membership__organization__authorized=True)
-    created_groups = FollowUpGroupFactory.create_batch(11, memberships=1, memberships__member=prescriber)
+    created_groups = FollowUpGroupFactory.create_batch(51, memberships=1, memberships__member=prescriber)
 
     client.force_login(prescriber)
     my_groups_url = reverse("gps:my_groups")
     response = client.get(my_groups_url)
-    assert len(response.context["memberships_page"].object_list) == 10
+    assert len(response.context["memberships_page"].object_list) == 50
     assert f"{my_groups_url}?page=2" in response.content.decode()
 
     # Filter by beneficiary name.
@@ -382,7 +384,7 @@ def test_groups_pagination_and_name_filter(client):
     assert memberships_page[0].follow_up_group.beneficiary == beneficiary
     # Assert 11 names are displayed in the dropdown.
     form = response.context["filters_form"]
-    assert len(form.fields["beneficiary"].choices) == 11
+    assert len(form.fields["beneficiary"].choices) == 51
 
     # Inactive memberships should not be displayed in the dropdown.
     membership = created_groups[0].memberships.first()
@@ -390,13 +392,13 @@ def test_groups_pagination_and_name_filter(client):
     membership.save()
     response = client.get(my_groups_url)
     form = response.context["filters_form"]
-    assert len(form.fields["beneficiary"].choices) == 10
+    assert len(form.fields["beneficiary"].choices) == 50
 
     # Filtering by another beneficiary should not be allowed.
     beneficiary = FollowUpGroupFactory().beneficiary
     response = client.get(my_groups_url, {"beneficiary": beneficiary.pk})
     memberships_page = response.context["memberships_page"]
-    assert len(memberships_page.object_list) == 10
+    assert len(memberships_page.object_list) == 50
 
     # HTMX
     beneficiary = created_groups[-1].beneficiary
