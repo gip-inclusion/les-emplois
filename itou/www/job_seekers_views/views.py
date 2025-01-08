@@ -1,4 +1,5 @@
 import logging
+import uuid
 
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -42,6 +43,57 @@ from .forms import (
 
 
 logger = logging.getLogger(__name__)
+
+
+class JobSeekerSession:
+    def __init__(self, session_kind=None, session_uuid=None):
+        self.session_kind = session_kind
+        self.session_uuid = session_uuid
+        self.session_namespace = None
+
+    def get(self, key, default=None):
+        if default is None:
+            default = {}
+        return self.session_namespace.get(key, default)
+
+    def set(self, key, value):
+        return self.session_namespace.set(key, value)
+
+    def update(self, data):
+        self.session_namespace.update(data)
+
+    def delete(self):
+        self.session_namespace.delete()
+
+    @classmethod
+    def load(cls, request, session_kind, session_uuid):
+        job_seeker_session = cls(session_kind, session_uuid)
+        job_seeker_session.session_namespace = SessionNamespace(
+            request.session, namespace=f"{session_kind}-{session_uuid}"
+        )
+        if not job_seeker_session.session_namespace.exists():
+            raise Http404
+
+        return job_seeker_session
+
+    @classmethod
+    def init(cls, request, from_url, session_kind, job_seeker_pk=None, apply=None):
+        session_uuid = str(uuid.uuid4())
+        job_seeker_session = cls(session_kind, session_uuid)
+        job_seeker_session.session_namespace = SessionNamespace(
+            request.session, namespace=f"{session_kind}-{session_uuid}"
+        )
+
+        data = {
+            "config": {"from_url": from_url, "session_kind": session_kind},
+        }
+        if job_seeker_pk:
+            data |= {"job_seeker_pk": job_seeker_pk}
+        if apply:
+            data |= {"apply": apply}
+
+        job_seeker_session.session_namespace.init(data)
+        return job_seeker_session
 
 
 class JobSeekerDetailView(UserPassesTestMixin, DetailView):
@@ -197,14 +249,13 @@ class JobSeekerBaseView(TemplateView):
         self.is_gps = False
 
     def setup(self, request, *args, session_uuid, hire_process=False, **kwargs):
-        self.job_seeker_session = SessionNamespace(request.session, session_uuid)
-        if not self.job_seeker_session.exists():
-            raise Http404
+        self.job_seeker_session = JobSeekerSession.load(request, self.EXPECTED_SESSION_KIND, session_uuid)
         # Ensure we are performing the action (update, create…) the session was created for.
-        if (
-            session_kind := self.job_seeker_session.get("config").get("session_kind")
-        ) and session_kind != self.EXPECTED_SESSION_KIND:
-            raise Http404
+        # We can get rid of that since the kind is now set in the session name
+        # if (
+        #     session_kind := self.job_seeker_session.get("config").get("session_kind")
+        # ) and session_kind != self.EXPECTED_SESSION_KIND:
+        # raise Http404
         self.is_gps = "gps" in request.GET and request.GET["gps"] == "true"
         if company_pk := self.job_seeker_session.get("apply", {}).get("company_pk"):
             self.company = (
@@ -363,7 +414,7 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
             # No user found with that NIR, save the NIR in the session and redirect to search by e-mail address.
             if not job_seeker:
                 self.job_seeker_session.set("profile", {"nir": self.form.cleaned_data["nir"]})
-                return HttpResponseRedirect(self.search_by_email_url(self.job_seeker_session.name))
+                return HttpResponseRedirect(self.search_by_email_url(self.job_seeker_session.session_uuid))
 
             # The NIR we found is correct
             if self.form.data.get("confirm"):
@@ -384,7 +435,7 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
         else:
             # Require at least one attempt with an invalid NIR to access the search by email feature.
             # The goal is to prevent users from skipping the search by NIR and creating duplicates.
-            context["temporary_nir_url"] = self.search_by_email_url(self.job_seeker_session.name)
+            context["temporary_nir_url"] = self.search_by_email_url(self.job_seeker_session.session_uuid)
 
         return self.render_to_response(self.get_context_data(**kwargs) | context)
 
@@ -433,7 +484,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                 )
 
                 return HttpResponseRedirect(
-                    reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.name})
+                    reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.session_uuid})
                     + ("?gps=true" if self.is_gps else "")
                 )
 
@@ -483,7 +534,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
         view_name = (
             "job_seekers_views:check_nir_for_hire" if self.hire_process else "job_seekers_views:check_nir_for_sender"
         )
-        return reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.name})
+        return reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.session_uuid})
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
@@ -505,14 +556,14 @@ class CreateJobSeekerForSenderBaseView(JobSeekerForSenderBaseView):
         view_name = self.previous_hire_url if self.hire_process else self.previous_apply_url
         return reverse(
             view_name,
-            kwargs={"session_uuid": self.job_seeker_session.name},
+            kwargs={"session_uuid": self.job_seeker_session.session_uuid},
         ) + ("?gps=true" if self.is_gps else "")
 
     def get_next_url(self):
         view_name = self.next_hire_url if self.hire_process else self.next_apply_url
         return reverse(
             view_name,
-            kwargs={"session_uuid": self.job_seeker_session.name},
+            kwargs={"session_uuid": self.job_seeker_session.session_uuid},
         ) + ("?gps=true" if self.is_gps else "")
 
     def get_context_data(self, **kwargs):
@@ -785,19 +836,19 @@ class UpdateJobSeekerStartView(View):
         if request.user.is_job_seeker or not request.user.can_view_personal_information(job_seeker):
             raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de ce candidat")
 
-        self.job_seeker_session = SessionNamespace.create_uuid_namespace(
-            request.session,
-            data={
-                "config": {"from_url": from_url, "session_kind": "job-seeker-update"},
-                "job_seeker_pk": job_seeker.pk,
-                "apply": {"company_pk": company.pk},
-            },
+        self.job_seeker_session = JobSeekerSession.init(
+            request,
+            from_url=from_url,
+            session_kind="job-seeker-update",
+            job_seeker_pk=job_seeker.pk,
+            apply={"company_pk": company.pk},
         )
 
     def get(self, request, *args, **kwargs):
         return HttpResponseRedirect(
             reverse(
-                "job_seekers_views:update_job_seeker_step_1", kwargs={"session_uuid": self.job_seeker_session.name}
+                "job_seekers_views:update_job_seeker_step_1",
+                kwargs={"session_uuid": self.job_seeker_session.session_uuid},
             )
         )
 
@@ -828,7 +879,7 @@ class UpdateJobSeekerBaseView(JobSeekerBaseView):
             "job_seeker": self.job_seeker,
             "step_3_url": reverse(
                 "job_seekers_views:update_job_seeker_step_3",
-                kwargs={"session_uuid": self.job_seeker_session.name},
+                kwargs={"session_uuid": self.job_seeker_session.session_uuid},
             ),
             "reset_url": self.get_reset_url(),
             "readonly_form": False,
@@ -844,13 +895,13 @@ class UpdateJobSeekerBaseView(JobSeekerBaseView):
     def get_back_url(self):
         return reverse(
             self.previous_url,
-            kwargs={"session_uuid": self.job_seeker_session.name},
+            kwargs={"session_uuid": self.job_seeker_session.session_uuid},
         )
 
     def get_next_url(self):
         return reverse(
             self.next_url,
-            kwargs={"session_uuid": self.job_seeker_session.name},
+            kwargs={"session_uuid": self.job_seeker_session.session_uuid},
         )
 
 
