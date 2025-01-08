@@ -1,0 +1,13 @@
+# serializer version: 1
+# name: test_fetch_card_results_with_filters[with pre-existing]
+  b'{"query":{"filter":["and",["and",["=",["field",100,{"base-type":"type/Text"}],"filter value 1","filter value 2"]],["=",["field",21,{"base-type":"type/Text"}],"baz"]]}}'
+# ---
+# name: test_fetch_card_results_with_filters[without pre-existing]
+  b'{"query":{"foo":"bar","filter":["and",[],["=",["field",21,{"base-type":"type/Text"}],"baz"]]}}'
+# ---
+# name: test_fetch_card_results_with_group_by[with pre-existing]
+  b'{"query":{"breakout":[["field",100,{"base-type":"type/Text"}],["field",2,{"base-type":"type/Text"}]]}}'
+# ---
+# name: test_fetch_card_results_with_group_by[without pre-existing]
+  b'{"query":{"foo":"bar","breakout":[["field",1,{"base-type":"type/Text"}]]}}'
+# ---
