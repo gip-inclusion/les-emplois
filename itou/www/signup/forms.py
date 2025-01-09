@@ -227,8 +227,13 @@ class JobSeekerCredentialsSignupForm(SignupForm):
         user.save()
         user.jobseeker_profile.nir = self.prior_cleaned_data["nir"]
         user.jobseeker_profile.birthdate = self.prior_cleaned_data["birthdate"]
-        user.jobseeker_profile.birth_place_id = self.prior_cleaned_data["birth_place"]
-        user.jobseeker_profile.birth_country_id = self.prior_cleaned_data["birth_country"]
+        try:
+            user.jobseeker_profile.birth_place_id = self.prior_cleaned_data["birth_place"]
+            user.jobseeker_profile.birth_country_id = self.prior_cleaned_data["birth_country"]
+        except KeyError:
+            # TODO: Remove try-except next week.
+            # Users signing up during deployment won’t have these in their session.
+            pass
         user.jobseeker_profile.save()
 
         return user
