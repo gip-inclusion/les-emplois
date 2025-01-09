@@ -160,7 +160,7 @@
                         {% if other_jobs_descriptions %}
                             <li class="nav-item" role="presentation">
                                 <a id="autres-metiers-tab" class="nav-link" role="tab" href="#autres-metiers" data-bs-toggle="tab" aria-selected="false" aria-controls="autres-metiers">
-                                    <span>Autre{{ other_jobs_descriptions|pluralizefr }} métier{{ other_jobs_descriptions|pluralizefr }} exercé{{ other_jobs_descriptions|pluralizefr }}</span>
+                                    <span>{{ other_jobs_descriptions|pluralizefr:"Autre métier exercé,Autres métiers exercés" }}</span>
                                     <span class="badge badge-sm rounded-pill ms-2">{{ other_jobs_descriptions|length }}</span>
                                 </a>
                             </li>

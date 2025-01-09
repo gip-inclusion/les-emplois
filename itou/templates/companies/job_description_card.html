@@ -32,7 +32,7 @@
             {% if job.is_active %}
                 <p class="mt-1 mb-0">
                     <span class="badge rounded-pill bg-success">
-                        {{ job.open_positions }} poste{{ job.open_positions|pluralizefr }} ouvert{{ job.open_positions|pluralizefr }} au recrutement
+                        {{ job.open_positions }} {{ job.open_positions|pluralizefr:"poste ouvert,postes ouverts" }} au recrutement
                     </span>
                 </p>
             {% endif %}

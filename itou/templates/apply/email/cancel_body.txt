@@ -28,7 +28,7 @@ Nous vous confirmons que l'embauche de {{ job_application.job_seeker.get_full_na
 {% with jobs=job_application.selected_jobs.all %}
 {% if jobs %}
 
-*Métier{{ jobs|pluralizefr }} recherché{{ jobs|pluralizefr }}* :
+*{{ jobs|pluralizefr:"Métier recherché,Métiers recherchés" }}* :
 
 {% for job in jobs %}
 - {{ job.display_name }}{% endfor %}

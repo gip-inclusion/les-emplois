@@ -24,7 +24,7 @@
 {% with jobs=job_application.selected_jobs.all %}
     <span class="d-block fs-sm">
         {% if jobs %}{{ jobs|length }}{% endif %}
-    Poste{{ jobs|pluralizefr }} recherché{{ jobs|pluralizefr }}</span>
+    {{ jobs|pluralizefr:"Poste recherché,Postes recherchés" }}</span>
     <ul class="list-group list-group-flush">
         {% for job in jobs %}
             <li class="list-group-item list-group-item-action py-2">

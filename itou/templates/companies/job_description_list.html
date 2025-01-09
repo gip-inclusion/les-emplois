@@ -63,7 +63,7 @@
                             </div>
                         </div>
                         <p class="mb-0">
-                            {{ job_pager.paginator.count }} métier{{ job_pager.paginator.count|pluralizefr }} exercé{{ job_pager.paginator.count|pluralizefr }}
+                            {{ job_pager.paginator.count }} {{ job_pager.paginator.count|pluralizefr:"métier exercé,métiers exercés" }}
                         </p>
                         {% if job_pager %}
                             <div class="table-responsive mt-3 mt-md-4">
