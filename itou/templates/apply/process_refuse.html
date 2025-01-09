@@ -30,7 +30,7 @@
                             {% elif wizard.steps.current == RefuseViewStep.JOB_SEEKER_ANSWER %}
                                 <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Message au candidat
                             {% elif wizard.steps.current == RefuseViewStep.PRESCRIBER_ANSWER %}
-                                <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Message {{ job_application.is_sent_by_authorized_prescriber|yesno:"au prescripteur,à l’orienteur" }}
+                                <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Message {{ to_prescriber }}
                             {% endif %}
                         </p>
                     </div>
@@ -42,8 +42,8 @@
                             {% if wizard.steps.current == RefuseViewStep.REASON %}
                                 <h2 class="mb-3 mb-md-4">Choix du motif de refus</h2>
                                 <p class="mb-3 mb-md-4">
-                                    {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
-                                        Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour le candidat comme pour {{ job_application.is_sent_by_authorized_prescriber|yesno:"le prescripteur,l’orienteur" }}. Nous vous encourageons à répondre à chacune des parties.
+                                    {% if with_prescriber %}
+                                        Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour le candidat comme pour {{ the_prescriber }}. Nous vous encourageons à répondre à chacune des parties.
                                     {% else %}
                                         Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour le candidat.
                                     {% endif %}
@@ -51,8 +51,8 @@
                             {% elif wizard.steps.current == RefuseViewStep.JOB_SEEKER_ANSWER %}
                                 <h2 class="mb-3 mb-md-4">Réponse au candidat</h2>
                                 <p class="mb-3 mb-md-4">
-                                    {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
-                                        Une copie de ce message sera adressée {{ job_application.is_sent_by_authorized_prescriber|yesno:"au prescripteur,à l’orienteur" }}.
+                                    {% if with_prescriber %}
+                                        Une copie de ce message sera adressée {{ to_prescriber }}.
                                         <br>
                                     {% endif %}
                                     Merci de bien vouloir adapter ce message en fonction de la situation.
@@ -63,11 +63,9 @@
                                     {% if not refusal_reason_shared_with_job_seeker %}<em>(Motif non communiqué au candidat)</em>{% endif %}
                                 </p>
                             {% elif wizard.steps.current == RefuseViewStep.PRESCRIBER_ANSWER %}
-                                <h2 class="mb-3 mb-md-4">
-                                    Réponse {{ job_application.is_sent_by_authorized_prescriber|yesno:"au prescripteur,à l’orienteur" }}
-                                </h2>
+                                <h2 class="mb-3 mb-md-4">Réponse {{ to_prescriber }}</h2>
                                 <p class="mb-3 mb-md-4">
-                                    Vous pouvez partager un message {{ job_application.is_sent_by_authorized_prescriber|yesno:"au prescripteur,à l’orienteur" }} uniquement, comme détailler ou évoquer d’autres motifs de refus.
+                                    Vous pouvez partager un message {{ to_prescriber }} uniquement, comme détailler ou évoquer d’autres motifs de refus.
                                 </p>
                                 <p class="mb-3 mb-md-4">
                                     <strong>Motif de refus :</strong>
@@ -105,9 +103,7 @@
                                                             <i class="ri-information-line ri-lg text-info ms-1" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
                                                         {% elif radio.data.value == RefusalReason.OTHER %}
                                                             {{ radio.choice_label }}
-                                                            {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
-                                                                (détails à fournir dans le message {{ job_application.is_sent_by_authorized_prescriber|yesno:"au prescripteur,à l’orienteur" }})
-                                                            {% endif %}
+                                                            {% if with_prescriber %}(détails à fournir dans le message {{ to_prescriber }}){% endif %}
                                                         {% else %}
                                                             {{ radio.choice_label }}
                                                         {% endif %}

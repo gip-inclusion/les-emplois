@@ -483,6 +483,13 @@ class JobApplicationRefuseView(NamedUrlSessionWizardView):
             "matomo_event_name": f"refuse-application-{self.steps.current}-submit",
             "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.id}),
             "RefuseViewStep": RefuseViewStep,
+            "to_prescriber": (
+                "au prescripteur" if self.job_application.is_sent_by_authorized_prescriber else "à l’orienteur"
+            ),
+            "the_prescriber": (
+                "le prescripteur" if self.job_application.is_sent_by_authorized_prescriber else "l’orienteur"
+            ),
+            "with_prescriber": self.job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER,
         }
 
     def get_form_kwargs(self, step=None):
