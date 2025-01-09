@@ -757,6 +757,22 @@ class TestUtilsTemplateTags:
         out = template.render(Context({"counter": 10}))
         assert out == "résultats"
 
+        template = Template('{% load str_filters %}hibou{{ counter|pluralizefr:"x" }}')
+        out = template.render(Context({"counter": 0}))
+        assert out == "hibou"
+        out = template.render(Context({"counter": 1}))
+        assert out == "hibou"
+        out = template.render(Context({"counter": 10}))
+        assert out == "hiboux"
+
+        template = Template('{% load str_filters %}{{ counter|pluralizefr:"grand hibou,grands hiboux" }}')
+        out = template.render(Context({"counter": 0}))
+        assert out == "grand hibou"
+        out = template.render(Context({"counter": 1}))
+        assert out == "grand hibou"
+        out = template.render(Context({"counter": 10}))
+        assert out == "grands hiboux"
+
     def test_mask_unless(self):
         template = Template("""{% load str_filters %}{{ value|mask_unless:predicate }}""")
 
