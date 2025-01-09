@@ -3,12 +3,11 @@ from functools import partial
 import freezegun
 import pytest
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
-from itou.users.models import User
 from tests.gps.factories import FollowUpGroupFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
     JobSeekerFactory,
@@ -36,8 +35,9 @@ def test_job_seeker_cannot_use_gps(client):
     assert response.status_code == 403
 
 
-def test_user_autocomplete():
+def test_user_autocomplete(client):
     prescriber = PrescriberFactory(first_name="gps member Vince")
+    PrescriberMembershipFactory(user=prescriber, organization__authorized=True)
     first_beneficiary = JobSeekerFactory(first_name="gps beneficiary Bob", last_name="Le Brico")
     second_beneficiary = JobSeekerFactory(first_name="gps second beneficiary Martin", last_name="Pêcheur")
     third_beneficiary = JobSeekerFactory(first_name="gps third beneficiary Foo", last_name="Bar")
@@ -46,18 +46,23 @@ def test_user_autocomplete():
     FollowUpGroupFactory(beneficiary=third_beneficiary, memberships=3, memberships__member=prescriber)
     FollowUpGroupFactory(beneficiary=second_beneficiary, memberships=2)
 
+    def get_autocomplete_results(user):
+        client.force_login(user)
+        response = client.get(reverse("autocomplete:gps_users") + "?term=gps")
+        return set(r["id"] for r in response.json()["results"])
+
     # Employers should get the 3 job seekers.
-    users = User.objects.autocomplete("gps", EmployerFactory())
-    assertQuerySetEqual(users, [first_beneficiary, second_beneficiary, third_beneficiary], ordered=False)
+    results = get_autocomplete_results(EmployerFactory(with_company=True))
+    assert results == {first_beneficiary.pk, second_beneficiary.pk, third_beneficiary.pk}
 
     # Authorized prescribers should get the 3 job seekers.
     org = PrescriberOrganizationWithMembershipFactory(authorized=True)
-    users = User.objects.autocomplete("gps", org.members.get())
-    assertQuerySetEqual(users, [first_beneficiary, second_beneficiary, third_beneficiary], ordered=False)
+    results = get_autocomplete_results(org.members.get())
+    assert results == {first_beneficiary.pk, second_beneficiary.pk, third_beneficiary.pk}
 
     # We should not get ourself nor the first and third user user because we are a member of their group
-    users = User.objects.autocomplete("gps", prescriber).all()
-    assertQuerySetEqual(users, [second_beneficiary])
+    results = get_autocomplete_results(prescriber)
+    assert results == {second_beneficiary.pk}
 
     # Now, if we remove the first user from our group by setting the membership to is_active False
     # The autocomplete should return it again
@@ -67,9 +72,8 @@ def test_user_autocomplete():
 
     # We should not get ourself but we should get the first beneficiary (we are is_active=False)
     # and the second one (we are not part of his group)
-    users = User.objects.autocomplete("gps", prescriber)
-
-    assertQuerySetEqual(users, [first_beneficiary, second_beneficiary], ordered=False)
+    results = get_autocomplete_results(prescriber)
+    assert results == {first_beneficiary.pk, second_beneficiary.pk}
 
 
 @pytest.mark.parametrize(
