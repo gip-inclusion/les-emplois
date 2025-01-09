@@ -68,6 +68,12 @@
                           
                               <p class="h4">Se connecter avec FranceConnect</p>
                               
+                                  <p>
+                                      <strong>Votre adresse e-mail utilise une connexion via FranceConnect. Veuillez vous connecter en utilisant le bouton ci-dessous.</strong>
+                                  </p>
+                                  <p>
+                                      FranceConnect est la solution proposée par l’État pour sécuriser et simplifier la connexion à vos services en ligne.
+                                  </p>
                                   <div class="mt-4">
   
   
@@ -143,6 +149,9 @@
                           
                               <p class="h4">Se connecter avec France Travail</p>
                               
+                                  <p>
+                                      <strong>Votre adresse e-mail utilise une connexion via France Travail. Veuillez vous connecter en utilisant le bouton ci-dessous.</strong>
+                                  </p>
                                   <div class="mt-4 text-center">
   
   

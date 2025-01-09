@@ -22,6 +22,12 @@
                         {% elif login_provider == "FC" %}
                             <p class="h4">Se connecter avec FranceConnect</p>
                             {% if show_france_connect %}
+                                <p>
+                                    <strong>Votre adresse e-mail utilise une connexion via FranceConnect. Veuillez vous connecter en utilisant le bouton ci-dessous.</strong>
+                                </p>
+                                <p>
+                                    FranceConnect est la solution proposée par l’État pour sécuriser et simplifier la connexion à vos services en ligne.
+                                </p>
                                 <div class="mt-4">{% include "signup/includes/france_connect_button.html" %}</div>
                             {% else %}
                                 <div class="alert alert-info" role="status">
@@ -31,6 +37,9 @@
                         {% elif login_provider == "PEC" %}
                             <p class="h4">Se connecter avec France Travail</p>
                             {% if show_peamu %}
+                                <p>
+                                    <strong>Votre adresse e-mail utilise une connexion via France Travail. Veuillez vous connecter en utilisant le bouton ci-dessous.</strong>
+                                </p>
                                 <div class="mt-4 text-center">{% include "signup/includes/peamu_button.html" %}</div>
                             {% else %}
                                 <div class="alert alert-info" role="status">
