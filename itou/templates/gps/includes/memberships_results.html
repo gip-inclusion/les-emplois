@@ -28,9 +28,7 @@
                             {% if counter < 1 %}
                                 Aucun autre professionnel que vous n'est intervenu auprès de ce bénéficiaire.
                             {% else %}
-                                {{ counter }} autre{{ counter|pluralizefr }} professionnel{{ counter|pluralizefr }}
-                                {{ counter|pluralize:"est,sont" }}
-                                intervenu{{ counter|pluralizefr }} auprès de ce bénéficiaire.
+                                {{ counter }} {{ counter|pluralizefr:"autre professionnel est intervenu,autres professionnels sont intervenus" }} auprès de ce bénéficiaire.
                             {% endif %}
                         </p>
                     {% endwith %}

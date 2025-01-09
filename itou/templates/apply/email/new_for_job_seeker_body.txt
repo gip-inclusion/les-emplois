@@ -26,7 +26,7 @@ Candidature chez {{ job_application.to_company.display_name }} envoyée avec suc
 {% with jobs=job_application.selected_jobs.all %}
 {% if jobs %}
 
-*Métier{{ jobs|pluralizefr }} recherché{{ jobs|pluralizefr }}* :
+*{{ jobs|pluralizefr:"Métier recherché,Métiers recherchés" }}* :
 
 {% for job in jobs %}
 - {{ job.display_name }}{% endfor %}

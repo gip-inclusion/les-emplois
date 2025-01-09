@@ -27,7 +27,7 @@ Vous avez reçu une nouvelle candidature !
 {% with jobs=job_application.selected_jobs.all %}
 {% if jobs %}
 
-*Métier{{ jobs|pluralizefr }} recherché{{ jobs|pluralizefr }}* :
+*{{ jobs|pluralizefr:"Métier recherché,Métiers recherchés" }}* :
 
 {% for job in jobs %}
 - {{ job.display_name }}{% endfor %}

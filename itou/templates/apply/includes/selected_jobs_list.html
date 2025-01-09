@@ -13,7 +13,7 @@
                     aria-expanded="false"
                     type="button"
                     aria-controls="collapse-job-application-{{ job_application.id }}">
-                <span>{{ all_jobs|length }} poste{{ all_jobs|pluralizefr }} recherché{{ all_jobs|pluralizefr }}</span>
+                <span>{{ all_jobs|length }} {{ all_jobs|pluralizefr:"poste recherché,postes recherchés" }}</span>
             </button>
             <div class="c-info__detail collapse" id="collapse-job-application-{{ job_application.id }}">
                 <ul class="list-unstyled">

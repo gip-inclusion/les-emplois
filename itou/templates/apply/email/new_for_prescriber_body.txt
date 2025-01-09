@@ -27,7 +27,7 @@ La candidature suivante a été envoyée avec succès à l'entreprise {{ job_app
 {% with jobs=job_application.selected_jobs.all %}
 {% if jobs %}
 
-*Métier{{ jobs|pluralizefr }} recherché{{ jobs|pluralizefr }}* :
+*{{ jobs|pluralizefr:"Métier recherché,Métiers recherchés" }}* :
 
 {% for job in jobs %}
 - {{ job.display_name }}{% endfor %}

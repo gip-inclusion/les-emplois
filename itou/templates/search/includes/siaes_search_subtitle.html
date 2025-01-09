@@ -4,8 +4,6 @@
     {% if request.resolver_match.view_name == "search:employers_results" or job_app_to_transfer|default:False %}
         <h2 class="mb-3 mb-md-4">Employeur{{ siaes_count|pluralizefr }}</h2>
     {% else %}
-        <h2 class="mb-3 mb-md-4">
-            Poste{{ job_descriptions_count|pluralizefr }} ouvert{{ job_descriptions_count|pluralizefr }} au recrutement
-        </h2>
+        <h2 class="mb-3 mb-md-4">{{ job_descriptions_count|pluralizefr:"Poste ouvert,Postes ouverts" }} au recrutement</h2>
     {% endif %}
 </div>
