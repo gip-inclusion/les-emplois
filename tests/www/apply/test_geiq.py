@@ -229,6 +229,16 @@ class TestJobApplicationGEIQEligibilityDetails:
         assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
         assertNotContains(response, self.CONFIRMATION_MODAL)
 
+    def test_accepted_without_diagnosis(self, client):
+        job_application = JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            to_company__kind=CompanyKind.GEIQ,
+            eligibility_diagnosis=None,
+        )
+
+        response = self.get_response(client, job_application, job_application.sender)
+        assert response.status_code == 200
+
 
 def test_get_geiq_eligibility_diagnosis(subtests):
     expired_prescriber_diagnosis = GEIQEligibilityDiagnosisFactory(
