@@ -917,10 +917,12 @@
                  "companies_jobdescription"."field_history",
                  "companies_jobdescription"."creation_source",
                  COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
-                                                                                                    WHERE "job_applications_jobapplication"."state" IN (%s, %s, %s)) AS "job_applications_count",
+                                                                                                    WHERE ("job_applications_jobapplication"."archived_at" IS NULL
+                                                                                                           AND "job_applications_jobapplication"."state" IN (%s, %s, %s))) AS "job_applications_count",
                  CASE
                      WHEN COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
-                                                                                                             WHERE ("job_applications_jobapplication"."state" IN (%s, %s, %s))) >= %s THEN %s
+                                                                                                             WHERE ("job_applications_jobapplication"."archived_at" IS NULL
+                                                                                                                    AND "job_applications_jobapplication"."state" IN (%s, %s, %s))) >= %s THEN %s
                      ELSE %s
                  END AS "is_popular",
                  "jobs_appellation"."updated_at",
@@ -1302,10 +1304,12 @@
                  "companies_jobdescription"."field_history",
                  "companies_jobdescription"."creation_source",
                  COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
-                                                                                                    WHERE "job_applications_jobapplication"."state" IN (%s, %s, %s)) AS "job_applications_count",
+                                                                                                    WHERE ("job_applications_jobapplication"."archived_at" IS NULL
+                                                                                                           AND "job_applications_jobapplication"."state" IN (%s, %s, %s))) AS "job_applications_count",
                  CASE
                      WHEN COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
-                                                                                                             WHERE ("job_applications_jobapplication"."state" IN (%s, %s, %s))) >= %s THEN %s
+                                                                                                             WHERE ("job_applications_jobapplication"."archived_at" IS NULL
+                                                                                                                    AND "job_applications_jobapplication"."state" IN (%s, %s, %s))) >= %s THEN %s
                      ELSE %s
                  END AS "is_popular",
                  "jobs_appellation"."updated_at",
@@ -1688,10 +1692,12 @@
                  "companies_jobdescription"."field_history",
                  "companies_jobdescription"."creation_source",
                  COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
-                                                                                                    WHERE "job_applications_jobapplication"."state" IN (%s, %s, %s)) AS "job_applications_count",
+                                                                                                    WHERE ("job_applications_jobapplication"."archived_at" IS NULL
+                                                                                                           AND "job_applications_jobapplication"."state" IN (%s, %s, %s))) AS "job_applications_count",
                  CASE
                      WHEN COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
-                                                                                                             WHERE ("job_applications_jobapplication"."state" IN (%s, %s, %s))) >= %s THEN %s
+                                                                                                             WHERE ("job_applications_jobapplication"."archived_at" IS NULL
+                                                                                                                    AND "job_applications_jobapplication"."state" IN (%s, %s, %s))) >= %s THEN %s
                      ELSE %s
                  END AS "is_popular",
                  "jobs_appellation"."updated_at",
@@ -2073,10 +2079,12 @@
                  "companies_jobdescription"."field_history",
                  "companies_jobdescription"."creation_source",
                  COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
-                                                                                                    WHERE "job_applications_jobapplication"."state" IN (%s, %s, %s)) AS "job_applications_count",
+                                                                                                    WHERE ("job_applications_jobapplication"."archived_at" IS NULL
+                                                                                                           AND "job_applications_jobapplication"."state" IN (%s, %s, %s))) AS "job_applications_count",
                  CASE
                      WHEN COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
-                                                                                                             WHERE ("job_applications_jobapplication"."state" IN (%s, %s, %s))) >= %s THEN %s
+                                                                                                             WHERE ("job_applications_jobapplication"."archived_at" IS NULL
+                                                                                                                    AND "job_applications_jobapplication"."state" IN (%s, %s, %s))) >= %s THEN %s
                      ELSE %s
                  END AS "is_popular",
                  "jobs_appellation"."updated_at",
