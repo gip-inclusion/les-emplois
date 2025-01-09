@@ -4,36 +4,44 @@
   <form action="/employee_record/create_step_2/[PK of JobApplication]" method="post">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                   <fieldset>
-                      <legend class="h2">Domiciliation du salarié</legend>
-                      <div class="row">
-                          <div class="col-12 col-lg-8">
+                      <legend>Domiciliation du salarié</legend>
+                      
+                      <div class="mb-3">
+                          <p>
+                              Merci de bien vouloir vérifier <b>l'adresse qui sera envoyée à l'ASP</b>.
+                          </p>
+                          <ul>
+                              <li>
+                                  Si elle est correcte, vous pouvez passer à l'étape suivante en cliquant sur le bouton <b>«Suivant»</b> en bas de page.
+                              </li>
+                              <li>
+                                  Si elle ne correspond pas, veuillez la modifier à l'aide du formulaire ci-dessous, puis cliquez
+                                  sur le bouton <b>«Valider cette adresse»</b>.
+                              </li>
+                          </ul>
+                          
+                              <p class="mb-0">
+                                  <i class="ri-error-warning-line ri-lg me-1"></i><strong>Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié.</strong>
+                              </p>
+                          
+                      </div>
+                      <div class="c-info mb-3 mb-md-5">
+                          <button class="c-info__summary">
+                              <span>Rappel de l’adresse du salarié renseignée sur Les emplois de l’inclusion</span>
+                          </button>
+                          <div class="c-info__detail">
                               
-                              <div class="mb-3 mb-md-5">
-                                  <p>
-                                      Merci de bien vouloir vérifier <b>l'adresse qui sera envoyée à l'ASP</b>.
-                                  </p>
-                                  <ul>
-                                      <li>
-                                          Si elle est correcte, vous pouvez passer à l'étape suivante en cliquant sur le bouton <b>«Suivant»</b> en bas de page.
-                                      </li>
-                                      <li>
-                                          Si elle ne correspond pas, veuillez la modifier à l'aide du formulaire ci-dessous, puis cliquez
-                                          sur le bouton <b>«Valider cette adresse»</b>.
-                                      </li>
+                                  <ul class="list-unstyled mb-0">
+                                      <li>Rue du Clos de la Grange</li>
+                                      
+                                      <li>58160 Sauvigny-les-Bois</li>
                                   </ul>
-                                  
-                                      <p class="mb-0">
-                                          <i class="ri-error-warning-line ri-lg me-1"></i><strong>Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié.</strong>
-                                      </p>
-                                  
-                              </div>
+                              
                           </div>
                       </div>
-                      <div class="row">
-                          <div class="col-12 col-lg-8">
-                              <div class="form-row">
-                                  <div class="col-12 col-md-3"><div class="form-group"><label class="form-label" for="id_hexa_lane_number">Numéro</label><input class="form-control" id="id_hexa_lane_number" maxlength="10" name="hexa_lane_number" placeholder="Numéro" type="text" value="42"/></div></div>
-                                  <div class="col-12 col-md-3"><div class="form-group"><label class="form-label" for="id_hexa_std_extension">Extension</label><select class="form-select" id="id_hexa_std_extension" name="hexa_std_extension">
+  
+                      <div class="form-group"><label class="form-label" for="id_hexa_lane_number">Numéro</label><input class="form-control" id="id_hexa_lane_number" maxlength="10" name="hexa_lane_number" placeholder="Numéro" type="text" value="42"/></div>
+                      <div class="form-group"><label class="form-label" for="id_hexa_std_extension">Extension</label><select class="form-select" id="id_hexa_std_extension" name="hexa_std_extension">
     <option selected="" value="">---------</option>
   
     <option value="B">Bis</option>
@@ -44,10 +52,8 @@
   
     <option value="C">Quinquies</option>
   
-  </select></div></div>
-                              </div>
-                              <div class="form-row">
-                                  <div class="col-12 col-md-3"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_lane_type">Type de voie</label><select class="form-select" id="id_hexa_lane_type" name="hexa_lane_type" required="">
+  </select></div>
+                      <div class="form-group form-group-required"><label class="form-label" for="id_hexa_lane_type">Type de voie</label><select class="form-select" id="id_hexa_lane_type" name="hexa_lane_type" required="">
     <option value="">---------</option>
   
     <option value="AER">Aérodrome</option>
@@ -236,49 +242,24 @@
   
     <option value="ZUP">Zone urbanisation prio</option>
   
-  </select></div></div>
-                                  <div class="col-12 col-md-6"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_lane_name">Nom de la voie</label><input class="form-control" id="id_hexa_lane_name" maxlength="120" name="hexa_lane_name" placeholder="Nom de la voie" required="" type="text" value="du Clos de la Grange"/></div></div>
-                              </div>
-                              <div class="form-group"><label class="form-label" for="id_hexa_additional_address">Complément d'adresse</label><input class="form-control" id="id_hexa_additional_address" maxlength="32" name="hexa_additional_address" placeholder="Complément d'adresse" type="text"/></div>
-                              <div class="form-row">
-                                  <div class="col-12 col-md-3"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_post_code">Code postal</label><input class="form-control" id="id_hexa_post_code" maxlength="6" name="hexa_post_code" placeholder="Code postal" required="" type="text" value="58160"/></div></div>
-                                  <div class="col-12 col-md-9"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_commune">Commune</label><select class="form-select django-select2" data-ajax--cache="true" data-ajax--type="GET" data-ajax--url="/autocomplete/communes" data-allow-clear="false" data-minimum-input-length="2" data-placeholder="Nom de la commune" data-theme="bootstrap-5" id="id_hexa_commune" lang="fr" name="hexa_commune" required="">
+  </select></div>
+                      <div class="form-group form-group-required"><label class="form-label" for="id_hexa_lane_name">Nom de la voie</label><input class="form-control" id="id_hexa_lane_name" maxlength="120" name="hexa_lane_name" placeholder="Nom de la voie" required="" type="text" value="du Clos de la Grange"/></div>
+                      <div class="form-group"><label class="form-label" for="id_hexa_additional_address">Complément d'adresse</label><input class="form-control" id="id_hexa_additional_address" maxlength="32" name="hexa_additional_address" placeholder="Complément d'adresse" type="text"/></div>
+                      <div class="form-group form-group-required"><label class="form-label" for="id_hexa_post_code">Code postal</label><input class="form-control" id="id_hexa_post_code" maxlength="6" name="hexa_post_code" placeholder="Code postal" required="" type="text" value="58160"/></div>
+                      <div class="form-group form-group-required"><label class="form-label" for="id_hexa_commune">Commune</label><select class="form-select django-select2" data-ajax--cache="true" data-ajax--type="GET" data-ajax--url="/autocomplete/communes" data-allow-clear="false" data-minimum-input-length="2" data-placeholder="Nom de la commune" data-theme="bootstrap-5" id="id_hexa_commune" lang="fr" name="hexa_commune" required="">
     <option selected="" value="47612">SAUVIGNY-LES-BOIS (058)</option>
   
-  </select></div></div>
-                              </div>
-                          </div>
-                          <div class="col-12 col-lg-4">
-                              <div class="c-form-conseil">
-                                  <div>
-                                      <p>
-                                          <i class="ri-lightbulb-line ri-lg me-1"></i><strong>Rappel de l’adresse du salarié renseignée sur Les emplois de l’inclusion</strong>
-                                      </p>
-                                      
-                                          <ul class="list-unstyled mb-0 mt-2">
-                                              <li>Rue du Clos de la Grange</li>
-                                              
-                                              <li>58160 Sauvigny-les-Bois</li>
-                                          </ul>
-                                      
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
+  </select></div>
+  
+                      <button class="btn btn-outline-primary mb-3">Valider cette adresse</button>
                   </fieldset>
-                  <div class="form-row">
-                      <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                          <button class="btn btn-outline-primary">Valider cette adresse</button>
-                      </div>
-                  </div>
-                  <div class="row">
-                      <div class="col-12 col-lg-8">
-                          
-                          
-                          
-                          
-                          
-                              
+  
+                  
+                  
+                  
+                  
+                  
+                      
   
   <div class="row">
       <div class="col-12">
@@ -337,9 +318,8 @@
       </div>
   
   
-                          
-                      </div>
-                  </div>
+                  
+  
               </form>
   '''
 # ---

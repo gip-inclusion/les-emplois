@@ -11,17 +11,11 @@
                     <legend>Etat civil du salarié</legend>
                     {% bootstrap_form_errors form type="all" %}
 
-                    <div class="form-row">
-                        <div class="col-12 col-md-6">{% bootstrap_field form.title %}</div>
-                    </div>
-                    <div class="form-row">
-                        <div class="col-12 col-md-6">{% bootstrap_field form.first_name %}</div>
-                        <div class="col-12 col-md-6">{% bootstrap_field form.last_name %}</div>
-                    </div>
-                    <div class="form-row">
-                        <div class="col-12 col-md-6">{% bootstrap_field form.birthdate %}</div>
-                        <div class="col-12 col-md-6">{% bootstrap_field form.birth_country %}</div>
-                    </div>
+                    {% bootstrap_field form.title %}
+                    {% bootstrap_field form.first_name %}
+                    {% bootstrap_field form.last_name %}
+                    {% bootstrap_field form.birthdate %}
+                    {% bootstrap_field form.birth_country %}
                     {% bootstrap_field form.birth_place %}
                 </fieldset>
                 {% url "employee_record_views:list" as secondary_url %}
