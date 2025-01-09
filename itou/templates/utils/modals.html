@@ -9,6 +9,8 @@
                 {% include "utils/modal_includes/sso_email_conflict_registration_failure.html" %}
             {% elif "registration_failure" in message.extra_tags %}
                 {% include "utils/modal_includes/registration_failure.html" %}
+            {% elif "login_failure" in message.extra_tags %}
+                {% include "utils/modal_includes/login_failure.html" %}
             {% endif %}
         </div>
 

@@ -1,0 +1,19 @@
+{% load django_bootstrap5 %}
+{% load static %}
+{% load theme_inclusion %}
+
+<div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="message-modal-{{ forloop.counter }}-label">
+                {% if "email_does_not_exist" in message.extra_tags %}
+                    Adresse e-mail inconnue
+                {% else %}
+                    Le connexion a échoué
+                {% endif %}
+            </h3>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        {{ message }}
+    </div>
+</div>

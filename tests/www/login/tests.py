@@ -208,19 +208,36 @@ class TestLaborInspectorLogin:
         assertRedirects(response, reverse("account_email_verification_sent"))
 
 
-class TestJopbSeekerLogin:
-    def test_login(self, client):
+class TestJobSeekerPreLogin:
+    def test_pre_login_email_invalid(self, client):
+        form_data = {"email": "emailinvalid"}
+        response = client.post(reverse("login:job_seeker"), data=form_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors["email"] == ["Saisissez une adresse e-mail valide."]
+
+    def test_pre_login_redirects_to_existing_user(self, client):
         user = JobSeekerFactory()
         url = reverse("login:job_seeker")
         response = client.get(url)
         assert response.status_code == 200
 
-        form_data = {
-            "login": user.email,
-            "password": DEFAULT_PASSWORD,
-        }
+        form_data = {"email": user.email}
         response = client.post(url, data=form_data)
-        assertRedirects(response, reverse("account_email_verification_sent"))
+        assertRedirects(response, f"{reverse('login:existing_user', args=(user.public_id,))}?back_url={url}")
+
+    def test_pre_login_email_unknown(self, client, snapshot):
+        url = reverse("login:job_seeker")
+        response = client.get(url)
+
+        form_data = {"email": "doesnotexist@test.fr"}
+        response = client.post(url, data=form_data)
+        assert response.status_code == 200
+
+        assert response.context["form"].errors["email"] == [
+            "Cette adresse e-mail est inconnue. Veuillez en saisir une autre, ou vous inscrire."
+        ]
+        assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
+        assertContains(response, reverse("signup:job_seeker_situation"))
 
     @respx.mock
     @override_settings(
@@ -289,6 +306,19 @@ class TestExistingUserLogin:
         response = client.get(url)
         assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
         assert str(parse_response_to_soup(response, selector=".c-form")) == snapshot
+
+    def test_login_django(self, client):
+        user = JobSeekerFactory(identity_provider=IdentityProvider.DJANGO)
+        url = reverse("login:existing_user", args=(user.public_id,))
+        response = client.get(url)
+        assert response.status_code == 200
+
+        form_data = {
+            "login": user.email,
+            "password": DEFAULT_PASSWORD,
+        }
+        response = client.post(url, data=form_data)
+        assertRedirects(response, reverse("account_email_verification_sent"))
 
     @pytest.mark.parametrize(
         "identity_provider",

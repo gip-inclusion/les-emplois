@@ -158,7 +158,7 @@ class TestJobSeekerSignup:
 
         # User cannot log in until confirmation.
         post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
-        url = reverse("login:job_seeker")
+        url = reverse("login:existing_user", args=(user.public_id,))
         response = client.post(url, data=post_data)
         assert response.status_code == 302
         assert response.url == reverse("account_email_verification_sent")

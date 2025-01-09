@@ -36,14 +36,13 @@ class TestChangeEmailView:
 
         # User cannot log in with his old address
         post_data = {"login": old_email, "password": DEFAULT_PASSWORD}
-        url = reverse("login:job_seeker")
+        url = reverse("login:existing_user", args=(user.public_id,))
         response = client.post(url, data=post_data)
         assert response.status_code == 200
         assert not response.context_data["form"].is_valid()
 
         # User cannot log in until confirmation
         post_data = {"login": new_email, "password": DEFAULT_PASSWORD}
-        url = reverse("login:job_seeker")
         response = client.post(url, data=post_data)
         assert response.status_code == 302
         assert response.url == reverse("account_email_verification_sent")

@@ -6,21 +6,21 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.views.generic.edit import FormView
 
 from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
 from itou.users.enums import MATOMO_ACCOUNT_TYPE, IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.urls import add_url_params, get_safe_url, get_url_param_value
-from itou.www.login.forms import ItouLoginForm
+from itou.www.login.forms import FindExistingUserViaEmailForm, ItouLoginForm
 
 
-class ItouLoginView(LoginNotRequiredMixin, LoginView):
+class UserKindLoginMixin:
     """
-    Generic authentication entry point.
-    This view is used only in one case:
-    when a user confirms its email after updating it.
-    Allauth magic is complicated to debug.
+    Mixin class which adds functionality relating to the different IdentityProviders,
+    configured to be used according to UserKind (certain identity providers accessible only to certain user kinds).
+    django-allauth provides the login behaviour, extended by views for each UserKind.
     """
 
     form_class = ItouLoginForm
@@ -91,6 +91,12 @@ class ItouLoginView(LoginNotRequiredMixin, LoginView):
         return super().dispatch(request, *args, **kwargs)
 
 
+class ItouLoginView(LoginNotRequiredMixin, UserKindLoginMixin, LoginView):
+    """Generic authentication entry point."""
+
+    pass
+
+
 class PrescriberLoginView(ItouLoginView):
     template_name = "account/login_generic.html"
     user_kind = UserKind.PRESCRIBER
@@ -139,20 +145,34 @@ class LaborInspectorLoginView(ItouLoginView):
         return context | extra_context
 
 
-class JobSeekerLoginView(ItouLoginView):
+class JobSeekerPreLoginView(LoginNotRequiredMixin, UserKindLoginMixin, FormView):
+    """
+    JobSeeker's do not log in directly.
+    Instead they enter their email and they are redirected to the login method configured on their account.
+    """
+
     template_name = "account/login_job_seeker.html"
     user_kind = UserKind.JOB_SEEKER
+    form_class = FindExistingUserViaEmailForm
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        extra_context = {
-            "show_france_connect": bool(settings.FRANCE_CONNECT_BASE_URL),
-            "show_peamu": bool(settings.PEAMU_AUTH_BASE_URL),
-        }
-        return context | extra_context
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["request"] = self.request
+        return kwargs
+
+    def form_valid(self, form):
+        self.user = form.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return f"{reverse('login:existing_user', args=(self.user.public_id,))}?back_url={reverse('login:job_seeker')}"
 
 
 class ExistingUserLoginView(ItouLoginView):
+    """
+    Allows a user to login with the provider configured on their account.
+    """
+
     template_name = "account/login_existing_user.html"
 
     def setup(self, request, *args, **kwargs):

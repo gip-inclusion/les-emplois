@@ -239,3 +239,6 @@
                       </div>
   '''
 # ---
+# name: TestJobSeekerPreLogin.test_pre_login_email_unknown
+  '<div class="modal-body"><p>Cette adresse e-mail est inconnue de nos services.</p><p>Si vous êtes déjà inscrit(e), assurez-vous de saisir correctement votre adresse e-mail.</p><p>Si vous n\'êtes pas encore inscrit(e), nous vous invitons à cliquer sur Inscription pour créer votre compte.</p></div><div class="modal-footer"><button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Retour</button><a href="/signup/job_seeker/situation" class="btn btn-sm btn-primary">Inscription</a></div>'
+# ---
