@@ -256,7 +256,7 @@
     "milestone": null,
     "comments": 2,
     "created_at": "2024-12-06T10:04:13Z",
-    "updated_at": "2024-12-16T08:31:16Z",
+    "updated_at": "2024-12-13T08:31:16Z",
     "closed_at": "2024-12-13T10:12:34Z",
     "author_association": "COLLABORATOR",
     "sub_issues_summary": {
@@ -271,7 +271,7 @@
       "html_url": "https://github.com/gip-inclusion/les-emplois/pull/5205",
       "diff_url": "https://github.com/gip-inclusion/les-emplois/pull/5205.diff",
       "patch_url": "https://github.com/gip-inclusion/les-emplois/pull/5205.patch",
-      "merged_at": "2024-12-13T10:12:34Z"
+      "merged_at": ""
     },
     "body": "## :thinking: Pourquoi ?\r\n\r\nLe modèle Datum conserve la valeur en tant qu'entier, or l'apdex et le taux de requête en erreur sont des pourcentages. Ils ont donc une valeur de 0 aujourd'hui. cf #5162 \r\nLes autres mesures étant des valeurs absolues, il me semble inutile de changer le type du champ.\r\nJe ferai une reprise de stock.\r\n\r\n```\r\nimport datetime\r\nimport logging\r\n\r\nfrom dateutil.relativedelta import relativedelta\r\nfrom itou.utils.apis.sentry import SentryApiClient\r\nfrom itou.analytics.models import Datum, DatumCode\r\n\r\ndata = Datum.objects.filter(code__in=[DatumCode.TECH_SENTRY_APDEX, DatumCode.TECH_SENTRY_FAILURE_RATE])\r\n\r\nlogger = logging.getLogger(\"itou.analytics\")\r\n\r\nfor datum in data:\r\n    if datum.value > 0:\r\n        continue\r\n    date = datetime.datetime.fromisoformat(datum.bucket)\r\n    start = (date - relativedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)\r\n    end = date.replace(hour=0, minute=0, second=0, microsecond=0)\r\n    sentry_metrics = SentryApiClient().get_metrics(start=start, end=end)\r\n    if datum.code == DatumCode.TECH_SENTRY_APDEX:\r\n        datum.value = round(sentry_metrics[\"apdex\"] * 10000)\r\n    elif datum.code == DatumCode.TECH_SENTRY_FAILURE_RATE:\r\n        datum.value = round(sentry_metrics[\"failure_rate\"] * 10000)\r\n    logger.info(f\"Updating bucket {datum.bucket} with value {datum.value}.\")\r\n    datum.save()\r\n\r\n```\r\n\r\n```\r\n\r\nimport datetime\r\nimport logging\r\n\r\nfrom dateutil.relativedelta import relativedelta\r\nfrom django import db\r\nfrom django.db import transaction\r\nfrom django.forms import models\r\n\r\nfrom itou.analytics.models import Datum\r\nfrom itou.analytics.tech import collect_analytics_data\r\n\r\n\r\nlogger = logging.getLogger(\"itou.analytics\")\r\ndates = []\r\n\r\nend = datetime.datetime(2024,12,5, tzinfo=datetime.UTC)\r\nstart = datetime.datetime(2024,11,13, tzinfo=datetime.UTC)\r\n\r\nfor days in range((end-start).days):\r\n    date = end - relativedelta(days=days)\r\n    dates.append(date)\r\n\r\n\r\nfor date in dates:\r\n    data = collect_analytics_data(date)\r\n\r\n    bucket = (date.date() - datetime.timedelta(days=1)).isoformat()\r\n    logger.info(f\"Saving analytics data in bucket '{bucket}'.\")\r\n    for code, value in data.items():\r\n        datum = Datum(\r\n            code=code.value,\r\n            bucket=bucket,\r\n            value=value,\r\n            measured_at=date,\r\n        )\r\n        try:\r\n            with transaction.atomic():\r\n                datum.save()\r\n        except db.IntegrityError:\r\n            logger.error(f\"Failed to save code={code.value} for bucket={bucket} because it already exists.\")\r\n        except models.ValidationError as error:\r\n            message = (\r\n                f\"Failed to save code={code.value} for bucket={bucket} because of a ValidationError: \"\r\n                f\"{error.message}\"\r\n            )\r\n            logger.error(message)\r\n        else:\r\n            logger.info(f\"Successfully saved code={code.value} bucket={bucket} value={value}.\")\r\n```",
     "closed_by": {
@@ -427,7 +427,7 @@
       "html_url": "https://github.com/gip-inclusion/les-emplois/pull/5265",
       "diff_url": "https://github.com/gip-inclusion/les-emplois/pull/5265.diff",
       "patch_url": "https://github.com/gip-inclusion/les-emplois/pull/5265.patch",
-      "merged_at": "2024-12-13T08:13:20Z"
+      "merged_at": "2024-12-02T08:13:20Z"
     },
     "body": "## :thinking: Pourquoi ?\r\n\r\nhttps://inclusion.sentry.io/issues/14217816/?project=4508410589020240&query=is%3Aunresolved%20is%3Afor_review%20assigned_or_suggested%3A%5Bme%2C%20my_teams%2C%20none%5D&referrer=issue-stream&sort=inbox&statsPeriod=14d&stream_index=0\r\n\r\n<!--\r\n# Catégories changelog\r\n\r\n +--------------------------|--------------------------+\r\n | API                      | Notifications            |\r\n | Accessibilité            | Page d’accueil           |\r\n | Admin                    | PASS IAE                 |\r\n | Annexes financières      | Performances             |\r\n | Candidature              | Pilotage                 |\r\n | Connexion                | Profil salarié           |\r\n | Contrôle a posteriori    | Prescripteur             |\r\n | Demandes de prolongation | Recherche employeur      |\r\n | Demandeur d’emploi       | Recherche fiche de poste |\r\n | Employeur                | Recherche prescripteur   |\r\n | Fiche de poste           | Stabilité                |\r\n | Fiche entreprise         | Statistiques             |\r\n | Fiches salarié           | Tableau de bord          |\r\n | GEIQ                     | UX/UI                    |\r\n | Inscription              | Vie privée               |\r\n +--------------------------|--------------------------+\r\n\r\n-->\r\n\r\n## :cake: Comment ? <!-- optionnel -->\r\n\r\n> _Décrivez en quelques mots la solution retenue et mise en oeuvre, les difficultés ou problèmes rencontrés. Attirez l'attention sur les décisions d'architecture ou de conception importantes._\r\n\r\n## :rotating_light: À vérifier\r\n\r\n- [ ] Mettre à jour le CHANGELOG_breaking_changes.md ?\r\n\r\n## :desert_island: Comment tester\r\n\r\n> _Les instructions pour reproduire le problème, les profils de test, le parcours spécifique à utiliser, etc. Si vous disposez d'une recette jetable, mettre l'URL pour tester dans cette partie._\r\n\r\n## :computer: Captures d'écran <!-- optionnel -->\r\n",
     "closed_by": {
@@ -567,9 +567,9 @@
     ],
     "milestone": null,
     "comments": 6,
-    "created_at": "2024-12-02T12:47:20Z",
-    "updated_at": "2024-12-02T15:45:55Z",
-    "closed_at": "2024-12-02T15:45:54Z",
+    "created_at": "2024-12-01T12:47:20Z",
+    "updated_at": "2024-12-01T15:45:55Z",
+    "closed_at": "2024-12-01T15:45:54Z",
     "author_association": "CONTRIBUTOR",
     "sub_issues_summary": {
       "total": 0,
@@ -583,7 +583,7 @@
       "html_url": "https://github.com/gip-inclusion/les-emplois/pull/5227",
       "diff_url": "https://github.com/gip-inclusion/les-emplois/pull/5227.diff",
       "patch_url": "https://github.com/gip-inclusion/les-emplois/pull/5227.patch",
-      "merged_at": "2024-12-12T15:45:54Z"
+      "merged_at": "2024-12-02T15:45:54Z"
     },
     "body": "## :thinking: Pourquoi ?\r\n\r\nTest bagottant : https://github.com/gip-inclusion/les-emplois/actions/runs/12235030153/attempts/1\r\nReproductible avec `pytest --randomly-seed=3864335593 -vv tests/www/employee_record_views/test_create.py::TestCreateEmployeeRecordStep2::test_access_granted`\r\n\r\nLes valeurs choisies était \"1999-12-31\" pour la date de naissance alors que la ville était :\r\n```\r\n  id   | start_date |  end_date  | code  |     name     |          created_at           | city_id \r\n-------+------------+------------+-------+--------------+-------------------------------+---------\r\n 57089 | 1900-01-01 | 1999-12-31 | 67152 | GEISPOLSHEIM | 2023-10-02 08:19:11.118299+00 |  [NULL]\r\n```",
     "closed_by": {
