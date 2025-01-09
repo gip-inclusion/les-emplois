@@ -15,7 +15,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
 def test_job_seeker_cannot_use_gps(client):
@@ -221,7 +221,8 @@ def test_my_groups(snapshot, client):
     )
     FollowUpGroup.objects.follow_beneficiary(beneficiary=group.beneficiary, user=user)
 
-    response = client.get(reverse("gps:my_groups"))
+    with assertSnapshotQueries(snapshot):
+        response = client.get(reverse("gps:my_groups"))
     groups = parse_response_to_soup(
         response,
         selector="#follow-up-groups-section",
