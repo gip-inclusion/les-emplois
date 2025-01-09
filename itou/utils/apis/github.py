@@ -33,14 +33,21 @@ class GithubApiClient:
 
         return self.client.get(endpoint, params=params).raise_for_status()
 
+    @staticmethod
+    def filter_by_merged_at(data, date):
+        filtered_data = []
+        for datum in data:
+            if not datum["pull_request"].get("merged_at"):
+                continue
+
+            if datetime.datetime.fromisoformat(datum["pull_request"]["merged_at"]).date() == date:
+                filtered_data.append(datum)
+
+        return filtered_data
+
     def get_metrics(self, start):
         response = self._request(endpoint="les-emplois/issues", start=start)
 
         # Filter results based on `date` because the API does not allow to pass an end date.
-        today_data = [
-            data
-            for data in response.json()
-            if datetime.datetime.fromisoformat(data["updated_at"]).date() == start.date()
-        ]
-
+        today_data = self.filter_by_merged_at(data=response.json(), date=start.date())
         return {"total_pr_bugs": len(today_data)}
