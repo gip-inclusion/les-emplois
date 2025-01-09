@@ -3,108 +3,88 @@
 {% load url_add_query %}
 
 <div class="row">
-    <div class="col-12">
+    <div class="col-12 col-lg-8">
         <div class="c-form">
             <form method="post" action="{% url "employee_record_views:create_step_2" job_application.id %}">
                 {% csrf_token %}
                 <fieldset>
-                    <legend class="h2">Domiciliation du salarié</legend>
-                    <div class="row">
-                        <div class="col-12 col-lg-8">
-                            {% bootstrap_form_errors form type="all" %}
-                            <div class="mb-3 mb-md-5">
-                                <p>
-                                    Merci de bien vouloir vérifier <b>l'adresse qui sera envoyée à l'ASP</b>.
-                                </p>
-                                <ul>
-                                    <li>
-                                        Si elle est correcte, vous pouvez passer à l'étape suivante en cliquant sur le bouton <b>«Suivant»</b> en bas de page.
-                                    </li>
-                                    <li>
-                                        Si elle ne correspond pas, veuillez la modifier à l'aide du formulaire ci-dessous, puis cliquez
-                                        sur le bouton <b>«Valider cette adresse»</b>.
-                                    </li>
-                                </ul>
-                                {% if profile.hexa_address_filled %}
-                                    <p class="mb-0">
-                                        <i class="ri-error-warning-line ri-lg me-1"></i><strong>Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié.</strong>
-                                    </p>
-                                {% else %}
-                                    <div class="alert alert-danger" role="status">
-                                        <p class="mb-2">
-                                            <strong>L'adresse du salarié n'a pu être vérifiée automatiquement.</strong>
-                                        </p>
-                                        <p class="mb-0">Ceci peut être dû à:</p>
-                                        <ul>
-                                            <li>une erreur temporaire de géolocalisation,</li>
-                                            <li>une adresse introuvable (code postal ou voie erronée).</li>
-                                        </ul>
-                                        <p class="m-0">
-                                            <b>Merci de bien vouloir saisir l'adresse du salarié dans le formulaire ci-dessous.</b>
-                                        </p>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-lg-8">
-                            <div class="form-row">
-                                <div class="col-12 col-md-3">{% bootstrap_field form.hexa_lane_number %}</div>
-                                <div class="col-12 col-md-3">{% bootstrap_field form.hexa_std_extension %}</div>
-                            </div>
-                            <div class="form-row">
-                                <div class="col-12 col-md-3">{% bootstrap_field form.hexa_lane_type %}</div>
-                                <div class="col-12 col-md-6">{% bootstrap_field form.hexa_lane_name %}</div>
-                            </div>
-                            {% bootstrap_field form.hexa_additional_address %}
-                            <div class="form-row">
-                                <div class="col-12 col-md-3">{% bootstrap_field form.hexa_post_code %}</div>
-                                <div class="col-12 col-md-9">{% bootstrap_field form.hexa_commune %}</div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-4">
-                            <div class="c-form-conseil">
-                                <div>
-                                    <p>
-                                        <i class="ri-lightbulb-line ri-lg me-1"></i><strong>Rappel de l’adresse du salarié renseignée sur Les emplois de l’inclusion</strong>
-                                    </p>
-                                    {% if address_filled %}
-                                        <ul class="list-unstyled mb-0 mt-2">
-                                            <li>{{ job_seeker.address_line_1 }}</li>
-                                            {% if job_seeker.address_line_2 %}<li>{{ job_seeker.address_line_2 }}</li>{% endif %}
-                                            <li>{{ job_seeker.post_code }} {{ job_seeker.city }}</li>
-                                        </ul>
-                                    {% else %}
-                                        <p class="mb-0 mt-2">Aucune adresse n'a été saisie sur les emplois de l'inclusion !</p>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </fieldset>
-                <div class="form-row">
-                    <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                        <button class="btn btn-outline-primary">Valider cette adresse</button>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12 col-lg-8">
-                        {% url "employee_record_views:create_step_3" job_application.id as primary_url %}
-                        {% url "employee_record_views:create" job_application.id as secondary_url %}
-                        {% url "employee_record_views:list" as reset_url %}
-                        {% if request.GET.status %}
-                            {% url_add_query primary_url status=request.GET.status as primary_url %}
-                            {% url_add_query secondary_url status=request.GET.status as secondary_url %}
-                            {% url_add_query reset_url status=request.GET.status as reset_url %}
-                        {% endif %}
+                    <legend>Domiciliation du salarié</legend>
+                    {% bootstrap_form_errors form type="all" %}
+                    <div class="mb-3">
+                        <p>
+                            Merci de bien vouloir vérifier <b>l'adresse qui sera envoyée à l'ASP</b>.
+                        </p>
+                        <ul>
+                            <li>
+                                Si elle est correcte, vous pouvez passer à l'étape suivante en cliquant sur le bouton <b>«Suivant»</b> en bas de page.
+                            </li>
+                            <li>
+                                Si elle ne correspond pas, veuillez la modifier à l'aide du formulaire ci-dessous, puis cliquez
+                                sur le bouton <b>«Valider cette adresse»</b>.
+                            </li>
+                        </ul>
                         {% if profile.hexa_address_filled %}
-                            {% itou_buttons_form primary_label="Suivant" primary_url=primary_url secondary_url=secondary_url reset_url=reset_url %}
+                            <p class="mb-0">
+                                <i class="ri-error-warning-line ri-lg me-1"></i><strong>Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié.</strong>
+                            </p>
                         {% else %}
-                            {% itou_buttons_form primary_label="Suivant" primary_disabled=True secondary_url=secondary_url reset_url=reset_url %}
+                            <div class="alert alert-danger" role="status">
+                                <p class="mb-2">
+                                    <strong>L'adresse du salarié n'a pu être vérifiée automatiquement.</strong>
+                                </p>
+                                <p class="mb-0">Ceci peut être dû à:</p>
+                                <ul>
+                                    <li>une erreur temporaire de géolocalisation,</li>
+                                    <li>une adresse introuvable (code postal ou voie erronée).</li>
+                                </ul>
+                                <p class="m-0">
+                                    <b>Merci de bien vouloir saisir l'adresse du salarié dans le formulaire ci-dessous.</b>
+                                </p>
+                            </div>
                         {% endif %}
                     </div>
-                </div>
+                    <div class="c-info mb-3 mb-md-5">
+                        <button class="c-info__summary">
+                            <span>Rappel de l’adresse du salarié renseignée sur Les emplois de l’inclusion</span>
+                        </button>
+                        <div class="c-info__detail">
+                            {% if address_filled %}
+                                <ul class="list-unstyled mb-0">
+                                    <li>{{ job_seeker.address_line_1 }}</li>
+                                    {% if job_seeker.address_line_2 %}<li>{{ job_seeker.address_line_2 }}</li>{% endif %}
+                                    <li>{{ job_seeker.post_code }} {{ job_seeker.city }}</li>
+                                </ul>
+                            {% else %}
+                                <p class="mb-0">Aucune adresse n'a été saisie sur les emplois de l'inclusion !</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% bootstrap_field form.hexa_lane_number %}
+                    {% bootstrap_field form.hexa_std_extension %}
+                    {% bootstrap_field form.hexa_lane_type %}
+                    {% bootstrap_field form.hexa_lane_name %}
+                    {% bootstrap_field form.hexa_additional_address %}
+                    {% bootstrap_field form.hexa_post_code %}
+                    {% bootstrap_field form.hexa_commune %}
+
+                    <button class="btn btn-outline-primary mb-3">Valider cette adresse</button>
+                </fieldset>
+
+                {% url "employee_record_views:create_step_3" job_application.id as primary_url %}
+                {% url "employee_record_views:create" job_application.id as secondary_url %}
+                {% url "employee_record_views:list" as reset_url %}
+                {% if request.GET.status %}
+                    {% url_add_query primary_url status=request.GET.status as primary_url %}
+                    {% url_add_query secondary_url status=request.GET.status as secondary_url %}
+                    {% url_add_query reset_url status=request.GET.status as reset_url %}
+                {% endif %}
+                {% if profile.hexa_address_filled %}
+                    {% itou_buttons_form primary_label="Suivant" primary_url=primary_url secondary_url=secondary_url reset_url=reset_url %}
+                {% else %}
+                    {% itou_buttons_form primary_label="Suivant" primary_disabled=True secondary_url=secondary_url reset_url=reset_url %}
+                {% endif %}
+
             </form>
         </div>
     </div>
