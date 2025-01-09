@@ -72,8 +72,9 @@ def check_waiting_period(job_application):
 def _get_geiq_eligibility_diagnosis(job_application, only_prescriber):
     # Return the job_application diagnosis if it's accepted
     if job_application.state.is_accepted:
-        # but not if the viewer is a prescriber and the diangosis was made by the company
-        if only_prescriber and job_application.geiq_eligibility_diagnosis.author_geiq:
+        # or None if the viewer is a prescriber and the diangosis was made by the company
+        # NB. the job application may not have a geiq diagnosis
+        if only_prescriber and getattr(job_application.geiq_eligibility_diagnosis, "author_geiq", None):
             return None
         return job_application.geiq_eligibility_diagnosis
     return GEIQEligibilityDiagnosis.objects.diagnoses_for(
