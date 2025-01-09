@@ -1,5 +1,8 @@
 {# django-allauth template override. #}
 {% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load django_bootstrap5 %}
+{% load redirection_fields %}
 {% load static %}
 
 {% block title %}Connexion candidat {{ block.super }}{% endblock %}
@@ -12,31 +15,43 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-lg-6">
                     <div class="c-form mb-5">
-                        <p class="h4">Se connecter avec FranceConnect</p>
-                        {% if show_france_connect %}
-                            <div class="mt-4">{% include "signup/includes/france_connect_button.html" %}</div>
-                        {% else %}
-                            <div class="alert alert-info" role="status">
-                                <p class="mb-0">FranceConnect est désactivé.</p>
-                            </div>
-                        {% endif %}
-                        <hr class="my-5" data-it-text="ou">
+                        <p class="h4 text-primary">Quelle adresse mail utilisez-vous ?</p>
+                        <p class="text-secondary fs-sm">
+                            Si vous avec un compte <strong>France Travail</strong> ou <strong>FranceConnect</strong> et que vous souhaitez vous connecter avec ce compte,
+                            merci de renseigner dans ce champs l’adresse e-mail qui y est associé.
+                        </p>
 
-                        <p class="h4">Se connecter avec France Travail</p>
-                        {% if show_peamu %}
-                            <div class="row mt-3">
-                                <div class="col-sm">
-                                    <div class="text-center">{% include "signup/includes/peamu_button.html" %}</div>
+                        <form method="post" class="js-prevent-multiple-submit">
+                            {% csrf_token %}
+                            {% redirection_input_field value=redirect_field_value %}
+
+                            <div class="form-group mb-1 form-group-required text-primary">
+                                {% bootstrap_label "Adresse e-mail" label_for="id_email" %}
+                                {% bootstrap_field form.email wrapper_class="form-group mb-0" show_label=False %}
+                                <div class="form-text mb-3">
+                                    <div class="text-end mt-1">
+                                        <button type="button" class="fs-sm text-secondary" data-bs-toggle="modal" data-bs-target="#no-email-modal">
+                                            Pas d'adresse e-mail ?
+                                        </button>
+                                    </div>
+                                    {% include "signup/includes/no_email_link.html" with exclude_button=True only %}
                                 </div>
                             </div>
-                        {% else %}
-                            <div class="alert alert-info" role="status">
-                                <p class="mb-0">France Travail est désactivé.</p>
-                            </div>
-                        {% endif %}
-                        <hr class="my-5" data-it-text="ou">
+                            {% url 'home:hp' as reset_url %}
+                            {% itou_buttons_form primary_label="Suivant" reset_url=reset_url %}
 
-                        {% include "account/includes/login_form.html" %}
+                            <div class="mt-5 mb-5 text-end text-primary">
+                                <p>
+                                    Vous n'avez pas de compte ? <a href="{% url 'signup:job_seeker_situation' %}">Inscription</a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- Hide left column on small devices. -->
+                <div class="d-none d-lg-inline-flex align-items-center col-lg-6 justify-content-center">
+                    <div class="w-75">
+                        <img class="img-fluid img-fitcover" src="{% static 'img/login.svg' %}" alt="">
                     </div>
                 </div>
             </div>

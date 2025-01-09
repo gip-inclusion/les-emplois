@@ -10,6 +10,6 @@ urlpatterns = [
     path("prescriber", views.PrescriberLoginView.as_view(), name="prescriber"),
     path("employer", views.EmployerLoginView.as_view(), name="employer"),
     path("labor_inspector", views.LaborInspectorLoginView.as_view(), name="labor_inspector"),
-    path("job_seeker", views.JobSeekerLoginView.as_view(), name="job_seeker"),
+    path("job_seeker", views.JobSeekerPreLoginView.as_view(), name="job_seeker"),
     path("existing/<uuid:user_public_id>", views.ExistingUserLoginView.as_view(), name="existing_user"),
 ]

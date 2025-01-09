@@ -1,11 +1,55 @@
 from allauth.account.forms import LoginForm
 from django import forms
 from django.conf import settings
+from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
+from itou.openid_connect.errors import format_error_modal_content
 from itou.users.enums import IdentityProvider
 from itou.users.models import User
+
+
+class FindExistingUserViaEmailForm(forms.Form):
+    """
+    Validates only the email field. Displays a modal to user if email not in use
+    """
+
+    email = forms.EmailField(
+        label="Adresse e-mail",
+        required=True,
+        widget=forms.TextInput(
+            attrs={"type": "email", "placeholder": "adresse@email.fr", "autocomplete": "email", "autofocus": True}
+        ),
+    )
+
+    def __init__(self, *args, request=None, **kwargs):
+        self.request = request
+        super().__init__(*args, **kwargs)
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        self.user = User.objects.filter(email__iexact=email).first()
+        if self.user is None:
+            messages.error(
+                self.request,
+                format_error_modal_content(
+                    mark_safe(
+                        "<p>Cette adresse e-mail est inconnue de nos services.</p>"
+                        "<p>Si vous êtes déjà inscrit(e), "
+                        "assurez-vous de saisir correctement votre adresse e-mail.</p>"
+                        "<p>Si vous n'êtes pas encore inscrit(e), "
+                        "nous vous invitons à cliquer sur Inscription pour créer votre compte.</p>"
+                    ),
+                    reverse("signup:job_seeker_situation"),
+                    "Inscription",
+                ),
+                extra_tags="modal login_failure email_does_not_exist",
+            )
+            raise ValidationError("Cette adresse e-mail est inconnue. Veuillez en saisir une autre, ou vous inscrire.")
+        return email
 
 
 class ItouLoginForm(LoginForm):
