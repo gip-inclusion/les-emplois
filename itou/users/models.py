@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, MinLengthValidator, RegexValidator
 from django.db import models
-from django.db.models import Count, Exists, OuterRef, Q
+from django.db.models import Count, Q
 from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils import timezone
@@ -35,7 +35,6 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.enums import CompanyKind
-from itou.utils.db import or_queries
 from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_absolute_url
@@ -46,36 +45,6 @@ from .notifications import JobSeekerCreatedByProxyNotification
 
 
 class ItouUserManager(UserManager):
-    def autocomplete(self, search_string, current_user):
-        """
-        We started by using to_vector queries but it's not suitable for searching names because
-        it tries to lemmatize names so for example, henry becomes henri after lemmatization and
-        the search doesn't work.
-        Then we tried TrigramSimilarity methods but it's too random for accurate searching.
-        Fallback to unaccent / icontains for now
-        """
-        from itou.gps.models import FollowUpGroup
-
-        search_terms = search_string.split(" ")
-        name_q = []
-        for term in search_terms:
-            name_q.append(Q(first_name__unaccent__istartswith=term))
-            name_q.append(Q(last_name__unaccent__istartswith=term))
-        queryset = (
-            self.filter(or_queries(name_q))
-            .filter(kind=UserKind.JOB_SEEKER)
-            .exclude(
-                Exists(
-                    FollowUpGroup.objects.filter(
-                        beneficiary_id=OuterRef("pk"),
-                        memberships__member=current_user,
-                        memberships__is_active=True,
-                    )
-                )
-            )
-        )
-        return queryset[:10]
-
     def get_duplicated_pole_emploi_ids(self):
         """
         Returns an array of `pole_emploi_id` used more than once:
