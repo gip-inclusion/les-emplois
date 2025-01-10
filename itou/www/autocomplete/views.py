@@ -1,8 +1,10 @@
 from datetime import datetime
+from functools import reduce
+from operator import add
 
 from django.contrib.auth.decorators import login_not_required
-from django.db.models import Exists, F, OuterRef, Q, Value
-from django.db.models.functions import Least, Lower, NullIf, StrIndex
+from django.db.models import Exists, F, IntegerField, OuterRef, Q, Value
+from django.db.models.functions import Cast, Least, Lower, NullIf, StrIndex
 from django.http import JsonResponse
 from unidecode import unidecode
 
@@ -13,7 +15,6 @@ from itou.jobs.models import Appellation
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.auth import check_user
-from itou.utils.db import or_queries
 from itou.www.gps.views import is_allowed_to_use_gps_advanced_features
 
 
@@ -141,37 +142,36 @@ def gps_users_autocomplete(request):
     users = []
 
     if term:
-        # We started by using to_vector queries but it's not suitable for searching names because
-        # it tries to lemmatize names so for example, henry becomes henri after lemmatization and
-        # the search doesn't work.
-        # Then we tried TrigramSimilarity methods but it's too random for accurate searching.
-        # Fallback to unaccent / icontains for now
-
-        search_terms = term.split(" ")
-        name_q = []
-        for term in search_terms:
-            name_q.append(Q(first_name__unaccent__istartswith=term))
-            name_q.append(Q(last_name__unaccent__istartswith=term))
-        users_qs = (
-            User.objects.filter(or_queries(name_q))
-            .filter(kind=UserKind.JOB_SEEKER)
-            .exclude(
-                Exists(
-                    FollowUpGroup.objects.filter(
-                        beneficiary_id=OuterRef("pk"),
-                        memberships__member=current_user,
-                        memberships__is_active=True,
-                    )
+        users_qs = User.objects.filter(kind=UserKind.JOB_SEEKER).exclude(
+            Exists(
+                FollowUpGroup.objects.filter(
+                    beneficiary_id=OuterRef("pk"),
+                    memberships__member=current_user,
+                    memberships__is_active=True,
                 )
             )
-        )[:10]
+        )
+
+        def match_term(term):
+            return Cast(
+                Q(first_name__unaccent__icontains=term) | Q(last_name__unaccent__icontains=term),
+                IntegerField(),
+            )
+
+        search_terms = [search_term for search_term in term.split(" ") if len(search_term) > 2]
+        users_qs = users_qs.annotate(
+            rank=(reduce(add, [match_term(search_term) for search_term in search_terms]))
+        ).order_by("-rank")
 
         users = [
             {
-                "text": user.get_full_name(),
+                "text": (
+                    f"{user.title.capitalize() + '.' if user.title else ""} "
+                    f"{user.get_full_name()} ({user.jobseeker_profile.birthdate})"
+                ),
                 "id": user.pk,
             }
-            for user in users_qs
+            for user in users_qs[:10]
         ]
 
     return JsonResponse({"results": users})

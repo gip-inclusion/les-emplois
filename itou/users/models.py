@@ -7,7 +7,8 @@ from allauth.account.utils import user_pk_to_url_str
 from citext import CIEmailField
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
-from django.contrib.postgres.indexes import OpClass
+from django.contrib.postgres.indexes import GinIndex, OpClass
+from django.contrib.postgres.lookups import Unaccent
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, MinLengthValidator, RegexValidator
@@ -231,7 +232,15 @@ class User(AbstractUser, AddressMixin):
             models.Index(
                 OpClass(Upper("email"), name="text_pattern_ops"),
                 name="users_user_email_upper",
-            )
+            ),
+            GinIndex(
+                Upper(Unaccent("first_name")),
+                name="upper_unaccent_first_name_gin",
+            ),
+            GinIndex(
+                Upper(Unaccent("last_name")),
+                name="upper_unaccent_last_name_gin",
+            ),
         ]
         constraints = [
             models.CheckConstraint(
