@@ -4728,7 +4728,7 @@ class TestFindJobSeekerForHireView:
 
     def get_check_nir_url(self, client):
         # Init session
-        start_url = reverse("apply:start", kwargs={"company_pk": self.company.pk})
+        start_url = reverse("apply:start_hire", kwargs={"company_pk": self.company.pk})
         client.get(start_url)
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
         return reverse("job_seekers_views:check_nir_for_hire", kwargs={"session_uuid": job_seeker_session_name})
