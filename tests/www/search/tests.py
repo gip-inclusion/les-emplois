@@ -240,24 +240,24 @@ class TestSearchCompany:
         )
         assertContains(response, "Offres clauses sociales")
 
-    def test_is_popular(self, client):
+    def test_is_overwhelmed(self, client):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117", with_membership=True)
         job = JobDescriptionFactory(company=company)
         JobApplicationFactory.create_batch(19, to_company=company, selected_jobs=[job], state="new")
         response = client.get(self.URL, {"city": city.slug})
-        popular_badge = """
+        overwhelmed_badge = """
             <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
                 <i class="ri-group-line me-1" aria-hidden="true"></i>
                 20+<span class="ms-1">candidatures</span>
             </span>
             """
-        assertNotContains(response, popular_badge, html=True)
+        assertNotContains(response, overwhelmed_badge, html=True)
 
         JobApplicationFactory(to_company=company, selected_jobs=[job], state="new")
         response = client.get(self.URL, {"city": city.slug})
-        assertContains(response, popular_badge, html=True)
+        assertContains(response, overwhelmed_badge, html=True)
 
     def test_has_no_active_members(self, client):
         create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)
@@ -798,24 +798,24 @@ class TestJobDescriptionSearchView:
         jobs_results = response.context["results_page"]
         assert list(jobs_results) == [job1, job2, job3]
 
-    def test_is_popular(self, client):
+    def test_is_overwhelmed(self, client):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117")
         job = JobDescriptionFactory(company=company)
         JobApplicationFactory.create_batch(19, to_company=company, selected_jobs=[job], state="new")
         response = client.get(self.URL, {"city": city.slug})
-        popular_badge = """
+        overwhelmed_badge = """
             <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
                 <i class="ri-group-line me-1" aria-hidden="true"></i>
                 20+<span class="ms-1">candidatures</span>
             </span>
             """
-        assertNotContains(response, popular_badge, html=True)
+        assertNotContains(response, overwhelmed_badge, html=True)
 
         JobApplicationFactory(to_company=company, selected_jobs=[job], state="new")
         response = client.get(self.URL, {"city": city.slug})
-        assertContains(response, popular_badge, html=True)
+        assertContains(response, overwhelmed_badge, html=True)
 
     def test_no_department(self, client):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
