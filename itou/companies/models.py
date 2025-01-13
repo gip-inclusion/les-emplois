@@ -136,10 +136,17 @@ class CompanyQuerySet(OrganizationQuerySet):
 
     def with_computed_job_app_score(self):
         """
-        Employers search results boost SIAE which did not receive enough job applications
-        compared to their total job descriptions.
+        Employer search results continuously boost companies which did not receive enough job applications
+        per job description. We strive to send approximately the same amount of applications per job description.
+        This means we strive to send 10 times more applications to a company with 10 descriptions than to another
+        company with just 1 description. Companies with 0 job description will be considered exactly as worthy of
+        being sent applications as the companies with 1 description.
+
+        We keep showing on the first page the companies which have not received yet their fair share of applications
+        relative to others.
+
         To do so, the following score is computed:
-        ** (total of recent job applications) / (total of active job descriptions) **
+        ** (total of recent job applications) / (total of active job descriptions or 1 if none) **
         """
         # Transform integer into a float to avoid any weird side effect.
         # See self.with_count_recent_received_job_apps()
@@ -156,6 +163,7 @@ class CompanyQuerySet(OrganizationQuerySet):
         get_score = Cast(
             count_recent_received_job_apps / count_active_job_descriptions, output_field=models.FloatField()
         )
+        get_score_fallback = Cast(count_recent_received_job_apps, output_field=models.FloatField())
 
         return (
             self.with_count_recent_received_job_apps()
@@ -163,7 +171,7 @@ class CompanyQuerySet(OrganizationQuerySet):
             .annotate(
                 computed_job_app_score=Case(
                     When(has_active_job_desc, then=get_score),
-                    default=None,
+                    default=get_score_fallback,
                 )
             )
         )

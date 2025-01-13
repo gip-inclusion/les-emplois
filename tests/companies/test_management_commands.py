@@ -126,20 +126,20 @@ def test_update_companies_job_app_score(caplog):
 
     stdout = io.StringIO()
     management.call_command("update_companies_job_app_score")
-    # company_1 did not change (from None to None)
-    assert caplog.messages[0] == "Updated 1 companies"
+    assert caplog.messages[0] == "Updated 2 companies"
 
     company_1.refresh_from_db()
     company_2.refresh_from_db()
 
-    assert company_1.job_app_score is None
+    assert company_1.job_app_score is not None
+    assert company_1.job_app_score == company_1.job_applications_received.count()
     assert company_2.job_app_score is not None
     assert (
         company_2.job_app_score
         == company_2.job_applications_received.count() / company_2.job_description_through.count()
     )
 
-    # Deleting job descriptions should bring score back to None.
+    # Deleting job descriptions should bring score back to job_applications_received.count().
     for jd in company_2.job_description_through.all():
         jd.delete()
     caplog.clear()
@@ -150,8 +150,10 @@ def test_update_companies_job_app_score(caplog):
     company_1.refresh_from_db()
     company_2.refresh_from_db()
 
-    assert company_1.job_app_score is None
-    assert company_2.job_app_score is None
+    assert company_1.job_app_score is not None
+    assert company_1.job_app_score == company_1.job_applications_received.count()
+    assert company_2.job_app_score is not None
+    assert company_2.job_app_score == company_2.job_applications_received.count()
 
 
 @freeze_time("2023-05-01")
