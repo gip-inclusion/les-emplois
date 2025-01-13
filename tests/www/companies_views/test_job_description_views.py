@@ -19,6 +19,9 @@ from tests.users.factories import JobSeekerFactory
 from tests.utils.test import assertSnapshotQueries
 
 
+POSTULER = "Postuler"
+
+
 class JobDescriptionAbstract:
     @pytest.fixture(autouse=True)
     def abstract_setup_method(self):
@@ -608,7 +611,7 @@ class TestJobDescriptionCard(JobDescriptionAbstract):
         with assertSnapshotQueries(snapshot):
             response = client.get(self.url)
 
-        assertContains(response, "Postuler auprès de l'employeur inclusif")
+        assertContains(response, f"{POSTULER} auprès de l'employeur inclusif")
         assertContains(response, self.apply_start_url(self.company))
         assertNotContains(
             response,
@@ -621,14 +624,14 @@ class TestJobDescriptionCard(JobDescriptionAbstract):
         with assertSnapshotQueries(snapshot):
             response = client.get(self.url)
 
-        assertContains(response, "Postuler auprès de l'employeur inclusif")
+        assertContains(response, f"{POSTULER} auprès de l'employeur inclusif")
         assertContains(response, self.apply_start_url(self.company))
         assertNotContains(response, self.update_job_description_url(self.job_description))
 
     def test_anonymous_card_actions(self, client):
         response = client.get(self.url)
 
-        assertContains(response, "Postuler auprès de l'employeur inclusif")
+        assertContains(response, f"{POSTULER} auprès de l'employeur inclusif")
         assertContains(response, self.apply_start_url(self.company))
         assertNotContains(response, self.update_job_description_url(self.job_description))
 
