@@ -3,13 +3,6 @@
 {% load str_filters %}
 {% load matomo %}
 
-{% block title %}
-    Candidature
-    -
-    {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
-    {{ block.super }}
-{% endblock %}
-
 {% block title_content %}
     <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
         <div class="d-xl-flex align-items-xl-center">

@@ -4,6 +4,11 @@
 {% load static %}
 {% load str_filters %}
 
+{% block title %}
+    Accepter la candidature de {{ job_application.job_seeker.get_full_name }}
+    {{ block.super }}
+{% endblock %}
+
 {% block title_content %}
     <div class="d-md-flex align-items-center">
         <h1 class="mb-1 mb-md-0 me-3">
