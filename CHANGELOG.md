@@ -1,5 +1,35 @@
 # Journal des modifications
 
+## 2025-01-13
+
+### Modifié
+
+- [candidature: correction de l'affichage d'une candidature geiq acceptée sans diagnostic](https://github.com/gip-inclusion/les-emplois/pull/5364)
+- [Candidature: Prévenir dans la candidature que la personne a quitté l’organisation](https://github.com/gip-inclusion/les-emplois/pull/4916)
+- [Connexion; Ajout de plus de contexte d'erreur lors d'échec de connexion via France Travail pour les candidats](https://github.com/gip-inclusion/les-emplois/pull/5350)
+- [Éligibilité : Prise en compte du forçage de `dateFin` à null par l’API Particulier](https://github.com/gip-inclusion/les-emplois/pull/5337)
+- [Éligibilité : Rattrapage de dates de fin incorrectes de l’API Particulier](https://github.com/gip-inclusion/les-emplois/pull/5339)
+- [Employeur: Réduction de la durée de validité du diagnostic d’éligibilité à 92 jours](https://github.com/gip-inclusion/les-emplois/pull/5285)
+- [Inscription : Ajouter les champs lieu et pays de naissance pour les candidats](https://github.com/gip-inclusion/les-emplois/pull/5351) 🖼
+- [Notifications: Continuer à envoyer les notifications aux anciens collaborateurs](https://github.com/gip-inclusion/les-emplois/pull/5354)
+- [Recherche employeur: Correctif de la mise à jour des scores de la recherche](https://github.com/gip-inclusion/les-emplois/pull/5314)
+- [Recherche fiche de poste: Simplification du tri des résultats de la recherche](https://github.com/gip-inclusion/les-emplois/pull/5341)
+- [UX/UI: corrections UI du parcours de "nouvelle candidature"](https://github.com/gip-inclusion/les-emplois/pull/5353) 🖼
+- [UX/UI: mise a jour du theme vers v2.5.6](https://github.com/gip-inclusion/les-emplois/pull/5340) 🖼
+- [UX/UI: modification de la couleur du badge "Agrément expiré"](https://github.com/gip-inclusion/les-emplois/pull/5349)
+- [UX/UI: Passer le "bon à savoir" en composant info](https://github.com/gip-inclusion/les-emplois/pull/5361) 🖼
+
+### Supprimé
+
+- [Demandeur d’emploi : Suppression du champ de l'aide ATA](https://github.com/gip-inclusion/les-emplois/pull/5312)
+- [UX/UI: Fin de la demande de retours prescripteurs habilités sur une refonte de leur espace](https://github.com/gip-inclusion/les-emplois/pull/5344)
+- [UX/UI: Retirer le texte d'aide du filtre archivé des candidatures](https://github.com/gip-inclusion/les-emplois/pull/5345)
+
+### Tech
+
+- [Correctif du script de génération du journal des changements.](https://github.com/gip-inclusion/les-emplois/pull/5342)
+- [Pilotage: Partage du fichier import fluxIAE via nouveau bucket S3](https://github.com/gip-inclusion/les-emplois/pull/5249)
+
 ## 2025-01-06
 
 ### Ajouté
