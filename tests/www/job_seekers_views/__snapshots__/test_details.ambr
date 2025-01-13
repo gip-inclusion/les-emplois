@@ -35,14 +35,17 @@
   
                               
                               
-      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-          <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
-          </li>
-          <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
-          </li>
-      </ul>
+      
+  
+  <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+      <li class="nav-item" role="presentation">
+          <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
+      </li>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
+      </li>
+  </ul>
+  
   
                           </div>
                       </div>
@@ -263,14 +266,17 @@
   
                               
                               
-      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-          <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
-          </li>
-          <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
-          </li>
-      </ul>
+      
+  
+  <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+      <li class="nav-item" role="presentation">
+          <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
+      </li>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
+      </li>
+  </ul>
+  
   
                           </div>
                       </div>
@@ -469,14 +475,17 @@
   
                               
                               
-      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-          <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
-          </li>
-          <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
-          </li>
-      </ul>
+      
+  
+  <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+      <li class="nav-item" role="presentation">
+          <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
+      </li>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
+      </li>
+  </ul>
+  
   
                           </div>
                       </div>
@@ -633,14 +642,17 @@
   
                               
                               
-      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-          <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
-          </li>
-          <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
-          </li>
-      </ul>
+      
+  
+  <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+      <li class="nav-item" role="presentation">
+          <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
+      </li>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
+      </li>
+  </ul>
+  
   
                           </div>
                       </div>
@@ -887,14 +899,17 @@
   
                               
                               
-      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-          <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
-          </li>
-          <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
-          </li>
-      </ul>
+      
+  
+  <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+      <li class="nav-item" role="presentation">
+          <a aria-controls="informations" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
+      </li>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="candidatures" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
+      </li>
+  </ul>
+  
   
                           </div>
                       </div>
@@ -1819,14 +1834,17 @@
   
                               
                               
-      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-          <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
-          </li>
-          <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
-          </li>
-      </ul>
+      
+  
+  <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+      <li class="nav-item" role="presentation">
+          <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
+      </li>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
+      </li>
+  </ul>
+  
   
                           </div>
                       </div>
@@ -2049,14 +2067,17 @@
   
                               
                               
-      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-          <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
-          </li>
-          <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
-          </li>
-      </ul>
+      
+  
+  <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+      <li class="nav-item" role="presentation">
+          <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
+      </li>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
+      </li>
+  </ul>
+  
   
                           </div>
                       </div>
@@ -2259,14 +2280,17 @@
   
                               
                               
-      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-          <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
-          </li>
-          <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
-          </li>
-      </ul>
+      
+  
+  <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+      <li class="nav-item" role="presentation">
+          <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
+      </li>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
+      </li>
+  </ul>
+  
   
                           </div>
                       </div>
@@ -2423,14 +2447,17 @@
   
                               
                               
-      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-          <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
-          </li>
-          <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
-          </li>
-      </ul>
+      
+  
+  <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+      <li class="nav-item" role="presentation">
+          <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
+      </li>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
+      </li>
+  </ul>
+  
   
                           </div>
                       </div>
@@ -2631,14 +2658,17 @@
   
                               
                               
-      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-          <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
-          </li>
-          <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
-          </li>
-      </ul>
+      
+  
+  <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+      <li class="nav-item" role="presentation">
+          <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
+      </li>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
+      </li>
+  </ul>
+  
   
                           </div>
                       </div>
@@ -2795,14 +2825,17 @@
   
                               
                               
-      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-          <li class="nav-item" role="presentation">
-              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
-          </li>
-          <li class="nav-item" role="presentation">
-              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
-          </li>
-      </ul>
+      
+  
+  <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+      <li class="nav-item" role="presentation">
+          <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
+      </li>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
+      </li>
+  </ul>
+  
   
                           </div>
                       </div>
