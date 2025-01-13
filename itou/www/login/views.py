@@ -13,6 +13,7 @@ from itou.users.enums import MATOMO_ACCOUNT_TYPE, IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.urls import add_url_params, get_safe_url, get_url_param_value
+from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 from itou.www.login.forms import FindExistingUserViaEmailForm, ItouLoginForm
 
 
@@ -179,6 +180,19 @@ class ExistingUserLoginView(ItouLoginView):
         super().setup(request, *args, **kwargs)
         self.user = get_object_or_404(User, public_id=self.kwargs["user_public_id"])
         self.user_kind = self.user.kind
+
+    def get_user_email(self):
+        """
+        This template can optionally have the email of the user displayed, if it is safe to do so.
+        This is done using the session and comparing the stashed value to the user concerned by this view.
+        """
+        stashed_email = self.request.session.get(ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY, None)
+        return stashed_email if stashed_email == self.user.email else None
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user_email"] = self.get_user_email()
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

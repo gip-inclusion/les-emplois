@@ -15,6 +15,7 @@ from itou.users import enums as users_enums
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.urls import add_url_params
+from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 from itou.www.login.forms import ItouLoginForm
 from itou.www.login.views import ExistingUserLoginView
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
@@ -225,6 +226,9 @@ class TestJobSeekerPreLogin:
         response = client.post(url, data=form_data)
         assertRedirects(response, f"{reverse('login:existing_user', args=(user.public_id,))}?back_url={url}")
 
+        # Email is populated in session. The utility of this is covered by the ExistingUserLoginView tests.
+        assert client.session[ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY] == user.email
+
     def test_pre_login_email_unknown(self, client, snapshot):
         url = reverse("login:job_seeker")
         response = client.get(url)
@@ -319,6 +323,36 @@ class TestExistingUserLogin:
         }
         response = client.post(url, data=form_data)
         assertRedirects(response, reverse("account_email_verification_sent"))
+
+    def test_login_email_prefilled(self, client, snapshot):
+        # Login is not pre-filled just by visiting the page.
+        # The user must prove they know this information
+        user = JobSeekerFactory(identity_provider=IdentityProvider.DJANGO, for_snapshot=True)
+        url = reverse("login:existing_user", args=(user.public_id,))
+        response = client.get(url)
+        assert response.status_code == 200
+
+        assert response.context["form"]["login"].initial is None
+        assert str(parse_response_to_soup(response, selector=".c-form")) == snapshot(name="login_not_prefilled")
+
+        # If the email has been populated in the session, but the email populated does not match the user requested,
+        # then it is ignored.
+        session = client.session
+        session[ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY] = "someoneelse@emaildomain.xyz"
+        session.save()
+        response = client.get(url)
+        assert response.status_code == 200
+        assert response.context["form"]["login"].initial is None
+        assert str(parse_response_to_soup(response, selector=".c-form")) == snapshot(name="login_not_prefilled")
+
+        # If the login has been populated in the session with the correct email,
+        # then the user will not need to re-enter it a second time.
+        session[ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY] = user.email
+        session.save()
+        response = client.get(url)
+        assert response.status_code == 200
+        assert response.context["form"]["login"].initial == user.email
+        assert str(parse_response_to_soup(response, selector=".c-form")) == snapshot(name="login_prefilled")
 
     @pytest.mark.parametrize(
         "identity_provider",
