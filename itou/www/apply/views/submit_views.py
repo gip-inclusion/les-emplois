@@ -676,7 +676,7 @@ class ApplicationResumeView(RequireApplySessionMixin, ApplicationBaseView):
             for employer in company_recipients:
                 job_application.notifications_new_for_employer(employer).send()
             job_application.notifications_new_for_job_seeker.send()
-            if self.request.user.is_prescriber:
+            if self.request.user.kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
                 job_application.notifications_new_for_proxy.send()
         finally:
             # We are done, send to the (mostly) stateless final page as we now have no session.

@@ -299,6 +299,18 @@ class TestEmailNotification:
             email_notification(self.user, self.organization).send()
         assert len(mailoutbox) == 0
 
+        # But we still forward it if the user left his organozation
+        admin = PrescriberMembershipFactory(
+            user=PrescriberFactory(),
+            organization=self.organization,
+            is_admin=True,
+        ).user
+
+        with django_capture_on_commit_callbacks(execute=True):
+            email_notification(self.user, self.organization).send()
+        assert len(mailoutbox) == 1
+        assert mailoutbox[0].to == [admin.email]
+
 
 class TestProfiledNotification:
     def setup_method(self):
