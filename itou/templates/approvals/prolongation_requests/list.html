@@ -42,7 +42,9 @@
                                         <th scope="col">Demandée le</th>
                                         <th scope="col">
                                             Adressée à
-                                            <i class="ri-information-line text-info" data-bs-toggle="tooltip" data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
+                                            <button type="button" data-bs-toggle="tooltip" data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande.">
+                                                <i class="ri-information-line text-info" aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
+                                            </button>
                                         </th>
                                         <th scope="col">Statut</th>
                                         <th scope="col" class="text-end w-50px"></th>
@@ -58,11 +60,14 @@
                                             <td>{{ prolongation_request.validated_by.get_full_name }}</td>
                                             <td>{% include "approvals/prolongation_requests/_status_badge.html" with badge_size="badge-xs" %}</td>
                                             <td class="text-end w-50px">
-                                                <a class="btn btn-sm btn-link btn-ico-only" href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}">
+                                                <a class="btn btn-sm btn-link btn-ico-only"
+                                                   href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}"
+                                                   data-bs-toggle="tooltip"
+                                                   {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}data-bs-title="Traiter"{% else %}data-bs-title="Ouvrir"{% endif %}>
                                                     {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}
-                                                        <i class="ri-pencil-line" data-bs-toggle="tooltip" data-bs-title="Traiter"></i>
+                                                        <i class="ri-pencil-line" aria-label="Traiter la prolongation de {{ prolongation_request.approval.user.get_full_name }}"></i>
                                                     {% else %}
-                                                        <i class="ri-eye-line" data-bs-toggle="tooltip" data-bs-title="Ouvrir"></i>
+                                                        <i class="ri-eye-line" aria-label="Ouvrir la prolongation de {{ prolongation_request.approval.user.get_full_name }}"></i>
                                                     {% endif %}
                                                 </a>
                                             </td>

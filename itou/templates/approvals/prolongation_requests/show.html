@@ -70,7 +70,9 @@
                         <hr>
                         <h3>
                             Adressé à
-                            <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
+                            <button type="button" data-bs-toggle="tooltip" data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande.">
+                                <i class="ri-information-line ri-xl text-info" aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
+                            </button>
                         </h3>
                         <p>{{ prolongation_request.validated_by.get_full_name }} a été sollicité pour cette demande.</p>
                         <h3>Date de fin de PASS IAE demandée : {{ prolongation_request.end_at|date:"d/m/Y" }}</h3>

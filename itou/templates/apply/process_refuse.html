@@ -108,13 +108,18 @@
                                                     <label for="{{ radio.id_for_label }}" class="form-check-label">
                                                         {% if radio.data.value == RefusalReason.PREVENT_OBJECTIVES %}
                                                             {{ radio.choice_label }}
-                                                            <i class="ri-information-line ri-lg text-info ms-1"
-                                                               data-bs-toggle="tooltip"
-                                                               data-bs-placement="top"
-                                                               data-bs-title="L'embauche empêche l'atteinte des engagements contractuels avec les parties prenantes à la convention de financement mise en place par l'État."></i>
+                                                            <button type="button"
+                                                                    data-bs-toggle="tooltip"
+                                                                    data-bs-placement="top"
+                                                                    data-bs-title="L'embauche empêche l'atteinte des engagements contractuels avec les parties prenantes à la convention de financement mise en place par l'État.">
+                                                                <i class="ri-information-line ri-lg text-info ms-1"
+                                                                   aria-label="L'embauche empêche l'atteinte des engagements contractuels avec les parties prenantes à la convention de financement mise en place par l'État."></i>
+                                                            </button>
                                                         {% elif radio.data.value == RefusalReason.NO_POSITION %}
                                                             {{ radio.choice_label }}
-                                                            <i class="ri-information-line ri-lg text-info ms-1" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
+                                                            <button type="button" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées.">
+                                                                <i class="ri-information-line ri-lg text-info ms-1" aria-label="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
+                                                            </button>
                                                         {% elif radio.data.value == RefusalReason.OTHER %}
                                                             {{ radio.choice_label }}
                                                             {% if with_prescriber %}(détails à fournir dans le message {{ to_prescriber }}){% endif %}

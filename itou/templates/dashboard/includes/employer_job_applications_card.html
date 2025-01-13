@@ -22,13 +22,15 @@
                 {% endfor %}
                 {% if request.current_organization.is_subject_to_eligibility_rules or request.current_organization.kind == CompanyKind.GEIQ %}
                     {% if siae_suspension_text_with_dates %}
-                        <span class="btn-link btn-ico"
-                              data-bs-toggle="tooltip"
-                              data-bs-placement="top"
-                              data-bs-title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ siae_suspension_text_with_dates }}">
-                            <i class="ri-user-follow-line ri-lg fw-normal disabled"></i>
+                        <button type="button"
+                                class="btn-link btn-ico"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                data-bs-title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ siae_suspension_text_with_dates }}"
+                                aria-label="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ siae_suspension_text_with_dates }}">
+                            <i class="ri-user-follow-line ri-lg fw-normal disabled" aria-hidden="true"></i>
                             <span class="disabled">Enregistrer une candidature</span>
-                        </span>
+                        </button>
                     {% else %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'apply:start' company_pk=request.current_organization.pk %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "enregistrer-candidature" %}>

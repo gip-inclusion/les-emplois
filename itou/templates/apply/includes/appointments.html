@@ -28,7 +28,7 @@
                         <td>{{ participation.appointment.reason }}</td>
                         <td id="participation-{{ participation.pk }}-row" class="text-end w-50px">
                             <button type="button" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="modal" data-bs-target="#participation-{{ participation.pk }}-modal" {% matomo_event "candidature" "clic" "visualisation-rdv" %}>
-                                <i class="ri-search-line" data-bs-toggle="tooltip" data-bs-title="Voir"></i>
+                                <i class="ri-search-line" data-bs-toggle="tooltip" data-bs-title="Voir" aria-label="Voir la participation commençant à {{ participation.appointment.start_at }}"></i>
                             </button>
                             <div class="modal modal--mini fade text-start" id="participation-{{ participation.pk }}-modal" tabindex="-1" aria-labelledby="participation-{{ participation.pk }}-modal-title" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">

@@ -33,11 +33,13 @@
             <i class="ri-check-line ri-xl fw-medium" aria-hidden="true"></i>
             Invitation envoyée
             <i class="ri-error-warning-line"
-               aria-hidden="true"
+               aria-label="Une relance sera envoyée 3 jours après. Vous pourrez renvoyer une invitation sous 10J."
                data-bs-toggle="tooltip"
                data-bs-placement="left"
                data-bs-html="true"
-               data-bs-title="Une relance sera envoyée 3 jours après. <br> Vous pourrez renvoyer une invitation sous 10J."></i>
+               data-bs-title="Une relance sera envoyée 3 jours après. <br> Vous pourrez renvoyer une invitation sous 10J."
+               role="button"
+               tabindex="0"></i>
         </span>
     {% else %}
         <form {% if for_detail %} hx-target="#rdvi-invitation-requests" hx-post="{% url "apply:rdv_insertion_invite_for_detail" job_application.pk %}" {% else %} hx-post="{% url "apply:rdv_insertion_invite" job_application.pk %}" {% endif %}

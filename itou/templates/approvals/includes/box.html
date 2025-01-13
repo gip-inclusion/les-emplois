@@ -30,15 +30,27 @@ Arguments:
                 <strong>{{ approval.start_at|date:"d/m/Y" }}</strong>
             </li>
             <li class="order-3{% if detail_view_version|default:False %} order-lg-4{% endif %}">
-                <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i></small>
+                <small>Date de fin prévisionnelle
+                    <i class="ri-information-line ri-xl text-info"
+                       aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
+                       data-bs-toggle="tooltip"
+                       data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
+                       role="button"
+                       tabindex="0">
+                    </i>
+                </small>
                 <strong>{{ approval.remainder_as_date|date:"d/m/Y" }}</strong>
             </li>
             <li class="order-4{% if detail_view_version|default:False %} order-lg-3{% endif %}">
                 <small>
                     Durée de validité
                     <i class="ri-information-line ri-xl text-info"
+                       aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."
                        data-bs-toggle="tooltip"
-                       data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
+                       data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."
+                       role="button"
+                       tabindex="0">
+                    </i>
                 </small>
                 <strong {% if approval.state == "VALID" or approval.state == "FUTURE" %}class="text-success"{% endif %}>{{ approval.get_remainder_display }}</strong>
             </li>

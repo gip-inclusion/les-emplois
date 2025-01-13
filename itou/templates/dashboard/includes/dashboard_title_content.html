@@ -41,13 +41,15 @@
             {% endcomment %}
             <div>
                 {% if siae_suspension_text_with_dates %}
-                    <span class="btn btn-lg btn-primary btn-ico disabled"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          data-bs-title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ siae_suspension_text_with_dates }}">
-                        <i class="ri-user-follow-line fw-medium"></i>
+                    <button type="button"
+                            class="btn btn-lg btn-primary btn-ico disabled"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            data-bs-title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ siae_suspension_text_with_dates }}"
+                            aria-label="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ siae_suspension_text_with_dates }}">
+                        <i class="ri-user-follow-line fw-medium" aria-hidden="true"></i>
                         <span>Déclarer une embauche</span>
-                    </span>
+                    </button>
                 {% else %}
                     <a href="{% url 'apply:start_hire' company_pk=request.current_organization.pk %}" class="btn btn-lg btn-primary btn-ico" {% matomo_event "employeurs" "clic" "declarer-embauche" %}>
                         <i class="ri-user-follow-line fw-medium"></i>

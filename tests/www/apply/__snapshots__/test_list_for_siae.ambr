@@ -2686,7 +2686,9 @@
       <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i class="ri-community-line"></i>
           <div>
-              <span data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip">EI</span>
+              <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
+                  EI
+              </button>
               <h3>Acme inc.</h3>
           </div>
       </div>
@@ -2790,7 +2792,9 @@
       <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i class="ri-community-line"></i>
           <div>
-              <span data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip">EI</span>
+              <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
+                  EI
+              </button>
               <h3>Acme inc.</h3>
           </div>
       </div>

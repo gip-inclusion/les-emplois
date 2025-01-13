@@ -21,7 +21,7 @@
                           <td>Entretien d'embauche</td>
                           <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade text-start" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -95,7 +95,7 @@
                           <td>Entretien d'embauche</td>
                           <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade text-start" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -169,7 +169,7 @@
                           <td>Entretien d'embauche</td>
                           <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade text-start" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -225,7 +225,7 @@
                           <td>Entretien d'embauche</td>
                           <td class="text-end w-50px" id="participation-22222222-2222-2222-2222-222222222222-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 1 juin 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-22222222-2222-2222-2222-222222222222-modal-title" class="modal modal--mini fade text-start" id="participation-22222222-2222-2222-2222-222222222222-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -299,7 +299,7 @@
                           <td>Entretien d'embauche</td>
                           <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade text-start" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -355,7 +355,7 @@
                           <td>Entretien d'embauche</td>
                           <td class="text-end w-50px" id="participation-22222222-2222-2222-2222-222222222222-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 1 juin 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-22222222-2222-2222-2222-222222222222-modal-title" class="modal modal--mini fade text-start" id="participation-22222222-2222-2222-2222-222222222222-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -429,7 +429,7 @@
                           <td>Entretien d'embauche</td>
                           <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade text-start" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -485,7 +485,7 @@
                           <td>Entretien d'embauche</td>
                           <td class="text-end w-50px" id="participation-22222222-2222-2222-2222-222222222222-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 4 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-22222222-2222-2222-2222-222222222222-modal-title" class="modal modal--mini fade text-start" id="participation-22222222-2222-2222-2222-222222222222-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -541,7 +541,7 @@
                           <td>Entretien d'embauche</td>
                           <td class="text-end w-50px" id="participation-33333333-3333-3333-3333-333333333333-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-33333333-3333-3333-3333-333333333333-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 3 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-33333333-3333-3333-3333-333333333333-modal-title" class="modal modal--mini fade text-start" id="participation-33333333-3333-3333-3333-333333333333-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -597,7 +597,7 @@
                           <td>Entretien d'embauche</td>
                           <td class="text-end w-50px" id="participation-44444444-4444-4444-4444-444444444444-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-44444444-4444-4444-4444-444444444444-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 2 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-44444444-4444-4444-4444-444444444444-modal-title" class="modal modal--mini fade text-start" id="participation-44444444-4444-4444-4444-444444444444-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -653,7 +653,7 @@
                           <td>Entretien d'embauche</td>
                           <td class="text-end w-50px" id="participation-55555555-5555-5555-5555-555555555555-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-55555555-5555-5555-5555-555555555555-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 1 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-55555555-5555-5555-5555-555555555555-modal-title" class="modal modal--mini fade text-start" id="participation-55555555-5555-5555-5555-555555555555-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -727,7 +727,7 @@
                           <td>Entretien d'embauche</td>
                           <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade text-start" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -783,7 +783,7 @@
                           <td>Entretien d'embauche</td>
                           <td class="text-end w-50px" id="participation-22222222-2222-2222-2222-222222222222-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 4 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-22222222-2222-2222-2222-222222222222-modal-title" class="modal modal--mini fade text-start" id="participation-22222222-2222-2222-2222-222222222222-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -839,7 +839,7 @@
                           <td>Entretien d'embauche</td>
                           <td class="text-end w-50px" id="participation-33333333-3333-3333-3333-333333333333-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-33333333-3333-3333-3333-333333333333-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 3 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-33333333-3333-3333-3333-333333333333-modal-title" class="modal modal--mini fade text-start" id="participation-33333333-3333-3333-3333-333333333333-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -895,7 +895,7 @@
                           <td>Entretien d'embauche</td>
                           <td class="text-end w-50px" id="participation-44444444-4444-4444-4444-444444444444-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-44444444-4444-4444-4444-444444444444-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 2 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-44444444-4444-4444-4444-444444444444-modal-title" class="modal modal--mini fade text-start" id="participation-44444444-4444-4444-4444-444444444444-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -951,7 +951,7 @@
                           <td>Entretien d'embauche</td>
                           <td class="text-end w-50px" id="participation-55555555-5555-5555-5555-555555555555-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-55555555-5555-5555-5555-555555555555-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 1 janvier 2024 09:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-55555555-5555-5555-5555-555555555555-modal-title" class="modal modal--mini fade text-start" id="participation-55555555-5555-5555-5555-555555555555-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -1007,7 +1007,7 @@
   '''
   <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade text-start" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -1059,7 +1059,7 @@
   '''
   <td class="text-end w-50px" id="participation-11111111-1111-1111-1111-111111111111-row">
                               <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="visualisation-rdv" type="button">
-                                  <i class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
+                                  <i aria-label="Voir la participation commençant à 1 septembre 2024 10:00" class="ri-search-line" data-bs-title="Voir" data-bs-toggle="tooltip"></i>
                               </button>
                               <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade text-start" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
@@ -1183,7 +1183,7 @@
           <span class="text-success text-center flex-grow-1 flex-md-grow-0" role="status">
               <i aria-hidden="true" class="ri-check-line ri-xl fw-medium"></i>
               Invitation envoyée
-              <i aria-hidden="true" class="ri-error-warning-line" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après. &lt;br&gt; Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip"></i>
+              <i aria-label="Une relance sera envoyée 3 jours après. Vous pourrez renvoyer une invitation sous 10J." class="ri-error-warning-line" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après. &lt;br&gt; Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" role="button" tabindex="0"></i>
           </span>
       
   
