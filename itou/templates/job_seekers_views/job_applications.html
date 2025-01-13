@@ -31,14 +31,14 @@
             <a class="nav-link"
                href="{% url 'job_seekers_views:details' public_id=job_seeker.public_id %}?back_url={% url 'job_seekers_views:list' %}"
                aria-controls="informations"
-               aria-selected="true"
+               aria-selected="false"
                {% matomo_event "candidat" "clic-onglet" "informations candidat" %}>Informations générales</a>
         </li>
         <li class="nav-item" role="presentation">
             <a class="nav-link active"
                href="{% url 'job_seekers_views:job_applications' public_id=job_seeker.public_id %}?back_url={% url 'job_seekers_views:list' %}"
                aria-controls="candidatures"
-               aria-selected="false"
+               aria-selected="true"
                {% matomo_event "candidat" "clic-onglet" "candidatures" %}>Candidatures</a>
         </li>
     </ul>
