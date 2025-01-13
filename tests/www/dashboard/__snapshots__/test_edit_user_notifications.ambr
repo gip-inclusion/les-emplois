@@ -253,7 +253,7 @@
 # ---
 # name: test_employer_create_update_notification_settings[view queries - disable all notifications]
   dict({
-    'num_queries': 19,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -612,6 +612,60 @@
           'edit_user_notifications[www/dashboard/views.py]',
         ]),
         'sql': '''
+          SELECT "communications_notificationrecord"."id",
+                 "communications_notificationrecord"."notification_class",
+                 "communications_notificationrecord"."name",
+                 "communications_notificationrecord"."category",
+                 "communications_notificationrecord"."can_be_disabled",
+                 "communications_notificationrecord"."is_obsolete"
+          FROM "communications_notificationrecord"
+          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
+                 AND "communications_notificationrecord"."notification_class" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EditUserNotificationForm.save[www/dashboard/forms.py]',
+          'edit_user_notifications[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "communications_notificationrecord"."id",
+                 "communications_notificationrecord"."notification_class",
+                 "communications_notificationrecord"."name",
+                 "communications_notificationrecord"."category",
+                 "communications_notificationrecord"."can_be_disabled",
+                 "communications_notificationrecord"."is_obsolete"
+          FROM "communications_notificationrecord"
+          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
+                 AND "communications_notificationrecord"."notification_class" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EditUserNotificationForm.save[www/dashboard/forms.py]',
+          'edit_user_notifications[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "communications_notificationrecord"."id",
+                 "communications_notificationrecord"."notification_class",
+                 "communications_notificationrecord"."name",
+                 "communications_notificationrecord"."category",
+                 "communications_notificationrecord"."can_be_disabled",
+                 "communications_notificationrecord"."is_obsolete"
+          FROM "communications_notificationrecord"
+          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
+                 AND "communications_notificationrecord"."notification_class" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EditUserNotificationForm.save[www/dashboard/forms.py]',
+          'edit_user_notifications[www/dashboard/views.py]',
+        ]),
+        'sql': '''
           SELECT "communications_notificationrecord"."id"
           FROM "communications_notificationrecord"
           INNER JOIN "communications_disablednotification" ON ("communications_notificationrecord"."id" = "communications_disablednotification"."notification_record_id")
@@ -635,6 +689,9 @@
                                                                                     %s,
                                                                                     %s,
                                                                                     %s,
+                                                                                    %s,
+                                                                                    %s,
+                                                                                    %s,
                                                                                     %s)
                  AND "communications_disablednotification"."settings_id" = %s)
           ORDER BY RANDOM() ASC
@@ -650,6 +707,9 @@
                                                              "settings_id",
                                                              "disabled_at")
           VALUES (%s, %s, %s),
+                 (%s, %s, %s),
+                 (%s, %s, %s),
+                 (%s, %s, %s),
                  (%s, %s, %s),
                  (%s, %s, %s),
                  (%s, %s, %s),

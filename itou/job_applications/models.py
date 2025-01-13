@@ -1085,9 +1085,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def notifications_new_for_proxy(self):
-        return job_application_notifications.JobApplicationNewForPrescriberNotification(
+        return job_application_notifications.JobApplicationNewForProxyNotification(
             self.sender,
-            self.sender_prescriber_organization,
+            self.sender_prescriber_organization or self.sender_company,
             job_application=self,
         )
 
@@ -1108,9 +1108,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def notifications_accept_for_proxy(self):
-        return job_application_notifications.JobApplicationAcceptedForPrescriberNotification(
+        return job_application_notifications.JobApplicationAcceptedForProxyNotification(
             self.sender,
-            self.sender_prescriber_organization,
+            self.sender_prescriber_organization or self.sender_company,
             job_application=self,
         )
 
@@ -1118,7 +1118,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def notifications_postpone_for_proxy(self):
         return job_application_notifications.JobApplicationPostponedForProxyNotification(
             self.sender,
-            self.sender_prescriber_organization,
+            self.sender_prescriber_organization or self.sender_company,
             job_application=self,
         )
 
@@ -1131,9 +1131,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def notifications_refuse_for_proxy(self):
-        return job_application_notifications.JobApplicationRefusedForPrescriberNotification(
+        return job_application_notifications.JobApplicationRefusedForProxyNotification(
             self.sender,
-            self.sender_prescriber_organization,
+            self.sender_prescriber_organization or self.sender_company,
             job_application=self,
         )
 
@@ -1155,7 +1155,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def notifications_cancel_for_proxy(self):
         return job_application_notifications.JobApplicationCanceledNotification(
             self.sender,
-            self.sender_prescriber_organization,
+            self.sender_prescriber_organization or self.sender_company,
             job_application=self,
         )
 

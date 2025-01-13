@@ -19,8 +19,8 @@ class JobApplicationNewForJobSeekerNotification(JobSeekerNotification, EmailNoti
 
 
 @notifications_registry.register
-class JobApplicationNewForPrescriberNotification(PrescriberNotification, EmailNotification):
-    """Notification sent to prescriber when created"""
+class JobApplicationNewForProxyNotification(PrescriberOrEmployerNotification, EmailNotification):
+    """Notification sent to proxy (prescriber or employer/orienter) when created"""
 
     name = "Confirmation d’envoi de candidature"
     category = NotificationCategory.JOB_APPLICATION
@@ -71,8 +71,8 @@ class JobApplicationAcceptedForJobSeekerNotification(JobSeekerNotification, Emai
 
 
 @notifications_registry.register
-class JobApplicationAcceptedForPrescriberNotification(PrescriberNotification, EmailNotification):
-    """Notification sent to prescriber when accepted"""
+class JobApplicationAcceptedForProxyNotification(PrescriberOrEmployerNotification, EmailNotification):
+    """Notification sent to proxy (prescriber or employer/orienter) when accepted"""
 
     name = "Confirmation d’acceptation de candidature"
     category = NotificationCategory.JOB_APPLICATION
@@ -101,8 +101,8 @@ class JobApplicationRefusedForJobSeekerNotification(JobSeekerNotification, Email
 
 
 @notifications_registry.register
-class JobApplicationRefusedForPrescriberNotification(PrescriberNotification, EmailNotification):
-    """Notification sent to prescriber when refused"""
+class JobApplicationRefusedForProxyNotification(PrescriberOrEmployerNotification, EmailNotification):
+    """Notification sent to proxy (prescriber or employer/orienter) when refused"""
 
     name = "Refus de candidature"
     category = NotificationCategory.JOB_APPLICATION

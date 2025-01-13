@@ -960,6 +960,21 @@ class TestJobApplicationNotifications:
         assert job_application.job_seeker.get_full_name() in mailoutbox[0].body
         assert mailoutbox[0].body == mailoutbox[1].body
 
+    def test_for_proxy_notification(self, subtests):
+        employer_job_app = JobApplicationFactory(sent_by_another_employer=True)
+        prescriber_job_app = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+
+        for transition in ["cancel", "postpone", "refuse", "new", "accept"]:
+            with subtests.test(transition):
+                assert (
+                    getattr(employer_job_app, f"notifications_{transition}_for_proxy").structure
+                    == employer_job_app.sender_company
+                )
+                assert (
+                    getattr(prescriber_job_app, f"notifications_{transition}_for_proxy").structure
+                    == prescriber_job_app.sender_prescriber_organization
+                )
+
     def test_cancel_sent_by_job_seeker(self, django_capture_on_commit_callbacks, mailoutbox):
         # When sent by jobseeker.
         job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationState.ACCEPTED)
