@@ -137,7 +137,7 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
                 "description": "Nous y répondons lors d’un webinaire questions / réponses animé chaque mois.",  # noqa: E501
                 "call_to_action": "Je m’inscris",
                 "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-professionnels-de-liae-questions-reponses-sur-les-tableaux-de-bord-1",
-                "is_displayable": lambda: True,
+                "is_displayable": lambda: False,
             }
         ]
     base_context["pilotage_webinar_banners"] = [
