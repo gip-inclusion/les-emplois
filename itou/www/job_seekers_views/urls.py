@@ -72,31 +72,6 @@ urlpatterns = [
         name="create_job_seeker_step_end_for_hire",
         kwargs={"hire_process": True},
     ),
-    # TODO(ewen): deprecated URLs
-    path(
-        "<int:company_pk>/hire/update/<uuid:job_seeker_public_id>/1",
-        views.DeprecatedUpdateJobSeekerStep1View.as_view(),
-        name="update_job_seeker_step_1_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/update/<uuid:job_seeker_public_id>/2",
-        views.DeprecatedUpdateJobSeekerStep2View.as_view(),
-        name="update_job_seeker_step_2_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/update/<uuid:job_seeker_public_id>/3",
-        views.DeprecatedUpdateJobSeekerStep3View.as_view(),
-        name="update_job_seeker_step_3_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/update/<uuid:job_seeker_public_id>/end",
-        views.DeprecatedUpdateJobSeekerStepEndView.as_view(),
-        name="update_job_seeker_step_end_for_hire",
-        kwargs={"hire_process": True},
-    ),
     path(
         "<int:company_pk>/hire/<uuid:job_seeker_public_id>/check-infos",
         views.CheckJobSeekerInformationsForHire.as_view(),
@@ -133,27 +108,6 @@ urlpatterns = [
     path(
         "update/<uuid:session_uuid>/end",
         views.UpdateJobSeekerStepEndView.as_view(),
-        name="update_job_seeker_step_end",
-    ),
-    # TODO(ewen): deprecated URLs
-    path(
-        "<int:company_pk>/update/<uuid:job_seeker_public_id>/1",
-        views.DeprecatedUpdateJobSeekerStep1View.as_view(),
-        name="update_job_seeker_step_1",
-    ),
-    path(
-        "<int:company_pk>/update/<uuid:job_seeker_public_id>/2",
-        views.DeprecatedUpdateJobSeekerStep2View.as_view(),
-        name="update_job_seeker_step_2",
-    ),
-    path(
-        "<int:company_pk>/update/<uuid:job_seeker_public_id>/3",
-        views.DeprecatedUpdateJobSeekerStep3View.as_view(),
-        name="update_job_seeker_step_3",
-    ),
-    path(
-        "<int:company_pk>/update/<uuid:job_seeker_public_id>/end",
-        views.DeprecatedUpdateJobSeekerStepEndView.as_view(),
         name="update_job_seeker_step_end",
     ),
     # Common
