@@ -114,8 +114,7 @@ TABLE.add_columns(
             "name": "total_embauches_30j",
             "type": "integer",
             "comment": (
-                "Nombre de candidatures en état accepté dans les 30 jours glissants "
-                "dont la structure est destinataire"
+                "Nombre de candidatures en état accepté dans les 30 jours glissants dont la structure est destinataire"
             ),
             "fn": lambda o: o.total_embauches_30j,
         },

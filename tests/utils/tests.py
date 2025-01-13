@@ -1292,7 +1292,7 @@ def test_yield_sync_diff():
         DiffItem(
             key=None,
             kind=DiffItemKind.SUMMARY,
-            label="count=0 label=Rome had the same key in collection and " "queryset",
+            label="count=0 label=Rome had the same key in collection and queryset",
             raw=None,
             db_obj=None,
         ),
@@ -1416,7 +1416,7 @@ def test_yield_sync_diff_composite_keys():
         "count=1 label=Commune had the same key in collection and queryset",
         "\tCHANGED end_date=1999-12-31 changed to value=1969-12-31",
         "count=2 label=Commune added by collection",
-        '\tADDED {"code": "75000", "name": "PARIS", "start": "1970-01-01", "end": ' '"1999-12-31"}',
+        '\tADDED {"code": "75000", "name": "PARIS", "start": "1970-01-01", "end": "1999-12-31"}',
         '\tADDED {"code": "75000", "name": "PARIS_2", "start_date": "2000-01-01"}',
         "count=1 label=Commune removed by collection",
         "\tREMOVED PARIS",

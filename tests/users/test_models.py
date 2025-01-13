@@ -503,9 +503,9 @@ class TestModel:
         }
         for user_type, user_specs in specs.items():
             for other_user_type, expected in user_specs.items():
-                assert (
-                    locals()[user_type].can_edit_personal_information(locals()[other_user_type]) is expected
-                ), f"{user_type}.can_edit_personal_information({other_user_type})"
+                assert locals()[user_type].can_edit_personal_information(locals()[other_user_type]) is expected, (
+                    f"{user_type}.can_edit_personal_information({other_user_type})"
+                )
 
     def test_can_view_personal_information(self):
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
@@ -551,9 +551,9 @@ class TestModel:
         }
         for user_type, user_specs in specs.items():
             for other_user_type, expected in user_specs.items():
-                assert (
-                    locals()[user_type].can_view_personal_information(locals()[other_user_type]) is expected
-                ), f"{user_type}.can_view_personal_information({other_user_type})"
+                assert locals()[user_type].can_view_personal_information(locals()[other_user_type]) is expected, (
+                    f"{user_type}.can_view_personal_information({other_user_type})"
+                )
 
     def test_can_add_nir(self):
         company = CompanyFactory(with_membership=True)

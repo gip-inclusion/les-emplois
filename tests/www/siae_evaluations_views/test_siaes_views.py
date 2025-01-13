@@ -705,13 +705,13 @@ class TestSiaeSelectCriteriaView:
         assert response.status_code == 200
 
         for i in range(len(response.context["level_1_fields"])):
-            assert (
-                "checked" not in response.context["level_1_fields"][i].subwidgets[0].data["attrs"]
-            ), f"{response.context['level_1_fields'][i].name} should not be checked"
+            assert "checked" not in response.context["level_1_fields"][i].subwidgets[0].data["attrs"], (
+                f"{response.context['level_1_fields'][i].name} should not be checked"
+            )
         for i in range(len(response.context["level_2_fields"])):
-            assert (
-                "checked" not in response.context["level_2_fields"][i].subwidgets[0].data["attrs"]
-            ), f"{response.context['level_2_fields'][i].name} should not be checked"
+            assert "checked" not in response.context["level_2_fields"][i].subwidgets[0].data["attrs"], (
+                f"{response.context['level_2_fields'][i].name} should not be checked"
+            )
 
         # preselected criteria
         criterion = (
@@ -727,13 +727,13 @@ class TestSiaeSelectCriteriaView:
 
         assert "checked" in response.context["level_1_fields"][0].subwidgets[0].data["attrs"]
         for i in range(1, len(response.context["level_1_fields"])):
-            assert (
-                "checked" not in response.context["level_1_fields"][i].subwidgets[0].data["attrs"]
-            ), f"{response.context['level_1_fields'][i].name} should not be checked"
+            assert "checked" not in response.context["level_1_fields"][i].subwidgets[0].data["attrs"], (
+                f"{response.context['level_1_fields'][i].name} should not be checked"
+            )
         for i in range(len(response.context["level_2_fields"])):
-            assert (
-                "checked" not in response.context["level_2_fields"][i].subwidgets[0].data["attrs"]
-            ), f"{response.context['level_2_fields'][i].name} should not be checked"
+            assert "checked" not in response.context["level_2_fields"][i].subwidgets[0].data["attrs"], (
+                f"{response.context['level_2_fields'][i].name} should not be checked"
+            )
 
 
 class TestSiaeUploadDocsView:
@@ -1031,12 +1031,12 @@ class TestSiaeSubmitProofsView:
         assert len(mailoutbox) == 1
         email = mailoutbox[0]
         assert (
-            f"[DEV] [Contrôle a posteriori] La structure { evaluated_job_application.evaluated_siae.siae.kind } "
-            f"{ evaluated_job_application.evaluated_siae.siae.name } a transmis ses pièces justificatives."
+            f"[DEV] [Contrôle a posteriori] La structure {evaluated_job_application.evaluated_siae.siae.kind} "
+            f"{evaluated_job_application.evaluated_siae.siae.name} a transmis ses pièces justificatives."
         ) == email.subject
         assert (
-            f"La structure { evaluated_job_application.evaluated_siae.siae.kind } "
-            f"{ evaluated_job_application.evaluated_siae.siae.name } vient de vous transmettre ses pièces"
+            f"La structure {evaluated_job_application.evaluated_siae.siae.kind} "
+            f"{evaluated_job_application.evaluated_siae.siae.name} vient de vous transmettre ses pièces"
         ) in email.body
         assert (
             email.to[0]

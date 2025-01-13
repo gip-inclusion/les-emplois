@@ -180,7 +180,7 @@ class TestJobSeekerSignup:
             <div class="alert alert-danger" role="status">
                 <p class="mb-2">Ce lien de confirmation d'adresse e-mail a expiré ou n'est pas valide.</p>
                 <p class="mb-0">
-                Veuillez lancer <a href="{reverse('account_email')}">une nouvelle demande de confirmation</a>.
+                Veuillez lancer <a href="{reverse("account_email")}">une nouvelle demande de confirmation</a>.
                 </p>
             </div>
             """,

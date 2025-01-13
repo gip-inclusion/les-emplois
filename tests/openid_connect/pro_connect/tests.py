@@ -549,7 +549,7 @@ class TestProConnectCallbackView:
                     "sur la plateforme des emplois, et est déjà associé à un autre compte. "
                     "Nous n'avons donc pas pu mettre à jour random@email.com en "
                     f"{OIDC_USERINFO['email']}. Veuillez vous rapprocher du support pour débloquer la situation en "
-                    f"suivant <a href='{ global_constants.ITOU_HELP_CENTER_URL }'>ce lien</a>.",
+                    f"suivant <a href='{global_constants.ITOU_HELP_CENTER_URL}'>ce lien</a>.",
                 )
             ],
         )

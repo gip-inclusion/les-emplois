@@ -1099,7 +1099,7 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
     context = {
         "form": form,
         "job_application": job_application,
-        "main_div_id": f"prior-action-{ prior_action.pk }" if prior_action else "add_prior_action",
+        "main_div_id": f"prior-action-{prior_action.pk}" if prior_action else "add_prior_action",
         "form_url": (
             reverse(
                 "apply:modify_prior_action",

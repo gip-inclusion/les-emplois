@@ -752,7 +752,7 @@ class TestPrescriberSignup:
         mail_body = mailoutbox[0].body
         assert prescriber_membership.user.get_full_name() in mail_body
         assert prescriber_membership.organization.display_name in mail_body
-        invitation_url = f'{reverse("invitations_views:invite_prescriber_with_org")}?{urlencode(requestor)}'
+        invitation_url = f"{reverse('invitations_views:invite_prescriber_with_org')}?{urlencode(requestor)}"
         assert invitation_url in mail_body
 
     @sso_parametrize
@@ -1057,8 +1057,7 @@ class TestProConnectPrescribersViewsExceptions:
             [
                 messages.Message(
                     messages.ERROR,
-                    "Vous ne pouvez pas rejoindre une organisation avec ce compte "
-                    "car vous n'êtes pas prescripteur.",
+                    "Vous ne pouvez pas rejoindre une organisation avec ce compte car vous n'êtes pas prescripteur.",
                 )
             ],
         )

@@ -13,7 +13,7 @@ ERROR_CANNOT_OBTAIN_NEW_FOR_USER = mark_safe(
 
 _doc_link = get_external_link_markup(
     url=(
-        f"{global_constants.ITOU_HELP_CENTER_URL }/articles/"
+        f"{global_constants.ITOU_HELP_CENTER_URL}/articles/"
         "14733589920913--Dérogation-au-délai-de-carence-d-un-parcours-IAE"
     ),
     text="En savoir plus sur la dérogation du délai de carence",

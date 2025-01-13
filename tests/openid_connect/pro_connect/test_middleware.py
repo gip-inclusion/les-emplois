@@ -59,6 +59,6 @@ def test_middleware_for_unlogged_proconnect_user(client, db, params, expected_pa
     response = client.get(f"/{params}&username={user.username}")
     assertRedirects(
         response,
-        f"{reverse("pro_connect:authorize")}?user_kind={user.kind}&next_url=/{expected_params}",
+        f"{reverse('pro_connect:authorize')}?user_kind={user.kind}&next_url=/{expected_params}",
         fetch_redirect_response=False,
     )

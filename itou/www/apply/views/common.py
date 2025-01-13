@@ -140,7 +140,7 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
             elif not job_application.hiring_without_approval:
                 external_link = get_external_link_markup(
                     url=(
-                        f"{global_constants.ITOU_HELP_CENTER_URL }/articles/"
+                        f"{global_constants.ITOU_HELP_CENTER_URL}/articles/"
                         "14733528375185--PASS-IAE-Comment-ça-marche-/#verification-des-demandes-de-pass-iae"
                     ),
                     text="consulter notre espace documentation",

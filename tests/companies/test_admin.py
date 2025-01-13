@@ -179,7 +179,7 @@ def test_companies_export(admin_client, snapshot):
             },
         )
         assert response.status_code == 200
-        assert response["Content-Disposition"] == ("attachment; " 'filename="entreprises_2024-05-17_11-11-11.xlsx"')
+        assert response["Content-Disposition"] == ('attachment; filename="entreprises_2024-05-17_11-11-11.xlsx"')
         assert get_rows_from_streaming_response(response) == snapshot
 
 

@@ -509,7 +509,7 @@ class TestJobDescriptionCardView:
 
         # Has link to apply with job_seeker public_id
         apply_url_with_job_seeker_id = (
-            f"{reverse('apply:start', kwargs={'company_pk':company.pk})}"
+            f"{reverse('apply:start', kwargs={'company_pk': company.pk})}"
             f"?job_description_id={job_description.pk}&amp;job_seeker={job_seeker_public_id}"
         )
         assertContains(response, apply_url_with_job_seeker_id)

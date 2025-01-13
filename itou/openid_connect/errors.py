@@ -38,7 +38,7 @@ def redirect_with_error_sso_email_conflict_on_registration(request, user, sso_na
                 sso_name,
                 redact_email_address(user.email),
             ),
-            f'{reverse("login:existing_user", args=(user.public_id,))}?back_url={quote(redirect_url)}',
+            f"{reverse('login:existing_user', args=(user.public_id,))}?back_url={quote(redirect_url)}",
             "Je me connecte avec ce compte",
         ),
         extra_tags="modal sso_email_conflict_registration_failure",

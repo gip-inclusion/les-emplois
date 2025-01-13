@@ -1047,7 +1047,7 @@ class TestProcessViews:
         assertContains(response, "Réponse au candidat")
         assertContains(
             response,
-            f"<strong>Motif de refus :</strong> {reason_label} " "<em>(Motif non communiqué au candidat)</em>",
+            f"<strong>Motif de refus :</strong> {reason_label} <em>(Motif non communiqué au candidat)</em>",
             html=True,
         )
 
@@ -3579,7 +3579,7 @@ def test_delete_prior_action(client, snapshot, with_geiq_diagnosis):
     assert str(soup) == snapshot
     update_page_with_htmx(
         simulated_page,
-        f"#delete_prior_action_{ prior_action2.pk }_modal > div > div > div > form",
+        f"#delete_prior_action_{prior_action2.pk}_modal > div > div > div > form",
         response,
     )
     job_application.refresh_from_db()
@@ -3638,12 +3638,12 @@ def test_htmx_modify_prior_action_and_cancel(client):
     response = client.get(modify_prior_action_url + "?modify=")
     update_page_with_htmx(
         simulated_page,
-        f"#prior-action-{ prior_action.pk }-modify-btn",
+        f"#prior-action-{prior_action.pk}-modify-btn",
         response,
     )
     # Click on Annuler
     response = client.get(modify_prior_action_url)
-    update_page_with_htmx(simulated_page, f"#prior-action-{ prior_action.pk } > form > div > button[hx-get]", response)
+    update_page_with_htmx(simulated_page, f"#prior-action-{prior_action.pk} > form > div > button[hx-get]", response)
 
     # Check that a fresh reload gets us in the same state
     response = client.get(details_url)
@@ -3748,7 +3748,7 @@ def test_details_for_company_with_prior_action(client, with_geiq_diagnosis):
         kwargs={"job_application_id": job_application.pk, "prior_action_id": prior_action.pk},
     )
     response = client.get(modify_prior_action_url + "?modify=")
-    update_page_with_htmx(simulated_page, f"#prior-action-{ prior_action.pk }-modify-btn", response)
+    update_page_with_htmx(simulated_page, f"#prior-action-{prior_action.pk}-modify-btn", response)
     response = client.post(
         modify_prior_action_url,
         data={
@@ -3757,7 +3757,7 @@ def test_details_for_company_with_prior_action(client, with_geiq_diagnosis):
             "end_at": timezone.localdate() + relativedelta(days=2),
         },
     )
-    update_page_with_htmx(simulated_page, f"#prior-action-{ prior_action.pk } > form", response)
+    update_page_with_htmx(simulated_page, f"#prior-action-{prior_action.pk} > form", response)
     prior_action.refresh_from_db()
     assert prior_action.action == job_applications_enums.Prequalification.POE
     # Check that a full reload gets us an equivalent HTML

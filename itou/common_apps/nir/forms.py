@@ -131,9 +131,9 @@ class JobSeekerNIRUpdateMixin:
                     </div>
                     <div class="col">
                         <p class="mb-2">
-                            <strong>{ title }</strong>
+                            <strong>{title}</strong>
                         </p>
-                        <p class="mb-0">{ details }</p>
+                        <p class="mb-0">{details}</p>
                     </div>
                 </div>
             </div>

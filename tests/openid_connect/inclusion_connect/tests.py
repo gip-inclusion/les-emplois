@@ -525,7 +525,7 @@ class TestInclusionConnectCallbackViewTest:
                     "Vous avez modifié votre e-mail sur Inclusion Connect, mais celui-ci est déjà associé à un compte "
                     "sur la plateforme. Nous n'avons donc pas pu mettre à jour random@email.com en "
                     f"{OIDC_USERINFO['email']}. Veuillez vous rapprocher du support pour débloquer la situation en "
-                    f"suivant <a href='{ global_constants.ITOU_HELP_CENTER_URL }'>ce lien</a>.",
+                    f"suivant <a href='{global_constants.ITOU_HELP_CENTER_URL}'>ce lien</a>.",
                 )
             ],
         )

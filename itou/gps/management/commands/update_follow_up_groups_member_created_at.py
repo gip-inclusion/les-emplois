@@ -134,4 +134,4 @@ class Command(BaseCommand):
                     FollowUpGroup.objects.bulk_update(groups, fields=["created_at", "updated_at"])
                     FollowUpGroupMembership.objects.bulk_update(memberships, fields=["created_at", "updated_at"])
                 chunks_count += 1
-                print(f"{chunks_count/chunks_total*100:.2f}%", end="\r")
+                print(f"{chunks_count / chunks_total * 100:.2f}%", end="\r")

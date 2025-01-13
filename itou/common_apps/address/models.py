@@ -63,8 +63,7 @@ def geolocate_qs(qs, is_verbose=False):
 
     if is_verbose:
         print(
-            f"> about to geolocate count={non_geolocated_qs.count()} objects "
-            "without geolocation or with a low score."
+            f"> about to geolocate count={non_geolocated_qs.count()} objects without geolocation or with a low score."
         )
 
     # Note : we could also order by latest geolocalization attempt. An order is necessary though

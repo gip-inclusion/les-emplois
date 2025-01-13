@@ -64,9 +64,7 @@ def create_campaigns_and_calendar(
     This method is intented to be executed manually, until it will be automised.
     """
 
-    name = (
-        f"contrôle pour la période du {evaluated_period_start_at:%d/%m/%Y} " f"au {evaluated_period_end_at:%d/%m/%Y}"
-    )
+    name = f"contrôle pour la période du {evaluated_period_start_at:%d/%m/%Y} au {evaluated_period_end_at:%d/%m/%Y}"
 
     institutions = Institution.objects.filter(kind=InstitutionKind.DDETS_IAE)
     if institution_ids:

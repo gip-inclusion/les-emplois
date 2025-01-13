@@ -180,7 +180,7 @@ class TestExportPEApiRejections:
             )
             assert response.status_code == 200
             assert response["Content-Disposition"] == (
-                "attachment; " 'filename="rejets_api_france_travail_2022-09-13_11-11-11.xlsx"'
+                'attachment; filename="rejets_api_france_travail_2022-09-13_11-11-11.xlsx"'
             )
             assert response["Content-Type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
@@ -218,7 +218,7 @@ class TestExportCTA:
                 reverse("itou_staff_views:export_cta"),
             )
             assert response.status_code == 200
-            assert response["Content-Disposition"] == ("attachment; " 'filename="export_cta_2024-05-17_11-11-11.csv"')
+            assert response["Content-Disposition"] == ('attachment; filename="export_cta_2024-05-17_11-11-11.csv"')
             assert b"".join(response.streaming_content).decode() == snapshot(name="streaming content")
 
 

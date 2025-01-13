@@ -164,7 +164,7 @@ def _compute_send_approvals_to_pe_stats(model, list_url):
             return str(value)
         if not total:
             return "-"
-        return f"{value} ({100 * value/total:.2f} %)"
+        return f"{value} ({100 * value / total:.2f} %)"
 
     counts = model.objects.aggregate(
         total=Count("pk"),
