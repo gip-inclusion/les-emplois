@@ -29,6 +29,12 @@
                     <i class="ri-user-add-line" aria-hidden="true"></i>
                     <span>Ajouter un bénéficiaire</span>
                 </a>
+            {% else %}
+                <a href="{{ request_new_beneficiary_form_url }}" id="request-new-beneficiary-link" class="btn btn-lg btn-ico btn-primary mt-3 mt-md-0">
+                    <i class="ri-user-add-line" aria-hidden="true"></i>
+                    <span>Demander l'ajout d'un bénéficiaire</span>
+                    <i class="ri-external-link-line ms-2"></i>
+                </a>
             {% endif %}
         </div>
     </div>

@@ -1,3 +1,5 @@
+import urllib.parse
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
@@ -45,6 +47,21 @@ def my_groups(request, template_name="gps/my_groups.html"):
         "memberships_page": memberships_page,
         "can_use_gps_advanced_features": is_allowed_to_use_gps_advanced_features(request.user),
     }
+
+    if not context["can_use_gps_advanced_features"]:
+        context["request_new_beneficiary_form_url"] = (
+            "https://formulaires.gps.inclusion.gouv.fr/ajouter-usager?"
+            + urllib.parse.urlencode(
+                {
+                    "user_name": request.user.get_full_name(),
+                    "user_id": request.user.pk,
+                    "user_email": request.user.email,
+                    "user_organization_name": getattr(request.current_organization, "display_name", ""),
+                    "user_organization_id": getattr(request.current_organization, "pk", ""),
+                    "success_url": request.build_absolute_uri(),
+                }
+            )
+        )
 
     return render(request, "gps/includes/memberships_results.html" if request.htmx else template_name, context)
 

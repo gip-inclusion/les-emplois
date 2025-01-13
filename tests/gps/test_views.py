@@ -236,6 +236,15 @@ def test_my_groups(snapshot, client):
     assert "et êtes <strong>référent</strong>" in str(groups[0])
 
 
+def test_my_groups_as_non_authorized_precriber(client):
+    user = PrescriberFactory()
+    client.force_login(user)
+
+    response = client.get(reverse("gps:my_groups"))
+    assertContains(response, "Demander l'ajout d'un bénéficiaire")
+    assertContains(response, "https://formulaires.gps.inclusion.gouv.fr/ajouter-usager?")
+
+
 def test_leave_group(client):
     member = PrescriberFactory(membership__organization__authorized=True)
     another_member = PrescriberFactory(membership=True)
