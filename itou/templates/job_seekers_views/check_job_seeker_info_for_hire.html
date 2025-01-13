@@ -14,8 +14,7 @@
     <div class="c-box my-4">
         <h2>
             Informations personnelles
-            <a class="btn btn-outline-primary float-end"
-               href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker=job_seeker.public_id company=siae.pk from_url=request.get_full_path|urlencode %}">Mettre à jour</a>
+            <a class="btn btn-outline-primary float-end" href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker=job_seeker.public_id from_url=request.get_full_path|urlencode %}">Mettre à jour</a>
         </h2>
 
         {% include "apply/includes/profile_infos.html" %}

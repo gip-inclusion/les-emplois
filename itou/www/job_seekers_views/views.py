@@ -775,12 +775,9 @@ class UpdateJobSeekerStartView(View):
         except ValidationError:
             raise Http404("Aucun candidat n'a été trouvé")
 
-        try:
-            company = get_object_or_404(Company.objects.with_has_active_members(), pk=request.GET.get("company"))
-        except ValueError:
-            raise Http404("Aucune entreprise n'a été trouvée")
-
-        from_url = get_safe_url(request, "from_url", fallback_url=reverse("dashboard:index"))
+        from_url = get_safe_url(request, "from_url")
+        if not from_url:
+            raise Http404
 
         if request.user.is_job_seeker or not request.user.can_view_personal_information(job_seeker):
             raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de ce candidat")
@@ -790,7 +787,6 @@ class UpdateJobSeekerStartView(View):
             data={
                 "config": {"from_url": from_url, "session_kind": "job-seeker-update"},
                 "job_seeker_pk": job_seeker.pk,
-                "apply": {"company_pk": company.pk},
             },
         )
 

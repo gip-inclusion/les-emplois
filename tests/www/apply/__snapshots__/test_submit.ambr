@@ -941,7 +941,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - start]
   dict({
-    'num_queries': 11,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -1102,58 +1102,6 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
           'User.can_edit_personal_information[users/models.py]',
           'User.can_view_personal_information[users/models.py]',
@@ -1208,7 +1156,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -1337,60 +1285,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -1550,7 +1444,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 9,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -1679,60 +1573,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -1809,7 +1649,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 9,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -1938,60 +1778,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -2634,7 +2420,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_company_with_proxied_job_seeker[queries - start]
   dict({
-    'num_queries': 11,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -2847,58 +2633,6 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -2934,7 +2668,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_company_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -3115,60 +2849,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -3336,7 +3016,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_company_with_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -3517,60 +3197,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -3655,7 +3281,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_company_with_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -3836,60 +3462,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -4660,7 +4232,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - start]
   dict({
-    'num_queries': 11,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -4821,58 +4393,6 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
           'User.can_edit_personal_information[users/models.py]',
           'User.can_view_personal_information[users/models.py]',
@@ -4927,7 +4447,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -5056,60 +4576,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -5269,7 +4735,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 9,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -5398,60 +4864,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -5528,7 +4940,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 9,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -5657,60 +5069,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -6353,7 +5711,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_with_job_seeker_without_nir[queries - start]
   dict({
-    'num_queries': 11,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -6566,58 +5924,6 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -6653,7 +5959,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_with_job_seeker_without_nir[queries - step 1]
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -6834,60 +6140,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -7055,7 +6307,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_with_job_seeker_without_nir[queries - step 2]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -7236,60 +6488,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -7374,7 +6572,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_with_job_seeker_without_nir[queries - step 3]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -7555,60 +6753,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -8379,7 +7523,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - start]
   dict({
-    'num_queries': 11,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -8540,58 +7684,6 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
           'User.can_edit_personal_information[users/models.py]',
           'User.can_view_personal_information[users/models.py]',
@@ -8646,7 +7738,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -8775,60 +7867,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -8988,7 +8026,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 9,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -9117,60 +8155,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -9247,7 +8231,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 9,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -9376,60 +8360,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -9543,7 +8473,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_company_with_proxied_job_seeker[queries - start]
   dict({
-    'num_queries': 11,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -9756,58 +8686,6 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -9843,7 +8721,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_company_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -10024,60 +8902,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -10245,7 +9069,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_company_with_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -10426,60 +9250,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -10564,7 +9334,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_company_with_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -10745,60 +9515,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -11609,7 +10325,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - start]
   dict({
-    'num_queries': 11,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -11770,58 +10486,6 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
           'User.can_edit_personal_information[users/models.py]',
           'User.can_view_personal_information[users/models.py]',
@@ -11876,7 +10540,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -12005,60 +10669,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -12218,7 +10828,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 9,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -12347,60 +10957,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -12477,7 +11033,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 9,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -12606,60 +11162,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -12773,7 +11275,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_with_job_seeker_without_nir[queries - start]
   dict({
-    'num_queries': 11,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -12986,58 +11488,6 @@
       }),
       dict({
         'origin': list([
-          'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -13073,7 +11523,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_with_job_seeker_without_nir[queries - step 1]
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -13254,60 +11704,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -13475,7 +11871,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_with_job_seeker_without_nir[queries - step 2]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -13656,60 +12052,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -13794,7 +12136,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_with_job_seeker_without_nir[queries - step 3]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -13975,60 +12317,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id",
-                 "companies_company"."address_line_1",
-                 "companies_company"."address_line_2",
-                 "companies_company"."post_code",
-                 "companies_company"."city",
-                 "companies_company"."department",
-                 "companies_company"."coords",
-                 "companies_company"."geocoding_score",
-                 "companies_company"."geocoding_updated_at",
-                 "companies_company"."ban_api_resolved_address",
-                 "companies_company"."insee_city_id",
-                 "companies_company"."name",
-                 "companies_company"."created_at",
-                 "companies_company"."updated_at",
-                 "companies_company"."uid",
-                 "companies_company"."active_members_email_reminder_last_sent_at",
-                 "companies_company"."automatic_geocoding_update",
-                 "companies_company"."siret",
-                 "companies_company"."naf",
-                 "companies_company"."kind",
-                 "companies_company"."brand",
-                 "companies_company"."phone",
-                 "companies_company"."email",
-                 "companies_company"."auth_email",
-                 "companies_company"."website",
-                 "companies_company"."description",
-                 "companies_company"."provided_support",
-                 "companies_company"."source",
-                 "companies_company"."created_by_id",
-                 "companies_company"."block_job_applications",
-                 "companies_company"."job_applications_blocked_at",
-                 "companies_company"."convention_id",
-                 "companies_company"."job_app_score",
-                 "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id",
-                 EXISTS
-            (SELECT %s AS "a"
-             FROM "companies_companymembership" U0
-             WHERE (U0."company_id" = ("companies_company"."id")
-                    AND U0."is_active")
-             LIMIT 1) AS "has_active_members"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([

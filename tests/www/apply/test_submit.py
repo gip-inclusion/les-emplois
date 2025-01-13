@@ -263,7 +263,7 @@ class TestHire:
         client.force_login(company.members.first())
         params = {
             "job_seeker": prescriber.public_id,
-            "company": company.pk,
+            "from_url": reverse("dashboard:index"),
         }
         url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         response = client.get(url)
@@ -3415,7 +3415,6 @@ class TestLastCheckedAtView:
 
         params = {
             "job_seeker": self.job_seeker.public_id,
-            "company": self.company.pk,
             "from_url": url,
         }
         update_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
@@ -3468,7 +3467,6 @@ class UpdateJobSeekerTestMixin:
             kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
         )
         self.config = {
-            "apply": {"company_pk": self.company.pk},
             "config": {"from_url": from_url, "session_kind": "job-seeker-update"},
             "job_seeker_pk": self.job_seeker.pk,
         }
@@ -3486,7 +3484,6 @@ class UpdateJobSeekerTestMixin:
 
         params = {
             "job_seeker": self.job_seeker.public_id,
-            "company": self.company.pk,
             "from_url": from_url,
         }
         self.start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
@@ -4094,7 +4091,10 @@ class TestUpdateJobSeekerStep3View:
         # START to setup jobseeker session
         params = {
             "job_seeker": job_seeker.public_id,
-            "company": company.pk,
+            "from_url": reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
         }
         url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         response = client.get(url)
@@ -4885,7 +4885,6 @@ class TestCheckJobSeekerInformationsForHire:
         assertContains(response, "Éligibilité IAE à valider")
         params = {
             "job_seeker": job_seeker.public_id,
-            "company": company.pk,
             "from_url": url_check_infos,
         }
         url_update = f"""
@@ -4929,7 +4928,6 @@ class TestCheckJobSeekerInformationsForHire:
         assertTemplateNotUsed(response, "approvals/includes/box.html")
         params = {
             "job_seeker": job_seeker.public_id,
-            "company": company.pk,
             "from_url": url_check_infos,
         }
         url_update = f"""
