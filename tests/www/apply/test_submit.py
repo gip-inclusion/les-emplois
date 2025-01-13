@@ -269,17 +269,6 @@ class TestHire:
         response = client.get(url)
         assert response.status_code == 404
 
-        # TODO(ewen): deprecated URL
-        for viewname in [
-            "job_seekers_views:update_job_seeker_step_1_for_hire",
-            "job_seekers_views:update_job_seeker_step_2_for_hire",
-            "job_seekers_views:update_job_seeker_step_3_for_hire",
-            "job_seekers_views:update_job_seeker_step_end_for_hire",
-        ]:
-            url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_public_id": prescriber.public_id})
-            response = client.get(url)
-            assert response.status_code == 404
-
     def test_404_when_trying_to_hire_a_prescriber(self, client):
         company = CompanyFactory(with_jobs=True, with_membership=True)
         prescriber = PrescriberFactory()
@@ -3483,22 +3472,6 @@ class UpdateJobSeekerTestMixin:
             "config": {"from_url": from_url, "session_kind": "job-seeker-update"},
             "job_seeker_pk": self.job_seeker.pk,
         }
-        self.step_1_url = reverse(
-            self.STEP_1_VIEW_NAME,
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-        )
-        self.step_2_url = reverse(
-            self.STEP_2_VIEW_NAME,
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-        )
-        self.step_3_url = reverse(
-            self.STEP_3_VIEW_NAME,
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-        )
-        self.step_end_url = reverse(
-            self.STEP_END_VIEW_NAME,
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-        )
 
         [self.city] = create_test_cities(["67"], num_per_department=1)
 
@@ -3534,26 +3507,10 @@ class UpdateJobSeekerTestMixin:
         response = client.get(self.start_url)
         assert response.status_code == 403
 
-    def _check_nothing_permitted_deprecated(self, client, user):
-        client.force_login(user)
-        for url in [
-            self.step_1_url,
-            self.step_2_url,
-            self.step_3_url,
-            self.step_end_url,
-        ]:
-            response = client.get(url)
-            assert response.status_code == 403
-
     def _check_that_last_step_doesnt_crash_with_direct_access(self, client, user):
         client.force_login(user)
         client.get(self.start_url)  # Setup job_seeker_session
         client.get(self.get_step_url("end", client))  # Use partial job_seeker_session
-
-    def _check_that_last_step_doesnt_crash_with_direct_access_deprecated(self, client, user):
-        client.force_login(user)
-        client.get(self.step_1_url)  # Setup job_seeker_session
-        client.get(self.step_end_url)  # Use partial job_seeker_session
 
     def _check_everything_allowed(self, client, snapshot, user, extra_post_data_1=None):
         client.force_login(user)
@@ -3746,192 +3703,6 @@ class UpdateJobSeekerTestMixin:
 
         assert self.job_seeker.last_checked_at != previous_last_checked_at
 
-    def _check_everything_allowed_deprecated(self, client, snapshot, user, extra_post_data_1=None):
-        client.force_login(user)
-
-        # STEP 1
-        response = client.get(self.step_1_url)
-        assertContains(response, self.job_seeker.first_name)
-        assertNotContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
-
-        # Let's check for consistency between the NIR, the birthdate and the title.
-        # (but do not check when there is no NIR)
-        # ----------------------------------------------------------------------
-
-        if self.job_seeker.jobseeker_profile.nir != "":
-            post_data = {
-                "title": "MME",  # Inconsistent title
-                "first_name": self.job_seeker.first_name,
-                "last_name": self.job_seeker.last_name,
-                "birthdate": self.job_seeker.jobseeker_profile.birthdate,
-                "lack_of_nir": False,
-                "lack_of_nir_reason": "",
-            }
-            response = client.post(self.step_1_url, data=post_data)
-            assert response.status_code == 200
-            assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE % "")
-
-            post_data = {
-                "title": "M",
-                "first_name": self.job_seeker.first_name,
-                "last_name": self.job_seeker.last_name,
-                "birthdate": datetime.date(1978, 11, 20),  # Inconsistent birthdate
-                "lack_of_nir": False,
-                "lack_of_nir_reason": "",
-            }
-            response = client.post(self.step_1_url, data=post_data)
-            assert response.status_code == 200
-            assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
-
-        # Resume to valid data and proceed with "normal" flow.
-        # ----------------------------------------------------------------------
-
-        NEW_FIRST_NAME = "New first name"
-        PROCESS_TITLE = "Modification du compte candidat"
-
-        post_data = {
-            "title": "M",
-            "first_name": NEW_FIRST_NAME,
-            "last_name": "New last name",
-            "birthdate": self.job_seeker.jobseeker_profile.birthdate,
-            "lack_of_nir": False,
-            "lack_of_nir_reason": "",
-        }
-        if extra_post_data_1 is not None:
-            post_data.update(extra_post_data_1)
-        response = client.post(self.step_1_url, data=post_data)
-        assertRedirects(response, self.step_2_url, fetch_redirect_response=False)
-
-        # Data is stored in the session but user is untouched
-        # (nir value is retrieved from the job_seeker and stored in the session)
-        lack_of_nir_reason = post_data.pop("lack_of_nir_reason")
-        nir = post_data.pop("nir", None)
-        birthdate = post_data.pop("birthdate", None)
-        birth_place = post_data.pop("birth_place", None)
-        birth_country = post_data.pop("birth_country", None)
-        expected_job_seeker_session = {
-            "user": post_data,
-            "profile": {
-                "birth_place": birth_place or self.job_seeker.jobseeker_profile.birth_place,
-                "birth_country": birth_country or self.job_seeker.jobseeker_profile.birth_country,
-                "birthdate": birthdate or self.job_seeker.jobseeker_profile.birthdate,
-                "nir": nir or self.job_seeker.jobseeker_profile.nir,
-                "lack_of_nir_reason": lack_of_nir_reason,
-            },
-        }
-        assert client.session[self.job_seeker_session_key] == expected_job_seeker_session
-        self.job_seeker.refresh_from_db()
-        assert self.job_seeker.first_name != NEW_FIRST_NAME
-
-        # If you go back to step 1, new data is shown
-        response = client.get(self.step_1_url)
-        assertContains(response, PROCESS_TITLE, html=True)
-        assertContains(response, NEW_FIRST_NAME)
-
-        # STEP 2
-        with assertSnapshotQueries(snapshot(name="queries - step 2")):
-            response = client.get(self.step_2_url)
-        assertContains(response, PROCESS_TITLE, html=True)
-        assertContains(response, self.job_seeker.phone)
-        assertNotContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
-
-        NEW_ADDRESS_LINE = "382 ROUTE DE JOLLIVET"
-
-        fields = [NEW_ADDRESS_LINE, f"{self.city.post_codes[0]} {self.city}"]
-        new_geocoding_address = ", ".join([field for field in fields if field])
-
-        post_data = {
-            "ban_api_resolved_address": new_geocoding_address,
-            "address_line_1": NEW_ADDRESS_LINE,
-            "post_code": self.city.post_codes[0],
-            "insee_code": self.city.code_insee,
-            "city": self.city.name,
-            "phone": self.job_seeker.phone,
-            "fill_mode": "ban_api",
-        }
-
-        response = client.post(self.step_2_url, data=post_data)
-        assertRedirects(response, self.step_3_url, fetch_redirect_response=False)
-
-        # Data is stored in the session but user is untouched
-        expected_job_seeker_session["user"] |= post_data | {"address_line_2": "", "address_for_autocomplete": None}
-        assert client.session[self.job_seeker_session_key] == expected_job_seeker_session
-        self.job_seeker.refresh_from_db()
-        assert self.job_seeker.address_line_1 != NEW_ADDRESS_LINE
-
-        # If you go back to step 2, new data is shown
-        response = client.get(self.step_2_url)
-        assertContains(response, NEW_ADDRESS_LINE)
-
-        # STEP 3
-        with assertSnapshotQueries(snapshot(name="queries - step 3")):
-            response = client.get(self.step_3_url)
-        assertContains(response, PROCESS_TITLE, html=True)
-        assertContains(response, "Niveau de formation")
-
-        post_data = {
-            "education_level": EducationLevel.BAC_LEVEL.value,
-        }
-        response = client.post(self.step_3_url, data=post_data)
-        assertRedirects(response, self.step_end_url, fetch_redirect_response=False)
-
-        # Data is stored in the session but user & profiles are untouched
-        expected_job_seeker_session["profile"] |= post_data | {
-            "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
-            "resourceless": False,
-            "rqth_employee": False,
-            "oeth_employee": False,
-            "pole_emploi": False,
-            "pole_emploi_id_forgotten": "",
-            "pole_emploi_since": "",
-            "unemployed": False,
-            "unemployed_since": "",
-            "rsa_allocation": False,
-            "has_rsa_allocation": RSAAllocation.NO.value,
-            "rsa_allocation_since": "",
-            "ass_allocation": False,
-            "ass_allocation_since": "",
-            "aah_allocation": False,
-            "aah_allocation_since": "",
-        }
-        assert client.session[self.job_seeker_session_key] == expected_job_seeker_session
-        self.job_seeker.refresh_from_db()
-
-        # If you go back to step 3, new data is shown
-        response = client.get(self.step_3_url)
-        assertContains(response, '<option value="40" selected="">Formation de niveau BAC</option>', html=True)
-
-        # Step END
-        response = client.get(self.step_end_url)
-        assertContains(response, PROCESS_TITLE, html=True)
-        assertContains(response, NEW_FIRST_NAME.title())  # User.get_full_name() changes the firstname display
-        assertContains(response, NEW_ADDRESS_LINE)
-        assertContains(response, "Formation de niveau BAC")
-        assertContains(response, "Valider les informations")
-
-        previous_last_checked_at = self.job_seeker.last_checked_at
-
-        response = client.post(self.step_end_url)
-        assertRedirects(
-            response,
-            reverse(
-                self.FINAL_REDIRECT_VIEW_NAME,
-                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-            ),
-            fetch_redirect_response=False,
-        )
-        assert client.session.get(self.job_seeker_session_key) is None
-
-        self.job_seeker.refresh_from_db()
-        assert self.job_seeker.has_jobseeker_profile is True
-        assert self.job_seeker.first_name == NEW_FIRST_NAME
-        assert self.job_seeker.address_line_1 == NEW_ADDRESS_LINE
-        self.job_seeker.jobseeker_profile.refresh_from_db()
-        assert self.job_seeker.jobseeker_profile.education_level == EducationLevel.BAC_LEVEL
-
-        assert self.job_seeker.last_checked_at != previous_last_checked_at
-
     def _check_only_administrative_allowed(self, client, user):
         client.force_login(user)
 
@@ -4021,128 +3792,20 @@ class UpdateJobSeekerTestMixin:
         assert self.job_seeker.jobseeker_profile.education_level == EducationLevel.BAC_LEVEL
         assert self.job_seeker.last_checked_at != previous_last_checked_at
 
-    def _check_only_administrative_allowed_deprecated(self, client, user):
-        client.force_login(user)
-
-        # STEP 1
-        response = client.get(self.step_1_url)
-        assertContains(response, self.job_seeker.first_name)
-        assertContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
-
-        response = client.post(self.step_1_url)
-        assertRedirects(response, self.step_2_url, fetch_redirect_response=False)
-
-        # Session is created
-        expected_job_seeker_session = {"user": {}}
-        assert client.session[self.job_seeker_session_key] == expected_job_seeker_session
-
-        # STEP 2
-        response = client.get(self.step_2_url)
-        assertContains(response, self.job_seeker.phone)
-        assertContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
-
-        response = client.post(self.step_2_url)
-        assertRedirects(response, self.step_3_url, fetch_redirect_response=False)
-
-        # Data is stored in the session but user is untouched
-        assert client.session[self.job_seeker_session_key] == expected_job_seeker_session
-
-        # STEP 3
-        response = client.get(self.step_3_url)
-        assertContains(response, "Niveau de formation")
-
-        post_data = {
-            "education_level": EducationLevel.BAC_LEVEL.value,
-        }
-        response = client.post(self.step_3_url, data=post_data)
-        assertRedirects(response, self.step_end_url, fetch_redirect_response=False)
-
-        # Data is stored in the session but user & profiles are untouched
-        expected_job_seeker_session["profile"] = post_data | {
-            "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
-            "resourceless": False,
-            "rqth_employee": False,
-            "oeth_employee": False,
-            "pole_emploi": False,
-            "pole_emploi_id_forgotten": "",
-            "pole_emploi_since": "",
-            "unemployed": False,
-            "unemployed_since": "",
-            "rsa_allocation": False,
-            "has_rsa_allocation": RSAAllocation.NO.value,
-            "rsa_allocation_since": "",
-            "ass_allocation": False,
-            "ass_allocation_since": "",
-            "aah_allocation": False,
-            "aah_allocation_since": "",
-        }
-        assert client.session[self.job_seeker_session_key] == expected_job_seeker_session
-        self.job_seeker.refresh_from_db()
-
-        # If you go back to step 3, new data is shown
-        response = client.get(self.step_3_url)
-        assertContains(response, '<option value="40" selected="">Formation de niveau BAC</option>', html=True)
-
-        # Step END
-        response = client.get(self.step_end_url)
-        assertContains(response, "Formation de niveau BAC")
-
-        previous_last_checked_at = self.job_seeker.last_checked_at
-
-        response = client.post(self.step_end_url)
-        assertRedirects(
-            response,
-            reverse(
-                self.FINAL_REDIRECT_VIEW_NAME,
-                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-            ),
-            fetch_redirect_response=False,
-        )
-        assert client.session.get(self.job_seeker_session_key) is None
-
-        self.job_seeker.refresh_from_db()
-        assert self.job_seeker.has_jobseeker_profile is True
-        assert self.job_seeker.jobseeker_profile.education_level == EducationLevel.BAC_LEVEL
-        assert self.job_seeker.last_checked_at != previous_last_checked_at
-
 
 class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
-    STEP_1_VIEW_NAME = "job_seekers_views:update_job_seeker_step_1"
-    STEP_2_VIEW_NAME = "job_seekers_views:update_job_seeker_step_2"
-    STEP_3_VIEW_NAME = "job_seekers_views:update_job_seeker_step_3"
-    STEP_END_VIEW_NAME = "job_seekers_views:update_job_seeker_step_end"
     FINAL_REDIRECT_VIEW_NAME = "apply:application_jobs"
 
     def test_anonymous_start(self, client):
         response = client.get(self.start_url)
         assertRedirects(response, add_url_params(reverse("account_login"), {"next": self.start_url}))
 
-    # TODO(ewen): deprecated
-    def test_anonymous_step_1(self, client):
-        response = client.get(self.step_1_url)
-        assertRedirects(response, reverse("account_login") + f"?next={self.step_1_url}")
-
-    def test_anonymous_step_2(self, client):
-        response = client.get(self.step_2_url)
-        assertRedirects(response, reverse("account_login") + f"?next={self.step_2_url}")
-
-    def test_anonymous_step_3(self, client):
-        response = client.get(self.step_3_url)
-        assertRedirects(response, reverse("account_login") + f"?next={self.step_3_url}")
-
-    def test_anonymous_step_end(self, client):
-        response = client.get(self.step_end_url)
-        assertRedirects(response, reverse("account_login") + f"?next={self.step_end_url}")
-
     def test_as_job_seeker(self, client):
         self._check_nothing_permitted(client, self.job_seeker)
-        self._check_nothing_permitted_deprecated(client, self.job_seeker)
 
     def test_as_unauthorized_prescriber(self, client):
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
         self._check_nothing_permitted(client, prescriber)
-        self._check_nothing_permitted_deprecated(client, prescriber)
 
     def test_as_unauthorized_prescriber_that_created_proxied_job_seeker(self, client, snapshot):
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
@@ -4163,25 +3826,6 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
             },
         )
 
-    def test_as_unauthorized_prescriber_that_created_proxied_job_seeker_deprecated(self, client, snapshot):
-        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
-        self.job_seeker.created_by = prescriber
-        self.job_seeker.last_login = None
-        self.job_seeker.save(update_fields=["created_by", "last_login"])
-
-        geispolsheim = create_city_geispolsheim()
-        birthdate = self.job_seeker.jobseeker_profile.birthdate
-
-        self._check_everything_allowed_deprecated(
-            client,
-            snapshot,
-            prescriber,
-            extra_post_data_1={
-                "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-                "birth_country": Country.france_id,
-            },
-        )
-
     def test_as_unauthorized_prescriber_that_created_the_non_proxied_job_seeker(self, client):
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
         self.job_seeker.created_by = prescriber
@@ -4189,7 +3833,6 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
         self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_nothing_permitted(client, prescriber)
-        self._check_nothing_permitted_deprecated(client, prescriber)
 
     def test_as_authorized_prescriber_with_proxied_job_seeker(self, client, snapshot):
         # Make sure the job seeker does not manage its own account
@@ -4211,33 +3854,12 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
             },
         )
 
-    def test_as_authorized_prescriber_with_proxied_job_seeker_deprecated(self, client, snapshot):
-        # Make sure the job seeker does not manage its own account
-        self.job_seeker.created_by = PrescriberFactory()
-        self.job_seeker.last_login = None
-        self.job_seeker.save(update_fields=["created_by", "last_login"])
-        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
-
-        geispolsheim = create_city_geispolsheim()
-        birthdate = self.job_seeker.jobseeker_profile.birthdate
-
-        self._check_everything_allowed_deprecated(
-            client,
-            snapshot,
-            authorized_prescriber,
-            extra_post_data_1={
-                "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-                "birth_country": Country.france_id,
-            },
-        )
-
     def test_as_authorized_prescriber_with_non_proxied_job_seeker(self, client):
         # Make sure the job seeker does manage its own account
         self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
         self.job_seeker.save(update_fields=["last_login"])
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         self._check_only_administrative_allowed(client, authorized_prescriber)
-        self._check_only_administrative_allowed_deprecated(client, authorized_prescriber)
 
     def test_as_company_with_proxied_job_seeker(self, client, snapshot):
         # Make sure the job seeker does not manage its own account
@@ -4258,31 +3880,11 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
             },
         )
 
-    def test_as_company_with_proxied_job_seeker_deprecated(self, client, snapshot):
-        # Make sure the job seeker does not manage its own account
-        self.job_seeker.created_by = EmployerFactory()
-        self.job_seeker.last_login = None
-        self.job_seeker.save(update_fields=["created_by", "last_login"])
-
-        geispolsheim = create_city_geispolsheim()
-        birthdate = self.job_seeker.jobseeker_profile.birthdate
-
-        self._check_everything_allowed_deprecated(
-            client,
-            snapshot,
-            self.company.members.first(),
-            extra_post_data_1={
-                "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-                "birth_country": Country.france_id,
-            },
-        )
-
     def test_as_company_with_non_proxied_job_seeker(self, client):
         # Make sure the job seeker does manage its own account
         self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
         self.job_seeker.save(update_fields=["last_login"])
         self._check_only_administrative_allowed(client, self.company.members.first())
-        self._check_only_administrative_allowed_deprecated(client, self.company.members.first())
 
     def test_with_invalid_job_seeker_session(self, client):
         client.force_login(self.company.members.first())
@@ -4296,15 +3898,6 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
         ]:
             response = client.get(url)
             assert response.status_code == 404
-
-        # TODO(ewen): deprecated
-        for url in [
-            self.step_2_url,
-            self.step_3_url,
-            self.step_end_url,
-        ]:
-            response = client.get(url)
-            assert response.status_code == 403
 
     def test_with_job_seeker_without_nir(self, client, snapshot):
         # Make sure the job seeker does not manage its own account (and has no nir)
@@ -4334,79 +3927,27 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
         # Check that we could update its NIR infos
         assert self.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
 
-    def test_with_job_seeker_without_nir_deprecated(self, client, snapshot):
-        # Make sure the job seeker does not manage its own account (and has no nir)
-        self.job_seeker.jobseeker_profile.nir = ""
-        self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
-        self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
-
-        self.job_seeker.created_by = EmployerFactory()
-        self.job_seeker.last_login = None
-        self.job_seeker.save(update_fields=["created_by", "last_login"])
-
-        geispolsheim = create_city_geispolsheim()
-        birthdate = self.job_seeker.jobseeker_profile.birthdate
-
-        self._check_everything_allowed_deprecated(
-            client,
-            snapshot,
-            self.company.members.first(),
-            extra_post_data_1={
-                "nir": "",
-                "lack_of_nir": True,
-                "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER.value,
-                "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-                "birth_country": Country.france_id,
-            },
-        )
-        # Check that we could update its NIR infos
-        assert self.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
-
     def test_as_company_that_last_step_doesnt_crash_with_direct_access(self, client):
         # Make sure the job seeker does not manage its own account
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_that_last_step_doesnt_crash_with_direct_access(client, self.company.members.first())
-        self._check_that_last_step_doesnt_crash_with_direct_access_deprecated(client, self.company.members.first())
 
 
 class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
-    STEP_1_VIEW_NAME = "job_seekers_views:update_job_seeker_step_1_for_hire"
-    STEP_2_VIEW_NAME = "job_seekers_views:update_job_seeker_step_2_for_hire"
-    STEP_3_VIEW_NAME = "job_seekers_views:update_job_seeker_step_3_for_hire"
-    STEP_END_VIEW_NAME = "job_seekers_views:update_job_seeker_step_end_for_hire"
     FINAL_REDIRECT_VIEW_NAME = "job_seekers_views:check_job_seeker_info_for_hire"
 
     def test_anonymous_start(self, client):
         response = client.get(self.start_url)
         assertRedirects(response, add_url_params(reverse("account_login"), {"next": self.start_url}))
 
-    # TODO(ewen): deprecated
-    def test_anonymous_step_1(self, client):
-        response = client.get(self.step_1_url)
-        assertRedirects(response, reverse("account_login") + f"?next={self.step_1_url}")
-
-    def test_anonymous_step_2(self, client):
-        response = client.get(self.step_2_url)
-        assertRedirects(response, reverse("account_login") + f"?next={self.step_2_url}")
-
-    def test_anonymous_step_3(self, client):
-        response = client.get(self.step_3_url)
-        assertRedirects(response, reverse("account_login") + f"?next={self.step_3_url}")
-
-    def test_anonymous_step_end(self, client):
-        response = client.get(self.step_end_url)
-        assertRedirects(response, reverse("account_login") + f"?next={self.step_end_url}")
-
     def test_as_job_seeker(self, client):
         self._check_nothing_permitted(client, self.job_seeker)
-        self._check_nothing_permitted_deprecated(client, self.job_seeker)
 
     def test_as_unauthorized_prescriber(self, client):
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
         self._check_nothing_permitted(client, prescriber)
-        self._check_nothing_permitted_deprecated(client, prescriber)
 
     def test_as_unauthorized_prescriber_that_created_proxied_job_seeker(self, client, snapshot):
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
@@ -4426,7 +3967,6 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
                 "birth_country": Country.france_id,
             },
         )
-        self._check_nothing_permitted_deprecated(client, prescriber)
 
     def test_as_unauthorized_prescriber_that_created_the_non_proxied_job_seeker(self, client):
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
@@ -4435,7 +3975,6 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
         self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_nothing_permitted(client, prescriber)
-        self._check_nothing_permitted_deprecated(client, prescriber)
 
     def test_as_authorized_prescriber_with_proxied_job_seeker(self, client, snapshot):
         # Make sure the job seeker does not manage its own account
@@ -4456,7 +3995,6 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
                 "birth_country": Country.france_id,
             },
         )
-        self._check_nothing_permitted_deprecated(client, authorized_prescriber)
 
     def test_as_authorized_prescriber_with_non_proxied_job_seeker(self, client):
         # Make sure the job seeker does manage its own account
@@ -4464,7 +4002,6 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
         self.job_seeker.save(update_fields=["last_login"])
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         self._check_only_administrative_allowed(client, authorized_prescriber)
-        self._check_nothing_permitted_deprecated(client, authorized_prescriber)
 
     def test_as_company_with_proxied_job_seeker(self, client, snapshot):
         # Make sure the job seeker does not manage its own account
@@ -4485,31 +4022,11 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
             },
         )
 
-    def test_as_company_with_proxied_job_seeker_deprecated(self, client, snapshot):
-        # Make sure the job seeker does not manage its own account
-        self.job_seeker.created_by = EmployerFactory()
-        self.job_seeker.last_login = None
-        self.job_seeker.save(update_fields=["created_by", "last_login"])
-
-        geispolsheim = create_city_geispolsheim()
-        birthdate = self.job_seeker.jobseeker_profile.birthdate
-
-        self._check_everything_allowed_deprecated(
-            client,
-            snapshot,
-            self.company.members.first(),
-            extra_post_data_1={
-                "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-                "birth_country": Country.france_id,
-            },
-        )
-
     def test_as_company_with_non_proxied_job_seeker(self, client):
         # Make sure the job seeker does manage its own account
         self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
         self.job_seeker.save(update_fields=["last_login"])
         self._check_only_administrative_allowed(client, self.company.members.first())
-        self._check_only_administrative_allowed_deprecated(client, self.company.members.first())
 
     def test_with_invalid_job_seeker_session(self, client):
         client.force_login(self.company.members.first())
@@ -4523,15 +4040,6 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
         ]:
             response = client.get(url)
             assert response.status_code == 404
-
-        # TODO(ewen): deprecated
-        for url in [
-            self.step_2_url,
-            self.step_3_url,
-            self.step_end_url,
-        ]:
-            response = client.get(url)
-            assert response.status_code == 403
 
     def test_with_job_seeker_without_nir(self, client, snapshot):
         # Make sure the job seeker does not manage its own account (and has no nir)
@@ -4561,41 +4069,12 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
         # Check that we could update its NIR infos
         assert self.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
 
-    def test_with_job_seeker_without_nir_deprecated(self, client, snapshot):
-        # Make sure the job seeker does not manage its own account (and has no nir)
-        self.job_seeker.jobseeker_profile.nir = ""
-        self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
-        self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
-
-        self.job_seeker.created_by = EmployerFactory()
-        self.job_seeker.last_login = None
-        self.job_seeker.save(update_fields=["created_by", "last_login"])
-
-        geispolsheim = create_city_geispolsheim()
-        birthdate = self.job_seeker.jobseeker_profile.birthdate
-
-        self._check_everything_allowed_deprecated(
-            client,
-            snapshot,
-            self.company.members.first(),
-            extra_post_data_1={
-                "nir": "",
-                "lack_of_nir": True,
-                "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER.value,
-                "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-                "birth_country": Country.france_id,
-            },
-        )
-        # Check that we could update its NIR infos
-        assert self.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
-
     def test_as_company_that_last_step_doesnt_crash_with_direct_access(self, client):
         # Make sure the job seeker does not manage its own account
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_that_last_step_doesnt_crash_with_direct_access(client, self.company.members.first())
-        self._check_that_last_step_doesnt_crash_with_direct_access_deprecated(client, self.company.members.first())
 
 
 class TestUpdateJobSeekerStep3View:
@@ -4629,29 +4108,6 @@ class TestUpdateJobSeekerStep3View:
             reverse(
                 "job_seekers_views:update_job_seeker_step_3",
                 kwargs={"session_uuid": job_seeker_session_name},
-            )
-        )
-        assertContains(
-            response,
-            '<input type="checkbox" name="ass_allocation" class="form-check-input" id="id_ass_allocation" checked="">',
-            html=True,
-        )
-
-        # TODO(ewen): Deprecated
-        # STEP 1 to setup jobseeker session
-        response = client.get(
-            reverse(
-                "job_seekers_views:update_job_seeker_step_1",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
-            )
-        )
-        assert response.status_code == 200
-
-        # Go straight to STEP 3
-        response = client.get(
-            reverse(
-                "job_seekers_views:update_job_seeker_step_3",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
         assertContains(
