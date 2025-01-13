@@ -121,7 +121,6 @@ class NewEmployeeRecordStep1Form(BirthPlaceAndCountryMixin, JobSeekerProfileFiel
             {
                 "min": DuetDatePickerWidget.min_birthdate(),
                 "max": DuetDatePickerWidget.max_birthdate(),
-                "class": "js-period-date-input",
             }
         )
 
