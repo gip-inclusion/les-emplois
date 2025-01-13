@@ -26,22 +26,7 @@
 {% endblock %}
 
 {% block title_extra %}
-    <ul class="s-tabs-01__nav nav nav-tabs mb-0" role="tablist" data-it-sliding-tabs="true">
-        <li class="nav-item" role="presentation">
-            <a class="nav-link active"
-               href="{% url 'job_seekers_views:details' public_id=job_seeker.public_id %}?back_url={% url 'job_seekers_views:list' %}"
-               aria-controls="informations"
-               aria-selected="true"
-               {% matomo_event "candidat" "clic-onglet" "informations candidat" %}>Informations générales</a>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link"
-               href="{% url 'job_seekers_views:job_applications' public_id=job_seeker.public_id %}?back_url={% url 'job_seekers_views:list' %}"
-               aria-controls="candidatures"
-               aria-selected="false"
-               {% matomo_event "candidat" "clic-onglet" "candidatures" %}>Candidatures</a>
-        </li>
-    </ul>
+    {% include "job_seekers_views/includes/nav_tabs.html" with job_seeker=job_seeker active_nav_tab="informations" only %}
 {% endblock %}
 {% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
