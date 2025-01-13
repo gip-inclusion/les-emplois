@@ -15,6 +15,7 @@ from itou.users.enums import Title, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.widgets import DuetDatePickerWidget
+from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 from itou.www.signup.forms import JobSeekerSituationForm
 from tests.asp.factories import CountryEuropeFactory, CountryFranceFactory
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
@@ -617,6 +618,9 @@ class TestJobSeekerSignup:
             name=f"{snapshot_name}_title"
         )
         assertContains(response, reverse("login:existing_user", args=(existing_user.public_id,)))
+
+        # Important that the email is not saved in the session, in the subsequent step the user must prove they know it
+        assert ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY not in client.session
 
         # NOTE: error is rendered for the case that the user ignores the modal
         if "email" in erroneous_fields:

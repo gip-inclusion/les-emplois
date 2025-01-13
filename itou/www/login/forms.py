@@ -10,6 +10,7 @@ from django.utils.safestring import mark_safe
 from itou.openid_connect.errors import format_error_modal_content
 from itou.users.enums import IdentityProvider
 from itou.users.models import User
+from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 
 
 class FindExistingUserViaEmailForm(forms.Form):
@@ -49,6 +50,7 @@ class FindExistingUserViaEmailForm(forms.Form):
                 extra_tags="modal login_failure email_does_not_exist",
             )
             raise ValidationError("Cette adresse e-mail est inconnue. Veuillez en saisir une autre, ou vous inscrire.")
+        self.request.session[ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY] = email
         return email
 
 
@@ -57,15 +59,22 @@ class ItouLoginForm(LoginForm):
     demo_banner_account = forms.BooleanField(widget=forms.HiddenInput(), required=False)
 
     def __init__(self, *args, **kwargs):
+        user_email = kwargs.pop("user_email", None)
         super().__init__(*args, **kwargs)
         self.fields["password"].widget.attrs["placeholder"] = "**********"
         self.fields["password"].help_text = format_html(
             '<a href="{}" class="btn-link fs-sm">Mot de passe oublié ?</a>',
             reverse("account_reset_password"),
         )
-        self.fields["login"].widget.attrs["placeholder"] = "adresse@email.fr"
         self.fields["login"].label = "Adresse e-mail"
-        self.fields["login"].widget.attrs["autofocus"] = True
+
+        if user_email:
+            self.fields["login"].initial = user_email
+            self.fields["login"].widget.attrs["disabled"] = True
+            self.data = self.data.dict() | {"login": user_email}
+        else:
+            self.fields["login"].widget.attrs["placeholder"] = "adresse@email.fr"
+            self.fields["login"].widget.attrs["autofocus"] = True
 
     def clean(self):
         # Parent method performs authentication on form success.

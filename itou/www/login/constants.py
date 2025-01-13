@@ -1,0 +1,1 @@
+ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY = "job_seeker_login_email"
