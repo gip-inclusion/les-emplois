@@ -192,8 +192,99 @@ class TestCreateForSender:
         )
 
 
-class TestUpdateJobSeeker:
-    def test_update_with_wrong_tunnel_in_session(self, client):
+class TestUpdateForJobSeekerStart:
+    def test_start_update_job_seeker_forbidden(self, client):
+        job_seeker = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
+        company = CompanyFactory(with_membership=True)
+        client.force_login(job_seeker)
+
+        company_pk = company.pk
+
+        from_url = reverse(
+            "apply:application_jobs",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+        )
+        params = {
+            "job_seeker": job_seeker.public_id,
+            "company": company_pk,
+            "from_url": from_url,
+        }
+        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+
+        response = client.get(start_url)
+        assert response.status_code == 403
+
+
+class TestUpdateForSenderStart:
+    @pytest.mark.parametrize(
+        "job_seeker_value, from_url_value, expected_status_code",
+        [
+            # Valid parameters
+            pytest.param("valid", "valid", 302, id="valid_values"),
+            # Invalid parameters
+            pytest.param("invalid_uuid", "valid", 404, id="invalid_job_seeker_not_a_uuid"),
+            pytest.param("invalid", "valid", 404, id="invalid_job_seeker_not_found"),
+            pytest.param(None, "valid", 404, id="missing_job_seeker"),
+            pytest.param("valid", None, 404, id="missing_from_url"),
+        ],
+    )
+    def test_start_update(self, job_seeker_value, from_url_value, expected_status_code, client):
+        job_seeker = JobSeekerFactory()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.get()
+        client.force_login(user)
+
+        match job_seeker_value:
+            case "valid":
+                job_seeker_public_id = job_seeker.public_id
+            case "invalid_uuid":
+                job_seeker_public_id = "invalid_uuid_value"
+            case "invalid":
+                job_seeker_public_id = uuid.uuid4()
+            case _:
+                job_seeker_public_id = None
+
+        if from_url_value == "valid":
+            from_url = reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
+        else:
+            from_url = None
+
+        params = {
+            "job_seeker": job_seeker_public_id,
+            "from_url": from_url,
+        }
+        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+
+        response = client.get(start_url)
+        assert response.status_code == expected_status_code
+
+        if expected_status_code == 302:
+            [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+            step_1_url = reverse(
+                "job_seekers_views:update_job_seeker_step_1",
+                kwargs={"session_uuid": job_seeker_session_name},
+            )
+
+            assertRedirects(response, step_1_url)
+            assert client.session[job_seeker_session_name].get("config").get("from_url") == from_url
+            response = client.get(step_1_url)
+            assertContains(
+                response,
+                f"""
+                    <a href="{from_url}"
+                    class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"
+                    aria-label="Annuler la saisie de ce formulaire">
+                      <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                      <span>Annuler</span>
+                    </a>
+                """,
+                html=True,
+            )
+
+    def test_update_with_wrong_session(self, client):
         job_seeker = JobSeekerFactory()
         company = CompanyFactory(with_membership=True)
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
@@ -216,109 +307,6 @@ class TestUpdateJobSeeker:
         assert response.status_code == 404
 
 
-class TestUpdateJobSeekerStart:
-    def test_update_start_with_valid_parameters(self, client):
-        job_seeker = JobSeekerFactory()
-        company = CompanyFactory(with_membership=True)
-        user = company.members.get()
-        client.force_login(user)
-
-        from_url = reverse(
-            "apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id}
-        )
-        params = {"job_seeker": job_seeker.public_id, "company": company.pk, "from_url": from_url}
-        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
-
-        response = client.get(start_url)
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
-        step_1_url = reverse(
-            "job_seekers_views:update_job_seeker_step_1",
-            kwargs={"session_uuid": job_seeker_session_name},
-        )
-
-        assertRedirects(response, step_1_url)
-        assert client.session[job_seeker_session_name].get("config").get("from_url") == from_url
-        response = client.get(step_1_url)
-        assertContains(
-            response,
-            f"""
-                <a href="{from_url}"
-                class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"
-                aria-label="Annuler la saisie de ce formulaire">
-                  <i class="ri-close-line ri-lg" aria-hidden="true"></i>
-                  <span>Annuler</span>
-                </a>
-            """,
-            html=True,
-        )
-
-    def test_update_start_with_invalid_parameters(self, client):
-        job_seeker = JobSeekerFactory()
-        company = CompanyFactory(with_membership=True)
-        user = company.members.get()
-        client.force_login(user)
-
-        # Invalid uuid
-        params = {"job_seeker": "invalid_uuid", "company": company.pk}
-        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
-        response = client.get(start_url)
-        assert response.status_code == 404
-
-        # Valid UUID but no job seeker associated to it
-        params = {
-            "job_seeker": uuid.uuid4(),
-            "company": company.pk,
-        }
-        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
-        response = client.get(start_url)
-        assert response.status_code == 404
-
-        # No company parameter
-        params = {
-            "job_seeker": job_seeker.public_id,
-        }
-        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
-        response = client.get(start_url)
-        assert response.status_code == 404
-
-        # Invalid company parameter
-        params = {
-            "job_seeker": job_seeker.public_id,
-            "company": "stringAndNotNumber",
-        }
-        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
-        response = client.get(start_url)
-        assert response.status_code == 404
-
-        # No from_url parameter
-        params = {
-            "job_seeker": job_seeker.public_id,
-            "company": company.pk,
-        }
-        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
-        response = client.get(start_url)
-
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
-        step_1_url = reverse(
-            "job_seekers_views:update_job_seeker_step_1",
-            kwargs={"session_uuid": job_seeker_session_name},
-        )
-        assert client.session[job_seeker_session_name].get("config").get("from_url") == reverse("dashboard:index")
-        response = client.get(step_1_url)
-        assertContains(
-            response,
-            f"""
-                <a href="{reverse("dashboard:index")}"
-                class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"
-                aria-label="Annuler la saisie de ce formulaire">
-                  <i class="ri-close-line ri-lg" aria-hidden="true"></i>
-                  <span>Annuler</span>
-                </a>
-            """,
-            html=True,
-        )
-
-
 class TestUpdateJobSeekerStep1:
     @pytest.mark.parametrize(
         "born_in_france", [pytest.param(True, id="born_in_france"), pytest.param(False, id="born_outside_france")]
@@ -332,7 +320,10 @@ class TestUpdateJobSeekerStep1:
         # Init session
         params = {
             "job_seeker": job_seeker.public_id,
-            "company": company.pk,
+            "from_url": reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         client.get(start_url)
@@ -376,7 +367,10 @@ class TestUpdateJobSeekerStep1:
         # Init session
         params = {
             "job_seeker": job_seeker.public_id,
-            "company": company.pk,
+            "from_url": reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         client.get(start_url)
@@ -416,7 +410,10 @@ class TestUpdateJobSeekerStep1:
         # Init session
         params = {
             "job_seeker": job_seeker.public_id,
-            "company": company.pk,
+            "from_url": reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         client.get(start_url)
