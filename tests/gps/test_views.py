@@ -320,7 +320,19 @@ def test_beneficiary_details(client, snapshot):
 
     user_details_url = reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id})
     response = client.get(user_details_url)
-    html_details = parse_response_to_soup(response, selector="#beneficiary_details_container")
+    html_details = parse_response_to_soup(
+        response,
+        selector="#beneficiary_details_container",
+        replace_in_attr=[
+            ("href", f"user_id={prescriber.pk}", "user_id=[PK of user]"),
+            (
+                "href",
+                f"user_organization_id={prescriber.prescribermembership_set.get().organization_id}",
+                "user_organization_id=[PK of organization]",
+            ),
+            ("href", f"beneficiary_id={beneficiary.pk}", "beneficiary_id=[PK of beneficiary]"),
+        ],
+    )
     assert str(html_details) == snapshot
     user_dropdown_menu = parse_response_to_soup(response, selector="div#dashboardUserDropdown")
 
@@ -331,7 +343,10 @@ def test_beneficiary_details(client, snapshot):
     prescriber.phone = ""
     prescriber.save()
     response = client.get(user_details_url)
-    assert "Téléphone non renseigné" in str(response.content.decode())
+    assertContains(response, "Téléphone non renseigné")
+
+    assertContains(response, "Ajouter un intervenant")
+    assertContains(response, "https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant")
 
 
 def test_remove_members_from_group(client):

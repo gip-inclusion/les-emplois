@@ -107,7 +107,17 @@
   
   
   <div class="c-box mb-3 mb-lg-5" id="gps_intervenants">
-      <h2 class="border-bottom pb-3">Intervenant</h2>
+      <div class="border-bottom">
+          <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between align-items-start">
+              <h2>Intervenant</h2>
+              <div aria-label="Actions sur les participants" class="d-flex flex-column flex-md-row gap-3" role="group">
+                  <a class="btn btn-sm btn-ico btn-primary mt-3 mt-md-0" href="https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?user_name=Pierre+DUPONT&amp;user_id=[PK of user]&amp;user_email=pierre.dupont%40test.local&amp;user_organization_name=Les+Olivades&amp;user_organization_id=[PK of organization]&amp;user_type=prescriber&amp;beneficiary_name=Jane+DOE&amp;beneficiary_id=[PK of beneficiary]&amp;beneficiary_email=jane.doe%40test.local&amp;success_url=http%3A%2F%2Ftestserver%2Fgps%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a" id="request-new-participant-link">
+                      <i aria-hidden="true" class="ri-user-add-line"></i>
+                      <span>Ajouter un intervenant existant</span>
+                  </a>
+              </div>
+          </div>
+      </div>
       <ul class="list-unstyled p-0 m-0">
           
               <li class="c-box--results__header px-0 gps_intervenant">
