@@ -477,7 +477,7 @@ class JobApplicationRefuseView(NamedUrlSessionWizardView):
             ).label
             context["refusal_reason_shared_with_job_seeker"] = cleaned_data["refusal_reason_shared_with_job_seeker"]
         return context | {
-            "job_application": self.job_application,
+            "job_applications": [self.job_application],
             "can_view_personal_information": True,  # SIAE members have access to personal info
             "matomo_custom_title": "Candidature refusée",
             "matomo_event_name": f"refuse-application-{self.steps.current}-submit",
@@ -490,6 +490,7 @@ class JobApplicationRefuseView(NamedUrlSessionWizardView):
                 "le prescripteur" if self.job_application.is_sent_by_authorized_prescriber else "l’orienteur"
             ),
             "with_prescriber": self.job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER,
+            "job_seeker_nb": 1,
         }
 
     def get_form_kwargs(self, step=None):

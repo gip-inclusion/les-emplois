@@ -4,13 +4,23 @@
 {% load buttons_form %}
 
 {% block title %}
-    Décliner la candidature de {{ job_application.job_seeker.get_full_name }}
+    {% if job_applications|length == 1 %}
+        Décliner la candidature de {{ job_applications.0.job_seeker.get_full_name }}
+    {% else %}
+        Décliner {{ job_applications|length }} candidature{{ job_applications|pluralizefr }}
+    {% endif %}
     {{ block.super }}
 {% endblock %}
 
 {% block title_content %}
     <div class="d-md-flex align-items-center mb-3">
-        <h1 class="mb-1 mb-md-0 me-3">Décliner la candidature de {{ job_application.job_seeker.get_full_name }}</h1>
+        <h1 class="mb-1 mb-md-0 me-3">
+            {% if job_applications|length == 1 %}
+                Décliner la candidature de {{ job_applications.0.job_seeker.get_full_name }}
+            {% else %}
+                Décliner {{ job_applications|length }} candidature{{ job_applications|pluralizefr }}
+            {% endif %}
+        </h1>
     </div>
 {% endblock %}
 
@@ -28,7 +38,7 @@
                             {% if wizard.steps.current == RefuseViewStep.REASON %}
                                 <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Choix du motif de refus
                             {% elif wizard.steps.current == RefuseViewStep.JOB_SEEKER_ANSWER %}
-                                <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Message au candidat
+                                <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Message {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }}
                             {% elif wizard.steps.current == RefuseViewStep.PRESCRIBER_ANSWER %}
                                 <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Message {{ to_prescriber }}
                             {% endif %}
@@ -43,13 +53,13 @@
                                 <h2 class="mb-3 mb-md-4">Choix du motif de refus</h2>
                                 <p class="mb-3 mb-md-4">
                                     {% if with_prescriber %}
-                                        Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour le candidat comme pour {{ the_prescriber }}. Nous vous encourageons à répondre à chacune des parties.
+                                        Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour {{ job_seeker_nb|pluralizefr:"le candidat,les candidats" }} comme pour {{ the_prescriber }}. Nous vous encourageons à répondre à chacune des parties.
                                     {% else %}
-                                        Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour le candidat.
+                                        Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour {{ job_seeker_nb|pluralizefr:"le candidat,les candidats" }}.
                                     {% endif %}
                                 </p>
                             {% elif wizard.steps.current == RefuseViewStep.JOB_SEEKER_ANSWER %}
-                                <h2 class="mb-3 mb-md-4">Réponse au candidat</h2>
+                                <h2 class="mb-3 mb-md-4">Réponse {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }}</h2>
                                 <p class="mb-3 mb-md-4">
                                     {% if with_prescriber %}
                                         Une copie de ce message sera adressée {{ to_prescriber }}.
@@ -60,7 +70,9 @@
                                 <p class="mb-3 mb-md-4">
                                     <strong>Motif de refus :</strong>
                                     {{ refusal_reason_label }}
-                                    {% if not refusal_reason_shared_with_job_seeker %}<em>(Motif non communiqué au candidat)</em>{% endif %}
+                                    {% if not refusal_reason_shared_with_job_seeker %}
+                                        <em>(Motif non communiqué {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }})</em>
+                                    {% endif %}
                                 </p>
                             {% elif wizard.steps.current == RefuseViewStep.PRESCRIBER_ANSWER %}
                                 <h2 class="mb-3 mb-md-4">Réponse {{ to_prescriber }}</h2>
@@ -70,7 +82,9 @@
                                 <p class="mb-3 mb-md-4">
                                     <strong>Motif de refus :</strong>
                                     {{ refusal_reason_label }}
-                                    {% if not refusal_reason_shared_with_job_seeker %}<em>(Motif non communiqué au candidat)</em>{% endif %}
+                                    {% if not refusal_reason_shared_with_job_seeker %}
+                                        <em>(Motif non communiqué {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }})</em>
+                                    {% endif %}
                                 </p>
                             {% endif %}
 
@@ -118,7 +132,9 @@
                                 </fieldset>
                                 <fieldset>
                                     <div class="form-group">
-                                        <legend class="fs-base fw-bold">Partager ce motif de refus au candidat ?</legend>
+                                        <legend class="fs-base fw-bold">
+                                            Partager ce motif de refus {{ job_seeker_nb|pluralizefr:"au candidat,aux candidats" }} ?
+                                        </legend>
                                         {% bootstrap_field form.refusal_reason_shared_with_job_seeker %}
                                     </div>
                                 </fieldset>
