@@ -45,7 +45,7 @@ class ApplicationJobsForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields["selected_jobs"].queryset = (
-            company.job_description_through.active().with_annotation_is_popular().prefetch_related("appellation")
+            company.job_description_through.active().with_annotation_is_overwhelmed().prefetch_related("appellation")
         )
         if not self.initial.get("selected_jobs"):
             self.initial["spontaneous_application"] = True

@@ -924,7 +924,7 @@
                                                                                                              WHERE ("job_applications_jobapplication"."archived_at" IS NULL
                                                                                                                     AND "job_applications_jobapplication"."state" IN (%s, %s, %s))) >= %s THEN %s
                      ELSE %s
-                 END AS "is_popular",
+                 END AS "is_overwhelmed",
                  "jobs_appellation"."updated_at",
                  "jobs_appellation"."code",
                  "jobs_appellation"."name",
@@ -1311,7 +1311,7 @@
                                                                                                              WHERE ("job_applications_jobapplication"."archived_at" IS NULL
                                                                                                                     AND "job_applications_jobapplication"."state" IN (%s, %s, %s))) >= %s THEN %s
                      ELSE %s
-                 END AS "is_popular",
+                 END AS "is_overwhelmed",
                  "jobs_appellation"."updated_at",
                  "jobs_appellation"."code",
                  "jobs_appellation"."name",
@@ -1699,7 +1699,7 @@
                                                                                                              WHERE ("job_applications_jobapplication"."archived_at" IS NULL
                                                                                                                     AND "job_applications_jobapplication"."state" IN (%s, %s, %s))) >= %s THEN %s
                      ELSE %s
-                 END AS "is_popular",
+                 END AS "is_overwhelmed",
                  "jobs_appellation"."updated_at",
                  "jobs_appellation"."code",
                  "jobs_appellation"."name",
@@ -2086,7 +2086,7 @@
                                                                                                              WHERE ("job_applications_jobapplication"."archived_at" IS NULL
                                                                                                                     AND "job_applications_jobapplication"."state" IN (%s, %s, %s))) >= %s THEN %s
                      ELSE %s
-                 END AS "is_popular",
+                 END AS "is_overwhelmed",
                  "jobs_appellation"."updated_at",
                  "jobs_appellation"."code",
                  "jobs_appellation"."name",

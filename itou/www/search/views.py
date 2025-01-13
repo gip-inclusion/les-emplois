@@ -202,7 +202,7 @@ class EmployerSearchView(EmployerSearchBaseView):
             siaes.prefetch_related(
                 Prefetch(
                     lookup="job_description_through",
-                    queryset=JobDescription.objects.with_annotation_is_popular()
+                    queryset=JobDescription.objects.with_annotation_is_overwhelmed()
                     .filter(company__in=siaes, is_active=True)
                     .select_related("appellation", "location", "company"),
                     to_attr="active_job_descriptions",
@@ -255,7 +255,7 @@ class JobDescriptionSearchView(EmployerSearchBaseView):
         job_descriptions = job_descriptions.order_by(F("source_kind").asc(nulls_first=True), "-updated_at")
 
         page = pager(job_descriptions, self.request.GET.get("page"), items_per_page=10)
-        # Prefer a prefetch_related over annotating the entire queryset with_annotation_is_popular().
+        # Prefer a prefetch_related over annotating the entire queryset with_annotation_is_overwhelmed().
         # That annotation is quite expensive and PostgreSQL runs it on the entire queryset, even
         # though we don’t sort or group by that column. It would be smarter to apply the limit
         # before computing the annotation, but that’s not what PostgreSQL 15 does on 2024-02-21.
@@ -267,8 +267,8 @@ class JobDescriptionSearchView(EmployerSearchBaseView):
             )
         )
         for job_description in page.object_list:
-            job_description.is_popular = (
-                len(job_description.jobapplication_set_pending) >= job_description._meta.model.POPULAR_THRESHOLD
+            job_description.is_overwhelmed = (
+                len(job_description.jobapplication_set_pending) >= job_description._meta.model.OVERWHELMED_THRESHOLD
             )
         return PageAndCounts(
             results_page=page,

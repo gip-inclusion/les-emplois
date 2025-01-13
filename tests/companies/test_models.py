@@ -347,42 +347,52 @@ class TestCompanyQuerySet:
 
 
 class TestJobDescriptionQuerySet:
-    def test_with_annotation_is_popular(self):
+    def test_with_annotation_is_overwhelmed(self):
         company = CompanyFactory(with_jobs=True)
         job_seeker = JobSeekerFactory()  # We don't care if it's always the same
         siae_job_descriptions = company.job_description_through.all()
 
         # Test attribute presence
-        siae_job_description = JobDescription.objects.with_annotation_is_popular().first()
-        assert hasattr(siae_job_description, "is_popular")
+        siae_job_description = JobDescription.objects.with_annotation_is_overwhelmed().first()
+        assert hasattr(siae_job_description, "is_overwhelmed")
 
-        # Test popular threshold: popular job description
-        popular_job_description = siae_job_descriptions[0]
-        for _ in range(JobDescription.POPULAR_THRESHOLD + 1):
-            JobApplicationFactory(to_company=company, selected_jobs=[popular_job_description], job_seeker=job_seeker)
+        # Test overwhelmed threshold: overwhelmed job description
+        overwhelmed_job_description = siae_job_descriptions[0]
+        for _ in range(JobDescription.OVERWHELMED_THRESHOLD + 1):
+            JobApplicationFactory(
+                to_company=company, selected_jobs=[overwhelmed_job_description], job_seeker=job_seeker
+            )
 
-        assert JobDescription.objects.with_annotation_is_popular().get(pk=popular_job_description.pk).is_popular
+        assert (
+            JobDescription.objects.with_annotation_is_overwhelmed()
+            .get(pk=overwhelmed_job_description.pk)
+            .is_overwhelmed
+        )
 
-        # Test popular threshold: unpopular job description
-        unpopular_job_description = siae_job_descriptions[1]
-        JobApplicationFactory(to_company=company, selected_jobs=[unpopular_job_description])
+        # Test overwhelmed threshold: non overwhelmed job description
+        non_overwhelmed_job_description = siae_job_descriptions[1]
+        JobApplicationFactory(to_company=company, selected_jobs=[non_overwhelmed_job_description])
 
-        assert not JobDescription.objects.with_annotation_is_popular().get(pk=unpopular_job_description.pk).is_popular
+        assert (
+            not JobDescription.objects.with_annotation_is_overwhelmed()
+            .get(pk=non_overwhelmed_job_description.pk)
+            .is_overwhelmed
+        )
 
-        # Popular job descriptions count related **pending** job applications.
+        # Overwhelmed job descriptions count related **pending** job applications.
         # They should ignore other states.
         job_description = siae_job_descriptions[2]
-        threshold_exceeded = JobDescription.POPULAR_THRESHOLD + 1
+        threshold_exceeded = JobDescription.OVERWHELMED_THRESHOLD + 1
 
         JobApplicationFactory.create_batch(
             threshold_exceeded,
             to_company=company,
             job_seeker=job_seeker,
-            selected_jobs=[popular_job_description],
+            selected_jobs=[overwhelmed_job_description],
             state=JobApplicationState.ACCEPTED,
         )
 
-        assert not JobDescription.objects.with_annotation_is_popular().get(pk=job_description.pk).is_popular
+        assert not JobDescription.objects.with_annotation_is_overwhelmed().get(pk=job_description.pk).is_overwhelmed
 
     def test_with_job_applications_count(self):
         company = CompanyFactory(with_jobs=True)
