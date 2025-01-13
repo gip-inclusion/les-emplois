@@ -19,6 +19,8 @@ class BaseNotification:
         return self.can_be_disabled and self.is_applicable()
 
     def should_send(self):
+        if not self.user.is_active:
+            return False
         if not self.is_applicable():
             return False
         if self.is_manageable_by_user():

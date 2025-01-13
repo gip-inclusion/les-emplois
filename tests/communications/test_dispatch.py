@@ -292,6 +292,13 @@ class TestEmailNotification:
             " ne fait plus partie de votre structure." in mailoutbox[1].body
         )
 
+    def test_method_send_for_inactive_user(self, email_notification, django_capture_on_commit_callbacks, mailoutbox):
+        self.user.is_active = False
+        self.user.save()
+        with django_capture_on_commit_callbacks(execute=True):
+            email_notification(self.user, self.organization).send()
+        assert len(mailoutbox) == 0
+
 
 class TestProfiledNotification:
     def setup_method(self):
