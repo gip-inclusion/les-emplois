@@ -169,6 +169,24 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
 
         membership = next(m for m in gps_memberships if m.member == self.request.user)
 
+        request_new_participant_form_url = (
+            "https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?"
+            + urllib.parse.urlencode(
+                {
+                    "user_name": self.request.user.get_full_name(),
+                    "user_id": self.request.user.pk,
+                    "user_email": self.request.user.email,
+                    "user_organization_name": getattr(self.request.current_organization, "display_name", ""),
+                    "user_organization_id": getattr(self.request.current_organization, "pk", ""),
+                    "user_type": self.request.user.kind,
+                    "beneficiary_name": self.object.get_full_name(),
+                    "beneficiary_id": self.object.pk,
+                    "beneficiary_email": self.object.email,
+                    "success_url": self.request.build_absolute_uri(),
+                }
+            )
+        )
+
         context = context | {
             "back_url": back_url,
             "gps_memberships": gps_memberships,
@@ -177,6 +195,7 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
             "profile": self.object.jobseeker_profile,
             "render_advisor_matomo_option": matomo_option,
             "matomo_option": "coordonnees-conseiller-" + (matomo_option if matomo_option else "ailleurs"),
+            "request_new_participant_form_url": request_new_participant_form_url,
         }
 
         return context
