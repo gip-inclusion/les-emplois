@@ -695,7 +695,9 @@
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i class="ri-community-line"></i>
           <div>
-              <span data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip">GEIQ</span>
+              <button data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip" type="button">
+                  GEIQ
+              </button>
               <h3>Acme inc.</h3>
           </div>
       </div>
@@ -1049,7 +1051,9 @@
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i class="ri-community-line"></i>
           <div>
-              <span data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip">GEIQ</span>
+              <button data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip" type="button">
+                  GEIQ
+              </button>
               <h3>Acme inc.</h3>
           </div>
       </div>
@@ -1401,7 +1405,9 @@
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i class="ri-community-line"></i>
           <div>
-              <span data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip">GEIQ</span>
+              <button data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip" type="button">
+                  GEIQ
+              </button>
               <h3>Acme inc.</h3>
           </div>
       </div>
@@ -1755,7 +1761,9 @@
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i class="ri-community-line"></i>
           <div>
-              <span data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip">GEIQ</span>
+              <button data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip" type="button">
+                  GEIQ
+              </button>
               <h3>Acme inc.</h3>
           </div>
       </div>
@@ -2109,7 +2117,9 @@
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i class="ri-community-line"></i>
           <div>
-              <span data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip">GEIQ</span>
+              <button data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip" type="button">
+                  GEIQ
+              </button>
               <h3>Acme inc.</h3>
           </div>
       </div>
@@ -2457,7 +2467,9 @@
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i class="ri-community-line"></i>
           <div>
-              <span data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip">GEIQ</span>
+              <button data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip" type="button">
+                  GEIQ
+              </button>
               <h3>Acme inc.</h3>
           </div>
       </div>
@@ -2784,7 +2796,9 @@
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i class="ri-community-line"></i>
           <div>
-              <span data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip">GEIQ</span>
+              <button data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip" type="button">
+                  GEIQ
+              </button>
               <h3>Acme inc.</h3>
           </div>
       </div>

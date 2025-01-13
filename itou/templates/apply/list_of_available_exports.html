@@ -93,16 +93,18 @@
                                             {% if export_for == "siae" %}
                                                 <a class="btn btn-sm btn-link btn-ico-only"
                                                    {% matomo_event "candidature" "exports" "export-siae" %}
-                                                   aria-label="Télécharger cet export SIAE au format .xlsx"
-                                                   href="{% url 'apply:list_for_siae_exports_download' %}">
-                                                    <i class="ri-download-line" data-bs-toggle="tooltip" data-bs-title="Télécharger (.xlsx)"></i>
+                                                   href="{% url 'apply:list_for_siae_exports_download' %}"
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-title="Télécharger (.xlsx)">
+                                                    <i class="ri-download-line" aria-label="Télécharger cet export SIAE de toutes les candidatures au format .xlsx"></i>
                                                 </a>
                                             {% else %}
                                                 <a class="btn btn-sm btn-link btn-ico-only"
                                                    {% matomo_event "candidature" "exports" "export-prescripteur" %}
-                                                   aria-label="Télécharger cet export prescripteur au format .xlsx"
-                                                   href="{% url 'apply:list_prescriptions_exports_download' %}">
-                                                    <i class="ri-download-line" data-bs-toggle="tooltip" data-bs-title="Télécharger (.xlsx)"></i>
+                                                   href="{% url 'apply:list_prescriptions_exports_download' %}"
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-title="Télécharger (.xlsx)">
+                                                    <i class="ri-download-line" aria-label="Télécharger cet export prescripteur de toutes les candidatures au format .xlsx"></i>
                                                 </a>
                                             {% endif %}
                                         </td>
@@ -115,16 +117,18 @@
                                                 {% if export_for == "siae" %}
                                                     <a class="btn btn-sm btn-link btn-ico-only"
                                                        {% matomo_event "candidature" "exports" "export-siae" %}
-                                                       aria-label="Télécharger cet export SIAE au format .xlsx"
-                                                       href="{% url 'apply:list_for_siae_exports_download' month_identifier=month.month|date:"Y-m" %}">
-                                                        <i class="ri-download-line" data-bs-toggle="tooltip" data-bs-title="Télécharger (.xlsx)"></i>
+                                                       href="{% url 'apply:list_for_siae_exports_download' month_identifier=month.month|date:"Y-m" %}"
+                                                       data-bs-toggle="tooltip"
+                                                       data-bs-title="Télécharger (.xlsx)">
+                                                        <i class="ri-download-line" aria-label="Télécharger cet export SIAE de {{ month.month|date:"F Y"|capfirst }} au format .xlsx"></i>
                                                     </a>
                                                 {% else %}
                                                     <a class="btn btn-sm btn-link btn-ico-only"
                                                        {% matomo_event "candidature" "exports" "export-prescripteur" %}
-                                                       aria-label="Télécharger cet export prescripteur au format .xlsx"
-                                                       href="{% url 'apply:list_prescriptions_exports_download' month_identifier=month.month|date:"Y-m" %}">
-                                                        <i class="ri-download-line" data-bs-toggle="tooltip" data-bs-title="Télécharger (.xlsx)"></i>
+                                                       href="{% url 'apply:list_prescriptions_exports_download' month_identifier=month.month|date:"Y-m" %}"
+                                                       data-bs-toggle="tooltip"
+                                                       data-bs-title="Télécharger (.xlsx)">
+                                                        <i class="ri-download-line" aria-label="Télécharger cet export prescripteur de {{ month.month|date:"F Y"|capfirst }} au format .xlsx"></i>
                                                     </a>
                                                 {% endif %}
                                             </td>

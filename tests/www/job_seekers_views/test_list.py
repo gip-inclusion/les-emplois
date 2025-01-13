@@ -27,14 +27,14 @@ def assert_contains_button_apply_for(response, job_seeker, with_city=True, with_
         response,
         f"""
             <a class="btn btn-sm btn-link btn-ico-only"
-                aria-label="Postuler pour ce candidat"
-                data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
+                data-bs-toggle="tooltip"
+                data-bs-title="Postuler pour ce candidat"
+                data-matomo-event="true"
+                data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="postuler-pour-ce-candidat"
                 {id_intro_js}
                 href="{reverse("search:employers_results")}?job_seeker={job_seeker.public_id}{city}">
-                <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip"
-                data-bs-title="Postuler pour ce candidat">
-                </i>
+                <i class="ri-draft-line" aria-label="Postuler pour ce candidat"></i>
             </a>
         """,
         count=1,

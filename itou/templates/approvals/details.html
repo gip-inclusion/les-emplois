@@ -109,19 +109,19 @@
                                                 </td>
                                                 <td>
                                                     {% if suspension.can_be_handled_by_current_user %}
-
-                                                        <a href="{% url 'approvals:suspension_update' suspension_id=suspension.pk %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-ico-only">
-                                                            <i class="ri-pencil-line fw-medium" aria-hidden="true" data-bs-toggle="tooltip" data-bs-title="Modifier la suspension"></i>
+                                                        <a href="{% url 'approvals:suspension_update' suspension_id=suspension.pk %}?back_url={{ request.get_full_path|urlencode }}"
+                                                           class="btn btn-ico-only"
+                                                           data-bs-toggle="tooltip"
+                                                           data-bs-title="Modifier la suspension">
+                                                            <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
                                                             <span class="visually-hidden">Modifier la suspension</span>
                                                         </a>
-
                                                         <button id="dropdown_{{ forloop.counter }}_action_menu" class="btn btn-link btn-ico-only btn-sm" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d'actions">
                                                             <i class="ri-more-2-fill" aria-hidden="true"></i>
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
                                                             <a class="dropdown-item" href="{% url 'approvals:suspension_action_choice' suspension_id=suspension.pk %}?back_url={{ request.get_full_path|urlencode }}">Supprimer la suspension</a>
                                                         </div>
-
                                                     {% endif %}
                                                 </td>
                                             </tr>

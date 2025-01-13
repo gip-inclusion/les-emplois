@@ -15,10 +15,9 @@
             <span>Modifier</span>
         </a>
         {% if not can_edit_personal_information %}
-            <i class="ri-information-line ri-xl text-info ms-1"
-               data-bs-toggle="tooltip"
-               data-bs-placement="top"
-               data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
+            <button type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.">
+                <i class="ri-information-line ri-xl text-info ms-1" aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
+            </button>
         {% endif %}
     </div>
 </div>

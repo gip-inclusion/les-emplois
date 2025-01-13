@@ -23,7 +23,9 @@
                         <td>
                             {{ member.user.get_full_name }}
                             {% if member.user in active_admin_members %}
-                                <span class="badge badge-xs rounded-pill bg-info" data-bs-toggle="tooltip" data-bs-title="Administrateur de la structure">admin</span>
+                                <button type="button" class="badge badge-xs rounded-pill bg-info" data-bs-toggle="tooltip" data-bs-title="Administrateur de la structure">
+                                    Admin<span class="visually-hidden">istrateur de la structure</span>
+                                </button>
                             {% endif %}
                         </td>
                         <td>
@@ -49,9 +51,9 @@
                                         {% endif %}
                                     </div>
                                 {% else %}
-                                    <div class="btn btn-sm btn-link btn-ico-only disabled" data-bs-toggle="tooltip" data-bs-title="Aucune action possible">
-                                        <i class="ri-more-2-fill" aria-hidden="true"></i>
-                                    </div>
+                                    <button type="button" class="btn btn-sm btn-link btn-ico-only disabled" data-bs-toggle="tooltip" data-bs-title="Aucune action possible">
+                                        <i class="ri-more-2-fill" aria-label="Aucune action possible"></i>
+                                    </button>
                                 {% endif %}
                             </td>
                         {% endif %}
