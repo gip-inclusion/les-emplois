@@ -15,6 +15,7 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, 
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.utils.test import parse_response_to_soup
+from tests.www.companies_views.test_job_description_views import POSTULER
 
 
 INTERNAL_TRANSFER_CONFIRM_BUTTON = """
@@ -96,7 +97,7 @@ def test_step_1(client, snapshot):
     )
     assertContains(response, other_company.name.capitalize())
     assertContains(response, job_application.to_company.name.capitalize())
-    assertNotContains(response, "Postuler")
+    assertNotContains(response, POSTULER)
     assertContains(
         response,
         "<span>Transférer la candidature</span>",
@@ -141,7 +142,7 @@ def test_step_1(client, snapshot):
         count=2,
     )
     assertContains(response, job_card_url, count=1)
-    assertNotContains(response, "Postuler")
+    assertNotContains(response, POSTULER)
     assertContains(
         response,
         "<span>Transférer la candidature</span>",
@@ -157,7 +158,7 @@ def test_step_1(client, snapshot):
         count=1,
     )
     assertContains(response, company_card_url, count=1)
-    assertNotContains(response, "Postuler")
+    assertNotContains(response, POSTULER)
     assertContains(
         response,
         "<span>Transférer la candidature</span>",
