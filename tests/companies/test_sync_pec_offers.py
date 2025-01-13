@@ -54,8 +54,7 @@ def test_sync_pec_offers(capsys, respx_mock, monkeypatch):
     assert stdout.splitlines() == [
         "retrieved count=2 PEC offers from PE API",
         "retrieved count=0 PEC offers from PE API",
-        "! no appellation match found (rome_code='M1607' "
-        "appellation_label='Secrétaire') skipping source_id='OHNOES'",
+        "! no appellation match found (rome_code='M1607' appellation_label='Secrétaire') skipping source_id='OHNOES'",
         "> successfully created count=1 PE job offers",
         "> successfully updated count=0 PE job offers",
         "> successfully deleted count=0 PE job offers",

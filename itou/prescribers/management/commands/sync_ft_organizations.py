@@ -13,7 +13,7 @@ from itou.utils.sync import DiffItemKind, yield_sync_diff
 def name_from_api_data(data):
     # Sometimes the `libelle` field can start with a "*",
     # it's most likely linked to the alias that agents can use instead of the official APE's email.
-    return f'France Travail - {data["libelle"].lstrip("*")}'
+    return f"France Travail - {data['libelle'].lstrip('*')}"
 
 
 def phone_from_api_data(data):

@@ -188,7 +188,7 @@ class Command(EmployeeRecordTransferCommand):
 
             with asp_utils.get_sftp_connection() as sftp:
                 self.stdout.write(f'Connected to "{settings.ASP_SFTP_HOST}" as "{settings.ASP_SFTP_USER}"')
-                self.stdout.write(f'''Current remote dir is "{sftp.normalize('.')}"''')
+                self.stdout.write(f'''Current remote dir is "{sftp.normalize(".")}"''')
 
                 # Send files to ASP
                 if upload:

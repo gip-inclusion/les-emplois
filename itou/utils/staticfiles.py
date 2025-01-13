@@ -306,7 +306,7 @@ def compute_moves(existing_filenames, extract_infos):
                 # We don't want the directories matching the globs
                 continue
             # Replace origin prefix by destination
-            destination_filepath = f"{destination}{filepath[len(origin):]}"
+            destination_filepath = f"{destination}{filepath[len(origin) :]}"
             moves.append((filepath, destination_filepath))
 
     return moves

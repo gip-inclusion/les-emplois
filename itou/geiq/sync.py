@@ -309,9 +309,9 @@ def sync_employee_and_contracts(assessment):
         _cleanup_employee_info(employee_info)
         if employee_info["id"] in employee_infos:
             # Check consistency between contracts
-            assert (
-                employee_infos[employee_info["id"]] == employee_info
-            ), f"{employee_info} != {employee_infos[employee_info['id']]}"
+            assert employee_infos[employee_info["id"]] == employee_info, (
+                f"{employee_info} != {employee_infos[employee_info['id']]}"
+            )
         else:
             employee_infos[employee_info["id"]] = employee_info
         contract_info["salarie"] = employee_info["id"]
@@ -323,9 +323,9 @@ def sync_employee_and_contracts(assessment):
         _cleanup_employee_info(employee_info)
         if employee_info["id"] in employee_infos:
             # Check consistency between contracts & prequalifications
-            assert (
-                employee_infos[employee_info["id"]] == employee_info
-            ), f"{employee_info} != {employee_infos[employee_info['id']]}"
+            assert employee_infos[employee_info["id"]] == employee_info, (
+                f"{employee_info} != {employee_infos[employee_info['id']]}"
+            )
         else:
             # Ignore prequalifications for employees without active contract in assessment year
             continue

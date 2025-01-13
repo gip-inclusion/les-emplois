@@ -450,7 +450,7 @@ class TestSearchCompany:
 
         # Has link to apply to company with job_seeker public_id
         apply_url_with_job_seeker_id = (
-            f"{reverse('apply:start', kwargs={'company_pk':guerande_company.pk})}?job_seeker={job_seeker_public_id}"
+            f"{reverse('apply:start', kwargs={'company_pk': guerande_company.pk})}?job_seeker={job_seeker_public_id}"
         )
         assertContains(response, apply_url_with_job_seeker_id)
 
@@ -459,7 +459,7 @@ class TestSearchCompany:
             f'<a href="{reverse("search:employers_results")}?city={guerande.slug}&job_seeker={job_seeker_public_id}" '
             'class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser les filtres actifs">'
             '<i class="ri-eraser-line fw-medium" aria-hidden="true"></i>'
-            '<span>Effacer tout</span></a>'
+            "<span>Effacer tout</span></a>"
         )
         assertContains(response, reset_button, html=True)
 
@@ -1257,6 +1257,6 @@ class TestJobDescriptionSearchView:
             f'&job_seeker={job_seeker_public_id}" '
             'class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser les filtres actifs">'
             '<i class="ri-eraser-line fw-medium" aria-hidden="true"></i>'
-            '<span>Effacer tout</span></a>'
+            "<span>Effacer tout</span></a>"
         )
         assertContains(response, reset_button, html=True)

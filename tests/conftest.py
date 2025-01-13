@@ -646,7 +646,7 @@ def detect_silent_date_cast():
         # DateTimeField inherits DateField, hence the check on self.__class__
         if self.__class__ is DateField and isinstance(getattr(model_instance, self.attname), datetime.datetime):
             raise ValueError(
-                f"<{model_instance}>.{self.attname}={getattr(model_instance, self.attname)}" " needs to be a date"
+                f"<{model_instance}>.{self.attname}={getattr(model_instance, self.attname)} needs to be a date"
             )
         return original_pre_save(self, model_instance, add)
 

@@ -160,7 +160,7 @@ class AnnouncementCampaign(models.Model):
         )
 
     def __str__(self):
-        return f"Campagne d'annonce du { self.start_date.strftime('%m/%Y') }"
+        return f"Campagne d'annonce du {self.start_date.strftime('%m/%Y')}"
 
     def clean(self):
         if self.start_date:

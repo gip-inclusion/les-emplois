@@ -263,7 +263,7 @@ def normalized_frame_filename(frame_info, debug):
         or debug
     ):
         if "site-packages" in frame_filename:
-            return f'<site-packages>{frame_filename.split("site-packages", 1)[1]}'
+            return f"<site-packages>{frame_filename.split('site-packages', 1)[1]}"
         elif debug:
             return frame_filename
 

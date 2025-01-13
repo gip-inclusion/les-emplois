@@ -74,7 +74,7 @@ class Command(BaseCommand):
             created_rows_count += len(contacts_to_create)
             updated_rows_count += len(contacts_to_update)
 
-            logger.info(f"{chunk_idx/chunks_total*100:.2f}%")
+            logger.info(f"{chunk_idx / chunks_total * 100:.2f}%")
 
         logger.info("-" * 80)
         logger.info(

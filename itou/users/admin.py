@@ -706,9 +706,9 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
                         kwargs={"object_id": from_user.pk},
                     )
                 )
-        title = f"Transfert des données de { from_user }"
+        title = f"Transfert des données de {from_user}"
         if to_user:
-            title += f" vers { to_user}"
+            title += f" vers {to_user}"
         context = self.admin_site.each_context(request) | {
             "media": self.media,
             "opts": self.opts,

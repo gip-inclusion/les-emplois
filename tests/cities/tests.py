@@ -88,8 +88,7 @@ def test_sync_cities(settings, capsys, respx_mock):
         "count=1 label=City had the same key in collection and queryset",
         "\tCHANGED name=Nouveau Nom de Ville changed to value=L'Abergement-Clémenciat",
         "\tCHANGED post_codes=['01234'] changed to value=['01234', '01400']",
-        "\tCHANGED coords=SRID=4326;POINT (-2.4747713 47.3358576) changed to "
-        "value=SRID=4326;POINT (4.9306 46.1517)",
+        "\tCHANGED coords=SRID=4326;POINT (-2.4747713 47.3358576) changed to value=SRID=4326;POINT (4.9306 46.1517)",
         "count=3 label=City added by collection",
         '\tADDED {"centre": {"coordinates": [5.4247, 46.0071], "type": "Point"}, '
         '"code": "01002", "codeDepartement": "01", "codeRegion": "84", '

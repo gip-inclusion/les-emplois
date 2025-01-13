@@ -506,8 +506,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         "Votre PASS IAE est suspendu. Vous ne pouvez pas postuler pendant la période de suspension."
     )
     ERROR_PASS_IAE_SUSPENDED_FOR_PROXY = (
-        "Le PASS IAE du candidat est suspendu. Vous ne pouvez pas postuler "
-        "pour lui pendant la période de suspension."
+        "Le PASS IAE du candidat est suspendu. Vous ne pouvez pas postuler pour lui pendant la période de suspension."
     )
 
     user = models.ForeignKey(

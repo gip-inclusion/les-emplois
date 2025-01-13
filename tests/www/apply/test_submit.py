@@ -4231,7 +4231,7 @@ def test_detect_existing_job_seeker(client):
     )
     assertContains(
         response,
-        f"""<a href="{ check_email_url }" class="btn btn-sm btn-primary">Modifier l'email du candidat</a>""",
+        f"""<a href="{check_email_url}" class="btn btn-sm btn-primary">Modifier l'email du candidat</a>""",
         html=True,
     )
     # Use the modal button to send confirmation

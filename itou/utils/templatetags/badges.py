@@ -21,12 +21,12 @@ def job_application_state_badge(job_application, *, hx_swap_oob=False, extra_cla
         JobApplicationState.REFUSED: "bg-danger",
     }[job_application.state]
     attrs = [
-        f'id="state_{ job_application.pk }"',
-        f'class="badge rounded-pill text-nowrap { extra_class } { state_classes }"',
+        f'id="state_{job_application.pk}"',
+        f'class="badge rounded-pill text-nowrap {extra_class} {state_classes}"',
     ]
     if hx_swap_oob:
         attrs.append('hx-swap-oob="true"')
-    badge = f"<span {' '.join(attrs)}>{ job_application.get_state_display() }</span>"
+    badge = f"<span {' '.join(attrs)}>{job_application.get_state_display()}</span>"
     if job_application.archived_at:
         badge = f"""\
             <span class="badge rounded-pill {extra_class} bg-light text-primary"
@@ -72,9 +72,9 @@ def approval_state_badge(
     approval_type = "PASS IAE" if approval.is_pass_iae else "Agrément"
     return mark_safe(
         f"""\
-            <span class="badge {span_extra_class} rounded-pill { span_class }">
-                <i class="{ icon_class }" aria-hidden="true"></i>
-                {approval_type} { approval_state.label.lower()}
+            <span class="badge {span_extra_class} rounded-pill {span_class}">
+                <i class="{icon_class}" aria-hidden="true"></i>
+                {approval_type} {approval_state.label.lower()}
             </span>"""
     )
 

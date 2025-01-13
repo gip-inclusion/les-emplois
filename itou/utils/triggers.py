@@ -52,7 +52,7 @@ class FieldsHistory(core.Trigger):
             CROSS JOIN jsonb_each(to_jsonb(NEW)) AS post
             WHERE pre.key = post.key
             AND pre.value IS DISTINCT FROM post.value
-            AND pre.key IN ({','.join([f"'{field}'" for field in sql_fields])});
+            AND pre.key IN ({",".join([f"'{field}'" for field in sql_fields])});
 
             NEW.{sql_history_field} = array_append(NEW.{sql_history_field}, _rows_diff);
             RETURN NEW;

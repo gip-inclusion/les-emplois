@@ -409,7 +409,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     employee_record = job_application.employee_record.full_fetch().latest("created_at")
 
     if request.method == "POST":
-        back_url = f'{reverse("employee_record_views:list")}?status={employee_record.status}'
+        back_url = f"{reverse('employee_record_views:list')}?status={employee_record.status}"
         employee_record.update_as_ready()
         toast_title, toast_message = (
             "La création de cette fiche salarié est terminée",
@@ -466,7 +466,7 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
     if not siae_is_allowed(job_application, siae):
         raise PermissionDenied
 
-    back_url = f'{reverse("employee_record_views:list")}?status={employee_record.status}'
+    back_url = f"{reverse('employee_record_views:list')}?status={employee_record.status}"
 
     if not employee_record.can_be_disabled:
         messages.error(request, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
@@ -497,7 +497,7 @@ def reactivate(request, employee_record_id, template_name="employee_record/react
     if not siae_is_allowed(job_application, siae):
         raise PermissionDenied
 
-    back_url = f'{reverse("employee_record_views:list")}?status={employee_record.status}'
+    back_url = f"{reverse('employee_record_views:list')}?status={employee_record.status}"
 
     if employee_record.status != Status.DISABLED:
         messages.error(request, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE)

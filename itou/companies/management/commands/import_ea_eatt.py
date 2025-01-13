@@ -74,7 +74,7 @@ class Command(BaseCommand):
 
         with asp_utils.get_sftp_connection() as sftp:
             self.stdout.write(f'Connected to "{settings.ASP_SFTP_HOST}" as "{settings.ASP_SFTP_USER}"')
-            self.stdout.write(f'''Current remote dir is "{sftp.normalize('.')}"''')
+            self.stdout.write(f'''Current remote dir is "{sftp.normalize(".")}"''')
             sftp.chdir(REMOTE_DOWNLOAD_DIR)  # Get into the download folder
 
             monday = monday_of_the_week().strftime("%Y%m%d")
@@ -98,7 +98,7 @@ class Command(BaseCommand):
     def clean_old_archives(self, *, wet_run):
         with asp_utils.get_sftp_connection() as sftp:
             self.stdout.write(f'Connected to "{settings.ASP_SFTP_HOST}" as "{settings.ASP_SFTP_USER}"')
-            self.stdout.write(f'''Current remote dir is "{sftp.normalize('.')}"''')
+            self.stdout.write(f'''Current remote dir is "{sftp.normalize(".")}"''')
 
             sftp.chdir(REMOTE_DOWNLOAD_DIR)  # Get into the download folder
             filenames = list(sorted(sftp.listdir(), reverse=True))
