@@ -268,7 +268,7 @@ class CreateProlongationRequestForm(CreateProlongationForm):
     )
     contact_phone = forms.CharField(
         label="Votre numéro de téléphone",
-        widget=forms.TextInput(attrs={"placeholder": "Merci de privilégier votre ligne directe"}),
+        widget=forms.TextInput(attrs={"placeholder": "Merci de privilégier votre ligne directe", "type": "tel"}),
         required=False,
         disabled=True,
         error_messages={
