@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils import timezone
 
 import itou.gps.models as models
 
@@ -36,14 +37,29 @@ class FollowUpGroupMembershipAdmin(ItouModelAdmin):
         "is_referent",
         "created_in_bulk",
     )
-    raw_id_fields = ["follow_up_group"]
-    readonly_fields = ["member", "creator", "created_at", "updated_at", "ended_at", "created_in_bulk"]
+    raw_id_fields = ("follow_up_group", "member")
+    readonly_fields = ("creator", "created_at", "updated_at", "ended_at", "created_in_bulk")
     ordering = ["-created_at"]
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ("follow_up_group", "member") + self.readonly_fields
+        return self.readonly_fields
 
     def lookup_allowed(self, lookup, value, request):
         if lookup in ["follow_up_group__beneficiary"]:
             return True
         return super().lookup_allowed(lookup, value)
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.creator = request.user
+
+        else:
+            if not form.cleaned_data["is_active"] and form.initial["is_active"]:
+                obj.ended_at = timezone.now()
+
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(models.FollowUpGroup)
