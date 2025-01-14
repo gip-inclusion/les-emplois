@@ -17,7 +17,7 @@ from itou.communications.models import NotificationSettings
 from itou.companies.models import CompanyMembership
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.geo.models import QPV
-from itou.gps.models import FranceTravailContact
+from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
@@ -40,6 +40,7 @@ from itou.utils.admin import (
     get_admin_view_link,
     get_structure_view_link,
 )
+from itou.utils.urls import add_url_params
 
 
 class EmailAddressInline(ItouTabularInline):
@@ -336,6 +337,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
         "is_staff",
         "jobseeker_profile_link",
         "disabled_notifications",
+        "follow_up_groups_or_members",
     )
 
     add_fieldsets = (
@@ -429,6 +431,22 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
             )
         return "Aucune"
 
+    @admin.display(description="GPS")
+    def follow_up_groups_or_members(self, obj):
+        if obj.pk is None:
+            return self.get_empty_value_display()
+        if obj.is_job_seeker:
+            url = add_url_params(
+                reverse("admin:gps_followupgroupmembership_changelist"), {"follow_up_group__beneficiary": obj.id}
+            )
+            count = FollowUpGroupMembership.objects.filter(follow_up_group__beneficiary=obj).count()
+            return format_html('<a href="{}">Liste des professionnels suivant ce bénéficiaire ({})</a>', url, count)
+        if obj.is_prescriber or obj.is_employer:
+            url = add_url_params(reverse("admin:gps_followupgroup_changelist"), {"memberships__member": obj.id})
+            count = FollowUpGroup.objects.filter(memberships__member=obj).count()
+            return format_html('<a href="{}">Liste des groupes de suivi de cet utilisateur ({}) </a>', url, count)
+        return ""
+
     @admin.action(description="Désactiver le compte IC / PC pour changement prescripteur <-> employeur")
     def free_sso_email(self, request, queryset):
         try:
@@ -511,6 +529,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
                         "identity_provider",
                         "jobseeker_profile_link",
                         "disabled_notifications",
+                        "follow_up_groups_or_members",
                     )
                 },
             ),
