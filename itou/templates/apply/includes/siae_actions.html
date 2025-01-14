@@ -5,6 +5,29 @@
         <h2 class="visually-hidden">Actions rapides</h2>
         <div class="form-row align-items-center gx-3">
             <div class="form-group col-12 col-lg-auto">
+                {% if can_postpone %}
+                    <button type="button"
+                            class="btn btn-lg btn-link-white btn-block btn-ico"
+                            {% matomo_event "candidature" "clic" "batch-postpone-applications-open-modal" %}
+                            data-bs-toggle="modal"
+                            data-bs-target="#postpone_confirmation_modal">
+                        <i class="ri-history-line fw-medium" aria-hidden="true"></i>
+                        <span>Mettre en liste d’attente</span>
+                    </button>
+                {% else %}
+                    <button type="button"
+                            class="btn btn-lg btn-link-white btn-block btn-ico"
+                            disabled
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            data-bs-custom-class="c-box--action-tooltip"
+                            data-bs-title="Seules les candidatures au statut « À l’étude »{% if request.current_organization.kind == CompanyKind.GEIQ %} ou « Action préalable à l’embauche »{% endif %} peuvent être mises en liste d’attente.">
+                        <i class="ri-history-line fw-medium" aria-hidden="true"></i>
+                        <span>Mettre en liste d’attente</span>
+                    </button>
+                {% endif %}
+            </div>
+            <div class="form-group col-12 col-lg-auto">
                 {% if can_archive %}
                     <button type="button"
                             class="btn btn-lg btn-link-white btn-block btn-ico"

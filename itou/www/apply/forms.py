@@ -885,3 +885,18 @@ class CheckJobSeekerGEIQEligibilityForm(forms.Form):
     def __init__(self, hx_post_url, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["choice"].widget.attrs.update({"hx-trigger": "change", "hx-post": hx_post_url})
+
+
+class BatchPostponeForm(AnswerForm):
+    def __init__(self, *args, job_seeker_nb, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["answer"].required = True
+        self.fields["answer"].widget.attrs["placeholder"] = (
+            "Votre réponse sera visible par les candidats et les prescripteurs/orienteurs"
+        )
+        if job_seeker_nb is not None:
+            self.fields["answer"].label = (
+                f"Commentaire à envoyer aux {job_seeker_nb} candidats"
+                if job_seeker_nb > 1
+                else "Commentaire à envoyer au candidat"
+            )

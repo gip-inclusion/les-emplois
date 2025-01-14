@@ -9,10 +9,12 @@ from django.views.decorators.http import require_POST
 from django_xworkflows import models as xwf_models
 
 from itou.companies.models import Company
+from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.utils.auth import check_user
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.urls import get_safe_url
+from itou.www.apply.forms import BatchPostponeForm
 
 
 logger = logging.getLogger(__name__)
@@ -77,6 +79,71 @@ def archive(request):
         archived_nb,
         ",".join(str(app_uid) for app_uid in archived_ids),
     )
+    return HttpResponseRedirect(next_url)
+
+
+@check_user(lambda user: user.is_employer)
+@require_POST
+def postpone(request):
+    next_url = get_safe_url(request, "next_url")
+    if next_url is None:
+        # This is somewhat extreme but will force developpers to always provide a proper next_url
+        raise Http404
+    applications = _get_and_lock_received_applications(request, request.POST.getlist("application_ids"))
+
+    form = BatchPostponeForm(job_seeker_nb=None, data=request.POST)
+
+    if not form.is_valid():
+        # This is unlikely since the form is quite simple and the answer field is required
+        messages.error(request, "Les candidatures n’ont pas pu être mises en attente.")
+        logger.error(
+            "user=%s tried to batch postponed %s applications but the form wasn't valid",
+            request.user.pk,
+            len(applications),
+        )
+    else:
+        postponed_ids = []
+        for job_application in applications:
+            if job_application.state == JobApplicationState.POSTPONED:
+                messages.warning(
+                    request,
+                    f"La candidature de {job_application.job_seeker.get_full_name()} est déjà mise en attente.",
+                    extra_tags="toast",
+                )
+                continue
+            try:
+                # After each successful transition, a save() is performed by django-xworkflows.
+                job_application.answer = form.cleaned_data["answer"]
+                job_application.postpone(user=request.user)
+            except xwf_models.InvalidTransitionError:
+                messages.error(
+                    request,
+                    (
+                        f"La candidature de {job_application.job_seeker.get_full_name()} n’a pas pu être mise en "
+                        f"attente car elle est au statut « {job_application.get_state_display()} »."
+                    ),
+                    extra_tags="toast",
+                )
+            else:
+                postponed_ids.append(job_application.pk)
+
+        postponed_nb = len(postponed_ids)
+        if postponed_nb:
+            messages.success(
+                request,
+                (
+                    f"{postponed_nb} candidatures ont bien été mises en attente."
+                    if postponed_nb > 1
+                    else "La candidature a bien été mise en attente."
+                ),
+                extra_tags="toast",
+            )
+        logger.info(
+            "user=%s batch postponed %s applications: %s",
+            request.user.pk,
+            postponed_nb,
+            ",".join(str(app_uid) for app_uid in postponed_ids),
+        )
     return HttpResponseRedirect(next_url)
 
 
