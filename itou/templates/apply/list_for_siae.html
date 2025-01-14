@@ -52,6 +52,12 @@
     </section>
 {% endblock %}
 
+{% block modals %}
+    {{ block.super }}
+    {% include "apply/includes/siae_actions_modals.html" with batch_mode=False %}
+
+{% endblock %}
+
 {% block script %}
     {{ block.super }}
     <!-- Needed to use Select2MultipleWidget. -->

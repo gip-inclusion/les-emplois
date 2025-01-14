@@ -393,3 +393,7 @@ table.table td > .modal .modal-content {
 .proconnect-button:hover {
   background-image: url("../img/pro_connect_bouton_hover.svg");
 }
+
+.c-box--action-tooltip {
+  z-index: 1050 !important;
+}
