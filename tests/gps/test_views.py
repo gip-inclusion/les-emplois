@@ -46,23 +46,23 @@ def test_user_autocomplete(client):
     FollowUpGroupFactory(beneficiary=third_beneficiary, memberships=3, memberships__member=prescriber)
     FollowUpGroupFactory(beneficiary=second_beneficiary, memberships=2)
 
-    def get_autocomplete_results(user):
+    def get_autocomplete_results(user, term="gps"):
         client.force_login(user)
-        response = client.get(reverse("autocomplete:gps_users") + "?term=gps")
-        return set(r["id"] for r in response.json()["results"])
+        response = client.get(reverse("autocomplete:gps_users") + f"?term={term}")
+        return [r["id"] for r in response.json()["results"]]
 
     # Employers should get the 3 job seekers.
     results = get_autocomplete_results(EmployerFactory(with_company=True))
-    assert results == {first_beneficiary.pk, second_beneficiary.pk, third_beneficiary.pk}
+    assert set(results) == {first_beneficiary.pk, second_beneficiary.pk, third_beneficiary.pk}
 
     # Authorized prescribers should get the 3 job seekers.
     org = PrescriberOrganizationWithMembershipFactory(authorized=True)
     results = get_autocomplete_results(org.members.get())
-    assert results == {first_beneficiary.pk, second_beneficiary.pk, third_beneficiary.pk}
+    assert set(results) == {first_beneficiary.pk, second_beneficiary.pk, third_beneficiary.pk}
 
     # We should not get ourself nor the first and third user user because we are a member of their group
     results = get_autocomplete_results(prescriber)
-    assert results == {second_beneficiary.pk}
+    assert set(results) == {second_beneficiary.pk}
 
     # Now, if we remove the first user from our group by setting the membership to is_active False
     # The autocomplete should return it again
@@ -73,7 +73,11 @@ def test_user_autocomplete(client):
     # We should not get ourself but we should get the first beneficiary (we are is_active=False)
     # and the second one (we are not part of his group)
     results = get_autocomplete_results(prescriber)
-    assert results == {first_beneficiary.pk, second_beneficiary.pk}
+    assert set(results) == {first_beneficiary.pk, second_beneficiary.pk}
+
+    # with "martin gps" Martin is the only match
+    results = get_autocomplete_results(prescriber, term="martin gps")
+    assert results == [second_beneficiary.pk]
 
 
 @pytest.mark.parametrize(
