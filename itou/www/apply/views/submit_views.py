@@ -12,7 +12,6 @@ from django.utils import timezone
 from django.views.generic import TemplateView
 
 from itou.approvals.models import Approval
-from itou.companies import enums as companies_enums
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, JobDescription
 from itou.eligibility.models import EligibilityDiagnosis
@@ -83,15 +82,9 @@ class ApplyStepBaseView(TemplateView):
         self.hire_process = None
         self.prescription_process = None
         self.auto_prescription_process = None
-        self.is_gps = False
 
     def setup(self, request, *args, **kwargs):
-        self.is_gps = "gps" in request.GET and request.GET["gps"] == "true"
-        self.company = (
-            get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
-            if not self.is_gps
-            else Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
-        )
+        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
         self.apply_session = SessionNamespace(request.session, f"job_application-{self.company.pk}")
         self.hire_process = kwargs.pop("hire_process", False)
         self.prescription_process = not self.hire_process and (
@@ -104,22 +97,21 @@ class ApplyStepBaseView(TemplateView):
         super().setup(request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.is_gps:
-            if self.hire_process and request.user.kind != UserKind.EMPLOYER:
-                raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches")
-            elif self.hire_process and not self.company.has_member(request.user):
-                raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
-            elif request.user.kind not in [
-                UserKind.JOB_SEEKER,
-                UserKind.PRESCRIBER,
-                UserKind.EMPLOYER,
-            ]:
-                raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
+        if self.hire_process and request.user.kind != UserKind.EMPLOYER:
+            raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches")
+        elif self.hire_process and not self.company.has_member(request.user):
+            raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
+        elif request.user.kind not in [
+            UserKind.JOB_SEEKER,
+            UserKind.PRESCRIBER,
+            UserKind.EMPLOYER,
+        ]:
+            raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
 
-            if not self.company.has_active_members:
-                raise PermissionDenied(
-                    "Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne."
-                )
+        if not self.company.has_active_members:
+            raise PermissionDenied(
+                "Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne."
+            )
         return super().dispatch(request, *args, **kwargs)
 
     def get_back_url(self):
@@ -162,7 +154,6 @@ class ApplyStepBaseView(TemplateView):
             "prescription_process": self.prescription_process,
             "auto_prescription_process": self.auto_prescription_process,
             "reset_url": self.get_reset_url(),
-            "is_gps": self.is_gps,
             "page_title": "Postuler",
         }
 
@@ -250,20 +241,16 @@ class StartView(ApplyStepBaseView):
         else:
             tunnel = "sender"
 
-        if not self.is_gps:
-            # Checks are not relevants for the creation of a job_seeker in the GPS context
-            # because we don't create a job application, only a job_seeker and a job_seeker_profile
+        if self.auto_prescription_process or self.hire_process:
+            if suspension_explanation := self.company.get_active_suspension_text_with_dates():
+                raise PermissionDenied(
+                    "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
+                    "a posteriori. " + suspension_explanation
+                )
 
-            if self.auto_prescription_process or self.hire_process:
-                if suspension_explanation := self.company.get_active_suspension_text_with_dates():
-                    raise PermissionDenied(
-                        "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
-                        "a posteriori. " + suspension_explanation
-                    )
-
-            # Refuse all applications except those made by an SIAE member
-            if self.company.block_job_applications and not self.company.has_member(request.user):
-                raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
+        # Refuse all applications except those made by an SIAE member
+        if self.company.block_job_applications and not self.company.has_member(request.user):
+            raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
 
         # Store away the selected job in the session to avoid passing it
         # along the many views before ApplicationJobsView.
@@ -292,7 +279,6 @@ class StartView(ApplyStepBaseView):
             request.user.is_prescriber
             and request.current_organization
             and request.current_organization.has_pending_authorization()
-            and not self.is_gps
         ):
             return HttpResponseRedirect(
                 reverse("apply:pending_authorization_for_sender", kwargs={"company_pk": self.company.pk})
@@ -306,13 +292,9 @@ class StartView(ApplyStepBaseView):
                 reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session.name})
             )
 
-        # TODO(ewen): get rid of GPS in apply
-        if self.is_gps:
-            tunnel = "gps"
-
         params = {
             "tunnel": tunnel,
-            "company": self.company.pk if tunnel != "gps" else None,
+            "company": self.company.pk,
             "from_url": self.get_reset_url(),
         }
 
