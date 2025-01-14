@@ -67,11 +67,11 @@ class EditJobSeekerInfoForm(
             "last_name",
             "phone",
         ] + JobSeekerAddressForm.Meta.fields
-
         help_texts = {
             "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978",
             "phone": "L'ajout du numéro de téléphone permet à l'employeur de vous contacter plus facilement.",
         }
+        widgets = {"phone": forms.TextInput(attrs={"type": "tel"})}
 
     def __init__(self, *args, **kwargs):
         editor = kwargs.get("editor", None)
@@ -124,6 +124,7 @@ class EditUserInfoForm(SSOReadonlyMixin, forms.ModelForm):
             "last_name",
             "phone",
         ]
+        widgets = {"phone": forms.TextInput(attrs={"type": "tel"})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

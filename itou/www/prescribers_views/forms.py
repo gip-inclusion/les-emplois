@@ -26,6 +26,7 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
             "description": "Texte de présentation de votre structure.",
             "website": "Votre site web doit commencer par http:// ou https://",
         }
+        widgets = {"phone": forms.TextInput(attrs={"type": "tel"})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

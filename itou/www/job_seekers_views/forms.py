@@ -176,6 +176,7 @@ class CreateOrUpdateJobSeekerStep1Form(
 class CreateOrUpdateJobSeekerStep2Form(JobSeekerAddressForm, forms.ModelForm):
     class Meta(JobSeekerAddressForm.Meta):
         fields = JobSeekerAddressForm.Meta.fields + ["phone"]
+        widgets = {"phone": forms.TextInput(attrs={"type": "tel"})}
 
 
 class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
@@ -291,6 +292,7 @@ class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):
         help_texts = {
             "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978.",
         }
+        widgets = {"phone": forms.TextInput(attrs={"type": "tel"})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

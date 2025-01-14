@@ -40,6 +40,7 @@ class CreateCompanyForm(forms.ModelForm):
         }
         widgets = {
             "description": EasyMDEEditor,
+            "phone": forms.TextInput(attrs={"type": "tel"}),
         }
 
     def __init__(self, current_company, current_user, *args, **kwargs):
@@ -121,6 +122,7 @@ class EditCompanyForm(forms.ModelForm):
             "address_line_2": "",
             "website": "Votre site web doit commencer par http:// ou https://",
         }
+        widgets = {"phone": forms.TextInput(attrs={"type": "tel"})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
