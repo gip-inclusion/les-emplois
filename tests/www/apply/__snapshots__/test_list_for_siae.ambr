@@ -2515,6 +2515,253 @@
               </div>
   '''
 # ---
+# name: test_list_for_siae_select_applications_batch_transfer[active transfer button]
+  '''
+  <div class="dropdown dropdown-structure text-end">
+                              <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle text-end" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
+                                  Transférer vers
+                              </button>
+                              <div aria-labelledby="transfer_to_button" class="dropdown-menu dropdown-menu-end w-100">
+                                  
+                                      
+                                          <button class="dropdown-item dropdown-item__summary" data-bs-target="#transfer_confirmation_modal_2222" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-open-modal" type="button">
+                                              <i class="ri-community-line"></i>
+                                              <span>EI</span>
+                                              <strong>Acme inc.</strong>
+                                          </button>
+                                      
+                                  
+                                      
+                                  
+                                      
+                                          <button class="dropdown-item dropdown-item__summary" data-bs-target="#transfer_confirmation_modal_3333" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-open-modal" type="button">
+                                              <i class="ri-community-line"></i>
+                                              <span>EITI</span>
+                                              <strong>Superbe snapshot</strong>
+                                          </button>
+                                      
+                                  
+                              </div>
+                          </div>
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_transfer[inactive archive button]
+  '''
+  <button class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle text-end" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Les candidatures au statut « Acceptée » ne peuvent pas être transférées." data-bs-toggle="tooltip" disabled="" type="button">
+                              Transférer vers
+                          </button>
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_transfer[modal with 1 transferable application]
+  '''
+  <div aria-hidden="true" aria-labelledby="modal_title_2222" class="modal" id="transfer_confirmation_modal_2222" tabindex="-1">
+                          <div class="modal-dialog modal-dialog-centered">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <h2 class="modal-title" id="modal_title_2222">
+                                          Transfert de 1 candidature
+                                      </h2>
+                                      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                  </div>
+                                  <div class="modal-body">
+                                      <p>
+                                          Êtes-vous sûr de vouloir transférer
+                                          
+                                              la candidature sélectionnée
+                                          
+                                          vers la structure suivante ?
+                                      </p>
+                                      
+  
+  <div class="c-box c-box--structure mb-3 mb-lg-5">
+      <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
+          <i class="ri-community-line"></i>
+          <div>
+              <span data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip">EI</span>
+              <h3>Acme inc.</h3>
+          </div>
+      </div>
+      <div class="c-box--structure__detail collapse" id="collapseBoxStructure">
+          <hr class="my-4"/>
+          <ul class="c-box--structure__list-contact">
+              <li>
+                  <i class="ri-map-pin-2-line fw-normal me-2"></i>
+                  <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
+                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+              </li>
+              
+                  
+      <li>
+      <i class="ri-mail-line fw-normal me-2"></i>
+      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
+      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  </li>
+  
+  
+  
+  
+      
+  <li>
+      <i class="ri-phone-line fw-normal me-2"></i>
+      06 12 34 56 78
+      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  </li>
+  
+  
+  
+  
+  
+              
+          </ul>
+          
+              
+                  
+                  
+                      
+                  
+                  <a class="btn btn-secondary btn-block mt-4" href="/company/2222/card" target="_blank">Voir la fiche de l'entreprise</a>
+              
+          
+      </div>
+  </div>
+  
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">Retour</button>
+                                      <form action="/apply/company/batch/transfer?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <input name="target_company_id" type="hidden" value="2222"/>
+                                          
+                                              <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
+                                          
+                                          <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-submit">
+                                              Confirmer
+                                          </button>
+                                      </form>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_transfer[modal with 2 transferable application]
+  '''
+  <div aria-hidden="true" aria-labelledby="modal_title_2222" class="modal" id="transfer_confirmation_modal_2222" tabindex="-1">
+                          <div class="modal-dialog modal-dialog-centered">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <h2 class="modal-title" id="modal_title_2222">
+                                          Transfert de 2 candidatures
+                                      </h2>
+                                      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                  </div>
+                                  <div class="modal-body">
+                                      <p>
+                                          Êtes-vous sûr de vouloir transférer
+                                          
+                                              les 2 candidatures sélectionnées
+                                          
+                                          vers la structure suivante ?
+                                      </p>
+                                      
+  
+  <div class="c-box c-box--structure mb-3 mb-lg-5">
+      <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
+          <i class="ri-community-line"></i>
+          <div>
+              <span data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip">EI</span>
+              <h3>Acme inc.</h3>
+          </div>
+      </div>
+      <div class="c-box--structure__detail collapse" id="collapseBoxStructure">
+          <hr class="my-4"/>
+          <ul class="c-box--structure__list-contact">
+              <li>
+                  <i class="ri-map-pin-2-line fw-normal me-2"></i>
+                  <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
+                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+              </li>
+              
+                  
+      <li>
+      <i class="ri-mail-line fw-normal me-2"></i>
+      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
+      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  </li>
+  
+  
+  
+  
+      
+  <li>
+      <i class="ri-phone-line fw-normal me-2"></i>
+      06 12 34 56 78
+      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  </li>
+  
+  
+  
+  
+  
+              
+          </ul>
+          
+              
+                  
+                  
+                      
+                  
+                  <a class="btn btn-secondary btn-block mt-4" href="/company/2222/card" target="_blank">Voir la fiche de l'entreprise</a>
+              
+          
+      </div>
+  </div>
+  
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">Retour</button>
+                                      <form action="/apply/company/batch/transfer?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <input name="target_company_id" type="hidden" value="2222"/>
+                                          
+                                              <input name="application_ids" type="hidden" value="22222222-2222-2222-2222-222222222222"/>
+                                          
+                                              <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
+                                          
+                                          <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-submit">
+                                              Confirmer
+                                          </button>
+                                      </form>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+  '''
+# ---
 # name: test_list_snapshot[applications list]
   '''
   <section aria-labelledby="apply-list-count" id="job-applications-section">

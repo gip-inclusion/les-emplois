@@ -27,6 +27,42 @@
                     </button>
                 {% endif %}
             </div>
+            {% if request.organizations|length > 1 %}
+                <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+                    {% if can_transfer %}
+                        <div class="dropdown dropdown-structure text-end">
+                            <button id="transfer_to_button" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle text-end" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
+                                Transférer vers
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end w-100" aria-labelledby="transfer_to_button">
+                                {% for siae in request.organizations %}
+                                    {% if siae != request.current_organization %}
+                                        <button type="button"
+                                                class="dropdown-item dropdown-item__summary"
+                                                {% matomo_event "candidature" "clic" "batch-transfer-applications-open-modal" %}
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#transfer_confirmation_modal_{{ siae.pk }}">
+                                            <i class="ri-community-line"></i>
+                                            <span>{{ siae.kind }}</span>
+                                            <strong>{{ siae.display_name }}</strong>
+                                        </button>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <button class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle text-end"
+                                type="button"
+                                disabled
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                data-bs-custom-class="c-box--action-tooltip"
+                                data-bs-title="Les candidatures au statut « Acceptée » ne peuvent pas être transférées.">
+                            Transférer vers
+                        </button>
+                    {% endif %}
+                </div>
+            {% endif %}
         </div>
     </div>
 {% else %}
