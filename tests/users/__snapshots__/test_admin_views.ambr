@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_num_queries
   dict({
-    'num_queries': 25,
+    'num_queries': 26,
     'queries': list([
       dict({
         'origin': list([
@@ -659,6 +659,29 @@
                  AND NOT ("communications_notificationrecord"."is_obsolete"))
           ORDER BY "communications_notificationrecord"."category" ASC,
                    "communications_notificationrecord"."name" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouUserAdmin.follow_up_groups_or_members[users/admin.py]',
+          'VariableNode[admin/includes/fieldset.html]',
+          'IfNode[admin/includes/fieldset.html]',
+          'IfNode[admin/includes/fieldset.html]',
+          'ForNode[admin/includes/fieldset.html]',
+          'ForNode[admin/includes/fieldset.html]',
+          'IncludeNode[admin/change_form.html]',
+          'ForNode[admin/change_form.html]',
+          'BlockNode[admin/change_form.html]',
+          'BlockNode[admin/base.html]',
+          'ExtendsNode[admin/base_site.html]',
+          'ExtendsNode[admin/change_form.html]',
+          'ExtendsNode[admin/users/change_user_form.html]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "gps_followupgroup"
+          INNER JOIN "gps_followupgroupmembership" ON ("gps_followupgroup"."id" = "gps_followupgroupmembership"."follow_up_group_id")
+          WHERE "gps_followupgroupmembership"."member_id" = %s
         ''',
       }),
       dict({

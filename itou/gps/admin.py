@@ -40,6 +40,11 @@ class FollowUpGroupMembershipAdmin(ItouModelAdmin):
     readonly_fields = ["member", "creator", "created_at", "updated_at", "ended_at", "created_in_bulk"]
     ordering = ["-created_at"]
 
+    def lookup_allowed(self, lookup, value, request):
+        if lookup in ["follow_up_group__beneficiary"]:
+            return True
+        return super().lookup_allowed(lookup, value)
+
 
 @admin.register(models.FollowUpGroup)
 class FollowUpGroupAdmin(ItouModelAdmin):
@@ -54,6 +59,11 @@ class FollowUpGroupAdmin(ItouModelAdmin):
     ]
 
     inlines = (MemberInline,)
+
+    def lookup_allowed(self, lookup, value, request):
+        if lookup in ["memberships__member"]:
+            return True
+        return super().lookup_allowed(lookup, value)
 
     @admin.display(description="Département")
     def beneficiary_department(self, obj):
