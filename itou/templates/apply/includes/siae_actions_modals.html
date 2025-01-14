@@ -1,8 +1,36 @@
+{% load django_bootstrap5 %}
 {% load matomo %}
 {% load str_filters %}
 
 {% if batch_mode %}
     <div id="batch-action-modals" {% if request.htmx %}hx-swap-oob="true"{% endif %}>
+        {% if can_postpone %}
+            <div id="postpone_confirmation_modal" class="modal" tabindex="-1" aria-labelledby="postpone_modal_title" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title" id="postpone_modal_title">
+                                Mettre en liste d’attente {{ selected_nb }} candidature{{ selected_nb|pluralizefr }}
+                            </h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <form method="post" action="{% url 'apply:batch_postpone' %}?next_url={{ list_url|urlencode }}">
+                            <div class="modal-body">{% bootstrap_form postpone_form alert_error_type="all" %}</div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Retour</button>
+                                {% csrf_token %}
+                                {% for application_id in selected_application_ids %}
+                                    <input type="hidden" name="application_ids" value="{{ application_id }}" />
+                                {% endfor %}
+                                <button class="btn btn-sm btn-primary" {% matomo_event "candidature" "submit" "batch-postpone-applications-submit" %}>
+                                    Confirmer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         {% if can_archive %}
             <div id="archive_confirmation_modal" class="modal" tabindex="-1" aria-labelledby="archive_modal_title" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
