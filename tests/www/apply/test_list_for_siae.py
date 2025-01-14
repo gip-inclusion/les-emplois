@@ -1,7 +1,7 @@
 import datetime
 import itertools
 import uuid
-from urllib.parse import unquote
+from urllib.parse import parse_qs, unquote, urlsplit
 
 import pytest
 from django.urls import reverse
@@ -996,6 +996,7 @@ def test_list_for_siae_select_applications_htmx(client):
     job_apps = JobApplicationFactory.create_batch(3, to_company=company, state=JobApplicationState.NEW)
     client.force_login(employer)
     table_url = add_url_params(reverse("apply:list_for_siae"), {"display": "table"})
+
     response = client.get(table_url)
     simulated_page = parse_response_to_soup(response, selector="#main")
     [action_form] = simulated_page.find_all(
@@ -1039,3 +1040,102 @@ def test_list_for_siae_select_applications_htmx(client):
     response = client.get(table_url)
     new_page = parse_response_to_soup(response, selector="#main")
     assertSoupEqual(new_page, simulated_page)
+
+
+def test_list_for_siae_select_applications_batch_archive(client, snapshot):
+    MODAL_ID = "archive_confirmation_modal"
+
+    company = CompanyFactory(with_membership=True)
+    employer = company.members.first()
+
+    archivable_app_1 = JobApplicationFactory(
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"), to_company=company, state=JobApplicationState.REFUSED
+    )
+    assert archivable_app_1.can_be_archived
+    archivable_app_2 = JobApplicationFactory(
+        pk=uuid.UUID("22222222-2222-2222-2222-222222222222"), to_company=company, state=JobApplicationState.REFUSED
+    )
+    assert archivable_app_2.can_be_archived
+    archived_app = JobApplicationFactory(
+        to_company=company, state=JobApplicationState.REFUSED, archived_at=timezone.now()
+    )
+    assert not archived_app.can_be_archived
+    unarchivable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.NEW)
+    assert not unarchivable_app.can_be_archived
+
+    client.force_login(employer)
+    table_url = add_url_params(reverse("apply:list_for_siae"), {"display": "table", "start_date": "2015-01-01"})
+
+    response = client.get(table_url)
+    simulated_page = parse_response_to_soup(
+        response,
+        # We need the whole body to be able to check modals
+        selector="body",
+    )
+    [action_form] = simulated_page.find_all(
+        "form", attrs={"hx-get": lambda attr: attr and attr.startswith(reverse("apply:list_for_siae_actions"))}
+    )
+    action_url = action_form["hx-get"]
+    assert parse_qs(urlsplit(action_url).query) == {"list_url": [table_url]}
+    assert simulated_page.find(id="batch-action-box").contents == []
+
+    def simulate_applications_selection(application_list):
+        response = client.get(
+            action_url,
+            # Explicitly redefine list_url since Django test client swallows it otherwise
+            query_params={"list_url": table_url, "selected-application": application_list},
+            headers={"HX-Request": "true"},
+        )
+        update_page_with_htmx(simulated_page, f"form[hx-get='{action_url}']", response)
+
+    def get_archive_modal():
+        return simulated_page.find(id=MODAL_ID)
+
+    def get_archive_button():
+        archive_buttons = [
+            span.parent
+            for span in simulated_page.find(id="batch-action-box").select("button > span")
+            if span.contents == ["Archiver"]
+        ]
+        if not archive_buttons:
+            return None
+        [archive_button] = archive_buttons
+        return archive_button
+
+    assert get_archive_modal() is None
+    assert get_archive_button() is None
+
+    # Select 1 archivable application
+    simulate_applications_selection([archivable_app_1.pk])
+    archive_button = get_archive_button()
+    assert archive_button is not None
+    assert archive_button["data-bs-target"] == f"#{MODAL_ID}"
+    assert str(archive_button) == snapshot(name="active archive button")
+
+    modal = get_archive_modal()
+    assert str(modal) == snapshot(name="modal with 1 archivable application")
+    # Check that the next_url is correctly transmitted
+    modal_form_action = urlsplit(modal.find("form")["action"])
+    assert modal_form_action.path == reverse("apply:batch_archive")
+    assert parse_qs(modal_form_action.query) == {"next_url": [table_url]}
+
+    # Select 2 archivable applications
+    simulate_applications_selection([archivable_app_1.pk, archivable_app_2.pk])
+    archive_button = get_archive_button()
+    assert archive_button is not None
+    assert archive_button["data-bs-target"] == f"#{MODAL_ID}"
+    assert str(archive_button) == snapshot(name="active archive button")
+    assert str(get_archive_modal()) == snapshot(name="modal with 2 archivable applications")
+
+    # Test with unarchivable batches
+    for app_list in [
+        [archived_app.pk],
+        [unarchivable_app.pk],
+        [archived_app.pk, archivable_app_1.pk],
+        [unarchivable_app.pk, archivable_app_2.pk],
+    ]:
+        simulate_applications_selection(app_list)
+        # No modal & linked button
+        assert get_archive_modal() is None
+        archive_button = get_archive_button()
+        assert str(archive_button) == snapshot(name="inactive archive button")

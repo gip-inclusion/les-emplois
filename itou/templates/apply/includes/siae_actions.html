@@ -1,10 +1,38 @@
+{% load matomo %}
+
 {% if batch_mode %}
     <div id="batch-action-box" class="c-box c-box--action selection-indicator" data-emplois-elements-visibility-on-selection="shown" {% if request.htmx %}hx-swap-oob="true"{% endif %}>
         <h2 class="visually-hidden">Actions rapides</h2>
+        <div class="form-row align-items-center gx-3">
+            <div class="form-group col-12 col-lg-auto">
+                {% if can_archive %}
+                    <button type="button"
+                            class="btn btn-lg btn-link-white btn-block btn-ico"
+                            {% matomo_event "candidature" "clic" "batch-archive-applications-open-modal" %}
+                            data-bs-toggle="modal"
+                            data-bs-target="#archive_confirmation_modal">
+                        <i class="ri-archive-line fw-medium" aria-hidden="true"></i>
+                        <span>Archiver</span>
+                    </button>
+                {% else %}
+                    <button type="button"
+                            class="btn btn-lg btn-link-white btn-block btn-ico"
+                            disabled
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            data-bs-custom-class="c-box--action-tooltip"
+                            data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées.">
+                        <i class="ri-archive-line fw-medium" aria-hidden="true"></i>
+                        <span>Archiver</span>
+                    </button>
+                {% endif %}
+            </div>
+        </div>
     </div>
 {% else %}
     <div id="batch-action-box" class="selection-indicator" {% if request.htmx %}hx-swap-oob="true"{% endif %}></div>
 {% endif %}
 {% if request.htmx %}
     {% include "apply/includes/selected_job_applications.html" with selected_nb=selected_nb request=request only %}
+    {% include "apply/includes/siae_actions_modals.html" %}
 {% endif %}

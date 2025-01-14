@@ -399,10 +399,12 @@ def list_for_siae_actions(request):
         response = HttpResponse()
         response["HX-Refresh"] = "true"
         return response
+    can_archive = all(job_application.can_be_archived for job_application in selected_job_applications)
     context = {
         "batch_mode": bool(selected_job_applications),
         "selected_nb": len(selected_job_applications),
         "selected_application_ids": [job_app.pk for job_app in selected_job_applications],
+        "can_archive": can_archive,
         "list_url": get_safe_url(request, "list_url", fallback_url=reverse("apply:list_for_siae")),
     }
     response = render(

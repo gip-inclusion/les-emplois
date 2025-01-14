@@ -1,0 +1,46 @@
+{% load matomo %}
+{% load str_filters %}
+
+{% if batch_mode %}
+    <div id="batch-action-modals" {% if request.htmx %}hx-swap-oob="true"{% endif %}>
+        {% if can_archive %}
+            <div id="archive_confirmation_modal" class="modal" tabindex="-1" aria-labelledby="archive_modal_title" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title" id="archive_modal_title">
+                                Archiver {{ selected_nb }} candidature{{ selected_nb|pluralizefr }}
+                            </h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                Êtes-vous sûr de vouloir archiver
+                                {% if selected_nb > 1 %}
+                                    les {{ selected_nb }} candidatures sélectionnées
+                                {% else %}
+                                    la candidature sélectionnée
+                                {% endif %}
+                                ?
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Retour</button>
+                            <form method="post" action="{% url 'apply:batch_archive' %}?next_url={{ list_url|urlencode }}">
+                                {% csrf_token %}
+                                {% for application_id in selected_application_ids %}
+                                    <input type="hidden" name="application_ids" value="{{ application_id }}" />
+                                {% endfor %}
+                                <button class="btn btn-sm btn-primary" {% matomo_event "candidature" "submit" "batch-archive-applications-submit" %}>
+                                    Confirmer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% else %}
+    <div id="batch-action-modals" {% if request.htmx %}hx-swap-oob="true"{% endif %}></div>
+{% endif %}

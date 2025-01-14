@@ -1,6 +1,6 @@
 from django.urls import path
 
-from itou.www.apply.views import edit_views, list_views, process_views, submit_views
+from itou.www.apply.views import batch_views, edit_views, list_views, process_views, submit_views
 
 
 # https://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces-and-included-urlconfs
@@ -106,6 +106,7 @@ urlpatterns = [
         name="list_for_siae_exports_download",
     ),
     path("siae/list/actions", list_views.list_for_siae_actions, name="list_for_siae_actions"),
+    path("company/batch/archive", batch_views.archive, name="batch_archive"),
     # Process.
     path(
         "<uuid:job_application_id>/jobseeker/details",
