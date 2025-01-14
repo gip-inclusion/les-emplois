@@ -40,6 +40,49 @@
                 </div>
             </div>
         {% endif %}
+        {% if can_transfer %}
+            {% for siae in request.organizations %}
+                {% if siae != request.current_organization %}
+                    <div id="transfer_confirmation_modal_{{ siae.pk }}" class="modal" tabindex="-1" aria-labelledby="modal_title_{{ siae.pk }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 class="modal-title" id="modal_title_{{ siae.pk }}">
+                                        Transfert de {{ selected_nb }} candidature{{ selected_nb|pluralizefr }}
+                                    </h2>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>
+                                        Êtes-vous sûr de vouloir transférer
+                                        {% if selected_nb > 1 %}
+                                            les {{ selected_nb }} candidatures sélectionnées
+                                        {% else %}
+                                            la candidature sélectionnée
+                                        {% endif %}
+                                        vers la structure suivante ?
+                                    </p>
+                                    {% include "companies/includes/_company_info.html" with company=siae show_cta=True extra_box_class="mb-3 mb-lg-5" open_in_tab=True only %}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Retour</button>
+                                    <form method="post" action="{% url 'apply:batch_transfer' %}?next_url={{ list_url|urlencode }}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="target_company_id" value="{{ siae.pk }}" />
+                                        {% for application_id in selected_application_ids %}
+                                            <input type="hidden" name="application_ids" value="{{ application_id }}" />
+                                        {% endfor %}
+                                        <button class="btn btn-sm btn-primary" {% matomo_event "candidature" "submit" "batch-transfer-applications-submit" %}>
+                                            Confirmer
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
     </div>
 {% else %}
     <div id="batch-action-modals" {% if request.htmx %}hx-swap-oob="true"{% endif %}></div>

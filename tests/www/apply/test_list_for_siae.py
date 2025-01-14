@@ -20,7 +20,7 @@ from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.views.list_views import JobApplicationsDisplayKind
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_city_saint_andre
-from tests.companies.factories import CompanyFactory, JobDescriptionFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
@@ -1139,3 +1139,108 @@ def test_list_for_siae_select_applications_batch_archive(client, snapshot):
         assert get_archive_modal() is None
         archive_button = get_archive_button()
         assert str(archive_button) == snapshot(name="inactive archive button")
+
+
+def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
+    company = CompanyFactory(pk=1111, with_membership=True)
+    employer = company.members.first()
+
+    transferable_app_1 = JobApplicationFactory(
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"), to_company=company, state=JobApplicationState.REFUSED
+    )
+    assert transferable_app_1.transfer.is_available()
+    transferable_app_2 = JobApplicationFactory(
+        pk=uuid.UUID("22222222-2222-2222-2222-222222222222"), to_company=company, state=JobApplicationState.REFUSED
+    )
+    assert transferable_app_2.transfer.is_available()
+
+    untransferable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
+    assert not untransferable_app.transfer.is_available()
+
+    client.force_login(employer)
+    table_url = add_url_params(reverse("apply:list_for_siae"), {"display": "table", "start_date": "2015-01-01"})
+
+    response = client.get(table_url)
+    simulated_page = parse_response_to_soup(
+        response,
+        # We need the whole body to be able to check modals
+        selector="body",
+    )
+    [action_form] = simulated_page.find_all(
+        "form", attrs={"hx-get": lambda attr: attr and attr.startswith(reverse("apply:list_for_siae_actions"))}
+    )
+    action_url = action_form["hx-get"]
+    assert parse_qs(urlsplit(action_url).query) == {"list_url": [table_url]}
+    assert simulated_page.find(id="batch-action-box").contents == []
+
+    def simulate_applications_selection(application_list):
+        response = client.get(
+            action_url,
+            # Explicitly redefine list_url since Django test client swallows it otherwise
+            query_params={"list_url": table_url, "selected-application": application_list},
+            headers={"HX-Request": "true"},
+        )
+        update_page_with_htmx(simulated_page, f"form[hx-get='{action_url}']", response)
+
+    def get_transfer_button():
+        archive_buttons = [
+            button
+            for button in simulated_page.find(id="batch-action-box").find_all("button")
+            if button.contents[0].strip() == "Transférer vers"
+        ]
+        if not archive_buttons:
+            return None
+        [archive_button] = archive_buttons
+        return archive_button
+
+    # assert get_archive_modal() is None
+    assert get_transfer_button() is None
+
+    # Select 1 transferable application
+    simulate_applications_selection([transferable_app_1.pk])
+    assert get_transfer_button() is None
+
+    # The employer needs at least an other Company to be able to transfer an application
+    other_company_1 = CompanyMembershipFactory(company__pk=2222, company__for_snapshot=True, user=employer).company
+    other_company_2 = CompanyMembershipFactory(
+        company__pk=3333, company__kind=CompanyKind.EITI, company__name="Superbe snapshot", user=employer
+    ).company
+
+    simulate_applications_selection([transferable_app_1.pk])
+    transfer_button = get_transfer_button()
+    assert transfer_button is not None
+    assert str(transfer_button.parent) == snapshot(name="active transfer button")
+
+    other_company_1_button = transfer_button.parent.find_all("button", attrs={"data-bs-target": True})[0]
+    modal_selector = other_company_1_button["data-bs-target"]
+    assert modal_selector == f"#transfer_confirmation_modal_{other_company_1.pk}"
+    modal = simulated_page.find(id=modal_selector[1:])  # Drop the first "#"
+    assert str(modal) == snapshot(name="modal with 1 transferable application")
+
+    # Check that the next_url is correctly transmitted
+    modal_form_action = urlsplit(modal.find("form")["action"])
+    assert modal_form_action.path == reverse("apply:batch_transfer")
+    assert parse_qs(modal_form_action.query) == {"next_url": [table_url]}
+
+    # Select 2 transferable applications
+    simulate_applications_selection([transferable_app_1.pk, transferable_app_2.pk])
+    transfer_button = get_transfer_button()
+    assert transfer_button is not None
+    assert str(transfer_button.parent) == snapshot(name="active transfer button")
+
+    other_company_1_button = transfer_button.parent.find_all("button", attrs={"data-bs-target": True})[0]
+    modal_selector = other_company_1_button["data-bs-target"]
+    assert modal_selector == f"#transfer_confirmation_modal_{other_company_1.pk}"
+    modal = simulated_page.find(id=modal_selector[1:])  # Drop the first "#"
+    assert str(modal) == snapshot(name="modal with 2 transferable application")
+
+    # Test with untransferable batches
+    for app_list in [
+        [untransferable_app.pk],
+        [untransferable_app.pk, transferable_app_1.pk],
+    ]:
+        simulate_applications_selection(app_list)
+        transfer_button = get_transfer_button()
+        assert str(transfer_button) == snapshot(name="inactive archive button")
+        assert simulated_page.find(id=f"transfer_confirmation_modal_{other_company_1.pk}") is None
+        assert simulated_page.find(id=f"transfer_confirmation_modal_{other_company_2.pk}") is None

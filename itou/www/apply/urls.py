@@ -107,6 +107,7 @@ urlpatterns = [
     ),
     path("siae/list/actions", list_views.list_for_siae_actions, name="list_for_siae_actions"),
     path("company/batch/archive", batch_views.archive, name="batch_archive"),
+    path("company/batch/transfer", batch_views.transfer, name="batch_transfer"),
     # Process.
     path(
         "<uuid:job_application_id>/jobseeker/details",
