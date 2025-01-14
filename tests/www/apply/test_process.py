@@ -2209,6 +2209,41 @@ class TestProcessAcceptViews:
         )
         assertFormError(response.context["form_accept"], None, JobApplication.ERROR_END_IS_BEFORE_START)
 
+    def test_accept_hiring_date_after_approval(self, client, mocker):
+        # jobseeker has a PASS IAE, but it ends before the start date of the job
+        job_application = self.create_job_application(
+            job_seeker=self.job_seeker,
+            to_company=self.company,
+            sent_by_authorized_prescriber_organisation=True,
+            approval=ApprovalFactory(end_at=(timezone.localdate() + datetime.timedelta(days=1))),
+            hiring_start_at=timezone.localdate() + datetime.timedelta(days=2),
+        )
+
+        # cannot accept the job application
+        employer = self.company.members.first()
+        client.force_login(employer)
+
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url_accept, follow=True)
+        post_data = self._accept_view_post_data(
+            job_application=job_application,
+            post_data={
+                "hiring_start_at": job_application.hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT)
+            },
+        )
+        response, _ = self.accept_job_application(
+            client, job_application, post_data=post_data, assert_successful=False
+        )
+        assertFormError(
+            response.context["form_accept"],
+            "hiring_start_at",
+            JobApplication.ERROR_HIRES_AFTER_APPROVAL_EXPIRES,
+        )
+
+        # employer amends the situation by submitting a different hiring start date
+        post_data["hiring_start_at"] = timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT)
+        response, _ = self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
+
     def test_no_address(self, client):
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
         employer = self.company.members.first()

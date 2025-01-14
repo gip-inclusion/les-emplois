@@ -132,6 +132,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     log_model = "job_applications.JobApplicationTransitionLog"
 
     error_missing_hiring_start_at = "Cannot accept a job application with no hiring start date."
+    error_hires_after_pass_invalid = "Cannot use an approval which ends before the hiring start date."
     error_wrong_eligibility_diagnosis = "Cannot use the eligibility diagnosis"
     error_missing_eligibility_diagnostic = "Cannot create an approval without eligibility diagnosis here."
 
@@ -402,6 +403,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     ERROR_START_AFTER_APPROVAL_END = (
         "Attention, le PASS IAE sera expiré lors du début du contrat. Veuillez modifier la date de début."
     )
+    ERROR_HIRES_AFTER_APPROVAL_EXPIRES = "Le contrat doit débuter sur la période couverte par le PASS IAE."
     ERROR_POSTPONE_TOO_FAR = (
         f"La date de début du contrat ne peut être repoussée de plus de {MAX_CONTRACT_POSTPONE_IN_DAYS} jours."
     )
@@ -984,6 +986,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             if self.job_seeker.has_valid_approval:
                 # Automatically reuse an existing valid approval.
                 self.approval = self.job_seeker.latest_approval
+                if self.hiring_start_at > self.approval.end_at:
+                    raise xwf_models.AbortTransition(JobApplicationWorkflow.error_hires_after_pass_invalid)
                 if self.approval.start_at > self.hiring_start_at:
                     # As a job seeker can have multiple contracts at the same time,
                     # the approval should start at the same time as most recent contract.

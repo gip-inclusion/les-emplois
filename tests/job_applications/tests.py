@@ -1579,6 +1579,22 @@ class TestJobApplicationWorkflow:
         # Email sent to the proxy.
         assert self.ACCEPT_EMAIL_SUBJECT_PROXY in mailoutbox[1].subject
 
+    def test_accept_job_application_hiring_after_approval_expires(self):
+        """
+        To be accepted a job must start while the approval is valid.
+        """
+        today = timezone.localdate()
+        job_application = JobApplicationFactory(
+            with_approval=True,
+            state=JobApplicationState.PROCESSING,
+            hiring_start_at=today + relativedelta(days=2),
+            approval__end_at=today + relativedelta(days=1),
+        )
+
+        with pytest.raises(xwf_models.AbortTransition) as raised_exception:
+            job_application.accept(user=job_application.to_company.members.first())
+        assert str(raised_exception.value) == JobApplicationWorkflow.error_hires_after_pass_invalid
+
     def test_accept_job_application_by_siae_not_subject_to_eligibility_rules(
         self, django_capture_on_commit_callbacks, mailoutbox
     ):
