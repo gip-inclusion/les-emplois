@@ -4,14 +4,12 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django_select2.forms import Select2Widget
 
-from itou.asp.forms import BirthPlaceAndCountryMixin
 from itou.asp.models import Commune, RSAAllocation
 from itou.companies.models import SiaeFinancialAnnex
 from itou.employee_record.enums import Status
-from itou.users.forms import JobSeekerProfileFieldsMixin
-from itou.users.models import JobSeekerProfile, User
+from itou.users.models import JobSeekerProfile
 from itou.utils.validators import validate_pole_emploi_id
-from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Widget
+from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 from itou.www.employee_record_views.enums import EmployeeRecordOrder
 
 
@@ -84,60 +82,6 @@ class EmployeeRecordFilterForm(forms.Form):
             [(user.id, user.get_full_name().title()) for user in job_seekers if user.get_full_name()],
             key=lambda u: u[1],
         )
-
-
-class NewEmployeeRecordStep1Form(BirthPlaceAndCountryMixin, JobSeekerProfileFieldsMixin, forms.ModelForm):
-    """
-    New employee record step 1:
-    - main details (just check)
-    - birth place and birth country of the employee
-    """
-
-    PROFILE_FIELDS = ["birth_country", "birthdate", "birth_place"]
-    READ_ONLY_FIELDS = []
-    REQUIRED_FIELDS = [
-        "title",
-        "first_name",
-        "last_name",
-        "birthdate",
-    ]
-
-    class Meta:
-        model = User
-        fields = [
-            "title",
-            "first_name",
-            "last_name",
-        ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        for field_name in self.REQUIRED_FIELDS:
-            self.fields[field_name].required = True
-
-        self.fields["birthdate"].widget = DuetDatePickerWidget(
-            {
-                "min": DuetDatePickerWidget.min_birthdate(),
-                "max": DuetDatePickerWidget.max_birthdate(),
-            }
-        )
-
-        jobseeker_profile = self.instance.jobseeker_profile
-
-        if jobseeker_profile.birth_place:
-            self.initial["birth_place"] = jobseeker_profile.birth_place_id
-
-        if jobseeker_profile.birth_country:
-            self.initial["birth_country"] = jobseeker_profile.birth_country_id
-
-    def save(self, commit=True):
-        instance = super().save(commit=commit)
-        if commit:
-            jobseeker_profile = self.instance.jobseeker_profile
-            # Fields were updated in _post_clean()
-            jobseeker_profile.save(update_fields=("birth_place", "birth_country"))
-        return instance
 
 
 class NewEmployeeRecordStep2Form(forms.ModelForm):

@@ -2,7 +2,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.template.response import TemplateResponse
@@ -12,6 +11,7 @@ from django.utils.safestring import mark_safe
 from django_htmx.http import HttpResponseClientRedirect
 from django_xworkflows import models as xwf_models
 
+from itou.asp.forms import BirthPlaceWithoutBirthdateModelForm
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.companies.enums import CompanyKind, ContractType
 from itou.eligibility.models import EligibilityDiagnosis
@@ -23,7 +23,6 @@ from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.urls import add_url_params, get_external_link_markup, get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
-    CertifiedCriteriaInfoRequiredForm,
     CheckJobSeekerGEIQEligibilityForm,
     JobSeekerPersonalDataForm,
 )
@@ -38,10 +37,9 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
     # This will ensure a smooth Approval delivery.
     form_personal_data = None
     form_user_address = None
-    form_certified_criteria = None
+    form_birth_place = None
     creating = job_application is None
     valid_diagnosis = None
-    birthdate = job_seeker.jobseeker_profile.birthdate
 
     if company.is_subject_to_eligibility_rules:
         valid_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker, for_siae=company)
@@ -52,26 +50,19 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
             tally_form_query=f"jobapplication={job_application.pk}" if job_application else None,
         )
         forms.append(form_personal_data)
-        try:
-            birthdate = form_personal_data.fields["birthdate"].clean(form_personal_data.data.get("birthdate"))
-        except ValidationError:
-            pass  # will be presented to user later
-
         form_user_address = JobSeekerAddressForm(instance=job_seeker, data=request.POST or None)
         forms.append(form_user_address)
     elif company.kind == CompanyKind.GEIQ:
         valid_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
             job_seeker=job_seeker, for_geiq=company
         ).first()
-
-    if valid_diagnosis and valid_diagnosis.criteria_can_be_certified():
-        form_certified_criteria = CertifiedCriteriaInfoRequiredForm(
-            instance=job_seeker.jobseeker_profile,
-            birthdate=birthdate,
-            data=request.POST or None,
-            with_birthdate_field=form_personal_data is not None,
-        )
-        forms.append(form_certified_criteria)
+        if valid_diagnosis and valid_diagnosis.criteria_can_be_certified():
+            form_birth_place = BirthPlaceWithoutBirthdateModelForm(
+                instance=job_seeker.jobseeker_profile,
+                birthdate=job_seeker.jobseeker_profile.birthdate,
+                data=request.POST or None,
+            )
+            forms.append(form_birth_place)
 
     form_accept = AcceptForm(instance=job_application, company=company, data=request.POST or None)
     forms.append(form_accept)
@@ -80,7 +71,7 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
         "form_accept": form_accept,
         "form_user_address": form_user_address,
         "form_personal_data": form_personal_data,
-        "form_certified_criteria": form_certified_criteria,
+        "form_birth_place": form_birth_place,
         "has_form_error": any(form.errors for form in forms),
         "can_view_personal_information": True,  # SIAE members have access to personal info
         "hide_value": ContractType.OTHER.value,
@@ -105,10 +96,12 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
             with transaction.atomic():
                 if form_personal_data:
                     form_personal_data.save()
+                    if settings.API_PARTICULIER_TOKEN:
+                        valid_diagnosis.certify_criteria()
                 if form_user_address:
                     form_user_address.save()
-                if form_certified_criteria:
-                    form_certified_criteria.save()
+                if form_birth_place:
+                    form_birth_place.save()
                     if settings.API_PARTICULIER_TOKEN:
                         valid_diagnosis.certify_criteria()
                 # After each successful transition, a save() is performed by django-xworkflows,

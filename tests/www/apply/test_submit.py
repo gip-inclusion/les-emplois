@@ -2668,6 +2668,8 @@ class TestDirectHireFullProcess:
             "first_name": dummy_job_seeker.first_name,
             "last_name": dummy_job_seeker.last_name,
             "birthdate": birthdate,
+            "birth_place": Commune.objects.by_insee_code_and_period("64483", birthdate).pk,
+            "birth_country": Country.objects.get(code=Country.INSEE_CODE_FRANCE).pk,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
         }
@@ -2858,6 +2860,7 @@ class TestDirectHireFullProcess:
             # Select the first and only one option
             "address_for_autocomplete": "0",
             # BRSA criterion certification.
+            "birthdate": birthdate,
             "birth_place": birth_place.pk,
             "birth_country": birth_country.pk,
         }
@@ -5104,7 +5107,11 @@ class TestHireConfirmation:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings, mocker):
         self.job_seeker = JobSeekerFactory(
-            first_name="Clara", last_name="Sion", with_pole_emploi_id=True, with_ban_geoloc_address=True
+            first_name="Clara",
+            last_name="Sion",
+            with_pole_emploi_id=True,
+            with_ban_geoloc_address=True,
+            born_in_france=True,
         )
         # This is the city matching with_ban_geoloc_address trait
         self.city = create_city_geispolsheim()
@@ -5136,6 +5143,9 @@ class TestHireConfirmation:
             "hiring_end_at": "",
             "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
+            "birthdate": self.job_seeker.jobseeker_profile.birthdate.isoformat(),
+            "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
+            "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
             "answer": "",
             "ban_api_resolved_address": self.job_seeker.geocoding_address,
             "address_line_1": self.job_seeker.address_line_1,

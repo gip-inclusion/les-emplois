@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
-from itou.asp.forms import BirthPlaceAndCountryMixin
+from itou.asp.forms import BirthPlaceWithBirthdateModelForm
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.prescribers.enums import CHOOSABLE_PRESCRIBER_KINDS
 from itou.prescribers.models import PrescriberOrganization
@@ -101,7 +101,7 @@ class JobSeekerSituationForm(forms.Form):
     )
 
 
-class JobSeekerSignupForm(BirthPlaceAndCountryMixin, FullnameFormMixin, BaseSignupForm):
+class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, BaseSignupForm):
     birthdate = forms.DateField(
         label="Date de naissance",
         required=True,
@@ -129,6 +129,10 @@ class JobSeekerSignupForm(BirthPlaceAndCountryMixin, FullnameFormMixin, BaseSign
 
     _nir_submitted = None
     _email_submitted = None
+
+    class Meta:
+        model = JobSeekerProfile
+        fields = ["birthdate", "birth_place", "birth_country"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
