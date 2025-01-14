@@ -1,27 +1,21 @@
 from unittest import mock
 
 import pytest
-from dateutil.relativedelta import relativedelta
 from django.test import override_settings
 from django.urls import resolve, reverse
-from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateNotUsed
 
 from itou.asp.models import Commune, Country, RSAAllocation
 from itou.companies import enums as companies_enums
 from itou.companies.enums import POLE_EMPLOI_SIRET
 from itou.companies.models import Company
-from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.users.models import User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
-from itou.utils.models import InclusiveDateRange
 from itou.utils.urls import add_url_params
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
-from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import (
     EmployerFactory,
     JobSeekerFactory,
@@ -52,17 +46,13 @@ def test_create_job_seeker(_mock, client):
 
     response = client.get(reverse("dashboard:index"))
 
-    apply_start_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
-
-    response = client.get(apply_start_url)
     params = {
         "tunnel": "gps",
-        "from_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
+        "from_url": reverse("gps:my_groups"),
     }
-    next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
-    assert response.url == next_url
+    create_beneficiary_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
 
-    response = client.get(next_url)
+    response = client.get(create_beneficiary_url)
     [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
     next_url = (
         reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
@@ -90,7 +80,7 @@ def test_create_job_seeker(_mock, client):
     expected_job_seeker_session = {
         "config": {
             "tunnel": "gps",
-            "from_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
+            "from_url": reverse("gps:my_groups"),
             "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
         },
         "apply": {"company_pk": singleton.pk},
@@ -237,63 +227,6 @@ def test_create_job_seeker(_mock, client):
     assert list(created_job_seeker.follow_up_group.members.all()) == [user]
 
 
-def test_gps_bypass(client):
-    # The sender has a pending authorization, but we should be able to create the user anyway
-    # Check that we are not redirected to apply:pending_authorization_for_sender"
-
-    singleton = Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
-
-    prescriber_organization = PrescriberOrganizationWithMembershipFactory(with_pending_authorization=True)
-    user = prescriber_organization.members.first()
-    client.force_login(user)
-
-    apply_start_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
-    response = client.get(apply_start_url)
-
-    params = {
-        "tunnel": "gps",
-        "from_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
-    }
-    next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
-    assert response.url == next_url
-
-    response = client.get(next_url)
-    [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
-    next_url = (
-        reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
-        + "?gps=true"
-    )
-    assertRedirects(response, next_url)
-
-    # SIAE has an active suspension, but we should be able to create the job_seeker for GPS
-    company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
-    Sanctions.objects.create(
-        evaluated_siae=EvaluatedSiaeFactory(siae=company),
-        suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
-    )
-
-    user = company.members.first()
-    client.force_login(user)
-
-    apply_start_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
-    response = client.get(apply_start_url)
-
-    params = {
-        "tunnel": "gps",
-        "from_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
-    }
-    next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
-    assert response.url == next_url
-
-    response = client.get(next_url)
-    [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
-    next_url = (
-        reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
-        + "?gps=true"
-    )
-    assertRedirects(response, next_url)
-
-
 @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
 def test_existing_user_with_email(client):
     """
@@ -309,7 +242,9 @@ def test_existing_user_with_email(client):
     client.force_login(user)
 
     # Follow all redirections…
-    response = client.get(reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true", follow=True)
+    params = {"tunnel": "gps", "from_url": reverse("gps:my_groups")}
+    create_beneficiary_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+    response = client.get(create_beneficiary_url, follow=True)
     [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
 
     # …until a job seeker has to be determined.
@@ -337,7 +272,7 @@ def test_existing_user_with_email(client):
     expected_job_seeker_session = {
         "config": {
             "tunnel": "gps",
-            "from_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
+            "from_url": reverse("gps:my_groups"),
             "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
         },
         "apply": {"company_pk": singleton.pk},
@@ -377,8 +312,6 @@ def test_existing_user_with_nir(client):
     """
     An user with the same NIR already exists, create the group with this user
     """
-    singleton = Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
-
     nir = "141068078200557"
     prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
     user = prescriber_organization.members.first()
@@ -387,7 +320,9 @@ def test_existing_user_with_nir(client):
     client.force_login(user)
 
     # Follow all redirections…
-    response = client.get(reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true", follow=True)
+    params = {"tunnel": "gps", "from_url": reverse("gps:my_groups")}
+    create_beneficiary_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+    response = client.get(create_beneficiary_url, follow=True)
     [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
 
     # …until a job seeker has to be determined.
@@ -429,26 +364,18 @@ def test_existing_user_with_nir(client):
     ],
 )
 def test_creation_by_user_kind(client, UserFactory, factory_args, expected_access):
-    singleton = Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
     user = UserFactory(**factory_args)
     client.force_login(user)
     # Assert contains link.
-    create_beneficiary_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+    params = {"tunnel": "gps", "from_url": reverse("gps:my_groups")}
+    create_beneficiary_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
     response = client.get(reverse("gps:join_group"))
     if expected_access:
-        assertContains(response, create_beneficiary_url)
+        assertContains(response, create_beneficiary_url.replace("&", "&amp;"))
     else:
         assert response.status_code == 403
 
     response = client.get(create_beneficiary_url)
-    params = {
-        "tunnel": "gps",
-        "from_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
-    }
-    next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
-    assert response.url == next_url
-
-    response = client.get(next_url)
     [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
     assert response.status_code == 302
     assert (
