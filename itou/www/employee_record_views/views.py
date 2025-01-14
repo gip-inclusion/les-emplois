@@ -14,6 +14,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
+from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import User
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
@@ -24,7 +25,6 @@ from itou.www.employee_record_views.forms import (
     AddEmployeeRecordChooseApprovalForm,
     AddEmployeeRecordChooseEmployeeForm,
     EmployeeRecordFilterForm,
-    NewEmployeeRecordStep1Form,
     NewEmployeeRecordStep2Form,
     NewEmployeeRecordStep3ForEITIForm,
     NewEmployeeRecordStep3Form,
@@ -222,7 +222,7 @@ def create(request, job_application_id, template_name="employee_record/create.ht
     Step 1: Name and birth date / place / country of the jobseeker
     """
     job_application = can_create_employee_record(request, job_application_id)
-    form = NewEmployeeRecordStep1Form(data=request.POST or None, instance=job_application.job_seeker)
+    form = JobSeekerProfileModelForm(data=request.POST or None, instance=job_application.job_seeker)
     query_param = f"?status={request.GET.get('status')}" if request.GET.get("status") else ""
 
     if request.method == "POST" and form.is_valid():

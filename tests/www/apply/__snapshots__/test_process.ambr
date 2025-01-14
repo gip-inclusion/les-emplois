@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestProcessAcceptViews.test_select_job_description_for_job_application[accept view SQL queries]
   dict({
-    'num_queries': 15,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -928,6 +928,31 @@
                            AND U2."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CustomFieldRenderer.render[utils/custom_renderer.py]',
+          'SimpleNode[apply/includes/job_application_accept_form.html]',
+          'IfNode[apply/includes/job_application_accept_form.html]',
+          'IncludeNode[apply/includes/accept_section.html]',
+          'IncludeNode[apply/process_accept.html]',
+          'BlockNode[apply/process_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_accept.html]',
+          '_accept[www/apply/views/common.py]',
+          'accept[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          ORDER BY "asp_country"."name" ASC
         ''',
       }),
       dict({

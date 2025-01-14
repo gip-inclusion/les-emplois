@@ -53,9 +53,3 @@ class TestCheckJobSeekerNirForm:
             "Vous ne pouvez postuler pour cet utilisateur car ce numéro de sécurité sociale "
             "n'est pas associé à un compte candidat."
         ) == form.errors["__all__"][0]
-
-
-class TestCreateOrUpdateJobSeekerStep1Form:
-    def test_commune_birthdate_dependency(self):
-        form = job_seekers_forms.CreateOrUpdateJobSeekerStep1Form()
-        assert form.with_birthdate_field

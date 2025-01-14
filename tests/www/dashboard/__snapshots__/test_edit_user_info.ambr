@@ -71,7 +71,6 @@
           'EditJobSeekerInfoForm.__init__[users/forms.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
-          'EditJobSeekerInfoForm.__init__[asp/forms.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
           'edit_user_info[www/dashboard/views.py]',
         ]),

@@ -4,13 +4,12 @@ from django.urls import reverse_lazy
 from django.utils.functional import SimpleLazyObject
 
 from itou.asp.models import Commune, Country
+from itou.users.models import JobSeekerProfile
 from itou.utils.validators import validate_birth_location
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
 
-class BirthPlaceAndCountryMixin(forms.Form):
-    with_birthdate_field = None
-
+class BirthPlaceModelForm(forms.ModelForm):
     birth_country = forms.ModelChoiceField(Country.objects, label="Pays de naissance", required=False)
     birth_place = forms.ModelChoiceField(
         queryset=Commune.objects,
@@ -33,18 +32,12 @@ class BirthPlaceAndCountryMixin(forms.Form):
         ),
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # with_birthdate_field indicates if JS is needed to link birthdate & birth_place fields
-        if self.with_birthdate_field is None:
-            self.with_birthdate_field = "birthdate" in self.fields
-
-        if self.with_birthdate_field:
-            self.fields["birth_place"].widget.attrs |= {"data-select2-link-with-birthdate": "id_birthdate"}
+    class Meta:
+        model = JobSeekerProfile
+        fields = ["birth_place", "birth_country"]
 
     def get_birth_date(self):
-        return self.cleaned_data.get("birthdate", getattr(self, "birthdate", None))
+        raise NotImplementedError
 
     def clean(self):
         super().clean()
@@ -83,3 +76,21 @@ class BirthPlaceAndCountryMixin(forms.Form):
                     f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {birth_date:%d/%m/%Y}"
                 )
                 self.add_error("birth_place", msg)
+
+
+class BirthPlaceWithBirthdateModelForm(BirthPlaceModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["birth_place"].widget.attrs["data-select2-link-with-birthdate"] = "id_birthdate"
+
+    def get_birth_date(self):
+        return self.cleaned_data.get("birthdate")
+
+
+class BirthPlaceWithoutBirthdateModelForm(BirthPlaceModelForm):
+    def __init__(self, birthdate, *args, **kwargs):
+        self.birthdate = birthdate
+        super().__init__(*args, **kwargs)
+
+    def get_birth_date(self):
+        return self.birthdate

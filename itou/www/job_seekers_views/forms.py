@@ -4,11 +4,10 @@ from django.utils.html import format_html
 from django_select2.forms import Select2Widget
 
 from itou.asp import models as asp_models
-from itou.asp.forms import BirthPlaceAndCountryMixin
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.users.enums import LackOfPoleEmploiId, UserKind
-from itou.users.forms import JobSeekerProfileFieldsMixin
+from itou.users.forms import JobSeekerProfileFieldsMixin, JobSeekerProfileModelForm
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
@@ -135,38 +134,11 @@ class JobSeekerExistsForm(forms.Form):
         return self.user
 
 
-class CreateOrUpdateJobSeekerStep1Form(
-    JobSeekerNIRUpdateMixin, BirthPlaceAndCountryMixin, JobSeekerProfileFieldsMixin, forms.ModelForm
-):
-    REQUIRED_FIELDS = [
-        "title",
-        "first_name",
-        "last_name",
-        "birthdate",
-    ]
-
+class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, JobSeekerProfileModelForm):
     PROFILE_FIELDS = ["birth_country", "birthdate", "birth_place", "nir", "lack_of_nir_reason"]
 
-    class Meta:
-        model = User
-        fields = [
-            "title",
-            "first_name",
-            "last_name",
-        ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        for field_name in self.REQUIRED_FIELDS:
-            self.fields[field_name].required = True
-
-        self.fields["birthdate"].widget = DuetDatePickerWidget(
-            {
-                "min": DuetDatePickerWidget.min_birthdate(),
-                "max": DuetDatePickerWidget.max_birthdate(),
-            }
-        )
+    class Meta(JobSeekerProfileModelForm.Meta):
+        pass
 
     def clean(self):
         super().clean()

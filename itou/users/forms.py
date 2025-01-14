@@ -1,7 +1,9 @@
 from django.core.exceptions import ValidationError
 
-from itou.users.models import JobSeekerProfile
+from itou.asp.forms import BirthPlaceWithBirthdateModelForm
+from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
+from itou.utils.widgets import DuetDatePickerWidget
 
 
 def validate_francetravail_email(email):
@@ -65,3 +67,28 @@ class JobSeekerProfileFieldsMixin:
             jobseeker_profile.validate_constraints()
         except ValidationError as e:
             self._update_errors(e)
+
+
+class JobSeekerProfileModelForm(JobSeekerProfileFieldsMixin, BirthPlaceWithBirthdateModelForm):
+    PROFILE_FIELDS = ["birthdate", "birth_place", "birth_country"]
+    REQUIRED_FIELDS = ["title", "first_name", "last_name", "birthdate"]
+
+    class Meta:
+        model = User
+        fields = ["title", "first_name", "last_name"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        birthdate = self.fields["birthdate"]
+        birthdate.widget = DuetDatePickerWidget(
+            attrs={
+                "min": DuetDatePickerWidget.min_birthdate(),
+                "max": DuetDatePickerWidget.max_birthdate(),
+            }
+        )
+        birthdate.help_text = "Au format JJ/MM/AAAA, par exemple 20/12/1978."
+        for fieldname in self.REQUIRED_FIELDS:
+            try:
+                self.fields[fieldname].required = True
+            except KeyError:
+                pass

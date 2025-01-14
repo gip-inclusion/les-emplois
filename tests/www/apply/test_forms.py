@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
@@ -11,9 +11,6 @@ from tests.cities.factories import create_test_cities
 from tests.companies.factories import JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import (
-    JobSeekerFactory,
-)
 
 
 class TestAcceptForm:
@@ -345,29 +342,3 @@ class TestJobApplicationAcceptFormWithGEIQFields:
         for kind in (CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS):
             assertNotContains(_response(kind), self.HELP_START_AT)
             assertNotContains(_response(kind), self.HELP_END_AT)
-
-
-class TestCertifiedCriteriaInfoRequiredForm:
-    def test_submit_valid(self):
-        job_seeker = JobSeekerFactory(
-            with_ban_api_mocked_address=True,
-            born_in_france=True,
-        )
-
-        birth_place = job_seeker.jobseeker_profile.birth_place
-        valid_birthdate = birth_place.start_date + timedelta(days=1)
-
-        form_data = {
-            "address_line_1": job_seeker.address_line_1,
-            "address_line_2": job_seeker.address_line_2,
-            "post_code": job_seeker.post_code,
-            "city": job_seeker.city,
-            "insee_code": job_seeker.insee_code,
-            "ban_api_resolved_address": job_seeker.geocoding_address,
-            "birth_country": job_seeker.jobseeker_profile.birth_country.id,
-            "birth_place": job_seeker.jobseeker_profile.birth_place.id,
-        }
-        form = apply_forms.CertifiedCriteriaInfoRequiredForm(
-            data=form_data, birthdate=valid_birthdate, with_birthdate_field=False
-        )
-        assert form.is_valid()

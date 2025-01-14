@@ -1861,6 +1861,9 @@ class TestProcessAcceptViews:
         }
         # JobSeekerPersonalDataForm
         personal_data_default_fields = {
+            "birthdate": job_seeker.jobseeker_profile.birthdate,
+            "birth_country": extra_post_data.setdefault("birth_country", CountryFranceFactory().pk),
+            "birth_place": extra_post_data.setdefault("birth_place", CommuneFactory().pk),
             "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
         }
         # AcceptForm
@@ -1872,11 +1875,6 @@ class TestProcessAcceptViews:
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "answer": "",
             "hired_job": job_description.pk,
-        }
-        # CertifiedCriteriaForm
-        certified_criteria_default_fields = {
-            "birth_country": extra_post_data.setdefault("birth_country", CountryFranceFactory().pk),
-            "birth_place": extra_post_data.setdefault("birth_place", CommuneFactory().pk),
         }
         # GEIQ-only mandatory fields
         if job_application.to_company.kind == CompanyKind.GEIQ:
@@ -1892,7 +1890,6 @@ class TestProcessAcceptViews:
             **personal_data_default_fields,
             **address_default_fields,
             **accept_default_fields,
-            **certified_criteria_default_fields,
         } | extra_post_data
 
     def accept_job_application(self, client, job_application, post_data=None, assert_successful=True):
@@ -1918,13 +1915,14 @@ class TestProcessAcceptViews:
             # Easier to debug than just a « sorry, the modal goes on a strike ».
             if response.context["has_form_error"]:
                 forms = [
-                    response.context.get("form_accept"),
-                    response.context.get("form_user_address"),
-                    response.context.get("form_personal_data"),
-                    response.context.get("form_certified_criteria"),
+                    response.context["form_accept"],
+                    response.context["form_user_address"],
+                    response.context["form_personal_data"],
+                    response.context.get("form_birth_place"),
                 ]
                 for form in forms:
-                    logger.error(f"{form.errors=}")
+                    if form:
+                        logger.error(f"{form.errors=}")
             assert not response.context["has_form_error"]
             assert (
                 response.headers["HX-Trigger"] == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
@@ -2579,7 +2577,7 @@ class TestProcessAcceptViews:
         response, _ = self.accept_job_application(
             client, job_application, post_data=post_data, assert_successful=False
         )
-        assert response.context["form_certified_criteria"].errors == {
+        assert response.context["form_personal_data"].errors == {
             "birth_place": ["Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles."],
             "birth_country": [
                 "Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles.",
@@ -2713,27 +2711,6 @@ class TestProcessAcceptViews:
         assert not jobseeker_profile.birth_country
         assert not jobseeker_profile.birth_place
 
-    def test_criteria__criteria_not_certificable(self, client):
-        # ############################
-        # No criteria to be certified: the form should not appear
-        # and it should not be valid.
-        ##############################
-        job_application = self.create_job_application()
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-
-        employer = job_application.to_company.members.first()
-        client.force_login(employer)
-
-        response = client.get(url_accept)
-        assertNotContains(response, self.BIRTH_COUNTRY_LABEL)
-        assertNotContains(response, self.BIRTH_PLACE_LABEL)
-
-        # CertifiedCriteriaForm
-        post_data = self._accept_view_post_data(job_application=job_application)
-        del post_data["birth_country"]
-        del post_data["birth_place"]
-        self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
-
     @freeze_time("2024-09-11")
     def test_accept_updated_birthdate_invalidating_birth_place(self, client, mocker):
         mocker.patch(
@@ -2784,8 +2761,7 @@ class TestProcessAcceptViews:
             f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {early_date:%d/%m/%Y}"
         )
 
-        assert response.context.get("form_personal_data").errors == {}
-        assert response.context.get("form_certified_criteria").errors["birth_place"] == [expected_msg]
+        assert response.context["form_personal_data"].errors == {"birth_place": [expected_msg]}
 
         # assert malformed birthdate does not crash view
         post_data["birthdate"] = "20240-001-001"
@@ -2793,8 +2769,7 @@ class TestProcessAcceptViews:
             client, job_application, post_data=post_data, assert_successful=False
         )
 
-        assert response.context.get("form_personal_data").errors == {"birthdate": ["Saisissez une date valide."]}
-        assert response.context.get("form_certified_criteria").errors == {}
+        assert response.context["form_personal_data"].errors == {"birthdate": ["Saisissez une date valide."]}
 
         # test that fixing the birthdate fixes the form submission
         post_data["birthdate"] = birth_place.start_date + datetime.timedelta(days=1)
