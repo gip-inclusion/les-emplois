@@ -7,7 +7,8 @@ from allauth.account.utils import user_pk_to_url_str
 from citext import CIEmailField
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
-from django.contrib.postgres.indexes import OpClass
+from django.contrib.postgres.indexes import GinIndex, OpClass
+from django.contrib.postgres.search import SearchVector, SearchVectorField
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, MinLengthValidator, RegexValidator
@@ -170,6 +171,12 @@ class User(AbstractUser, AddressMixin):
         default="",
         choices=Title.choices,
     )
+    full_name_search_vector = models.GeneratedField(
+        expression=SearchVector("first_name", "last_name", config="simple_unaccent"),
+        output_field=SearchVectorField(),
+        verbose_name="nom complet utilisé pour rechercher un utilisateur",
+        db_persist=True,
+    )
 
     email = CIEmailField(
         "adresse e-mail",
@@ -231,7 +238,8 @@ class User(AbstractUser, AddressMixin):
             models.Index(
                 OpClass(Upper("email"), name="text_pattern_ops"),
                 name="users_user_email_upper",
-            )
+            ),
+            GinIndex("full_name_search_vector", name="users_user_full_name_idx"),
         ]
         constraints = [
             models.CheckConstraint(

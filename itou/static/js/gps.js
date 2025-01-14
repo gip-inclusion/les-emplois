@@ -11,15 +11,18 @@ htmx.onLoad((target) => {
         language: {
             ...frTranslations.dict,
             noResults: () => $(`
-              <div class="d-inline-flex w-100 mb-2">
-                  <span class="text-muted d-block pe-1">Aucun résultat.</span>
-                  <a href="${searchUserInputField.data('noResultsUrl')}" class="link" data-matomo-event="true"
-                  data-matomo-category="GPS_formulaire_recherche" data-matomo-action="clic"
-                  data-matomo-option="creation_beneficiaire">
-                  Enregistrer un nouveau bénéficiaire
-                  </a>
-              </div>
-          `),
+                <div class="d-inline-flex w-100 mb-2">
+                    <span class="text-muted d-block pe-1">Aucun résultat.</span>
+                    <a href="${searchUserInputField.data('noResultsUrl')}" class="link" data-matomo-event="true"
+                    data-matomo-category="GPS_formulaire_recherche" data-matomo-action="clic"
+                    data-matomo-option="creation_beneficiaire">
+                    Enregistrer un nouveau bénéficiaire
+                    </a>
+                </div>
+            `),
+        },
+        ajax: {
+          delay: 250 // wait 250 milliseconds before triggering the request
         },
     });
     searchUserInputField.on("select2:select", function (e) {

@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_not_required
+from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.db.models import Exists, F, OuterRef, Q, Value
 from django.db.models.functions import Least, Lower, NullIf, StrIndex
 from django.http import JsonResponse
@@ -13,7 +14,6 @@ from itou.jobs.models import Appellation
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.auth import check_user
-from itou.utils.db import or_queries
 from itou.www.gps.views import is_allowed_to_use_gps_advanced_features
 
 
@@ -141,37 +141,35 @@ def gps_users_autocomplete(request):
     users = []
 
     if term:
-        # We started by using to_vector queries but it's not suitable for searching names because
-        # it tries to lemmatize names so for example, henry becomes henri after lemmatization and
-        # the search doesn't work.
-        # Then we tried TrigramSimilarity methods but it's too random for accurate searching.
-        # Fallback to unaccent / icontains for now
-
-        search_terms = term.split(" ")
-        name_q = []
-        for term in search_terms:
-            name_q.append(Q(first_name__unaccent__istartswith=term))
-            name_q.append(Q(last_name__unaccent__istartswith=term))
-        users_qs = (
-            User.objects.filter(or_queries(name_q))
-            .filter(kind=UserKind.JOB_SEEKER)
-            .exclude(
-                Exists(
-                    FollowUpGroup.objects.filter(
-                        beneficiary_id=OuterRef("pk"),
-                        memberships__member=current_user,
-                        memberships__is_active=True,
-                    )
+        users_qs = User.objects.filter(kind=UserKind.JOB_SEEKER).exclude(
+            Exists(
+                FollowUpGroup.objects.filter(
+                    beneficiary_id=OuterRef("pk"),
+                    memberships__member=current_user,
+                    memberships__is_active=True,
                 )
             )
-        )[:10]
+        )
+
+        search_query = SearchQuery(term, config="simple_unaccent")
+        users_qs = users_qs.filter(full_name_search_vector=search_query)
+        users_qs = users_qs.annotate(rank=SearchRank("full_name_search_vector", search_query)).order_by("-rank")
+
+        def format_user_name(user):
+            res = ""
+            if user.title:
+                res += f"{user.title.capitalize()}. "
+            res += user.get_full_name()
+            if getattr(user.jobseeker_profile, "birthdate", None):
+                res += f" ({user.jobseeker_profile.birthdate})"
+            return res
 
         users = [
             {
-                "text": user.get_full_name(),
+                "text": format_user_name(user),
                 "id": user.pk,
             }
-            for user in users_qs
+            for user in users_qs[:10]
         ]
 
     return JsonResponse({"results": users})
