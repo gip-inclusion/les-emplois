@@ -3,6 +3,7 @@
 {% load static %}
 {% load matomo %}
 {% load buttons_form %}
+{% load url_add_query %}
 
 {% block progress_title %}{{ block.super }} - Message & CV{% endblock %}
 {% block step_title %}Finaliser la candidature{% endblock %}
@@ -136,7 +137,7 @@
                     <p class="mb-0">
                         Vous pouvez vous appuyer sur le document
                         <a class="has-external-link"
-                           href="https://communaute.inclusion.beta.gouv.fr/surveys/dsp/create/"
+                           href="{% autologin_proconnect 'https://communaute.inclusion.gouv.fr/surveys/dsp/create/' user %}"
                            target="_blank"
                            rel="noreferrer noopener"
                            aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
@@ -161,7 +162,7 @@
                     <p class="mb-0">
                         Vous pouvez vous appuyer sur le document
                         <a class="has-external-link"
-                           href="https://communaute.inclusion.beta.gouv.fr/surveys/dsp/create/"
+                           href="{% autologin_proconnect 'https://communaute.inclusion.gouv.fr/surveys/dsp/create/' user %}"
                            target="_blank"
                            rel="noreferrer noopener"
                            aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
