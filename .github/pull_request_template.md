@@ -32,6 +32,7 @@
 ## :rotating_light: À vérifier
 
 - [ ] Mettre à jour le CHANGELOG_breaking_changes.md ?
+- [ ] Ajouter l'étiquette « Bug » ?
 
 ## :desert_island: Comment tester
 
