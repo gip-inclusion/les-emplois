@@ -133,6 +133,11 @@ class EmailConfirmation(EmailConfirmationMixin, models.Model):
     created = models.DateTimeField(verbose_name="créé", default=timezone.now)
     sent = models.DateTimeField(verbose_name="envoyé", null=True)
     key = models.CharField(verbose_name="clé", max_length=64, unique=True)
+    used = models.BooleanField(
+        verbose_name="utilisée",
+        default=False,
+        help_text="Pour des raisons de sécurité, un lien de confirmation ne peut être utilisé qu'une seule fois.",
+    )
 
     objects = EmailConfirmationManager()
 
