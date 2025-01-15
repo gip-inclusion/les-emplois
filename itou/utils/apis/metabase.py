@@ -304,6 +304,9 @@ METABASE_DASHBOARDS = {
 }
 
 
+SUSPENDED_DASHBOARD_IDS = [357, 389, 162, 298, 168]
+
+
 # Metabase private / signed URLs
 # See:
 # * https://www.metabase.com/docs/latest/enterprise-guide/full-app-embedding.html
