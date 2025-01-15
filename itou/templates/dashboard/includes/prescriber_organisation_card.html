@@ -1,3 +1,4 @@
+{% load url_add_query %}
 <div class="col mb-3 mb-md-5">
     <div class="c-box p-0 h-100">
         <div class="d-flex p-3 p-lg-4">
@@ -47,7 +48,7 @@
                 <hr class="mb-3">
                 <p class="fs-sm mb-lg-5">
                     <i class="ri-award-line ri-lg fw-normal me-1" aria-hidden="true"></i>
-                    {{ request.current_organization.display_name }} est une organisation habilitée. Vous pouvez réaliser le <a href="https://communaute.inclusion.beta.gouv.fr/surveys/dsp/create/"
+                    {{ request.current_organization.display_name }} est une organisation habilitée. Vous pouvez réaliser le <a href="{% autologin_proconnect 'https://communaute.inclusion.gouv.fr/surveys/dsp/create/' user %}"
     target="_blank"
     class="has-external-link"
     aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
