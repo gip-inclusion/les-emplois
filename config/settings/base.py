@@ -745,3 +745,9 @@ API_PARTICULIER_TOKEN = os.getenv("API_PARTICULIER_TOKEN")
 # Brevo
 # ------------------------------------------------------------------------------
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
+
+
+# Pilotage
+# ------------------------------------------------------------------------------
+
+PILOTAGE_SHOW_STATS_WEBINAR = os.getenv("PILOTAGE_SHOW_STATS_WEBINAR", True) in [True, "True", "true"]
