@@ -10,6 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 class GithubApiClient:
+    MAX_RESULTS_PER_PAGE = 100
+
     def __init__(self):
         self.client = httpx.Client(
             base_url=f"{settings.API_GITHUB_BASE_URL}/repos/gip-inclusion/",
@@ -27,7 +29,7 @@ class GithubApiClient:
             "labels": ["bug"],
             "state": "closed",
             "pulls": True,
-            "per_page": 100,
+            "per_page": self.MAX_RESULTS_PER_PAGE,
             "since": start.isoformat(),  # The GH API does not allow an end date.
         }
 
@@ -47,6 +49,8 @@ class GithubApiClient:
 
     def get_metrics(self, start):
         response = self._request(endpoint="les-emplois/issues", start=start)
+        if len(response.json()) == self.MAX_RESULTS_PER_PAGE:
+            logger.error(f"Pagination required: {len(response.json())} results returned.")
 
         # Filter results based on `date` because the API does not allow to pass an end date.
         today_data = self.filter_by_merged_at(data=response.json(), date=start.date())
