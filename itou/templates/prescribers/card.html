@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load static %}
 {% load format_filters %}
 {% load markdownify %}
 
@@ -6,7 +7,7 @@
 
 {% block title_content %}
     <h1>Prescripteur habilité</h1>
-    <p>{{ prescriber_org.get_kind_display }} - {{ prescriber_org.name }}</p>
+    <h2>{{ prescriber_org.get_kind_display }} - {{ prescriber_org.name }}</h2>
 {% endblock %}
 
 {% block title_prevstep %}
@@ -17,38 +18,46 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
-                <div class="col-12 col-lg-8">
-                    <p class="text-muted">
-                        {{ prescriber_org.address_line_1 }},
-                        {% if prescriber_org.address_line_2 %}{{ prescriber_org.address_line_2 }},{% endif %}
-                        {{ prescriber_org.post_code }} {{ prescriber_org.city }}
-                    </p>
-
-                    {% if prescriber_org.description %}
-                        <hr>
-                        <div>{{ prescriber_org.description|markdownify }}</div>
-                    {% endif %}
-
-                    {% if user.is_authenticated and prescriber_org.email %}
-                        <p>
-                            <i class="ri-mail-line me-1" aria-label="Adresse e-mail"></i>
-                            <a href="mailto:{{ prescriber_org.email }}">{{ prescriber_org.email }}</a>
-                        </p>
-                    {% endif %}
-
-                    {% if user.is_authenticated and prescriber_org.phone %}
-                        <p>
-                            <i class="ri-phone-line me-1" aria-label="Téléphone"></i>
-                            <a href="tel:{{ prescriber_org.phone|cut:" " }}">{{ prescriber_org.phone|format_phone }}</a>
-                        </p>
-                    {% endif %}
-
-                    {% if prescriber_org.website %}
-                        <p>
-                            <i class="ri-external-link-line me-1"></i>
-                            <a href="{{ prescriber_org.website }}" rel="noopener" target="_blank" aria-label="{{ prescriber_org.website }} (ouverture dans un nouvel onglet)">{{ prescriber_org.website }}</a>
-                        </p>
-                    {% endif %}
+                <div class="col-12 col-lg-8 order-2 order-lg-1 mt-3 mt-lg-0 {% if not prescriber_org.description %}d-none d-lg-block{% endif %}">
+                    <div class="c-box h-100 {% if not prescriber_org.description %}d-flex align-items-center justify-content-center{% endif %}">
+                        {% if prescriber_org.description %}
+                            <article class="mb-3 mb-lg-5">
+                                <h2 class="h3">Son activité</h2>
+                                {{ prescriber_org.description|markdownify }}
+                            </article>
+                        {% else %}
+                            <div class="text-center">
+                                <img class="img-fluid" src="{% static 'img/illustration-siae-card-no-result.png' %}" alt="" loading="lazy">
+                                <p class="mb-0 mt-3">
+                                    <strong>Oups ! Aucune information en vue !</strong>
+                                </p>
+                                <p>
+                                    <i>La structure n’a pas encore renseigné son activité.</i>
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4 order-1 order-lg-2 d-flex flex-column">
+                    <div class="c-box">
+                        <h3 class="mb-2">Coordonnées</h3>
+                        <div class="d-flex text-secondary fs-sm">
+                            <i class="ri-map-pin-2-line me-2"></i>
+                            <address class="m-0">{{ prescriber_org.address_on_one_line }}</address>
+                        </div>
+                        <hr class="my-3">
+                        <ul class="fs-sm list-unstyled mb-0">
+                            {% if user.is_authenticated and prescriber_org.email %}
+                                {% include "includes/email_li.html" with email=prescriber_org.email only %}
+                            {% endif %}
+                            {% if user.is_authenticated and prescriber_org.phone %}
+                                {% include "includes/phone_li.html" with phonenumber=prescriber_org.phone only %}
+                            {% endif %}
+                            {% if prescriber_org.website %}
+                                {% include "includes/website_li.html" with website=prescriber_org.website only %}
+                            {% endif %}
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
