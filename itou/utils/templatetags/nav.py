@@ -86,6 +86,11 @@ NAV_ENTRIES = {
         target=reverse("search:prescribers_results"),
         active_view_names=["search:prescribers_home", "search:prescribers_results"],
     ),
+    "documents-search": NavItem(
+        label="Une documentation",
+        target=f"{settings.COMMU_BASE_URL}/documentation/?proconnect_login=true",
+        active_view_names=[],
+    ),
     # Job seekers.
     "job-seeker-job-apps": NavItem(
         label="Mes candidatures",
@@ -250,6 +255,7 @@ def nav(request):
                 items=[
                     NAV_ENTRIES["employers-search"],
                     NAV_ENTRIES["prescribers-search"],
+                    NAV_ENTRIES["documents-search"],
                 ],
             )
         )
