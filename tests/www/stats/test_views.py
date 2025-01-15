@@ -1,11 +1,12 @@
 from datetime import UTC, datetime
+from unittest.mock import patch
 
 import factory
 import pytest
 from django.test import override_settings
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertQuerySetEqual, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual, assertRedirects
 
 from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION
@@ -422,9 +423,10 @@ def test_stats_staff(client, view_name):
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
 def test_webinar_banner_display(client, snapshot):
     client.force_login(ItouStaffFactory())
+    url = reverse("stats:stats_staff_service_indicators")
 
     with override_settings(PILOTAGE_SHOW_STATS_WEBINAR=True):
-        response = client.get(reverse("stats:stats_staff_service_indicators"))
+        response = client.get(url)
         assert response.status_code == 200
         rendered_banners = [
             banner | {"is_displayable": True} for banner in response.context["pilotage_webinar_banners"]
@@ -432,9 +434,27 @@ def test_webinar_banner_display(client, snapshot):
         assert str(rendered_banners) == snapshot
 
     with override_settings(PILOTAGE_SHOW_STATS_WEBINAR=False):
-        response = client.get(reverse("stats:stats_staff_service_indicators"))
+        response = client.get(url)
         assert response.status_code == 200
         assert response.context["pilotage_webinar_banners"] == []
+
+
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+def test_suspended_stats_page_banner(client, snapshot):
+    """Test a banner appears for the user when a dashboard is marked as suspended"""
+    client.force_login(ItouStaffFactory())
+    staff_dashboard_id = METABASE_DASHBOARDS.get("stats_staff_service_indicators")["dashboard_id"]
+    tally_suspension_form = f"https://tally.so/r/wkOxRR?URLTB={staff_dashboard_id}"
+
+    with patch("itou.utils.apis.metabase.SUSPENDED_DASHBOARD_IDS", [staff_dashboard_id]):
+        response = client.get(reverse("stats:stats_staff_service_indicators"))
+        assert response.status_code == 200
+        assertContains(response, tally_suspension_form)
+
+    with patch("itou.utils.apis.metabase.SUSPENDED_DASHBOARD_IDS", []):
+        response = client.get(reverse("stats:stats_staff_service_indicators"))
+        assert response.status_code == 200
+        assertNotContains(response, tally_suspension_form)
 
 
 def test_get_params_aci_asp_ids_for_department():
