@@ -7,6 +7,8 @@ from urllib.parse import urlsplit, urlunsplit
 from django import template
 from django.http import QueryDict
 
+from itou.users.enums import IdentityProvider
+
 
 register = template.Library()
 
@@ -31,3 +33,10 @@ def url_add_query(url, **kwargs):
             querystring.pop(item)
     querystring.update(cleaned_kwargs)
     return urlunsplit(parsed._replace(query=querystring.urlencode("/")))
+
+
+@register.simple_tag
+def autologin_proconnect(url, user):
+    if user.is_authenticated and user.identity_provider == IdentityProvider.PRO_CONNECT:
+        return url_add_query(url, proconnect_login="true")
+    return url

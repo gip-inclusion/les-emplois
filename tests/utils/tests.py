@@ -42,7 +42,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.users.enums import UserKind
+from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants, pagination
 from itou.utils.emails import redact_email_address
@@ -673,6 +673,21 @@ class TestUtilsTemplateTags:
         expected = "/company/10/card"
         assert out_empty == expected
         assert out_none == expected
+
+    @pytest.mark.parametrize(
+        "user,expected_query_params",
+        [
+            (lambda: JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT), ""),
+            (
+                lambda: PrescriberFactory(identity_provider=IdentityProvider.PRO_CONNECT),
+                "?proconnect_login=true",
+            ),
+        ],
+    )
+    def test_autologin_proconnect(self, db, user, expected_query_params):
+        template = Template("{% load url_add_query %}{% autologin_proconnect url user %}")
+        out = template.render(Context({"url": "/test/", "user": user()}))
+        assert out == f"/test/{expected_query_params}"
 
     def test_redirection_url(self):
         base_url = reverse("dashboard:index")
