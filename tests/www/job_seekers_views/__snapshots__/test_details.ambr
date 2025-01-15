@@ -1535,9 +1535,9 @@
                  "eligibility_selectedadministrativecriteria"."certified_at",
                  "eligibility_selectedadministrativecriteria"."certification_period",
                  "eligibility_selectedadministrativecriteria"."data_returned_by_api",
+                 "eligibility_selectedadministrativecriteria"."created_at",
                  "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id",
-                 "eligibility_selectedadministrativecriteria"."administrative_criteria_id",
-                 "eligibility_selectedadministrativecriteria"."created_at"
+                 "eligibility_selectedadministrativecriteria"."administrative_criteria_id"
           FROM "eligibility_selectedadministrativecriteria"
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s)
           ORDER BY RANDOM() ASC

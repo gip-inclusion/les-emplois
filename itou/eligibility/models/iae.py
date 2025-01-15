@@ -293,7 +293,6 @@ class SelectedAdministrativeCriteria(AbstractSelectedAdministrativeCriteria):
         on_delete=models.RESTRICT,
         related_name="administrative_criteria_through",
     )
-    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
 
     class Meta:
         verbose_name = "critère administratif IAE sélectionné"
