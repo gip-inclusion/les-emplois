@@ -205,6 +205,7 @@ class AbstractSelectedAdministrativeCriteria(models.Model):
     data_returned_by_api = models.JSONField(
         blank=True, null=True, verbose_name="résultat renvoyé par l'API Particulier"
     )
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
 
     class Meta:
         abstract = True
