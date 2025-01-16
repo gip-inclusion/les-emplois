@@ -221,10 +221,7 @@ class GetOrCreateJobSeekerStartView(View):
         elif self.tunnel == "hire":
             view_name = "job_seekers_views:check_nir_for_hire"
 
-        return HttpResponseRedirect(
-            reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.name})
-            + ("?gps=true" if self.tunnel == "gps" else "")
-        )
+        return HttpResponseRedirect(reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.name}))
 
 
 class JobSeekerBaseView(TemplateView):
@@ -248,7 +245,7 @@ class JobSeekerBaseView(TemplateView):
             session_kind := self.job_seeker_session.get("config").get("session_kind")
         ) and session_kind != self.EXPECTED_SESSION_KIND:
             raise Http404
-        self.is_gps = "gps" in request.GET and request.GET["gps"] == "true"
+        self.is_gps = self.job_seeker_session.get("config", {}).get("tunnel") == "gps"
         if company_pk := self.job_seeker_session.get("apply", {}).get("company_pk"):
             self.company = (
                 get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
@@ -395,7 +392,7 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
             if self.hire_process
             else "job_seekers_views:search_by_email_for_sender"
         )
-        return reverse(view_name, kwargs={"session_uuid": session_uuid}) + ("?gps=true" if self.is_gps else "")
+        return reverse(view_name, kwargs={"session_uuid": session_uuid})
 
     def post(self, request, *args, **kwargs):
         context = {}
@@ -476,10 +473,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                     else "job_seekers_views:create_job_seeker_step_1_for_sender"
                 )
 
-                return HttpResponseRedirect(
-                    reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.name})
-                    + ("?gps=true" if self.is_gps else "")
-                )
+                return HttpResponseRedirect(reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.name}))
 
             # Ask the sender to confirm the email we found is associated to the correct user
             if self.form.data.get("preview"):
@@ -551,14 +545,14 @@ class CreateJobSeekerForSenderBaseView(JobSeekerForSenderBaseView):
         return reverse(
             view_name,
             kwargs={"session_uuid": self.job_seeker_session.name},
-        ) + ("?gps=true" if self.is_gps else "")
+        )
 
     def get_next_url(self):
         view_name = self.next_hire_url if self.hire_process else self.next_apply_url
         return reverse(
             view_name,
             kwargs={"session_uuid": self.job_seeker_session.name},
-        ) + ("?gps=true" if self.is_gps else "")
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
