@@ -1,16 +1,19 @@
 # serializer version: 1
 # name: test_command[gps-admin-readonly]
   list([
+    'view_company',
     'view_followupgroup',
     'view_followupgroupmembership',
     'view_jobapplication',
     'view_jobapplicationtransitionlog',
+    'view_prescriberorganization',
     'view_jobseekerprofile',
     'view_user',
   ])
 # ---
 # name: test_command[gps-admin]
   list([
+    'view_company',
     'add_followupgroup',
     'change_followupgroup',
     'delete_followupgroup',
@@ -21,6 +24,7 @@
     'view_followupgroupmembership',
     'view_jobapplication',
     'view_jobapplicationtransitionlog',
+    'view_prescriberorganization',
     'change_jobseekerprofile',
     'view_jobseekerprofile',
     'add_user',
