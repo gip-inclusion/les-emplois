@@ -1,33 +1,35 @@
 {% load buttons_form %}
 
 <div class="content-small">
-    {% if action == "remove" %}
-        <h1>Retrait des droits d'administrateur</h1>
-        <h2 class="text-muted">{{ structure.display_name }}</h2>
-        <div class="mt-4 alert alert-warning">
-            Vous allez retirer les droits d'administrateur de votre structure à <b>{{ target_member.get_full_name }}</b>
-        </div>
-    {% else %}
-        <h1>Ajout des droits d'administrateur</h1>
-        <h2 class="text-muted">{{ structure.display_name }}</h2>
-        <div class="mt-4 alert alert-warning">
-            Vous allez ajouter les droits d'administrateur de votre structure à <b>{{ target_member.get_full_name }}</b>
-        </div>
-    {% endif %}
-
-    <ul>
-        <li>Le role d'administrateur permet d'ajouter ou de retirer des utilisateurs de votre structure.</li>
-        <li>Il permet également d'ajouter ou de retirer de nouveaux administrateurs.</li>
-        <li>Cet utilisateur sera notifié par e-mail de la modification de son rôle.</li>
-    </ul>
-
-    <form action="{% url base_url|add:":update_admin_role" action target_member.pk %}" method="post">
-        {% url base_url|add:":members" as reset_url %}
-        {% csrf_token %}
+    {% with request.user.is_employer|yesno:"structure,organisation" as org_display %}
         {% if action == "remove" %}
-            {% itou_buttons_form primary_label="Retirer les droits administrateur" reset_url=reset_url %}
+            <h1>Retrait des droits d'administrateur</h1>
+            <h2 class="text-muted">{{ structure.display_name }}</h2>
+            <div class="mt-4 alert alert-warning">
+                Vous allez retirer les droits d'administrateur de votre {{ org_display }} à <b>{{ target_member.get_full_name }}</b>
+            </div>
         {% else %}
-            {% itou_buttons_form primary_label="Ajouter les droits administrateur" reset_url=reset_url %}
+            <h1>Ajout des droits d'administrateur</h1>
+            <h2 class="text-muted">{{ structure.display_name }}</h2>
+            <div class="mt-4 alert alert-warning">
+                Vous allez ajouter les droits d'administrateur de votre {{ org_display }} à <b>{{ target_member.get_full_name }}</b>
+            </div>
         {% endif %}
-    </form>
+
+        <ul>
+            <li>Le role d'administrateur permet d'ajouter ou de retirer des utilisateurs de votre {{ org_display }}.</li>
+            <li>Il permet également d'ajouter ou de retirer de nouveaux administrateurs.</li>
+            <li>Cet utilisateur sera notifié par e-mail de la modification de son rôle.</li>
+        </ul>
+
+        <form action="{% url base_url|add:":update_admin_role" action target_member.pk %}" method="post">
+            {% url base_url|add:":members" as reset_url %}
+            {% csrf_token %}
+            {% if action == "remove" %}
+                {% itou_buttons_form primary_label="Retirer les droits administrateur" reset_url=reset_url %}
+            {% else %}
+                {% itou_buttons_form primary_label="Ajouter les droits administrateur" reset_url=reset_url %}
+            {% endif %}
+        </form>
+    {% endwith %}
 </div>
