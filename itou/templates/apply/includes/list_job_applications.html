@@ -54,8 +54,15 @@
         </div>
     {% else %}
         {% if display_kind.is_table %}
-            <div class="table-responsive mt-3 mt-md-4">{% include "apply/includes/list_table.html" %}</div>
-
+            <div class="table-responsive mt-3 mt-md-4">
+                {% if job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
+                    <form hx-get="{% url 'apply:list_for_siae_actions' %}?list_url={{ request.get_full_path|urlencode }}" hx-trigger="change delay:.5" hx-swap="none" hx-indicator="#batch-action-box">
+                        {% include "apply/includes/list_table.html" %}
+                    </form>
+                {% else %}
+                    {% include "apply/includes/list_table.html" %}
+                {% endif %}
+            </div>
         {% elif display_kind.is_list %}
             {% for job_application in job_applications_page %}
                 {% include "apply/includes/list_card_body.html" %}

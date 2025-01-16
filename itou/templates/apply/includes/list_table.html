@@ -2,6 +2,12 @@
     <caption class="visually-hidden">Liste des candidatures</caption>
     <thead>
         <tr>
+            {% if job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
+                <th scope="col" class="text-start w-50px">
+                    <input class="form-check-input" type="checkbox" id="select-all-applications" data-emplois-select-all-target-input-name="selected-application">
+                    <label class="visually-hidden" for="select-all-applications">Sélectionner toutes les candidatures</label>
+                </th>
+            {% endif %}
             {% if job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %}
                 <th scope="col">Candidature chez</th>
             {% else %}

@@ -329,10 +329,13 @@
   <section aria-labelledby="apply-list-count" id="job-applications-section">
       
           
-              <div class="table-responsive mt-3 mt-md-4"><table class="table table-hover">
+              <div class="table-responsive mt-3 mt-md-4">
+                  
+                      <table class="table table-hover">
       <caption class="visually-hidden">Liste des candidatures</caption>
       <thead>
           <tr>
+              
               
                   <th scope="col">Candidature chez</th>
               
@@ -356,6 +359,7 @@
   
   
   <tr class="align-top">
+      
       
           <td>
               <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
@@ -406,6 +410,7 @@
   
   <tr class="align-top">
       
+      
           <td>
               <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
                   Acme inc.
@@ -453,6 +458,7 @@
   
   <tr class="align-top">
       
+      
           <td>
               <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
                   Acme inc.
@@ -491,8 +497,9 @@
           
       </tbody>
   </table>
-  </div>
   
+                  
+              </div>
           
           
   

@@ -4,6 +4,7 @@ from collections import defaultdict
 from django.conf import settings
 from django.db import models
 from django.db.models import Count, Exists, F, OuterRef, Q, Subquery
+from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
@@ -385,3 +386,28 @@ def list_for_siae_exports_download(request, month_identifier=None):
         job_applications = job_applications.created_on_given_year_and_month(year, month)
 
     return stream_xlsx_export(job_applications, filename, request_user=request.user)
+
+
+@check_user(lambda user: user.is_employer)
+def list_for_siae_actions(request):
+    company = get_current_company_or_404(request)
+    selected_job_applications = list(
+        company.job_applications_received.filter(pk__in=request.GET.getlist("selected-application"))
+    )
+    if len(selected_job_applications) != len(request.GET.getlist("selected-application")):
+        # Something is fishy, let's force a refresh to reorder the universe
+        response = HttpResponse()
+        response["HX-Refresh"] = "true"
+        return response
+    context = {
+        "batch_mode": bool(selected_job_applications),
+        "selected_nb": len(selected_job_applications),
+        "selected_application_ids": [job_app.pk for job_app in selected_job_applications],
+        "list_url": get_safe_url(request, "list_url", fallback_url=reverse("apply:list_for_siae")),
+    }
+    response = render(
+        request,
+        "apply/includes/siae_actions.html",
+        context,
+    )
+    return response

@@ -164,10 +164,44 @@ htmx.onLoad((target) => {
   querySelectorAllIncludingTarget(target, "button[data-setter-target]").forEach((button) => {
     button.addEventListener("click", function() {
       const inputElement = document.querySelector(this.getAttribute("data-setter-target"))
-      inputElement.value = this.getAttribute("data-setter-value")
+      if (this.hasAttribute("data-setter-value")) {
+        inputElement.value = this.getAttribute("data-setter-value")
+      } else if (this.hasAttribute("data-setter-checked")) {
+        inputElement.checked = this.getAttribute("data-setter-checked") === 'true'
+        inputElement.indeterminate = false
+      }
       inputElement.dispatchEvent(new Event("change", { bubbles: true }));
     });
 
   })
 
+  /**
+   * JS to check/unckeck all checkbox in one click
+   **/
+  querySelectorAllIncludingTarget(target, "input[type='checkbox'][data-emplois-select-all-target-input-name]").forEach((selectAllCheckbox) => {
+    const targetCheckboxes = Array.from(document.querySelectorAll(`input[name='${selectAllCheckbox.getAttribute("data-emplois-select-all-target-input-name")}']`));
+
+    // Check & uncheck all linked checkboxes when changing the "Select all" checkbox
+    selectAllCheckbox.addEventListener("change", function() {
+      targetCheckboxes.forEach((checkBox) => {
+        checkBox.checked = selectAllCheckbox.checked
+      })
+    })
+
+    // On each linked checkbox change, adapt "Select all" check status
+    targetCheckboxes.forEach((checkBox) => {
+      checkBox.addEventListener("change", function() {
+        if (targetCheckboxes.every(cb => cb.checked)) {
+          selectAllCheckbox.checked = true
+          selectAllCheckbox.indeterminate = false
+        } else if (targetCheckboxes.every(cb => !cb.checked)) {
+          selectAllCheckbox.checked = false
+          selectAllCheckbox.indeterminate = false
+        } else {
+          selectAllCheckbox.indeterminate = true
+        }
+      })
+    });
+
+  })
 });

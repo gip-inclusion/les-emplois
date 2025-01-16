@@ -1,5 +1,6 @@
 import datetime
 import itertools
+import uuid
 from urllib.parse import unquote
 
 import pytest
@@ -827,6 +828,21 @@ def test_list_snapshot(client, snapshot):
                         f"state_{job_application.pk}",
                         "state_[PK of JobApplication]",
                     ),
+                    (
+                        "value",
+                        str(job_application.pk),
+                        "[PK of JobApplication]",
+                    ),
+                    (
+                        "id",
+                        f"select-{job_application.pk}",
+                        "select-[PK of JobApplication]",
+                    ),
+                    (
+                        "for",
+                        f"select-{job_application.pk}",
+                        "select-[PK of JobApplication]",
+                    ),
                 ]
                 for job_application in job_applications
             )
@@ -958,3 +974,68 @@ def test_reset_filter_button_snapshot(client, snapshot):
     assert str(parse_response_to_soup(response, selector="#offcanvasApplyFiltersButtons")) == snapshot(
         name="off-canvas buttons in table view"
     )
+
+
+def test_list_for_siae_actions_forced_refresh(client):
+    job_application = JobApplicationFactory()
+    client.force_login(job_application.to_company.members.get())
+    response = client.get(reverse("apply:list_for_siae_actions"), {"selected-application": []})
+    assert not response.headers.get("HX-Refresh")
+    response = client.get(reverse("apply:list_for_siae_actions"), {"selected-application": [job_application.pk]})
+    assert not response.headers.get("HX-Refresh")
+    # If the user checks an application, that either doesn't exist anymore or was transfered to another company
+    # a forced refresh should occur
+    response = client.get(reverse("apply:list_for_siae_actions"), {"selected-application": [str(uuid.uuid4())]})
+    assert response.headers.get("HX-Refresh") == "true"
+
+
+def test_list_for_siae_select_applications_htmx(client):
+    company = CompanyFactory(with_membership=True)
+    employer = company.members.first()
+
+    job_apps = JobApplicationFactory.create_batch(3, to_company=company, state=JobApplicationState.NEW)
+    client.force_login(employer)
+    table_url = add_url_params(reverse("apply:list_for_siae"), {"display": "table"})
+    response = client.get(table_url)
+    simulated_page = parse_response_to_soup(response, selector="#main")
+    [action_form] = simulated_page.find_all(
+        "form", attrs={"hx-get": lambda attr: attr.startswith(reverse("apply:list_for_siae_actions"))}
+    )
+    action_url = action_form["hx-get"]
+    assert simulated_page.find(id="selected-nb-display").contents == []
+    assert simulated_page.find(id="batch-action-box").contents == []
+
+    def simulate_applications_selection(application_list):
+        response = client.get(
+            action_url, {"selected-application": [app.pk for app in application_list]}, headers={"HX-Request": "true"}
+        )
+        update_page_with_htmx(simulated_page, f"form[hx-get='{action_url}']", response)
+
+    # Select 1 application
+    simulate_applications_selection([job_apps[0]])
+    # Check selected nb info
+    assert simulated_page.find(id="selected-nb-display").find("p").contents == ["1 résultat sélectionné"]
+    # Check reset selection button
+    reset_button = simulated_page.find(id="selected-nb-display").find("button")
+    assert reset_button.find("span").contents == ["annuler la sélection"]
+    assert reset_button["data-setter-checked"] == "false"
+    assert simulated_page.select(reset_button["data-setter-target"])
+    # Check batch action box display
+    assert simulated_page.find(id="batch-action-box").find("h2")
+
+    # Select 3 applications
+    simulate_applications_selection(job_apps)
+    assert simulated_page.find(id="selected-nb-display").find("p").contents == ["3 résultats sélectionnés"]
+    # Check batch action box display
+    assert simulated_page.find(id="batch-action-box").find("h2")
+
+    # Unselect all
+    simulate_applications_selection([])
+    assert simulated_page.find(id="selected-nb-display").contents == []
+    # Check batch action box display
+    assert simulated_page.find(id="batch-action-box").contents == []
+
+    # Reload page
+    response = client.get(table_url)
+    new_page = parse_response_to_soup(response, selector="#main")
+    assertSoupEqual(new_page, simulated_page)
