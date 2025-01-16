@@ -141,19 +141,13 @@ class ApplyStepBaseView(TemplateView):
             return reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
         return reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description})
 
-    def init_job_seeker_session(self, request, tunnel):
-        session_kind = None
-        if tunnel == "sender" or tunnel == "hire":
-            session_kind = JobSeekerSessionKinds.GET_OR_CREATE
-        elif tunnel == "job_seeker":
-            session_kind = JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER
-
+    def init_job_seeker_session(self, request):
         job_seeker_session = SessionNamespace.create_uuid_namespace(
             request.session,
             data={
                 "config": {
-                    "reset_url": self.get_reset_url(),
-                    "session_kind": session_kind,
+                    "from_url": self.get_reset_url(),
+                    "session_kind": JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER,
                 },
                 "apply": {"company_pk": self.company.pk},
             },
@@ -304,13 +298,26 @@ class StartView(ApplyStepBaseView):
                 reverse("apply:pending_authorization_for_sender", kwargs={"company_pk": self.company.pk})
             )
 
-        # Init a job_seeker_session needed for job_seekers_views
-        job_seeker_session = self.init_job_seeker_session(request, tunnel)
+        if tunnel == "job_seeker":
+            # Init a job_seeker_session needed for job_seekers_views
+            job_seeker_session = self.init_job_seeker_session(request)
 
-        return HttpResponseRedirect(
-            reverse(f"job_seekers_views:check_nir_for_{tunnel}", kwargs={"session_uuid": job_seeker_session.name})
-            + ("?gps=true" if self.is_gps else "")
-        )
+            return HttpResponseRedirect(
+                reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session.name})
+            )
+
+        # TODO(ewen): get rid of GPS in apply
+        if self.is_gps:
+            tunnel = "gps"
+
+        params = {
+            "tunnel": tunnel,
+            "company": self.company.pk if tunnel != "gps" else None,
+            "from_url": self.get_reset_url(),
+        }
+
+        next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+        return HttpResponseRedirect(next_url)
 
 
 class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
@@ -318,10 +325,13 @@ class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.job_seeker_session = self.init_job_seeker_session(request, "sender")
-        self.next_url = reverse(
-            "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": self.job_seeker_session.name}
-        )
+        params = {
+            "tunnel": "sender",
+            "company": self.company.pk,
+            "from_url": self.get_reset_url(),
+        }
+
+        self.next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {"next_url": self.next_url}

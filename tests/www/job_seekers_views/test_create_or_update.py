@@ -9,6 +9,7 @@ from itou.asp.models import Commune, Country
 from itou.users.enums import Title
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params
+from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.companies.factories import CompanyFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
@@ -68,13 +69,100 @@ class TestCreateForJobSeeker:
 
 
 class TestCreateForSender:
+    @pytest.mark.parametrize(
+        "company_value, tunnel_value, from_url_value, expected_status_code",
+        [
+            # Valid parameters
+            pytest.param("valid", "valid", "valid", 302, id="valid_values"),
+            pytest.param("valid", "valid_hire", "valid", 302, id="valid_values_hire"),
+            # Invalid parameters
+            pytest.param(None, "valid", "valid", 404, id="missing_company"),
+            pytest.param(None, "valid", "valid_hire", 404, id="missing_company_hire"),
+            pytest.param("invalid", "valid", "valid", 404, id="invalid_company"),
+            pytest.param("valid", "invalid", "valid", 404, id="invalid_tunnel"),
+            pytest.param("valid", None, "valid", 404, id="missing_tunnel"),
+            pytest.param("valid", "valid", None, 404, id="missing_from_url"),
+        ],
+    )
+    def test_start_get_or_create_sender(
+        self,
+        company_value,
+        tunnel_value,
+        from_url_value,
+        expected_status_code,
+        client,
+    ):
+        job_seeker = JobSeekerFactory()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.get()
+        client.force_login(user)
+
+        match company_value:
+            case "valid":
+                company_pk = company.pk
+            case "invalid":
+                company_pk = "invalid_pk"
+            case _:
+                company_pk = None
+
+        match tunnel_value:
+            case "valid":
+                tunnel = "sender"
+            case "valid_hire":
+                tunnel = "hire"
+            case "invalid":
+                tunnel = "invalid-tunnel"
+            case _:
+                tunnel = None
+
+        if from_url_value == "valid":
+            from_url = reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
+        else:
+            from_url = None
+
+        params = {
+            "tunnel": tunnel,
+            "company": company_pk,
+            "from_url": from_url,
+        }
+        start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+
+        response = client.get(start_url)
+        assert response.status_code == expected_status_code
+
+        if expected_status_code == 302:
+            [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+            next_url = reverse(
+                f"job_seekers_views:check_nir_for_{tunnel}",
+                kwargs={"session_uuid": job_seeker_session_name},
+            )
+
+            assertRedirects(response, next_url)
+            assert client.session[job_seeker_session_name].get("config").get("from_url") == from_url
+            response = client.get(next_url)
+            assertContains(
+                response,
+                f"""
+                    <a href="{from_url}"
+                    class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"
+                    aria-label="Annuler la saisie de ce formulaire">
+                      <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                      <span>Annuler</span>
+                    </a>
+                """,
+                html=True,
+            )
+
     def test_check_nir_with_session(self, client):
         company = CompanyFactory(with_membership=True)
         client.force_login(company.members.get())
 
         # Init session
         start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
-        client.get(start_url)
+        client.get(start_url, follow=True)
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
 
         response = client.get(
@@ -91,7 +179,7 @@ class TestCreateForSender:
         client.force_login(company.members.get())
 
         # Init session
-        client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
+        client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
 
         birthdate = datetime.date(1911, 11, 1)
@@ -129,7 +217,7 @@ class TestCreateForSender:
         client.force_login(company.members.get())
 
         # Init session
-        client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
+        client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
 
         birthdate = datetime.date(1911, 11, 1)
@@ -163,7 +251,7 @@ class TestCreateForSender:
         client.force_login(company.members.get())
 
         # Init session
-        client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
+        client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
 
         response = client.post(
@@ -294,7 +382,10 @@ class TestUpdateForSenderStart:
         job_seeker_session = SessionNamespace.create_uuid_namespace(
             client.session,
             data={
-                "config": {"from_url": reverse("dashboard:index"), "session_kind": "job-seeker-get-or-create-sender"},
+                "config": {
+                    "from_url": reverse("dashboard:index"),
+                    "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
+                },
                 "job_seeker_pk": job_seeker.pk,
                 "apply": {"company_pk": company.pk},
             },

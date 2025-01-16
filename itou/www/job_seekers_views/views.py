@@ -185,6 +185,48 @@ class JobSeekerListView(UserPassesTestMixin, ListView):
         return query
 
 
+class GetOrCreateJobSeekerStartView(View):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.tunnel = request.GET.get("tunnel")
+        if self.tunnel not in ("sender", "hire", "gps"):
+            raise Http404
+        self.from_url = get_safe_url(request, "from_url")
+        if not self.from_url:
+            raise Http404
+
+        company = None
+        if self.tunnel == "gps":
+            company = Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
+        else:
+            try:
+                company = get_object_or_404(Company.objects.with_has_active_members(), pk=request.GET.get("company"))
+            except ValueError:
+                raise Http404("Aucune entreprise n'a été trouvée")
+
+        data = {
+            "config": {
+                "tunnel": self.tunnel,
+                "from_url": self.from_url,
+                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
+            },
+            "apply": {"company_pk": company.pk} if company else {},
+        }
+        self.job_seeker_session = SessionNamespace.create_uuid_namespace(request.session, data)
+
+    def get(self, request, *args, **kwargs):
+        if self.tunnel == "sender" or self.tunnel == "gps":
+            view_name = "job_seekers_views:check_nir_for_sender"
+        elif self.tunnel == "hire":
+            view_name = "job_seekers_views:check_nir_for_hire"
+
+        return HttpResponseRedirect(
+            reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.name})
+            + ("?gps=true" if self.tunnel == "gps" else "")
+        )
+
+
 class JobSeekerBaseView(TemplateView):
     EXPECTED_SESSION_KIND = None
 
@@ -245,7 +287,7 @@ class JobSeekerBaseView(TemplateView):
         return None
 
     def get_reset_url(self):
-        return self.job_seeker_session.get("config", {}).get("reset_url") or reverse("dashboard:index")
+        return self.job_seeker_session.get("config", {}).get("from_url") or reverse("dashboard:index")
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
