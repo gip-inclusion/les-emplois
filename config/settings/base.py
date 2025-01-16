@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     "itou.siae_evaluations",
     "itou.geiq",
     "itou.geo",
+    "itou.www.accounts",
     "itou.www.apply",
     "itou.www.approvals_views",
     "itou.www.autocomplete",

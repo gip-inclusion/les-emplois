@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 
 from itou.utils import redirect_legacy_views
 from itou.utils.urls import SiretConverter
+from itou.www.accounts import views as account_views
 from itou.www.dashboard import views as dashboard_views
 from itou.www.error import server_error
 from itou.www.login import views as login_views
@@ -45,6 +46,19 @@ urlpatterns = [
     re_path(
         r"^accounts/password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
         signup_views.ItouPasswordResetFromKeyView.as_view(),
+    ),
+    # --------------------------------------------------------------------------------------
+    # Override allauth `account_confirm_email` URL.
+    re_path(
+        r"^accounts/confirm-email/(?P<key>[-:\w]+)/$",
+        account_views.ConfirmEmailView.as_view(),
+        name="account_confirm_email",
+    ),
+    # Custom resend-confirmation URL, extension on allauth behavior.
+    re_path(
+        r"^accounts/resend-confirmation/(?P<key>[-:\w]+)/$",
+        account_views.ResendConfirmationView.as_view(),
+        name="account_resend_confirmation_email",
     ),
     # --------------------------------------------------------------------------------------
     # Other allauth URLs.
