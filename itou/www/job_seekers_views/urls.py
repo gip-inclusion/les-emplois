@@ -8,6 +8,11 @@ app_name = "job_seekers_views"
 urlpatterns = [
     path("details/<uuid:public_id>", views.JobSeekerDetailView.as_view(), name="details"),
     path("list", views.JobSeekerListView.as_view(), name="list"),
+    path(
+        "start",
+        views.GetOrCreateJobSeekerStartView.as_view(),
+        name="get_or_create_start",
+    ),
     # For sender
     path("<uuid:session_uuid>/sender/check-nir", views.CheckNIRForSenderView.as_view(), name="check_nir_for_sender"),
     path(

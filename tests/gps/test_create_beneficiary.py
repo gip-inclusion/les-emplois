@@ -16,6 +16,7 @@ from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.users.models import User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
+from itou.utils.urls import add_url_params
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
@@ -54,6 +55,14 @@ def test_create_job_seeker(_mock, client):
     apply_start_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
 
     response = client.get(apply_start_url)
+    params = {
+        "tunnel": "gps",
+        "from_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
+    }
+    next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+    assert response.url == next_url
+
+    response = client.get(next_url)
     [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
     next_url = (
         reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
@@ -80,7 +89,8 @@ def test_create_job_seeker(_mock, client):
 
     expected_job_seeker_session = {
         "config": {
-            "reset_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
+            "tunnel": "gps",
+            "from_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
             "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
         },
         "apply": {"company_pk": singleton.pk},
@@ -240,6 +250,14 @@ def test_gps_bypass(client):
     apply_start_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     response = client.get(apply_start_url)
 
+    params = {
+        "tunnel": "gps",
+        "from_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
+    }
+    next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+    assert response.url == next_url
+
+    response = client.get(next_url)
     [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
     next_url = (
         reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
@@ -260,6 +278,14 @@ def test_gps_bypass(client):
     apply_start_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     response = client.get(apply_start_url)
 
+    params = {
+        "tunnel": "gps",
+        "from_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
+    }
+    next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+    assert response.url == next_url
+
+    response = client.get(next_url)
     [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
     next_url = (
         reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
@@ -310,7 +336,8 @@ def test_existing_user_with_email(client):
     )
     expected_job_seeker_session = {
         "config": {
-            "reset_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
+            "tunnel": "gps",
+            "from_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
             "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
         },
         "apply": {"company_pk": singleton.pk},
@@ -414,6 +441,14 @@ def test_creation_by_user_kind(client, UserFactory, factory_args, expected_acces
         assert response.status_code == 403
 
     response = client.get(create_beneficiary_url)
+    params = {
+        "tunnel": "gps",
+        "from_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
+    }
+    next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+    assert response.url == next_url
+
+    response = client.get(next_url)
     [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
     assert response.status_code == 302
     assert (
