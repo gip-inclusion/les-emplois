@@ -2728,10 +2728,13 @@
   <section aria-labelledby="apply-list-count" id="job-applications-section">
       
           
-              <div class="table-responsive mt-3 mt-md-4"><table class="table table-hover">
+              <div class="table-responsive mt-3 mt-md-4">
+                  
+                      <table class="table table-hover">
       <caption class="visually-hidden">Liste des candidatures</caption>
       <thead>
           <tr>
+              
               
                   <th scope="col">Candidature de</th>
               
@@ -2758,6 +2761,7 @@
   
   
   <tr class="align-top">
+      
       
           <td>
               <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
@@ -2829,6 +2833,7 @@
   
   <tr class="align-top">
       
+      
           <td>
               <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
                   J… D…
@@ -2899,6 +2904,7 @@
   
   <tr class="align-top">
       
+      
           <td>
               <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
                   J… D…
@@ -2961,8 +2967,9 @@
           
       </tbody>
   </table>
-  </div>
   
+                  
+              </div>
           
           
   

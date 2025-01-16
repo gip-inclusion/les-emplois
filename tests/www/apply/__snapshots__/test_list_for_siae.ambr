@@ -2682,10 +2682,19 @@
   <section aria-labelledby="apply-list-count" id="job-applications-section">
       
           
-              <div class="table-responsive mt-3 mt-md-4"><table class="table table-hover">
+              <div class="table-responsive mt-3 mt-md-4">
+                  
+                      <form hx-get="/apply/siae/list/actions?list_url=/apply/siae/list%3Fdisplay%3Dtable" hx-indicator="#batch-action-box" hx-swap="none" hx-trigger="change delay:.5">
+                          <table class="table table-hover">
       <caption class="visually-hidden">Liste des candidatures</caption>
       <thead>
           <tr>
+              
+                  <th class="text-start w-50px" scope="col">
+                      <input class="form-check-input" data-emplois-select-all-target-input-name="selected-application" id="select-all-applications" type="checkbox"/>
+                      <label class="visually-hidden" for="select-all-applications">Sélectionner toutes les candidatures</label>
+                  </th>
+              
               
                   <th scope="col">Candidature de</th>
               
@@ -2712,6 +2721,12 @@
   
   
   <tr class="align-top">
+      
+          <th class="text-start w-50px" scope="row">
+              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+              <label class="visually-hidden" for="select-[PK of JobApplication]">Sélectionner cette candidature</label>
+          </th>
+      
       
           <td>
               <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
@@ -2784,6 +2799,12 @@
   
   <tr class="align-top">
       
+          <th class="text-start w-50px" scope="row">
+              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+              <label class="visually-hidden" for="select-[PK of JobApplication]">Sélectionner cette candidature</label>
+          </th>
+      
+      
           <td>
               <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
                   Jane DOE
@@ -2852,6 +2873,12 @@
   
   <tr class="align-top">
       
+          <th class="text-start w-50px" scope="row">
+              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+              <label class="visually-hidden" for="select-[PK of JobApplication]">Sélectionner cette candidature</label>
+          </th>
+      
+      
           <td>
               <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
                   Jane DOE
@@ -2912,8 +2939,10 @@
           
       </tbody>
   </table>
-  </div>
   
+                      </form>
+                  
+              </div>
           
           
   
