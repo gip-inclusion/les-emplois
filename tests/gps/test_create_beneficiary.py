@@ -62,6 +62,7 @@ def test_create_job_seeker(_mock, client):
     assertNotContains(response, france_travail.display_name)
     assertNotContains(response, france_travail.siret)
     assertNotContains(response, france_travail.kind)
+    assertContains(response, "<h1>Enregistrer un nouveau bénéficiaire</h1>", html=True)
 
     response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
 
@@ -87,6 +88,9 @@ def test_create_job_seeker(_mock, client):
 
     # Step get job seeker e-mail.
     # ----------------------------------------------------------------------
+
+    response = client.get(next_url)
+    assertContains(response, "<h1>Enregistrer un nouveau bénéficiaire</h1>", html=True)
 
     response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
 
@@ -119,6 +123,7 @@ def test_create_job_seeker(_mock, client):
             kwargs={"session_uuid": job_seeker_session_name},
         ),
     )
+    assertContains(response, "<h1>Création du compte bénéficiaire</h1>", html=True)
 
     geispolsheim = create_city_geispolsheim()
     birthdate = dummy_job_seeker.jobseeker_profile.birthdate
@@ -147,6 +152,9 @@ def test_create_job_seeker(_mock, client):
     )
     assertRedirects(response, next_url)
 
+    response = client.get(next_url)
+    assertContains(response, "<h1>Création du compte bénéficiaire</h1>", html=True)
+
     post_data = {
         "ban_api_resolved_address": dummy_job_seeker.geocoding_address,
         "address_line_1": dummy_job_seeker.address_line_1,
@@ -167,6 +175,9 @@ def test_create_job_seeker(_mock, client):
         kwargs={"session_uuid": job_seeker_session_name},
     )
     assertRedirects(response, next_url)
+
+    response = client.get(next_url)
+    assertContains(response, "<h1>Création du compte bénéficiaire</h1>", html=True)
 
     post_data = {
         "education_level": dummy_job_seeker.jobseeker_profile.education_level,
@@ -200,6 +211,7 @@ def test_create_job_seeker(_mock, client):
     assertRedirects(response, next_url)
 
     response = client.get(next_url)
+    assertContains(response, '<h1 class="my-5">Création du bénéficiaire</h1>', html=True)
     assertContains(response, "Créer et suivre le bénéficiaire")
 
     response = client.post(next_url)
