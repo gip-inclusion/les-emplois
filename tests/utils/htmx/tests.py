@@ -184,6 +184,58 @@ def test_update_page_with_htmx_empty_response():
     )
 
 
+def test_update_page_with_none_hx_swap_and_oob():
+    simulated_page = parse_response_to_soup(
+        FakeResponse(
+            b"""
+              <html>
+                <body>
+                  <div id="main">
+                    <div>
+                      <form hx-post="/somewhere?with_query_string=" hx-swap="none">
+                        <input name="some_input"/>
+                      </form>
+                    </div>
+
+                    <div id="other-div-for-oob-test">
+                    </div>
+                  </div>
+                </body>
+              </html>
+            """
+        )
+    )
+
+    htmx_response = FakeResponse(
+        b"""<div id="other-div-for-oob-test" hx-swap-oob="true">OOB Swap successful</div>""",
+        request={"PATH_INFO": "/somewhere", "REQUEST_METHOD": "POST", "QUERY_STRING": "with_query_string="},
+    )
+
+    update_page_with_htmx(simulated_page, "form", htmx_response)
+
+    assertSoupEqual(
+        simulated_page,
+        BeautifulSoup(
+            b"""
+              <html>
+                <body>
+                  <div id="main">
+                    <div>
+                      <form hx-post="/somewhere?with_query_string=" hx-swap="none">
+                        <input name="some_input"/>
+                      </form>
+                    </div>
+
+                    <div id="other-div-for-oob-test">OOB Swap successful</div>
+                  </div>
+                </body>
+              </html>
+            """,
+            "html5lib",
+        ),
+    )
+
+
 def test_update_page_with_htmx_hx_target_this():
     simulated_page = parse_response_to_soup(
         FakeResponse(

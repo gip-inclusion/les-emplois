@@ -15,6 +15,9 @@ class HtmxClient(ItouClient):
 
 
 def _handle_swap(page, *, target, new_elements, mode):
+    if mode == "none":
+        # Easy one!
+        return
     if mode == "outerHTML":
         target_element = page.select_one(target) if isinstance(target, str) else target
         if not new_elements:
