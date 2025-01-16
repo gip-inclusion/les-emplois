@@ -30,6 +30,7 @@ from itou.utils.session import SessionNamespace
 from itou.utils.urls import get_safe_url
 from itou.www.apply.views.submit_views import ApplicationBaseView
 
+from .enums import JobSeekerSessionKinds
 from .forms import (
     CheckJobSeekerInfoForm,
     CheckJobSeekerNirForm,
@@ -276,7 +277,7 @@ class JobSeekerForSenderBaseView(JobSeekerBaseView):
 
 class CheckNIRForJobSeekerView(JobSeekerBaseView):
     template_name = "job_seekers_views/step_check_job_seeker_nir.html"
-    EXPECTED_SESSION_KIND = "job-seeker-get-or-create-job-seeker"
+    EXPECTED_SESSION_KIND = JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER
 
     def __init__(self):
         super().__init__()
@@ -336,7 +337,7 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
 
 class CheckNIRForSenderView(JobSeekerForSenderBaseView):
     template_name = "job_seekers_views/step_check_job_seeker_nir.html"
-    EXPECTED_SESSION_KIND = "job-seeker-get-or-create-sender"
+    EXPECTED_SESSION_KIND = JobSeekerSessionKinds.GET_OR_CREATE
 
     def __init__(self):
         super().__init__()
@@ -398,6 +399,7 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
 
 class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
     template_name = "job_seekers_views/step_search_job_seeker_by_email.html"
+    EXPECTED_SESSION_KIND = JobSeekerSessionKinds.GET_OR_CREATE
 
     def __init__(self):
         super().__init__()
@@ -496,6 +498,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
 
 class CreateJobSeekerForSenderBaseView(JobSeekerForSenderBaseView):
     required_session_namespaces = ["job_seeker_session"]
+    EXPECTED_SESSION_KIND = JobSeekerSessionKinds.GET_OR_CREATE
 
     def __init__(self):
         super().__init__()
@@ -785,7 +788,7 @@ class UpdateJobSeekerStartView(View):
         self.job_seeker_session = SessionNamespace.create_uuid_namespace(
             request.session,
             data={
-                "config": {"from_url": from_url, "session_kind": "job-seeker-update"},
+                "config": {"from_url": from_url, "session_kind": JobSeekerSessionKinds.UPDATE},
                 "job_seeker_pk": job_seeker.pk,
             },
         )
@@ -799,7 +802,7 @@ class UpdateJobSeekerStartView(View):
 
 
 class UpdateJobSeekerBaseView(JobSeekerBaseView):
-    EXPECTED_SESSION_KIND = "job-seeker-update"
+    EXPECTED_SESSION_KIND = JobSeekerSessionKinds.UPDATE
 
     def __init__(self):
         super().__init__()
