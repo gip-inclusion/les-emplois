@@ -32,18 +32,22 @@ def default_password():
     return make_password(DEFAULT_PASSWORD)
 
 
-def _verify_emails_for_user(self, create, extracted, **kwargs):
+def _create_emails_for_user(user, create, extracted, verify_emails=False, **kwargs):
     if not create:
         # Simple build, do nothing.
         return
 
-    emails = extracted or [self.email]
+    emails = extracted or [user.email]
     for email in emails:
-        email_address, _ = allauth_models.EmailAddress.objects.get_or_create(user=self, email=email)
-        email_address.verified = True
+        email_address, _ = allauth_models.EmailAddress.objects.get_or_create(user=user, email=email)
+        email_address.verified = verify_emails
         email_address.primary = True
         email_address.save()
-        self.emailaddress_set.add(email_address)
+        user.emailaddress_set.add(email_address)
+
+
+def _verify_emails_for_user(user, create, extracted, **kwargs):
+    return _create_emails_for_user(user, create, extracted, verify_emails=True, **kwargs)
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -58,6 +62,7 @@ class UserFactory(factory.django.DjangoModelFactory):
             is_active=True,
             emails=factory.PostGeneration(_verify_emails_for_user),
         )
+        with_unverified_email = factory.Trait(is_active=False, emails=factory.PostGeneration(_create_emails_for_user))
         for_snapshot = factory.Trait(
             first_name="John",
             last_name="Doe",
