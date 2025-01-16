@@ -27,6 +27,7 @@ from itou.www.apply.forms import ApplicationJobsForm, SubmitJobApplicationForm
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForm
+from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import CreateOrUpdateJobSeekerStep2Form
 
 
@@ -140,12 +141,19 @@ class ApplyStepBaseView(TemplateView):
             return reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
         return reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description})
 
-    def init_job_seeker_session(self, request):
+    def init_job_seeker_session(self, request, tunnel):
+        session_kind = None
+        if tunnel == "sender" or tunnel == "hire":
+            session_kind = JobSeekerSessionKinds.GET_OR_CREATE
+        elif tunnel == "job_seeker":
+            session_kind = JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER
+
         job_seeker_session = SessionNamespace.create_uuid_namespace(
             request.session,
             data={
                 "config": {
                     "reset_url": self.get_reset_url(),
+                    "session_kind": session_kind,
                 },
                 "apply": {"company_pk": self.company.pk},
             },
@@ -297,7 +305,7 @@ class StartView(ApplyStepBaseView):
             )
 
         # Init a job_seeker_session needed for job_seekers_views
-        job_seeker_session = self.init_job_seeker_session(request)
+        job_seeker_session = self.init_job_seeker_session(request, tunnel)
 
         return HttpResponseRedirect(
             reverse(f"job_seekers_views:check_nir_for_{tunnel}", kwargs={"session_uuid": job_seeker_session.name})
@@ -310,7 +318,7 @@ class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.job_seeker_session = self.init_job_seeker_session(request)
+        self.job_seeker_session = self.init_job_seeker_session(request, "sender")
         self.next_url = reverse(
             "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": self.job_seeker_session.name}
         )

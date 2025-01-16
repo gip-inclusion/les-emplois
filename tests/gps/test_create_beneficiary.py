@@ -16,6 +16,7 @@ from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.users.models import User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
+from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
@@ -80,6 +81,7 @@ def test_create_job_seeker(_mock, client):
     expected_job_seeker_session = {
         "config": {
             "reset_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
+            "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
         },
         "apply": {"company_pk": singleton.pk},
         "profile": {
@@ -309,6 +311,7 @@ def test_existing_user_with_email(client):
     expected_job_seeker_session = {
         "config": {
             "reset_url": reverse("companies_views:card", kwargs={"siae_id": singleton.pk}),
+            "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
         },
         "apply": {"company_pk": singleton.pk},
         "profile": {

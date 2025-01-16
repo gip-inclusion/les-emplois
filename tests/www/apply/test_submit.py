@@ -39,6 +39,7 @@ from itou.utils.models import InclusiveDateRange
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
+from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.approvals.factories import PoleEmploiApprovalFactory
 from tests.asp.factories import CommuneFactory, CountryFranceFactory
 from tests.cities.factories import create_city_geispolsheim, create_city_in_zrr, create_test_cities
@@ -867,6 +868,7 @@ class TestApplyAsAuthorizedPrescriber:
         expected_job_seeker_session = {
             "config": {
                 "reset_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "apply": {"company_pk": company.pk},
             "profile": {
@@ -1148,9 +1150,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert response.status_code == 302
 
         expected_job_seeker_session = {
-            "config": {
-                "reset_url": reset_url_company,
-            },
+            "config": {"reset_url": reset_url_company, "session_kind": JobSeekerSessionKinds.GET_OR_CREATE},
             "apply": {"company_pk": company.pk},
             "user": {
                 "email": dummy_job_seeker.email,
@@ -1553,9 +1553,7 @@ class TestApplyAsPrescriber:
         assert response.url == next_url
 
         expected_job_seeker_session = {
-            "config": {
-                "reset_url": reset_url_company,
-            },
+            "config": {"reset_url": reset_url_company, "session_kind": JobSeekerSessionKinds.GET_OR_CREATE},
             "apply": {"company_pk": company.pk},
             "profile": {"nir": dummy_job_seeker.jobseeker_profile.nir},
         }
@@ -1842,6 +1840,7 @@ class TestApplyAsPrescriber:
         session[session_name] = {
             "config": {
                 "reset_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "apply": {"company_pk": company.pk},
         }
@@ -1850,9 +1849,7 @@ class TestApplyAsPrescriber:
         response = client.get(
             reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": session_name})
         )
-        assertRedirects(
-            response, reverse("apply:start", kwargs={"company_pk": company.pk}), fetch_redirect_response=False
-        )
+        assert response.status_code == 404  # session_kind doesn't match
 
     def test_check_info_as_prescriber_for_job_seeker_with_incomplete_info(self, client):
         company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
@@ -1950,6 +1947,7 @@ class TestApplyAsPrescriberNirExceptions:
         expected_job_seeker_session = {
             "config": {
                 "reset_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "apply": {"company_pk": company.pk},
             "profile": {
@@ -2035,6 +2033,7 @@ class TestApplyAsPrescriberNirExceptions:
         expected_job_seeker_session = {
             "config": {
                 "reset_url": reverse("companies_views:card", kwargs={"siae_id": siae.pk}),
+                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "apply": {"company_pk": siae.pk},
             "profile": {
@@ -2147,7 +2146,7 @@ class TestApplyAsCompany:
             kwargs={"session_uuid": job_seeker_session_name},
         )
         expected_job_seeker_session = {
-            "config": {"reset_url": reset_url},
+            "config": {"reset_url": reset_url, "session_kind": JobSeekerSessionKinds.GET_OR_CREATE},
             "apply": {"company_pk": company.pk},
             "profile": {
                 "nir": dummy_job_seeker.jobseeker_profile.nir,
@@ -2617,7 +2616,7 @@ class TestDirectHireFullProcess:
         assert response.status_code == 302
 
         expected_job_seeker_session = {
-            "config": {"reset_url": reset_url_dashboard},
+            "config": {"reset_url": reset_url_dashboard, "session_kind": JobSeekerSessionKinds.GET_OR_CREATE},
             "apply": {"company_pk": company.pk},
             "profile": {
                 "nir": dummy_job_seeker.jobseeker_profile.nir,
@@ -4159,6 +4158,7 @@ def test_detect_existing_job_seeker(client):
     expected_job_seeker_session = {
         "config": {
             "reset_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+            "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
         },
         "apply": {"company_pk": company.pk},
         "profile": {
@@ -4849,6 +4849,7 @@ class TestFindJobSeekerForHireView:
         expected_job_seeker_session = {
             "config": {
                 "reset_url": reverse("dashboard:index"),  # Hire: reset_url = dashboard
+                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "apply": {"company_pk": self.company.pk},
             "user": {
