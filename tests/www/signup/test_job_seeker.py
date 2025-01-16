@@ -5,6 +5,7 @@ import respx
 from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import get_user
 from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertFormError, assertMessages, assertRedirects
@@ -161,8 +162,8 @@ class TestJobSeekerSignup:
         post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
         url = reverse("login:existing_user", args=(user.public_id,))
         response = client.post(url, data=post_data)
-        assert response.status_code == 302
-        assert response.url == reverse("account_email_verification_sent")
+        assertRedirects(response, reverse("account_email_verification_sent"))
+        assert get_user(client).is_authenticated is False
 
         # Confirm email + auto login.
         confirmation_token = EmailConfirmationHMAC(user_email).key
@@ -170,6 +171,7 @@ class TestJobSeekerSignup:
         # User clicks on the confirm link in the email, that is a GET request.
         response = client.get(confirm_email_url)
         assertRedirects(response, reverse("welcoming_tour:index"))
+        assert get_user(client).is_authenticated is True
         user_email = user.emailaddress_set.first()
         assert user_email.verified
 
