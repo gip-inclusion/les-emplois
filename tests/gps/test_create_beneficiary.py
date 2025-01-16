@@ -54,10 +54,7 @@ def test_create_job_seeker(_mock, client):
 
     response = client.get(create_beneficiary_url)
     [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
-    next_url = (
-        reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
-        + "?gps=true"
-    )
+    next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
     assertRedirects(response, next_url)
     response = client.get(next_url)
     france_travail = Company.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
@@ -68,13 +65,10 @@ def test_create_job_seeker(_mock, client):
 
     response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
 
-    job_seeker_session_name = str(resolve(response.url.replace("?gps=true", "")).kwargs["session_uuid"])
-    next_url = (
-        reverse(
-            "job_seekers_views:search_by_email_for_sender",
-            kwargs={"session_uuid": job_seeker_session_name},
-        )
-        + "?gps=true"
+    job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
+    next_url = reverse(
+        "job_seekers_views:search_by_email_for_sender",
+        kwargs={"session_uuid": job_seeker_session_name},
     )
 
     expected_job_seeker_session = {
@@ -96,19 +90,16 @@ def test_create_job_seeker(_mock, client):
 
     response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
 
-    job_seeker_session_name = str(resolve(response.url.replace("?gps=true", "")).kwargs["session_uuid"])
+    job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
 
     expected_job_seeker_session |= {
         "user": {
             "email": dummy_job_seeker.email,
         },
     }
-    next_url = (
-        reverse(
-            "job_seekers_views:create_job_seeker_step_1_for_sender",
-            kwargs={"session_uuid": job_seeker_session_name},
-        )
-        + "?gps=true"
+    next_url = reverse(
+        "job_seekers_views:create_job_seeker_step_1_for_sender",
+        kwargs={"session_uuid": job_seeker_session_name},
     )
 
     assertRedirects(response, next_url)
@@ -150,12 +141,9 @@ def test_create_job_seeker(_mock, client):
     expected_job_seeker_session["user"] |= post_data
     assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
-    next_url = (
-        reverse(
-            "job_seekers_views:create_job_seeker_step_2_for_sender",
-            kwargs={"session_uuid": job_seeker_session_name},
-        )
-        + "?gps=true"
+    next_url = reverse(
+        "job_seekers_views:create_job_seeker_step_2_for_sender",
+        kwargs={"session_uuid": job_seeker_session_name},
     )
     assertRedirects(response, next_url)
 
@@ -174,12 +162,9 @@ def test_create_job_seeker(_mock, client):
     expected_job_seeker_session["user"] |= post_data | {"address_line_2": "", "address_for_autocomplete": None}
     assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
-    next_url = (
-        reverse(
-            "job_seekers_views:create_job_seeker_step_3_for_sender",
-            kwargs={"session_uuid": job_seeker_session_name},
-        )
-        + "?gps=true"
+    next_url = reverse(
+        "job_seekers_views:create_job_seeker_step_3_for_sender",
+        kwargs={"session_uuid": job_seeker_session_name},
     )
     assertRedirects(response, next_url)
 
@@ -208,12 +193,9 @@ def test_create_job_seeker(_mock, client):
     }
     assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
-    next_url = (
-        reverse(
-            "job_seekers_views:create_job_seeker_step_end_for_sender",
-            kwargs={"session_uuid": job_seeker_session_name},
-        )
-        + "?gps=true"
+    next_url = reverse(
+        "job_seekers_views:create_job_seeker_step_end_for_sender",
+        kwargs={"session_uuid": job_seeker_session_name},
     )
     assertRedirects(response, next_url)
 
@@ -250,10 +232,8 @@ def test_existing_user_with_email(client):
     # …until a job seeker has to be determined.
     assert response.status_code == 200
     last_url = response.redirect_chain[-1][0]
-    assert (
-        last_url
-        == reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
-        + "?gps=true"
+    assert last_url == reverse(
+        "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}
     )
 
     # Enter a non-existing NIR.
@@ -261,13 +241,10 @@ def test_existing_user_with_email(client):
     nir = "141068078200557"
     post_data = {"nir": nir, "confirm": 1}
     response = client.post(last_url, data=post_data)
-    job_seeker_session_name = str(resolve(response.url.replace("?gps=true", "")).kwargs["session_uuid"])
-    next_url = (
-        reverse(
-            "job_seekers_views:search_by_email_for_sender",
-            kwargs={"session_uuid": job_seeker_session_name},
-        )
-        + "?gps=true"
+    job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
+    next_url = reverse(
+        "job_seekers_views:search_by_email_for_sender",
+        kwargs={"session_uuid": job_seeker_session_name},
     )
     expected_job_seeker_session = {
         "config": {
@@ -328,10 +305,8 @@ def test_existing_user_with_nir(client):
     # …until a job seeker has to be determined.
     assert response.status_code == 200
     last_url = response.redirect_chain[-1][0]
-    assert (
-        last_url
-        == reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
-        + "?gps=true"
+    assert last_url == reverse(
+        "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}
     )
 
     # Enter an existing NIR.
@@ -378,8 +353,6 @@ def test_creation_by_user_kind(client, UserFactory, factory_args, expected_acces
     response = client.get(create_beneficiary_url)
     [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
     assert response.status_code == 302
-    assert (
-        response["Location"]
-        == reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
-        + "?gps=true"
+    assert response["Location"] == reverse(
+        "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}
     )
