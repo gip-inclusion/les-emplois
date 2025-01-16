@@ -227,6 +227,51 @@ def test_update_page_with_htmx_hx_target_this():
     )
 
 
+def test_update_page_with_htmx_no_hx_target():
+    simulated_page = parse_response_to_soup(
+        FakeResponse(
+            b"""
+              <html>
+                <body>
+                  <div id="main">
+                    <div>
+                      <form id="the-form" hx-post="/somewhere" hx-swap="outerHTML">
+                        <input name="some_input"/>
+                      </form>
+                    </div>
+                  </div>
+                </body>
+              </html>
+            """
+        )
+    )
+
+    htmx_response = FakeResponse(
+        b"""<div id="new-div">This replaced the form</div>""",
+        request={"PATH_INFO": "/somewhere", "REQUEST_METHOD": "POST", "QUERY_STRING": ""},
+    )
+
+    update_page_with_htmx(simulated_page, "#the-form", htmx_response)
+
+    assertSoupEqual(
+        simulated_page,
+        BeautifulSoup(
+            b"""
+              <html>
+                <body>
+                  <div id="main">
+                    <div>
+                      <div id="new-div">This replaced the form</div>
+                    </div>
+                  </div>
+                </body>
+              </html>
+            """,
+            "html5lib",
+        ),
+    )
+
+
 def test_assertSoupEqual():
     first_part = b"""<form hx-post="/somewhere" hx-swap="outerHTML" hx-target="this">
             <input name="csrfmiddlewaretoken" type="hidden" value="1234"/>

@@ -77,7 +77,7 @@ def update_page_with_htmx(page, select_htmx_element, htmx_response):
             _handle_swap(page, target=target, new_elements=[out_of_band_swap], mode=mode)
     _handle_swap(
         page,
-        target=_get_hx_attribute(htmx_element, "hx-target"),
+        target=_get_hx_attribute(htmx_element, "hx-target", default=htmx_element),
         new_elements=parsed_response.contents,
         mode=_get_hx_attribute(htmx_element, "hx-swap", default="innerHTML"),
     )
