@@ -1,23 +1,34 @@
 {% load buttons_form %}
 
 <div class="content-small">
-    <h1>Retrait d'un collaborateur</h1>
-    <div class="mt-4 alert alert-warning">
-        Vous allez retirer <b>{{ target_member.get_full_name }}</b>
-        de votre organisation <b>({{ structure.display_name }})</b>.
-    </div>
+    {% with request.user.is_employer|yesno:"structure,organisation" as org_display %}
+        <h1>Retrait d'un collaborateur</h1>
+        <p>
+            Êtes-vous sûr de vouloir retirer <b>{{ target_member.get_full_name }}</b> de votre {{ org_display }} <b>{{ structure.display_name }}</b> ?
+        </p>
 
-    <ul>
-        <li>Le tableau de bord de votre structure ne lui sera plus accessible.</li>
-        <li>Les modifications et ajouts réalisés sont toujours accessibles par les autres membres de votre organisation.</li>
-        <li>Cet utilisateur sera notifié par e-mail de son retrait de votre organisation.</li>
-        <li>En cas d'erreur, vous pourrez toujours lui renvoyer une invitation pour rejoindre votre organisation.</li>
-        {% if current_user.is_employer or current_user.is_prescriber %}
+        <p class="mb-0">Une fois retiré :</p>
+        <ul>
+            <li>Cet utilisateur sera notifié par e-mail de son retrait de votre {{ org_display }}.</li>
+            <li>Le tableau de bord de votre {{ org_display }} ne lui sera plus accessible.</li>
+            {% if request.user.is_prescriber %}
+                <li>Les candidatures effectuées par cet utilisateur resteront dans le tableau de bord de votre {{ org_display }}.</li>
+            {% else %}
+                <li>
+                    Les modifications et ajouts réalisés par cet utilisateur seront toujours accessibles par les autres membres de votre {{ org_display }}.
+                </li>
+            {% endif %}
+            {% if request.user.is_prescriber %}
+                <li>Cet utilisateur sera notifié par mail des éventuelles suites données aux candidatures qu'il a transmises.</li>
+            {% else %}
+                <li>Cet utilisateur continuera de recevoir ses notifications e-mail.</li>
+            {% endif %}
             <li>
-                Toutes les candidatures effectuées par ce collaborateur resteront dans le tableau de bord de l'organisation. Ce collaborateur sera notifié par mail des éventuelles suites données aux candidatures qu'il a transmises.
+                Toutes les notifications emails envoyées à cet utilisateur seront également envoyées aux administrateurs de votre {{ org_display }}.
             </li>
-        {% endif %}
-    </ul>
+        </ul>
+        <p>En cas d'erreur, vous pourrez toujours lui renvoyer une invitation pour rejoindre votre {{ org_display }}.</p>
+    {% endwith %}
 
     <form action="{% url base_url|add:":deactivate_member" target_member.pk %}" method="post">
         {% url base_url|add:":members" as reset_url %}
