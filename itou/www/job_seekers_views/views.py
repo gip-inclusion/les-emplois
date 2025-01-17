@@ -14,7 +14,6 @@ from django.utils import timezone
 from django.utils.html import format_html
 from django.views.generic import DetailView, ListView, TemplateView, View
 
-from itou.companies import enums as companies_enums
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
@@ -197,9 +196,7 @@ class GetOrCreateJobSeekerStartView(View):
             raise Http404
 
         company = None
-        if self.tunnel == "gps":
-            company = Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
-        else:
+        if self.tunnel == "sender" or self.tunnel == "hire":
             try:
                 company = get_object_or_404(Company.objects.with_has_active_members(), pk=request.GET.get("company"))
             except ValueError:
@@ -210,9 +207,9 @@ class GetOrCreateJobSeekerStartView(View):
                 "tunnel": self.tunnel,
                 "from_url": self.from_url,
                 "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
-            },
-            "apply": {"company_pk": company.pk} if company else {},
+            }
         }
+        data |= {"apply": {"company_pk": company.pk}} if company else {}
         self.job_seeker_session = SessionNamespace.create_uuid_namespace(request.session, data)
 
     def get(self, request, *args, **kwargs):
@@ -247,11 +244,8 @@ class JobSeekerBaseView(TemplateView):
             raise Http404
         self.is_gps = self.job_seeker_session.get("config", {}).get("tunnel") == "gps"
         if company_pk := self.job_seeker_session.get("apply", {}).get("company_pk"):
-            self.company = (
-                get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
-                if not self.is_gps
-                else Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
-            )
+            if not self.is_gps:
+                self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
         self.hire_process = hire_process
         self.prescription_process = (
             not self.hire_process
@@ -751,12 +745,11 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         )
 
     def get_next_url(self):
-        kwargs = {"company_pk": self.company.pk, "job_seeker_public_id": self.profile.user.public_id}
-
         if self.is_gps:
-            kwargs = {}
-            view_name = "gps:my_groups"
-        elif self.hire_process:
+            return reverse("gps:my_groups")
+
+        kwargs = {"company_pk": self.company.pk, "job_seeker_public_id": self.profile.user.public_id}
+        if self.hire_process:
             if self.company.kind == CompanyKind.GEIQ:
                 view_name = "apply:geiq_eligibility_for_hire"
             else:
