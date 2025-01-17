@@ -3,19 +3,11 @@
 
 {% block progress_title %}
     État civil du
-    {% if is_gps %}
-        bénéficiaire
-    {% else %}
-        candidat
-    {% endif %}
+    {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
 {% endblock %}
 {% block step_title %}
     Quel est l’état civil du
-    {% if is_gps %}
-        bénéficiaire
-    {% else %}
-        candidat
-    {% endif %}
+    {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
     ?
 {% endblock %}
 
