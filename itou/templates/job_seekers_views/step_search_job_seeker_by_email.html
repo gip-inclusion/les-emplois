@@ -56,7 +56,7 @@
                             </p>
                             <p>
                                 L'identité du candidat est une information clé pour la structure.
-                                {% if is_gps %}
+                                {% if is_gps|default:False %}
                                     Si vous ne souhaitez pas suivre <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Suivre un autre bénéficiaire » afin d'enregistrer ses informations personnelles.
                                 {% else %}
                                     Si cette candidature n'est pas pour <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
@@ -67,11 +67,7 @@
                             {% if can_add_nir %}
                                 <p>
                                     En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale {{ nir|format_nir }} soit associé à ce
-                                    {% if is_gps %}
-                                        bénéficiaire
-                                    {% else %}
-                                        candidat
-                                    {% endif %}
+                                    {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
                                 .</b>
                             </p>
                         {% endif %}
@@ -79,7 +75,7 @@
                     <div class="modal-footer">
 
                         {# Reload this page with a new form. #}
-                        {% if is_gps %}
+                        {% if is_gps|default:False %}
                             {% bootstrap_button "Suivre un autre bénéficiaire" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
                         {% else %}
                             {% bootstrap_button "Ce n'est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}

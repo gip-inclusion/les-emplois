@@ -10,11 +10,7 @@
         Création
     {% endif %}
     du compte
-    {% if is_gps %}
-        bénéficiaire
-    {% else %}
-        candidat
-    {% endif %}
+    {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
     {{ block.super }}
 {% endblock %}
 
@@ -26,11 +22,7 @@
             Création
         {% endif %}
         du compte
-        {% if is_gps %}
-            bénéficiaire
-        {% else %}
-            candidat
-        {% endif %}
+        {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
     </h1>
 {% endblock %}
 
