@@ -59,7 +59,7 @@
             {% endif %}
         </div>
     </div>
-    {% if siae.active_job_descriptions %}
+    {% if siae.active_job_descriptions and not siae.block_job_applications %}
         <hr class="m-0">
         {% if job_app_to_transfer|default:False %}
             <div class="c-box--results__body">

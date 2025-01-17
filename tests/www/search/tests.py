@@ -14,7 +14,12 @@ from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractNature,
 from itou.companies.models import Company
 from itou.jobs.models import Appellation, Rome
 from tests.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
-from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
+from tests.companies.factories import (
+    CompanyFactory,
+    CompanyMembershipFactory,
+    CompanyWithMembershipAndJobsFactory,
+    JobDescriptionFactory,
+)
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
@@ -398,6 +403,17 @@ class TestSearchCompany:
         )
         assertContains(response, f"<h3>{searchable_company.display_name}</h3>")
         assertNotContains(response, f"<h3>{unsearchable_company.display_name}</h3>")
+
+    def test_apply_button_is_not_shown_when_applications_are_blocked(self, client):
+        guerande = create_city_guerande()
+
+        company = CompanyWithMembershipAndJobsFactory(
+            department="44", coords=guerande.coords, post_code="44350", block_job_applications=True
+        )
+        response = client.get(self.URL, {"city": guerande.slug})
+
+        apply_url = f"{reverse('apply:start', kwargs={'company_pk': company.pk})}"
+        assertNotContains(response, apply_url)
 
     def test_results_links_from_job_seeker_list(self, client):
         """
