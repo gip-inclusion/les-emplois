@@ -50,8 +50,9 @@ AUTHORIZED_SCOPES = [
     "api_maj-pass-iaev1",
     "api_offresdemploiv2",
     "api_rechercheindividucertifiev1",
-    "api_romev1",
-    "nomenclatureRome",
+    # TODO: check if those 2 ROME-related scopes are again valid in a few days and uncomment them
+    # "api_romev1",
+    # "nomenclatureRome",
     "o2dsoffre",
     "passIAE",
     "rechercherIndividuCertifie",
