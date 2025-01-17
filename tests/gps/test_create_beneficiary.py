@@ -6,7 +6,6 @@ from django.urls import resolve, reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateNotUsed
 
 from itou.asp.models import Commune, Country, RSAAllocation
-from itou.companies import enums as companies_enums
 from itou.companies.enums import POLE_EMPLOI_SIRET
 from itou.companies.models import Company
 from itou.users.enums import LackOfPoleEmploiId, UserKind
@@ -32,7 +31,6 @@ from tests.utils.test import KNOWN_SESSION_KEYS
 )
 def test_create_job_seeker(_mock, client):
     [city] = create_test_cities(["67"], num_per_department=1)
-    singleton = Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
 
     prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
     user = prescriber_organization.members.first()
@@ -78,7 +76,6 @@ def test_create_job_seeker(_mock, client):
             "from_url": reverse("gps:my_groups"),
             "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
         },
-        "apply": {"company_pk": singleton.pk},
         "profile": {
             "nir": dummy_job_seeker.jobseeker_profile.nir,
         },
@@ -226,7 +223,6 @@ def test_existing_user_with_email(client):
     """
     A user with the same email already exists, create the group with this user
     """
-    singleton = Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
     # Only authorized prescribers can add a NIR.
     # See User.can_add_nir
     prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
@@ -264,7 +260,6 @@ def test_existing_user_with_email(client):
             "from_url": reverse("gps:my_groups"),
             "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
         },
-        "apply": {"company_pk": singleton.pk},
         "profile": {
             "nir": nir,
         },
