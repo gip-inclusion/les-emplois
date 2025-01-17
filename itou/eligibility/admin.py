@@ -1,23 +1,57 @@
 from django.contrib import admin
+from django.contrib.admin.templatetags import admin_list
+from django.forms import ValidationError
+from django.forms.models import BaseInlineFormSet
 from django.utils.html import format_html
 
 from itou.approvals import models as approvals_models
 from itou.eligibility import models
+from itou.eligibility.models.common import AbstractSelectedAdministrativeCriteria
 from itou.job_applications import models as job_applications_models
 from itou.utils.admin import ItouModelAdmin, ItouTabularInline, PkSupportRemarkInline, get_admin_view_link
 
 
-class AbstractAdministrativeCriteriaInline(ItouTabularInline):
+class AbstractSelectedAdministrativeCriteriaInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        for line in self.cleaned_data:
+            if line["DELETE"] and line["id"].certified:
+                raise ValidationError("Impossible de supprimer un critère certifié")
+
+
+class AbstractSelectedAdministrativeCriteriaInline(ItouTabularInline):
+    formset = AbstractSelectedAdministrativeCriteriaInlineFormSet
     extra = 0
     raw_id_fields = ("administrative_criteria",)
-    readonly_fields = ("created_at",)
+    fields = (
+        "administrative_criteria",
+        "certified_display",
+        "certified_at",
+        "certification_period",
+        "data_returned_by_api",
+        "created_at",
+    )
+    readonly_fields = (
+        "administrative_criteria",
+        "certified_display",
+        "certified_at",
+        "certification_period",
+        "data_returned_by_api",
+        "created_at",
+    )
+
+    @admin.display(description=AbstractSelectedAdministrativeCriteria._meta.get_field("certified").verbose_name)
+    def certified_display(self, obj):
+        if not obj.administrative_criteria.is_certifiable:
+            return "Non certifiable"
+        return admin_list._boolean_icon(obj.certified)
 
 
-class AdministrativeCriteriaInline(AbstractAdministrativeCriteriaInline):
+class SelectedAdministrativeCriteriaInline(AbstractSelectedAdministrativeCriteriaInline):
     model = models.EligibilityDiagnosis.administrative_criteria.through
 
 
-class GEIQAdministrativeCriteriaInline(AbstractAdministrativeCriteriaInline):
+class SelectedGEIQAdministrativeCriteriaInline(AbstractSelectedAdministrativeCriteriaInline):
     model = models.GEIQEligibilityDiagnosis.administrative_criteria.through
 
 
@@ -149,7 +183,7 @@ class EligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
         "is_considered_valid",
     )
     inlines = (
-        AdministrativeCriteriaInline,
+        SelectedAdministrativeCriteriaInline,
         JobApplicationInline,
         ApprovalInline,
         PkSupportRemarkInline,
@@ -185,7 +219,7 @@ class GEIQEligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
         "allowance_amount",
     )
     inlines = (
-        GEIQAdministrativeCriteriaInline,
+        SelectedGEIQAdministrativeCriteriaInline,
         JobApplicationInline,
         PkSupportRemarkInline,
     )
