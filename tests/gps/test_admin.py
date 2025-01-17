@@ -1,4 +1,5 @@
 import pytest
+from django.contrib.auth import get_user
 from django.urls import reverse
 from pytest_django.asserts import assertContains
 
@@ -42,3 +43,28 @@ def test_participant_admin_link(admin_client, user_factory):
 
     # Assert that the lookup works
     admin_client.get(expected_url)
+
+
+def test_create_follow_up_membership(admin_client):
+    group = FollowUpGroupFactory()
+    prescriber = PrescriberFactory()
+
+    url = reverse("admin:gps_followupgroupmembership_add")
+
+    post_data = {
+        "is_active": "on",
+        "follow_up_group": group.pk,
+        "member": prescriber.pk,
+    }
+    response = admin_client.post(url, data=post_data)
+    assert response.status_code == 302
+
+    membership = group.memberships.get()
+    assert membership.creator == get_user(admin_client)
+    assert membership.ended_at is None
+
+    url = reverse("admin:gps_followupgroupmembership_change", args=(membership.pk,))
+    response = admin_client.post(url, data={})  # no is_active to set it to False
+
+    membership.refresh_from_db()
+    assert membership.ended_at is not None
