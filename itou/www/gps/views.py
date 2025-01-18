@@ -105,7 +105,7 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
     queryset = User.objects.select_related("follow_up_group", "jobseeker_profile").prefetch_related(
         "follow_up_group__memberships"
     )
-    template_name = "users/details.html"
+    template_name = "gps/user_details.html"
     slug_field = "public_id"
     slug_url_kwarg = "public_id"
     context_object_name = "beneficiary"
