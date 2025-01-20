@@ -8,7 +8,9 @@ Organisation :
 
 - Nom : {{ structure.display_name }}
 - Type : {{ structure.kind }}
+{% if structure.email %}
 - Email de contact : {{ structure.email }}
+{% endif %}
 
 Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs cette structure sur les emplois de l'inclusion.
 

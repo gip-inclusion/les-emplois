@@ -93,6 +93,29 @@ class TestMembers:
         institution.refresh_from_db()
         assert_set_admin_role__creation(guest, institution, mailoutbox)
 
+    def test_deactivate_user(self, client, mailoutbox):
+        institution = InstitutionFactory()
+        admin_membership = InstitutionMembershipFactory(institution=institution, is_admin=True)
+        guest_membership = InstitutionMembershipFactory(institution=institution, is_admin=False)
+        guest_id = guest_membership.user_id
+
+        client.force_login(admin_membership.user)
+        url = reverse("institutions_views:deactivate_member", kwargs={"user_id": guest_id})
+        response = client.post(url)
+        assert response.status_code == 302
+
+        # User should be deactivated now
+        guest_membership.refresh_from_db()
+        assert guest_membership.is_active is False
+        assert admin_membership.user_id == guest_membership.updated_by_id
+        assert guest_membership.updated_at is not None
+
+        # User must have been notified of deactivation (we're human after all)
+        [email] = mailoutbox
+        assert f"[DEV] [Désactivation] Vous n'êtes plus membre de {institution.display_name}" == email.subject
+        assert "Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion" in email.body
+        assert email.to == [guest_membership.user.email]
+
     def test_remove_admin(self, client, mailoutbox):
         """
         Check the ability for an admin to remove another admin
