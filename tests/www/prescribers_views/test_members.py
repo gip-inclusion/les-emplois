@@ -84,7 +84,7 @@ class TestUserMembershipDeactivation:
         membership = memberships.first()
 
         client.force_login(admin)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": admin.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"public_id": admin.public_id})
         response = client.post(url)
         assert response.status_code == 403
 
@@ -106,7 +106,7 @@ class TestUserMembershipDeactivation:
         membership = memberships.first()
 
         client.force_login(admin)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
 
@@ -133,7 +133,7 @@ class TestUserMembershipDeactivation:
         organization.members.add(guest)
 
         client.force_login(guest)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 403
 
@@ -148,7 +148,7 @@ class TestUserMembershipDeactivation:
         guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
         client.force_login(admin)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
 
@@ -175,7 +175,7 @@ class TestUserMembershipDeactivation:
 
         # Admin remove guest from structure
         client.force_login(admin)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
         client.logout()

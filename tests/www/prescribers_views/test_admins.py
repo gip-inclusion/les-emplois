@@ -16,7 +16,7 @@ class TestPrescribersOrganizationAdminMembersManagement:
         guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
         client.force_login(admin)
-        url = reverse("prescribers_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
+        url = reverse("prescribers_views:update_admin_role", kwargs={"action": "add", "public_id": guest.public_id})
 
         # Redirection to confirm page
         response = client.get(url)
@@ -43,7 +43,7 @@ class TestPrescribersOrganizationAdminMembersManagement:
         assert guest in organization.active_admin_members
 
         client.force_login(admin)
-        url = reverse("prescribers_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
+        url = reverse("prescribers_views:update_admin_role", kwargs={"action": "remove", "public_id": guest.public_id})
 
         # Redirection to confirm page
         response = client.get(url)
@@ -65,7 +65,7 @@ class TestPrescribersOrganizationAdminMembersManagement:
         guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
         client.force_login(guest)
-        url = reverse("prescribers_views:update_admin_role", kwargs={"action": "remove", "user_id": admin.id})
+        url = reverse("prescribers_views:update_admin_role", kwargs={"action": "remove", "public_id": admin.public_id})
 
         # Redirection to confirm page
         response = client.get(url)
@@ -76,7 +76,7 @@ class TestPrescribersOrganizationAdminMembersManagement:
         assert response.status_code == 403
 
         # Add self as admin with no privilege
-        url = reverse("prescribers_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
+        url = reverse("prescribers_views:update_admin_role", kwargs={"action": "add", "public_id": guest.public_id})
 
         response = client.get(url)
         assert response.status_code == 403
@@ -97,4 +97,7 @@ class TestPrescribersOrganizationAdminMembersManagement:
 
         # update: possible actions are now filtered via RE_PATH in urls.py
         with pytest.raises(NoReverseMatch):
-            reverse("prescribers_views:update_admin_role", kwargs={"action": suspicious_action, "user_id": admin.id})
+            reverse(
+                "prescribers_views:update_admin_role",
+                kwargs={"action": suspicious_action, "public_id": admin.public_id},
+            )
