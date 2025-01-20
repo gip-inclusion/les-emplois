@@ -396,6 +396,18 @@ class TestJobDescriptionQuerySet:
 
         assert not JobDescription.objects.with_annotation_is_overwhelmed().get(pk=job_description.pk).is_overwhelmed
 
+        # Archived job applications should not count towards is_overwhelmed threshold.
+        job_description = siae_job_descriptions[3]
+        JobApplicationFactory.create_batch(
+            threshold_exceeded,
+            to_company=company,
+            job_seeker=job_seeker,
+            selected_jobs=[job_description],
+            archived_at=timezone.now() - timedelta(days=1),
+        )
+
+        assert not JobDescription.objects.with_annotation_is_overwhelmed().get(pk=job_description.pk).is_overwhelmed
+
     def test_with_job_applications_count(self):
         company = CompanyFactory(with_jobs=True)
         job_description = company.job_description_through.first()
