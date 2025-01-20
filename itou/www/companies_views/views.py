@@ -28,7 +28,7 @@ from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
 from itou.www.companies_views import forms as companies_forms
-
+from itou.users.models import User
 
 ITOU_SESSION_EDIT_COMPANY_KEY = "edit_siae_session_key"
 ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
@@ -635,21 +635,23 @@ def members(request, template_name="companies/members.html"):
 
 
 @check_user(lambda user: user.is_employer)
-def deactivate_member(request, user_id, template_name="companies/deactivate_member.html"):
+def deactivate_member(request, public_id, template_name="companies/deactivate_member.html"):
+    user = get_object_or_404(User, public_id=public_id)
     return deactivate_org_member(
         request,
-        user_id,
+        user.id,
         success_url=reverse("companies_views:members"),
         template_name=template_name,
     )
 
 
 @check_user(lambda user: user.is_employer)
-def update_admin_role(request, action, user_id, template_name="companies/update_admins.html"):
+def update_admin_role(request, action, public_id, template_name="companies/update_admins.html"):
+    user = get_object_or_404(User, public_id=public_id)
     return update_org_admin_role(
         request,
         action,
-        user_id,
+        user.id,
         success_url=reverse("companies_views:members"),
         template_name=template_name,
     )
