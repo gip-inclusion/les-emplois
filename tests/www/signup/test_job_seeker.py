@@ -7,9 +7,9 @@ from django.conf import settings
 from django.contrib import messages
 from django.test import override_settings
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertFormError, assertMessages, assertRedirects
+from pytest_django.asserts import assertContains, assertFormError, assertMessages, assertNotContains, assertRedirects
 
-from itou.asp.models import Commune
+from itou.asp.models import Commune, Country
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.users.enums import Title, UserKind
 from itou.users.models import User
@@ -20,7 +20,7 @@ from itou.www.signup.forms import JobSeekerSituationForm
 from tests.asp.factories import CountryEuropeFactory, CountryFranceFactory
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
-from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, JobSeekerFactory
 from tests.utils.test import parse_response_to_soup, reload_module
 
 
@@ -720,6 +720,32 @@ class TestJobSeekerSignup:
             name="birth_fields_conflict_title"
         )
         assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
+
+    def test_job_seeker_signup_cannot_conflict_with_other_user_type(self, client):
+        # If a user exists with the requested email, but they are not a candidate,
+        # I'm not given the option to login with the existing account.
+        existing_user = EmployerFactory()
+        geispolsheim = create_city_geispolsheim()
+        birthdate = "1990-01-01"
+
+        post_data = {
+            "nir": "141068078200557",
+            "title": existing_user.title,
+            "first_name": existing_user.first_name,
+            "last_name": existing_user.last_name,
+            "email": existing_user.email,  # Conflict on email
+            "birthdate": birthdate,
+            "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+            "birth_country": Country.france_id,
+        }
+
+        response = client.post(reverse("signup:job_seeker"), post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors["email"] == ["Un autre utilisateur utilise déjà cette adresse e-mail."]
+
+        # No modal presented.
+        assertMessages(response, [])
+        assertNotContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
 
     def test_job_seeker_signup_email_and_nir_priorities(self, client):
         """

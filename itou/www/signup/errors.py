@@ -34,8 +34,9 @@ class JobSeekerSignupConflictModalResolver:
 
     def __init__(self, cleaned_data, errors, nir, email):
         self.errors = errors
-        email_conflict_user = User.objects.filter(email=email).first() if email is not None else None
-        nir_conflict_user = User.objects.filter(jobseeker_profile__nir=nir).first() if nir is not None else None
+        job_seekers = User.objects.filter(kind=UserKind.JOB_SEEKER)
+        email_conflict_user = job_seekers.filter(email=email).first() if email is not None else None
+        nir_conflict_user = job_seekers.filter(jobseeker_profile__nir=nir).first() if nir is not None else None
 
         # A guess of identity is made (in order of priority) on NIR, email, and birth details
         # The final fallback is included because users will sometimes create one account with a temporary NIR,
@@ -45,8 +46,7 @@ class JobSeekerSignupConflictModalResolver:
             or email_conflict_user
             or (
                 all(key in cleaned_data for key in ["birthdate", "first_name", "last_name"])
-                and User.objects.filter(
-                    kind=UserKind.JOB_SEEKER,
+                and job_seekers.filter(
                     jobseeker_profile__birthdate=cleaned_data["birthdate"],
                     first_name__unaccent__iexact=cleaned_data["first_name"],
                     last_name__unaccent__iexact=cleaned_data["last_name"],
