@@ -125,6 +125,10 @@ class TestUserMembershipDeactivation:
         assert membership.updated_at is not None
         assert f"Expired 1 invitations to companies.Company {company.pk} for user_id={guest.pk}." in caplog.messages
         assert f"Expired 1 invitations to companies.Company {company.pk} from user_id={guest.pk}." in caplog.messages
+        assert (
+            f"User {admin.pk} deactivated companies.CompanyMembership of organization_id={company.pk} "
+            f"for user_id={guest.pk} is_admin=False."
+        ) in caplog.messages
 
         # Check mailbox
         # User must have been notified of deactivation (we're human after all)
@@ -194,6 +198,38 @@ class TestUserMembershipDeactivation:
         response = request(reverse("companies_views:deactivate_member", kwargs={"user_id": other_user.pk}))
         assert response.status_code == 404
         assert mailoutbox == []
+
+    def test_deactivate_admin(self, caplog, client, mailoutbox):
+        company = CompanyFactory()
+        admin_membership = CompanyMembershipFactory(company=company, is_admin=True)
+        other_admin_membership = CompanyMembershipFactory(company=company, is_admin=True)
+        other_admin = other_admin_membership.user
+        invitation = EmployerInvitationFactory(email=other_admin.email, company=company)
+
+        client.force_login(admin_membership.user)
+        response = client.post(reverse("companies_views:deactivate_member", kwargs={"user_id": other_admin.pk}))
+
+        assertRedirects(response, reverse("companies_views:members"))
+        other_admin_membership.refresh_from_db()
+        assert other_admin_membership.is_active is False
+        assert other_admin_membership.updated_by_id == admin_membership.user_id
+        assert other_admin_membership.updated_at is not None
+        assert (
+            f"Expired 1 invitations to companies.Company {company.pk} for user_id={other_admin.pk}."
+        ) in caplog.messages
+        assert (
+            f"Expired 0 invitations to companies.Company {company.pk} from user_id={other_admin.pk}."
+        ) in caplog.messages
+        assert (
+            f"User {admin_membership.user_id} deactivated companies.CompanyMembership "
+            f"of organization_id={company.pk} for user_id={other_admin.pk} is_admin=True."
+        ) in caplog.messages
+        [email] = mailoutbox
+        assert f"[DEV] [Désactivation] Vous n'êtes plus membre de {company.display_name}" == email.subject
+        assert "Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion" in email.body
+        assert email.to == [other_admin_membership.user.email]
+        invitation.refresh_from_db()
+        assert invitation.has_expired is True
 
     def test_user_with_no_company_left(self, client):
         """

@@ -64,6 +64,10 @@ class TestInstitutionModel:
             f"Expired 0 invitations to institutions.Institution {institution.pk} for user_id={admin_user.pk}."
             in caplog.messages
         )
+        assert (
+            f"Creating institutions.InstitutionMembership of organization_id={institution.pk} "
+            f"for user_id={admin_user.pk} is_admin=True."
+        ) in caplog.messages
 
         other_user = LaborInspectorFactory()
         invit1, invit2 = LaborInspectorInvitationFactory.create_batch(
@@ -83,6 +87,10 @@ class TestInstitutionModel:
         assert (
             f"Expired 2 invitations to institutions.Institution {institution.pk} for user_id={other_user.pk}."
         ) in caplog.messages
+        assert (
+            f"Creating institutions.InstitutionMembership of organization_id={institution.pk} "
+            f"for user_id={other_user.pk} is_admin=False."
+        ) in caplog.messages
         assertQuerySetEqual(
             LaborInspectorInvitation.objects.all(),
             [
@@ -101,7 +109,7 @@ class TestInstitutionModel:
             ordered=False,
         )
 
-        institution.memberships.filter(user=other_user).update(is_active=False)
+        institution.memberships.filter(user=other_user).update(is_active=False, is_admin=True)
         invit = LaborInspectorInvitationFactory(email=other_user.email, institution=institution, sender=admin_user)
         institution.add_or_activate_membership(other_user)
         assert institution.memberships.get(user=other_user).is_active
@@ -110,6 +118,10 @@ class TestInstitutionModel:
             f"Expired 1 invitations to institutions.Institution {institution.pk} for user_id={other_user.pk}."
             in caplog.messages
         )
+        assert (
+            f"Reactivating institutions.InstitutionMembership of organization_id={institution.pk} "
+            f"for user_id={other_user.pk} is_admin=False."
+        ) in caplog.messages
         invit.refresh_from_db()
         assert invit.has_expired is True
 

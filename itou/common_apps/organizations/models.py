@@ -102,14 +102,30 @@ class OrganizationAbstract(models.Model):
         )
 
     def add_or_activate_membership(self, user):
-        """Add user to organization members, or activate membership if already there"""
-
-        updated = self.memberships.filter(user=user).update(is_active=True)
-        if not updated:
-            # There was no membership with this user
-            is_admin = not self.members.exists()
-            self.memberships.create(user=user, is_admin=is_admin)
+        membership_model = self.members.through
+        is_only_active_member = not self.memberships.active().exists()
+        try:
+            membership = self.memberships.get(user=user)
+        except membership_model.DoesNotExist:
+            membership = self.memberships.create(user=user, is_admin=is_only_active_member)
+            action = "Creating"
+        else:
+            action = "Reactivating"
+            membership.is_active = True
+            membership.is_admin = is_only_active_member
+            membership.save(update_fields=["is_active", "is_admin"])
         self.expire_invitations(user)
+        logger.info(
+            "%(action)s %(membership)s of organization_id=%(organization_id)d "
+            "for user_id=%(user_id)d is_admin=%(is_admin)s.",
+            {
+                "action": action,
+                "membership": membership_model._meta.label,
+                "organization_id": self.pk,
+                "user_id": user.pk,
+                "is_admin": membership.is_admin,
+            },
+        )
 
     def deactivate_membership(self, membership, *, updated_by):
         """
@@ -122,6 +138,7 @@ class OrganizationAbstract(models.Model):
             raise ValueError(
                 f"Cannot deactivate users from other organizations. {membership_organization_id=} {self.pk=}."
             )
+        was_admin = membership.is_admin
         membership.is_active = False
         # If this member is invited again, he should no still be an administrator.
         # Remove admin rights as a precaution.
@@ -130,6 +147,17 @@ class OrganizationAbstract(models.Model):
         membership.save(update_fields=["is_active", "is_admin", "updated_by"])
         self.expire_invitations(membership.user)
         self.member_deactivation_email(membership.user).send()
+        logger.info(
+            "User %(updated_by)s deactivated %(membership)s of organization_id=%(organization_id)d "
+            "for user_id=%(user_id)d is_admin=%(is_admin)s.",
+            {
+                "updated_by": updated_by.pk,
+                "membership": self.members.through._meta.label,
+                "organization_id": self.pk,
+                "user_id": membership.user_id,
+                "is_admin": was_admin,
+            },
+        )
 
     def set_admin_role(self, membership, admin, *, updated_by):
         membership_organization_id = getattr(membership, f"{self.members.source_field_name}_id")

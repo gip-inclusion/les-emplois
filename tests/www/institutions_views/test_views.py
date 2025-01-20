@@ -1,6 +1,6 @@
 import pytest
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.institutions.factories import (
@@ -122,6 +122,10 @@ class TestMembers:
         assert (
             f"Expired 1 invitations to institutions.Institution {institution.pk} from user_id={guest.pk}."
         ) in caplog.messages
+        assert (
+            f"User {admin_membership.user_id} deactivated institutions.InstitutionMembership "
+            f"of organization_id={institution.pk} for user_id={guest.pk} is_admin=False."
+        ) in caplog.messages
 
         # User must have been notified of deactivation (we're human after all)
         [email] = mailoutbox
@@ -180,6 +184,38 @@ class TestMembers:
         response = request(reverse("institutions_views:deactivate_member", kwargs={"user_id": other_user.pk}))
         assert response.status_code == 404
         assert mailoutbox == []
+
+    def test_deactivate_admin(self, caplog, client, mailoutbox):
+        institution = InstitutionFactory()
+        admin_membership = InstitutionMembershipFactory(institution=institution, is_admin=True)
+        other_admin_membership = InstitutionMembershipFactory(institution=institution, is_admin=True)
+        other_admin = other_admin_membership.user
+        invitation = LaborInspectorInvitationFactory(email=other_admin.email, institution=institution)
+
+        client.force_login(admin_membership.user)
+        response = client.post(reverse("institutions_views:deactivate_member", kwargs={"user_id": other_admin.pk}))
+
+        assertRedirects(response, reverse("institutions_views:members"))
+        other_admin_membership.refresh_from_db()
+        assert other_admin_membership.is_active is False
+        assert other_admin_membership.updated_by_id == admin_membership.user_id
+        assert other_admin_membership.updated_at is not None
+        assert (
+            f"Expired 1 invitations to institutions.Institution {institution.pk} for user_id={other_admin.pk}."
+        ) in caplog.messages
+        assert (
+            f"Expired 0 invitations to institutions.Institution {institution.pk} from user_id={other_admin.pk}."
+        ) in caplog.messages
+        assert (
+            f"User {admin_membership.user_id} deactivated institutions.InstitutionMembership "
+            f"of organization_id={institution.pk} for user_id={other_admin.pk} is_admin=True."
+        ) in caplog.messages
+        [email] = mailoutbox
+        assert f"[DEV] [Désactivation] Vous n'êtes plus membre de {institution.display_name}" == email.subject
+        assert "Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion" in email.body
+        assert email.to == [other_admin_membership.user.email]
+        invitation.refresh_from_db()
+        assert invitation.has_expired is True
 
     def test_remove_admin(self, client, mailoutbox):
         """

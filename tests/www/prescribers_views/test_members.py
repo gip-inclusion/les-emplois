@@ -1,6 +1,6 @@
 import pytest
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
 from tests.prescribers.factories import (
@@ -129,6 +129,10 @@ class TestUserMembershipDeactivation:
             f"Expired 1 invitations to prescribers.PrescriberOrganization {organization.pk} from user_id={guest.pk}."
             in caplog.messages
         )
+        assert (
+            f"User {admin.pk} deactivated prescribers.PrescriberMembership of organization_id={organization.pk} "
+            f"for user_id={guest.pk} is_admin=False."
+        ) in caplog.messages
 
         # Check mailbox
         # User must have been notified of deactivation (we're human after all)
@@ -224,6 +228,40 @@ class TestUserMembershipDeactivation:
         url = reverse("dashboard:index")
         response = client.post(url)
         assert response.status_code == 200
+
+    def test_deactivate_admin(self, caplog, client, mailoutbox):
+        organization = PrescriberOrganizationFactory()
+        admin_membership = PrescriberMembershipFactory(organization=organization, is_admin=True)
+        other_admin_membership = PrescriberMembershipFactory(organization=organization, is_admin=True)
+        other_admin = other_admin_membership.user
+        invitation = PrescriberWithOrgInvitationFactory(email=other_admin.email, organization=organization)
+
+        client.force_login(admin_membership.user)
+        response = client.post(reverse("prescribers_views:deactivate_member", kwargs={"user_id": other_admin.pk}))
+
+        assertRedirects(response, reverse("prescribers_views:members"))
+        other_admin_membership.refresh_from_db()
+        assert other_admin_membership.is_active is False
+        assert other_admin_membership.updated_by_id == admin_membership.user_id
+        assert other_admin_membership.updated_at is not None
+        assert (
+            f"Expired 1 invitations to prescribers.PrescriberOrganization {organization.pk} "
+            f"for user_id={other_admin.pk}."
+        ) in caplog.messages
+        assert (
+            f"Expired 0 invitations to prescribers.PrescriberOrganization {organization.pk} "
+            f"from user_id={other_admin.pk}."
+        ) in caplog.messages
+        assert (
+            f"User {admin_membership.user_id} deactivated prescribers.PrescriberMembership "
+            f"of organization_id={organization.pk} for user_id={other_admin.pk} is_admin=True."
+        ) in caplog.messages
+        [email] = mailoutbox
+        assert f"[DEV] [Désactivation] Vous n'êtes plus membre de {organization.display_name}" == email.subject
+        assert "Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion" in email.body
+        assert email.to == [other_admin_membership.user.email]
+        invitation.refresh_from_db()
+        assert invitation.has_expired is True
 
     def test_structure_selector(self, client):
         """
