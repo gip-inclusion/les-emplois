@@ -1,11 +1,15 @@
+from datetime import timedelta
+
 import pytest
 from django.db import IntegrityError, transaction
 from django.forms import ValidationError
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertRedirects
+from django.utils import timezone
+from pytest_django.asserts import assertContains, assertQuerySetEqual, assertRedirects
 
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
+from itou.invitations.models import LaborInspectorInvitation
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.institutions.factories import (
     InstitutionFactory,
@@ -13,6 +17,7 @@ from tests.institutions.factories import (
     InstitutionWith2MembershipFactory,
     InstitutionWithMembershipFactory,
 )
+from tests.invitations.factories import LaborInspectorInvitationFactory
 from tests.users.factories import LaborInspectorFactory, PrescriberFactory
 
 
@@ -48,23 +53,65 @@ class TestInstitutionModel:
 
         assert active_user_with_active_membership not in institution.active_members
 
-    def test_add_or_activate_membership(self):
+    def test_add_or_activate_membership(self, caplog):
         institution = InstitutionFactory()
         assert 0 == institution.members.count()
         admin_user = LaborInspectorFactory()
         institution.add_or_activate_membership(admin_user)
         assert 1 == institution.memberships.count()
         assert institution.memberships.get(user=admin_user).is_admin
+        assert (
+            f"Expired 0 invitations to institutions.Institution {institution.pk} for user_id={admin_user.pk}."
+            in caplog.messages
+        )
 
         other_user = LaborInspectorFactory()
+        invit1, invit2 = LaborInspectorInvitationFactory.create_batch(
+            2, email=other_user.email, institution=institution, sender=admin_user
+        )
+        invit_expired = LaborInspectorInvitationFactory(
+            email=other_user.email,
+            institution=institution,
+            sender=admin_user,
+            sent_at=timezone.now() - timedelta(days=365),
+        )
+        invit_other = LaborInspectorInvitationFactory(email=other_user.email)
         institution.add_or_activate_membership(other_user)
         assert 2 == institution.memberships.count()
         assert not institution.memberships.get(user=other_user).is_admin
         assert institution.memberships.get(user=other_user).is_active
+        assert (
+            f"Expired 2 invitations to institutions.Institution {institution.pk} for user_id={other_user.pk}."
+        ) in caplog.messages
+        assertQuerySetEqual(
+            LaborInspectorInvitation.objects.all(),
+            [
+                (invit1.pk, institution.pk, admin_user.pk, other_user.email, 0),
+                (invit2.pk, institution.pk, admin_user.pk, other_user.email, 0),
+                (invit_expired.pk, institution.pk, admin_user.pk, other_user.email, 14),
+                (invit_other.pk, invit_other.institution_id, invit_other.sender_id, other_user.email, 14),
+            ],
+            transform=lambda x: (
+                x.pk,
+                x.institution_id,
+                x.sender_id,
+                x.email,
+                x.validity_days,
+            ),
+            ordered=False,
+        )
 
         institution.memberships.filter(user=other_user).update(is_active=False)
+        invit = LaborInspectorInvitationFactory(email=other_user.email, institution=institution, sender=admin_user)
         institution.add_or_activate_membership(other_user)
         assert institution.memberships.get(user=other_user).is_active
+        assert institution.memberships.get(user=other_user).is_admin is False
+        assert (
+            f"Expired 1 invitations to institutions.Institution {institution.pk} for user_id={other_user.pk}."
+            in caplog.messages
+        )
+        invit.refresh_from_db()
+        assert invit.has_expired is True
 
         wrong_kind_user = PrescriberFactory()
         with pytest.raises(ValidationError):

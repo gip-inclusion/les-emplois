@@ -10,6 +10,7 @@ from tests.institutions.factories import (
     InstitutionWithMembershipFactory,
     LaborInspectorFactory,
 )
+from tests.invitations.factories import LaborInspectorInvitationFactory
 
 
 class TestMembers:
@@ -95,14 +96,18 @@ class TestMembers:
         institution.refresh_from_db()
         assert_set_admin_role__creation(guest, institution, mailoutbox)
 
-    def test_deactivate_user(self, client, mailoutbox, snapshot):
+    def test_deactivate_user(self, caplog, client, mailoutbox, snapshot):
         institution = InstitutionFactory(name="DDETS 14")
         admin_membership = InstitutionMembershipFactory(institution=institution, is_admin=True)
         guest_membership = InstitutionMembershipFactory(institution=institution, is_admin=False)
-        guest_id = guest_membership.user_id
+        guest = guest_membership.user
+
+        received_invitation = LaborInspectorInvitationFactory(email=guest.email, institution=institution)
+        sent_invitation = LaborInspectorInvitationFactory(sender=guest, institution=institution)
+        sent_invitation_to_other = LaborInspectorInvitationFactory(sender=guest)
 
         client.force_login(admin_membership.user)
-        url = reverse("institutions_views:deactivate_member", kwargs={"user_id": guest_id})
+        url = reverse("institutions_views:deactivate_member", kwargs={"user_id": guest.pk})
         response = client.post(url)
         assert response.status_code == 302
 
@@ -111,6 +116,12 @@ class TestMembers:
         assert guest_membership.is_active is False
         assert admin_membership.user_id == guest_membership.updated_by_id
         assert guest_membership.updated_at is not None
+        assert (
+            f"Expired 1 invitations to institutions.Institution {institution.pk} for user_id={guest.pk}."
+        ) in caplog.messages
+        assert (
+            f"Expired 1 invitations to institutions.Institution {institution.pk} from user_id={guest.pk}."
+        ) in caplog.messages
 
         # User must have been notified of deactivation (we're human after all)
         [email] = mailoutbox
@@ -118,6 +129,12 @@ class TestMembers:
         assert "Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion" in email.body
         assert email.to == [guest_membership.user.email]
         assert email.body == snapshot
+        received_invitation.refresh_from_db()
+        assert received_invitation.has_expired is True
+        sent_invitation.refresh_from_db()
+        assert sent_invitation.has_expired is True
+        sent_invitation_to_other.refresh_from_db()
+        assert sent_invitation_to_other.has_expired is False
 
     def test_deactivate_user_from_another_organisation(self, client, mailoutbox):
         my_institution = InstitutionFactory()
