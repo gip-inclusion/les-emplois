@@ -4,11 +4,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Prefetch
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
+from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 
-from itou.gps.models import FollowUpGroupMembership
+from itou.gps.grist import log_contact_info_display
+from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.pagination import pager
@@ -175,3 +177,22 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
         }
 
         return context
+
+
+@require_POST
+@check_user(is_allowed_to_use_gps)
+def display_contact_info(request, group_id, target_participant_public_id, mode):
+    template_name = {
+        "email": "gps/includes/member_email.html",
+        "phone": "gps/includes/member_phone.html",
+    }.get(mode, None)
+    if not template_name:
+        raise ValueError("Invalid mode: %s", mode)
+
+    follow_up_group = get_object_or_404(FollowUpGroup.objects.filter(members=request.user), pk=group_id)
+    target_participant = get_object_or_404(
+        User.objects.filter(follow_up_groups__follow_up_group_id=group_id),
+        public_id=target_participant_public_id,
+    )
+    log_contact_info_display(request.user, follow_up_group, target_participant, mode)
+    return render(request, template_name, {"member": target_participant})

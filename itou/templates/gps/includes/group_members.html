@@ -14,54 +14,62 @@
             </div>
         </div>
     </div>
-    <ul class="list-unstyled p-0 m-0">
-        {% for membership in gps_memberships %}
-            <li class="c-box--results__header px-0 gps_intervenant">
-                <div class="c-box--results__summary flex-grow-1">
-                    <i class="ri-user-line" aria-hidden="true"></i>
-                    <div>
-                        <h3 class="mb-2">
-                            {{ membership.member.get_full_name }}
-                            <span class="fw-normal fs-6 fst-italic">
-                                {% comment %}
+    <form>
+        {% csrf_token %}
+        <ul class="list-unstyled p-0 m-0">
+            {% for membership in gps_memberships %}
+                <li class="c-box--results__header px-0 gps_intervenant" id="card-{{ membership.member_id }}">
+                    <div class="c-box--results__summary">
+                        <i class="ri-user-line" aria-hidden="true"></i>
+                        <div class="d-flex flex-column flex-md-row gap-2 align-items-md-start gap-md-3">
+                            <div class="col">
+                                <h3 class="mb-2">
+                                    {{ membership.member.get_full_name }}
+                                    <span class="fw-normal fs-6 fst-italic">
+                                        {% comment %}
                                 DJlint wants to move the if block and the closing parenthesis to the next line,
                                 adding two inelegant spaces.
-                                {% endcomment %}
-                                {# djlint:off #}
+                                        {% endcomment %}
+                                        {# djlint:off #}
                                 ({{ membership.member.get_kind_display }}{% if membership.organization_name %} pour {{ membership.organization_name }}{% endif %})
-                                {# djlint:on #}
-                            </span>
-                        </h3>
+                                        {# djlint:on #}
+                                    </span>
+                                </h3>
 
-                        <ul class="list-unstyled">
-                            <li class="py-1">
-                                <i class="ri-mail-line fw-normal me-1" aria-hidden="true"></i>
-                                <span>{{ membership.member.email }}</span>
-                                {% matomo_event "gps" "clic" "copied_member_email" as matomo_event_attrs %}
-                                {% include 'includes/copy_to_clipboard.html' with content=membership.member.email css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
-                            </li>
-                            <li class="py-1">
-                                <i class="ri-phone-line fw-normal me-1" aria-hidden="true"></i>
-                                {% if membership.member.phone %}
-                                    <span>{{ membership.member.phone|format_phone }}</span>
-                                    {% matomo_event "gps" "clic" "copied_member_phone" as matomo_event_attrs %}
-                                    {% include 'includes/copy_to_clipboard.html' with content=membership.member.phone css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
-                                {% else %}
-                                    <i class="text-disabled">Téléphone non renseigné</i>
-                                {% endif %}
-                            </li>
-                            <li class="py-1">
-                                <i class="ri-calendar-line fw-normal me-1" aria-hidden="true"></i>Suivi depuis le <strong>{{ membership.created_at|date:"d/m/Y" }}</strong>
-                            </li>
-                            {% if membership.is_referent %}
-                                <li class="py-1">
-                                    <i class="ri-map-pin-user-line fw-normal me-1" aria-hidden="true"></i><strong>Référent</strong>
-                                </li>
+                                <ul class="list-unstyled">
+                                    <li class="py-1">
+                                        <i class="ri-calendar-line fw-normal me-1" aria-hidden="true"></i>Suivi depuis le <strong>{{ membership.created_at|date:"d/m/Y" }}</strong>
+                                    </li>
+                                    {% if membership.is_referent %}
+                                        <li class="py-1">
+                                            <i class="ri-map-pin-user-line fw-normal me-1" aria-hidden="true"></i><strong>Référent</strong>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            {% if membership.member.phone %}
+                                <button class="btn btn-outline-primary btn-ico w-100 w-md-auto"
+                                        id="phone-{{ membership.member_id }}"
+                                        hx-post="{% url "gps:display_contact_info" beneficiary.follow_up_group.id membership.member_id "phone" %}"
+                                        hx-swap="outerHTML"
+                                        {% matomo_event "gps" "clic" "displayed_member_phone" %}>
+                                    <i class="ri-phone-line fw-normal me-1" aria-hidden="true"></i>
+                                    <span>Afficher le téléphone</span>
+                                </button>
                             {% endif %}
-                        </ul>
+                            <button class="btn btn-outline-primary btn-ico w-100 w-md-auto"
+                                    id="email-{{ membership.member_id }}"
+                                    hx-post="{% url "gps:display_contact_info" beneficiary.follow_up_group.id membership.member_id "email" %}"
+                                    hx-swap="outerHTML"
+                                    {% matomo_event "gps" "clic" "displayed_member_email" %}>
+                                <i class="ri-mail-line fw-normal me-1" aria-hidden="true"></i>
+                                <span>Afficher l'email</span>
+                            </button>
+
+                        </div>
                     </div>
-                </div>
-            </li>
-        {% endfor %}
-    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    </form>
 </div>
