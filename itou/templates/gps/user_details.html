@@ -69,7 +69,7 @@
             <div class="row">
                 <div class="col-12" id="beneficiary_details_container">
                     {# Job seeker info ------------------------------------------------------------------------- #}
-                    <div class="c-box mb-3 mb-lg-5">
+                    <div class="c-box">
                         <h2>Données administratives</h2>
                         <hr>
                         <div class="row">
@@ -238,11 +238,12 @@
                             </div>
                         </div>
                     </div>
-                    {% include "gps/includes/group_members.html" with gps_memberships=gps_memberships %}
                 </div>
             </div>
         </div>
     </section>
+
+    {% include "gps/includes/group_members.html" with gps_memberships=gps_memberships %}
 {% endblock %}
 
 {% block modals %}
