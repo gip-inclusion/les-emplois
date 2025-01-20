@@ -1,10 +1,10 @@
 RDV_INSERTION_AUTH_SUCCESS_BODY = {
     "data": {
-        "email": "tech@inclusion.beta.gouv.fr",
+        "email": "tech.emplois@inclusion.gouv.fr",
         "first_name": "Jean",
         "last_name": "Teste",
         "provider": "email",
-        "uid": "tech@inclusion.beta.gouv.fr",
+        "uid": "tech.emplois@inclusion.gouv.fr",
         "id": 1,
         "deleted_at": None,
         "email_original": None,
@@ -29,7 +29,7 @@ RDV_INSERTION_AUTH_SUCCESS_BODY = {
 RDV_INSERTION_AUTH_SUCCESS_HEADERS = {
     "access-token": "V60eQsbHA6m2hTIsHzD-Jw",
     "client": "KhtrOXm0US_kCq79JhJAyA",
-    "uid": "tech@inclusion.beta.gouv.fr",
+    "uid": "tech.emplois@inclusion.gouv.fr",
 }
 
 RDV_INSERTION_AUTH_FAILURE_BODY = {
@@ -53,7 +53,7 @@ RDV_INSERTION_CREATE_AND_INVITE_SUCCESS_BODY = {
         "title": "monsieur",
         "address": "112 Quai de Jemmapes, 75010 Paris",
         "phone_number": None,
-        "email": "tech@inclusion.beta.gouv.fr",
+        "email": "tech.emplois@inclusion.gouv.fr",
         "birth_date": "1970-01-01",
         "rights_opening_date": "2024-06-22",
         "birth_name": None,
@@ -99,7 +99,7 @@ RDV_INSERTION_WEBHOOK_INVITATION_BODY = {
             "id": 3432,
             "uid": None,
             "role": "demandeur",
-            "email": "tech@inclusion.beta.gouv.fr",
+            "email": "tech.emplois@inclusion.gouv.fr",
             "title": "madame",
             "address": "102 Quai de Jemmapes, 75010 Paris 10ème",
             "last_name": "Test",
@@ -157,7 +157,7 @@ RDV_INSERTION_WEBHOOK_APPOINTMENT_BODY = {
                 "id": 3432,
                 "uid": None,
                 "role": "demandeur",
-                "email": "tech@inclusion.beta.gouv.fr",
+                "email": "tech.emplois@inclusion.gouv.fr",
                 "title": "madame",
                 "address": "102 Quai de Jemmapes, 75010 Paris 10ème",
                 "last_name": "Test",
@@ -176,7 +176,7 @@ RDV_INSERTION_WEBHOOK_APPOINTMENT_BODY = {
         "agents": [
             {
                 "id": 370,
-                "email": "tech@inclusion.beta.gouv.fr",
+                "email": "tech.emplois@inclusion.gouv.fr",
                 "last_name": "Itou",
                 "first_name": "Tech",
                 "rdv_solidarites_agent_id": 1791,
@@ -204,7 +204,7 @@ RDV_INSERTION_WEBHOOK_APPOINTMENT_BODY = {
                     "id": 3432,
                     "uid": None,
                     "role": "demandeur",
-                    "email": "tech@inclusion.beta.gouv.fr",
+                    "email": "tech.emplois@inclusion.gouv.fr",
                     "title": "madame",
                     "address": "102 Quai de Jemmapes, 75010 Paris 10ème",
                     "last_name": "Test",
