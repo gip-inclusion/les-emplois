@@ -1,6 +1,5 @@
 DDETS_HELP_CENTER_URL = "https://plateforme-inclusion-ddets-dreets.zendesk.com/hc/fr"
 ITOU_HELP_CENTER_URL = "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr"
-ITOU_EMAIL_PROLONGATION = "prolongation@inclusion.beta.gouv.fr"
 PILOTAGE_HELP_CENTER_URL = "https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr"
 PILOTAGE_SITE_URL = "https://pilotage.inclusion.beta.gouv.fr"
 EMPLOIS_SITE_URL = "https://emplois.inclusion.beta.gouv.fr"
