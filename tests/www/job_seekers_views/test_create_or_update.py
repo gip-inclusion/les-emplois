@@ -85,6 +85,36 @@ class TestGetOrCreateForJobSeeker:
             response = client.get(start_url)
             assert response.status_code == 403
 
+    def test_create_forbidden_for_job_seekers(self, client):
+        TUNNELS = ["sender", "hire", "gps"]
+        company = CompanyFactory()
+        job_seeker = JobSeekerFactory()
+
+        client.force_login(job_seeker)
+
+        for tunnel in TUNNELS:
+            # Init session, since a job seeker cannot access the start view this should be impossible
+            session = client.session
+            session_name = str(uuid.uuid4())
+            session[session_name] = {
+                "config": {
+                    "tunnel": tunnel,
+                    "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+                    "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
+                },
+                "apply": {"company_pk": company.pk},
+            }
+            session.save()
+            response = client.get(
+                reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": session_name})
+            )
+            assert response.status_code == 403
+
+            response = client.get(
+                reverse("job_seekers_views:check_nir_for_hire", kwargs={"session_uuid": session_name})
+            )
+            assert response.status_code == 403
+
     def test_check_nir_with_session(self, client):
         company = CompanyFactory(with_membership=True)
         user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
@@ -223,6 +253,28 @@ class TestGetOrCreateForSender:
                 """,
                 html=True,
             )
+
+    def test_check_nir_for_jobseeker_forbidden_for_sender(self, client):
+        company = CompanyFactory(with_membership=True)
+        user = company.members.get()
+        client.force_login(user)
+
+        # Init a job_seeker session for a sender (should be impossible, the tunnels
+        # are well separated in apply StartView)
+        session = client.session
+        session_name = str(uuid.uuid4())
+        session[session_name] = {
+            "config": {
+                "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+                "session_kind": JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER,
+            },
+            "apply": {"company_pk": company.pk},
+        }
+        session.save()
+        response = client.get(
+            reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": session_name})
+        )
+        assert response.status_code == 403
 
     def test_check_nir_with_session(self, client):
         company = CompanyFactory(with_membership=True)
