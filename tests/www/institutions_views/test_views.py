@@ -83,7 +83,7 @@ class TestMembers:
         guest = institution.members.filter(institutionmembership__is_admin=False).first()
 
         client.force_login(admin)
-        url = reverse("institutions_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
+        url = reverse("institutions_views:update_admin_role", kwargs={"action": "add", "public_id": guest.public_id})
 
         # Redirection to confirm page
         response = client.get(url)
@@ -107,7 +107,7 @@ class TestMembers:
         sent_invitation_to_other = LaborInspectorInvitationFactory(sender=guest)
 
         client.force_login(admin_membership.user)
-        url = reverse("institutions_views:deactivate_member", kwargs={"user_id": guest.pk})
+        url = reverse("institutions_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
 
@@ -150,7 +150,7 @@ class TestMembers:
         response = client.post(
             reverse(
                 "institutions_views:deactivate_member",
-                kwargs={"user_id": other_membership.user_id},
+                kwargs={"public_id": other_membership.user.public_id},
             ),
         )
 
@@ -167,7 +167,7 @@ class TestMembers:
         client.force_login(admin_membership.user)
         request = getattr(client, method)
         response = request(
-            reverse("institutions_views:deactivate_member", kwargs={"user_id": guest_membership.user_id})
+            reverse("institutions_views:deactivate_member", kwargs={"public_id": guest_membership.user.public_id})
         )
         assert response.status_code == 404
         guest_membership.refresh_from_db()
@@ -181,7 +181,7 @@ class TestMembers:
         other_user = LaborInspectorFactory()
         client.force_login(admin_membership.user)
         request = getattr(client, method)
-        response = request(reverse("institutions_views:deactivate_member", kwargs={"user_id": other_user.pk}))
+        response = request(reverse("institutions_views:deactivate_member", kwargs={"public_id": other_user.public_id}))
         assert response.status_code == 404
         assert mailoutbox == []
 
@@ -193,7 +193,9 @@ class TestMembers:
         invitation = LaborInspectorInvitationFactory(email=other_admin.email, institution=institution)
 
         client.force_login(admin_membership.user)
-        response = client.post(reverse("institutions_views:deactivate_member", kwargs={"user_id": other_admin.pk}))
+        response = client.post(
+            reverse("institutions_views:deactivate_member", kwargs={"public_id": other_admin.public_id})
+        )
 
         assertRedirects(response, reverse("institutions_views:members"))
         other_admin_membership.refresh_from_db()
@@ -231,7 +233,9 @@ class TestMembers:
         assert guest in institution.active_admin_members
 
         client.force_login(admin)
-        url = reverse("institutions_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
+        url = reverse(
+            "institutions_views:update_admin_role", kwargs={"action": "remove", "public_id": guest.public_id}
+        )
 
         # Redirection to confirm page
         response = client.get(url)
