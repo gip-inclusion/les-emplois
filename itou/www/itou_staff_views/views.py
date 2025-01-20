@@ -204,7 +204,7 @@ def merge_users(request, template_name="itou_staff_views/merge_users.html"):
         return HttpResponseRedirect(
             reverse(
                 "itou_staff_views:merge_users_confirm",
-                kwargs={"user_1_pk": form.user_1.pk, "user_2_pk": form.user_2.pk},
+                kwargs={"user_1_public_id": form.user_1.public_id, "user_2_public_id": form.user_2.public_id},
             )
         )
 
@@ -212,14 +212,17 @@ def merge_users(request, template_name="itou_staff_views/merge_users.html"):
 
 
 @check_user(lambda user: user.is_superuser)
-def merge_users_confirm(request, user_1_pk, user_2_pk, template_name="itou_staff_views/merge_users_confirm.html"):
+def merge_users_confirm(
+    request, user_1_public_id, user_2_public_id, template_name="itou_staff_views/merge_users_confirm.html"
+):
     ALLOWED_USER_KINDS = [UserKind.PRESCRIBER, UserKind.EMPLOYER]
 
-    # Always put the oldest user (with the smallest pk) on the left side
-    to_user_pk, from_user_pk = sorted((user_1_pk, user_2_pk))
+    user_1 = get_object_or_404(User, public_id=user_1_public_id)
+    user_2 = get_object_or_404(User, public_id=user_2_public_id)
 
-    to_user = get_object_or_404(User, pk=to_user_pk)
-    from_user = get_object_or_404(User, pk=from_user_pk)
+    # Always put the oldest user (with the smallest pk) on the left side
+    to_user, from_user = sorted([user_1, user_2], key=lambda user: user.id)
+
     to_user_error = None
     from_user_error = None
     transfer_data = []
@@ -259,7 +262,7 @@ def merge_users_confirm(request, user_1_pk, user_2_pk, template_name="itou_staff
                 return HttpResponseRedirect(
                     reverse(
                         "itou_staff_views:merge_users_confirm",
-                        kwargs={"user_1_pk": to_user_pk, "user_2_pk": from_user_pk},
+                        kwargs={"user_1_public_id": to_user.public_id, "user_2_public_id": from_user.public_id},
                     )
                 )
 
