@@ -2,6 +2,7 @@ import datetime
 import uuid
 
 import pytest
+from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects
 
@@ -51,6 +52,19 @@ class TestGetOrCreateAsOther:
             start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
             response = client.get(start_url)
             assert response.status_code == 403
+
+    def test_anonymous_access(self, client):
+        company = CompanyFactory()
+
+        for tunnel in self.TUNNELS:
+            params = {
+                "tunnel": tunnel,
+                "company": company.pk,
+                "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+            }
+            start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+            response = client.get(start_url)
+            assertRedirects(response, reverse("account_login") + f"?next={urlencode(start_url)}")
 
 
 class TestGetOrCreateForJobSeeker:
@@ -362,6 +376,17 @@ class TestUpdateAsOther:
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         response = client.get(start_url)
         assert response.status_code == 403
+
+    def test_anonymous_access(self, client):
+        job_seeker = JobSeekerFactory()
+
+        params = {
+            "job_seeker": job_seeker.public_id,
+            "from_url": reverse("dashboard:index"),
+        }
+        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+        response = client.get(start_url)
+        assertRedirects(response, reverse("account_login") + f"?next={urlencode(start_url)}")
 
 
 class TestUpdateForJobSeeker:
