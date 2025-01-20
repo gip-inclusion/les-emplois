@@ -19,7 +19,7 @@
                                 </label>
                                 {% if job_description.is_overwhelmed %}
                                     <div class="order-1 order-md-2">
-                                        <span class="badge badge-sm rounded-pill bg-accent-03 text-primary ms-0 ms-lg-2 mt-1 mt-lg-0"><i class="ri-group-line"></i>20+ candidatures</span>
+                                        <span class="badge badge-sm rounded-pill bg-accent-03 text-primary ms-0 ms-lg-2 mt-1 mt-lg-0"><i class="ri-group-line"></i>{{ job_description.OVERWHELMED_THRESHOLD }}+ candidatures</span>
                                     </div>
                                 {% endif %}
                             </div>
