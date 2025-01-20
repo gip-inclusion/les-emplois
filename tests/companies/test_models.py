@@ -358,10 +358,12 @@ class TestJobDescriptionQuerySet:
 
         # Test overwhelmed threshold: overwhelmed job description
         overwhelmed_job_description = siae_job_descriptions[0]
-        for _ in range(JobDescription.OVERWHELMED_THRESHOLD + 1):
-            JobApplicationFactory(
-                to_company=company, selected_jobs=[overwhelmed_job_description], job_seeker=job_seeker
-            )
+        JobApplicationFactory.create_batch(
+            JobDescription.OVERWHELMED_THRESHOLD + 1,
+            to_company=company,
+            selected_jobs=[overwhelmed_job_description],
+            job_seeker=job_seeker,
+        )
 
         assert (
             JobDescription.objects.with_annotation_is_overwhelmed()
