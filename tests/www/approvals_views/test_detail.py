@@ -31,13 +31,13 @@ from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 class TestApprovalDetailView:
     def test_anonymous_user(self, client):
         approval = JobApplicationFactory(with_approval=True).approval
-        url = reverse("approvals:details", kwargs={"pk": approval.pk})
+        url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         response = client.get(url)
         assertRedirects(response, reverse("account_login") + f"?next={url}")
 
     def test_wrong_user_type(self, client):
         approval = JobApplicationFactory(with_approval=True).approval
-        url = reverse("approvals:details", kwargs={"pk": approval.pk})
+        url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         user = LaborInspectorFactory(membership=True)
         client.force_login(user)
         response = client.get(url)
@@ -45,7 +45,7 @@ class TestApprovalDetailView:
 
     def test_job_seeker_access(self, client):
         approval = JobApplicationFactory(with_approval=True).approval
-        url = reverse("approvals:details", kwargs={"pk": approval.pk})
+        url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
 
         user = JobSeekerFactory()
         client.force_login(user)
@@ -65,7 +65,7 @@ class TestApprovalDetailView:
             approval=approval,
             job_seeker=approval.user,
         )
-        url = reverse("approvals:details", kwargs={"pk": approval.pk})
+        url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         employer = job_application.to_company.members.first()
         prescriber = job_application.sender
         assert prescriber.is_prescriber
@@ -124,7 +124,7 @@ class TestApprovalDetailView:
             with_approval=True,
         )
         approval = job_application.approval
-        url = reverse("approvals:details", kwargs={"pk": approval.pk})
+        url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         employer = job_application.to_company.members.first()
         prescriber = job_application.sender
         assert prescriber.is_prescriber
@@ -155,7 +155,7 @@ class TestApprovalDetailView:
                 response,
                 selector=".s-section .row:nth-of-type(2) .c-box",
                 replace_in_attr=[
-                    ("href", f"/approvals/details/{approval.pk}", "/approvals/details/[PK of Approval]"),
+                    ("href", f"/approvals/details/{approval.public_id}", "/approvals/details/[Public ID of Approval]"),
                 ],
             )
 
@@ -216,7 +216,7 @@ class TestApprovalDetailView:
             with_approval=True,
         )
         approval = job_application.approval
-        url = reverse("approvals:details", kwargs={"pk": approval.pk})
+        url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         employer = job_application.to_company.members.first()
         prescriber = job_application.sender
         assert prescriber.is_prescriber
@@ -325,7 +325,7 @@ class TestApprovalDetailView:
         assert prescriber.is_prescriber
         job_seeker = approval.user
 
-        url = reverse("approvals:details", kwargs={"pk": approval.pk})
+        url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         prolongation_url = reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id})
 
         def check_prolongation_url_and_reason(as_user, with_url, expected_reason):
@@ -402,7 +402,7 @@ class TestApprovalDetailView:
 
         # suspension still active, more than 1 year old, starting after the accepted job application
         suspension = SuspensionFactory(approval=job_application.approval, start_at=datetime.date(2022, 4, 8))
-        url = reverse("approvals:details", kwargs={"pk": job_application.approval.pk})
+        url = reverse("approvals:details", kwargs={"public_id": job_application.approval.public_id})
         response = client.get(url)
 
         delete_button = parse_response_to_soup(response, selector=f"#{REMOVAL_BUTTON_ID}")
@@ -443,7 +443,7 @@ class TestApprovalDetailView:
         assert prescriber.is_prescriber
         job_seeker = approval.user
 
-        url = reverse("approvals:details", kwargs={"pk": approval.pk})
+        url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         suspend_url = reverse("approvals:suspend", kwargs={"approval_id": approval.id})
 
         def check_suspend_url_and_reason(as_user, with_url, expected_reason):
@@ -512,7 +512,7 @@ class TestApprovalDetailView:
         )
         approval = job_application.approval
         siae = job_application.to_company
-        url = reverse("approvals:details", kwargs={"pk": approval.pk})
+        url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
         client.force_login(siae.members.first())
 
         PROLONG_BUTTON_LABEL = "<span>Prolonger</span>"
@@ -536,3 +536,9 @@ class TestApprovalDetailView:
         job_application.delete()
         response = client.get(url)
         assert response.status_code == 403
+
+    def test_access_with_single_object_mixin_on_pk(self, client):
+        approval = JobApplicationFactory(with_approval=True).approval
+        client.force_login(approval.user)
+        response = client.get(reverse("approvals:details", kwargs={"pk": approval.id}))
+        assert response.status_code == 200

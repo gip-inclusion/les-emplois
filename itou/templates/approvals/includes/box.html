@@ -100,7 +100,7 @@ Arguments:
             {% endif %}
         {% endif %}
         {% if approval.is_pass_iae and link_from_current_url|default:None %}
-            <a href="{% url 'approvals:details' pk=approval.pk %}?back_url={{ link_from_current_url|urlencode }}" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
+            <a href="{% url 'approvals:details' public_id=approval.public_id %}?back_url={{ link_from_current_url|urlencode }}" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
                 <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
                 <span>Afficher le PASS IAE</span>
             </a>

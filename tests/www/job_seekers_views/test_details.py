@@ -81,7 +81,7 @@ def test_with_approval(client, snapshot):
         response,
         selector="#main",
         replace_in_attr=[
-            ("href", f"/approvals/details/{approval.pk}", "/approvals/details/[PK of Approval]"),
+            ("href", f"/approvals/details/{approval.public_id}", "/approvals/details/[Public ID of Approval]"),
         ],
     )
     assert str(soup) == snapshot(name="HTML page")

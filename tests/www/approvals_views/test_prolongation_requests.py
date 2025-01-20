@@ -287,8 +287,8 @@ def test_snapshot_by_status(client, snapshot, status):
                     ),
                     (
                         "href",
-                        f"/approvals/details/{prolongation_request.approval.pk}",
-                        "/approvals/details/[PK of Approval]",
+                        f"/approvals/details/{prolongation_request.approval.public_id}",
+                        "/approvals/details/[Public ID of Approval]",
                     ),
                 ],
             )

@@ -64,7 +64,7 @@ class TestEmployeeDetailView:
         with assertSnapshotQueries(snapshot(name="employee detail view")):
             response = client.get(url)
         assertContains(response, self.APPROVAL_NUMBER_LABEL)
-        assertContains(response, reverse("approvals:details", kwargs={"pk": approval.pk}))
+        assertContains(response, reverse("approvals:details", kwargs={"public_id": approval.public_id}))
         assertContains(response, "Informations du salarié")
         assertContains(response, "Éligibilité à l'IAE")
         assertContains(response, "Candidatures de ce salarié")

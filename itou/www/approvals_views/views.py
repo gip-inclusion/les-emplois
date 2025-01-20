@@ -115,6 +115,8 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
 
 class ApprovalDetailView(UserPassesTestMixin, DetailView):
     model = Approval
+    slug_field = "public_id"
+    slug_url_kwarg = "public_id"
     queryset = Approval.objects.select_related("user__jobseeker_profile").prefetch_related(
         # Useful for get_suspensions method and the approval remainder field
         Prefetch(
@@ -621,7 +623,7 @@ def suspension_action_choice(request, suspension_id, template_name="approvals/su
     back_url = get_safe_url(
         request,
         "back_url",
-        fallback_url=reverse("approvals:details", kwargs={"pk": suspension.approval_id}),
+        fallback_url=reverse("approvals:details", kwargs={"public_id": suspension.approval.public_id}),
     )
 
     if request.method == "POST":
@@ -708,7 +710,7 @@ def suspension_update_enddate(request, suspension_id, template_name="approvals/s
     back_url = get_safe_url(
         request,
         "back_url",
-        fallback_url=reverse("approvals:details", kwargs={"pk": suspension.approval_id}),
+        fallback_url=reverse("approvals:details", kwargs={"public_id": suspension.approval.public_id}),
     )
 
     if request.method == "POST" and form.is_valid():
@@ -747,7 +749,7 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
     back_url = get_safe_url(
         request,
         "back_url",
-        fallback_url=reverse("approvals:details", kwargs={"pk": suspension.approval_id}),
+        fallback_url=reverse("approvals:details", kwargs={"public_id": suspension.approval.public_id}),
     )
 
     if request.method == "POST" and request.POST.get("confirm") == "true":
@@ -757,7 +759,7 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
             f"La suspension de {suspension.approval.user.get_full_name()} a bien été supprimée.",
             extra_tags="toast",
         )
-        return HttpResponseRedirect(reverse("approvals:details", kwargs={"pk": suspension.approval_id}))
+        return HttpResponseRedirect(reverse("approvals:details", kwargs={"public_id": suspension.approval.public_id}))
 
     context = {
         "suspension": suspension,
