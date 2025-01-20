@@ -86,7 +86,7 @@ class TestUserMembershipDeactivation:
         membership = memberships.first()
 
         client.force_login(admin)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": admin.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"public_id": admin.public_id})
         response = client.post(url)
         assert response.status_code == 403
 
@@ -112,7 +112,7 @@ class TestUserMembershipDeactivation:
         sent_invitation_to_other = PrescriberWithOrgInvitationFactory(sender=guest)
 
         client.force_login(admin)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
 
@@ -159,7 +159,7 @@ class TestUserMembershipDeactivation:
         response = client.post(
             reverse(
                 "prescribers_views:deactivate_member",
-                kwargs={"user_id": other_membership.user_id},
+                kwargs={"public_id": other_membership.user.public_id},
             ),
         )
 
@@ -177,7 +177,7 @@ class TestUserMembershipDeactivation:
         organization.members.add(guest)
 
         client.force_login(guest)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 403
 
@@ -190,7 +190,7 @@ class TestUserMembershipDeactivation:
         client.force_login(admin_membership.user)
         request = getattr(client, method)
         response = request(
-            reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest_membership.user_id})
+            reverse("prescribers_views:deactivate_member", kwargs={"public_id": guest_membership.user.public_id})
         )
         assert response.status_code == 404
         guest_membership.refresh_from_db()
@@ -204,7 +204,7 @@ class TestUserMembershipDeactivation:
         other_user = PrescriberFactory()
         client.force_login(admin_membership.user)
         request = getattr(client, method)
-        response = request(reverse("prescribers_views:deactivate_member", kwargs={"user_id": other_user.pk}))
+        response = request(reverse("prescribers_views:deactivate_member", kwargs={"public_id": other_user.public_id}))
         assert response.status_code == 404
         assert mailoutbox == []
 
@@ -219,7 +219,7 @@ class TestUserMembershipDeactivation:
         guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
         client.force_login(admin)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
 
@@ -237,7 +237,9 @@ class TestUserMembershipDeactivation:
         invitation = PrescriberWithOrgInvitationFactory(email=other_admin.email, organization=organization)
 
         client.force_login(admin_membership.user)
-        response = client.post(reverse("prescribers_views:deactivate_member", kwargs={"user_id": other_admin.pk}))
+        response = client.post(
+            reverse("prescribers_views:deactivate_member", kwargs={"public_id": other_admin.public_id})
+        )
 
         assertRedirects(response, reverse("prescribers_views:members"))
         other_admin_membership.refresh_from_db()
@@ -280,7 +282,7 @@ class TestUserMembershipDeactivation:
 
         # Admin remove guest from structure
         client.force_login(admin)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
         client.logout()
