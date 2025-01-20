@@ -3017,7 +3017,7 @@
   
   
       
-          <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/prescriptions/list">
+          <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/prescriptions/list?display=list">
               <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
               <span>Effacer tout</span>
           </a>
@@ -3038,7 +3038,7 @@
   
   
       
-          <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/prescriptions/list">
+          <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/prescriptions/list?display=table">
               <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
               <span>Effacer tout</span>
           </a>
@@ -3052,7 +3052,7 @@
   '''
   <div class="ms-md-auto" id="apply-list-filter-counter">
           
-              <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/prescriptions/list">
+              <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/prescriptions/list?display=list">
                   <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
                   <span>Effacer tout</span>
               </a>
@@ -3064,7 +3064,7 @@
   '''
   <div class="ms-md-auto" id="apply-list-filter-counter">
           
-              <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/prescriptions/list">
+              <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/prescriptions/list?display=table">
                   <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
                   <span>Effacer tout</span>
               </a>

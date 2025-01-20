@@ -10,7 +10,7 @@
 {% if btn_dropdown_filter|default:False %}
     <div class="ms-md-auto" id="apply-list-filter-counter"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
         {% if filters_counter > 0 %}
-            <a href="{{ reset_url }}" class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser {{ filters_counter|pluralizefr:"le filtre actif,les filtres actifs" }}">
+            <a href="{{ reset_url }}?display={{ display_kind }}" class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser {{ filters_counter|pluralizefr:"le filtre actif,les filtres actifs" }}">
                 <i class="ri-eraser-line fw-medium" aria-hidden="true"></i>
                 <span>Effacer tout</span>
             </a>
@@ -18,7 +18,7 @@
     </div>
 {% else %}
     {% if filters_counter > 0 %}
-        <a href="{{ reset_url }}" class="btn btn-ico btn-block btn-outline-primary" aria-label="Réinitialiser {{ filters_counter|pluralizefr:"le filtre actif,les filtres actifs" }}">
+        <a href="{{ reset_url }}?display={{ display_kind }}" class="btn btn-ico btn-block btn-outline-primary" aria-label="Réinitialiser {{ filters_counter|pluralizefr:"le filtre actif,les filtres actifs" }}">
             <i class="ri-eraser-line fw-medium" aria-hidden="true"></i>
             <span>Effacer tout</span>
         </a>
