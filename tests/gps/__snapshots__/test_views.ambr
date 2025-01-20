@@ -3,7 +3,7 @@
   '''
   <div class="col-12" id="beneficiary_details_container">
                       
-                      <div class="c-box mb-3 mb-lg-5">
+                      <div class="c-box">
                           <h2>Données administratives</h2>
                           <hr/>
                           <div class="row">
@@ -102,71 +102,6 @@
                               </div>
                           </div>
                       </div>
-                      
-  
-  
-  
-  <div class="c-box mb-3 mb-lg-5" id="gps_intervenants">
-      <div class="border-bottom">
-          <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between align-items-start">
-              <h2>Intervenant</h2>
-              <div aria-label="Actions sur les participants" class="d-flex flex-column flex-md-row gap-3" role="group">
-                  <a class="btn btn-sm btn-ico btn-primary mt-3 mt-md-0" href="https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?user_name=Pierre+DUPONT&amp;user_id=[PK of user]&amp;user_email=pierre.dupont%40test.local&amp;user_organization_name=Les+Olivades&amp;user_organization_id=[PK of organization]&amp;user_type=prescriber&amp;beneficiary_name=Jane+DOE&amp;beneficiary_id=[PK of beneficiary]&amp;beneficiary_email=jane.doe%40test.local&amp;success_url=http%3A%2F%2Ftestserver%2Fgps%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a" id="request-new-participant-link">
-                      <i aria-hidden="true" class="ri-user-add-line"></i>
-                      <span>Ajouter un intervenant existant</span>
-                  </a>
-              </div>
-          </div>
-      </div>
-      <form>
-          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <ul class="list-unstyled p-0 m-0">
-              
-                  <li class="c-box--results__header px-0 gps_intervenant" id="card-[PK of prescriber]">
-                      <div class="c-box--results__summary">
-                          <i aria-hidden="true" class="ri-user-line"></i>
-                          <div class="d-flex flex-column flex-md-row gap-2 align-items-md-start gap-md-3">
-                              <div class="col">
-                                  <h3 class="mb-2">
-                                      Pierre DUPONT
-                                      <span class="fw-normal fs-6 fst-italic">
-                                          
-                                          
-                                  (prescripteur pour Les Olivades)
-                                          
-                                      </span>
-                                  </h3>
-  
-                                  <ul class="list-unstyled">
-                                      <li class="py-1">
-                                          <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>Suivi depuis le <strong>21/06/2024</strong>
-                                      </li>
-                                      
-                                          <li class="py-1">
-                                              <i aria-hidden="true" class="ri-map-pin-user-line fw-normal me-1"></i><strong>Référent</strong>
-                                          </li>
-                                      
-                                  </ul>
-                              </div>
-                              
-                                  <button class="btn btn-outline-primary btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_phone" hx-post="display_phone_url" hx-swap="outerHTML" id="display_phone_id">
-                                      <i aria-hidden="true" class="ri-phone-line fw-normal me-1"></i>
-                                      <span>Afficher le téléphone</span>
-                                  </button>
-                              
-                              <button class="btn btn-outline-primary btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_email" hx-post="display_email_url" hx-swap="outerHTML" id="display_email_id">
-                                  <i aria-hidden="true" class="ri-mail-line fw-normal me-1"></i>
-                                  <span>Afficher l'email</span>
-                              </button>
-  
-                          </div>
-                      </div>
-                  </li>
-              
-          </ul>
-      </form>
-  </div>
-  
                   </div>
   '''
 # ---
@@ -235,52 +170,56 @@
 # ---
 # name: test_display_participant_contact_info
   '''
-  <li class="c-box--results__header px-0 gps_intervenant" id="card'[PK of target_participant]">
-                      <div class="c-box--results__summary">
-                          <i aria-hidden="true" class="ri-user-line"></i>
-                          <div class="d-flex flex-column flex-md-row gap-2 align-items-md-start gap-md-3">
-                              <div class="col">
-                                  <h3 class="mb-2">
-                                      Jean DUPONT
-                                      <span class="fw-normal fs-6 fst-italic">
-                                          
-                                          
-                                  (prescripteur)
-                                          
-                                      </span>
-                                  </h3>
-  
-                                  <ul class="list-unstyled">
-                                      <li class="py-1">
-                                          <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>Suivi depuis le <strong>20/01/2025</strong>
-                                      </li>
+  <div class="c-box c-box--results has-links-inside my-3 my-md-4" id="card'[PK of target_participant]">
+                              <div class="c-box--results__header">
+                                  <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                                      <div class="c-box--results__summary flex-grow-1">
+                                          <i aria-hidden="true" class="ri-user-line"></i>
+                                          <div>
+                                              <h3>Jean DUPONT</h3>
+                                              <span>
+                                                  
+                                                  
+                                                  Prescripteur
+                                                  
+                                              </span>
+                                          </div>
+                                      </div>
                                       
+                                  </div>
+                              </div>
+                              <hr class="m-0"/>
+                              <div class="c-box--results__body">
+                                  <ul class="list-data list-data__two-column-md">
+                                      <li>
+                                          <small>Suivi depuis le</small>
+                                          <strong>20/01/2025</strong>
+                                      </li>
+                                      <li>
+                                          <small>Adresse e-mail</small>
+                                          <strong>jean@dupont.fr</strong>
+  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jean@dupont.fr">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  
+                                      </li>
+                                      <li>
+                                          <small>Téléphone</small>
+                                          
+                                              <strong>0123456789</strong>
+  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0123456789">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  
+                                          
+                                      </li>
                                   </ul>
                               </div>
-                              
-                                  <div class="btn btn-secondary w-100 w-md-auto">
-      <span pr="">0123456789</span>
-      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0123456789">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  </div>
-  
-                              
-                              <div class="btn btn-secondary w-100 w-md-auto">
-      <span pr="">jean@dupont.fr</span>
-      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jean@dupont.fr">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  </div>
-  
-  
                           </div>
-                      </div>
-                  </li>
   '''
 # ---
 # name: test_my_groups

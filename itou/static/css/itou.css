@@ -260,6 +260,10 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
 }
 
 /* HTMX button indicator */
+.has-btn-with-spinner-loading-text.has-spinner-loading {
+    pointer-events: none;
+}
+
 .has-btn-with-spinner-loading-text.has-spinner-loading::after {
     display: none;
 }
