@@ -1,5 +1,34 @@
 # Journal des modifications
 
+## 2025-01-20
+
+### Ajouté
+
+- [Connexion: Nouveau parcours pour les candidats](https://github.com/gip-inclusion/les-emplois/pull/5288)
+- [GPS: Ajout d'un bouton pour demander l'ajout d'un bénéficiaire](https://github.com/gip-inclusion/les-emplois/pull/5366)
+- [GPS: Créer le flux “Ajouter un intervenant existant”](https://github.com/gip-inclusion/les-emplois/pull/5367)
+- [Permettre l'autoconnection à proconnect sur les liens vers la communauté (DSP)](https://github.com/gip-inclusion/les-emplois/pull/5393)
+- [Pilotage: Ajouter un bandeau sur les tableaux de bord en sursis](https://github.com/gip-inclusion/les-emplois/pull/5392)
+
+### Modifié
+
+- [Admin: Amélioration de l'affichage des critères administratifs](https://github.com/gip-inclusion/les-emplois/pull/5396)
+- [Candidatures : Masquer le bouton « Modifier » des fiches de poste lors du transfert vers un métier de sa structure](https://github.com/gip-inclusion/les-emplois/pull/5046)
+- [Connexion: Rediriger les utilisateurs d'InclusionConnect vers ProConnect](https://github.com/gip-inclusion/les-emplois/pull/5407)
+- [GPS: Ajout de liens dans l'admin](https://github.com/gip-inclusion/les-emplois/pull/5383)
+- [GPS: Amélioration de l'autocomplete avec recherche plein texte](https://github.com/gip-inclusion/les-emplois/pull/5365)
+- [GPS: Corriger et améliorer le formulaire d'admin des participants](https://github.com/gip-inclusion/les-emplois/pull/5385)
+- [GPS: Transformer la liste des bénéficiaires en tableau](https://github.com/gip-inclusion/les-emplois/pull/5359)
+- [Notifications: Correction de l'envoi de certaines notifications](https://github.com/gip-inclusion/les-emplois/pull/5343)
+- [Prescripteur: Mettre à jour le bandeau d’info des utilisateurs sans organisation](https://github.com/gip-inclusion/les-emplois/pull/5369)
+- [UX/UI: Amélioration du message affiché avant de retirer un collaborateur](https://github.com/gip-inclusion/les-emplois/pull/5386)
+- [UX/UI: Changer de input type pour les numéros de téléphone](https://github.com/gip-inclusion/les-emplois/pull/5388)
+- [UX/UI: Correction des fiches de détail d’un prescripteur](https://github.com/gip-inclusion/les-emplois/pull/5391) 🖼
+
+### Tech
+
+- [Changer l’adresse de contact pour l’API des emplois](https://github.com/gip-inclusion/les-emplois/pull/5280)
+
 ## 2025-01-13
 
 ### Modifié
