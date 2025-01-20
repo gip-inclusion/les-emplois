@@ -1,0 +1,4 @@
+<div class="btn btn-secondary w-100 w-md-auto">
+    <span pr>{{ member.email }}</span>
+    {% include 'includes/copy_to_clipboard.html' with content=member.email css_classes="btn-link" only_icon=True %}
+</div>

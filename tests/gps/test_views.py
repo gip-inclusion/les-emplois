@@ -180,7 +180,7 @@ def test_beneficiary_details(client, snapshot):
         membership__organization__department="24",
     )
     beneficiary = JobSeekerFactory(for_snapshot=True)
-    FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
+    group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
 
     client.force_login(prescriber)
 
@@ -197,6 +197,11 @@ def test_beneficiary_details(client, snapshot):
                 "user_organization_id=[PK of organization]",
             ),
             ("href", f"beneficiary_id={beneficiary.pk}", "beneficiary_id=[PK of beneficiary]"),
+            ("hx-post", f"/gps/display/{group.pk}/{prescriber.pk}/phone", "display_phone_url"),
+            ("hx-post", f"/gps/display/{group.pk}/{prescriber.pk}/email", "display_email_url"),
+            ("id", f"phone-{prescriber.pk}", "display_phone_id"),
+            ("id", f"email-{prescriber.pk}", "display_email_id"),
+            ("id", f"card-{prescriber.pk}", "card-[PK of prescriber]"),
         ],
     )
     assert str(html_details) == snapshot
@@ -205,14 +210,96 @@ def test_beneficiary_details(client, snapshot):
     assert prescriber.email in str(user_dropdown_menu)
     assert beneficiary.email not in str(user_dropdown_menu)
 
+    display_phone_txt = "<span>Afficher le téléphone</span>"
+    display_email_txt = "<span>Afficher l'email</span>"
+
+    assertContains(response, display_email_txt)
+    assertContains(response, display_phone_txt)
+
     # Membership card: missing member information.
     prescriber.phone = ""
     prescriber.save()
     response = client.get(user_details_url)
-    assertContains(response, "Téléphone non renseigné")
+    assertContains(response, display_email_txt)
+    assertNotContains(response, display_phone_txt)
 
     assertContains(response, "Ajouter un intervenant")
     assertContains(response, "https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant")
+
+
+@freezegun.freeze_time("2025-01-20")
+def test_display_participant_contact_info(client, mocker, snapshot):
+    prescriber = PrescriberFactory(
+        membership=True,
+        for_snapshot=True,
+        membership__organization__name="Les Olivades",
+        membership__organization__authorized=True,
+        membership__organization__department="24",
+    )
+    beneficiary = JobSeekerFactory(for_snapshot=True)
+    group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
+    target_participant = FollowUpGroupMembershipFactory(
+        follow_up_group=group,
+        member__first_name="Jean",
+        member__last_name="Dupont",
+        member__email="jean@dupont.fr",
+        member__phone="0123456789",
+    ).member
+
+    client.force_login(prescriber)
+    grist_log_mock = mocker.patch("itou.www.gps.views.log_contact_info_display")  # Mock the import in the views file
+
+    user_details_url = reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id})
+    response = client.get(user_details_url)
+    display_phone_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.pk, "phone"))
+    assertContains(response, display_phone_url)
+    display_email_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.pk, "email"))
+    assertContains(response, display_email_url)
+
+    simulated_page = parse_response_to_soup(
+        response,
+        selector=f"#card-{target_participant.pk}",
+        replace_in_attr=[("id", f"card-{target_participant.pk}", "card'[PK of target_participant]")],
+    )
+
+    response = client.post(display_phone_url)
+    assertContains(response, target_participant.phone)
+    update_page_with_htmx(simulated_page, f"#phone-{target_participant.pk}", response)
+    response = client.post(display_email_url)
+    assertContains(response, target_participant.email)
+    update_page_with_htmx(simulated_page, f"#email-{target_participant.pk}", response)
+
+    assert str(simulated_page) == snapshot
+
+    assert grist_log_mock.call_args_list == [
+        ((prescriber, group, target_participant, "phone"),),
+        ((prescriber, group, target_participant, "email"),),
+    ]
+
+
+def test_display_participant_contact_info_not_allowed(client):
+    prescriber = PrescriberFactory(
+        membership=True,
+        membership__organization__authorized=True,
+    )
+    group = FollowUpGroupFactory(memberships=1)
+    target_participant = FollowUpGroupMembershipFactory(
+        follow_up_group=group,
+        member__first_name="Jean",
+        member__last_name="Dupont",
+        member__email="jean@dupont.fr",
+        member__phone="0123456789",
+    ).member
+
+    client.force_login(prescriber)
+
+    display_phone_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.pk, "phone"))
+    display_email_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.pk, "email"))
+
+    response = client.post(display_phone_url)
+    assert response.status_code == 404
+    response = client.post(display_email_url)
+    assert response.status_code == 404
 
 
 def test_remove_members_from_group(client):

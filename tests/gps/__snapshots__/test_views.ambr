@@ -118,59 +118,53 @@
               </div>
           </div>
       </div>
-      <ul class="list-unstyled p-0 m-0">
-          
-              <li class="c-box--results__header px-0 gps_intervenant">
-                  <div class="c-box--results__summary flex-grow-1">
-                      <i aria-hidden="true" class="ri-user-line"></i>
-                      <div>
-                          <h3 class="mb-2">
-                              Pierre DUPONT
-                              <span class="fw-normal fs-6 fst-italic">
-                                  
-                                  
+      <form>
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <ul class="list-unstyled p-0 m-0">
+              
+                  <li class="c-box--results__header px-0 gps_intervenant" id="card-[PK of prescriber]">
+                      <div class="c-box--results__summary">
+                          <i aria-hidden="true" class="ri-user-line"></i>
+                          <div class="d-flex flex-column flex-md-row gap-2 align-items-md-start gap-md-3">
+                              <div class="col">
+                                  <h3 class="mb-2">
+                                      Pierre DUPONT
+                                      <span class="fw-normal fs-6 fst-italic">
+                                          
+                                          
                                   (prescripteur pour Les Olivades)
-                                  
-                              </span>
-                          </h3>
+                                          
+                                      </span>
+                                  </h3>
   
-                          <ul class="list-unstyled">
-                              <li class="py-1">
-                                  <i aria-hidden="true" class="ri-mail-line fw-normal me-1"></i>
-                                  <span>pierre.dupont@test.local</span>
-                                  
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dupont@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_member_email">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-                              </li>
-                              <li class="py-1">
-                                  <i aria-hidden="true" class="ri-phone-line fw-normal me-1"></i>
-                                  
-                                      <span>06 12 34 56 78</span>
+                                  <ul class="list-unstyled">
+                                      <li class="py-1">
+                                          <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>Suivi depuis le <strong>21/06/2024</strong>
+                                      </li>
                                       
-                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_member_phone">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
+                                          <li class="py-1">
+                                              <i aria-hidden="true" class="ri-map-pin-user-line fw-normal me-1"></i><strong>Référent</strong>
+                                          </li>
+                                      
+                                  </ul>
+                              </div>
+                              
+                                  <button class="btn btn-outline-primary btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_phone" hx-post="display_phone_url" hx-swap="outerHTML" id="display_phone_id">
+                                      <i aria-hidden="true" class="ri-phone-line fw-normal me-1"></i>
+                                      <span>Afficher le téléphone</span>
+                                  </button>
+                              
+                              <button class="btn btn-outline-primary btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_email" hx-post="display_email_url" hx-swap="outerHTML" id="display_email_id">
+                                  <i aria-hidden="true" class="ri-mail-line fw-normal me-1"></i>
+                                  <span>Afficher l'email</span>
+                              </button>
   
-                                  
-                              </li>
-                              <li class="py-1">
-                                  <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>Suivi depuis le <strong>21/06/2024</strong>
-                              </li>
-                              
-                                  <li class="py-1">
-                                      <i aria-hidden="true" class="ri-map-pin-user-line fw-normal me-1"></i><strong>Référent</strong>
-                                  </li>
-                              
-                          </ul>
+                          </div>
                       </div>
-                  </div>
-              </li>
-          
-      </ul>
+                  </li>
+              
+          </ul>
+      </form>
   </div>
   
                   </div>
@@ -237,6 +231,56 @@
                                                   
                                               </div>
                                           </div>
+  '''
+# ---
+# name: test_display_participant_contact_info
+  '''
+  <li class="c-box--results__header px-0 gps_intervenant" id="card'[PK of target_participant]">
+                      <div class="c-box--results__summary">
+                          <i aria-hidden="true" class="ri-user-line"></i>
+                          <div class="d-flex flex-column flex-md-row gap-2 align-items-md-start gap-md-3">
+                              <div class="col">
+                                  <h3 class="mb-2">
+                                      Jean DUPONT
+                                      <span class="fw-normal fs-6 fst-italic">
+                                          
+                                          
+                                  (prescripteur)
+                                          
+                                      </span>
+                                  </h3>
+  
+                                  <ul class="list-unstyled">
+                                      <li class="py-1">
+                                          <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>Suivi depuis le <strong>20/01/2025</strong>
+                                      </li>
+                                      
+                                  </ul>
+                              </div>
+                              
+                                  <div class="btn btn-secondary w-100 w-md-auto">
+      <span pr="">0123456789</span>
+      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0123456789">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  </div>
+  
+                              
+                              <div class="btn btn-secondary w-100 w-md-auto">
+      <span pr="">jean@dupont.fr</span>
+      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jean@dupont.fr">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  </div>
+  
+  
+                          </div>
+                      </div>
+                  </li>
   '''
 # ---
 # name: test_my_groups
