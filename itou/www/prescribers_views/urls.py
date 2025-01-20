@@ -10,10 +10,12 @@ urlpatterns = [
     path("edit_organization", views.edit_organization, name="edit_organization"),
     path("colleagues", views.member_list, name="members"),
     path("<int:org_id>/card", views.card, name="card"),
-    path("deactivate_member/<int:user_id>", views.deactivate_member, name="deactivate_member"),
+    path("deactivate_member/<uuid:public_id>", views.deactivate_member, name="deactivate_member"),
     # Can't mix capture var syntaxes in `re_path`: all path vars expressed as RE
     re_path(
-        "admin_role/(?P<action>add|remove)/(?P<user_id>[0-9]+)", views.update_admin_role, name="update_admin_role"
+        "admin_role/(?P<action>add|remove)/(?P<public_id>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})",
+        views.update_admin_role,
+        name="update_admin_role",
     ),
     path("list_accredited_organizations", views.list_accredited_organizations, name="list_accredited_organizations"),
 ]
