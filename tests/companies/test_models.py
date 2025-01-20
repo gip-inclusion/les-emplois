@@ -261,6 +261,10 @@ class TestCompanyModel:
         assert (
             f"Expired 0 invitations to companies.Company {company.pk} for user_id={admin_user.pk}." in caplog.messages
         )
+        assert (
+            f"Creating companies.CompanyMembership of organization_id={company.pk} "
+            f"for user_id={admin_user.pk} is_admin=True."
+        ) in caplog.messages
 
         other_user = EmployerFactory()
         invit1, invit2 = EmployerInvitationFactory.create_batch(
@@ -279,6 +283,10 @@ class TestCompanyModel:
         assert (
             f"Expired 2 invitations to companies.Company {company.pk} for user_id={other_user.pk}." in caplog.messages
         )
+        assert (
+            f"Creating companies.CompanyMembership of organization_id={company.pk} "
+            f"for user_id={other_user.pk} is_admin=False."
+        ) in caplog.messages
         assertQuerySetEqual(
             EmployerInvitation.objects.all(),
             [
@@ -297,7 +305,7 @@ class TestCompanyModel:
             ordered=False,
         )
 
-        company.memberships.filter(user=other_user).update(is_active=False)
+        company.memberships.filter(user=other_user).update(is_active=False, is_admin=True)
         invit = EmployerInvitationFactory(email=other_user.email, company=company, sender=admin_user)
         company.add_or_activate_membership(other_user)
         assert company.memberships.get(user=other_user).is_active
@@ -305,6 +313,10 @@ class TestCompanyModel:
         assert (
             f"Expired 1 invitations to companies.Company {company.pk} for user_id={other_user.pk}." in caplog.messages
         )
+        assert (
+            f"Reactivating companies.CompanyMembership of organization_id={company.pk} "
+            f"for user_id={other_user.pk} is_admin=False."
+        ) in caplog.messages
         invit.refresh_from_db()
         assert invit.has_expired is True
 

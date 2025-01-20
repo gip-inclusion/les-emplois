@@ -188,6 +188,10 @@ class TestPrescriberOrganizationModel:
         assert (
             f"Expired 0 invitations to prescribers.PrescriberOrganization {org.pk} for user_id={admin_user.pk}."
         ) in caplog.messages
+        assert (
+            f"Creating prescribers.PrescriberMembership of organization_id={org.pk} "
+            f"for user_id={admin_user.pk} is_admin=True."
+        ) in caplog.messages
 
         other_user = PrescriberFactory()
         invit1, invit2 = PrescriberWithOrgInvitationFactory.create_batch(
@@ -205,6 +209,10 @@ class TestPrescriberOrganizationModel:
         assert not org.memberships.get(user=other_user).is_admin
         assert (
             f"Expired 2 invitations to prescribers.PrescriberOrganization {org.pk} for user_id={other_user.pk}."
+        ) in caplog.messages
+        assert (
+            f"Creating prescribers.PrescriberMembership of organization_id={org.pk} "
+            f"for user_id={other_user.pk} is_admin=False."
         ) in caplog.messages
         assertQuerySetEqual(
             PrescriberWithOrgInvitation.objects.all(),
@@ -224,13 +232,17 @@ class TestPrescriberOrganizationModel:
             ordered=False,
         )
 
-        org.memberships.filter(user=other_user).update(is_active=False)
+        org.memberships.filter(user=other_user).update(is_active=False, is_admin=True)
         invit = PrescriberWithOrgInvitationFactory(email=other_user.email, organization=org, sender=admin_user)
         org.add_or_activate_membership(other_user)
         assert org.memberships.get(user=other_user).is_active
         assert org.memberships.get(user=other_user).is_admin is False
         assert (
             f"Expired 1 invitations to prescribers.PrescriberOrganization {org.pk} for user_id={other_user.pk}."
+        ) in caplog.messages
+        assert (
+            f"Reactivating prescribers.PrescriberMembership of organization_id={org.pk} "
+            f"for user_id={other_user.pk} is_admin=False."
         ) in caplog.messages
         invit.refresh_from_db()
         assert invit.has_expired is True
