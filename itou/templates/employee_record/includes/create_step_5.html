@@ -48,7 +48,7 @@
                 <hr class="my-3">
                 <a class="btn btn-outline-primary btn-block"
                    {% matomo_event "telechargement-pdf" "agrement" "detail-agrement" %}
-                   href="{% url 'approvals:display_printable_approval' approval_id=job_application.approval.id %}"
+                   href="{% url 'approvals:display_printable_approval' public_id=job_application.approval.public_id %}"
                    target="_blank">Afficher le PASS IAE</a>
             {% endwith %}
         </div>

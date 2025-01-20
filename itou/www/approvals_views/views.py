@@ -10,7 +10,7 @@ from django.core.files.storage import default_storage
 from django.db import IntegrityError
 from django.db.models import Max, Prefetch
 from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views import View
@@ -71,6 +71,13 @@ class ApprovalBaseViewMixin:
         context = super().get_context_data(**kwargs)
         context["siae"] = self.siae
         return context
+
+
+# redirections to be removed in few weeks
+@check_user(lambda user: user.is_employer)
+def redirect_to_display_printable_approval(request, approval_id):
+    approval = get_object_or_404(Approval, pk=approval_id)
+    return redirect("approvals:display_printable_approval", public_id=approval.public_id)
 
 
 class ApprovalListView(ApprovalBaseViewMixin, ListView):
@@ -269,7 +276,7 @@ class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         queryset = Approval.objects.select_related("user")
-        approval = get_object_or_404(queryset, pk=self.kwargs["approval_id"])
+        approval = get_object_or_404(queryset, public_id=self.kwargs["public_id"])
 
         diagnosis = approval.eligibility_diagnosis
         diagnosis_author = None

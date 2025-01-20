@@ -28,7 +28,7 @@
                 </a>
             {% endif %}
             {% if is_employer_with_accepted_application %}
-                <a href="{% url 'approvals:display_printable_approval' approval_id=approval.pk %}" class="btn btn-lg btn-primary btn-ico" rel="noopener" target="_blank">
+                <a href="{% url 'approvals:display_printable_approval' public_id=approval.public_id %}" class="btn btn-lg btn-primary btn-ico" rel="noopener" target="_blank">
                     <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
                     <span>Afficher l’attestation</span>
                 </a>

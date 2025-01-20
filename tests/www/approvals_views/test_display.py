@@ -1,10 +1,14 @@
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.utils import constants as global_constants
+from tests.approvals.factories import ApprovalFactory
+from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 
 
 class TestDisplayApproval:
@@ -18,7 +22,7 @@ class TestDisplayApproval:
         client.force_login(employer)
 
         response = client.get(
-            reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
+            reverse("approvals:display_printable_approval", kwargs={"public_id": job_application.approval.public_id})
         )
 
         assert response.context["approval"] == job_application.approval
@@ -44,7 +48,7 @@ class TestDisplayApproval:
         client.force_login(employer)
 
         response = client.get(
-            reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
+            reverse("approvals:display_printable_approval", kwargs={"public_id": job_application.approval.public_id})
         )
 
         assert response.context["approval"] == job_application.approval
@@ -64,7 +68,7 @@ class TestDisplayApproval:
         client.force_login(employer)
 
         response = client.get(
-            reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
+            reverse("approvals:display_printable_approval", kwargs={"public_id": job_application.approval.public_id})
         )
 
         assert response.context["approval"] == job_application.approval
@@ -72,3 +76,57 @@ class TestDisplayApproval:
         assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
         assertContains(response, "Imprimer ce PASS IAE")
         assertNotContains(response, self.WITH_DIAGNOSIS_STR)
+
+
+@pytest.mark.parametrize(
+    "user",
+    [
+        None,
+        lambda: PrescriberFactory(),
+        lambda: JobSeekerFactory(),
+        lambda: EmployerFactory(with_company=True),
+        lambda: InstitutionWithMembershipFactory().active_members.first(),
+    ],
+)
+def test_redirect_to_display_printable_approval_on_user_kind(client, user):
+    approval = ApprovalFactory()
+
+    if user:
+        user = user()
+        client.force_login(user)
+
+    url = reverse("approvals:redirect_to_display_printable_approval", kwargs={"approval_id": approval.id})
+    response = client.get(url)
+
+    if not user:
+        assertRedirects(response, reverse("account_login") + f"?next={url}")
+    elif not user.is_employer:
+        assert response.status_code == 403
+    else:
+        assertRedirects(
+            response,
+            reverse("approvals:display_printable_approval", kwargs={"public_id": approval.public_id}),
+            fetch_redirect_response=False,
+        )
+
+
+@pytest.mark.parametrize("approval", [None, lambda: ApprovalFactory()])
+def test_redirect_to_display_printable_approval_on_approval_existence(client, approval):
+    approval_id = 2025
+    if approval:
+        approval = approval()
+        approval_id = approval.id
+    client.force_login(EmployerFactory(with_company=True))
+
+    response = client.get(
+        reverse("approvals:redirect_to_display_printable_approval", kwargs={"approval_id": approval_id})
+    )
+
+    if not approval:
+        assert response.status_code == 404
+    else:
+        assertRedirects(
+            response,
+            reverse("approvals:display_printable_approval", kwargs={"public_id": approval.public_id}),
+            fetch_redirect_response=False,
+        )
