@@ -1,9 +1,13 @@
+from datetime import timedelta
+
 from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.emails.models import Email
 from tests.users.factories import JobSeekerFactory
 
 
@@ -57,3 +61,49 @@ class TestResendConfirmationView:
 
         response = client.get(resend_confirmation_url)
         assertRedirects(response, reverse("signup:choose_user_kind"))
+
+    def test_rate_limiting(self, client, mailoutbox):
+        # A user is limited in how many emails they can trigger in one day
+        user = JobSeekerFactory(with_unverified_email=True)
+        user_email = user.emailaddress_set.first()
+        with freeze_time("2023-01-01"):
+            confirmation_token = EmailConfirmationHMAC(user_email).key
+        url = reverse("account_resend_confirmation_email", kwargs={"key": confirmation_token})
+
+        email_limit = settings.ACCOUNT_MAX_DAILY_EMAIL_CONFIRMATION_REQUESTS
+        confirmation_subject_query = "confirmez votre adresse e-mail"
+
+        for i in range(email_limit):
+            response = client.get(url)
+            assertRedirects(response, reverse("account_email_verification_sent"))
+            assert len(mailoutbox) == i + 1
+            assert (
+                Email.objects.filter(
+                    to__contains=[user_email.email],
+                    subject__icontains=confirmation_subject_query,
+                ).count()
+                == i + 1
+            )
+
+        response = client.get(url)
+        assertRedirects(response, reverse("account_email_rate_limit_exceeded"))
+        assert len(mailoutbox) == email_limit
+        assert (
+            Email.objects.filter(
+                to__contains=[user_email.email],
+                subject__icontains=confirmation_subject_query,
+            ).count()
+            == email_limit
+        )
+
+        with freeze_time(timezone.now() + timedelta(days=1)):
+            response = client.get(url)
+            assertRedirects(response, reverse("account_email_verification_sent"))
+            assert len(mailoutbox) == email_limit + 1
+            assert (
+                Email.objects.filter(
+                    to__contains=[user_email.email],
+                    subject__icontains=confirmation_subject_query,
+                ).count()
+                == email_limit + 1
+            )

@@ -340,6 +340,7 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_DISPLAY = "itou.users.models.get_allauth_account_user_display"
+ACCOUNT_MAX_DAILY_EMAIL_CONFIRMATION_REQUESTS = 3
 
 BOOTSTRAP5 = {
     "required_css_class": "form-group-required",

@@ -60,6 +60,11 @@ urlpatterns = [
         account_views.ResendConfirmationView.as_view(),
         name="account_resend_confirmation_email",
     ),
+    path(
+        "accounts/resend-confirmation-exceeded/",
+        login_not_required(TemplateView.as_view(template_name="account/verification_rate_exceeded.html")),
+        name="account_email_rate_limit_exceeded",
+    ),
     # --------------------------------------------------------------------------------------
     # Other allauth URLs.
     path("accounts/", include("allauth.urls")),

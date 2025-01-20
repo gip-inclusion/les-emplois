@@ -1,0 +1,12 @@
+{# django-allauth template override. #}
+{% extends "layout/base.html" %}
+
+{% block title %}E-mail de confirmation bloqué {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    <h1>Vous avez dépassé la limite des e-mails de confirmation</h1>
+    <p>
+        Si vous avez reçu un e-mail de validation, veuillez le suivre pour compléter votre inscription
+        Vous pourrez redemander un e-mail de validation demain.
+    </p>
+{% endblock %}

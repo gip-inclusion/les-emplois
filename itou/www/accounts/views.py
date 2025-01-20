@@ -2,12 +2,15 @@ from allauth.account import app_settings
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
 from allauth.account.utils import send_email_confirmation
 from allauth.account.views import ConfirmEmailView as BaseConfirmEmailView
+from django.conf import settings
 from django.core import signing
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import View
 
+from itou.emails.models import Email
 from itou.utils.auth import LoginNotRequiredMixin
 
 
@@ -52,6 +55,19 @@ class ResendConfirmationView(LoginNotRequiredMixin, ExpiredConfirmationMixin, Vi
         # Do not send a confirmation to a verified address.
         if email_address.verified:
             return self.fail()
+
+        # Rate limiting.
+        this_morning = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        confirmation_subject_query = "confirmez votre adresse e-mail"
+        if (
+            Email.objects.filter(
+                to__contains=[email_address.email],
+                created_at__gte=this_morning,
+                subject__icontains=confirmation_subject_query,
+            ).count()
+            >= settings.ACCOUNT_MAX_DAILY_EMAIL_CONFIRMATION_REQUESTS
+        ):
+            return redirect(reverse("account_email_rate_limit_exceeded"))
 
         send_email_confirmation(request, email_address.user, email_address.email)
         return redirect(reverse("account_email_verification_sent"))
