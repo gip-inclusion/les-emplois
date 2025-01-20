@@ -1067,7 +1067,7 @@ class TestCustomApprovalAdminViews:
             [
                 messages.Message(
                     messages.ERROR,
-                    "Impossible de créer un PASS IAE car la candidature n'a pas de diagnostique d'éligibilité.",
+                    "Impossible de créer un PASS IAE car la candidature n'a pas de diagnostic d'éligibilité.",
                 )
             ],
         )
