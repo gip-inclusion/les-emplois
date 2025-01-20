@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from django.conf import settings
@@ -8,6 +9,9 @@ from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
 from itou.utils.emails import get_email_message
+
+
+logger = logging.getLogger("itou.members")
 
 
 class OrganizationQuerySet(models.QuerySet):
@@ -74,6 +78,29 @@ class OrganizationAbstract(models.Model):
     def has_admin(self, user):
         return self.active_admin_members.filter(pk=user.pk).exists()
 
+    def expire_invitations(self, user):
+        expired_invit_to_user = self.invitations.pending().filter(email=user.email).update(validity_days=0)
+        context = {
+            "org_model": self._meta.label,
+            "org_id": self.pk,
+            "user_id": user.pk,
+        }
+        logger.info(
+            "Expired %(expired)d invitations to %(org_model)s %(org_id)d for user_id=%(user_id)d.",
+            {
+                **context,
+                "expired": expired_invit_to_user,
+            },
+        )
+        expired_invit_from_user = self.invitations.pending().filter(sender=user).update(validity_days=0)
+        logger.info(
+            "Expired %(expired)d invitations to %(org_model)s %(org_id)d from user_id=%(user_id)d.",
+            {
+                **context,
+                "expired": expired_invit_from_user,
+            },
+        )
+
     def add_or_activate_membership(self, user):
         """Add user to organization members, or activate membership if already there"""
 
@@ -82,6 +109,7 @@ class OrganizationAbstract(models.Model):
             # There was no membership with this user
             is_admin = not self.members.exists()
             self.memberships.create(user=user, is_admin=is_admin)
+        self.expire_invitations(user)
 
     def deactivate_membership(self, membership, *, updated_by):
         """
@@ -100,6 +128,7 @@ class OrganizationAbstract(models.Model):
         membership.is_admin = False
         membership.updated_by = updated_by
         membership.save(update_fields=["is_active", "is_admin", "updated_by"])
+        self.expire_invitations(membership.user)
         self.member_deactivation_email(membership.user).send()
 
     def set_admin_role(self, membership, admin, *, updated_by):

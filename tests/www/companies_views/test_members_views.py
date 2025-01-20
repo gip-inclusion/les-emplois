@@ -10,6 +10,7 @@ from tests.companies.factories import (
     CompanyWith2MembershipsFactory,
     EmployerFactory,
 )
+from tests.invitations.factories import EmployerInvitationFactory
 
 
 class TestMembers:
@@ -95,7 +96,7 @@ class TestUserMembershipDeactivation:
         membership.refresh_from_db()
         assert membership.is_active
 
-    def test_deactivate_user(self, client, mailoutbox, snapshot):
+    def test_deactivate_user(self, caplog, client, mailoutbox, snapshot):
         """
         Standard use case of user deactivation.
         Everything should be fine ...
@@ -108,6 +109,10 @@ class TestUserMembershipDeactivation:
         assert guest not in company.active_admin_members
         assert admin in company.active_admin_members
 
+        received_invitation = EmployerInvitationFactory(email=guest.email, company=company)
+        sent_invitation = EmployerInvitationFactory(sender=guest, company=company)
+        sent_invitation_to_other = EmployerInvitationFactory(sender=guest)
+
         client.force_login(admin)
         url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
         response = client.post(url)
@@ -118,6 +123,8 @@ class TestUserMembershipDeactivation:
         assert not membership.is_active
         assert admin == membership.updated_by
         assert membership.updated_at is not None
+        assert f"Expired 1 invitations to companies.Company {company.pk} for user_id={guest.pk}." in caplog.messages
+        assert f"Expired 1 invitations to companies.Company {company.pk} from user_id={guest.pk}." in caplog.messages
 
         # Check mailbox
         # User must have been notified of deactivation (we're human after all)
@@ -127,6 +134,12 @@ class TestUserMembershipDeactivation:
         assert "Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion" in email.body
         assert email.to[0] == guest.email
         assert email.body == snapshot
+        received_invitation.refresh_from_db()
+        assert received_invitation.has_expired is True
+        sent_invitation.refresh_from_db()
+        assert sent_invitation.has_expired is True
+        sent_invitation_to_other.refresh_from_db()
+        assert sent_invitation_to_other.has_expired is False
 
     def test_deactivate_with_no_perms(self, client):
         """

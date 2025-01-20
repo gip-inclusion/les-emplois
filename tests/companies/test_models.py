@@ -10,9 +10,11 @@ from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
+from pytest_django.asserts import assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Company, JobDescription
+from itou.invitations.models import EmployerInvitation
 from itou.job_applications.enums import JobApplicationState
 from tests.companies.factories import (
     CompanyAfterGracePeriodFactory,
@@ -24,6 +26,7 @@ from tests.companies.factories import (
     CompanyWithMembershipAndJobsFactory,
     JobDescriptionFactory,
 )
+from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
@@ -248,22 +251,62 @@ class TestCompanyModel:
         company.kind = CompanyKind.OPCS
         assert company.is_opcs
 
-    def test_add_or_activate_membership(self):
+    def test_add_or_activate_membership(self, caplog):
         company = CompanyFactory()
         assert 0 == company.members.count()
         admin_user = EmployerFactory()
         company.add_or_activate_membership(admin_user)
         assert 1 == company.memberships.count()
         assert company.memberships.get(user=admin_user).is_admin
+        assert (
+            f"Expired 0 invitations to companies.Company {company.pk} for user_id={admin_user.pk}." in caplog.messages
+        )
 
         other_user = EmployerFactory()
+        invit1, invit2 = EmployerInvitationFactory.create_batch(
+            2, email=other_user.email, company=company, sender=admin_user
+        )
+        invit_expired = EmployerInvitationFactory(
+            email=other_user.email,
+            company=company,
+            sender=admin_user,
+            sent_at=timezone.now() - timedelta(days=365),
+        )
+        invit_other = EmployerInvitationFactory(email=other_user.email)
         company.add_or_activate_membership(other_user)
         assert 2 == company.memberships.count()
         assert not company.memberships.get(user=other_user).is_admin
+        assert (
+            f"Expired 2 invitations to companies.Company {company.pk} for user_id={other_user.pk}." in caplog.messages
+        )
+        assertQuerySetEqual(
+            EmployerInvitation.objects.all(),
+            [
+                (invit1.pk, company.pk, admin_user.pk, other_user.email, 0),
+                (invit2.pk, company.pk, admin_user.pk, other_user.email, 0),
+                (invit_expired.pk, company.pk, admin_user.pk, other_user.email, 14),
+                (invit_other.pk, invit_other.company_id, invit_other.sender_id, other_user.email, 14),
+            ],
+            transform=lambda x: (
+                x.pk,
+                x.company_id,
+                x.sender_id,
+                x.email,
+                x.validity_days,
+            ),
+            ordered=False,
+        )
 
         company.memberships.filter(user=other_user).update(is_active=False)
+        invit = EmployerInvitationFactory(email=other_user.email, company=company, sender=admin_user)
         company.add_or_activate_membership(other_user)
         assert company.memberships.get(user=other_user).is_active
+        assert company.memberships.get(user=other_user).is_admin is False
+        assert (
+            f"Expired 1 invitations to companies.Company {company.pk} for user_id={other_user.pk}." in caplog.messages
+        )
+        invit.refresh_from_db()
+        assert invit.has_expired is True
 
         non_employer = PrescriberFactory()
         with pytest.raises(ValidationError):

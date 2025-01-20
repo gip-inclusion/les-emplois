@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import httpx
 import pytest
@@ -12,8 +12,15 @@ from django.core.management import call_command
 from django.db import IntegrityError
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
+from pytest_django.asserts import (
+    assertContains,
+    assertMessages,
+    assertNotContains,
+    assertQuerySetEqual,
+    assertRedirects,
+)
 
+from itou.invitations.models import PrescriberWithOrgInvitation
 from itou.job_applications import models as job_applications_models
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.management.commands.merge_organizations import organization_merge_into
@@ -21,6 +28,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
+from tests.invitations.factories import PrescriberWithOrgInvitationFactory
 from tests.job_applications import factories as job_applications_factories
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
@@ -170,22 +178,62 @@ class TestPrescriberOrganizationModel:
 
         assert active_user_with_active_membership not in org.active_members
 
-    def test_add_or_activate_membership(self):
+    def test_add_or_activate_membership(self, caplog):
         org = PrescriberOrganizationFactory()
         assert 0 == org.members.count()
         admin_user = PrescriberFactory()
         org.add_or_activate_membership(admin_user)
         assert 1 == org.memberships.count()
         assert org.memberships.get(user=admin_user).is_admin
+        assert (
+            f"Expired 0 invitations to prescribers.PrescriberOrganization {org.pk} for user_id={admin_user.pk}."
+        ) in caplog.messages
 
         other_user = PrescriberFactory()
+        invit1, invit2 = PrescriberWithOrgInvitationFactory.create_batch(
+            2, email=other_user.email, organization=org, sender=admin_user
+        )
+        invit_expired = PrescriberWithOrgInvitationFactory(
+            email=other_user.email,
+            organization=org,
+            sender=admin_user,
+            sent_at=timezone.now() - timedelta(days=365),
+        )
+        invit_other = PrescriberWithOrgInvitationFactory(email=other_user.email)
         org.add_or_activate_membership(other_user)
         assert 2 == org.memberships.count()
         assert not org.memberships.get(user=other_user).is_admin
+        assert (
+            f"Expired 2 invitations to prescribers.PrescriberOrganization {org.pk} for user_id={other_user.pk}."
+        ) in caplog.messages
+        assertQuerySetEqual(
+            PrescriberWithOrgInvitation.objects.all(),
+            [
+                (invit1.pk, org.pk, admin_user.pk, other_user.email, 0),
+                (invit2.pk, org.pk, admin_user.pk, other_user.email, 0),
+                (invit_expired.pk, org.pk, admin_user.pk, other_user.email, 14),
+                (invit_other.pk, invit_other.organization_id, invit_other.sender_id, other_user.email, 14),
+            ],
+            transform=lambda x: (
+                x.pk,
+                x.organization_id,
+                x.sender_id,
+                x.email,
+                x.validity_days,
+            ),
+            ordered=False,
+        )
 
         org.memberships.filter(user=other_user).update(is_active=False)
+        invit = PrescriberWithOrgInvitationFactory(email=other_user.email, organization=org, sender=admin_user)
         org.add_or_activate_membership(other_user)
         assert org.memberships.get(user=other_user).is_active
+        assert org.memberships.get(user=other_user).is_admin is False
+        assert (
+            f"Expired 1 invitations to prescribers.PrescriberOrganization {org.pk} for user_id={other_user.pk}."
+        ) in caplog.messages
+        invit.refresh_from_db()
+        assert invit.has_expired is True
 
         non_prescriber = EmployerFactory()
         with pytest.raises(ValidationError):
