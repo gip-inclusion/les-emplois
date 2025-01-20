@@ -1,8 +1,8 @@
 """
 Generate fake data based on global Itou's fixtures.
 You can use it with the quick login accounts located on the header banner.
-Employer's account: test+cap@inclusion.beta.gouv.fr
-Labor inspector's account: test+ddets@inclusion.beta.gouv.fr
+Employer's account: test+cap@inclusion.gouv.fr
+Labor inspector's account: test+ddets@inclusion.gouv.fr
 """
 
 import random
@@ -62,7 +62,7 @@ def load_data():
 
     created_job_applications_pks = []
 
-    employer = User.objects.get(email="test+cap@inclusion.beta.gouv.fr")
+    employer = User.objects.get(email="test+cap@inclusion.gouv.fr")
     controlled_siaes = employer.company_set.all()
     assert controlled_siaes.count() == 5
     total_administrative_criteria = AdministrativeCriteria.objects.count()

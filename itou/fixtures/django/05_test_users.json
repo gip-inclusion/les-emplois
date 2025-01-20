@@ -49,7 +49,7 @@
       "created_by": null,
       "date_joined": "2019-09-30T13:42:09Z",
       "department": "",
-      "email": "test+de@inclusion.beta.gouv.fr",
+      "email": "test+de@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Jacques",
@@ -72,7 +72,7 @@
       "public_id": "46d882ce-39b9-4969-ac33-e8e6db3f2270",
       "title": "",
       "user_permissions": [],
-      "username": "test+de@inclusion.beta.gouv.fr"
+      "username": "test+de@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 2
@@ -88,7 +88,7 @@
       "created_by": null,
       "date_joined": "2019-09-30T13:42:57Z",
       "department": "",
-      "email": "test+prescripteur@inclusion.beta.gouv.fr",
+      "email": "test+prescripteur@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "André",
@@ -111,7 +111,7 @@
       "public_id": "ee0606e0-638e-408e-9a3d-1323a67ee0bd",
       "title": "",
       "user_permissions": [],
-      "username": "test+prescripteur@inclusion.beta.gouv.fr"
+      "username": "test+prescripteur@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 3
@@ -127,7 +127,7 @@
       "created_by": null,
       "date_joined": "2019-09-30T13:43:26Z",
       "department": "",
-      "email": "test+etti@inclusion.beta.gouv.fr",
+      "email": "test+etti@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Daphnée",
@@ -150,7 +150,7 @@
       "public_id": "96bf0bfd-d9b6-4c3e-a9da-93ba6f508ebf",
       "title": "",
       "user_permissions": [],
-      "username": "test+etti@inclusion.beta.gouv.fr"
+      "username": "test+etti@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 4
@@ -166,7 +166,7 @@
       "created_by": null,
       "date_joined": "2019-09-30T13:44:15Z",
       "department": "",
-      "email": "test+orienteur-solo@inclusion.beta.gouv.fr",
+      "email": "test+orienteur-solo@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Emmanuelle",
@@ -189,7 +189,7 @@
       "public_id": "1a2a1479-f4f8-4e2a-a707-358b8aed1d87",
       "title": "",
       "user_permissions": [],
-      "username": "test+orienteur-solo@inclusion.beta.gouv.fr"
+      "username": "test+orienteur-solo@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 5
@@ -205,7 +205,7 @@
       "created_by": null,
       "date_joined": "2020-04-09T13:36:52Z",
       "department": "",
-      "email": "test+ei@inclusion.beta.gouv.fr",
+      "email": "test+ei@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Victor",
@@ -228,7 +228,7 @@
       "public_id": "d9e0b843-fc23-4d9c-9909-5c1cb43ef6bf",
       "title": "",
       "user_permissions": [],
-      "username": "test+ei@inclusion.beta.gouv.fr"
+      "username": "test+ei@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 6
@@ -244,7 +244,7 @@
       "created_by": null,
       "date_joined": "2020-04-09T13:48:41Z",
       "department": "",
-      "email": "test+orienteur@inclusion.beta.gouv.fr",
+      "email": "test+orienteur@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Olivier",
@@ -267,7 +267,7 @@
       "public_id": "d0c8253d-9d47-4fa0-8714-d4aac51a26c2",
       "title": "",
       "user_permissions": [],
-      "username": "test+orienteur@inclusion.beta.gouv.fr"
+      "username": "test+orienteur@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 7
@@ -283,7 +283,7 @@
       "created_by": 3,
       "date_joined": "2020-04-09T14:06:40Z",
       "department": "37",
-      "email": "test+de-proxy@inclusion.beta.gouv.fr",
+      "email": "test+de-proxy@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Sylvie",
@@ -306,7 +306,7 @@
       "public_id": "7feb3b2e-8c62-482e-8681-ed7a5e95abf1",
       "title": "",
       "user_permissions": [],
-      "username": "test+de-proxy@inclusion.beta.gouv.fr"
+      "username": "test+de-proxy@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 8
@@ -322,7 +322,7 @@
       "created_by": null,
       "date_joined": "2020-04-14T16:10:12Z",
       "department": "",
-      "email": "test+geiq@inclusion.beta.gouv.fr",
+      "email": "test+geiq@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Laura",
@@ -345,7 +345,7 @@
       "public_id": "72ba065b-6a9a-47c1-9e77-b7563b3d55d7",
       "title": "",
       "user_permissions": [],
-      "username": "test+geiq@inclusion.beta.gouv.fr"
+      "username": "test+geiq@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 9
@@ -595,7 +595,7 @@
       "created_by": null,
       "date_joined": "2021-02-22T15:02:19Z",
       "department": "",
-      "email": "test+ea@inclusion.beta.gouv.fr",
+      "email": "test+ea@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Alphonse",
@@ -829,7 +829,7 @@
       "created_by": null,
       "date_joined": "2021-07-13T15:33:29Z",
       "department": "",
-      "email": "test+dreets@inclusion.beta.gouv.fr",
+      "email": "test+dreets@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Joseph",
@@ -852,7 +852,7 @@
       "public_id": "f55fe9f1-abe2-42ab-b4cd-782097401192",
       "title": "",
       "user_permissions": [],
-      "username": "test+dreets@inclusion.beta.gouv.fr"
+      "username": "test+dreets@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 24
@@ -868,7 +868,7 @@
       "created_by": null,
       "date_joined": "2021-11-23T13:43:26Z",
       "department": "",
-      "email": "test+ai@inclusion.beta.gouv.fr",
+      "email": "test+ai@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Jean-Claude",
@@ -891,7 +891,7 @@
       "public_id": "c5e7eeb7-0a8d-4645-bda9-16a6f1e57210",
       "title": "",
       "user_permissions": [],
-      "username": "test+ai@inclusion.beta.gouv.fr"
+      "username": "test+ai@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 25
@@ -946,7 +946,7 @@
       "created_by": null,
       "date_joined": "2023-06-02T09:35:44.525Z",
       "department": "",
-      "email": "test+ddets@inclusion.beta.gouv.fr",
+      "email": "test+ddets@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Georges",
@@ -969,7 +969,7 @@
       "public_id": "d95b438f-53c0-4d18-93aa-60fce8d25a24",
       "title": "",
       "user_permissions": [],
-      "username": "test+ddets@inclusion.beta.gouv.fr"
+      "username": "test+ddets@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 27
@@ -985,7 +985,7 @@
       "created_by": null,
       "date_joined": "2023-06-21T13:49:22.935Z",
       "department": "",
-      "email": "test+cap@inclusion.beta.gouv.fr",
+      "email": "test+cap@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Georges",
@@ -1024,7 +1024,7 @@
       "created_by": null,
       "date_joined": "2023-06-21T13:49:22.935Z",
       "department": "",
-      "email": "test+institution@inclusion.beta.gouv.fr",
+      "email": "test+institution@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Gustave",

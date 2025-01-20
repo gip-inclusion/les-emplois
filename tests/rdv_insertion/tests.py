@@ -36,7 +36,7 @@ class TestRDVInsertionTokenRenewal:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings):
         settings.RDV_SOLIDARITES_API_BASE_URL = "https://rdv-solidarites.fake/api/v1/"
-        settings.RDV_SOLIDARITES_EMAIL = "tech@inclusion.beta.gouv.fr"
+        settings.RDV_SOLIDARITES_EMAIL = "tech.emplois@inclusion.gouv.fr"
         settings.RDV_SOLIDARITES_PASSWORD = "password"
         settings.RDV_SOLIDARITES_TOKEN_EXPIRY = 86000
         settings.RDV_INSERTION_API_BASE_URL = "https://rdv-insertion.fake/api/v1/"

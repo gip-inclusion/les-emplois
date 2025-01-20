@@ -24,7 +24,7 @@ from tests.utils.test import parse_response_to_soup
 @pytest.fixture(autouse=True)
 def mock_rdvs_api(settings):
     settings.RDV_SOLIDARITES_API_BASE_URL = "https://rdv-solidarites.fake/api/v1/"
-    settings.RDV_SOLIDARITES_EMAIL = "tech@inclusion.beta.gouv.fr"
+    settings.RDV_SOLIDARITES_EMAIL = "tech.emplois@inclusion.gouv.fr"
     settings.RDV_SOLIDARITES_PASSWORD = "password"
     settings.RDV_INSERTION_API_BASE_URL = "https://rdv-insertion.fake/api/v1/"
     settings.RDV_INSERTION_INVITE_HOLD_DURATION = datetime.timedelta(days=2)

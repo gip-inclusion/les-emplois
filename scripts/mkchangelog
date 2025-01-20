@@ -164,7 +164,7 @@ def main(publish):
             "-c",
             "user.name=Changelog Bot",
             "-c",
-            "user.email=noreply@inclusion.beta.gouv.fr",
+            "user.email=tech.emplois@inclusion.gouv.fr",
             "commit",
         ]
         title = f"changelog: From {sprint_start} to {sprint_end}"

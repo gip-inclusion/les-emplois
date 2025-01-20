@@ -10,7 +10,7 @@ def employers_accounts_tag():
     action_url = reverse("login:employer")
     return [
         {
-            "email": "test+etti@inclusion.beta.gouv.fr",
+            "email": "test+etti@inclusion.gouv.fr",
             "description": "1 poste ouvert au recrutement",
             "image": "etti.svg",
             "location": "Beaucaire (30)",
@@ -18,7 +18,7 @@ def employers_accounts_tag():
             "action_url": action_url,
         },
         {
-            "email": "test+ei@inclusion.beta.gouv.fr",
+            "email": "test+ei@inclusion.gouv.fr",
             "description": "2 postes ouverts au recrutement",
             "image": "ei.svg",
             "location": "St-Etienne du Grès (13)",
@@ -26,7 +26,7 @@ def employers_accounts_tag():
             "action_url": action_url,
         },
         {
-            "email": "test+geiq@inclusion.beta.gouv.fr",
+            "email": "test+geiq@inclusion.gouv.fr",
             "description": "1 poste ouvert au recrutement",
             "image": "geiq.svg",
             "location": "Tarascon (13)",
@@ -34,7 +34,7 @@ def employers_accounts_tag():
             "action_url": action_url,
         },
         {
-            "email": "test+ea@inclusion.beta.gouv.fr",
+            "email": "test+ea@inclusion.gouv.fr",
             "description": "1 poste ouvert au recrutement",
             "image": "ea.svg",
             "location": "Fontvieille (13)",
@@ -42,7 +42,7 @@ def employers_accounts_tag():
             "action_url": action_url,
         },
         {
-            "email": "test+ai@inclusion.beta.gouv.fr",
+            "email": "test+ai@inclusion.gouv.fr",
             "description": "1 poste ouvert au recrutement",
             "image": "ai.svg",
             "location": "Tours (37)",
@@ -58,19 +58,19 @@ def prescribers_accounts_tag():
     return [
         {
             "title": "Prescripteur habilité",
-            "email": "test+prescripteur@inclusion.beta.gouv.fr",
+            "email": "test+prescripteur@inclusion.gouv.fr",
             "image": "prescripteur_habilite.svg",
             "action_url": action_url,
         },
         {
             "title": "Orienteur <br>(prescripteur non habilité)",
-            "email": "test+orienteur@inclusion.beta.gouv.fr",
+            "email": "test+orienteur@inclusion.gouv.fr",
             "image": "prescripteur_non_habilite.svg",
             "action_url": action_url,
         },
         {
             "title": "Orienteur seul,<br> sans organisation",
-            "email": "test+orienteur-solo@inclusion.beta.gouv.fr",
+            "email": "test+orienteur-solo@inclusion.gouv.fr",
             "image": "prescripteur_solo.svg",
             "action_url": action_url,
         },
@@ -80,4 +80,4 @@ def prescribers_accounts_tag():
 @register.simple_tag
 def job_seekers_accounts_tag():
     action_url = reverse("login:job_seeker")
-    return [{"email": "test+de@inclusion.beta.gouv.fr", "image": "de.svg", "action_url": action_url}]
+    return [{"email": "test+de@inclusion.gouv.fr", "image": "de.svg", "action_url": action_url}]
