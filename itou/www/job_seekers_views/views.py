@@ -210,6 +210,12 @@ class GetOrCreateJobSeekerStartView(View):
         data |= {"apply": {"company_pk": company.pk}} if company else {}
         self.job_seeker_session = SessionNamespace.create_uuid_namespace(request.session, data)
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
+            raise PermissionDenied("Vous n'êtes pas autorisé à rechercher ou créer un compte candidat.")
+
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         if self.tunnel == "sender" or self.tunnel == "gps":
             view_name = "job_seekers_views:check_nir_for_sender"
