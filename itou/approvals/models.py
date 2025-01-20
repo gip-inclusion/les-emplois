@@ -555,7 +555,6 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         help_text="identifiant opaque, pour les API et les URLs publiques",
         default=uuid.uuid4,
         unique=True,
-        null=True,
     )
 
     objects = ApprovalQuerySet.as_manager()
