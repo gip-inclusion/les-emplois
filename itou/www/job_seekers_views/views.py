@@ -307,8 +307,7 @@ class JobSeekerForSenderBaseView(JobSeekerBaseView):
 
     def dispatch(self, request, *args, **kwargs):
         if self.sender.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
-            logger.info(f"dispatch ({request.path}) : {self.sender.kind} in sender tunnel")
-            return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.company.pk}))
+            raise PermissionDenied()
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -328,8 +327,7 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
 
     def dispatch(self, request, *args, **kwargs):
         if not self.job_seeker.is_job_seeker:
-            logger.info(f"dispatch ({request.path}) : {request.user.kind} in jobseeker tunnel")
-            return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.company.pk}))
+            raise PermissionDenied()
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):

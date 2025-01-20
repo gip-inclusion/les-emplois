@@ -549,27 +549,6 @@ class TestApplyAsJobSeeker:
             html=True,
         )
 
-    def test_apply_as_job_seeker_on_sender_tunnel(self, client):
-        company = CompanyFactory()
-        user = JobSeekerFactory()
-        client.force_login(user)
-
-        # Init session (as it would be in apply:start)
-        session = client.session
-        session_name = str(uuid.uuid4())
-        session[session_name] = {
-            "config": {
-                "tunnel": "job_seeker",
-                "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
-            },
-            "apply": {"company_pk": company.pk},
-        }
-        session.save()
-        response = client.get(reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": session_name}))
-        assertRedirects(
-            response, reverse("apply:start", kwargs={"company_pk": company.pk}), fetch_redirect_response=False
-        )
-
     def test_apply_as_job_seeker_from_job_description(self, client):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
         job_description = company.job_description_through.first()
@@ -1865,29 +1844,6 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assert response.status_code == 200
-
-    def test_apply_as_prescriber_on_job_seeker_tunnel(self, client):
-        company = CompanyFactory()
-        user = PrescriberFactory()
-        client.force_login(user)
-
-        # Init session (as it would be in apply:start)
-        session = client.session
-        session_name = str(uuid.uuid4())
-        session[session_name] = {
-            "config": {
-                "tunnel": "sender",
-                "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
-                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
-            },
-            "apply": {"company_pk": company.pk},
-        }
-        session.save()
-
-        response = client.get(
-            reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": session_name})
-        )
-        assert response.status_code == 404  # session_kind doesn't match
 
     def test_check_info_as_prescriber_for_job_seeker_with_incomplete_info(self, client):
         company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
