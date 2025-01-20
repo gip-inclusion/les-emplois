@@ -1648,7 +1648,7 @@
           
           
           
-              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[PK of Approval]?back_url=/approvals/prolongation/request/666">
+              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/prolongation/request/666">
                   <i aria-hidden="true" class="ri-eye-line font-weight-medium"></i>
                   <span>Afficher le PASS IAE</span>
               </a>
@@ -1894,7 +1894,7 @@
           
           
           
-              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[PK of Approval]?back_url=/approvals/prolongation/request/666">
+              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/prolongation/request/666">
                   <i aria-hidden="true" class="ri-eye-line font-weight-medium"></i>
                   <span>Afficher le PASS IAE</span>
               </a>
@@ -2163,7 +2163,7 @@
           
           
           
-              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[PK of Approval]?back_url=/approvals/prolongation/request/666">
+              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/prolongation/request/666">
                   <i aria-hidden="true" class="ri-eye-line font-weight-medium"></i>
                   <span>Afficher le PASS IAE</span>
               </a>

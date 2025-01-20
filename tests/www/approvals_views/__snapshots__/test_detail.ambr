@@ -407,7 +407,7 @@
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
-          WHERE "approvals_approval"."id" = %s
+          WHERE "approvals_approval"."public_id" = %s
           LIMIT 21
         ''',
       }),
@@ -1132,7 +1132,7 @@
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
-          WHERE "approvals_approval"."id" = %s
+          WHERE "approvals_approval"."public_id" = %s
           LIMIT 21
         ''',
       }),
@@ -1751,7 +1751,7 @@
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
-          WHERE "approvals_approval"."id" = %s
+          WHERE "approvals_approval"."public_id" = %s
           LIMIT 21
         ''',
       }),
@@ -2716,7 +2716,7 @@
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
-          WHERE "approvals_approval"."id" = %s
+          WHERE "approvals_approval"."public_id" = %s
           LIMIT 21
         ''',
       }),
@@ -3442,7 +3442,7 @@
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
-          WHERE "approvals_approval"."id" = %s
+          WHERE "approvals_approval"."public_id" = %s
           LIMIT 21
         ''',
       }),
@@ -4061,7 +4061,7 @@
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
-          WHERE "approvals_approval"."id" = %s
+          WHERE "approvals_approval"."public_id" = %s
           LIMIT 21
         ''',
       }),
@@ -4545,7 +4545,7 @@
                                                   <td>
                                                       
   
-                                                          <a class="btn btn-ico-only" href="/approvals/suspension/1/action/edit/?back_url=/approvals/details/[PK of Approval]">
+                                                          <a class="btn btn-ico-only" href="/approvals/suspension/1/action/edit/?back_url=/approvals/details/[Public ID of Approval]">
                                                               <i aria-hidden="true" class="ri-pencil-line fw-medium" data-bs-title="Modifier la suspension" data-bs-toggle="tooltip"></i>
                                                               <span class="visually-hidden">Modifier la suspension</span>
                                                           </a>
@@ -4554,7 +4554,7 @@
                                                               <i aria-hidden="true" class="ri-more-2-fill"></i>
                                                           </button>
                                                           <div aria-labelledby="dropdown_1_action_menu" class="dropdown-menu">
-                                                              <a class="dropdown-item" href="/approvals/suspension/1/action/?back_url=/approvals/details/[PK of Approval]">Supprimer la suspension</a>
+                                                              <a class="dropdown-item" href="/approvals/suspension/1/action/?back_url=/approvals/details/[Public ID of Approval]">Supprimer la suspension</a>
                                                           </div>
   
                                                       

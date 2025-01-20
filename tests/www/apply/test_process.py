@@ -147,7 +147,7 @@ class TestProcessViews:
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             {"back_url": back_url},
         )
-        approval_url = reverse("approvals:details", kwargs={"pk": job_application.approval.pk})
+        approval_url = reverse("approvals:details", kwargs={"public_id": job_application.approval.public_id})
         with assertSnapshotQueries(snapshot(name="job application detail for company")):
             response = client.get(url)
         assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
