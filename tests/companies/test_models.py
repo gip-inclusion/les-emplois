@@ -351,6 +351,7 @@ class TestJobDescriptionQuerySet:
         company = CompanyFactory(with_jobs=True)
         job_seeker = JobSeekerFactory()  # We don't care if it's always the same
         siae_job_descriptions = company.job_description_through.all()
+        threshold_exceeded = JobDescription.OVERWHELMED_THRESHOLD + 1
 
         # Test attribute presence
         siae_job_description = JobDescription.objects.with_annotation_is_overwhelmed().first()
@@ -359,7 +360,7 @@ class TestJobDescriptionQuerySet:
         # Test overwhelmed threshold: overwhelmed job description
         overwhelmed_job_description = siae_job_descriptions[0]
         JobApplicationFactory.create_batch(
-            JobDescription.OVERWHELMED_THRESHOLD + 1,
+            threshold_exceeded,
             to_company=company,
             selected_jobs=[overwhelmed_job_description],
             job_seeker=job_seeker,
@@ -384,7 +385,6 @@ class TestJobDescriptionQuerySet:
         # Overwhelmed job descriptions count related **pending** job applications.
         # They should ignore other states.
         job_description = siae_job_descriptions[2]
-        threshold_exceeded = JobDescription.OVERWHELMED_THRESHOLD + 1
 
         JobApplicationFactory.create_batch(
             threshold_exceeded,
