@@ -615,7 +615,7 @@ Rien à signaler cette semaine
 - [Admin : Ajouter une icône à la partie administration du site](https://github.com/gip-inclusion/les-emplois/pull/4303)
 - [Admin: Correction de permissions](https://github.com/gip-inclusion/les-emplois/pull/4322)
 - [Admin: Robustifier le changement d'état des candidatures](https://github.com/gip-inclusion/les-emplois/pull/4244)
-- [Candidature : N'utiliser que les diagnostiques considérés comme valides pour la SIAE](https://github.com/gip-inclusion/les-emplois/pull/4229)
+- [Candidature : N'utiliser que les diagnostics considérés comme valides pour la SIAE](https://github.com/gip-inclusion/les-emplois/pull/4229)
 - [GPS : liste des groupes > la date n'apparaît pas pour les groupes créés en masse // changement de l'ordre](https://github.com/gip-inclusion/les-emplois/pull/4279) 🖼
 - [Import IAE : Limiter la période de grâce pour le déconventionnement au premier semestre](https://github.com/gip-inclusion/les-emplois/pull/4255)
 - [Recherche employeur: Correction d’un bug lors de la recherche de département adjacent](https://github.com/gip-inclusion/les-emplois/pull/4290)
@@ -952,7 +952,7 @@ Rien à signaler cette semaine
 - Fiches salarié : afficher une erreur lorsqu’une SIAE sans convention essaie
   d’accéder aux fiches salariées
 - Diagoriente : faire arriver les liens sur la page d’accueil
-- Diagnostique socio-professionnel : bascule du lien d’aide vers la [communauté
+- diagnostic socio-professionnel : bascule du lien d’aide vers la [communauté
   de
   l’inclusion](https://communaute.inclusion.beta.gouv.fr/surveys/dsp/create/)
 - Interface : gestion des emails très longs dans les fiches entreprise et de
@@ -1344,7 +1344,7 @@ Rien à signaler cette semaine
 ### Modifié
 
 - Fiches salarié : Précision du message d’erreur lors de la création quand lorsqu’une fiche archivée existe
-- Liste des candidatures : Légère correction en cas de multiples diagnostiques d’éligibilité
+- Liste des candidatures : Légère correction en cas de multiples diagnostics d’éligibilité
 - Liste des candidatures : Refonte et affichage de la localisation des postes pour les employeurs
 - Liste des métiers d’une SIAE : Afficher le nombre de métiers
 
@@ -1650,7 +1650,7 @@ Rien à signaler cette semaine
 - PASS IAE : En tant que SIAE je veux m'assurer que l'annulation du PASS est justifiée dans mon cas #1476
 - Candidatures - refus : Un bouton radio sans texte #1471
 - Candidatures - refus : nouveaux motif de refus / Pilotage #1474
-- Candidatures - nouveau parcours : Enregistrement de la date d'expiration du diagnostique d'éligibilité en base de données #1472
+- Candidatures - nouveau parcours : Enregistrement de la date d'expiration du diagnostic d'éligibilité en base de données #1472
 - Candidatures - nouveau parcours : Diverses corrections et améliorations #1473
 - Contrôle a posteriori : Déplacement des données de contrôle a posteriori pendant un move_siae_data #1479
 - Sécurité mots de passe : Améliorations de sécurité diverses #1502

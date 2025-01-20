@@ -59,7 +59,7 @@ def manually_add_approval(
 
     if job_application.eligibility_diagnosis is None:
         messages.error(
-            request, "Impossible de créer un PASS IAE car la candidature n'a pas de diagnostique d'éligibilité."
+            request, "Impossible de créer un PASS IAE car la candidature n'a pas de diagnostic d'éligibilité."
         )
         return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
 
