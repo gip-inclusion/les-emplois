@@ -16,7 +16,7 @@ from tests.users.factories import JobSeekerFactory
 from tests.utils.test import KNOWN_SESSION_KEYS
 
 
-class TestCreateForJobSeeker:
+class TestGetOrCreateForJobSeeker:
     def test_check_nir_with_session(self, client):
         company = CompanyFactory(with_membership=True)
         user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
@@ -68,7 +68,7 @@ class TestCreateForJobSeeker:
         )
 
 
-class TestCreateForSender:
+class TestGetOrCreateForSender:
     @pytest.mark.parametrize(
         "company_value, tunnel_value, from_url_value, expected_status_code",
         [
@@ -280,7 +280,7 @@ class TestCreateForSender:
         )
 
 
-class TestUpdateForJobSeekerStart:
+class TestUpdateForJobSeeker:
     def test_start_update_job_seeker_forbidden(self, client):
         job_seeker = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
         company = CompanyFactory(with_membership=True)
@@ -303,7 +303,7 @@ class TestUpdateForJobSeekerStart:
         assert response.status_code == 403
 
 
-class TestUpdateForSenderStart:
+class TestUpdateForSender:
     @pytest.mark.parametrize(
         "job_seeker_value, from_url_value, expected_status_code",
         [
@@ -397,12 +397,10 @@ class TestUpdateForSenderStart:
 
         assert response.status_code == 404
 
-
-class TestUpdateJobSeekerStep1:
     @pytest.mark.parametrize(
         "born_in_france", [pytest.param(True, id="born_in_france"), pytest.param(False, id="born_outside_france")]
     )
-    def test_create_step_1(self, born_in_france, client):
+    def test_update_step_1(self, born_in_france, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
         job_seeker = JobSeekerFactory(created_by=user, title=Title.M, jobseeker_profile__nir="111116411111144")
