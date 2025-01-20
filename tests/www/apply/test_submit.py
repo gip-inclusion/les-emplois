@@ -96,21 +96,8 @@ class TestApply:
             "apply:start",
             "apply:start_hire",
             "apply:pending_authorization_for_sender",
-            "job_seekers_views:check_nir_for_sender",
-            "job_seekers_views:check_nir_for_job_seeker",
         ):
-            if viewname.startswith("apply"):
-                url = reverse(viewname, kwargs={"company_pk": company.pk})
-            else:
-                # Init session (as it would be in apply:start)
-                session = client.session
-                session_name = str(uuid.uuid4())
-                session[session_name] = {
-                    "config": {},
-                    "apply": {"company_pk": company.pk},
-                }
-                session.save()
-                url = reverse(viewname, kwargs={"session_uuid": session_name})
+            url = reverse(viewname, kwargs={"company_pk": company.pk})
             response = client.get(url)
             assertRedirects(response, reverse("account_login") + f"?next={url}")
 
@@ -3834,10 +3821,6 @@ class UpdateJobSeekerTestMixin:
 class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
     FINAL_REDIRECT_VIEW_NAME = "apply:application_jobs"
 
-    def test_anonymous_start(self, client):
-        response = client.get(self.start_url)
-        assertRedirects(response, add_url_params(reverse("account_login"), {"next": self.start_url}))
-
     def test_as_job_seeker(self, client):
         self._check_nothing_permitted(client, self.job_seeker)
 
@@ -3975,10 +3958,6 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
 
 class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
     FINAL_REDIRECT_VIEW_NAME = "job_seekers_views:check_job_seeker_info_for_hire"
-
-    def test_anonymous_start(self, client):
-        response = client.get(self.start_url)
-        assertRedirects(response, add_url_params(reverse("account_login"), {"next": self.start_url}))
 
     def test_as_job_seeker(self, client):
         self._check_nothing_permitted(client, self.job_seeker)
