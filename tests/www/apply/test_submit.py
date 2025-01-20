@@ -3107,8 +3107,6 @@ class TestApplyAsOther:
     ROUTES = [
         "apply:start",
         "apply:start_hire",
-        "job_seekers_views:check_nir_for_job_seeker",
-        "job_seekers_views:check_nir_for_sender",
     ]
 
     def test_labor_inspectors_are_not_allowed_to_submit_application(self, client, subtests):
@@ -3119,18 +3117,7 @@ class TestApplyAsOther:
 
         for route in self.ROUTES:
             with subtests.test(route=route):
-                if route.startswith("apply"):
-                    response = client.get(reverse(route, kwargs={"company_pk": company.pk}), follow=True)
-                else:
-                    # Init session (as it would be in apply:start)
-                    session = client.session
-                    session_name = str(uuid.uuid4())
-                    session[session_name] = {
-                        "config": {},
-                        "apply": {"company_pk": company.pk},
-                    }
-                    session.save()
-                    response = client.get(reverse(route, kwargs={"session_uuid": session_name}), follow=True)
+                response = client.get(reverse(route, kwargs={"company_pk": company.pk}), follow=True)
                 assert response.status_code == 403
 
     def test_itou_staff_are_not_allowed_to_submit_application(self, client, subtests):
@@ -3140,18 +3127,7 @@ class TestApplyAsOther:
 
         for route in self.ROUTES:
             with subtests.test(route=route):
-                if route.startswith("apply"):
-                    response = client.get(reverse(route, kwargs={"company_pk": company.pk}), follow=True)
-                else:
-                    # Init session (as it would be in apply:start)
-                    session = client.session
-                    session_name = str(uuid.uuid4())
-                    session[session_name] = {
-                        "config": {},
-                        "apply": {"company_pk": company.pk},
-                    }
-                    session.save()
-                    response = client.get(reverse(route, kwargs={"session_uuid": session_name}), follow=True)
+                response = client.get(reverse(route, kwargs={"company_pk": company.pk}), follow=True)
                 assert response.status_code == 403
 
 

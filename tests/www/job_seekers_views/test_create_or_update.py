@@ -11,12 +11,66 @@ from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.companies.factories import CompanyFactory
+from tests.institutions.factories import InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.test import KNOWN_SESSION_KEYS
 
 
+class TestGetOrCreateAsOther:
+    TUNNELS = ["sender", "hire", "gps"]
+
+    def test_labor_inspectors_are_not_allowed_to_get_or_create_job_seeker(self, client):
+        company = CompanyFactory()
+        institution_member = InstitutionMembershipFactory().user
+
+        client.force_login(institution_member)
+
+        for tunnel in self.TUNNELS:
+            params = {
+                "tunnel": tunnel,
+                "company": company.pk,
+                "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+            }
+            start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+            response = client.get(start_url)
+            assert response.status_code == 403
+
+    def test_itou_staff_are_not_allowed_to_get_or_create_job_seeker(self, client):
+        company = CompanyFactory()
+        user = ItouStaffFactory()
+
+        client.force_login(user)
+
+        for tunnel in self.TUNNELS:
+            params = {
+                "tunnel": tunnel,
+                "company": company.pk,
+                "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+            }
+            start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+            response = client.get(start_url)
+            assert response.status_code == 403
+
+
 class TestGetOrCreateForJobSeeker:
+    def test_start_create_forbidden_for_job_seekers(self, client):
+        TUNNELS = ["sender", "hire", "gps"]
+        company = CompanyFactory()
+        job_seeker = JobSeekerFactory()
+
+        client.force_login(job_seeker)
+
+        for tunnel in TUNNELS:
+            params = {
+                "tunnel": tunnel,
+                "company": company.pk,
+                "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+            }
+            start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+            response = client.get(start_url)
+            assert response.status_code == 403
+
     def test_check_nir_with_session(self, client):
         company = CompanyFactory(with_membership=True)
         user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
@@ -278,6 +332,36 @@ class TestGetOrCreateForSender:
             html=True,
             count=1,
         )
+
+
+class TestUpdateAsOther:
+    def test_labor_inspectors_are_not_allowed_update_job_seeker(self, client):
+        institution_member = InstitutionMembershipFactory().user
+        job_seeker = JobSeekerFactory()
+
+        client.force_login(institution_member)
+
+        params = {
+            "job_seeker": job_seeker.public_id,
+            "from_url": reverse("dashboard:index"),
+        }
+        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+        response = client.get(start_url)
+        assert response.status_code == 403
+
+    def test_itou_staff_are_not_allowed_to_update_job_seeker(self, client):
+        user = ItouStaffFactory()
+        job_seeker = JobSeekerFactory()
+
+        client.force_login(user)
+
+        params = {
+            "job_seeker": job_seeker.public_id,
+            "from_url": reverse("dashboard:index"),
+        }
+        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+        response = client.get(start_url)
+        assert response.status_code == 403
 
 
 class TestUpdateForJobSeeker:
