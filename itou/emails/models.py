@@ -91,12 +91,8 @@ class EmailAddress(models.Model):
                 self.save(update_fields=["verified"])
         return self.verified
 
-    def get_confirmation_url(self, absolute_url=False):
-        url = reverse("accounts:account_confirm_email", args=[EmailConfirmationHMAC(self).key])
-        return get_absolute_url(url) if absolute_url else url
-
     def send_confirmation(self, request=None, signup=False):
-        confirmation = EmailConfirmationHMAC.create(self)
+        confirmation = EmailConfirmation.create(self)
         confirmation.send(request, signup=signup)
         return confirmation
 
@@ -112,25 +108,7 @@ class EmailAddress(models.Model):
             user_email(self.user, alt_email, commit=True)
 
 
-class EmailConfirmationMixin:
-    def confirm(self, request):
-        email_address = self.email_address
-        if not email_address.verified:
-            confirmed = get_adapter().confirm_email(request, email_address)
-            if confirmed:
-                return email_address
-
-    def send(self, request=None, signup=False):
-        get_adapter().send_confirmation_mail(request, self, signup)
-        signals.email_confirmation_sent.send(
-            sender=self.__class__,
-            request=request,
-            confirmation=self,
-            signup=signup,
-        )
-
-
-class EmailConfirmation(EmailConfirmationMixin, models.Model):
+class EmailConfirmation(models.Model):
     email_address = models.ForeignKey(
         EmailAddress,
         verbose_name="adresse e-mail",
@@ -155,51 +133,20 @@ class EmailConfirmation(EmailConfirmationMixin, models.Model):
         return f"confirmation for {self.email_address}"
 
     @classmethod
-    def create(cls, email_address):
-        key = get_adapter().generate_emailconfirmation_key(email_address.email)
-        return cls._default_manager.create(email_address=email_address, key=key)
-
-    @classmethod
-    def from_key(cls, key):
-        qs = EmailConfirmation.objects.all_valid()
-        qs = qs.select_related("email_address__user")
-        emailconfirmation = qs.filter(key=key.lower()).first()
-        return emailconfirmation
-
-    def key_expired(self):
-        expiration_date = self.sent + datetime.timedelta(days=settings.EMAIL_CONFIRMATION_EXPIRE_DAYS)
-        return expiration_date <= timezone.now()
-
-    key_expired.boolean = True  # type: ignore[attr-defined]
-
-    def confirm(self, request):
-        if not self.key_expired():
-            return super().confirm(request)
-
-    def send(self, request=None, signup=False):
-        super().send(request=request, signup=signup)
-        self.sent = timezone.now()
-        self.save()
-
-
-class EmailConfirmationHMAC(EmailConfirmationMixin):
-    def __init__(self, email_address):
-        self.email_address = email_address
+    def generate_key(cls, email_address):
+        signing.dumps(obj=email_address, salt=settings.EMAIL_CONFIRMATION_SALT)
 
     @classmethod
     def create(cls, email_address):
-        return EmailConfirmationHMAC(email_address)
-
-    @property
-    def key(self):
-        return signing.dumps(obj=self.email_address.pk, salt=settings.EMAIL_CONFIRMATION_SALT)
+        return cls._default_manager.create(email_address=email_address, key=cls.generate_key(email_address))
 
     @classmethod
     def from_key(cls, key):
         try:
             max_age = 60 * 60 * 24 * settings.EMAIL_CONFIRMATION_EXPIRE_DAYS
             pk = signing.loads(key, max_age=max_age, salt=settings.EMAIL_CONFIRMATION_SALT)
-            ret = EmailConfirmationHMAC(EmailAddress.objects.get(pk=pk, verified=False))
+            email_address = EmailAddress.objects.get(pk=pk, verified=False)
+            ret = EmailConfirmation.objects.filter(email_address=email_address, used=False).first()
         except (
             signing.SignatureExpired,
             signing.BadSignature,
@@ -208,5 +155,35 @@ class EmailConfirmationHMAC(EmailConfirmationMixin):
             ret = None
         return ret
 
+    @property
+    def get_key(self):
+        return EmailConfirmation.generate_key(self.email_address.pk)
+
+    def get_confirmation_url(self, absolute_url=False):
+        url = reverse("accounts:account_confirm_email", args=[self.key])
+        return get_absolute_url(url) if absolute_url else url
+
     def key_expired(self):
-        return False
+        expiration_date = self.sent + datetime.timedelta(days=settings.EMAIL_CONFIRMATION_EXPIRE_DAYS)
+        return expiration_date <= timezone.now()
+
+    def can_confirm_email(self):
+        return not self.used and not self.email_address.verified and not self.key_expired()
+
+    def confirm(self, request):
+        if self.can_confirm_email():
+            confirmed = get_adapter().confirm_email(request, self.email_address)
+            if confirmed:
+                return self.email_address
+
+    def send(self, request=None, signup=False):
+        get_adapter().send_confirmation_mail(request, self, signup)
+        signals.email_confirmation_sent.send(
+            sender=self.__class__,
+            request=request,
+            confirmation=self,
+            signup=signup,
+        )
+
+        self.sent = timezone.now()
+        self.save()
