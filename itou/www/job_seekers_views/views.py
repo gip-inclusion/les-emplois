@@ -225,19 +225,13 @@ class GetOrCreateJobSeekerStartView(View):
         return HttpResponseRedirect(reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.name}))
 
 
-class JobSeekerBaseView(TemplateView):
+class ExpectedJobSeekerSessionMixin:
     EXPECTED_SESSION_KIND = None
 
     def __init__(self):
-        super().__init__()
-        self.company = None
         self.job_seeker_session = None
-        self.hire_process = None
-        self.prescription_proces = None
-        self.auto_prescription_process = None
-        self.is_gps = False
 
-    def setup(self, request, *args, session_uuid, hire_process=False, **kwargs):
+    def setup(self, request, *args, session_uuid, **kwargs):
         self.job_seeker_session = SessionNamespace(request.session, session_uuid)
         if not self.job_seeker_session.exists():
             raise Http404
@@ -246,6 +240,33 @@ class JobSeekerBaseView(TemplateView):
             session_kind := self.job_seeker_session.get("config").get("session_kind")
         ) and session_kind != self.EXPECTED_SESSION_KIND:
             raise Http404
+
+        super().setup(request, *args, **kwargs)
+
+    def get_reset_url(self):
+        return self.job_seeker_session.get("config", {}).get("from_url") or reverse("dashboard:index")
+
+    def get_back_url(self):
+        return None
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "reset_url": self.get_reset_url(),
+            "back_url": self.get_back_url(),
+        }
+
+
+class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
+    def __init__(self):
+        super().__init__()
+        self.company = None
+        self.hire_process = None
+        self.prescription_proces = None
+        self.auto_prescription_process = None
+        self.is_gps = False
+
+    def setup(self, request, *args, hire_process=False, **kwargs):
+        super().setup(request, *args, **kwargs)
         self.is_gps = self.job_seeker_session.get("config", {}).get("tunnel") == "gps"
         if company_pk := self.job_seeker_session.get("apply", {}).get("company_pk"):
             if not self.is_gps:
@@ -266,8 +287,6 @@ class JobSeekerBaseView(TemplateView):
             and self.company == request.current_organization
         )
 
-        super().setup(request, *args, **kwargs)
-
     def redirect_to_check_infos(self, job_seeker_public_id):
         view_name = (
             "job_seekers_views:check_job_seeker_info_for_hire"
@@ -278,17 +297,9 @@ class JobSeekerBaseView(TemplateView):
             reverse(view_name, kwargs={"company_pk": self.company.pk, "job_seeker_public_id": job_seeker_public_id})
         )
 
-    def get_back_url(self):
-        return None
-
-    def get_reset_url(self):
-        return self.job_seeker_session.get("config", {}).get("from_url") or reverse("dashboard:index")
-
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "siae": self.company,
-            "back_url": self.get_back_url(),
-            "reset_url": self.get_reset_url(),
             "hire_process": self.hire_process,
             "prescription_process": self.prescription_process,
             "auto_prescription_process": self.auto_prescription_process,
@@ -832,7 +843,7 @@ class UpdateJobSeekerStartView(View):
         )
 
 
-class UpdateJobSeekerBaseView(JobSeekerBaseView):
+class UpdateJobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
     EXPECTED_SESSION_KIND = JobSeekerSessionKinds.UPDATE
 
     def __init__(self):
