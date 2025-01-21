@@ -48,6 +48,7 @@ class Migration(migrations.Migration):
             name="author_siae",
             field=models.ForeignKey(
                 blank=True,
+                limit_choices_to={"kind__in": ["AI", "ACI", "EI", "EITI", "ETTI"]},
                 null=True,
                 on_delete=django.db.models.deletion.RESTRICT,
                 to="companies.company",
