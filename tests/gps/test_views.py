@@ -80,6 +80,15 @@ def test_user_autocomplete(client):
     assert results == [second_beneficiary.pk]
 
 
+def test_user_autocomplete_XSS():
+    # The javascript code return a jquery object that will not be escaped, we need to escape the user name
+    # to prevent xss
+    with open("itou/static/js/gps.js") as f:
+        script_content = f.read()
+        assert "${select2Utils.escapeMarkup(data.name)}" in script_content
+        assert "${select2Utils.escapeMarkup(data.title)}" in script_content
+
+
 @pytest.mark.parametrize(
     "is_referent",
     [
