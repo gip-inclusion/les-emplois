@@ -8,9 +8,11 @@ from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
 from django.core import signing
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 
 from itou.emails.managers import EmailAddressManager, EmailConfirmationManager
+from itou.utils.urls import get_absolute_url
 
 
 class Email(models.Model):
@@ -88,6 +90,10 @@ class EmailAddress(models.Model):
             if commit:
                 self.save(update_fields=["verified"])
         return self.verified
+
+    def get_confirmation_url(self, absolute_url=False):
+        url = reverse("accounts:account_confirm_email", args=[EmailConfirmationHMAC(self).key])
+        return get_absolute_url(url) if absolute_url else url
 
     def send_confirmation(self, request=None, signup=False):
         confirmation = EmailConfirmationHMAC.create(self)
