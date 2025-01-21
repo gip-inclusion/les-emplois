@@ -68,14 +68,12 @@
                                               <p>
                                                   Conformément à l’article Art. R. 5132-1-8. du Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, le refus de prolongation d'un prescripteur est motivé par écrit et notifié, par tout moyen donnant date certaine à la réception de cette notification, à la structure et à l'intéressé.
                                               </p>
-                                              <a aria-label="En savoir plus concernant le contexte légal" class="btn btn-link px-0" href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043990367" rel="noopener" target="_blank">
-                                                  <span>En savoir plus</span>
-                                                  <i class="ri-external-link-line ri-lg"></i>
+                                              <a aria-label="En savoir plus concernant le contexte légal" class="btn-link has-external-link" href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043990367" rel="noopener" target="_blank">
+                                                  En savoir plus
                                               </a>
                                           </div>
                                       </div>
                                   
-  
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
@@ -120,7 +118,6 @@
                                   <div class="form-group form-group-required"><label class="form-label" for="id_reason_explanation-reason_explanation">Explications du motif de refus</label><textarea class="form-control" cols="40" id="id_reason_explanation-reason_explanation" name="reason_explanation-reason_explanation" placeholder="Message" required="" rows="10"></textarea></div>
   
                                   
-  
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
@@ -213,7 +210,6 @@
   </div></div><div class="form-group form-group-required"><label class="form-label" for="id_proposed_actions-proposed_actions_explanation">Précisions</label><textarea class="form-control" cols="40" id="id_proposed_actions-proposed_actions_explanation" name="proposed_actions-proposed_actions_explanation" placeholder="Message" required="" rows="10"></textarea></div>
   
                                   
-  
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
@@ -300,14 +296,12 @@
                                               <p>
                                                   Conformément à l’article Art. R. 5132-1-8. du Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, le refus de prolongation d'un prescripteur est motivé par écrit et notifié, par tout moyen donnant date certaine à la réception de cette notification, à la structure et à l'intéressé.
                                               </p>
-                                              <a aria-label="En savoir plus concernant le contexte légal" class="btn btn-link px-0" href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043990367" rel="noopener" target="_blank">
-                                                  <span>En savoir plus</span>
-                                                  <i class="ri-external-link-line ri-lg"></i>
+                                              <a aria-label="En savoir plus concernant le contexte légal" class="btn-link has-external-link" href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043990367" rel="noopener" target="_blank">
+                                                  En savoir plus
                                               </a>
                                           </div>
                                       </div>
                                   
-  
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
@@ -352,7 +346,6 @@
                                   <div class="form-group form-group-required"><label class="form-label" for="id_reason_explanation-reason_explanation">Explications du motif de refus</label><textarea class="form-control" cols="40" id="id_reason_explanation-reason_explanation" name="reason_explanation-reason_explanation" placeholder="Message" required="" rows="10"></textarea></div>
   
                                   
-  
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
@@ -461,14 +454,12 @@
                                               <p>
                                                   Conformément à l’article Art. R. 5132-1-8. du Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, le refus de prolongation d'un prescripteur est motivé par écrit et notifié, par tout moyen donnant date certaine à la réception de cette notification, à la structure et à l'intéressé.
                                               </p>
-                                              <a aria-label="En savoir plus concernant le contexte légal" class="btn btn-link px-0" href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043990367" rel="noopener" target="_blank">
-                                                  <span>En savoir plus</span>
-                                                  <i class="ri-external-link-line ri-lg"></i>
+                                              <a aria-label="En savoir plus concernant le contexte légal" class="btn-link has-external-link" href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043990367" rel="noopener" target="_blank">
+                                                  En savoir plus
                                               </a>
                                           </div>
                                       </div>
                                   
-  
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
@@ -513,7 +504,6 @@
                                   <div class="form-group form-group-required"><label class="form-label" for="id_reason_explanation-reason_explanation">Explications du motif de refus</label><textarea class="form-control" cols="40" id="id_reason_explanation-reason_explanation" name="reason_explanation-reason_explanation" placeholder="Message" required="" rows="10"></textarea></div>
   
                                   
-  
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
@@ -622,14 +612,12 @@
                                               <p>
                                                   Conformément à l’article Art. R. 5132-1-8. du Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, le refus de prolongation d'un prescripteur est motivé par écrit et notifié, par tout moyen donnant date certaine à la réception de cette notification, à la structure et à l'intéressé.
                                               </p>
-                                              <a aria-label="En savoir plus concernant le contexte légal" class="btn btn-link px-0" href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043990367" rel="noopener" target="_blank">
-                                                  <span>En savoir plus</span>
-                                                  <i class="ri-external-link-line ri-lg"></i>
+                                              <a aria-label="En savoir plus concernant le contexte légal" class="btn-link has-external-link" href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043990367" rel="noopener" target="_blank">
+                                                  En savoir plus
                                               </a>
                                           </div>
                                       </div>
                                   
-  
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
@@ -674,7 +662,6 @@
                                   <div class="form-group form-group-required"><label class="form-label" for="id_reason_explanation-reason_explanation">Explications du motif de refus</label><textarea class="form-control" cols="40" id="id_reason_explanation-reason_explanation" name="reason_explanation-reason_explanation" placeholder="Message" required="" rows="10"></textarea></div>
   
                                   
-  
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
