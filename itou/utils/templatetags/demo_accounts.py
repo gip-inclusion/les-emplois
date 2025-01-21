@@ -1,7 +1,13 @@
+import logging
+
 from django import template
 from django.urls import reverse
 
+from itou.users.enums import UserKind
+from itou.users.models import User
 
+
+logger = logging.getLogger(__name__)
 register = template.Library()
 
 
@@ -79,5 +85,14 @@ def prescribers_accounts_tag():
 
 @register.simple_tag
 def job_seekers_accounts_tag():
-    action_url = reverse("login:job_seeker")
-    return [{"email": "test+de@inclusion.gouv.fr", "image": "de.svg", "action_url": action_url}]
+    user_email = "test+de@inclusion.gouv.fr"
+    try:
+        user_public_id = User.objects.get(kind=UserKind.JOB_SEEKER, email=user_email).public_id
+    except User.DoesNotExist:
+        logger.warning(
+            f"Unable to initialise job_seekers_accounts_tag: no job seeker with email='{user_email}' found !"
+        )
+        return []  # Fail.
+
+    action_url = reverse("login:existing_user", kwargs={"user_public_id": user_public_id})
+    return [{"email": user_email, "image": "de.svg", "action_url": action_url}]

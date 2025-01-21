@@ -1,8 +1,18 @@
 import pytest
 from django import forms
+from django.contrib.auth import authenticate, get_user
+from django.core.management import call_command
 from django.template import Context, Template
+from django.test import override_settings
 from django.urls import reverse
 
+from itou.users.enums import UserKind
+from itou.users.models import User
+from itou.utils.templatetags.demo_accounts import (
+    employers_accounts_tag,
+    job_seekers_accounts_tag,
+    prescribers_accounts_tag,
+)
 from itou.utils.templatetags.nav import NAV_ENTRIES
 
 
@@ -103,3 +113,35 @@ class TestThemeInclusion:
         template = Template("{% load theme_inclusion %}" + field_markup * 2)
         with pytest.raises(NotImplementedError):
             template.render(Context({"form": NIRForm()}))
+
+
+@pytest.fixture
+def load_test_users():
+    call_command("loaddata", "05_test_users.json")
+    call_command("loaddata", "06_confirmed_emails.json")
+
+
+class TestDemoAccount:
+    @pytest.mark.parametrize(
+        "user_kind,template_tag",
+        [
+            (UserKind.EMPLOYER, employers_accounts_tag),
+            (UserKind.PRESCRIBER, prescribers_accounts_tag),
+            (UserKind.JOB_SEEKER, job_seekers_accounts_tag),
+        ],
+    )
+    @override_settings(SHOW_DEMO_ACCOUNTS_BANNER=True)
+    def test_can_login_to_demo_account(self, client, load_test_users, user_kind, template_tag):
+        password = "password"
+
+        for account in template_tag():
+            email = account["email"]
+            user = User.objects.get(kind=user_kind, email=email)
+            assert authenticate(email=email, password=password) == user
+
+            response = client.post(
+                account["action_url"], {"login": email, "password": password, "demo_banner_account": True}
+            )
+            # NOTE: Login redirects tested elsewhere.
+            assert response.status_code == 302
+            assert get_user(client).is_authenticated is True
