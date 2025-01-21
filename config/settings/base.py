@@ -24,6 +24,7 @@ _current_dir = os.path.dirname(os.path.realpath(__file__))
 ROOT_DIR = os.path.abspath(os.path.join(_current_dir, "../.."))
 
 APPS_DIR = os.path.abspath(os.path.join(ROOT_DIR, "itou"))
+FIXTURE_DIRS = [os.path.abspath(os.path.join(ROOT_DIR, "itou/fixtures/django"))]
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
