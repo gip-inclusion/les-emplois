@@ -236,9 +236,8 @@ class ExpectedJobSeekerSessionMixin:
         if not self.job_seeker_session.exists():
             raise Http404
         # Ensure we are performing the action (update, create…) the session was created for.
-        if (
-            session_kind := self.job_seeker_session.get("config").get("session_kind")
-        ) and session_kind != self.EXPECTED_SESSION_KIND:
+        session_kind = self.job_seeker_session.get("config", {}).get("session_kind")
+        if session_kind != self.EXPECTED_SESSION_KIND:
             raise Http404
 
         super().setup(request, *args, **kwargs)
