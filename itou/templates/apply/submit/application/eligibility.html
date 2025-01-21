@@ -38,56 +38,47 @@
 {% endblock %}
 
 {% block form_content %}
-    <div class="d-flex flex-column flex-lg-row">
-        {% if is_subject_to_eligibility_rules and prescription_process %}
-            <div class="order-0 order-lg-1">
-                <div class="alert alert-primary bg-white py-0" role="status">
-                    <div class="row">
-                        <div class="col-auto pe-0">
-                            <i class="ri-lightbulb-line ri-xl" aria-hidden="true"></i>
-                        </div>
-                        <div class="col">
-                            <p class="mb-2">
-                                <strong>Bon à savoir</strong>
-                            </p>
-                            <p class="mb-0">Pour valider l'éligibilité IAE du candidat :</p>
-                            <ol>
-                                <li>
-                                    Veuillez vous assurer d’avoir réalisé un diagnostic socio-professionnel dans le cadre d'un entretien individuel.
-                                    Vous pouvez vous appuyer sur le document
-                                    <a class="text-important"
-                                       href="{% autologin_proconnect 'https://communaute.inclusion.gouv.fr/surveys/dsp/create/' user %}"
-                                       target="_blank"
-                                       rel="noreferrer noopener"
-                                       aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
-                                </li>
-                                <li>Il est recommandé de sélectionner le(s) critères(s) administratifs d’éligibilité correspondants.</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
+    {% if is_subject_to_eligibility_rules and prescription_process %}
+        <div class="c-info mb-3">
+            <button class="c-info__summary">
+                <span>Pour valider l'éligibilité IAE du candidat</span>
+            </button>
+            <div class="c-info__detail">
+                <ul>
+                    <li>
+                        Veuillez vous assurer d’avoir réalisé un diagnostic socio-professionnel dans le cadre d'un entretien individuel.
+                        Vous pouvez vous appuyer sur le document
+                        <a class="has-external-link"
+                           href="{% autologin_proconnect 'https://communaute.inclusion.gouv.fr/surveys/dsp/create/' user %}"
+                           target="_blank"
+                           rel="noreferrer noopener"
+                           aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+                    </li>
+                    <li>Il est recommandé de sélectionner le(s) critères(s) administratifs d’éligibilité correspondants.</li>
+                </ul>
             </div>
-        {% endif %}
-        <div class="col-12 col-lg-7 ps-0{% if eligibility_diagnosis and not form.is_bound %} js-shroud{% endif %}">
-            <fieldset>
-                <legend class="h3">Critères administratifs de niveau 1</legend>
-                {% for field in form %}
-                    {% if form.LEVEL_1_PREFIX in field.name %}
-                        {% bootstrap_field field %}
-                    {% endif %}
-                {% endfor %}
-            </fieldset>
-
-            <fieldset>
-                <legend class="h3">Critères administratifs de niveau 2</legend>
-                {% for field in form %}
-                    {% if form.LEVEL_2_PREFIX in field.name %}
-                        {% bootstrap_field field %}
-                    {% endif %}
-                {% endfor %}
-            </fieldset>
-
-            <input type="hidden" name="shrouded" value="1" data-shroud-input />
         </div>
+    {% endif %}
+
+    <div class="{% if eligibility_diagnosis and not form.is_bound %}js-shroud{% endif %}">
+        <fieldset>
+            <legend class="h3">Critères administratifs de niveau 1</legend>
+            {% for field in form %}
+                {% if form.LEVEL_1_PREFIX in field.name %}
+                    {% bootstrap_field field %}
+                {% endif %}
+            {% endfor %}
+        </fieldset>
+
+        <fieldset>
+            <legend class="h3">Critères administratifs de niveau 2</legend>
+            {% for field in form %}
+                {% if form.LEVEL_2_PREFIX in field.name %}
+                    {% bootstrap_field field %}
+                {% endif %}
+            {% endfor %}
+        </fieldset>
+
+        <input type="hidden" name="shrouded" value="1" data-shroud-input>
     </div>
 {% endblock %}

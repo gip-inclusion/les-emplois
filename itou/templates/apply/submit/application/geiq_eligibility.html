@@ -32,17 +32,9 @@
 
 {% block form_content %}
     <div {% if geiq_eligibility_diagnosis and not form.is_bound %}class="js-shroud"{% endif %}>
-        <div class="row">
-            <div class="col-6 col-lg-7">
-                <h2>Préciser la situation administrative du candidat (facultatif)</h2>
-            </div>
-            <div class="col">{% include "apply/includes/geiq/legislative_text_link.html" %}</div>
-        </div>
-        <div class="row">
-            {# Form fragment rendered by HTMX #}
-            <div class="col-6 col-lg-7">
-                <div hx-target="this">{% include "apply/includes/geiq/geiq_administrative_criteria_form.html" %}</div>
-            </div>
-        </div>
+        <h2>Préciser la situation administrative du candidat (facultatif)</h2>
+        {% include "apply/includes/geiq/legislative_text_link.html" %}
+        {# Form fragment rendered by HTMX #}
+        <div hx-target="this">{% include "apply/includes/geiq/geiq_administrative_criteria_form.html" %}</div>
     </div>
 {% endblock %}
