@@ -77,7 +77,7 @@
               <span>Modifier</span>
           </a>
           
-              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-toggle="tooltip" title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
+              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip"></i>
           
       </div>
   </div>
@@ -308,7 +308,7 @@
               <span>Modifier</span>
           </a>
           
-              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-toggle="tooltip" title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
+              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip"></i>
           
       </div>
   </div>
@@ -517,7 +517,7 @@
               <span>Modifier</span>
           </a>
           
-              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-toggle="tooltip" title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
+              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip"></i>
           
       </div>
   </div>
@@ -684,7 +684,7 @@
               <span>Modifier</span>
           </a>
           
-              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-toggle="tooltip" title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
+              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip"></i>
           
       </div>
   </div>
@@ -1876,7 +1876,7 @@
               <span>Modifier</span>
           </a>
           
-              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-toggle="tooltip" title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
+              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip"></i>
           
       </div>
   </div>
@@ -2109,7 +2109,7 @@
               <span>Modifier</span>
           </a>
           
-              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-toggle="tooltip" title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
+              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip"></i>
           
       </div>
   </div>
@@ -2322,7 +2322,7 @@
               <span>Modifier</span>
           </a>
           
-              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-toggle="tooltip" title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
+              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip"></i>
           
       </div>
   </div>
@@ -2489,7 +2489,7 @@
               <span>Modifier</span>
           </a>
           
-              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-toggle="tooltip" title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
+              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip"></i>
           
       </div>
   </div>
@@ -2700,7 +2700,7 @@
               <span>Modifier</span>
           </a>
           
-              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-toggle="tooltip" title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
+              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip"></i>
           
       </div>
   </div>
@@ -2867,7 +2867,7 @@
               <span>Modifier</span>
           </a>
           
-              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-toggle="tooltip" title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
+              <i class="ri-information-line ri-xl text-info ms-1" data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip"></i>
           
       </div>
   </div>
@@ -2970,7 +2970,10 @@
                   <strong>01/01/3000</strong>
               </li>
               <li class="order-4">
-                  <small>Durée de validité <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i></small>
+                  <small>
+                      Durée de validité
+                      <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i>
+                  </small>
                   <strong class="text-success">356252 jours (Environ 975 ans et 4 mois)</strong>
               </li>
           

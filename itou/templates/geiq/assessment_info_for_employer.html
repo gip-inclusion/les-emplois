@@ -91,7 +91,7 @@
                                     {% bootstrap_form_errors submission_form type="non_fields" %}
                                     {% bootstrap_field submission_form.up_to_date_information %}
                                     <div class="form-group mb-0 col-6 col-lg-auto">
-                                        <button type="submit" class="btn btn-primary" {% if assessment.submitted_at %} disabled data-bs-toggle="tooltip" data-bs-placement="top" title="Votre dossier a déjà été envoyé." {% endif %}>
+                                        <button type="submit" class="btn btn-primary" {% if assessment.submitted_at %} disabled data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Votre dossier a déjà été envoyé." {% endif %}>
                                             <span>Envoyer le bilan d’exécution</span>
                                         </button>
                                     </div>

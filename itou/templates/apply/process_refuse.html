@@ -99,10 +99,10 @@
                                                             <i class="ri-information-line ri-lg text-info ms-1"
                                                                data-bs-toggle="tooltip"
                                                                data-bs-placement="top"
-                                                               title="L'embauche empêche l'atteinte des engagements contractuels avec les parties prenantes à la convention de financement mise en place par l'État."></i>
+                                                               data-bs-title="L'embauche empêche l'atteinte des engagements contractuels avec les parties prenantes à la convention de financement mise en place par l'État."></i>
                                                         {% elif radio.data.value == RefusalReason.NO_POSITION %}
                                                             {{ radio.choice_label }}
-                                                            <i class="ri-information-line ri-lg text-info ms-1" data-bs-toggle="tooltip" data-bs-placement="right" title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
+                                                            <i class="ri-information-line ri-lg text-info ms-1" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
                                                         {% elif radio.data.value == RefusalReason.OTHER %}
                                                             {{ radio.choice_label }}
                                                             {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
