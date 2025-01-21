@@ -21,7 +21,7 @@
                        class="danger js-with-confirm"
                        name="transition_cancel"
                        value="Annuler"
-                       {% if not original.can_be_cancelled %} disabled data-bs-toggle="tooltip" data-bs-placement="top" title=" Une fichie salarié doit probablement être supprimée avant de pouvoir annuler cette candidature " {% endif %}>
+                       {% if not original.can_be_cancelled %} disabled title="Une fiche salarié doit probablement être supprimée avant de pouvoir annuler cette candidature" {% endif %}>
             {% endif %}
             {% if original.state.is_obsolete %}
                 <input type='submit' class="danger js-with-confirm" name="transition_reset" value="Remettre au statut nouveau">
