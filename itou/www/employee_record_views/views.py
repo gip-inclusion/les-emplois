@@ -8,15 +8,18 @@ from django.views.decorators.http import require_safe
 from formtools.wizard.views import NamedUrlSessionWizardView
 
 from itou.approvals.models import Approval
+from itou.companies.enums import CompanyKind
 from itou.employee_record.constants import get_availability_date_for_kind
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
+from itou.users.models import User
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
 from itou.utils.urls import add_url_params, get_safe_url
+from itou.www.employee_record_views.enums import EmployeeRecordOrder
 from itou.www.employee_record_views.forms import (
     AddEmployeeRecordChooseApprovalForm,
     AddEmployeeRecordChooseEmployeeForm,
@@ -28,10 +31,6 @@ from itou.www.employee_record_views.forms import (
     NewEmployeeRecordStep4,
     SelectEmployeeRecordStatusForm,
 )
-
-from ...companies.enums import CompanyKind
-from ...users.models import User
-from .enums import EmployeeRecordOrder
 
 
 # Labels and steps for multi-steps component
