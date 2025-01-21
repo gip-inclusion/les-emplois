@@ -69,6 +69,7 @@ class FollowUpGroupAdmin(ItouModelAdmin):
         "created_in_bulk",
     ]
     list_filter = ("created_in_bulk", "beneficiary__department")
+    search_fields = ("beneficiary__first_name", "beneficiary__last_name", "beneficiary__email")
 
     raw_id_fields = [
         "beneficiary",
