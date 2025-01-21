@@ -155,21 +155,20 @@ def gps_users_autocomplete(request):
         users_qs = users_qs.filter(full_name_search_vector=search_query)
         users_qs = users_qs.annotate(rank=SearchRank("full_name_search_vector", search_query)).order_by("-rank")
 
-        def format_user_name(user):
-            res = ""
-            if user.title:
-                res += f"{user.title.capitalize()}. "
-            res += user.get_full_name()
-            if getattr(user.jobseeker_profile, "birthdate", None):
-                res += f" ({user.jobseeker_profile.birthdate})"
-            return res
-
-        users = [
-            {
-                "text": format_user_name(user),
+        def format_data(user):
+            data = {
                 "id": user.pk,
+                "title": "",
+                "name": user.get_full_name(),
+                "birthdate": "",
             }
-            for user in users_qs[:10]
-        ]
+            if user.title:
+                # only add a . after M, not Mme
+                data["title"] = f"{user.title.capitalize()}."[:3] + " "
+            if getattr(user.jobseeker_profile, "birthdate", None):
+                data["birthdate"] = user.jobseeker_profile.birthdate.strftime("%d/%m/%Y")
+            return data
+
+        users = [format_data(user) for user in users_qs[:10]]
 
     return JsonResponse({"results": users})
