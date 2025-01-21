@@ -8,6 +8,7 @@ from django.db.models import Case, Exists, OuterRef, When
 from django.utils import timezone
 
 from itou.approvals.models import Approval
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models.common import (
     AbstractAdministrativeCriteria,
@@ -128,6 +129,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         verbose_name="SIAE de l'auteur",
         null=True,
         blank=True,
+        limit_choices_to={"kind__in": SIAE_WITH_CONVENTION_KINDS},
         on_delete=models.RESTRICT,  # For traceability and accountability
     )
     # Administrative criteria are mandatory only when an SIAE is performing an eligibility diagnosis.
