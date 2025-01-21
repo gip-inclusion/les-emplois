@@ -14,23 +14,25 @@
                 </p>
                 {% include "companies/includes/_company_info.html" with company=company show_cta=True extra_box_class="mb-3 mb-lg-5" open_in_tab=True only %}
             </div>
-            <div class="modal-footer has-btn-with-spinner-loading-text"
-                 hx-post="{{ request.path }}"
-                 hx-target="#acceptFormDiv"
-                 hx-swap="outerHTML"
-                 hx-vals='{"confirmed": "True"}'
-                 hx-include="#acceptForm"
-                 {% matomo_event "candidature" "submit" "accept_application_confirmation" %}>
-                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
-                <button class="btn btn-sm btn-primary">
-                    <div class="stable-text">
-                        <span>Confirmer</span>
-                    </div>
-                    <div class="loading-text">
-                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                        <span>Envoi en cours</span>
-                    </div>
-                </button>
+            <div class="modal-footer">
+                <form class="has-btn-with-spinner-loading-text"
+                      hx-post="{{ request.path }}"
+                      hx-target="#acceptFormDiv"
+                      hx-swap="outerHTML"
+                      hx-vals='{"confirmed": "True"}'
+                      hx-include="#acceptForm"
+                      {% matomo_event "candidature" "submit" "accept_application_confirmation" %}>
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                    <button class="btn btn-sm btn-primary">
+                        <div class="stable-text">
+                            <span>Confirmer</span>
+                        </div>
+                        <div class="loading-text">
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span>Envoi en cours</span>
+                        </div>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
