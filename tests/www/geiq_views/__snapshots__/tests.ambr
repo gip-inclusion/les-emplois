@@ -883,7 +883,7 @@
                                       
                                       <div class="form-group form-group-required"><div class="form-check"><input checked="checked" class="form-check-input" disabled="disabled" id="id_up_to_date_information" name="up_to_date_information" required="" type="checkbox"/><label class="form-check-label" for="id_up_to_date_information">En cochant cette case, je certifie que les données de l’année concernée sont à jour.</label></div></div>
                                       <div class="form-group mb-0 col-6 col-lg-auto">
-                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="Votre dossier a déjà été envoyé." type="submit">
+                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-title="Votre dossier a déjà été envoyé." data-bs-toggle="tooltip" disabled="" type="submit">
                                               <span>Envoyer le bilan d’exécution</span>
                                           </button>
                                       </div>
@@ -1237,7 +1237,7 @@
                                       
                                       <div class="form-group form-group-required"><div class="form-check"><input checked="checked" class="form-check-input" disabled="disabled" id="id_up_to_date_information" name="up_to_date_information" required="" type="checkbox"/><label class="form-check-label" for="id_up_to_date_information">En cochant cette case, je certifie que les données de l’année concernée sont à jour.</label></div></div>
                                       <div class="form-group mb-0 col-6 col-lg-auto">
-                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="Votre dossier a déjà été envoyé." type="submit">
+                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-title="Votre dossier a déjà été envoyé." data-bs-toggle="tooltip" disabled="" type="submit">
                                               <span>Envoyer le bilan d’exécution</span>
                                           </button>
                                       </div>
@@ -1589,7 +1589,7 @@
                                       
                                       <div class="form-group form-group-required"><div class="form-check"><input checked="checked" class="form-check-input" disabled="disabled" id="id_up_to_date_information" name="up_to_date_information" required="" type="checkbox"/><label class="form-check-label" for="id_up_to_date_information">En cochant cette case, je certifie que les données de l’année concernée sont à jour.</label></div></div>
                                       <div class="form-group mb-0 col-6 col-lg-auto">
-                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="Votre dossier a déjà été envoyé." type="submit">
+                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-title="Votre dossier a déjà été envoyé." data-bs-toggle="tooltip" disabled="" type="submit">
                                               <span>Envoyer le bilan d’exécution</span>
                                           </button>
                                       </div>
@@ -1943,7 +1943,7 @@
                                       
                                       <div class="form-group form-group-required"><div class="form-check"><input checked="checked" class="form-check-input" disabled="disabled" id="id_up_to_date_information" name="up_to_date_information" required="" type="checkbox"/><label class="form-check-label" for="id_up_to_date_information">En cochant cette case, je certifie que les données de l’année concernée sont à jour.</label></div></div>
                                       <div class="form-group mb-0 col-6 col-lg-auto">
-                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="Votre dossier a déjà été envoyé." type="submit">
+                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-title="Votre dossier a déjà été envoyé." data-bs-toggle="tooltip" disabled="" type="submit">
                                               <span>Envoyer le bilan d’exécution</span>
                                           </button>
                                       </div>
@@ -2297,7 +2297,7 @@
                                       
                                       <div class="form-group form-group-required"><div class="form-check"><input checked="checked" class="form-check-input" disabled="disabled" id="id_up_to_date_information" name="up_to_date_information" required="" type="checkbox"/><label class="form-check-label" for="id_up_to_date_information">En cochant cette case, je certifie que les données de l’année concernée sont à jour.</label></div></div>
                                       <div class="form-group mb-0 col-6 col-lg-auto">
-                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="Votre dossier a déjà été envoyé." type="submit">
+                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-title="Votre dossier a déjà été envoyé." data-bs-toggle="tooltip" disabled="" type="submit">
                                               <span>Envoyer le bilan d’exécution</span>
                                           </button>
                                       </div>
@@ -2643,7 +2643,7 @@
                                       
                                       <div class="form-group form-group-required"><div class="form-check"><input checked="checked" class="form-check-input" disabled="disabled" id="id_up_to_date_information" name="up_to_date_information" required="" type="checkbox"/><label class="form-check-label" for="id_up_to_date_information">En cochant cette case, je certifie que les données de l’année concernée sont à jour.</label></div></div>
                                       <div class="form-group mb-0 col-6 col-lg-auto">
-                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="Votre dossier a déjà été envoyé." type="submit">
+                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-title="Votre dossier a déjà été envoyé." data-bs-toggle="tooltip" disabled="" type="submit">
                                               <span>Envoyer le bilan d’exécution</span>
                                           </button>
                                       </div>

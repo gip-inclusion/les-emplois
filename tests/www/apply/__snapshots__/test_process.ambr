@@ -947,7 +947,7 @@
       <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
           
           
-              <div data-bs-placement="bottom" data-bs-toggle="tooltip" title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur">
+              <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip">
                   <div class="dropdown-item disabled">
                       <i class="ri-home-smile-line"></i>
                       <strong>Une autre structure</strong>

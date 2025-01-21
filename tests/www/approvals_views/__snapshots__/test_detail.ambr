@@ -48,7 +48,10 @@
                   <strong>02/01/2025</strong>
               </li>
               <li class="order-4 order-lg-3">
-                  <small>Durée de validité <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i></small>
+                  <small>
+                      Durée de validité
+                      <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i>
+                  </small>
                   <strong class="text-success">2 jours</strong>
               </li>
           
@@ -83,7 +86,10 @@
                   <strong>01/01/3000</strong>
               </li>
               <li class="order-4 order-lg-3">
-                  <small>Durée de validité <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i></small>
+                  <small>
+                      Durée de validité
+                      <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i>
+                  </small>
                   <strong class="text-success">356210 jours (Environ 975 ans et 3 mois)</strong>
               </li>
           
@@ -118,7 +124,10 @@
                   <strong>07/01/3000</strong>
               </li>
               <li class="order-4 order-lg-3">
-                  <small>Durée de validité <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i></small>
+                  <small>
+                      Durée de validité
+                      <i class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip"></i>
+                  </small>
                   <strong>356216 jours (Environ 975 ans et 3 mois)</strong>
               </li>
           
@@ -2181,7 +2190,7 @@
                               
                                   <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
                                       
-                                          <button class="btn btn-block btn-outline-primary btn-ico" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="Il ne peut y avoir qu’une seule demande de prolongation en attente à la fois." type="button">
+                                          <button class="btn btn-block btn-outline-primary btn-ico" data-bs-placement="top" data-bs-title="Il ne peut y avoir qu’une seule demande de prolongation en attente à la fois." data-bs-toggle="tooltip" disabled="" type="button">
                                               <i aria-hidden="true" class="ri-refresh-line fw-medium"></i>
                                               <span>Prolonger</span>
                                           </button>
@@ -4487,7 +4496,7 @@
                               
                                   <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
                                       
-                                          <button class="btn btn-block btn-outline-primary btn-ico" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="La suspension n’est pas possible car une suspension est déjà en cours." type="button">
+                                          <button class="btn btn-block btn-outline-primary btn-ico" data-bs-placement="top" data-bs-title="La suspension n’est pas possible car une suspension est déjà en cours." data-bs-toggle="tooltip" disabled="" type="button">
                                               <i aria-hidden="true" class="ri-pause-circle-line fw-medium"></i>
                                               <span>Suspendre</span>
                                           </button>
@@ -4591,7 +4600,7 @@
                               
                                   <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
                                       
-                                          <button class="btn btn-block btn-outline-primary btn-ico" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="La suspension n’est pas possible car une suspension est déjà en cours." type="button">
+                                          <button class="btn btn-block btn-outline-primary btn-ico" data-bs-placement="top" data-bs-title="La suspension n’est pas possible car une suspension est déjà en cours." data-bs-toggle="tooltip" disabled="" type="button">
                                               <i aria-hidden="true" class="ri-pause-circle-line fw-medium"></i>
                                               <span>Suspendre</span>
                                           </button>

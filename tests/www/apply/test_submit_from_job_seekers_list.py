@@ -54,7 +54,9 @@ class TestApplyAsPrescriber:
                 data-matomo-option="postuler-pour-ce-candidat"
                 id="introJsBtnPostuler"
                 href="{next_url}">
-                <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip" title="Postuler pour ce candidat">
+                <i class="ri-draft-line" aria-hidden="true"
+                data-bs-toggle="tooltip"
+                data-bs-title="Postuler pour ce candidat">
                 </i>
             </a>
             """,
@@ -221,7 +223,9 @@ class TestApplyAsPrescriber:
                 data-matomo-option="postuler-pour-ce-candidat"
                 id="introJsBtnPostuler"
                 href="{next_url}">
-                <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip" title="Postuler pour ce candidat">
+                <i class="ri-draft-line" aria-hidden="true"
+                data-bs-toggle="tooltip"
+                data-bs-title="Postuler pour ce candidat">
                 </i>
             </a>
             """,

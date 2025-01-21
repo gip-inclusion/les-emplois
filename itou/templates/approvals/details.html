@@ -65,7 +65,7 @@
                                                 disabled
                                                 data-bs-toggle="tooltip"
                                                 data-bs-placement="top"
-                                                {% if approval.is_suspended %}title="La suspension n’est pas possible car une suspension est déjà en cours."{% elif not approval.is_valid %}title="Il est impossible de faire une suspension de PASS IAE expiré."{% elif not approval.is_in_progress %}title="La suspension n’est pas possible car le PASS IAE n’a pas encore démarré."{% else %}title="La suspension n’est pas possible car un autre employeur a embauché le candidat."{% endif %}>
+                                                {% if approval.is_suspended %}data-bs-title="La suspension n’est pas possible car une suspension est déjà en cours."{% elif not approval.is_valid %}data-bs-title="Il est impossible de faire une suspension de PASS IAE expiré."{% elif not approval.is_in_progress %}data-bs-title="La suspension n’est pas possible car le PASS IAE n’a pas encore démarré."{% else %}data-bs-title="La suspension n’est pas possible car un autre employeur a embauché le candidat."{% endif %}>
                                             <i class="ri-pause-circle-line fw-medium" aria-hidden="true"></i>
                                             <span>Suspendre</span>
                                         </button>
@@ -173,7 +173,7 @@
                                                 disabled
                                                 data-bs-toggle="tooltip"
                                                 data-bs-placement="top"
-                                                {% if not approval.is_valid %} title="Il est impossible de faire une prolongation de PASS IAE expiré." {% elif prolongation_request_pending %} title="Il ne peut y avoir qu’une seule demande de prolongation en attente à la fois." {% else %} title="Les prolongations ne sont possibles qu’entre le {{ approval.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_BEFORE_END }}ème mois avant la fin d’un PASS IAE et jusqu’à son dernier jour de validité." {% endif %}>
+                                                {% if not approval.is_valid %} data-bs-title="Il est impossible de faire une prolongation de PASS IAE expiré." {% elif prolongation_request_pending %} data-bs-title="Il ne peut y avoir qu’une seule demande de prolongation en attente à la fois." {% else %} data-bs-title="Les prolongations ne sont possibles qu’entre le {{ approval.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_BEFORE_END }}ème mois avant la fin d’un PASS IAE et jusqu’à son dernier jour de validité." {% endif %}>
                                             <i class="ri-refresh-line fw-medium" aria-hidden="true"></i>
                                             <span>Prolonger</span>
                                         </button>

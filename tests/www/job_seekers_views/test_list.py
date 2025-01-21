@@ -112,7 +112,7 @@ def test_multiple(client, snapshot):
                     {introjs_id}
                     href="{reverse("search:employers_results")}?job_seeker={application.job_seeker.public_id}&city={application.job_seeker.city_slug}">
                     <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip"
-                    title="Postuler pour ce candidat">
+                    data-bs-title="Postuler pour ce candidat">
                     </i>
                 </a>
                 """,
@@ -129,7 +129,7 @@ def test_multiple(client, snapshot):
                     data-matomo-option="postuler-pour-ce-candidat"
                     href="{reverse("search:employers_results")}?job_seeker={job_app4.job_seeker.public_id}">
                     <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip"
-                    title="Postuler pour ce candidat">
+                    data-bs-title="Postuler pour ce candidat">
                     </i>
                 </a>
                 """,
@@ -150,7 +150,7 @@ def test_multiple(client, snapshot):
                 id="introJsBtnPostuler"
                 href="{reverse("search:employers_results")}?job_seeker={job_app5.job_seeker.public_id}">
                 <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip"
-                title="Postuler pour ce candidat">
+                data-bs-title="Postuler pour ce candidat">
                 </i>
             </a>
             """,

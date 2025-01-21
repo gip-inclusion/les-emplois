@@ -296,9 +296,12 @@
                   <strong>31/12/2026</strong>
               </li>
               <li class="order-4">
-                  <small>Durée de validité <i class="ri-information-line ri-xl text-info"
-      data-bs-toggle="tooltip"
-      data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
+                  <small>
+                      Durée de validité
+                      <i class="ri-information-line ri-xl text-info"
+                         data-bs-toggle="tooltip"
+                         data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
+                  </small>
                   <strong class="text-success">730 jours (Environ 2 ans)</strong>
               </li>
           
@@ -344,9 +347,12 @@
                   <strong>04/12/2025</strong>
               </li>
               <li class="order-4">
-                  <small>Durée de validité <i class="ri-information-line ri-xl text-info"
-      data-bs-toggle="tooltip"
-      data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
+                  <small>
+                      Durée de validité
+                      <i class="ri-information-line ri-xl text-info"
+                         data-bs-toggle="tooltip"
+                         data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
+                  </small>
                   <strong >486 jours (Environ 1 an et 3 mois)</strong>
               </li>
           
@@ -404,9 +410,12 @@
                   <strong>30/12/2025</strong>
               </li>
               <li class="order-4">
-                  <small>Durée de validité <i class="ri-information-line ri-xl text-info"
-      data-bs-toggle="tooltip"
-      data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
+                  <small>
+                      Durée de validité
+                      <i class="ri-information-line ri-xl text-info"
+                         data-bs-toggle="tooltip"
+                         data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
+                  </small>
                   <strong class="text-success">512 jours (Environ 1 an et 4 mois)</strong>
               </li>
           
@@ -451,9 +460,12 @@
                   <strong>30/12/2025</strong>
               </li>
               <li class="order-4">
-                  <small>Durée de validité <i class="ri-information-line ri-xl text-info"
-      data-bs-toggle="tooltip"
-      data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
+                  <small>
+                      Durée de validité
+                      <i class="ri-information-line ri-xl text-info"
+                         data-bs-toggle="tooltip"
+                         data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
+                  </small>
                   <strong class="text-success">512 jours (Environ 1 an et 4 mois)</strong>
               </li>
           
@@ -513,9 +525,12 @@
                   <strong>31/12/2025</strong>
               </li>
               <li class="order-4">
-                  <small>Durée de validité <i class="ri-information-line ri-xl text-info"
-      data-bs-toggle="tooltip"
-      data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
+                  <small>
+                      Durée de validité
+                      <i class="ri-information-line ri-xl text-info"
+                         data-bs-toggle="tooltip"
+                         data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
+                  </small>
                   <strong class="text-success">513 jours (Environ 1 an et 4 mois)</strong>
               </li>
           
