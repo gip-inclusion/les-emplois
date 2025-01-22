@@ -1,0 +1,55 @@
+# serializer version: 1
+# name: TestConfirmEmailView.test_invalid_url
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+                              <h1>Confirmer l'adresse e-mail</h1>
+                              
+      
+                                  
+  
+  
+                              
+      <div class="alert alert-warning" role="status">
+          <p class="mb-0">Ce compte est inactif.</p>
+      </div>
+  
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      
+  
+                          
+  
+                          <div class="alert alert-danger" role="status">
+                              <p class="mb-2">Ce lien de confirmation d'adresse e-mail a expiré ou n'est pas valide.</p>
+                              <p class="mb-0">
+                                  Veuillez lancer <a href="">une nouvelle demande de confirmation</a>.
+                              </p>
+                          </div>
+  
+                      
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
