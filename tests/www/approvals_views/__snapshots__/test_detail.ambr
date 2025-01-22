@@ -334,6 +334,7 @@
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
                  "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -898,7 +899,8 @@
                  "approvals_approval"."origin_siae_siret",
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind"
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
           ORDER BY "approvals_approval"."start_at" DESC
@@ -1057,6 +1059,7 @@
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
                  "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -1675,6 +1678,7 @@
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
                  "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -2639,6 +2643,7 @@
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
                  "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -3204,7 +3209,8 @@
                  "approvals_approval"."origin_siae_siret",
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind"
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
           ORDER BY "approvals_approval"."start_at" DESC
@@ -3363,6 +3369,7 @@
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
                  "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -3981,6 +3988,7 @@
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
                  "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",

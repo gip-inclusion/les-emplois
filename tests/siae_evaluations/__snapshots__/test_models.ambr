@@ -412,7 +412,8 @@
                  "approvals_approval"."origin_siae_siret",
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind"
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
           FROM "job_applications_jobapplication"
           INNER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           INNER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")

@@ -1380,7 +1380,8 @@
                  "approvals_approval"."origin_siae_siret",
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind"
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE ("approvals_approval"."user_id" = %s
                  AND "approvals_approval"."end_at" >= %s)
@@ -1413,7 +1414,8 @@
                  "approvals_approval"."origin_siae_siret",
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind"
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
           ORDER BY "approvals_approval"."created_at" DESC
@@ -3357,7 +3359,8 @@
                  "approvals_approval"."origin_siae_siret",
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind"
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE ("approvals_approval"."user_id" = %s
                  AND "approvals_approval"."end_at" >= %s)
@@ -3412,7 +3415,8 @@
                  "approvals_approval"."origin_siae_siret",
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind"
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
           ORDER BY "approvals_approval"."created_at" DESC

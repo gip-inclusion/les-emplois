@@ -895,7 +895,8 @@
                  "approvals_approval"."origin_siae_siret",
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind"
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
           LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
@@ -988,7 +989,8 @@
                  "approvals_approval"."origin_siae_siret",
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind"
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" IN (%s,
                                                    %s)
@@ -1611,7 +1613,8 @@
                  "approvals_approval"."origin_siae_siret",
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind"
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
           LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
@@ -1699,7 +1702,8 @@
                  "approvals_approval"."origin_siae_siret",
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind"
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" IN (%s,
                                                    %s)
