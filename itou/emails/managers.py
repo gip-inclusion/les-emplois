@@ -38,6 +38,22 @@ class EmailAddressManager(models.Manager):
     def get_verified(self, user):
         return self.filter(user=user, verified=True).order_by("pk").first()
 
+    def get_primary(self, user):
+        try:
+            return self.get(user=user, primary=True)
+        except self.model.DoesNotExist:
+            return None
+
+    def get_primary_email(self, user) -> str | None:
+        from allauth.account.utils import user_email
+
+        primary = self.get_primary(user)
+        if primary:
+            email = primary.email
+        else:
+            email = user_email(user)
+        return email
+
     def is_verified(self, email):
         return self.filter(email=email.lower(), verified=True).exists()
 

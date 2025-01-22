@@ -152,7 +152,7 @@ class EmailConfirmation(models.Model):
 
     @classmethod
     def generate_key(cls, email_address):
-        signing.dumps(obj=email_address, salt=settings.EMAIL_CONFIRMATION_SALT)
+        return signing.dumps(obj=email_address.pk, salt=settings.EMAIL_CONFIRMATION_SALT)
 
     @classmethod
     def create(cls, email_address):
