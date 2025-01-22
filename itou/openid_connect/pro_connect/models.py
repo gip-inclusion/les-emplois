@@ -4,11 +4,10 @@ from typing import ClassVar
 
 from django.db import models
 
+from itou.openid_connect.models import OIDConnectState, OIDConnectUserData
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
-
-from ..models import OIDConnectState, OIDConnectUserData
 
 
 logger = logging.getLogger(__name__)

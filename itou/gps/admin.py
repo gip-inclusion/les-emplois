@@ -2,8 +2,7 @@ from django.contrib import admin
 from django.utils import timezone
 
 import itou.gps.models as models
-
-from ..utils.admin import ItouModelAdmin
+from itou.utils.admin import ItouModelAdmin
 
 
 class MemberInline(admin.TabularInline):

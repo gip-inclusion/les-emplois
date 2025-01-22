@@ -1,7 +1,7 @@
 from anymail.signals import tracking
 from django.dispatch import receiver
 
-from .models import RejectedEmailEventData
+from itou.external_data.models import RejectedEmailEventData
 
 
 def store_rejected_email_event(event):

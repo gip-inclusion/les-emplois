@@ -11,12 +11,11 @@ from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.throttling import UserRateThrottle
 
 from itou.api.auth import DepartmentTokenAuthentication
+from itou.api.siae_api.serializers import SiaeSerializer
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.companies.models import Company, JobDescription
 from itou.utils.auth import LoginNotRequiredMixin
-
-from .serializers import SiaeSerializer
 
 
 logger = logging.getLogger("api_drf")

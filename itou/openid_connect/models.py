@@ -8,11 +8,10 @@ from django.db import models
 from django.utils import crypto, timezone
 from django.utils.html import format_html
 
+from itou.openid_connect.constants import OIDC_STATE_CLEANUP, OIDC_STATE_EXPIRATION
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils.constants import ITOU_HELP_CENTER_URL
-
-from .constants import OIDC_STATE_CLEANUP, OIDC_STATE_EXPIRATION
 
 
 logger = logging.getLogger(__name__)

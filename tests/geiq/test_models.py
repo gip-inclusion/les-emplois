@@ -8,9 +8,8 @@ from itou.geiq.enums import ReviewState
 from itou.geiq.models import ImplementationAssessmentCampaign
 from itou.institutions.enums import InstitutionKind
 from tests.files.factories import FileFactory
+from tests.geiq.factories import EmployeeFactory, ImplementationAssessmentFactory, PrequalificationFactory
 from tests.institutions.factories import InstitutionFactory
-
-from .factories import EmployeeFactory, ImplementationAssessmentFactory, PrequalificationFactory
 
 
 def test_campaign_review_after_submission_constraint():

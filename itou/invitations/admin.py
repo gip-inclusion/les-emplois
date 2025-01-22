@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from ..utils.admin import ItouModelAdmin
-from .models import EmployerInvitation, LaborInspectorInvitation, PrescriberWithOrgInvitation
+from itou.invitations.models import EmployerInvitation, LaborInspectorInvitation, PrescriberWithOrgInvitation
+from itou.utils.admin import ItouModelAdmin
 
 
 class IsValidFilter(admin.SimpleListFilter):

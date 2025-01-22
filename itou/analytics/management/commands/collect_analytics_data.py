@@ -6,10 +6,9 @@ from django.db import transaction
 from django.forms import models
 from django.utils import timezone
 
+from itou.analytics import api_usage, approvals, employee_record, tech, users
+from itou.analytics.models import Datum
 from itou.utils.command import BaseCommand
-
-from ... import api_usage, approvals, employee_record, tech, users
-from ...models import Datum
 
 
 class Command(BaseCommand):

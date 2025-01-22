@@ -5,6 +5,7 @@ from django.forms import ValidationError
 from drf_spectacular.utils import extend_schema
 from rest_framework import authentication, exceptions, generics, permissions, status
 
+from itou.api.geiq.serializers import GeiqJobApplicationSerializer
 from itou.api.models import CompanyToken
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
@@ -12,8 +13,6 @@ from itou.job_applications.enums import JobApplicationState, Prequalification, P
 from itou.job_applications.models import JobApplication, PriorAction
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.validators import validate_siren
-
-from .serializers import GeiqJobApplicationSerializer
 
 
 class GeiqApiAnonymousUser(AnonymousUser):

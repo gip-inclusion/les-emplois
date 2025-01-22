@@ -8,16 +8,15 @@ from django.utils.text import slugify
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel, AuthorKind
-from itou.eligibility.utils import geiq_allowance_amount
-from itou.prescribers.models import PrescriberOrganization
-from itou.users.models import User
-
-from .common import (
+from itou.eligibility.models.common import (
     AbstractAdministrativeCriteria,
     AbstractEligibilityDiagnosisModel,
     AbstractSelectedAdministrativeCriteria,
     CommonEligibilityDiagnosisQuerySet,
 )
+from itou.eligibility.utils import geiq_allowance_amount
+from itou.prescribers.models import PrescriberOrganization
+from itou.users.models import User
 
 
 # GEIQ Eligibility model:

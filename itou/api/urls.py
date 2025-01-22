@@ -3,18 +3,14 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView
 from rest_framework import routers
 
+from itou.api.applicants_api.views import ApplicantsView
 from itou.api.c4_api.views import C4CompanyView
 from itou.api.data_inclusion_api.views import DataInclusionStructureView
+from itou.api.employee_record_api.viewsets import EmployeeRecordUpdateNotificationViewSet, EmployeeRecordViewSet
 from itou.api.geiq.views import GeiqJobApplicationListView
-
-from .applicants_api.views import ApplicantsView
-from .employee_record_api.viewsets import (
-    EmployeeRecordUpdateNotificationViewSet,
-    EmployeeRecordViewSet,
-)
-from .redoc_views import ItouSpectacularRedocView
-from .siae_api.viewsets import SiaeViewSet
-from .token_auth.views import ObtainAuthToken
+from itou.api.redoc_views import ItouSpectacularRedocView
+from itou.api.siae_api.viewsets import SiaeViewSet
+from itou.api.token_auth.views import ObtainAuthToken
 
 
 # High level app for API

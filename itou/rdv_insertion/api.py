@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 
-from .enums import InvitationStatus
+from itou.rdv_insertion.enums import InvitationStatus
 
 
 logger = logging.getLogger(__name__)

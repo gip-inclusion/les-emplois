@@ -30,8 +30,7 @@ from itou.utils.auth import check_user
 from itou.utils.emails import send_email_messages
 from itou.utils.pagination import pager
 from itou.utils.urls import get_safe_url
-
-from .forms import AssessmentReviewForm, AssessmentSubmissionForm
+from itou.www.geiq_views.forms import AssessmentReviewForm, AssessmentSubmissionForm
 
 
 logger = logging.getLogger(__name__)

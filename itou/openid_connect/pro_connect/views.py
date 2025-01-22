@@ -14,7 +14,11 @@ from django.utils import crypto
 from django.utils.html import format_html
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 
+from itou.openid_connect.errors import redirect_with_error_sso_email_conflict_on_registration
+from itou.openid_connect.models import EmailInUseException, InvalidKindException, MultipleUsersFoundException
 from itou.openid_connect.pro_connect import constants
+from itou.openid_connect.pro_connect.enums import ProConnectChannel
+from itou.openid_connect.pro_connect.models import ProConnectEmployerData, ProConnectPrescriberData, ProConnectState
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider, UserKind
 from itou.users.models import User
@@ -22,19 +26,6 @@ from itou.utils import constants as global_constants
 from itou.utils.constants import ITOU_HELP_CENTER_URL
 from itou.utils.urls import add_url_params, get_absolute_url
 from itou.www.invitations_views.helpers import accept_all_pending_invitations
-
-from ..errors import redirect_with_error_sso_email_conflict_on_registration
-from ..models import (
-    EmailInUseException,
-    InvalidKindException,
-    MultipleUsersFoundException,
-)
-from .enums import ProConnectChannel
-from .models import (
-    ProConnectEmployerData,
-    ProConnectPrescriberData,
-    ProConnectState,
-)
 
 
 logger = logging.getLogger(__name__)

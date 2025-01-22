@@ -7,7 +7,7 @@ from itou.utils.enums import ItouEnvironment
 ITOU_ENVIRONMENT = ItouEnvironment.DEV
 os.environ["ITOU_ENVIRONMENT"] = ITOU_ENVIRONMENT
 
-from .test import *  # noqa: E402,F403
+from config.settings.test import *  # noqa: E402,F403
 
 
 # Django settings

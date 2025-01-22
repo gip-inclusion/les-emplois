@@ -21,7 +21,7 @@ class NotificationRegistry:
         return iter(sorted(self._registry, key=attrgetter("category", "name")))
 
     def register(self, notification_class):
-        from .dispatch.base import BaseNotification
+        from itou.communications.dispatch.base import BaseNotification
 
         if not issubclass(notification_class, BaseNotification):
             raise ValueError("Notification must subclass BaseNotification.")

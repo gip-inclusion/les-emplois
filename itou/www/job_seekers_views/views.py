@@ -28,9 +28,8 @@ from itou.utils.pagination import ItouPaginator
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import get_safe_url
 from itou.www.apply.views.submit_views import ApplicationBaseView
-
-from .enums import JobSeekerSessionKinds
-from .forms import (
+from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
+from itou.www.job_seekers_views.forms import (
     CheckJobSeekerInfoForm,
     CheckJobSeekerNirForm,
     CreateOrUpdateJobSeekerStep1Form,

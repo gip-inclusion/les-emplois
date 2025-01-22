@@ -8,11 +8,10 @@ from django.utils.html import format_html
 
 import itou.employee_record.models as models
 from itou.companies import models as companies_models
-
-from ..utils.admin import ItouModelAdmin, ItouTabularInline, ReadonlyMixin, get_admin_view_link
-from ..utils.templatetags.str_filters import pluralizefr
-from .enums import Status
-from .models import EmployeeRecordUpdateNotification
+from itou.employee_record.enums import Status
+from itou.employee_record.models import EmployeeRecordUpdateNotification
+from itou.utils.admin import ItouModelAdmin, ItouTabularInline, ReadonlyMixin, get_admin_view_link
+from itou.utils.templatetags.str_filters import pluralizefr
 
 
 class EmployeeRecordUpdateNotificationInline(ReadonlyMixin, ItouTabularInline):

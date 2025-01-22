@@ -1,9 +1,8 @@
 import dataclasses
 from typing import ClassVar
 
+from itou.openid_connect.models import OIDConnectState, OIDConnectUserData
 from itou.users.enums import IdentityProvider, UserKind
-
-from ..models import OIDConnectState, OIDConnectUserData
 
 
 class PoleEmploiConnectState(OIDConnectState):

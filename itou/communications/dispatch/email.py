@@ -1,10 +1,9 @@
 import logging
 
+from itou.communications.dispatch.base import BaseNotification
 from itou.companies.models import CompanyMembership
 from itou.prescribers.models import PrescriberMembership
 from itou.utils.emails import get_email_message
-
-from .base import BaseNotification
 
 
 logger = logging.getLogger(__name__)

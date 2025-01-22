@@ -12,11 +12,10 @@ from django.utils import timezone
 from itou.approvals.models import Approval
 from itou.asp.models import EmployerType, PrescriberType, SiaeMeasure
 from itou.companies.models import Company, SiaeFinancialAnnex
+from itou.employee_record.enums import MovementType, NotificationStatus, Status
+from itou.employee_record.exceptions import InvalidStatusError
 from itou.job_applications.enums import SenderKind
 from itou.utils.validators import validate_siret
-
-from .enums import MovementType, NotificationStatus, Status
-from .exceptions import InvalidStatusError
 
 
 # Validators
