@@ -159,4 +159,4 @@ class FranceTravailContact(models.Model):
         verbose_name_plural = "conseillers FT"
 
     def __str__(self):
-        return f"{self.name} ({self.jobseeker_profile})"
+        return f"{self.name} ({self.email})"

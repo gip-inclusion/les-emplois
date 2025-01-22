@@ -789,6 +789,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
         "pe_last_certification_attempt_at",
         "is_pe_certified",
         "disabled_notifications",
+        "advisor_information",
     )
     show_full_result_count = False
 
@@ -808,6 +809,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
                     "pole_emploi_id",
                     "lack_of_pole_emploi_id_reason",
                     "pole_emploi_since",
+                    "advisor_information",
                     "unemployed_since",
                     "resourceless",
                     "rqth_employee",
