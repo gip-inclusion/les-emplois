@@ -58,7 +58,6 @@ class Migration(migrations.Migration):
                 "verbose_name": "confirmation par e-mail",
                 "verbose_name_plural": "confirmations par e-mail",
             },
-            bases=(itou.emails.models.EmailConfirmationMixin, models.Model),
         ),
         migrations.RunSQL(
             """
