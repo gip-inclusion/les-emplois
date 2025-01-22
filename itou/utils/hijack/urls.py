@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from itou.utils.hijack import views
 
 
 app_name = "hijack"

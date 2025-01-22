@@ -13,6 +13,7 @@ from django.utils import crypto
 from django.utils.html import format_html
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 
+from itou.openid_connect.inclusion_connect import constants
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider, UserKind
 from itou.users.models import User
@@ -28,7 +29,6 @@ from ..models import (
     MultipleSubSameEmailException,
     MultipleUsersFoundException,
 )
-from . import constants
 from .enums import InclusionConnectChannel
 from .models import (
     InclusionConnectEmployerData,

@@ -18,7 +18,7 @@ def post_communications_migrate_handler(sender, app_config, **kwargs):
 
 
 def sync_notifications(notification_record_model):
-    from . import registry
+    from itou.communications import registry
 
     try:
         with transaction.atomic():

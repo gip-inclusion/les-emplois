@@ -8,11 +8,10 @@ from itou.companies.models import Company, CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel
 from itou.eligibility.models import GEIQAdministrativeCriteria
 from itou.eligibility.utils import geiq_allowance_amount
+from itou.geiq import models
 from itou.users.enums import Title
 from itou.utils.apis import geiq_label
 from itou.utils.sync import DiffItemKind, yield_sync_diff
-
-from . import models
 
 
 logger = logging.getLogger(__name__)

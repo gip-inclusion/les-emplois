@@ -4,8 +4,7 @@ import uuid
 from django.core.exceptions import PermissionDenied
 
 import itou.utils.json
-
-from . import python
+from itou.utils import python
 
 
 class SessionNamespace:

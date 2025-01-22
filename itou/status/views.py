@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_not_required
 from django.shortcuts import render
 
-from . import models, probes
+from itou.status import models, probes
 
 
 @login_not_required

@@ -38,8 +38,7 @@ from itou.utils.apis import metabase as mb
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
-
-from . import utils
+from itou.www.stats import utils
 
 
 def get_stats_siae_current_org(request):

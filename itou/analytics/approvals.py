@@ -1,9 +1,8 @@
 from django.db.models import Count, Q
 
+from itou.analytics import models
 from itou.approvals import models as approvals_models
 from itou.utils.apis import enums as api_enums
-
-from . import models
 
 
 def collect_analytics_data(before):

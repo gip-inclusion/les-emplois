@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from ..utils.admin import ItouModelAdmin
-from .models import Datum, StatsDashboardVisit
+from itou.analytics.models import Datum, StatsDashboardVisit
+from itou.utils.admin import ItouModelAdmin
 
 
 @admin.register(Datum)

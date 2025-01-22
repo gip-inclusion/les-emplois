@@ -15,6 +15,7 @@ from django.utils.http import urlencode
 
 from itou.external_data.models import ExternalDataImport
 from itou.external_data.tasks import huey_import_user_pe_data
+from itou.openid_connect.pe_connect import constants
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.urls import add_url_params, get_absolute_url
@@ -27,7 +28,6 @@ from ..models import (
     MultipleUsersFoundException,
 )
 from ..utils import init_user_nir_from_session
-from . import constants
 from .models import PoleEmploiConnectState, PoleEmploiConnectUserData
 
 

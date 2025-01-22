@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils import crypto
 from django.utils.http import urlencode
 
+from itou.openid_connect.france_connect import constants
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.urls import get_absolute_url
@@ -23,7 +24,6 @@ from ..models import (
     MultipleUsersFoundException,
 )
 from ..utils import init_user_nir_from_session
-from . import constants
 from .models import FranceConnectState, FranceConnectUserData
 
 

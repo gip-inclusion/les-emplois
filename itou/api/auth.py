@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AnonymousUser
 from rest_framework import authentication
 
-from . import models
+from itou.api import models
 
 
 class DepartmentTokenAuthentication(authentication.TokenAuthentication):

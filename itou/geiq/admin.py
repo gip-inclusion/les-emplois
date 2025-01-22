@@ -4,6 +4,7 @@ from django.contrib import admin, messages
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.html import format_html
 
+from itou.geiq import models, sync
 from itou.utils.admin import (
     ItouModelAdmin,
     ItouTabularInline,
@@ -12,8 +13,6 @@ from itou.utils.admin import (
     get_admin_view_link,
 )
 from itou.utils.apis import geiq_label
-
-from . import models, sync
 
 
 logger = logging.getLogger(__name__)

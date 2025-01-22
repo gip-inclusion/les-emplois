@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from itou.openid_connect.inclusion_connect import views
 
 
 app_name = "inclusion_connect"
