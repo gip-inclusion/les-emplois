@@ -62,6 +62,7 @@ class EmailAddress(models.Model):
         max_length=settings.EMAIL_ADDRESS_MAX_LENGTH,
         verbose_name="adresse e-mail",
     )
+    primary = models.BooleanField(verbose_name="principale", default=False)
     verified = models.BooleanField(verbose_name="vérifiée", default=False)
 
     objects = EmailAddressManager()

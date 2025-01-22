@@ -21,6 +21,7 @@ class Migration(migrations.Migration):
                 ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("email", models.EmailField(db_index=True, max_length=254, verbose_name="adresse e-mail")),
                 ("verified", models.BooleanField(default=False, verbose_name="vérifiée")),
+                ("primary", models.BooleanField(default=False, verbose_name="principale")),
                 (
                     "user",
                     models.ForeignKey(
