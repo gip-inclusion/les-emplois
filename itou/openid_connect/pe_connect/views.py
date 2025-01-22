@@ -15,20 +15,19 @@ from django.utils.http import urlencode
 
 from itou.external_data.models import ExternalDataImport
 from itou.external_data.tasks import huey_import_user_pe_data
-from itou.openid_connect.pe_connect import constants
-from itou.users.enums import IdentityProvider, UserKind
-from itou.utils import constants as global_constants
-from itou.utils.urls import add_url_params, get_absolute_url
-
-from ..errors import redirect_with_error_sso_email_conflict_on_registration
-from ..models import (
+from itou.openid_connect.errors import redirect_with_error_sso_email_conflict_on_registration
+from itou.openid_connect.models import (
     EmailInUseException,
     InvalidKindException,
     MultipleSubSameEmailException,
     MultipleUsersFoundException,
 )
-from ..utils import init_user_nir_from_session
-from .models import PoleEmploiConnectState, PoleEmploiConnectUserData
+from itou.openid_connect.pe_connect import constants
+from itou.openid_connect.pe_connect.models import PoleEmploiConnectState, PoleEmploiConnectUserData
+from itou.openid_connect.utils import init_user_nir_from_session
+from itou.users.enums import IdentityProvider, UserKind
+from itou.utils import constants as global_constants
+from itou.utils.urls import add_url_params, get_absolute_url
 
 
 logger = logging.getLogger(__name__)

@@ -1,8 +1,8 @@
 from django.contrib import admin
 from rest_framework.authtoken.admin import TokenAdmin
 
-from ..utils.admin import ItouModelAdmin
-from .models import CompanyToken, DepartmentToken
+from itou.api.models import CompanyToken, DepartmentToken
+from itou.utils.admin import ItouModelAdmin
 
 
 # Patching TokenAdmin for all sub-APIs

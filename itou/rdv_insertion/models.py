@@ -4,7 +4,12 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
-from .enums import InvitationRequestReasonCategory, InvitationStatus, InvitationType, ParticipationStatus
+from itou.rdv_insertion.enums import (
+    InvitationRequestReasonCategory,
+    InvitationStatus,
+    InvitationType,
+    ParticipationStatus,
+)
 
 
 class InvitationRequest(models.Model):

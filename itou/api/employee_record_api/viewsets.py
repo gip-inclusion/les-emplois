@@ -7,11 +7,13 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from rest_framework.throttling import UserRateThrottle
 
 from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
+from itou.api.employee_record_api.perms import EmployeeRecordAPIPermission
+from itou.api.employee_record_api.serializers import (
+    EmployeeRecordAPISerializer,
+    EmployeeRecordUpdateNotificationAPISerializer,
+)
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification, Status
 from itou.utils.auth import LoginNotRequiredMixin
-
-from .perms import EmployeeRecordAPIPermission
-from .serializers import EmployeeRecordAPISerializer, EmployeeRecordUpdateNotificationAPISerializer
 
 
 logger = logging.getLogger("api_drf")

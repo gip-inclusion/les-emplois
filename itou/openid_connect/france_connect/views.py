@@ -11,20 +11,19 @@ from django.urls import reverse
 from django.utils import crypto
 from django.utils.http import urlencode
 
+from itou.openid_connect.errors import redirect_with_error_sso_email_conflict_on_registration
 from itou.openid_connect.france_connect import constants
-from itou.users.enums import IdentityProvider, UserKind
-from itou.utils import constants as global_constants
-from itou.utils.urls import get_absolute_url
-
-from ..errors import redirect_with_error_sso_email_conflict_on_registration
-from ..models import (
+from itou.openid_connect.france_connect.models import FranceConnectState, FranceConnectUserData
+from itou.openid_connect.models import (
     EmailInUseException,
     InvalidKindException,
     MultipleSubSameEmailException,
     MultipleUsersFoundException,
 )
-from ..utils import init_user_nir_from_session
-from .models import FranceConnectState, FranceConnectUserData
+from itou.openid_connect.utils import init_user_nir_from_session
+from itou.users.enums import IdentityProvider, UserKind
+from itou.utils import constants as global_constants
+from itou.utils.urls import get_absolute_url
 
 
 logger = logging.getLogger(__name__)

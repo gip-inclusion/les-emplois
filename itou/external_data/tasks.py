@@ -1,6 +1,6 @@
 from huey.contrib.djhuey import on_commit_task
 
-from .apis.pe_connect import import_user_pe_data
+from itou.external_data.apis.pe_connect import import_user_pe_data
 
 
 @on_commit_task()

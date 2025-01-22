@@ -4,12 +4,11 @@ from rest_framework.test import APIClient
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
+from tests.api.utils import _str_with_tz
 from tests.companies.factories import CompanyFactory, SiaeConventionFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.test import BASE_NUM_QUERIES
-
-from ..utils import _str_with_tz
 
 
 NUM_QUERIES = BASE_NUM_QUERIES

@@ -1,6 +1,5 @@
 from itou.approvals import notifications
-
-from .factories import ProlongationRequestDenyInformationFactory, ProlongationRequestFactory
+from tests.approvals.factories import ProlongationRequestDenyInformationFactory, ProlongationRequestFactory
 
 
 def test_prolongation_request_created(snapshot):

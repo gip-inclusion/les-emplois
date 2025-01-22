@@ -10,10 +10,9 @@ import warnings
 
 from dotenv import load_dotenv
 
+from config.sentry import sentry_init
 from itou.utils.enums import ItouEnvironment
 from itou.utils.urls import markdown_url_set_protocol, markdown_url_set_target_blank
-
-from ..sentry import sentry_init
 
 
 load_dotenv()

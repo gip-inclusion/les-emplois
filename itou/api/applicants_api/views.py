@@ -5,13 +5,12 @@ from rest_framework import authentication, generics
 from rest_framework.exceptions import ValidationError
 
 from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
+from itou.api.applicants_api.perms import ApplicantsAPIPermission
+from itou.api.applicants_api.serializers import APIParametersSerializer, ApplicantSerializer
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.auth import LoginNotRequiredMixin
-
-from .perms import ApplicantsAPIPermission
-from .serializers import APIParametersSerializer, ApplicantSerializer
 
 
 class ApplicantsView(LoginNotRequiredMixin, generics.ListAPIView):

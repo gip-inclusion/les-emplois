@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.contrib.gis.admin import GISModelAdmin
 
-from ..utils.admin import ItouModelAdmin
-from .models import QPV, ZRR
+from itou.geo.models import QPV, ZRR
+from itou.utils.admin import ItouModelAdmin
 
 
 @admin.register(QPV)

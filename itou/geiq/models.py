@@ -3,10 +3,9 @@ from django.db import models
 
 from itou.companies.models import Company
 from itou.files.models import File
+from itou.geiq.enums import ReviewState
 from itou.institutions.models import Institution
 from itou.users.enums import Title
-
-from .enums import ReviewState
 
 
 class ImplementationAssessmentCampaign(models.Model):

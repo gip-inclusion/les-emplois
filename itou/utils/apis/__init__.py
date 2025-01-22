@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from .pole_emploi import PoleEmploiApiClient
+from itou.utils.apis.pole_emploi import PoleEmploiApiClient
 
 
 def pole_emploi_api_client():

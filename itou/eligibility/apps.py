@@ -16,7 +16,7 @@ class EligibilityAppConfig(AppConfig):
 
 
 def create_administrative_criteria(*args, **kwargs):
-    from .models import AdministrativeCriteria, GEIQAdministrativeCriteria
+    from itou.eligibility.models import AdministrativeCriteria, GEIQAdministrativeCriteria
 
     to_load = (
         (AdministrativeCriteria, "administrative_criteria.json"),

@@ -12,8 +12,7 @@ from itou.users.forms import JobSeekerProfileFieldsMixin
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.validators import validate_pole_emploi_id
 from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Widget
-
-from .enums import EmployeeRecordOrder
+from itou.www.employee_record_views.enums import EmployeeRecordOrder
 
 
 class AddEmployeeRecordChooseEmployeeForm(forms.Form):

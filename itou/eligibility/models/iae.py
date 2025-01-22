@@ -9,8 +9,7 @@ from django.utils import timezone
 
 from itou.approvals.models import Approval
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
-
-from .common import (
+from itou.eligibility.models.common import (
     AbstractAdministrativeCriteria,
     AbstractEligibilityDiagnosisModel,
     AbstractSelectedAdministrativeCriteria,

@@ -36,13 +36,12 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.enums import CompanyKind
+from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
+from itou.users.notifications import JobSeekerCreatedByProxyNotification
 from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_birth_location, validate_birthdate, validate_nir, validate_pole_emploi_id
-
-from .enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
-from .notifications import JobSeekerCreatedByProxyNotification
 
 
 class ItouUserManager(UserManager):
