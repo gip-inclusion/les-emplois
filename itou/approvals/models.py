@@ -1,5 +1,6 @@
 import datetime
 import logging
+import uuid
 
 import pgtrigger
 from dateutil.relativedelta import relativedelta
@@ -560,7 +561,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     public_id = models.UUIDField(
         verbose_name="identifiant public",
         help_text="identifiant opaque, pour les API et les URLs publiques",
-        default=None,
+        default=uuid.uuid4,
         unique=True,
         null=True,
     )
