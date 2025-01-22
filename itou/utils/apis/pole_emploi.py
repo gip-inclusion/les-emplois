@@ -1,3 +1,4 @@
+import json
 import logging
 import re
 
@@ -15,8 +16,9 @@ REFRESH_TOKEN_MARGIN_SECONDS = 10  # arbitrary value, in order not to be *right*
 class PoleEmploiAPIException(Exception):
     """unexpected exceptions (meaning, "exceptional") that warrant a subsequent retry."""
 
-    def __init__(self, error_code):
+    def __init__(self, error_code, response_content=None):
         self.error_code = error_code
+        self.response_content = response_content
         super().__init__()
 
     def __str__(self):
@@ -131,9 +133,18 @@ class PoleEmploiApiClient:
             if response.status_code == 204:
                 return None
             if response.status_code == 429:
+                logger.warning("Request on url=%s triggered rate limit", url)
                 raise PoleEmploiRateLimitException(429)
             if response.status_code not in (200, 206):
-                raise PoleEmploiAPIException(response.status_code)
+                logger.warning("Request on url=%s returned status_code=%s", url, response.status_code)
+                try:
+                    content = response.json()
+                    # This might look like:
+                    # {'codeErreur': 'JCS0011G', 'codeHttp': 500,
+                    #  'message': 'La vue service retournée par le connecteur HTTP est nulle ou mal formée'}
+                except json.decoder.JSONDecodeError:
+                    content = response.content
+                raise PoleEmploiAPIException(response.status_code, response_content=content)
             data = response.json()
             return data
         except httpx.RequestError as exc:
