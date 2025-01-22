@@ -5,8 +5,6 @@ import django.utils.timezone
 from django.conf import settings
 from django.db import migrations, models
 
-import itou.emails.models
-
 
 class Migration(migrations.Migration):
     atomic = True  # Explicitly declared default value
