@@ -711,6 +711,12 @@ class TestApprovalModel:
         with pytest.raises(ProgrammingError):
             approval.save()
 
+    def test_public_id_is_unique_uuid(self):
+        approval = ApprovalFactory(public_id="95aeabb1-f0ad-4ec8-9305-d8184607bae7")
+
+        with pytest.raises(IntegrityError):
+            ApprovalFactory(public_id=approval.public_id)
+
 
 class TestPoleEmploiApprovalModel:
     def test_format_name_as_pole_emploi(self):

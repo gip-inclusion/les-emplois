@@ -557,6 +557,14 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         choices=prescribers_enums.PrescriberOrganizationKind.choices,
     )
 
+    public_id = models.UUIDField(
+        verbose_name="identifiant public",
+        help_text="identifiant opaque, pour les API et les URLs publiques",
+        default=None,
+        unique=True,
+        null=True,
+    )
+
     objects = ApprovalQuerySet.as_manager()
 
     class Meta:

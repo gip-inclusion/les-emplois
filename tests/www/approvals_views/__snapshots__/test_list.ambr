@@ -253,7 +253,8 @@
                              "approvals_approval"."origin_siae_siret" AS "col15",
                              "approvals_approval"."origin_siae_kind" AS "col16",
                              "approvals_approval"."origin_sender_kind" AS "col17",
-                             "approvals_approval"."origin_prescriber_organization_kind" AS "col18"
+                             "approvals_approval"."origin_prescriber_organization_kind" AS "col18",
+                             "approvals_approval"."public_id" AS "col19"
              FROM "approvals_approval"
              WHERE EXISTS
                  (SELECT %s AS "a"
@@ -335,6 +336,7 @@
                           "approvals_approval"."origin_siae_kind",
                           "approvals_approval"."origin_sender_kind",
                           "approvals_approval"."origin_prescriber_organization_kind",
+                          "approvals_approval"."public_id",
                           "users_user"."id",
                           "users_user"."password",
                           "users_user"."last_login",
