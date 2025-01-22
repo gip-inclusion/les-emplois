@@ -118,8 +118,8 @@ class EmailAdmin(admin.ModelAdmin):
 
 @admin.register(models.EmailAddress)
 class EmailAddressAdmin(ItouModelAdmin):
-    list_display = ["email", "user", "verified"]
-    list_filter = ["verified"]
+    list_display = ["email", "user", "primary", "verified"]
+    list_filter = ["primary", "verified"]
     search_fields = ["email", "user__first_name", "user__last_name"]
     raw_id_fields = ["user"]
     actions = ["make_verified"]

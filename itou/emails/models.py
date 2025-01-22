@@ -92,6 +92,23 @@ class EmailAddress(models.Model):
                 self.save(update_fields=["verified"])
         return self.verified
 
+    def set_as_primary(self, conditional=False):
+        """Marks the email address as primary. In case of `conditional`, it is
+        only marked as primary if there is no other primary email address set.
+        """
+        from allauth.account.utils import user_email
+
+        old_primary = EmailAddress.objects.get_primary(self.user)
+        if old_primary:
+            if conditional:
+                return False
+            old_primary.primary = False
+            old_primary.save()
+        self.primary = True
+        self.save()
+        user_email(self.user, self.email, commit=True)
+        return True
+
     def send_confirmation(self, request=None, signup=False):
         confirmation = EmailConfirmation.create(self)
         confirmation.send(request, signup=signup)
