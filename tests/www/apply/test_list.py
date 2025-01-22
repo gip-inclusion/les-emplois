@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 
+from itou.www.apply.views.list_views import JobApplicationsDisplayKind
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
@@ -50,7 +51,7 @@ def test_list_warns_about_long_awaiting_applications(client, snapshot):
     )
 
     client.force_login(hit_pit.members.get())
-    response = client.get(reverse("apply:list_for_siae"))
+    response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.LIST})
     results_section = parse_response_to_soup(response, selector="#job-applications-section")
 
     assert str(results_section) == snapshot(name="SIAE - warnings for 2222 and 3333")

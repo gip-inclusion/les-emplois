@@ -15,6 +15,7 @@ from itou.utils.mocks.rdv_insertion import (
     RDV_INSERTION_CREATE_AND_INVITE_FAILURE_BODY,
     RDV_INSERTION_CREATE_AND_INVITE_SUCCESS_BODY,
 )
+from itou.www.apply.views.list_views import JobApplicationsDisplayKind
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.rdv_insertion.factories import InvitationRequestFactory, ParticipationFactory
@@ -88,7 +89,7 @@ class TestRdvInsertionDisplay:
         self.job_application.to_company.save()
 
         profile_login(profile, self.job_application)
-        response = client.get(reverse(view_name))
+        response = client.get(reverse(view_name), {"display": JobApplicationsDisplayKind.LIST})
         assertContains(response, job_application_label)
         assertTemplateNotUsed(response, "apply/includes/buttons/rdv_insertion_invite.html")
 
@@ -103,7 +104,7 @@ class TestRdvInsertionDisplay:
         self, profile_login, client, profile, view_name, job_application_label
     ):
         profile_login(profile, self.job_application)
-        response = client.get(reverse(view_name))
+        response = client.get(reverse(view_name), {"display": JobApplicationsDisplayKind.LIST})
         assertContains(response, job_application_label)
         if profile == "employer":
             assertTemplateUsed(response, "apply/includes/buttons/rdv_insertion_invite.html")
@@ -133,7 +134,7 @@ class TestRdvInsertionDisplay:
         )
 
         profile_login(profile, self.job_application)
-        response = client.get(reverse(view_name))
+        response = client.get(reverse(view_name), {"display": JobApplicationsDisplayKind.LIST})
         assertContains(response, job_application_label)
         if profile == "employer":
             assertTemplateUsed(response, "apply/includes/buttons/rdv_insertion_invite.html")
@@ -155,7 +156,7 @@ class TestRdvInsertionDisplay:
     def test_list_no_upcoming_appointments(self, profile_login, client, profile, view_name):
         self.participation.appointment.delete()
         profile_login(profile, self.job_application)
-        response = client.get(reverse(view_name))
+        response = client.get(reverse(view_name), {"display": JobApplicationsDisplayKind.LIST})
         assertTemplateUsed(response, "apply/includes/list_card_body.html")
         assertTemplateUsed(response, "apply/includes/next_appointment.html")
         assertNotContains(response, self.NEXT_APPOINTMENT_LABEL)
@@ -172,7 +173,7 @@ class TestRdvInsertionDisplay:
     )
     def test_list_with_one_upcoming_appointment(self, profile_login, client, profile, view_name):
         profile_login(profile, self.job_application)
-        response = client.get(reverse(view_name))
+        response = client.get(reverse(view_name), {"display": JobApplicationsDisplayKind.LIST})
         assertTemplateUsed(response, "apply/includes/list_card_body.html")
         assertTemplateUsed(response, "apply/includes/next_appointment.html")
         assertContains(response, self.NEXT_APPOINTMENT_LABEL)
@@ -197,7 +198,7 @@ class TestRdvInsertionDisplay:
             appointment__status=Appointment.Status.UNKNOWN,
             appointment__start_at=datetime.datetime(2024, 9, 2, 8, 0, tzinfo=datetime.UTC),
         )
-        response = client.get(reverse(view_name))
+        response = client.get(reverse(view_name), {"display": JobApplicationsDisplayKind.LIST})
         assertTemplateUsed(response, "apply/includes/list_card_body.html")
         assertTemplateUsed(response, "apply/includes/next_appointment.html")
         assertContains(response, self.NEXT_APPOINTMENT_LABEL)
@@ -211,7 +212,7 @@ class TestRdvInsertionDisplay:
             appointment__status=Appointment.Status.UNKNOWN,
             appointment__start_at=datetime.datetime(2024, 9, 3, 8, 0, tzinfo=datetime.UTC),
         )
-        response = client.get(reverse(view_name))
+        response = client.get(reverse(view_name), {"display": JobApplicationsDisplayKind.LIST})
         assertTemplateUsed(response, "apply/includes/list_card_body.html")
         assertTemplateUsed(response, "apply/includes/next_appointment.html")
         assertContains(response, self.NEXT_APPOINTMENT_LABEL)

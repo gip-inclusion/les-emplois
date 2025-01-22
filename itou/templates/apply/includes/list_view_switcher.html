@@ -1,5 +1,5 @@
 <button id="list_display_button"
-        class="btn btn-ico btn-block {{ display_kind.is_list|yesno:'btn-secondary,btn-link' }}"
+        class="btn btn-ico btn-block {{ display_kind.is_list|yesno:'btn-secondary,btn-link' }}{% if job_applications_list_kind is JobApplicationsListKind.RECEIVED %} order-2{% endif %}"
         data-setter-target="#display-kind"
         data-setter-value="{{ display_kind.LIST }}"
         {% if request.htmx %}hx-swap-oob="true"{% endif %}>

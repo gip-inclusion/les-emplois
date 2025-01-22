@@ -329,7 +329,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     try:
         display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
     except ValueError:
-        display_kind = JobApplicationsDisplayKind.LIST
+        display_kind = JobApplicationsDisplayKind.TABLE
 
     context = {
         "title": title,

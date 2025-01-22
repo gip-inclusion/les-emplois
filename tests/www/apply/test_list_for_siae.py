@@ -60,7 +60,7 @@ class TestProcessListSiae:
 
         client.force_login(employer)
         with assertSnapshotQueries(snapshot(name="view queries")):
-            response = client.get(reverse("apply:list_for_siae"))
+            response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.LIST})
 
         total_applications = len(response.context["job_applications_page"].object_list)
 
@@ -206,7 +206,9 @@ class TestProcessListSiae:
             with subtests.test(kind=kind.label):
                 company.kind = kind
                 company.save(update_fields=("kind",))
-                response = client.get(reverse("apply:list_for_siae"))
+                response = client.get(
+                    reverse("apply:list_for_siae"), data={"display": JobApplicationsDisplayKind.LIST}
+                )
                 if expect_to_see_criteria[kind]:
                     assertContains(response, TITLE, html=True)
                     assertContains(response, CRITERION, html=True)
@@ -542,8 +544,8 @@ def test_list_display_kind(client):
     LIST_VIEW_MARKER = '<div class="c-box--results__header">'
 
     for display_param, expected_marker in [
-        ({}, LIST_VIEW_MARKER),
-        ({"display": "invalid"}, LIST_VIEW_MARKER),
+        ({}, TABLE_VIEW_MARKER),
+        ({"display": "invalid"}, TABLE_VIEW_MARKER),
         ({"display": JobApplicationsDisplayKind.LIST}, LIST_VIEW_MARKER),
         ({"display": JobApplicationsDisplayKind.TABLE}, TABLE_VIEW_MARKER),
     ]:
@@ -609,7 +611,7 @@ def test_list_for_siae_filter_for_different_kind(client, snapshot):
     for kind in CompanyKind:
         company.kind = kind
         company.save(update_fields=("kind",))
-        response = client.get(reverse("apply:list_for_siae"))
+        response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.LIST})
         assert response.status_code == 200
         filter_form = parse_response_to_soup(response, "#offcanvasApplyFilters")
         # GEIQ and non IAE kind do not have a filter on approval and eligibility.
@@ -633,23 +635,23 @@ def test_archived(client):
 
     client.force_login(company.members.get())
     url = reverse("apply:list_for_siae")
-    response = client.get(url)
+    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST})
     assertContains(response, active.pk)
     assertNotContains(response, archived.pk)
     assertNotContains(response, archived_badge_html, html=True)
-    response = client.get(url, data={"archived": ""})
+    response = client.get(url, data={"display": JobApplicationsDisplayKind.LIST, "archived": ""})
     assertContains(response, active.pk)
     assertNotContains(response, archived.pk)
     assertNotContains(response, archived_badge_html, html=True)
-    response = client.get(url, data={"archived": "archived"})
+    response = client.get(url, data={"display": JobApplicationsDisplayKind.LIST, "archived": "archived"})
     assertNotContains(response, active.pk)
     assertContains(response, archived.pk)
     assertContains(response, archived_badge_html, html=True, count=1)
-    response = client.get(url, data={"archived": "all"})
+    response = client.get(url, data={"display": JobApplicationsDisplayKind.LIST, "archived": "all"})
     assertContains(response, active.pk)
     assertContains(response, archived.pk)
     assertContains(response, archived_badge_html, html=True, count=1)
-    response = client.get(url, data={"archived": "invalid"})
+    response = client.get(url, data={"display": JobApplicationsDisplayKind.LIST, "archived": "invalid"})
     assertContains(response, active.pk)
     assertContains(response, archived.pk)
     assertContains(response, archived_badge_html, html=True, count=1)
@@ -946,7 +948,7 @@ def test_list_for_siae_exports_download_by_month(client):
 def test_list_for_siae_badge(client, snapshot, job_app_kwargs):
     job_application = JobApplicationFactory(**job_app_kwargs)
     client.force_login(job_application.to_company.members.get())
-    response = client.get(reverse("apply:list_for_siae"))
+    response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.LIST})
     badge = parse_response_to_soup(response, selector=".c-box--results__summary span.badge")
     assert str(badge) == snapshot
 
@@ -955,7 +957,7 @@ def test_reset_filter_button_snapshot(client, snapshot):
     job_application = JobApplicationFactory()
     client.force_login(job_application.to_company.members.get())
 
-    filter_params = {"states": [job_application.state]}
+    filter_params = {"states": [job_application.state], "display": JobApplicationsDisplayKind.LIST}
     response = client.get(reverse("apply:list_for_siae"), filter_params)
 
     assert str(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
