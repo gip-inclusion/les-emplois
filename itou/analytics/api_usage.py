@@ -1,6 +1,5 @@
+from itou.analytics import models
 from itou.utils.apis.datadog import DatadogApiClient
-
-from . import models
 
 
 def collect_analytics_data(before, client=None):

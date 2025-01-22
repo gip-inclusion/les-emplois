@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from itou.status import views
 
 
 app_name = "status"

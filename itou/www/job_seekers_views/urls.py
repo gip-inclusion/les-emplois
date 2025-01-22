@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from itou.www.job_seekers_views import views
 
 
 app_name = "job_seekers_views"

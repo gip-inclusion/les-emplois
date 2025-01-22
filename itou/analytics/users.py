@@ -1,8 +1,7 @@
 from django.db.models import Count
 
+from itou.analytics import models
 from itou.users import enums as users_enums, models as users_models
-
-from . import models
 
 
 def collect_analytics_data(before):

@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from itou.openid_connect.pro_connect import views
 
 
 app_name = "pro_connect"

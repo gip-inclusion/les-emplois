@@ -17,6 +17,7 @@ from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, Contra
 from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
+from itou.job_applications import notifications as job_application_notifications
 from itou.job_applications.enums import (
     ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL,
     GEIQ_MAX_HOURS_PER_WEEK,
@@ -34,8 +35,6 @@ from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.utils.emails import get_email_message
 from itou.utils.models import InclusiveDateRangeField
 from itou.utils.urls import get_absolute_url
-
-from . import notifications as job_application_notifications
 
 
 class JobApplicationWorkflow(xwf_models.Workflow):

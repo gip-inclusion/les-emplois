@@ -17,6 +17,7 @@ from django.utils.safestring import mark_safe
 from django.utils.timesince import timeuntil
 from unidecode import unidecode
 
+from itou.approvals import enums, notifications
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import Origin
 from itou.approvals.utils import get_user_last_accepted_siae_job_application, last_hire_was_made_by_siae
@@ -30,8 +31,6 @@ from itou.utils.db import or_queries
 from itou.utils.models import DateRange
 from itou.utils.templatetags.str_filters import pluralizefr
 from itou.utils.validators import alphanumeric, validate_siret
-
-from . import enums, notifications
 
 
 logger = logging.getLogger(__name__)

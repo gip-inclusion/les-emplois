@@ -4,10 +4,9 @@ from django.contrib import admin
 from django.db.models import Count
 from django.utils.html import format_html
 
+from itou.rdv_insertion import models
 from itou.utils.admin import ItouModelAdmin, ItouTabularInline, ReadonlyMixin
 from itou.utils.templatetags.str_filters import pluralizefr
-
-from . import models
 
 
 class InvitationInline(ItouTabularInline):

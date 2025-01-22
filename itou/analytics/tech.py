@@ -1,9 +1,8 @@
 from dateutil.relativedelta import relativedelta
 
+from itou.analytics import models
 from itou.utils.apis.sentry import SentryApiClient
 from itou.utils.apis.updown import UpdownApiClient
-
-from . import models
 
 
 def collect_analytics_data(before):

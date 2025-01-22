@@ -1,8 +1,7 @@
 from django.db.models import Count, Max, Min
 
+from itou.analytics import models
 from itou.employee_record import models as employee_record_models
-
-from . import models
 
 
 def collect_employee_records_count(before):
