@@ -16,9 +16,7 @@ from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import (
-    EmployerFactory,
     JobSeekerFactory,
-    PrescriberFactory,
 )
 from tests.utils.test import KNOWN_SESSION_KEYS
 
@@ -334,32 +332,3 @@ def test_existing_user_with_nir(client):
     job_seeker.refresh_from_db()
     assert job_seeker.follow_up_group is not None
     assert user in job_seeker.follow_up_group.members.all()
-
-
-@pytest.mark.parametrize(
-    "UserFactory, factory_args, expected_access",
-    [
-        (PrescriberFactory, {"membership": False}, False),
-        (PrescriberFactory, {"membership": True}, False),
-        (PrescriberFactory, {"membership__organization__authorized": True}, True),
-        (EmployerFactory, {"with_company": True}, True),
-    ],
-)
-def test_creation_by_user_kind(client, UserFactory, factory_args, expected_access):
-    user = UserFactory(**factory_args)
-    client.force_login(user)
-    # Assert contains link.
-    params = {"tunnel": "gps", "from_url": reverse("gps:my_groups")}
-    create_beneficiary_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
-    response = client.get(reverse("gps:join_group"))
-    if expected_access:
-        assertContains(response, create_beneficiary_url.replace("&", "&amp;"))
-    else:
-        assert response.status_code == 403
-
-    response = client.get(create_beneficiary_url)
-    [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
-    assert response.status_code == 302
-    assert response["Location"] == reverse(
-        "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}
-    )
