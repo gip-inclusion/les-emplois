@@ -10,5 +10,4 @@ urlpatterns = [
     path("cities", views.cities_autocomplete, name="cities"),
     path("jobs", views.jobs_autocomplete, name="jobs"),
     path("communes", views.communes_autocomplete, name="communes"),
-    path("gps_users", views.gps_users_autocomplete, name="gps_users"),
 ]

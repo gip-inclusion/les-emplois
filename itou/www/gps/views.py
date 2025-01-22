@@ -8,12 +8,12 @@ from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView
 
-from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.gps.models import FollowUpGroupMembership
 from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.pagination import pager
 from itou.utils.urls import get_safe_url
-from itou.www.gps.forms import GpsUserSearchForm, MembershipsFiltersForm
+from itou.www.gps.forms import MembershipsFiltersForm
 
 
 def is_allowed_to_use_gps(user):
@@ -54,45 +54,21 @@ def my_groups(request, template_name="gps/my_groups.html"):
         "can_use_gps_advanced_features": is_allowed_to_use_gps_advanced_features(request.user),
     }
 
-    if not context["can_use_gps_advanced_features"]:
-        context["request_new_beneficiary_form_url"] = (
-            "https://formulaires.gps.inclusion.gouv.fr/ajouter-usager?"
-            + urllib.parse.urlencode(
-                {
-                    "user_name": request.user.get_full_name(),
-                    "user_id": request.user.pk,
-                    "user_email": request.user.email,
-                    "user_organization_name": getattr(request.current_organization, "display_name", ""),
-                    "user_organization_id": getattr(request.current_organization, "pk", ""),
-                    "success_url": request.build_absolute_uri(),
-                }
-            )
+    context["request_new_beneficiary_form_url"] = (
+        "https://formulaires.gps.inclusion.gouv.fr/ajouter-usager?"
+        + urllib.parse.urlencode(
+            {
+                "user_name": request.user.get_full_name(),
+                "user_id": request.user.pk,
+                "user_email": request.user.email,
+                "user_organization_name": getattr(request.current_organization, "display_name", ""),
+                "user_organization_id": getattr(request.current_organization, "pk", ""),
+                "success_url": request.build_absolute_uri(),
+            }
         )
+    )
 
     return render(request, "gps/includes/memberships_results.html" if request.htmx else template_name, context)
-
-
-@check_user(is_allowed_to_use_gps_advanced_features)
-def join_group(request, template_name="gps/join_group.html"):
-    form = GpsUserSearchForm(data=request.POST or None)
-
-    my_groups_url = reverse("gps:my_groups")
-    back_url = get_safe_url(request, "back_url", my_groups_url)
-
-    if request.method == "POST" and form.is_valid():
-        user = form.cleaned_data["user"]
-        is_referent = form.cleaned_data["is_referent"]
-
-        FollowUpGroup.objects.follow_beneficiary(beneficiary=user, user=request.user, is_referent=is_referent)
-
-        return HttpResponseRedirect(my_groups_url)
-
-    context = {
-        "form": form,
-        "reset_url": back_url,
-    }
-
-    return render(request, template_name, context)
 
 
 @check_user(is_allowed_to_use_gps)

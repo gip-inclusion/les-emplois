@@ -1,20 +1,14 @@
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_not_required
-from django.contrib.postgres.search import SearchQuery, SearchRank
-from django.db.models import Exists, F, OuterRef, Q, Value
+from django.db.models import F, Q, Value
 from django.db.models.functions import Least, Lower, NullIf, StrIndex
 from django.http import JsonResponse
 from unidecode import unidecode
 
 from itou.asp.models import Commune
 from itou.cities.models import City
-from itou.gps.models import FollowUpGroup
 from itou.jobs.models import Appellation
-from itou.users.enums import UserKind
-from itou.users.models import User
-from itou.utils.auth import check_user
-from itou.www.gps.views import is_allowed_to_use_gps_advanced_features
 
 
 # Consider that after 50 matches the user should refine its search.
@@ -127,48 +121,3 @@ def communes_autocomplete(request):
         ]
 
     return JsonResponse({"results": communes}, safe=False)
-
-
-@check_user(is_allowed_to_use_gps_advanced_features)
-def gps_users_autocomplete(request):
-    """
-    Returns JSON data compliant with Select2
-    """
-
-    current_user = request.user
-
-    term = request.GET.get("term", "").strip()
-    users = []
-
-    if term:
-        users_qs = User.objects.filter(kind=UserKind.JOB_SEEKER).exclude(
-            Exists(
-                FollowUpGroup.objects.filter(
-                    beneficiary_id=OuterRef("pk"),
-                    memberships__member=current_user,
-                    memberships__is_active=True,
-                )
-            )
-        )
-
-        search_query = SearchQuery(term, config="simple_unaccent")
-        users_qs = users_qs.filter(full_name_search_vector=search_query)
-        users_qs = users_qs.annotate(rank=SearchRank("full_name_search_vector", search_query)).order_by("-rank")
-
-        def format_data(user):
-            data = {
-                "id": user.pk,
-                "title": "",
-                "name": user.get_full_name(),
-                "birthdate": "",
-            }
-            if user.title:
-                # only add a . after M, not Mme
-                data["title"] = f"{user.title.capitalize()}."[:3] + " "
-            if getattr(user.jobseeker_profile, "birthdate", None):
-                data["birthdate"] = user.jobseeker_profile.birthdate.strftime("%d/%m/%Y")
-            return data
-
-        users = [format_data(user) for user in users_qs[:10]]
-
-    return JsonResponse({"results": users})

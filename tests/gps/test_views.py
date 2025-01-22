@@ -7,7 +7,6 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
-from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
     JobSeekerFactory,
@@ -25,7 +24,6 @@ def test_job_seeker_cannot_use_gps(client):
 
     for route, kwargs in [
         ("gps:my_groups", {}),
-        ("gps:join_group", {}),
         ("gps:leave_group", {"group_id": group.pk}),
         ("gps:toggle_referent", {"group_id": group.pk}),
     ]:
@@ -33,142 +31,6 @@ def test_job_seeker_cannot_use_gps(client):
         assert response.status_code == 403
     response = client.get(reverse("gps:user_details", kwargs={"public_id": job_seeker.public_id}))
     assert response.status_code == 403
-
-
-def test_user_autocomplete(client):
-    prescriber = PrescriberFactory(first_name="gps member Vince")
-    PrescriberMembershipFactory(user=prescriber, organization__authorized=True)
-    first_beneficiary = JobSeekerFactory(first_name="gps beneficiary Bob", last_name="Le Brico")
-    second_beneficiary = JobSeekerFactory(first_name="gps second beneficiary Martin", last_name="Pêcheur")
-    third_beneficiary = JobSeekerFactory(first_name="gps third beneficiary Foo", last_name="Bar")
-
-    my_group = FollowUpGroupFactory(beneficiary=first_beneficiary, memberships=4, memberships__member=prescriber)
-    FollowUpGroupFactory(beneficiary=third_beneficiary, memberships=3, memberships__member=prescriber)
-    FollowUpGroupFactory(beneficiary=second_beneficiary, memberships=2)
-
-    def get_autocomplete_results(user, term="gps"):
-        client.force_login(user)
-        response = client.get(reverse("autocomplete:gps_users") + f"?term={term}")
-        return [r["id"] for r in response.json()["results"]]
-
-    # Employers should get the 3 job seekers.
-    results = get_autocomplete_results(EmployerFactory(with_company=True))
-    assert set(results) == {first_beneficiary.pk, second_beneficiary.pk, third_beneficiary.pk}
-
-    # Authorized prescribers should get the 3 job seekers.
-    org = PrescriberOrganizationWithMembershipFactory(authorized=True)
-    results = get_autocomplete_results(org.members.get())
-    assert set(results) == {first_beneficiary.pk, second_beneficiary.pk, third_beneficiary.pk}
-
-    # We should not get ourself nor the first and third user user because we are a member of their group
-    results = get_autocomplete_results(prescriber)
-    assert set(results) == {second_beneficiary.pk}
-
-    # Now, if we remove the first user from our group by setting the membership to is_active False
-    # The autocomplete should return it again
-    membership = FollowUpGroupMembership.objects.filter(member=prescriber).filter(follow_up_group=my_group).first()
-    membership.is_active = False
-    membership.save()
-
-    # We should not get ourself but we should get the first beneficiary (we are is_active=False)
-    # and the second one (we are not part of his group)
-    results = get_autocomplete_results(prescriber)
-    assert set(results) == {first_beneficiary.pk, second_beneficiary.pk}
-
-    # with "martin gps" Martin is the only match
-    results = get_autocomplete_results(prescriber, term="martin gps")
-    assert results == [second_beneficiary.pk]
-
-
-def test_user_autocomplete_XSS():
-    # The javascript code return a jquery object that will not be escaped, we need to escape the user name
-    # to prevent xss
-    with open("itou/static/js/gps.js") as f:
-        script_content = f.read()
-        assert "${select2Utils.escapeMarkup(data.name)}" in script_content
-        assert "${select2Utils.escapeMarkup(data.title)}" in script_content
-
-
-@pytest.mark.parametrize(
-    "is_referent",
-    [
-        True,
-        False,
-    ],
-)
-def test_join_group_of_a_job_seeker(is_referent, client):
-    prescriber = PrescriberFactory(membership__organization__authorized=True)
-    job_seeker = JobSeekerFactory()
-
-    client.force_login(prescriber)
-
-    url = reverse("gps:join_group")
-
-    response = client.get(url)
-
-    post_data = {
-        "user": job_seeker.id,
-        "is_referent": is_referent,
-    }
-
-    response = client.post(url, data=post_data)
-    assert response.status_code == 302
-
-    # A follow up group and a membership to this group should have been created
-    assert FollowUpGroup.objects.count() == 1
-    follow_up_group = FollowUpGroup.objects.get(beneficiary=job_seeker)
-    assert FollowUpGroupMembership.objects.count() == 1
-    membership = (
-        FollowUpGroupMembership.objects.filter(member=prescriber).filter(follow_up_group=follow_up_group).first()
-    )
-
-    assert membership.is_referent == is_referent
-
-    # Login with another prescriber and join the same follow_up_group
-    other_prescriber = PrescriberFactory(membership__organization__authorized=True)
-
-    client.force_login(other_prescriber)
-
-    post_data = {
-        "user": job_seeker.id,
-        "is_referent": not is_referent,
-    }
-
-    response = client.post(url, data=post_data)
-    assert response.status_code == 302
-
-    # We should not have created another FollowUpGroup
-    assert FollowUpGroup.objects.count() == 1
-    follow_up_group = FollowUpGroup.objects.get(beneficiary=job_seeker)
-
-    # Just a new membership should have been created
-    assert FollowUpGroupMembership.objects.count() == 2
-
-
-def test_join_group_of_a_prescriber(client):
-    prescriber = PrescriberFactory(membership__organization__authorized=True)
-    another_prescriber = PrescriberFactory(membership=True)
-
-    client.force_login(prescriber)
-
-    url = reverse("gps:join_group")
-
-    response = client.get(url)
-
-    post_data = {
-        "user": another_prescriber.id,
-        "is_referent": True,
-    }
-
-    response = client.post(url, data=post_data)
-
-    # We should not be redirected to "my_groups" because the form is not valid
-    # regarding queryset=User.objects.filter(kind=UserKind.JOB_SEEKER)
-    assert response.status_code == 200
-    assertContains(
-        response,
-        "Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles.",
-    )
 
 
 @pytest.mark.parametrize(
@@ -204,18 +66,9 @@ def test_gps_access(client, factory, access):
     FEATURE_ADD = "<span>Ajouter un bénéficiaire</span>"
     if access is None:
         assert response.status_code == 403
-    elif access == "partial":
+    else:
         assertContains(response, FEATURE_INVITE)
         assertNotContains(response, FEATURE_ADD)
-    else:
-        assertContains(response, FEATURE_INVITE)
-        assertContains(response, FEATURE_ADD)
-
-    response = client.get(reverse("gps:join_group"))
-    if access is None or access == "partial":
-        assert response.status_code == 403
-    else:
-        assert response.status_code == 200
 
 
 @freezegun.freeze_time("2024-06-21", tick=True)
