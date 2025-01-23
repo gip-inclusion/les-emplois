@@ -5,7 +5,6 @@ from django.urls import reverse
 from django.utils.http import urlencode
 
 from itou.openid_connect.france_connect.constants import FRANCE_CONNECT_SESSION_STATE, FRANCE_CONNECT_SESSION_TOKEN
-from itou.openid_connect.inclusion_connect.constants import INCLUSION_CONNECT_SESSION_KEY
 from itou.openid_connect.pe_connect.constants import PE_CONNECT_SESSION_TOKEN
 from itou.openid_connect.pro_connect.constants import PRO_CONNECT_SESSION_KEY
 from itou.utils.urls import get_safe_url
@@ -55,7 +54,7 @@ class UserAdapter(DefaultAccountAdapter):
         this method is also invoked if you attempt to log out while no user
         is logged in. Therefore, request.user is not guaranteed to be an
         authenticated user.
-        Tests are in itou.inclusion_connect.tests.
+        Tests are in itou.openid_connect.***.tests.
         """
         redirect_url = reverse("search:employers_home")
         # ProConnect
@@ -66,14 +65,6 @@ class UserAdapter(DefaultAccountAdapter):
                 params = {"token": token}
                 pro_connect_base_logout_url = reverse("pro_connect:logout")
                 return f"{pro_connect_base_logout_url}?{urlencode(params)}"
-        # Inclusion Connect
-        ic_session = request.session.get(INCLUSION_CONNECT_SESSION_KEY)
-        if ic_session:
-            token = ic_session["token"]
-            if token:
-                params = {"token": token}
-                ic_base_logout_url = reverse("inclusion_connect:logout")
-                return f"{ic_base_logout_url}?{urlencode(params)}"
         # France Connect
         fc_token = request.session.get(FRANCE_CONNECT_SESSION_TOKEN)
         fc_state = request.session.get(FRANCE_CONNECT_SESSION_STATE)

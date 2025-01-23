@@ -121,18 +121,20 @@ class TestUserHijackPerm:
         (JobSeekerFactory, IdentityProvider.PE_CONNECT, False),
         (JobSeekerFactory, IdentityProvider.FRANCE_CONNECT, False),
         (PrescriberFactory, IdentityProvider.DJANGO, True),
-        (PrescriberFactory, IdentityProvider.INCLUSION_CONNECT, False),
+        (PrescriberFactory, IdentityProvider.INCLUSION_CONNECT, True),
+        (PrescriberFactory, IdentityProvider.PRO_CONNECT, False),
         (partial(EmployerFactory, with_company=True), IdentityProvider.DJANGO, True),
-        (partial(EmployerFactory, with_company=True), IdentityProvider.INCLUSION_CONNECT, False),
+        (partial(EmployerFactory, with_company=True), IdentityProvider.INCLUSION_CONNECT, True),
+        (partial(EmployerFactory, with_company=True), IdentityProvider.PRO_CONNECT, False),
         (LaborInspectorFactory, IdentityProvider.DJANGO, False),
     ],
 )
-def test_redirect_to_ic_activation_view(client, user_factory, identity_provider, is_redirected):
+def test_redirect_to_pc_activation_view(client, user_factory, identity_provider, is_redirected):
     user = user_factory(identity_provider=identity_provider)
     client.force_login(user)
     response = client.get(reverse("search:employers_home"), follow=True)
     if is_redirected:
-        assertRedirects(response, reverse("dashboard:activate_ic_account"))
+        assertRedirects(response, reverse("dashboard:activate_pro_connect_account"))
     else:
         assert response.status_code == 200
 

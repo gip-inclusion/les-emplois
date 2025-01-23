@@ -43,7 +43,7 @@ def test_middleware_for_authenticated_user(client, db, params, expected_params):
 
 @pytest.mark.parametrize("params,expected_params", params_tuples)
 def test_middlware_for_non_proconnect_user(client, db, params, expected_params):
-    user = EmployerFactory(with_company=True)
+    user = EmployerFactory(with_company=True, identity_provider=IdentityProvider.INCLUSION_CONNECT)
     for username_param in ["", "&username=123-abc", f"&username={user.username}"]:
         response = client.get(f"/{params}{username_param}")
         assertRedirects(

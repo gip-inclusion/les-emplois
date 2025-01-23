@@ -10,7 +10,6 @@ from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden, 
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 from rest_framework.authtoken.models import Token
@@ -24,14 +23,13 @@ from itou.employee_record.models import EmployeeRecord
 from itou.geiq.models import ImplementationAssessmentCampaign
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
-from itou.openid_connect.inclusion_connect import constants as ic_constants
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
-from itou.users.enums import MATOMO_ACCOUNT_TYPE, IdentityProvider, UserKind
+from itou.users.enums import MATOMO_ACCOUNT_TYPE, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
-from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
+from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.dashboard.forms import (
     EditJobSeekerInfoForm,
     EditUserEmailForm,
@@ -246,28 +244,10 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
         success_url = get_safe_url(request, "success_url", fallback_url=dashboard_url)
         return HttpResponseRedirect(success_url)
 
-    ic_account_url = None
-    if request.user.identity_provider == IdentityProvider.INCLUSION_CONNECT:
-        # SSO users do not have access to edit_user_email dedicated view:
-        # this field allows them to discover their dedicated process
-        ic_login_params = {
-            "next_url": request.build_absolute_uri(),
-            "user_kind": request.user.kind,
-        }
-        inclusion_connect_url = (
-            f"{get_absolute_url(reverse('inclusion_connect:authorize'))}?{urlencode(ic_login_params)}"
-        )
-        params = {
-            "referrer": ic_constants.INCLUSION_CONNECT_CLIENT_ID,
-            "referrer_uri": inclusion_connect_url,
-        }
-        ic_account_url = f"{ic_constants.INCLUSION_CONNECT_ACCOUNT_URL}?{urlencode(params)}"
-
     context = {
         "extra_data": extra_data,
         "form": form,
         "prev_url": prev_url,
-        "ic_account_url": ic_account_url,
     }
 
     return render(request, template_name, context)
@@ -378,7 +358,7 @@ def api_token(request, template_name="dashboard/api_token.html"):
 
 
 class AccountMigrationView(TemplateView):
-    template_name = "account/activate_inclusion_connect_account.html"
+    template_name = "account/activate_pro_connect_account.html"
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.kind not in MATOMO_ACCOUNT_TYPE:
@@ -399,13 +379,11 @@ class AccountMigrationView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         params = self._get_params()
-        inclusion_connect_url = add_url_params(reverse("inclusion_connect:activate_account"), params)
         pro_connect_url = (
             add_url_params(reverse("pro_connect:authorize"), params) if settings.PRO_CONNECT_BASE_URL else None
         )
 
         extra_context = {
-            "inclusion_connect_url": inclusion_connect_url,
             "pro_connect_url": pro_connect_url,
             "matomo_account_type": MATOMO_ACCOUNT_TYPE[self.request.user.kind],
         }

@@ -279,13 +279,13 @@ class TestModel:
         user = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
         assert user.has_sso_provider
 
+        user = JobSeekerFactory(identity_provider=IdentityProvider.PE_CONNECT)
+        assert user.has_sso_provider
+
         user = PrescriberFactory()
         assert user.has_sso_provider
 
-        user = PrescriberFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
-        assert user.has_sso_provider
-
-        user = JobSeekerFactory(identity_provider=IdentityProvider.PE_CONNECT)
+        user = PrescriberFactory(identity_provider=IdentityProvider.PRO_CONNECT)
         assert user.has_sso_provider
 
     def test_update_external_data_source_history_field(self):

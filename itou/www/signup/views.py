@@ -287,16 +287,10 @@ class CompanyUserView(LoginNotRequiredMixin, CompanyBaseView, TemplateView):
             "previous_url": self.request.get_full_path(),
             "next_url": reverse("signup:company_join", args=(self.company.pk, self.token)),
         }
-        inclusion_connect_url = (
-            f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
-            if settings.INCLUSION_CONNECT_BASE_URL
-            else None
-        )
         pro_connect_url = (
             f"{reverse('pro_connect:authorize')}?{urlencode(params)}" if settings.PRO_CONNECT_BASE_URL else None
         )
         return super().get_context_data(**kwargs) | {
-            "inclusion_connect_url": inclusion_connect_url,
             "pro_connect_url": pro_connect_url,
             "company": self.company,
             "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.EMPLOYER],
@@ -655,17 +649,11 @@ def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_e
         "previous_url": request.get_full_path(),
         "next_url": reverse("signup:prescriber_join_org"),
     }
-    inclusion_connect_url = (
-        f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
-        if settings.INCLUSION_CONNECT_BASE_URL
-        else None
-    )
     pro_connect_url = (
         f"{reverse('pro_connect:authorize')}?{urlencode(params)}" if settings.PRO_CONNECT_BASE_URL else None
     )
 
     context = {
-        "inclusion_connect_url": inclusion_connect_url,
         "pro_connect_url": pro_connect_url,
         "pole_emploi_org": pole_emploi_org,
         "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.PRESCRIBER],
@@ -725,17 +713,11 @@ def prescriber_user(request, template_name="signup/prescriber_user.html"):
         # Redirect to the join organization view after login or signup.
         params["next_url"] = reverse("signup:prescriber_join_org")
 
-    inclusion_connect_url = (
-        f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
-        if settings.INCLUSION_CONNECT_BASE_URL
-        else None
-    )
     pro_connect_url = (
         f"{reverse('pro_connect:authorize')}?{urlencode(params)}" if settings.PRO_CONNECT_BASE_URL else None
     )
 
     context = {
-        "inclusion_connect_url": inclusion_connect_url,
         "pro_connect_url": pro_connect_url,
         "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.PRESCRIBER],
         "join_as_orienteur_without_org": join_as_orienteur_without_org,
@@ -873,16 +855,10 @@ class FacilitatorUserView(LoginNotRequiredMixin, FacilitatorBaseMixin, TemplateV
             "previous_url": self.request.get_full_path(),
             "next_url": reverse("signup:facilitator_join"),
         }
-        inclusion_connect_url = (
-            f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
-            if settings.INCLUSION_CONNECT_BASE_URL
-            else None
-        )
         pro_connect_url = (
             f"{reverse('pro_connect:authorize')}?{urlencode(params)}" if settings.PRO_CONNECT_BASE_URL else None
         )
         return super().get_context_data(**kwargs) | {
-            "inclusion_connect_url": inclusion_connect_url,
             "pro_connect_url": pro_connect_url,
             "company": self.company_to_create,
             "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.EMPLOYER],

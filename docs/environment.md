@@ -48,11 +48,10 @@ export CLEVER_SECRET=VOTRE_SECRET
 
 ### Inclusion Connect
 
-`FORCE_IC_LOGIN` : Obliger les employeurs et prescripteurs à utiliser
-[Inclusion Connect](https://github.com/gip-inclusion/inclusion-connect).
+`FORCE_PROCONNECT_LOGIN` : Obliger les employeurs et prescripteurs à utiliser ProConnect
 
 D’autres variables d’environnement permettent de configurer la connexion avec
-Inclusion Connect, elles sont préfixées par `INCLUSION_CONNECT_`.
+ProConnect, elles sont préfixées par `PRO_CONNECT_`.
 
 #### Mailjet
 

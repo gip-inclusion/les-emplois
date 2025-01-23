@@ -56,7 +56,7 @@ class IdentityProvider(models.TextChoices):
         return {
             cls.DJANGO: tuple(UserKind.values),
             cls.FRANCE_CONNECT: (UserKind.JOB_SEEKER,),
-            cls.INCLUSION_CONNECT: (UserKind.PRESCRIBER, UserKind.EMPLOYER),
+            cls.INCLUSION_CONNECT: (),  # Not supported anymore
             cls.PE_CONNECT: (UserKind.JOB_SEEKER,),
             cls.PRO_CONNECT: (UserKind.PRESCRIBER, UserKind.EMPLOYER),
         }

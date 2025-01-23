@@ -16,14 +16,10 @@
                 <div class="s-section__col col-12 col-lg-6">
                     <div class="c-form mb-5">
                         {% if login_provider == "IC" %}
-                            {% if pro_connect_url %}
-                                <div class="alert alert-important">
-                                    <p class="mb-0">Inclusion Connect devient ProConnect</p>
-                                </div>
-                                {% include "account/includes/login_pro_connect.html" %}
-                            {% else %}
-                                {% include "account/includes/login_inclusion_connect.html" %}
-                            {% endif %}
+                            <div class="alert alert-important">
+                                <p class="mb-0">Inclusion Connect devient ProConnect</p>
+                            </div>
+                            {% include "account/includes/login_pro_connect.html" %}
                         {% elif login_provider == "PC" %}
                             {% include "account/includes/login_pro_connect.html" %}
                         {% elif login_provider == "FC" %}

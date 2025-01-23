@@ -714,3 +714,12 @@ def github_respx_mock_fixture(respx_mock):
 
     url = f"{settings.API_GITHUB_BASE_URL}/repos/gip-inclusion/les-emplois/issues"
     return start, respx_mock.route(headers=headers, method="GET", params=params, url=url).respond(json=resp_json)
+
+
+@pytest.fixture(name="pro_connect")
+def setup_pro_connect():
+    # this import requirest the settings to be loaded so we con't put it with the others
+    from tests.openid_connect.pro_connect.test import pro_connect_setup
+
+    with pro_connect_setup():
+        yield pro_connect_setup

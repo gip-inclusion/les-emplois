@@ -14,7 +14,7 @@ from itou.invitations.models import (
     LaborInspectorInvitation,
     PrescriberWithOrgInvitation,
 )
-from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
+from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, MATOMO_ACCOUNT_TYPE
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -47,29 +47,23 @@ def handle_invited_user_registration_with_django(request, invitation, invitation
     return render(request, "invitations_views/new_user.html", context=context)
 
 
-def handle_invited_user_registration_with_inclusion_or_pro_connect(request, invitation, invitation_type):
+def handle_invited_user_registration_with_pro_connect(request, invitation, invitation_type):
     params = {
         "user_kind": invitation_type,
         "user_email": invitation.email,
-        "channel": InclusionConnectChannel.INVITATION.value,
+        "channel": ProConnectChannel.INVITATION.value,
         "previous_url": request.get_full_path(),
         "next_url": invitation.acceptance_url_for_existing_user,
     }
-    inclusion_connect_url = (
-        f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
-        if settings.INCLUSION_CONNECT_BASE_URL
-        else None
-    )
     pro_connect_url = (
         f"{reverse('pro_connect:authorize')}?{urlencode(params)}" if settings.PRO_CONNECT_BASE_URL else None
     )
     context = {
-        "inclusion_connect_url": inclusion_connect_url,
         "pro_connect_url": pro_connect_url,
         "invitation": invitation,
         "matomo_account_type": MATOMO_ACCOUNT_TYPE[invitation_type],
     }
-    return render(request, "invitations_views/new_ic_user.html", context=context)
+    return render(request, "invitations_views/new_pro_connect_user.html", context=context)
 
 
 @login_not_required
@@ -114,8 +108,8 @@ def new_user(request, invitation_type, invitation_id):
 
     # A new user should be created before joining
     handle_registration = {
-        KIND_PRESCRIBER: handle_invited_user_registration_with_inclusion_or_pro_connect,
-        KIND_EMPLOYER: handle_invited_user_registration_with_inclusion_or_pro_connect,
+        KIND_PRESCRIBER: handle_invited_user_registration_with_pro_connect,
+        KIND_EMPLOYER: handle_invited_user_registration_with_pro_connect,
         KIND_LABOR_INSPECTOR: handle_invited_user_registration_with_django,
     }[invitation_type]
     return handle_registration(request, invitation, invitation_type)

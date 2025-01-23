@@ -86,7 +86,7 @@ class ItouStaffFactory(UserFactory):
 
 class PrescriberFactory(UserFactory):
     kind = UserKind.PRESCRIBER
-    identity_provider = IdentityProvider.INCLUSION_CONNECT
+    identity_provider = IdentityProvider.PRO_CONNECT
 
     class Params:
         for_snapshot = factory.Trait(
@@ -119,7 +119,7 @@ class PrescriberFactory(UserFactory):
 
 class EmployerFactory(UserFactory):
     kind = UserKind.EMPLOYER
-    identity_provider = IdentityProvider.INCLUSION_CONNECT
+    identity_provider = IdentityProvider.PRO_CONNECT
 
     @factory.post_generation
     def with_company(self, created, extracted, **kwargs):

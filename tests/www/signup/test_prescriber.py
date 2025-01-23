@@ -15,7 +15,6 @@ from pytest_django.asserts import (
     assertTemplateUsed,
 )
 
-from itou.openid_connect.inclusion_connect.constants import INCLUSION_CONNECT_SESSION_KEY
 from itou.openid_connect.pro_connect.constants import PRO_CONNECT_SESSION_KEY
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
@@ -26,7 +25,6 @@ from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.urls import add_url_params
 from itou.www.signup.forms import PrescriberChooseKindForm
-from tests.openid_connect.test import sso_parametrize
 from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWithMembershipFactory,
@@ -61,9 +59,8 @@ class TestPrescriberSignup:
         response = client.post(url, data={"kind": UserKind.PRESCRIBER})
         assertRedirects(response, reverse("signup:prescriber_check_already_exists"))
 
-    @sso_parametrize
     @respx.mock
-    def test_create_user_prescriber_member_of_france_travail(self, client, mailoutbox, sso_setup):
+    def test_create_user_prescriber_member_of_france_travail(self, client, mailoutbox, pro_connect):
         organization = PrescriberPoleEmploiFactory()
 
         # Go through each step to ensure session data is recorded properly.
@@ -94,9 +91,9 @@ class TestPrescriberSignup:
         assert email == session_data.get("email")
 
         response = client.get(response.url)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
-        # Check IC will redirect to the correct url
+        # Check ProConnect will redirect to the correct url
         previous_url = reverse("signup:prescriber_pole_emploi_user")
         next_url = reverse("signup:prescriber_join_org")
         params = {
@@ -105,11 +102,11 @@ class TestPrescriberSignup:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
-        # Connect with Inclusion Connect but no safir code is returned
-        response = sso_setup.mock_oauth_dance(
+        # Connect with ProConnect but no safir code is returned
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_PRESCRIBER,
             user_email=email,
@@ -146,10 +143,9 @@ class TestPrescriberSignup:
         # No email has been sent to support (validation/refusal of authorisation not needed).
         assert len(mailoutbox) == 0
 
-    @sso_parametrize
     @respx.mock
     def test_create_user_prescriber_with_authorized_org_returns_on_other_browser(
-        self, client, mocker, mailoutbox, sso_setup
+        self, client, mocker, mailoutbox, pro_connect
     ):
         mock_call_ban_geocoding_api = mocker.patch(
             "itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK
@@ -177,7 +173,7 @@ class TestPrescriberSignup:
         url = reverse("signup:prescriber_user")
         assertRedirects(response, url)
         response = client.get(url)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
@@ -187,11 +183,11 @@ class TestPrescriberSignup:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
         other_client = ItouClient()
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_PRESCRIBER,
             previous_url=previous_url,
@@ -203,7 +199,7 @@ class TestPrescriberSignup:
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check `User` state.
-        user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
+        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.kind == UserKind.PRESCRIBER
 
         # Emails are not checked in Django anymore.
@@ -225,9 +221,8 @@ class TestPrescriberSignup:
         subject = mailoutbox[0].subject
         assert "Vérification de l'habilitation d'une nouvelle organisation" in subject
 
-    @sso_parametrize
     @respx.mock
-    def test_create_user_prescriber_with_authorized_org_of_known_kind(self, client, mocker, mailoutbox, sso_setup):
+    def test_create_user_prescriber_with_authorized_org_of_known_kind(self, client, mocker, mailoutbox, pro_connect):
         """
         Test the creation of a user of type prescriber with an authorized organization of *known* kind.
         """
@@ -257,7 +252,7 @@ class TestPrescriberSignup:
         url = reverse("signup:prescriber_user")
         assertRedirects(response, url)
         response = client.get(url)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
@@ -267,10 +262,10 @@ class TestPrescriberSignup:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_PRESCRIBER,
             previous_url=previous_url,
@@ -281,7 +276,7 @@ class TestPrescriberSignup:
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check `User` state.
-        user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
+        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.kind == UserKind.PRESCRIBER
 
         # Emails are not checked in Django anymore.
@@ -306,9 +301,8 @@ class TestPrescriberSignup:
         assert f"- ID : {org.pk}" in body_lines
         assert "- Type sélectionné par l’utilisateur : Cap emploi" in body_lines
 
-    @sso_parametrize
     @respx.mock
-    def test_create_user_prescriber_with_authorized_org_of_unknown_kind(self, client, mocker, mailoutbox, sso_setup):
+    def test_create_user_prescriber_with_authorized_org_of_unknown_kind(self, client, mocker, mailoutbox, pro_connect):
         """
         Test the creation of a user of type prescriber with an authorized organization of *unknown* kind.
         """
@@ -354,7 +348,7 @@ class TestPrescriberSignup:
         url = reverse("signup:prescriber_user")
         assertRedirects(response, url)
         response = client.get(url)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
@@ -364,11 +358,11 @@ class TestPrescriberSignup:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
         previous_url = reverse("signup:prescriber_user")
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_PRESCRIBER,
             previous_url=previous_url,
@@ -379,7 +373,7 @@ class TestPrescriberSignup:
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check `User` state.
-        user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
+        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.kind == UserKind.PRESCRIBER
 
         # Emails are not checked in Django anymore.
@@ -401,9 +395,8 @@ class TestPrescriberSignup:
         subject = mailoutbox[0].subject
         assert "Vérification de l'habilitation d'une nouvelle organisation" in subject
 
-    @sso_parametrize
     @respx.mock
-    def test_create_user_prescriber_with_unauthorized_org(self, client, mocker, mailoutbox, sso_setup):
+    def test_create_user_prescriber_with_unauthorized_org(self, client, mocker, mailoutbox, pro_connect):
         """
         Test the creation of a user of type prescriber with an unauthorized organization.
         """
@@ -441,7 +434,7 @@ class TestPrescriberSignup:
         url = reverse("signup:prescriber_user")
         assertRedirects(response, url)
         response = client.get(url)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
@@ -451,10 +444,10 @@ class TestPrescriberSignup:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_PRESCRIBER,
             previous_url=previous_url,
@@ -465,7 +458,7 @@ class TestPrescriberSignup:
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check `User` state.
-        user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
+        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.kind == UserKind.PRESCRIBER
 
         # Emails are not checked in Django anymore.
@@ -567,9 +560,8 @@ class TestPrescriberSignup:
         url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret2})
         assertRedirects(response, url)
 
-    @sso_parametrize
     @respx.mock
-    def test_create_user_prescriber_without_org(self, client, mailoutbox, sso_setup):
+    def test_create_user_prescriber_without_org(self, client, mailoutbox, pro_connect):
         """
         Test the creation of a user of type prescriber without organization.
         """
@@ -582,7 +574,7 @@ class TestPrescriberSignup:
         url = reverse("signup:prescriber_user")
         assertContains(response, url)
         response = client.get(url)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
@@ -590,10 +582,10 @@ class TestPrescriberSignup:
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_PRESCRIBER,
             previous_url=previous_url,
@@ -603,7 +595,7 @@ class TestPrescriberSignup:
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check `User` state.
-        user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
+        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.kind == UserKind.PRESCRIBER
 
         # Emails are not checked in Django anymore.
@@ -615,9 +607,8 @@ class TestPrescriberSignup:
         # No email has been sent to support (validation/refusal of authorisation not needed).
         assert len(mailoutbox) == 0
 
-    @sso_parametrize
     @respx.mock
-    def test_create_user_prescriber_with_same_siret_and_different_kind(self, client, mocker, sso_setup):
+    def test_create_user_prescriber_with_same_siret_and_different_kind(self, client, mocker, pro_connect):
         """
         A user can create a new prescriber organization with an existing SIRET number,
         provided that:
@@ -657,7 +648,7 @@ class TestPrescriberSignup:
         url = reverse("signup:prescriber_user")
         assertRedirects(response, url)
         response = client.get(url)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
@@ -667,10 +658,10 @@ class TestPrescriberSignup:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_PRESCRIBER,
             previous_url=previous_url,
@@ -687,9 +678,8 @@ class TestPrescriberSignup:
         assert PrescriberOrganizationKind.ML.value == org1.kind
         assert PrescriberOrganizationKind.PLIE.value == org2.kind
 
-    @sso_parametrize
     @respx.mock
-    def test_create_user_prescriber_with_same_siret_and_same_kind(self, client, mocker, sso_setup):
+    def test_create_user_prescriber_with_same_siret_and_same_kind(self, client, mocker, pro_connect):
         """
         A user can't create a new prescriber organization with an existing SIRET number if:
         * the kind of the new organization is the same as an existing one
@@ -755,21 +745,20 @@ class TestPrescriberSignup:
         invitation_url = f"{reverse('invitations_views:invite_prescriber_with_org')}?{urlencode(requestor)}"
         assert invitation_url in mail_body
 
-    @sso_parametrize
     @respx.mock
-    def test_prescriber_already_exists__simple_signup(self, client, sso_setup):
+    def test_prescriber_already_exists__simple_signup(self, client, pro_connect):
         """
         He does not want to join an organization, only create an account.
         He likely forgot he had an account.
         He will be logged in instead as if he just used the login through IC button
         """
         #### User is a prescriber. Update it and connect. ####
-        PrescriberFactory(email=sso_setup.oidc_userinfo["email"], username=sso_setup.oidc_userinfo["sub"])
+        PrescriberFactory(email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"])
         client.get(reverse("signup:prescriber_check_already_exists"))
 
         # Step 2: register as a simple prescriber (orienteur).
         response = client.get(reverse("signup:prescriber_user"))
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
@@ -777,11 +766,11 @@ class TestPrescriberSignup:
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
         # Connect with Inclusion Connect.
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_PRESCRIBER,
             previous_url=previous_url,
@@ -790,18 +779,17 @@ class TestPrescriberSignup:
         response = client.get(response.url, follow=True)
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
-        user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
+        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.has_sso_provider
 
-    @sso_parametrize
     @respx.mock
-    def test_prescriber_already_exists__create_organization(self, client, sso_setup):
+    def test_prescriber_already_exists__create_organization(self, client, pro_connect):
         """
         User is already a prescriber.
         We should update his account and make him join this new organization.
         """
         org = PrescriberOrganizationFactory.build(kind=PrescriberOrganizationKind.OTHER)
-        user = PrescriberFactory(email=sso_setup.oidc_userinfo["email"], username=sso_setup.oidc_userinfo["sub"])
+        user = PrescriberFactory(email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"])
 
         client.get(reverse("signup:prescriber_check_already_exists"))
 
@@ -837,7 +825,7 @@ class TestPrescriberSignup:
         signup_url = reverse("signup:prescriber_user")
 
         response = client.get(signup_url)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
@@ -847,11 +835,11 @@ class TestPrescriberSignup:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
         # Connect with Inclusion Connect.
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_PRESCRIBER,
             previous_url=previous_url,
@@ -909,15 +897,14 @@ class TestProConnectPrescribersViewsExceptions:
     Prescribers' signup and login exceptions: user already exists, ...
     """
 
-    @sso_parametrize
     @respx.mock
-    def test_organization_creation_error(self, client, sso_setup):
+    def test_organization_creation_error(self, client, pro_connect):
         """
         The organization creation didn't work.
         The user is still created and can try again.
         """
         org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.OTHER)
-        user = PrescriberFactory(email=sso_setup.oidc_userinfo["email"], username=sso_setup.oidc_userinfo["sub"])
+        user = PrescriberFactory(email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"])
 
         client.get(reverse("signup:prescriber_check_already_exists"))
 
@@ -955,12 +942,12 @@ class TestProConnectPrescribersViewsExceptions:
         signup_url = reverse("signup:prescriber_user")
 
         response = client.get(signup_url)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # Connect with Inclusion Connect.
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_PRESCRIBER,
             previous_url=previous_url,
@@ -970,29 +957,27 @@ class TestProConnectPrescribersViewsExceptions:
         response = client.get(response.url)
         assertRedirects(
             response,
-            add_url_params(sso_setup.logout_url, {"token": 123456}),
+            add_url_params(pro_connect.logout_url, {"token": 123456}),
             fetch_redirect_response=False,
         )
 
         # The user should be logged out and redirected to the home page.
-        assert not client.session.get(INCLUSION_CONNECT_SESSION_KEY)
         assert not client.session.get(PRO_CONNECT_SESSION_KEY)
         assert not auth.get_user(client).is_authenticated
 
         # Check user was created but did not join an organisation
-        user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
+        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert not user.prescriberorganization_set.exists()
 
-    @sso_parametrize
     @respx.mock
-    def test_non_prescriber_cant_join_organisation(self, client, sso_setup):
+    def test_non_prescriber_cant_join_organisation(self, client, pro_connect):
         """
         The organization creation didn't work.
         The user is still created and can try again.
         """
         org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.OTHER)
         EmployerFactory(
-            email=sso_setup.oidc_userinfo["email"], username=sso_setup.oidc_userinfo["sub"], with_company=True
+            email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"], with_company=True
         )
 
         response = client.get(reverse("signup:prescriber_check_already_exists"))
@@ -1032,12 +1017,12 @@ class TestProConnectPrescribersViewsExceptions:
         signup_url = reverse("signup:prescriber_user")
 
         response = client.get(signup_url)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # Connect with Inclusion Connect.
         previous_url = signup_url
         next_url = reverse("signup:prescriber_join_org")
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_PRESCRIBER,
             previous_url=previous_url,
@@ -1049,7 +1034,7 @@ class TestProConnectPrescribersViewsExceptions:
         assertTemplateNotUsed(response, "welcoming_tour/prescriber.html")
 
         # The user should be redirected to home page with a warning, the session isn't flushed
-        assert client.session.get(sso_setup.session_key)
+        assert client.session.get(pro_connect.session_key)
         assert auth.get_user(client).is_authenticated
         assertRedirects(response, reverse("search:employers_home"))
         assertMessages(
@@ -1062,15 +1047,14 @@ class TestProConnectPrescribersViewsExceptions:
             ],
         )
 
-    @sso_parametrize
     @respx.mock
-    def test_employer_already_exists(self, client, sso_setup):
+    def test_employer_already_exists(self, client, pro_connect):
         """
         User is already a member of an SIAE.
         Raise an exception.
         """
         org = PrescriberOrganizationFactory.build(kind=PrescriberOrganizationKind.OTHER)
-        user = EmployerFactory(email=sso_setup.oidc_userinfo["email"], username=sso_setup.oidc_userinfo["sub"])
+        user = EmployerFactory(email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"])
         client.get(reverse("signup:prescriber_check_already_exists"))
 
         session_signup_data = client.session.get(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
@@ -1105,17 +1089,17 @@ class TestProConnectPrescribersViewsExceptions:
         signup_url = reverse("signup:prescriber_user")
 
         response = client.get(signup_url)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # Connect with Inclusion Connect.
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_PRESCRIBER,
             previous_url=previous_url,
             next_url=next_url,
-            expected_redirect_url=add_url_params(sso_setup.logout_url, {"redirect_url": previous_url}),
+            expected_redirect_url=add_url_params(pro_connect.logout_url, {"redirect_url": previous_url}),
         )
 
         # IC logout redirects to previous_url
@@ -1128,7 +1112,7 @@ class TestProConnectPrescribersViewsExceptions:
                 messages.Message(
                     messages.ERROR,
                     "Un compte employeur existe déjà avec cette adresse e-mail. Vous devez créer un compte "
-                    f"{sso_setup.identity_provider.label} avec une autre adresse e-mail pour devenir prescripteur "
+                    f"{pro_connect.identity_provider.label} avec une autre adresse e-mail pour devenir prescripteur "
                     "sur la plateforme. "
                     f"Besoin d'aide ? <a href='{global_constants.ITOU_HELP_CENTER_URL}/requests/new' "
                     "target='_blank'>Contactez-nous</a>.",
@@ -1136,15 +1120,14 @@ class TestProConnectPrescribersViewsExceptions:
             ],
         )
 
-        user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
-        assert user.first_name != sso_setup.oidc_userinfo["given_name"]
+        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
+        assert user.first_name != pro_connect.oidc_userinfo["given_name"]
         organization_exists = PrescriberOrganization.objects.filter(siret=org.siret).exists()
         assert not organization_exists
         assert not user.prescriberorganization_set.exists()
 
-    @sso_parametrize
     @respx.mock
-    def test_prescriber_signup__pe_organization_wrong_email(self, client, sso_setup):
+    def test_prescriber_signup__pe_organization_wrong_email(self, client, pro_connect):
         """
         A user creates a prescriber account on Itou with Inclusion Connect.
         He wants to join a Pôle emploi organization
@@ -1167,13 +1150,13 @@ class TestProConnectPrescribersViewsExceptions:
         check_email_url = reverse("signup:prescriber_check_pe_email")
         post_data = {"email": pe_email}
         response = client.post(check_email_url, data=post_data, follow=True)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # Connect with Inclusion Connect but, this time, don't use a PE email.
         previous_url = reverse("signup:prescriber_pole_emploi_user")
         next_url = reverse("signup:prescriber_join_org")
         wrong_email = "athos@touspourun.com"
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_PRESCRIBER,
             user_email=pe_email,
@@ -1181,7 +1164,7 @@ class TestProConnectPrescribersViewsExceptions:
             previous_url=previous_url,
             next_url=next_url,
             user_info_email=wrong_email,
-            expected_redirect_url=add_url_params(sso_setup.logout_url, {"redirect_url": previous_url}),
+            expected_redirect_url=add_url_params(pro_connect.logout_url, {"redirect_url": previous_url}),
         )
 
         # IC logout redirects to previous_url
@@ -1192,7 +1175,7 @@ class TestProConnectPrescribersViewsExceptions:
                 messages.Message(
                     messages.ERROR,
                     "L’adresse e-mail que vous avez utilisée pour vous connecter avec "
-                    f"{sso_setup.identity_provider.label} (athos@touspourun.com) est différente de celle que vous "
+                    f"{pro_connect.identity_provider.label} (athos@touspourun.com) est différente de celle que vous "
                     "avez indiquée précédemment (athos@pole-emploi.fr).",
                 )
             ],

@@ -14,7 +14,6 @@ from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploi
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from tests.asp.factories import CountryEuropeFactory, CountryOutsideEuropeFactory
-from tests.openid_connect.inclusion_connect.test import inclusion_connect_setup
 from tests.users.factories import (
     JobSeekerFactory,
     PrescriberFactory,
@@ -688,7 +687,6 @@ class TestEditUserInfoView:
             first_name="Not Bob",
             last_name="Not Saint Clair",
             phone="0600000000",
-            identity_provider=IdentityProvider.PRO_CONNECT,
         )
         client.force_login(original_user)
         url = reverse("dashboard:edit_user_info")
@@ -716,39 +714,3 @@ class TestEditUserInfoView:
         assert updated_user.first_name == original_user.first_name
         assert updated_user.last_name == original_user.last_name
         assert updated_user.phone == post_data["phone"]
-
-    def test_edit_as_prescriber_IC(self, client):
-        with inclusion_connect_setup():
-            original_user = PrescriberFactory(
-                email="bob@saintclair.tld",
-                first_name="Not Bob",
-                last_name="Not Saint Clair",
-                phone="0600000000",
-                identity_provider=IdentityProvider.INCLUSION_CONNECT,
-            )
-            client.force_login(original_user)
-            url = reverse("dashboard:edit_user_info")
-            response = client.get(url)
-            assertNotContains(response, self.NIR_FIELD_ID)
-            assertNotContains(response, self.LACK_OF_NIR_FIELD_ID)
-            assertNotContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
-            assertNotContains(response, self.BIRTHDATE_FIELD_NAME)
-            assertContains(response, f"Prénom : <strong>{original_user.first_name.title()}</strong>")
-            assertContains(response, f"Nom : <strong>{original_user.last_name.upper()}</strong>")
-            assertContains(response, f"Adresse e-mail : <strong>{original_user.email}</strong>")
-            assertContains(response, "Modifier ces informations")
-
-            post_data = {
-                "email": "notbob@notsaintclair.com",
-                "first_name": "Bob",
-                "last_name": "Saint Clair",
-                "phone": "0610203050",
-            }
-            response = client.post(url, data=post_data)
-            assert response.status_code == 302
-
-            updated_user = User.objects.get(pk=original_user.pk)
-            assert updated_user.email == original_user.email
-            assert updated_user.first_name == original_user.first_name
-            assert updated_user.last_name == original_user.last_name
-            assert updated_user.phone == post_data["phone"]

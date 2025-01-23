@@ -16,8 +16,8 @@ urlpatterns = [
     path("edit_job_seeker_info/<uuid:job_seeker_public_id>", views.edit_job_seeker_info, name="edit_job_seeker_info"),
     path("switch-organization", views.switch_organization, name="switch_organization"),
     path(
-        "activate_ic_account",
+        "activate-pro-connect-account",
         views.AccountMigrationView.as_view(),
-        name="activate_ic_account",
+        name="activate_pro_connect_account",
     ),
 ]

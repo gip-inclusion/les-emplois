@@ -24,7 +24,6 @@ from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.urls import add_url_params
 from tests.companies.factories import CompanyFactory
 from tests.invitations.factories import PrescriberWithOrgSentInvitationFactory
-from tests.openid_connect.test import sso_parametrize
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import ItouClient, assert_previous_step
@@ -256,12 +255,11 @@ class TestAcceptPrescriberWithOrgInvitation:
         # A user can be member of one or more organizations
         assert current_org in user.prescriberorganization_set.all()
 
-    @sso_parametrize
     @respx.mock
-    def test_accept_prescriber_org_invitation(self, client, mailoutbox, sso_setup):
+    def test_accept_prescriber_org_invitation(self, client, mailoutbox, pro_connect):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         response = client.get(invitation.acceptance_link)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
@@ -273,18 +271,18 @@ class TestAcceptPrescriberWithOrgInvitation:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
         # Singup fails on Inclusion Connect with email different than the one from the invitation
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             UserKind.PRESCRIBER,
             user_email=invitation.email,
             channel="invitation",
             previous_url=previous_url,
             next_url=next_url,
-            expected_redirect_url=add_url_params(sso_setup.logout_url, {"redirect_url": previous_url}),
+            expected_redirect_url=add_url_params(pro_connect.logout_url, {"redirect_url": previous_url}),
         )
         # Inclusion connect redirects to previous_url
         response = client.get(previous_url, follow=True)
@@ -295,7 +293,7 @@ class TestAcceptPrescriberWithOrgInvitation:
                 messages.Message(
                     messages.ERROR,
                     "L’adresse e-mail que vous avez utilisée pour vous connecter avec "
-                    f"{sso_setup.identity_provider.label} (michel@lestontons.fr) ne correspond pas à "
+                    f"{pro_connect.identity_provider.label} (michel@lestontons.fr) ne correspond pas à "
                     f"l’adresse e-mail de l’invitation ({invitation.email}).",
                 )
             ],
@@ -303,9 +301,9 @@ class TestAcceptPrescriberWithOrgInvitation:
         assert not User.objects.filter(email=invitation.email).exists()
 
         # Singup works on Inclusion Connect with the correct email
-        invitation.email = sso_setup.oidc_userinfo["email"]
+        invitation.email = pro_connect.oidc_userinfo["email"]
         invitation.save()
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             UserKind.PRESCRIBER,
             user_email=invitation.email,
@@ -320,16 +318,15 @@ class TestAcceptPrescriberWithOrgInvitation:
         user = User.objects.get(email=invitation.email)
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
 
-    @sso_parametrize
     @respx.mock
-    def test_accept_prescriber_org_invitation_returns_on_other_browser(self, client, mailoutbox, sso_setup):
+    def test_accept_prescriber_org_invitation_returns_on_other_browser(self, client, mailoutbox, pro_connect):
         invitation = PrescriberWithOrgSentInvitationFactory(
-            email=sso_setup.oidc_userinfo["email"],
+            email=pro_connect.oidc_userinfo["email"],
             sender=self.sender,
             organization=self.organization,
         )
         response = client.get(invitation.acceptance_link)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
@@ -341,11 +338,11 @@ class TestAcceptPrescriberWithOrgInvitation:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
         other_client = ItouClient()
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             UserKind.PRESCRIBER,
             user_email=invitation.email,
@@ -360,17 +357,16 @@ class TestAcceptPrescriberWithOrgInvitation:
         user = User.objects.get(email=invitation.email)
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
 
-    @sso_parametrize
     @respx.mock
-    def test_accept_prescriber_org_invitation_without_link(self, client, mailoutbox, sso_setup):
+    def test_accept_prescriber_org_invitation_without_link(self, client, mailoutbox, pro_connect):
         # The user's invitations are automatically accepted at login
         invitation = PrescriberWithOrgSentInvitationFactory(
-            email=sso_setup.oidc_userinfo["email"],
+            email=pro_connect.oidc_userinfo["email"],
             sender=self.sender,
             organization=self.organization,
         )
 
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             UserKind.PRESCRIBER,
             user_email=invitation.email,
@@ -427,13 +423,12 @@ class TestAcceptPrescriberWithOrgInvitation:
         assertRedirects(response, reverse("dashboard:index"))
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox, new_user=False)
 
-    @sso_parametrize
     @respx.mock
-    def test_accept_existing_user_not_logged_in_using_PC(self, client, mailoutbox, sso_setup):
+    def test_accept_existing_user_not_logged_in_using_PC(self, client, mailoutbox, pro_connect):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         user = PrescriberFactory(
-            username=sso_setup.oidc_userinfo["sub"],
-            email=sso_setup.oidc_userinfo["email"],
+            username=pro_connect.oidc_userinfo["sub"],
+            email=pro_connect.oidc_userinfo["email"],
             has_completed_welcoming_tour=True,
         )
         # The user verified its email
@@ -455,10 +450,10 @@ class TestAcceptPrescriberWithOrgInvitation:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             UserKind.PRESCRIBER,
             user_email=user.email,
@@ -495,7 +490,7 @@ class TestAcceptPrescriberWithOrgInvitation:
             follow=True,
         )
         assert response.context["user"].is_authenticated
-        assertRedirects(response, reverse("dashboard:activate_ic_account"))
+        assertRedirects(response, reverse("dashboard:activate_pro_connect_account"))
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox, new_user=False)
 
 
