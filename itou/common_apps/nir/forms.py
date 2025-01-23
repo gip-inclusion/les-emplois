@@ -14,9 +14,6 @@ class JobSeekerNIRUpdateMixin:
     nir & lack_of_nir_reason must be declared in the form's Meta.fields
     """
 
-    def get_user_instance(self):
-        return self.instance
-
     def __init__(self, *args, editor=None, tally_form_query=None, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -60,7 +57,7 @@ class JobSeekerNIRUpdateMixin:
             # Disable NIR editing altogether if the job seeker already has one
             self.fields["nir"].disabled = True
             self.fields["lack_of_nir"].widget = forms.HiddenInput()
-            user_instance = self.get_user_instance()
+            user_instance = self.instance
             if user_instance.pk:
                 # These messages should only appear when updating a job seeker
                 # and not when creating one

@@ -20,7 +20,8 @@ from itou.eligibility.models import AdministrativeCriteria
 from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, PriorAction
-from itou.users.models import JobSeekerProfile
+from itou.users.forms import JobSeekerProfileFieldsMixin
+from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.types import InclusiveDateRange
@@ -578,27 +579,27 @@ class EditHiringDateForm(forms.ModelForm):
         return cleaned_data
 
 
-class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, forms.ModelForm):
+class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileFieldsMixin, forms.ModelForm):
     """
     Info that will be used to search for an existing Pôle emploi approval.
     """
 
+    PROFILE_FIELDS = ["birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason", "nir", "lack_of_nir_reason"]
+
     class Meta:
-        model = JobSeekerProfile
-        fields = ["birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason", "nir", "lack_of_nir_reason"]
-        help_texts = {"birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978."}
+        model = User
+        fields = []
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["birthdate"].widget = DuetDatePickerWidget(
+        birthdate = self.fields["birthdate"]
+        birthdate.help_text = "Au format JJ/MM/AAAA, par exemple 20/12/1978."
+        birthdate.widget = DuetDatePickerWidget(
             attrs={
                 "min": DuetDatePickerWidget.min_birthdate(),
                 "max": DuetDatePickerWidget.max_birthdate(),
             }
         )
-
-    def get_user_instance(self):
-        return self.instance.user
 
     def clean(self):
         super().clean()
