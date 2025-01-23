@@ -2,15 +2,12 @@ from anymail.webhooks.mailjet import MailjetTrackingWebhookView
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.decorators import login_not_required
-from django.urls import include, path, re_path, register_converter, reverse_lazy
-from django.views.generic import RedirectView, TemplateView
+from django.urls import include, path, re_path, register_converter
+from django.views.generic import TemplateView
 
 from itou.utils import redirect_legacy_views
 from itou.utils.urls import SiretConverter
-from itou.www.dashboard import views as dashboard_views
 from itou.www.error import server_error
-from itou.www.login import views as login_views
-from itou.www.signup import views as signup_views
 
 
 register_converter(SiretConverter, "siret")
@@ -18,39 +15,6 @@ register_converter(SiretConverter, "siret")
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("hijack/", include("itou.utils.hijack.urls")),
-    # --------------------------------------------------------------------------------------
-    # allauth URLs. Order is important because some URLs are overriden.
-    # --------------------------------------------------------------------------------------
-    # Override allauth `account_signup` URL.
-    # /accounts/signup/ <=> account_signup
-    # We don't want any user to be able to signup using the default allauth `signup` url
-    # because we have multiple specific signup processes for different kind of users.
-    re_path(
-        r"^accounts/signup/$", login_not_required(RedirectView.as_view(url=reverse_lazy("signup:choose_user_kind")))
-    ),
-    # --------------------------------------------------------------------------------------
-    # Override allauth `account_login` URL.
-    # /accounts/login/ <=> account_login
-    # Customized login pages per user type are handled by login.urls.
-    re_path(r"^accounts/login/$", login_views.ItouLoginView.as_view()),
-    # --------------------------------------------------------------------------------------
-    # Override allauth `account_change_password` URL.
-    # /accounts/password/change/ <=> account_change_password
-    # https://github.com/pennersr/django-allauth/issues/468
-    re_path(r"^accounts/password/change/$", dashboard_views.ItouPasswordChangeView.as_view()),
-    # --------------------------------------------------------------------------------------
-    # Override allauth `account_reset_password` URL.
-    # Avoid user enumeration via password reset page.
-    re_path(r"^accounts/password/reset/$", signup_views.ItouPasswordResetView.as_view()),
-    # --------------------------------------------------------------------------------------
-    # Override allauth `account_reset_password_from_key` URL.
-    re_path(
-        r"^accounts/password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
-        signup_views.ItouPasswordResetFromKeyView.as_view(),
-    ),
-    # --------------------------------------------------------------------------------------
-    # Other allauth URLs.
-    path("accounts/", include("allauth.urls")),
     # --------------------------------------------------------------------------------------
     # PEAMU URLs.
     path("pe_connect/", include("itou.openid_connect.pe_connect.urls")),
@@ -60,6 +24,8 @@ urlpatterns = [
     path("inclusion_connect/", include("itou.openid_connect.inclusion_connect.urls")),
     # ProConnect URLs.
     path("pro_connect/", include("itou.openid_connect.pro_connect.urls")),
+    # Authentication and account management URLs.
+    path("accounts/", include("itou.www.accounts.urls")),
     # --------------------------------------------------------------------------------------
     # API.
     path("api/v1/", include("itou.api.urls", namespace="v1")),
