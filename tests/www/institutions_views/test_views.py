@@ -93,8 +93,8 @@ class TestMembers:
         institution.refresh_from_db()
         assert_set_admin_role__creation(guest, institution, mailoutbox)
 
-    def test_deactivate_user(self, client, mailoutbox):
-        institution = InstitutionFactory()
+    def test_deactivate_user(self, client, mailoutbox, snapshot):
+        institution = InstitutionFactory(name="DDETS 14")
         admin_membership = InstitutionMembershipFactory(institution=institution, is_admin=True)
         guest_membership = InstitutionMembershipFactory(institution=institution, is_admin=False)
         guest_id = guest_membership.user_id
@@ -115,6 +115,7 @@ class TestMembers:
         assert f"[DEV] [Désactivation] Vous n'êtes plus membre de {institution.display_name}" == email.subject
         assert "Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion" in email.body
         assert email.to == [guest_membership.user.email]
+        assert email.body == snapshot
 
     def test_remove_admin(self, client, mailoutbox):
         """

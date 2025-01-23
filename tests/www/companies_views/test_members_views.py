@@ -94,12 +94,12 @@ class TestUserMembershipDeactivation:
         membership.refresh_from_db()
         assert membership.is_active
 
-    def test_deactivate_user(self, client, mailoutbox):
+    def test_deactivate_user(self, client, mailoutbox, snapshot):
         """
         Standard use case of user deactivation.
         Everything should be fine ...
         """
-        company = CompanyWith2MembershipsFactory()
+        company = CompanyWith2MembershipsFactory(name="Les petits paniers", email="petitspaniers@mailinator.com")
         admin = company.members.filter(companymembership__is_admin=True).first()
         guest = company.members.filter(companymembership__is_admin=False).first()
 
@@ -125,6 +125,7 @@ class TestUserMembershipDeactivation:
         assert f"[DEV] [Désactivation] Vous n'êtes plus membre de {company.display_name}" == email.subject
         assert "Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion" in email.body
         assert email.to[0] == guest.email
+        assert email.body == snapshot
 
     def test_deactivate_with_no_perms(self, client):
         """
