@@ -694,10 +694,6 @@ class User(AbstractUser, AddressMixin):
         return UserKind(self.kind).label
 
 
-def get_allauth_account_user_display(user):
-    return user.email
-
-
 class JobSeekerProfile(models.Model):
     """
     Specific information about the job seeker

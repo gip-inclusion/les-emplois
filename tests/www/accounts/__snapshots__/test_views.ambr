@@ -52,4 +52,158 @@
   
           </main>
   '''
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+                              
+      <h1>Si un compte existe, vous recevrez un e-mail de réinitialisation</h1>
+      
+  
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      
+                          
+  
+  
+  
+  
+  <p>
+      <b>Remarque :</b> vous êtes déjà connecté en tant que <b>user_name0</b>.
+  </p>
+  
+                      
+                      <p>Il contient les instructions pour réinitialiser votre mot de passe.</p>
+                      <p>Si vous le ne recevez pas dans les minutes qui suivent :</p>
+                      <ul>
+                          <li>vérifiez votre courrier indésirable</li>
+                          <li>vérifiez qu'il n'y a pas d'erreur dans votre e-mail</li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
+# name: TestPasswordResetDoneView.test_already_logged_in
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+                              
+      <h1>Si un compte existe, vous recevrez un e-mail de réinitialisation</h1>
+      
+  
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      
+                          <p>
+      <b>Remarque :</b> vous êtes déjà connecté en tant que <b>jane.doe@test.local</b>.
+  </p>
+  
+                      
+                      <p>Il contient les instructions pour réinitialiser votre mot de passe.</p>
+                      <p>Si vous le ne recevez pas dans les minutes qui suivent :</p>
+                      <ul>
+                          <li>vérifiez votre courrier indésirable</li>
+                          <li>vérifiez qu'il n'y a pas d'erreur dans votre e-mail</li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
+# name: TestPasswordResetDoneView.test_get
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+                              
+      <h1>Si un compte existe, vous recevrez un e-mail de réinitialisation</h1>
+      
+  
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      
+                      <p>Il contient les instructions pour réinitialiser votre mot de passe.</p>
+                      <p>Si vous le ne recevez pas dans les minutes qui suivent :</p>
+                      <ul>
+                          <li>vérifiez votre courrier indésirable</li>
+                          <li>vérifiez qu'il n'y a pas d'erreur dans votre e-mail</li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
 # ---

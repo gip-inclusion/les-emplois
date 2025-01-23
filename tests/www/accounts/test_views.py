@@ -94,3 +94,19 @@ class TestConfirmEmailView:
 
         response = client.post(url)
         assert get_user(client).is_authenticated is False
+
+
+class TestPasswordResetDoneView:
+    def test_get(self, client, snapshot):
+        response = client.get(reverse("accounts:account_reset_password_done"))
+        assert response.status_code == 200
+        assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+        assertNotContains(response, "vous êtes déjà connecté en tant que")
+
+    def test_already_logged_in(self, client, snapshot):
+        # Content is changed if user is authenticated
+        client.force_login(JobSeekerFactory(for_snapshot=True))
+        response = client.get(reverse("accounts:account_reset_password_done"))
+        assert response.status_code == 200
+        assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+        assertContains(response, "vous êtes déjà connecté en tant que")

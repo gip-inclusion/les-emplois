@@ -23,6 +23,11 @@ urlpatterns = [
     path("password/change", account_views.ItouPasswordChangeView.as_view(), name="account_change_password"),
     # Avoid user enumeration via password reset page.
     path("password/reset", signup_views.ItouPasswordResetView.as_view(), name="account_reset_password"),
+    path(
+        "password/reset/done/",
+        account_views.PasswordResetDoneView.as_view(),
+        name="account_reset_password_done",
+    ),
     re_path(
         r"^password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
         signup_views.ItouPasswordResetFromKeyView.as_view(),
@@ -39,4 +44,5 @@ urlpatterns = [
         name="account_confirm_email",
     ),
     # NOTE: left out reauthenticate, email (edit) views
+    # NOTE: left out password set view. We set password during registration, so it shouldn't be necessary.
 ]

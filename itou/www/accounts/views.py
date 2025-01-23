@@ -18,6 +18,10 @@ class ItouPasswordChangeView(PasswordChangeView):
     success_url = reverse_lazy("dashboard:index")
 
 
+class PasswordResetDoneView(LoginNotRequiredMixin, TemplateView):
+    template_name = "account/password_reset_done.html"
+
+
 class AccountInactiveView(LoginNotRequiredMixin, TemplateView):
     template_name = "account/account_inactive.html"
 
