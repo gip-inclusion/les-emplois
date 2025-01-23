@@ -6,6 +6,7 @@ from django.utils.html import format_html
 
 from itou.approvals import models as approvals_models
 from itou.eligibility import models
+from itou.eligibility.admin_form import GEIQEligibilityDiagnosisAdminForm, IAEEligibilityDiagnosisAdminForm
 from itou.eligibility.models.common import AbstractSelectedAdministrativeCriteria
 from itou.job_applications import models as job_applications_models
 from itou.utils.admin import ItouModelAdmin, ItouTabularInline, PkSupportRemarkInline, get_admin_view_link
@@ -15,7 +16,7 @@ class AbstractSelectedAdministrativeCriteriaInlineFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
         for line in self.cleaned_data:
-            if line["DELETE"] and line["id"].certified:
+            if line.get("DELETE") and line["id"].certified:
                 raise ValidationError("Impossible de supprimer un critère certifié")
 
 
@@ -32,13 +33,15 @@ class AbstractSelectedAdministrativeCriteriaInline(ItouTabularInline):
         "created_at",
     )
     readonly_fields = (
-        "administrative_criteria",
         "certified_display",
         "certified_at",
         "certification_period",
         "data_returned_by_api",
         "created_at",
     )
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
     @admin.display(description=AbstractSelectedAdministrativeCriteria._meta.get_field("certified").verbose_name)
     def certified_display(self, obj):
@@ -161,6 +164,7 @@ class AbstractEligibilityDiagnosisAdmin(ItouModelAdmin):
         "created_at",
         "updated_at",
         "expires_at",
+        "is_valid",
     )
     search_fields = ("pk", "job_seeker__email", "author__email")
     list_filter = (
@@ -170,7 +174,13 @@ class AbstractEligibilityDiagnosisAdmin(ItouModelAdmin):
 
     @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):
-        return obj.is_valid
+        if obj.pk:
+            return obj.is_valid
+        return None
+
+    def save_model(self, request, obj, form, change):
+        obj.expires_at = self.model._expiration_date(obj.author)
+        return super().save_model(request, obj, form, change)
 
 
 @admin.register(models.EligibilityDiagnosis)
@@ -178,16 +188,14 @@ class EligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
     list_display = AbstractEligibilityDiagnosisAdmin.list_display + ("has_approval",)
     list_filter = AbstractEligibilityDiagnosisAdmin.list_filter + (HasApprovalFilter,)
     raw_id_fields = AbstractEligibilityDiagnosisAdmin.raw_id_fields + ("author_siae",)
-    readonly_fields = AbstractEligibilityDiagnosisAdmin.readonly_fields + (
-        "is_valid",
-        "is_considered_valid",
-    )
+    readonly_fields = AbstractEligibilityDiagnosisAdmin.readonly_fields + ("is_considered_valid",)
     inlines = (
         SelectedAdministrativeCriteriaInline,
         JobApplicationInline,
         ApprovalInline,
         PkSupportRemarkInline,
     )
+    form = IAEEligibilityDiagnosisAdminForm
 
     @admin.display(boolean=True, description="valide ou PASS IAE en cours")
     def is_considered_valid(self, obj):
@@ -195,7 +203,9 @@ class EligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
         This uses a property of the model and is intended to be used on the
         detail view to avoid too many SQL queries on a list view.
         """
-        return obj.is_considered_valid
+        if obj.pk:
+            return obj.is_considered_valid
+        return None
 
     @admin.display(boolean=True, description="PASS IAE en cours")
     def has_approval(self, obj):
@@ -214,15 +224,13 @@ class EligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
 @admin.register(models.GEIQEligibilityDiagnosis)
 class GEIQEligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
     raw_id_fields = AbstractEligibilityDiagnosisAdmin.raw_id_fields + ("author_geiq",)
-    readonly_fields = AbstractEligibilityDiagnosisAdmin.readonly_fields + (
-        "is_valid",
-        "allowance_amount",
-    )
+    readonly_fields = AbstractEligibilityDiagnosisAdmin.readonly_fields + ("allowance_amount",)
     inlines = (
         SelectedGEIQAdministrativeCriteriaInline,
         JobApplicationInline,
         PkSupportRemarkInline,
     )
+    form = GEIQEligibilityDiagnosisAdminForm
 
     @admin.display(description="montant de l'aide")
     def allowance_amount(self, obj):
