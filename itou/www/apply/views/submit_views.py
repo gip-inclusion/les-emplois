@@ -20,6 +20,7 @@ from itou.files.models import File
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.auth import check_user
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params
 from itou.www.apply.forms import ApplicationJobsForm, SubmitJobApplicationForm
@@ -775,6 +776,7 @@ class ApplicationEndView(ApplyStepBaseView):
         }
 
 
+@check_user(lambda user: user.is_employer)
 def eligibility_for_hire(
     request,
     company_pk,
@@ -811,6 +813,7 @@ def eligibility_for_hire(
     )
 
 
+@check_user(lambda user: user.is_employer)
 def geiq_eligibility_for_hire(
     request,
     company_pk,
@@ -847,6 +850,7 @@ def geiq_eligibility_for_hire(
     )
 
 
+@check_user(lambda user: user.is_employer)
 def geiq_eligibility_criteria_for_hire(request, company_pk, job_seeker_public_id):
     company = get_object_or_404(
         Company.objects.filter(pk__in={org.pk for org in request.organizations}, kind=CompanyKind.GEIQ), pk=company_pk
@@ -859,6 +863,7 @@ def geiq_eligibility_criteria_for_hire(request, company_pk, job_seeker_public_id
     )
 
 
+@check_user(lambda user: user.is_employer)
 def hire_confirmation(
     request,
     company_pk,

@@ -32,6 +32,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.files.models import File
 from itou.job_applications.enums import JobApplicationState
 from itou.utils import constants as global_constants
+from itou.utils.auth import check_user
 from itou.utils.pagination import ItouPaginator, pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -487,6 +488,7 @@ def prolongation_requests_list(request, template_name="approvals/prolongation_re
 
 
 @require_safe
+@check_user(lambda user: user.is_prescriber)
 def prolongation_request_report_file(request, prolongation_request_id):
     prolongation_request = get_object_or_404(
         ProlongationRequest,

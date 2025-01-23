@@ -7,7 +7,7 @@ import httpx
 import sentry_sdk
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Count, Exists, F, OuterRef, Q
@@ -573,8 +573,11 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     )
 
 
-class AcceptHTMXFragmentView(TemplateView):
+class AcceptHTMXFragmentView(UserPassesTestMixin, TemplateView):
     NO_ERROR_FIELDS = []
+
+    def test_func(self):
+        return self.request.user.is_employer
 
     def setup(self, request, company_pk=None, *args, **kwargs):
         super().setup(request, *args, **kwargs)
