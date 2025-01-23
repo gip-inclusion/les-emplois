@@ -286,15 +286,27 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             and self.company == request.current_organization
         )
 
-    def redirect_to_check_infos(self, job_seeker_public_id):
-        view_name = (
-            "job_seekers_views:check_job_seeker_info_for_hire"
-            if self.hire_process
-            else "job_seekers_views:check_job_seeker_info"
-        )
-        return HttpResponseRedirect(
-            reverse(view_name, kwargs={"company_pk": self.company.pk, "job_seeker_public_id": job_seeker_public_id})
-        )
+    def get_exit_url(self, job_seeker_public_id, created=False):
+        if self.is_gps:
+            return reverse("gps:my_groups")
+
+        kwargs = {"company_pk": self.company.pk, "job_seeker_public_id": job_seeker_public_id}
+        if created and self.hire_process:
+            # The job seeker was just created, we don't need to check info if we are hiring
+            if self.company.kind == CompanyKind.GEIQ:
+                view_name = "apply:geiq_eligibility_for_hire"
+            else:
+                view_name = "apply:eligibility_for_hire"
+        elif self.hire_process:
+            # Hiring a job seeker that was found but not created: we check info
+            view_name = "job_seekers_views:check_job_seeker_info_for_hire"
+        elif created:
+            # We created a job seeker, and we apply for them
+            view_name = "apply:application_jobs"
+        else:
+            # We found a job seeker to apply for, so we check their info
+            view_name = "job_seekers_views:check_job_seeker_info"
+        return reverse(view_name, kwargs=kwargs)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
@@ -363,7 +375,12 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
             # TODO(ewen): check_job_seeker_info doesn't use the session yet,
             # so we delete the session here.
             self.job_seeker_session.delete()
-            return self.redirect_to_check_infos(self.job_seeker.public_id)
+            return HttpResponseRedirect(
+                reverse(
+                    "job_seekers_views:check_job_seeker_info",
+                    kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+                )
+            )
         else:
             next_url = reverse(
                 "job_seekers_views:check_job_seeker_info",
@@ -417,9 +434,7 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
                     FollowUpGroup.objects.follow_beneficiary(
                         beneficiary=job_seeker, user=request.user, is_referent=True
                     )
-                    return HttpResponseRedirect(reverse("gps:my_groups"))
-                else:
-                    return self.redirect_to_check_infos(job_seeker.public_id)
+                return HttpResponseRedirect(self.get_exit_url(job_seeker.public_id))
 
             context = {
                 # Ask the sender to confirm the NIR we found is associated to the correct user
@@ -488,7 +503,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
             # The email we found is correct
             if self.form.data.get("confirm"):
                 if not can_add_nir:
-                    return self.redirect_to_check_infos(job_seeker.public_id)
+                    return HttpResponseRedirect(self.get_exit_url(job_seeker.public_id))
 
                 try:
                     job_seeker.jobseeker_profile.nir = nir
@@ -509,9 +524,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                         FollowUpGroup.objects.follow_beneficiary(
                             beneficiary=job_seeker, user=request.user, is_referent=True
                         )
-                        return HttpResponseRedirect(reverse("gps:my_groups"))
-                    else:
-                        return self.redirect_to_check_infos(job_seeker.public_id)
+                    return HttpResponseRedirect(self.get_exit_url(job_seeker.public_id))
 
         return self.render_to_response(
             self.get_context_data(**kwargs)
@@ -756,24 +769,6 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             **self._get_profile_data_from_session(),
         )
 
-    def get_next_url(self):
-        if self.is_gps:
-            return reverse("gps:my_groups")
-
-        kwargs = {"company_pk": self.company.pk, "job_seeker_public_id": self.profile.user.public_id}
-        if self.hire_process:
-            if self.company.kind == CompanyKind.GEIQ:
-                view_name = "apply:geiq_eligibility_for_hire"
-            else:
-                view_name = "apply:eligibility_for_hire"
-        else:
-            view_name = self.next_apply_url
-
-        return reverse(
-            view_name,
-            kwargs=kwargs,
-        )
-
     def post(self, request, *args, **kwargs):
         try:
             with transaction.atomic():
@@ -797,7 +792,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 user.save()
 
             self.job_seeker_session.delete()
-            url = self.get_next_url()
+            url = self.get_exit_url(self.profile.user.public_id, created=True)
 
             if self.is_gps:
                 FollowUpGroup.objects.follow_beneficiary(beneficiary=user, user=request.user, is_referent=True)
@@ -1112,11 +1107,11 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
             )
         else:
             self.profile.save()
-            url = self.get_next_url()
+            url = self.get_exit_url()
             self.job_seeker_session.delete()
         return HttpResponseRedirect(url)
 
-    def get_next_url(self):
+    def get_exit_url(self):
         return self.job_seeker_session.get("config").get("from_url")
 
     def get_context_data(self, **kwargs):
