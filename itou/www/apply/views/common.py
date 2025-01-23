@@ -47,15 +47,13 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
         valid_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker, for_siae=company)
         # Info that will be used to search for an existing Pôle emploi approval.
         form_personal_data = JobSeekerPersonalDataForm(
-            instance=job_seeker.jobseeker_profile,
+            instance=job_seeker,
             data=request.POST or None,
             tally_form_query=f"jobapplication={job_application.pk}" if job_application else None,
         )
         forms.append(form_personal_data)
         try:
-            birthdate = JobSeekerPersonalDataForm.base_fields["birthdate"].clean(
-                form_personal_data.data.get("birthdate")
-            )
+            birthdate = form_personal_data.fields["birthdate"].clean(form_personal_data.data.get("birthdate"))
         except ValidationError:
             pass  # will be presented to user later
 
