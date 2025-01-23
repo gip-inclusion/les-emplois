@@ -525,3 +525,28 @@ def test_exports_download_by_month(client):
     )
     assert 200 == response.status_code
     assert "spreadsheetml" in response.get("Content-Type")
+
+
+def test_reset_filter_button_snapshot(client, snapshot):
+    job_application = JobApplicationFactory()
+    client.force_login(job_application.sender)
+
+    filter_params = {"states": [job_application.state]}
+    response = client.get(reverse("apply:list_prescriptions"), filter_params)
+
+    assert str(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
+        name="reset-filter button in list view"
+    )
+    assert str(parse_response_to_soup(response, selector="#offcanvasApplyFiltersButtons")) == snapshot(
+        name="off-canvas buttons in list view"
+    )
+
+    filter_params["display"] = JobApplicationsDisplayKind.TABLE
+    response = client.get(reverse("apply:list_prescriptions"), filter_params)
+
+    assert str(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
+        name="reset-filter button in table view"
+    )
+    assert str(parse_response_to_soup(response, selector="#offcanvasApplyFiltersButtons")) == snapshot(
+        name="off-canvas buttons in table view"
+    )
