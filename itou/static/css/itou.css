@@ -259,27 +259,6 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     min-height: 11rem;
 }
 
-/* HTMX button indicator */
-.has-btn-with-spinner-loading-text.has-spinner-loading {
-    pointer-events: none;
-}
-
-.has-btn-with-spinner-loading-text.has-spinner-loading::after {
-    display: none;
-}
-
-.has-btn-with-spinner-loading-text.has-spinner-loading .stable-text {
-    display: none;
-}
-
-.has-btn-with-spinner-loading-text .loading-text {
-    display: none;
-}
-
-.has-btn-with-spinner-loading-text.has-spinner-loading .loading-text {
-    display: block;
-}
-
 /* step 1/5 */
 .progress-bar-20 {
     width: 20%;
