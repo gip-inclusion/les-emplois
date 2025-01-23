@@ -3006,3 +3006,69 @@
   </section>
   '''
 # ---
+# name: test_reset_filter_button_snapshot[off-canvas buttons in list view]
+  '''
+  <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
+      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
+      
+  
+  
+      
+  
+  
+      
+          <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/prescriptions/list">
+              <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
+              <span>Effacer tout</span>
+          </a>
+      
+  
+  
+  </div>
+  '''
+# ---
+# name: test_reset_filter_button_snapshot[off-canvas buttons in table view]
+  '''
+  <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
+      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
+      
+  
+  
+      
+  
+  
+      
+          <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/prescriptions/list">
+              <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
+              <span>Effacer tout</span>
+          </a>
+      
+  
+  
+  </div>
+  '''
+# ---
+# name: test_reset_filter_button_snapshot[reset-filter button in list view]
+  '''
+  <div class="ms-md-auto" id="apply-list-filter-counter">
+          
+              <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/prescriptions/list">
+                  <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
+                  <span>Effacer tout</span>
+              </a>
+          
+      </div>
+  '''
+# ---
+# name: test_reset_filter_button_snapshot[reset-filter button in table view]
+  '''
+  <div class="ms-md-auto" id="apply-list-filter-counter">
+          
+              <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/prescriptions/list">
+                  <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
+                  <span>Effacer tout</span>
+              </a>
+          
+      </div>
+  '''
+# ---

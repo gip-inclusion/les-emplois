@@ -224,3 +224,28 @@ def test_list_snapshot(client, snapshot):
         ),
     )
     assert str(page) == snapshot(name="applications table")
+
+
+def test_reset_filter_button_snapshot(client, snapshot):
+    job_application = JobApplicationFactory()
+    client.force_login(job_application.job_seeker)
+
+    filter_params = {"states": [job_application.state]}
+    response = client.get(reverse("apply:list_for_job_seeker"), filter_params)
+
+    assert str(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
+        name="reset-filter button in list view"
+    )
+    assert str(parse_response_to_soup(response, selector="#offcanvasApplyFiltersButtons")) == snapshot(
+        name="off-canvas buttons in list view"
+    )
+
+    filter_params["display"] = JobApplicationsDisplayKind.TABLE
+    response = client.get(reverse("apply:list_for_job_seeker"), filter_params)
+
+    assert str(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
+        name="reset-filter button in table view"
+    )
+    assert str(parse_response_to_soup(response, selector="#offcanvasApplyFiltersButtons")) == snapshot(
+        name="off-canvas buttons in table view"
+    )
