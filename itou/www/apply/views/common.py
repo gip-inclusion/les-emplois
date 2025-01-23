@@ -96,7 +96,11 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
             with transaction.atomic():
                 if form_personal_data:
                     form_personal_data.save()
-                    if settings.API_PARTICULIER_TOKEN:
+                    if (
+                        valid_diagnosis
+                        and valid_diagnosis.criteria_can_be_certified()
+                        and settings.API_PARTICULIER_TOKEN
+                    ):
                         valid_diagnosis.certify_criteria()
                 if form_user_address:
                     form_user_address.save()
