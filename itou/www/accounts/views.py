@@ -22,6 +22,10 @@ class PasswordResetDoneView(LoginNotRequiredMixin, TemplateView):
     template_name = "account/password_reset_done.html"
 
 
+class PasswordResetFromKeyDoneView(LoginNotRequiredMixin, TemplateView):
+    template_name = "account/password_reset_from_key_done.html"
+
+
 class AccountInactiveView(LoginNotRequiredMixin, TemplateView):
     template_name = "account/account_inactive.html"
 
