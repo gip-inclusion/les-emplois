@@ -117,7 +117,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         # The following would have been nice in a unique constraint,
         # but infortunately functions.Now() is not immutable
         if (
-            self.job_seeker
+            self.job_seeker_id
             and GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, self.author_geiq).exists()
         ):
             raise ValidationError(f"Il existe déjà un diagnostic GEIQ valide pour cet utilisateur : {self.job_seeker}")
@@ -167,6 +167,10 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         )
 
     @classmethod
+    def _expiration_date(cls, author=None):
+        return timezone.localdate() + relativedelta(months=cls.EXPIRATION_DELAY_MONTHS)
+
+    @classmethod
     @transaction.atomic()
     def create_eligibility_diagnosis(
         cls,
@@ -197,7 +201,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
             author_kind=author_kind,
             author_prescriber_organization=author_org,
             author_geiq=author_geiq,
-            expires_at=timezone.localdate() + relativedelta(months=cls.EXPIRATION_DELAY_MONTHS),
+            expires_at=cls._expiration_date(),
         )
 
         if administrative_criteria:
