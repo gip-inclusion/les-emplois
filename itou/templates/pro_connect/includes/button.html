@@ -8,6 +8,20 @@
         <br>
         <a href="https://proconnect.gouv.fr/" class="btn btn-link has-external-link" target="_blank">En savoir plus</a>
     </div>
+{% elif SHOW_DEMO_ACCOUNTS_BANNER %}
+    <div class="alert alert-info" role="status">
+        <p class="mb-2">
+            <strong>ProConnect n'est pas disponible sur cet environnement.</strong>
+        </p>
+        {% if activation|default:False %}
+            <p class="mb-2">Vous devez vous deconnecter et utiliser un autre compte.</p>
+        {% else %}
+            <p class="mb-2">Vous pouvez utiliser un des comptes de démonstration pour vous connecter.</p>
+            <button type="button" class="text-decoration-underline" data-bs-toggle="modal" data-bs-target="#testAccountsModal">
+                Voir les comptes de démonstration
+            </button>
+        {% endif %}
+    </div>
 {% elif login|default:False %}
     <div class="alert alert-info" role="status">
         <p class="mb-2">
