@@ -1,7 +1,6 @@
 {# django-allauth template override. #}
 {% extends "layout/base.html" %}
 
-{% load account %}
 {% load django_bootstrap5 %}
 {% load buttons_form %}
 
@@ -27,12 +26,12 @@
                             Confirmez que <a href="mailto:{{ confirmation.email_address.email }}" aria-label="{{ confirmation.email_address.email }} est bien votre adresse e-mail">{{ confirmation.email_address.email }}</a> est bien votre adresse e-mail en cliquant sur le bouton ci-dessous.
                         </p>
 
-                        <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+                        <form method="post" action="{% url 'accounts:account_confirm_email' confirmation.key %}">
 
                             {% csrf_token %}
 
                             {# `is_safe_url` is secure enough to let us use request params here. #}
-                            {# See Allauth.account.adapter.DefaultAccountAdapter.is_safe_url #}
+                            {# See itou.utils.requests.is_safe_url #}
                             {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 
                             {% itou_buttons_form primary_label="Confirmer" show_mandatory_fields_mention=False %}

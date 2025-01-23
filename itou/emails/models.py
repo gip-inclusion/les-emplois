@@ -2,14 +2,18 @@ import datetime
 
 from allauth.account import signals
 from allauth.account.adapter import get_adapter
+from allauth.account.internal.flows.manage_email import emit_email_changed
 from citext import CIEmailField
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import login
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
 from django.core import signing
-from django.db import models
+from django.db import models, transaction
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import escape
 
 from itou.emails.managers import EmailAddressManager, EmailConfirmationManager
 from itou.utils.urls import get_absolute_url
@@ -57,6 +61,8 @@ class EmailAddress(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name="utilisateur", on_delete=models.CASCADE, related_name="email_addresses"
     )
+    # TODO: make email unique, and remove the can_set_verified etc.
+    #   Check first if there are any duplicate emails in the database on production.
     email = models.EmailField(
         db_index=True,
         max_length=settings.EMAIL_ADDRESS_MAX_LENGTH,
@@ -109,7 +115,7 @@ class EmailAddress(models.Model):
         user_email(self.user, self.email, commit=True)
         return True
 
-    def send_confirmation(self, request=None, signup=False):
+    def send_confirmation(self, request, signup=False):
         confirmation = EmailConfirmation.create(self)
         confirmation.send(request, signup=signup)
         return confirmation
@@ -182,19 +188,53 @@ class EmailConfirmation(models.Model):
         return get_absolute_url(url) if absolute_url else url
 
     def key_expired(self):
-        expiration_date = self.sent + datetime.timedelta(days=settings.EMAIL_CONFIRMATION_EXPIRE_DAYS)
+        expiration_date = self.created + datetime.timedelta(days=settings.EMAIL_CONFIRMATION_EXPIRE_DAYS)
         return expiration_date <= timezone.now()
 
     def can_confirm_email(self):
         return not self.used and not self.email_address.verified and not self.key_expired()
 
-    def confirm(self, request):
-        if self.can_confirm_email():
-            confirmed = get_adapter().confirm_email(request, self.email_address)
-            if confirmed:
-                return self.email_address
+    def confirm(self, request, perform_login_on_success=False):
+        email_address = self.email_address
 
-    def send(self, request=None, signup=False):
+        if email_address.verified:
+            return email_address
+
+        if not self.can_confirm_email():
+            return None
+
+        from_email_address = (
+            EmailAddress.objects.filter(user_id=email_address.user_id).exclude(pk=email_address.pk).first()
+        )
+        with transaction.atomic():
+            successful_verification = email_address.set_verified(commit=False)
+            email_address.set_as_primary()
+            email_address.save()
+            self.used = True
+            self.save()
+
+        # TODO: if you make email unique, you can remove this condition. It won't fail for any non-exception reason
+        if not successful_verification:
+            return None
+
+        for instance in EmailAddress.objects.filter(user_id=email_address.user_id).exclude(pk=email_address.pk):
+            instance.remove()
+
+        # TODO: replace emit_email_changed. It sends a signal and an email
+        emit_email_changed(request, from_email_address, email_address)
+
+        signals.email_confirmed.send(
+            sender=EmailAddress,
+            request=request,
+            email_address=email_address,
+        )
+        messages.add_message(request, messages.SUCCESS, f"Vous avez confirmé {escape(email_address.email)}")
+
+        if perform_login_on_success:
+            login(request, email_address.user, backend="django.contrib.auth.backends.ModelBackend")
+        return email_address
+
+    def send(self, request, signup=False):
         get_adapter().send_confirmation_mail(request, self, signup)
         signals.email_confirmation_sent.send(
             sender=self.__class__,
