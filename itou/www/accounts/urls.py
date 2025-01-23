@@ -34,6 +34,11 @@ urlpatterns = [
         name="account_reset_password_from_key",
     ),
     path(
+        "password/reset/key/done/",
+        account_views.PasswordResetFromKeyDoneView.as_view(),
+        name="account_reset_password_from_key_done",
+    ),
+    path(
         "confirm-email/",
         account_views.EmailVerificationSentView.as_view(),
         name="account_email_verification_sent",

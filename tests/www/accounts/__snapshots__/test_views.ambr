@@ -207,3 +207,34 @@
           </main>
   '''
 # ---
+# name: TestPasswordResetFromKeyDoneView.test_get
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+                              
+      <h1>Modification de votre mot de passe</h1>
+      <p>Votre mot de passe a été modifié !</p>
+  
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+          </main>
+  '''
+# ---

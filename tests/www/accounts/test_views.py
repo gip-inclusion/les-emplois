@@ -110,3 +110,10 @@ class TestPasswordResetDoneView:
         assert response.status_code == 200
         assert str(parse_response_to_soup(response, selector="#main")) == snapshot
         assertContains(response, "vous êtes déjà connecté en tant que")
+
+
+class TestPasswordResetFromKeyDoneView:
+    def test_get(self, client, snapshot):
+        response = client.get(reverse("accounts:account_reset_password_from_key_done"))
+        assert response.status_code == 200
+        assert str(parse_response_to_soup(response, selector="#main")) == snapshot
