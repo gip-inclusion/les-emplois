@@ -1,7 +1,6 @@
 import datetime
 
 from allauth.account import signals
-from allauth.account.adapter import get_adapter
 from allauth.account.internal.flows.manage_email import emit_email_changed
 from citext import CIEmailField
 from django.conf import settings
@@ -15,6 +14,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape
 
+from itou.emails import notifications
 from itou.emails.managers import EmailAddressManager, EmailConfirmationManager
 from itou.utils.urls import get_absolute_url
 
@@ -221,6 +221,7 @@ class EmailConfirmation(models.Model):
             instance.remove()
 
         # TODO: replace emit_email_changed. It sends a signal and an email
+        # NOTE: email_confirmation_sent is unused, you might be able to remove it.
         emit_email_changed(request, from_email_address, email_address)
 
         signals.email_confirmed.send(
@@ -235,13 +236,12 @@ class EmailConfirmation(models.Model):
         return email_address
 
     def send(self, request, signup=False):
-        get_adapter().send_confirmation_mail(request, self, signup)
-        signals.email_confirmation_sent.send(
-            sender=self.__class__,
-            request=request,
-            confirmation=self,
-            signup=signup,
-        )
+        # Send email notification.
+        if signup:
+            notification_class = notifications.EmailConfirmationSignupNotification
+        else:
+            notification_class = notifications.EmailConfirmationNotification
 
+        notification_class(self.email_address.user, activate_url=self.get_confirmation_url(absolute_url=True)).send()
         self.sent = timezone.now()
         self.save()

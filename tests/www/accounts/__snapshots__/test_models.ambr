@@ -1,0 +1,37 @@
+# serializer version: 1
+# name: TestEmailConfirmation.test_send_confirmation_email[email body]
+  '''
+  Nous avons bien enregistré votre demande d'inscription et vous remercions de votre confiance.
+  
+  Afin de finaliser votre inscription, cliquez sur le lien suivant :
+  
+  [CONFIRMATION URL REMOVED]
+  
+  Si vous n'êtes pas à l'origine de cette demande, merci de ne pas prendre en compte ce message.
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestEmailConfirmation.test_send_confirmation_email[email subject]
+  '[DEV] [DEV] Confirmez votre adresse e-mail'
+# ---
+# name: TestEmailConfirmation.test_send_confirmation_email_signup[email body]
+  '''
+  Nous avons bien enregistré votre demande d'inscription et vous remercions de votre confiance.
+  
+  Afin de finaliser votre inscription, cliquez sur le lien suivant :
+  
+  [CONFIRMATION URL REMOVED]
+  
+  Si vous n'êtes pas à l'origine de cette demande, merci de ne pas prendre en compte ce message.
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestEmailConfirmation.test_send_confirmation_email_signup[email subject]
+  '[DEV] [DEV] Confirmez votre adresse e-mail'
+# ---
