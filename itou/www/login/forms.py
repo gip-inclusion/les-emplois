@@ -87,9 +87,13 @@ class ItouLoginForm(LoginForm):
         ):
             identity_provider = IdentityProvider(user.identity_provider)
             if identity_provider == IdentityProvider.INCLUSION_CONNECT:
-                identity_provider = IdentityProvider.PRO_CONNECT
-            error_message = (
-                f"Votre compte est relié à {identity_provider.label}. Merci de vous connecter avec ce service."
-            )
+                error_message = (
+                    f"Votre compte est relié à {identity_provider.label}. "
+                    "Merci de vous connecter avec ProConnect qui remplace ce service."
+                )
+            else:
+                error_message = (
+                    f"Votre compte est relié à {identity_provider.label}. Merci de vous connecter avec ce service."
+                )
             raise forms.ValidationError(error_message)
         return super().clean()

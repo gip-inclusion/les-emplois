@@ -8,7 +8,6 @@ from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from tests.companies.factories import CompanyFactory
-from tests.openid_connect.test import sso_parametrize
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 
 
@@ -58,27 +57,25 @@ class TestWelcomingTour:
         assert response.wsgi_request.path == reverse("welcoming_tour:index")
         assertTemplateUsed(response, "welcoming_tour/job_seeker.html")
 
-    @sso_parametrize
     @respx.mock
-    def test_new_prescriber_sees_welcoming_tour_test(self, client, sso_setup):
+    def test_new_prescriber_sees_welcoming_tour_test(self, client, pro_connect):
         session = client.session
         session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {"url_history": []}
         session.save()
-        response = sso_setup.mock_oauth_dance(client, KIND_PRESCRIBER)
+        response = pro_connect.mock_oauth_dance(client, KIND_PRESCRIBER)
         response = client.get(response.url, follow=True)
 
         # User should be redirected to the welcoming tour as he just signed up
         assert response.wsgi_request.path == reverse("welcoming_tour:index")
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
-    @sso_parametrize
     @respx.mock
-    def test_new_employer_sees_welcoming_tour(self, client, sso_setup):
+    def test_new_employer_sees_welcoming_tour(self, client, pro_connect):
         company = CompanyFactory(with_membership=True)
         token = company.get_token()
         previous_url = reverse("signup:employer", args=(company.pk, token))
         next_url = reverse("signup:company_join", args=(company.pk, token))
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_EMPLOYER,
             previous_url=previous_url,

@@ -17,7 +17,6 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.templatetags.format_filters import format_siret
 from itou.utils.urls import get_tally_form_url
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWithMembershipAndJobsFactory
-from tests.openid_connect.test import sso_parametrize
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, PrescriberFactory
 from tests.utils.test import ItouClient, assertSnapshotQueries
 
@@ -31,10 +30,9 @@ class TestCompanySignup:
         response = client.post(url, data={"kind": UserKind.EMPLOYER})
         assertRedirects(response, reverse("signup:company_select"))
 
-    @sso_parametrize
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
-    def test_join_an_company_without_members(self, client, mailoutbox, sso_setup):
+    def test_join_an_company_without_members(self, client, mailoutbox, pro_connect):
         """
         A user joins a company without members.
         """
@@ -66,7 +64,7 @@ class TestCompanySignup:
 
         # No error when opening magic link a second time.
         response = client.get(magic_link)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # Check IC will redirect to the correct url
         token = company.get_token()
@@ -77,10 +75,10 @@ class TestCompanySignup:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_EMPLOYER,
             previous_url=previous_url,
@@ -93,7 +91,7 @@ class TestCompanySignup:
         response = client.get(response.url)
         assertContains(response, "Publiez vos offres, augmentez votre visibilité")
 
-        user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
+        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
 
         # Check `User` state.
         assert user.kind == UserKind.EMPLOYER
@@ -112,10 +110,9 @@ class TestCompanySignup:
         )
         assertContains(response, escape(expected_message))
 
-    @sso_parametrize
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
-    def test_join_an_company_without_members_as_an_existing_employer(self, client, sso_setup):
+    def test_join_an_company_without_members_as_an_existing_employer(self, client, pro_connect):
         """
         A user joins a company without members.
         """
@@ -123,8 +120,8 @@ class TestCompanySignup:
         assert 0 == company.members.count()
 
         user = EmployerFactory(
-            username=sso_setup.oidc_userinfo["sub"],
-            email=sso_setup.oidc_userinfo["email"],
+            username=pro_connect.oidc_userinfo["sub"],
+            email=pro_connect.oidc_userinfo["email"],
             has_completed_welcoming_tour=True,
         )
         CompanyMembershipFactory(user=user)
@@ -132,7 +129,7 @@ class TestCompanySignup:
 
         magic_link = company.signup_magic_link
         response = client.get(magic_link)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # Check IC will redirect to the correct url
         token = company.get_token()
@@ -143,10 +140,10 @@ class TestCompanySignup:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_EMPLOYER,
             previous_url=previous_url,
@@ -161,25 +158,26 @@ class TestCompanySignup:
         assert 1 == company.members.count()
         assert 2 == user.company_set.count()
 
-    @sso_parametrize
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
-    def test_join_an_company_without_members_as_an_existing_employer_returns_on_other_browser(self, client, sso_setup):
+    def test_join_an_company_without_members_as_an_existing_employer_returns_on_other_browser(
+        self, client, pro_connect
+    ):
         """
         A user joins a company without members.
         """
         company = CompanyFactory(kind=CompanyKind.ETTI)
 
         user = EmployerFactory(
-            username=sso_setup.oidc_userinfo["sub"],
-            email=sso_setup.oidc_userinfo["email"],
+            username=pro_connect.oidc_userinfo["sub"],
+            email=pro_connect.oidc_userinfo["email"],
             has_completed_welcoming_tour=True,
         )
         CompanyMembershipFactory(user=user)
 
         magic_link = company.signup_magic_link
         response = client.get(magic_link)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # Check IC will redirect to the correct url
         token = company.get_token()
@@ -190,11 +188,11 @@ class TestCompanySignup:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
         other_client = ItouClient()
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_EMPLOYER,
             previous_url=previous_url,
@@ -242,9 +240,8 @@ class TestCompanySignup:
             ],
         )
 
-    @sso_parametrize
     @respx.mock
-    def test_create_facilitator(self, client, mocker, mailoutbox, settings, sso_setup):
+    def test_create_facilitator(self, client, mocker, mailoutbox, settings, pro_connect):
         settings.API_INSEE_BASE_URL = "https://insee.fake"
         settings.API_INSEE_SIRENE_BASE_URL = "https://entreprise.fake"
         settings.API_INSEE_CONSUMER_KEY = "foo"
@@ -286,7 +283,7 @@ class TestCompanySignup:
 
         # Now, we're on the second page.
         url = reverse("signup:facilitator_user")
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:facilitator_user")
@@ -296,10 +293,10 @@ class TestCompanySignup:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_EMPLOYER,
             previous_url=previous_url,
@@ -312,7 +309,7 @@ class TestCompanySignup:
         response = client.get(response.url)
         assertContains(response, "Publiez vos offres, augmentez votre visibilité")
 
-        user = User.objects.get(email=sso_setup.oidc_userinfo["email"])
+        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
 
         # Check `User` state.
         assert user.kind == UserKind.EMPLOYER

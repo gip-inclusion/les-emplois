@@ -110,6 +110,7 @@ class pro_connect_setup:
     oidc_userinfo = OIDC_USERINFO
     oidc_userinfo_with_safir = OIDC_USERINFO_FT_WITH_SAFIR
     mock_oauth_dance = mock_oauth_dance
+    assert_and_mock_forced_logout = assert_and_mock_forced_logout
     identity_provider = IdentityProvider.PRO_CONNECT
     session_key = constants.PRO_CONNECT_SESSION_KEY
 

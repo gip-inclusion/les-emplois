@@ -14,7 +14,6 @@ from itou.utils.templatetags.theme_inclusion import static_theme_images
 from itou.utils.urls import add_url_params
 from tests.companies.factories import CompanyFactory
 from tests.invitations.factories import EmployerInvitationFactory
-from tests.openid_connect.test import sso_parametrize
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory
 from tests.utils.test import ItouClient
@@ -43,12 +42,11 @@ class TestAcceptInvitation:
         # A user can be member of one or more siae
         assert current_company in user.company_set.all()
 
-    @sso_parametrize
     @respx.mock
-    def test_accept_invitation_signup(self, client, mailoutbox, sso_setup):
-        invitation = EmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"])
+    def test_accept_invitation_signup(self, client, mailoutbox, pro_connect):
+        invitation = EmployerInvitationFactory(email=pro_connect.oidc_userinfo["email"])
         response = client.get(invitation.acceptance_link, follow=True)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
@@ -60,12 +58,12 @@ class TestAcceptInvitation:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
         total_users_before = User.objects.count()
 
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_EMPLOYER,
             user_email=invitation.email,
@@ -84,12 +82,11 @@ class TestAcceptInvitation:
         user = User.objects.get(email=invitation.email)
         self.assert_accepted_invitation(response, invitation, user, mailoutbox)
 
-    @sso_parametrize
     @respx.mock
-    def test_accept_invitation_signup_returns_on_other_browser(self, client, mailoutbox, sso_setup):
-        invitation = EmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"])
+    def test_accept_invitation_signup_returns_on_other_browser(self, client, mailoutbox, pro_connect):
+        invitation = EmployerInvitationFactory(email=pro_connect.oidc_userinfo["email"])
         response = client.get(invitation.acceptance_link, follow=True)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
@@ -101,14 +98,14 @@ class TestAcceptInvitation:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
         total_users_before = User.objects.count()
 
         # coming back from another browser without the next_url
         other_client = ItouClient()
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_EMPLOYER,
             user_email=invitation.email,
@@ -125,15 +122,14 @@ class TestAcceptInvitation:
         user = User.objects.get(email=invitation.email)
         self.assert_accepted_invitation(response, invitation, user, mailoutbox)
 
-    @sso_parametrize
     @respx.mock
-    def test_accept_invitation_signup_without_link(self, client, mailoutbox, sso_setup):
+    def test_accept_invitation_signup_without_link(self, client, mailoutbox, pro_connect):
         # The user's invitations are automatically accepted at login
-        invitation = EmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"])
+        invitation = EmployerInvitationFactory(email=pro_connect.oidc_userinfo["email"])
 
         total_users_before = User.objects.count()
 
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_EMPLOYER,
             user_email=invitation.email,
@@ -146,12 +142,11 @@ class TestAcceptInvitation:
         user = User.objects.get(email=invitation.email)
         self.assert_accepted_invitation(response, invitation, user, mailoutbox)
 
-    @sso_parametrize
     @respx.mock
-    def test_accept_invitation_signup_bad_email_case(self, client, mailoutbox, sso_setup):
-        invitation = EmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"].upper())
+    def test_accept_invitation_signup_bad_email_case(self, client, mailoutbox, pro_connect):
+        invitation = EmployerInvitationFactory(email=pro_connect.oidc_userinfo["email"].upper())
         response = client.get(invitation.acceptance_link, follow=True)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
@@ -163,12 +158,12 @@ class TestAcceptInvitation:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
         assert User.objects.filter(email=invitation.email).first() is None
 
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_EMPLOYER,
             # Using the same email with a different case should not fail
@@ -185,13 +180,12 @@ class TestAcceptInvitation:
         user = User.objects.get(email=invitation.email)
         self.assert_accepted_invitation(response, invitation, user, mailoutbox)
 
-    @sso_parametrize
     @respx.mock
-    def test_accept_existing_user_not_logged_in_using_ProConnect(self, client, mailoutbox, sso_setup):
-        invitation = EmployerInvitationFactory(email=sso_setup.oidc_userinfo["email"])
+    def test_accept_existing_user_not_logged_in_using_ProConnect(self, client, mailoutbox, pro_connect):
+        invitation = EmployerInvitationFactory(email=pro_connect.oidc_userinfo["email"])
         user = EmployerFactory(
-            username=sso_setup.oidc_userinfo["sub"],
-            email=sso_setup.oidc_userinfo["email"],
+            username=pro_connect.oidc_userinfo["sub"],
+            email=pro_connect.oidc_userinfo["email"],
             has_completed_welcoming_tour=True,
         )
         response = client.get(invitation.acceptance_link, follow=True)
@@ -204,10 +198,10 @@ class TestAcceptInvitation:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             UserKind.EMPLOYER,
             user_email=user.email,
@@ -230,12 +224,11 @@ class TestAcceptInvitation:
         response = client.get(invitation.acceptance_link, follow=True)
         assertRedirects(response, reverse("account_logout"))
 
-    @sso_parametrize
     @respx.mock
-    def test_accept_invitation_signup_wrong_email(self, client, sso_setup):
+    def test_accept_invitation_signup_wrong_email(self, client, pro_connect):
         invitation = EmployerInvitationFactory()
         response = client.get(invitation.acceptance_link, follow=True)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
@@ -247,11 +240,11 @@ class TestAcceptInvitation:
             "previous_url": previous_url,
             "next_url": next_url,
         }
-        url = escape(f"{sso_setup.authorize_url}?{urlencode(params)}")
+        url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
         url = reverse("dashboard:index")
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_EMPLOYER,
             # the login hint is different from the email used to create the SSO account
@@ -259,7 +252,7 @@ class TestAcceptInvitation:
             channel="invitation",
             previous_url=previous_url,
             next_url=next_url,
-            expected_redirect_url=add_url_params(sso_setup.logout_url, {"redirect_url": previous_url}),
+            expected_redirect_url=add_url_params(pro_connect.logout_url, {"redirect_url": previous_url}),
         )
         # After logout, the SSO redirects to previous_url (see redirect_url param in expected_redirect_url)
         response = client.get(previous_url, follow=True)
@@ -270,7 +263,7 @@ class TestAcceptInvitation:
                 messages.Message(
                     messages.ERROR,
                     "L’adresse e-mail que vous avez utilisée pour vous connecter avec "
-                    f"{sso_setup.identity_provider.label} (michel@lestontons.fr) ne correspond pas à "
+                    f"{pro_connect.identity_provider.label} (michel@lestontons.fr) ne correspond pas à "
                     f"l’adresse e-mail de l’invitation ({invitation.email}).",
                 )
             ],
@@ -339,15 +332,14 @@ class TestAcceptInvitation:
         assert company.pk == current_company.pk
         self.assert_accepted_invitation(response, invitation, user, mailoutbox)
 
-    @sso_parametrize
     @respx.mock
-    def test_accept_new_user_to_inactive_siae(self, client, sso_setup):
+    def test_accept_new_user_to_inactive_siae(self, client, pro_connect):
         company = CompanyFactory(convention__is_active=False, with_membership=True)
         sender = company.members.first()
         invitation = EmployerInvitationFactory(
             sender=sender,
             company=company,
-            email=sso_setup.oidc_userinfo["email"],
+            email=pro_connect.oidc_userinfo["email"],
         )
         response = client.get(invitation.acceptance_link, follow=True)
         assertContains(response, escape("La structure que vous souhaitez rejoindre n'est plus active."))
@@ -356,7 +348,7 @@ class TestAcceptInvitation:
         # If the user still manages to signup with IC
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
         next_url = reverse("invitations_views:join_company", args=(invitation.pk,))
-        response = sso_setup.mock_oauth_dance(
+        response = pro_connect.mock_oauth_dance(
             client,
             KIND_EMPLOYER,
             user_email=invitation.email,

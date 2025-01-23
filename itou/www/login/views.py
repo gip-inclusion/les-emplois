@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic.edit import FormView
 
-from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
+from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.users.enums import MATOMO_ACCOUNT_TYPE, IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils.auth import LoginNotRequiredMixin
@@ -29,22 +29,6 @@ class UserKindLoginMixin:
 
     # Allow users to choose their account type
     template_name = "account/account_type_selection.html"
-
-    def _get_inclusion_connect_url(self, context):
-        if not settings.INCLUSION_CONNECT_BASE_URL:
-            return None
-
-        if self.user_kind not in IdentityProvider.supported_user_kinds[IdentityProvider.INCLUSION_CONNECT]:
-            return None
-
-        params = {
-            "user_kind": self.user_kind,
-            "previous_url": self.request.get_full_path(),
-        }
-        if context["redirect_field_value"]:
-            params["next_url"] = context["redirect_field_value"]
-
-        return add_url_params(reverse("inclusion_connect:authorize"), params)
 
     def _get_pro_connect_url(self, context):
         if not settings.PRO_CONNECT_BASE_URL:
@@ -71,24 +55,19 @@ class UserKindLoginMixin:
             "signup_url": signup_url,
             "signup_allowed": True,
             "redirect_field_value": get_safe_url(self.request, REDIRECT_FIELD_NAME),
-            "inclusion_connect_url": self._get_inclusion_connect_url(context),
             "pro_connect_url": self._get_pro_connect_url(context),
         }
         return context | extra_context
 
     def dispatch(self, request, *args, **kwargs):
         if next_url := request.GET.get("next"):
-            if get_url_param_value(next_url, "channel") == InclusionConnectChannel.MAP_CONSEILLER:
+            if get_url_param_value(next_url, "channel") == ProConnectChannel.MAP_CONSEILLER:
                 params = {
                     "user_kind": UserKind.PRESCRIBER,
                     "next_url": next_url,
-                    "channel": InclusionConnectChannel.MAP_CONSEILLER.value,
+                    "channel": ProConnectChannel.MAP_CONSEILLER.value,
                 }
-                if settings.PRO_CONNECT_BASE_URL:
-                    redirect_to = f"{reverse('pro_connect:authorize')}?{urlencode(params)}"
-                else:
-                    redirect_to = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
-                return HttpResponseRedirect(redirect_to)
+                return HttpResponseRedirect(f"{reverse('pro_connect:authorize')}?{urlencode(params)}")
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -110,7 +89,7 @@ class PrescriberLoginView(ItouLoginView):
             "login_url": reverse("login:prescriber"),
             "signup_url": reverse("signup:prescriber_check_already_exists"),
             "signup_allowed": True,
-            "uses_inclusion_connect": True,
+            "uses_pro_connect": True,
         }
         return context | extra_context
 
@@ -127,7 +106,7 @@ class EmployerLoginView(ItouLoginView):
             "login_url": reverse("login:employer"),
             "signup_url": reverse("signup:company_select"),
             "signup_allowed": True,
-            "uses_inclusion_connect": True,
+            "uses_pro_connect": True,
         }
         return context | extra_context
 
@@ -141,7 +120,7 @@ class LaborInspectorLoginView(ItouLoginView):
         extra_context = {
             "login_url": reverse("login:labor_inspector"),
             "signup_allowed": False,
-            "uses_inclusion_connect": False,
+            "uses_pro_connect": False,
         }
         return context | extra_context
 

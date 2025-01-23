@@ -56,8 +56,6 @@ urlpatterns = [
     path("pe_connect/", include("itou.openid_connect.pe_connect.urls")),
     # FranceConnect URLs.
     path("franceconnect/", include("itou.openid_connect.france_connect.urls")),
-    # Inclusion Connect URLs.
-    path("inclusion_connect/", include("itou.openid_connect.inclusion_connect.urls")),
     # ProConnect URLs.
     path("pro_connect/", include("itou.openid_connect.pro_connect.urls")),
     # --------------------------------------------------------------------------------------

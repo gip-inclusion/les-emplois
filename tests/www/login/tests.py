@@ -19,7 +19,6 @@ from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 from itou.www.login.forms import ItouLoginForm
 from itou.www.login.views import ExistingUserLoginView
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
-from tests.openid_connect.test import sso_parametrize
 from tests.users.factories import (
     DEFAULT_PASSWORD,
     EmployerFactory,
@@ -31,7 +30,6 @@ from tests.users.factories import (
 from tests.utils.test import parse_response_to_soup, reload_module
 
 
-CONNECT_WITH_IC = "Se connecter avec Inclusion Connect"
 PRO_CONNECT_BTN = 'class="proconnect-button"'
 
 
@@ -73,17 +71,16 @@ class TestItouLoginForm:
 
 
 class TestPrescriberLogin:
-    @sso_parametrize
-    def test_login_options(self, client, sso_setup):
+    def test_login_options(self, client, pro_connect):
         url = reverse("login:prescriber")
         response = client.get(url)
-        sso_setup.assertContainsButton(response)
+        pro_connect.assertContainsButton(response)
         params = {
             "user_kind": UserKind.PRESCRIBER,
             "previous_url": url,
         }
-        sso_url = escape(add_url_params(sso_setup.authorize_url, params))
-        assertContains(response, sso_url + '"')
+        pro_connect_url = escape(add_url_params(pro_connect.authorize_url, params))
+        assertContains(response, pro_connect_url + '"')
         assertContains(response, "Adresse e-mail")
         assertContains(response, "Mot de passe")
 
@@ -94,11 +91,10 @@ class TestPrescriberLogin:
             "previous_url": url_with_next,
             "next_url": "/next_url",
         }
-        sso_url = escape(add_url_params(sso_setup.authorize_url, params))
-        assertContains(response, sso_url + '"')
+        pro_connect_url = escape(add_url_params(pro_connect.authorize_url, params))
+        assertContains(response, pro_connect_url + '"')
 
-    @sso_parametrize
-    def test_login_using_django(self, client, sso_setup):
+    def test_login_using_django(self, client, pro_connect):
         user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
         url = reverse("login:prescriber")
         response = client.get(url)
@@ -111,9 +107,8 @@ class TestPrescriberLogin:
         response = client.post(url, data=form_data)
         assertRedirects(response, reverse("account_email_verification_sent"))
 
-    @sso_parametrize
-    def test_login_using_django_but_has_sso_provider(self, client, sso_setup):
-        user = PrescriberFactory(identity_provider=sso_setup.identity_provider)
+    def test_login_using_django_but_has_sso_provider(self, client, pro_connect):
+        user = PrescriberFactory()
         url = reverse("login:prescriber")
         response = client.get(url)
         assert response.status_code == 200
@@ -130,17 +125,16 @@ class TestPrescriberLogin:
 
 
 class TestEmployerLogin:
-    @sso_parametrize
-    def test_login_options(self, client, sso_setup):
+    def test_login_options(self, client, pro_connect):
         url = reverse("login:employer")
         response = client.get(url)
-        sso_setup.assertContainsButton(response)
+        assertContains(response, 'class="proconnect-button"')
         params = {
             "user_kind": UserKind.EMPLOYER,
             "previous_url": url,
         }
-        inclusion_connect_url = escape(add_url_params(sso_setup.authorize_url, params))
-        assertContains(response, inclusion_connect_url + '"')
+        pro_connect_url = escape(add_url_params(reverse("pro_connect:authorize"), params))
+        assertContains(response, pro_connect_url + '"')
         assertContains(response, "Adresse e-mail")
         assertContains(response, "Mot de passe")
 
@@ -151,11 +145,10 @@ class TestEmployerLogin:
             "previous_url": url_with_next,
             "next_url": "/next_url",
         }
-        inclusion_connect_url = escape(add_url_params(sso_setup.authorize_url, params))
-        assertContains(response, inclusion_connect_url + '"')
+        pro_connect_url = escape(add_url_params(reverse("pro_connect:authorize"), params))
+        assertContains(response, pro_connect_url + '"')
 
-    @sso_parametrize
-    def test_login_using_django(self, client, sso_setup):
+    def test_login_using_django(self, client, pro_connect):
         user = EmployerFactory(identity_provider=IdentityProvider.DJANGO)
         url = reverse("login:employer")
         response = client.get(url)
@@ -168,9 +161,8 @@ class TestEmployerLogin:
         response = client.post(url, data=form_data)
         assertRedirects(response, reverse("account_email_verification_sent"))
 
-    @sso_parametrize
-    def test_login_using_django_but_has_sso_provider(self, client, sso_setup):
-        user = EmployerFactory(identity_provider=sso_setup.identity_provider)
+    def test_login_using_django_but_has_sso_provider(self, client, pro_connect):
+        user = EmployerFactory()
         url = reverse("login:employer")
         response = client.get(url)
         assert response.status_code == 200
@@ -190,7 +182,6 @@ class TestLaborInspectorLogin:
     def test_login_options(self, client):
         url = reverse("login:labor_inspector")
         response = client.get(url)
-        assertNotContains(response, CONNECT_WITH_IC)
         assertNotContains(response, PRO_CONNECT_BTN)
         assertContains(response, "Adresse e-mail")
         assertContains(response, "Mot de passe")
@@ -295,11 +286,18 @@ class TestExistingUserLogin:
             response = client.get(reverse("login:existing_user", args=(user.public_id,)))
             assertContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
 
-    @pytest.mark.parametrize("identity_provider", IdentityProvider.values)
+    @pytest.mark.parametrize(
+        "identity_provider",
+        [
+            IdentityProvider.DJANGO,
+            IdentityProvider.FRANCE_CONNECT,
+            IdentityProvider.PE_CONNECT,
+            IdentityProvider.PRO_CONNECT,
+        ],
+    )
     @override_settings(
         FRANCE_CONNECT_BASE_URL="http://localhost:8080",
         PEAMU_AUTH_BASE_URL="http://localhost:8080",
-        INCLUSION_CONNECT_BASE_URL="http://localhost:8080",
         PRO_CONNECT_BASE_URL="http://localhost:8080",
     )
     def test_login(self, client, snapshot, identity_provider):
@@ -357,16 +355,15 @@ class TestExistingUserLogin:
     @pytest.mark.parametrize(
         "identity_provider",
         [
+            IdentityProvider.DJANGO,
             IdentityProvider.FRANCE_CONNECT,
             IdentityProvider.PE_CONNECT,
             IdentityProvider.PRO_CONNECT,
-            IdentityProvider.INCLUSION_CONNECT,
         ],
     )
     @override_settings(
         FRANCE_CONNECT_BASE_URL=None,
         PEAMU_AUTH_BASE_URL=None,
-        INCLUSION_CONNECT_BASE_URL=None,
         PRO_CONNECT_BASE_URL=None,
     )
     def test_login_disabled_provider(self, client, snapshot, identity_provider):
@@ -381,11 +378,11 @@ class TestExistingUserLogin:
         assert response.status_code == 404
 
 
-def test_prescriber_account_activation_view_with_next(client):
+def test_prescriber_account_activation_view_with_next(client, pro_connect):
     user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
     client.force_login(user)
 
-    url = reverse("dashboard:activate_ic_account")
+    url = reverse("dashboard:activate_pro_connect_account")
     response = client.get(url)
     # Check the href link
     params = {
@@ -393,24 +390,24 @@ def test_prescriber_account_activation_view_with_next(client):
         "previous_url": url,
         "user_email": user.email,
     }
-    ic_auhtorize_url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
-    assertContains(response, f'{ic_auhtorize_url}"')
+    pc_auhtorize_url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
+    assertContains(response, f'{pc_auhtorize_url}"')
 
     next_url = "/test_join"
-    url = f"{reverse('dashboard:activate_ic_account')}?{urlencode({'next': next_url})}"
+    url = f"{reverse('dashboard:activate_pro_connect_account')}?{urlencode({'next': next_url})}"
     response = client.get(url)
     # Check the href link
     params["previous_url"] = url
     params["next_url"] = next_url
-    ic_auhtorize_url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
-    assertContains(response, f'{ic_auhtorize_url}"')
+    pc_auhtorize_url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
+    assertContains(response, f'{pc_auhtorize_url}"')
 
 
-def test_employer_account_activation_view(client):
+def test_employer_account_activation_view(client, pro_connect):
     user = EmployerFactory(with_company=True, identity_provider=IdentityProvider.DJANGO)
     client.force_login(user)
 
-    url = reverse("dashboard:activate_ic_account")
+    url = reverse("dashboard:activate_pro_connect_account")
     response = client.get(url)
     # Check the href link
     params = {
@@ -418,13 +415,14 @@ def test_employer_account_activation_view(client):
         "previous_url": url,
         "user_email": user.email,
     }
-    ic_auhtorize_url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
-    assertContains(response, f'{ic_auhtorize_url}"')
+    pc_auhtorize_url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
+    assertContains(response, f'{pc_auhtorize_url}"')
 
     next_url = "/test_join"
-    url = f"{reverse('dashboard:activate_ic_account')}?{urlencode({'next': next_url})}"
+    url = f"{reverse('dashboard:activate_pro_connect_account')}?{urlencode({'next': next_url})}"
     response = client.get(url)
     # Check the href link
     params["previous_url"] = url
     params["next_url"] = next_url
-    ic_auhtorize_url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
+    pc_auhtorize_url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
+    assertContains(response, f'{pc_auhtorize_url}"')
