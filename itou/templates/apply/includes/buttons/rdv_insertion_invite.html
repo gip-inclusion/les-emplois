@@ -5,7 +5,7 @@
         {% if job_application %}
             <form {% if for_detail %} hx-target="#rdvi-invitation-requests" hx-post="{% url "apply:rdv_insertion_invite_for_detail" job_application.pk %}" {% else %} hx-post="{% url "apply:rdv_insertion_invite" job_application.pk %}" {% endif %}
                   hx-swap="outerHTML"
-                  class="d-inline-flex has-btn-with-spinner-loading-text">
+                  class="d-inline-flex">
                 {% csrf_token %}
                 <button class="btn btn-danger btn-ico w-100 w-md-auto"
                         data-bs-toggle="tooltip"
@@ -42,7 +42,7 @@
     {% else %}
         <form {% if for_detail %} hx-target="#rdvi-invitation-requests" hx-post="{% url "apply:rdv_insertion_invite_for_detail" job_application.pk %}" {% else %} hx-post="{% url "apply:rdv_insertion_invite" job_application.pk %}" {% endif %}
               hx-swap="outerHTML"
-              class="d-inline-flex has-btn-with-spinner-loading-text">
+              class="d-inline-flex">
             {% csrf_token %}
             <button class="btn btn-secondary btn-ico w-100 w-md-auto" aria-label="Proposer un rendez-vous à {{ job_application.job_seeker.get_full_name }}" {% matomo_event "candidature" "clic" "proposer-rdv" %}>
                 <div class="stable-text">
