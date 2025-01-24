@@ -27,6 +27,22 @@ arguments pour se connecter à la base de données.
 Les variables suivantes permet d’accéder à la base de données définie dans le
 [docker-compose.yml](../docker-compose.yml) simplement avec la commande `psql`.
 
+Deux options:
+
+#### Socket UNIX
+
+La plus performante, et devrait bien fonctionner sur les systèmes
+[*nix](https://fr.wikipedia.org/wiki/Type_Unix).
+
+```bash
+export PGDATABASE=itou
+export PGHOST="${PWD}/docker/dev/postgres"
+export PGUSER=postgres
+# La connexion par la socket est autorisée par défaut.
+```
+
+#### TCP
+
 ```bash
 export PGDATABASE=itou
 export PGHOST=localhost
