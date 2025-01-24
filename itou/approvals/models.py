@@ -294,7 +294,9 @@ class PENotificationMixin(models.Model):
     def get_pe_end_at(self):
         return self.end_at.strftime(DATE_FORMAT)
 
-    def _pe_notification_update(self, status, at=None, endpoint=None, exit_code=None):
+    def _pe_notification_update(
+        self, status: api_enums.PEApiNotificationStatus, at=None, endpoint=None, exit_code=None
+    ) -> api_enums.PEApiNotificationStatus:
         """A helper method to update the fields of the mixin:
         - whatever the destination class (Approval, PoleEmploiApproval)
         - without triggering the model's save() method which usually is quite computation intensive
@@ -309,18 +311,19 @@ class PENotificationMixin(models.Model):
         }
         queryset = self.__class__.objects.filter(pk=self.pk)
         queryset.update(**{key: value for key, value in update_dict.items() if value})
+        return status
 
     def pe_save_pending(self, reason, at=None):
-        self._pe_notification_update(api_enums.PEApiNotificationStatus.PENDING, at, None, reason)
+        return self._pe_notification_update(api_enums.PEApiNotificationStatus.PENDING, at, None, reason)
 
     def pe_save_error(self, endpoint, exit_code, at=None):
-        self._pe_notification_update(api_enums.PEApiNotificationStatus.ERROR, at, endpoint, exit_code)
+        return self._pe_notification_update(api_enums.PEApiNotificationStatus.ERROR, at, endpoint, exit_code)
 
     def pe_save_should_retry(self, at=None):
-        self._pe_notification_update(api_enums.PEApiNotificationStatus.SHOULD_RETRY, at)
+        return self._pe_notification_update(api_enums.PEApiNotificationStatus.SHOULD_RETRY, at)
 
     def pe_save_success(self, at=None):
-        self._pe_notification_update(api_enums.PEApiNotificationStatus.SUCCESS, at)
+        return self._pe_notification_update(api_enums.PEApiNotificationStatus.SUCCESS, at)
 
     def _pe_log(self, prefix, fmt, *args, **kwargs):
         logger.info(
@@ -370,15 +373,13 @@ class PENotificationMixin(models.Model):
             )
         except PoleEmploiAPIException:
             self.pe_log_err("got a recoverable error in maj_pass_iae")
-            self.pe_save_should_retry(at)
-            return
+            return self.pe_save_should_retry(at)
         except PoleEmploiAPIBadResponse as exc:
             self.pe_log_err("got an unrecoverable error={} in maj_pass_iae", exc.response_code)
-            self.pe_save_error(api_enums.PEApiEndpoint.MISE_A_JOUR_PASS_IAE, exc.response_code, at)
-            return
+            return self.pe_save_error(api_enums.PEApiEndpoint.MISE_A_JOUR_PASS_IAE, exc.response_code, at)
         else:
             self.pe_log_info("got success in maj_pass_iae")
-            self.pe_save_success(at)
+            return self.pe_save_success(at)
 
 
 class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
@@ -417,28 +418,26 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
         # For cancelled approval, we send start_at == end_at
         return self.start_at.strftime(DATE_FORMAT)
 
-    def notify_pole_emploi(self):
+    def notify_pole_emploi(self) -> api_enums.PEApiNotificationStatus | None:
         at = timezone.now()
         today = timezone.localdate(at)
         if self.start_at > today:
             self.pe_log_err("start_at={} starts after today={}", self.start_at, today)
-            self.pe_save_pending(
+            return self.pe_save_pending(
                 api_enums.PEApiPreliminaryCheckFailureReason.STARTS_IN_FUTURE,
                 at,
             )
-            return
 
         type_siae = companies_enums.siae_kind_to_pe_type_siae(self.origin_siae_kind)
         if not type_siae:
             self.pe_log_err(
                 "could not find PE type for siae_siret={} siae_kind={}", self.origin_siae_siret, self.origin_siae_kind
             )
-            self.pe_save_error(
+            return self.pe_save_error(
                 None,
                 api_enums.PEApiPreliminaryCheckFailureReason.INVALID_SIAE_KIND,
                 at,
             )
-            return
 
         if not all(
             [
@@ -456,11 +455,10 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
             )
             # we save those as pending since the cron will ignore those cases anyway and thus has
             # no chance to block itself.
-            self.pe_save_pending(
+            return self.pe_save_pending(
                 api_enums.PEApiPreliminaryCheckFailureReason.MISSING_USER_DATA,
                 at,
             )
-            return
 
         if not self.user_id_national_pe:
             id_national = self.pe_rech_individu(
@@ -474,7 +472,7 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
                 return
             self.user_id_national_pe = id_national
             self.save(update_fields=["user_id_national_pe"])
-        self.pe_maj_pass(
+        return self.pe_maj_pass(
             id_national_pe=self.user_id_national_pe,
             siae_siret=self.origin_siae_siret,
             siae_kind=self.origin_siae_kind,
@@ -927,7 +925,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             - datetime.timedelta(days=1)
         )
 
-    def notify_pole_emploi(self):
+    def notify_pole_emploi(self) -> api_enums.PEApiNotificationStatus | None:
         # We do not send approvals that start in the future to PE, because their IS can't handle them.
         # In this case, do not mark them as "should retry" but leave them pending. The pending ones
         # will be caught by the second pass cron. The "should retry" then assumes:
@@ -936,11 +934,10 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         now = timezone.now()
         if self.start_at > now.date():
             self.pe_log_err("start_at={} starts after today={}", self.start_at, now.date())
-            self.pe_save_pending(
+            return self.pe_save_pending(
                 api_enums.PEApiPreliminaryCheckFailureReason.STARTS_IN_FUTURE,
                 now,
             )
-            return
 
         sender_kind = self.origin_sender_kind
         prescriber_organization_kind = self.origin_prescriber_organization_kind
@@ -950,11 +947,10 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             job_application = self.jobapplication_set.accepted().order_by("-created_at").first()
             if not job_application:
                 self.pe_log_err("had no accepted job application")
-                self.pe_save_pending(
+                return self.pe_save_pending(
                     api_enums.PEApiPreliminaryCheckFailureReason.NO_JOB_APPLICATION,
                     now,
                 )
-                return
 
             siae_siret = job_application.to_company.siret
             siae_kind = job_application.to_company.kind
@@ -965,12 +961,11 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         type_siae = companies_enums.siae_kind_to_pe_type_siae(siae_kind)
         if not type_siae:
             self.pe_log_err("could not find PE type for siae_siret={} siae_kind={}", siae_siret, siae_kind)
-            self.pe_save_error(
+            return self.pe_save_error(
                 None,
                 api_enums.PEApiPreliminaryCheckFailureReason.INVALID_SIAE_KIND,
                 now,
             )
-            return
 
         if not all(
             [
@@ -983,11 +978,10 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             self.pe_log_err("had an invalid user={} nir={}", self.user, self.user.jobseeker_profile.nir)
             # we save those as pending since the cron will ignore those cases anyway and thus has
             # no chance to block itself.
-            self.pe_save_pending(
+            return self.pe_save_pending(
                 api_enums.PEApiPreliminaryCheckFailureReason.MISSING_USER_DATA,
                 now,
             )
-            return
 
         if not self.user.jobseeker_profile.pe_obfuscated_nir:
             id_national = self.pe_rech_individu(
@@ -998,12 +992,12 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 now,
             )
             if not id_national:
-                return
+                return None
             self.user.jobseeker_profile.pe_obfuscated_nir = id_national
             self.user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
             self.user.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
 
-        self.pe_maj_pass(
+        return self.pe_maj_pass(
             id_national_pe=self.user.jobseeker_profile.pe_obfuscated_nir,
             siae_siret=siae_siret,
             siae_kind=siae_kind,
@@ -1965,7 +1959,7 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
     def number_with_spaces(self):
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
 
-    def notify_pole_emploi(self):
+    def notify_pole_emploi(self) -> api_enums.PEApiNotificationStatus | None:
         now = timezone.now()
         id_national = self.pe_rech_individu(
             first_name=self.first_name,
@@ -1975,7 +1969,7 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
             at=now,
         )
         if id_national:
-            self.pe_maj_pass(
+            return self.pe_maj_pass(
                 id_national_pe=id_national,
                 siae_siret=self.siae_siret,
                 siae_kind=self.siae_kind,
@@ -1983,6 +1977,7 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
                 prescriber_kind=prescribers_enums.PrescriberOrganizationKind.PE,
                 at=now,
             )
+        return None
 
 
 class OriginalPoleEmploiApproval(CommonApprovalMixin):

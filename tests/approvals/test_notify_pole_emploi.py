@@ -48,7 +48,8 @@ class TestApprovalNotifyPoleEmploiIntegration:
         """
         approval = ApprovalFactory(user__jobseeker_profile__nir="", with_jobapplication=True)
         with freeze_time() as frozen_now:
-            approval.notify_pole_emploi()
+            return_status = approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.PENDING
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_pending"
         assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
@@ -61,7 +62,8 @@ class TestApprovalNotifyPoleEmploiIntegration:
             with_jobapplication__state=JobApplicationState.CANCELLED,
         )
         with freeze_time() as frozen_now:
-            approval.notify_pole_emploi()
+            return_status = approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.PENDING
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_pending"
         assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
@@ -79,7 +81,8 @@ class TestApprovalNotifyPoleEmploiIntegration:
             with_jobapplication=True,
             with_jobapplication__to_company__kind=CompanyKind.ACI,
         )
-        approval.notify_pole_emploi()
+        return_status = approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.SUCCESS
         approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
         assert payload == {
@@ -112,7 +115,8 @@ class TestApprovalNotifyPoleEmploiIntegration:
         approval.user.jobseeker_profile.pe_obfuscated_nir = "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
         approval.user.jobseeker_profile.save()
         with freeze_time() as frozen_now:
-            approval.notify_pole_emploi()
+            return_status = approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.SUCCESS
         approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
         assert payload == {
@@ -143,7 +147,8 @@ class TestApprovalNotifyPoleEmploiIntegration:
             with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.CAF,
         )
         with freeze_time() as frozen_now:
-            approval.notify_pole_emploi()
+            return_status = approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.SUCCESS
         approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
         assert payload == {
@@ -175,7 +180,8 @@ class TestApprovalNotifyPoleEmploiIntegration:
             with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.SPIP,
         )
         with freeze_time() as frozen_now:
-            approval.notify_pole_emploi()
+            return_status = approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.SUCCESS
         approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
         assert payload == {
@@ -204,7 +210,8 @@ class TestApprovalNotifyPoleEmploiIntegration:
         tomorrow = (now + datetime.timedelta(days=1)).date()
         approval = ApprovalFactory(start_at=tomorrow)
         with freeze_time() as frozen_now:
-            approval.notify_pole_emploi()
+            return_status = approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.PENDING
         assert (
             f"! notify_pole_emploi approval={approval} "
             f"start_at={approval.start_at} "
@@ -224,7 +231,8 @@ class TestApprovalNotifyPoleEmploiIntegration:
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker, with_jobapplication=True)
         with freeze_time() as frozen_now:
-            approval.notify_pole_emploi()
+            return_status = approval.notify_pole_emploi()
+        assert return_status is None
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_should_retry"
         assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
@@ -239,7 +247,8 @@ class TestApprovalNotifyPoleEmploiIntegration:
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker, with_jobapplication=True)
         with freeze_time() as frozen_now:
-            approval.notify_pole_emploi()
+            return_status = approval.notify_pole_emploi()
+        assert return_status is None
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_error"
         assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
@@ -255,7 +264,8 @@ class TestApprovalNotifyPoleEmploiIntegration:
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker, with_jobapplication=True)
         with freeze_time() as frozen_now:
-            approval.notify_pole_emploi()
+            return_status = approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.ERROR
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_error"
         assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
@@ -273,7 +283,8 @@ class TestApprovalNotifyPoleEmploiIntegration:
         approval = ApprovalFactory(user=job_seeker)
         JobApplicationFactory(to_company=company, approval=approval, state=JobApplicationState.ACCEPTED)
         with freeze_time() as frozen_now:
-            approval.notify_pole_emploi()
+            return_status = approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.ERROR
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_error"
         assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
@@ -291,7 +302,8 @@ class TestApprovalNotifyPoleEmploiIntegration:
         approval = ApprovalFactory(user=job_seeker)
         JobApplicationFactory(to_company=company, approval=approval, state=JobApplicationState.POSTPONED)
         with freeze_time() as frozen_now:
-            approval.notify_pole_emploi()
+            return_status = approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.PENDING
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_pending"
         assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
@@ -310,7 +322,8 @@ class TestApprovalNotifyPoleEmploiIntegration:
         siae = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker, with_origin_values=True, origin_siae_kind=CompanyKind.ETTI)
         JobApplicationFactory(to_company=siae, approval=approval, state=JobApplicationState.ACCEPTED)
-        approval.notify_pole_emploi()
+        return_status = approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.SUCCESS
         approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
         assert payload == {
@@ -349,7 +362,8 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
         """
         cancelled_approval = CancelledApprovalFactory(user_nir="")
         with freeze_time() as frozen_now:
-            cancelled_approval.notify_pole_emploi()
+            return_status = cancelled_approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.PENDING
         cancelled_approval.refresh_from_db()
         assert cancelled_approval.pe_notification_status == "notification_pending"
         assert cancelled_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
@@ -364,7 +378,8 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         cancelled_approval = CancelledApprovalFactory(origin_siae_kind=CompanyKind.EI)
         with freeze_time() as frozen_now:
-            cancelled_approval.notify_pole_emploi()
+            return_status = cancelled_approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.SUCCESS
         cancelled_approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
         assert payload == {
@@ -389,7 +404,8 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
             origin_siae_kind=CompanyKind.ACI, user_id_national_pe="ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
         )
         with freeze_time() as frozen_now:
-            cancelled_approval.notify_pole_emploi()
+            return_status = cancelled_approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.SUCCESS
         cancelled_approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
         assert payload == {
@@ -419,7 +435,8 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
             origin_prescriber_organization_kind=PrescriberOrganizationKind.CAF,
         )
         with freeze_time() as frozen_now:
-            cancelled_approval.notify_pole_emploi()
+            return_status = cancelled_approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.SUCCESS
         cancelled_approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
         assert payload == {
@@ -450,7 +467,8 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
             origin_prescriber_organization_kind=PrescriberOrganizationKind.SPIP,
         )
         with freeze_time() as frozen_now:
-            cancelled_approval.notify_pole_emploi()
+            return_status = cancelled_approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.SUCCESS
         cancelled_approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
         assert payload == {
@@ -478,7 +496,8 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         tomorrow = timezone.localdate() + datetime.timedelta(days=1)
         cancelled_approval = CancelledApprovalFactory(start_at=tomorrow)
-        cancelled_approval.notify_pole_emploi()
+        return_status = cancelled_approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.PENDING
         assert (
             f"! notify_pole_emploi cancelledapproval={cancelled_approval} "
             f"start_at={cancelled_approval.start_at} "
@@ -497,7 +516,8 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
         )
         cancelled_approval = CancelledApprovalFactory()
         with freeze_time() as frozen_now:
-            cancelled_approval.notify_pole_emploi()
+            return_status = cancelled_approval.notify_pole_emploi()
+        assert return_status is None
         cancelled_approval.refresh_from_db()
         assert cancelled_approval.pe_notification_status == "notification_should_retry"
         assert cancelled_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
@@ -511,7 +531,8 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
         )
         cancelled_approval = CancelledApprovalFactory()
         with freeze_time() as frozen_now:
-            cancelled_approval.notify_pole_emploi()
+            return_status = cancelled_approval.notify_pole_emploi()
+        assert return_status is None
         cancelled_approval.refresh_from_db()
         assert cancelled_approval.pe_notification_status == "notification_error"
         assert cancelled_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
@@ -526,7 +547,8 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
         cancelled_approval = CancelledApprovalFactory()
         with freeze_time() as frozen_now:
-            cancelled_approval.notify_pole_emploi()
+            return_status = cancelled_approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.ERROR
         cancelled_approval.refresh_from_db()
         assert cancelled_approval.pe_notification_status == "notification_error"
         assert cancelled_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
@@ -541,7 +563,8 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
         cancelled_approval = CancelledApprovalFactory(origin_siae_kind="FOO")  # unknown kind
         with freeze_time() as frozen_now:
-            cancelled_approval.notify_pole_emploi()
+            return_status = cancelled_approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.ERROR
         cancelled_approval.refresh_from_db()
         assert cancelled_approval.pe_notification_status == "notification_error"
         assert cancelled_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
@@ -646,7 +669,8 @@ class TestPoleEmploiApprovalNotifyPoleEmploiIntegration:
             nir="FOOBAR2000", siae_kind=CompanyKind.ACI.value
         )  # avoid the OPCS, not mapped yet
         with freeze_time() as frozen_now:
-            pe_approval.notify_pole_emploi()
+            return_status = pe_approval.notify_pole_emploi()
+        assert return_status == api_enums.PEApiNotificationStatus.SUCCESS
         pe_approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
         assert payload == {
