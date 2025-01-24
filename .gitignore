@@ -5,6 +5,7 @@ envs/secrets.env
 
 # Config
 docker-compose-prod.yml
+docker/dev/postgres/
 docker/prod/
 
 # Project specific

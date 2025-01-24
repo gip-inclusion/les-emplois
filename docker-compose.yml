@@ -36,6 +36,9 @@ services:
     shm_size: 1g
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - type: bind
+        source: ${PWD}/docker/dev/postgres
+        target: /var/run/postgresql/
     restart: unless-stopped
     ports:
       - "127.0.0.1:${POSTGRES_PORT_ON_DOCKER_HOST:-5432}:5432"

@@ -36,8 +36,8 @@ jobs:
         image: postgis/postgis:15-master
         env:
           POSTGRES_PASSWORD: password
-        ports:
-          - 5432:5432
+        volumes:
+          - /var/run/postgresql:/var/run/postgresql
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -46,6 +46,10 @@ jobs:
           --health-retries 5
 
     steps:
+    - name: Setup PostgreSQL environment
+      run: |
+        echo PGHOST=/var/run/postgresql >> $GITHUB_ENV
+        echo PGUSER=postgres >> $GITHUB_ENV
     - name: 🐘 Non-durable PostgreSQL
       run: |
         psql <<SQL
@@ -54,10 +58,6 @@ jobs:
           ALTER SYSTEM SET full_page_writes=off;
         SQL
         docker kill --signal=SIGHUP ${{ job.services.postgres.id }}
-      env:
-        PGPASSWORD: password
-        PGHOST: localhost
-        PGUSER: postgres
     - uses: actions/checkout@v4.2.2
     - name: 🌍 Install spatial libraries
       run: sudo apt-get update && sudo apt-get install binutils build-essential libproj-dev gdal-bin
@@ -66,10 +66,6 @@ jobs:
         psql <<SQL
             CREATE DATABASE itou;
         SQL
-      env:
-        PGPASSWORD: password
-        PGHOST: localhost
-        PGUSER: postgres
     - name: 💂 Install Python
       uses: actions/setup-python@v5
       with:
