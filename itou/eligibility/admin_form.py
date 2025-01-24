@@ -27,6 +27,9 @@ class AbstractEligibilityDiagnosisAdminForm(forms.ModelForm):
         author_prescriber_organization = self.cleaned_data.get("author_prescriber_organization")
         author_company = self.cleaned_data.get(self.author_company_fieldname)
 
+        if author_prescriber_organization and author_company:
+            self.add_error("__all__", "Vous ne pouvez pas saisir une entreprise et une organisation prescriptrice.")
+
         if author and author_kind:
             if author.kind == UserKind.PRESCRIBER:
                 if not author_kind == AuthorKind.PRESCRIBER:

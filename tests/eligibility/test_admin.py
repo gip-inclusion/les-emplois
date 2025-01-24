@@ -10,6 +10,7 @@ from itou.companies.models import Company
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import AdministrativeCriteria, EligibilityDiagnosis
 from itou.users.enums import UserKind
+from tests.companies.factories import CompanyFactory
 from tests.eligibility.admin_utils import build_geiq_diag_post_data, build_iae_diag_post_data
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
@@ -216,3 +217,23 @@ class TestAdminForm:
         response = admin_client.post(self.get_add_url(kind), data=post_data)
         assert response.status_code == 200
         assert response.context["errors"] == [["L'auteur n'appartient pas à cette structure."]]
+
+    @pytest.mark.parametrize("user_kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
+    def test_add_eligibility_not_both_org_and_company(self, admin_client, kind, user_kind):
+        author = self.user_factory(kind, user_kind)
+        post_data = self.build_post_data(kind, author=author, job_seeker=JobSeekerFactory())
+        if user_kind == UserKind.EMPLOYER:
+            post_data["author_prescriber_organization"] = PrescriberOrganizationFactory().pk
+        else:
+            post_data[self.company_field_name(kind)] = CompanyFactory(
+                kind=CompanyKind.GEIQ if kind == "geiq" else CompanyKind.EI
+            ).pk
+
+        response = admin_client.post(self.get_add_url(kind), data=post_data)
+        assert response.status_code == 200
+        expected_errors = [["Vous ne pouvez pas saisir une entreprise et une organisation prescriptrice."]]
+        if kind == "geiq":
+            # Additional error thanks to the db constraint
+            expected_errors[0].append("Le diagnostic d'éligibilité GEIQ ne peut avoir 2 structures pour auteur")
+        assert response.context["errors"] == expected_errors
+        assert not self.get_diag_model(kind).objects.exists()
