@@ -10,8 +10,4 @@ class ExternalDataConfig(AppConfig):
     verbose_name = "Gestion des données utilisateur (APIs externes)"
 
     def ready(self):
-        """
-        When the app is loaded:
-        import / activate registration to allauth login signals
-        """
         import itou.external_data.signals  # noqa F401
