@@ -197,10 +197,18 @@ def test_beneficiary_details(client, snapshot):
                 "user_organization_id=[PK of organization]",
             ),
             ("href", f"beneficiary_id={beneficiary.pk}", "beneficiary_id=[PK of beneficiary]"),
-            ("hx-post", f"/gps/display/{group.pk}/{prescriber.pk}/phone", "display_phone_url"),
-            ("hx-post", f"/gps/display/{group.pk}/{prescriber.pk}/email", "display_email_url"),
-            ("id", f"phone-{prescriber.pk}", "display_phone_id"),
-            ("id", f"email-{prescriber.pk}", "display_email_id"),
+            (
+                "hx-post",
+                f"/gps/display/{group.pk}/{prescriber.public_id}/phone",
+                "/gps/display/[PK of group]/[Public ID of prescriber]/phone",
+            ),
+            (
+                "hx-post",
+                f"/gps/display/{group.pk}/{prescriber.public_id}/email",
+                "/gps/display/[PK of group]/[Public ID of prescriber]/email",
+            ),
+            ("id", f"phone-{prescriber.pk}", "phone-[PK of prescriber]"),
+            ("id", f"email-{prescriber.pk}", "email-[PK of prescriner]"),
             ("id", f"card-{prescriber.pk}", "card-[PK of prescriber]"),
         ],
     )
@@ -251,15 +259,15 @@ def test_display_participant_contact_info(client, mocker, snapshot):
 
     user_details_url = reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id})
     response = client.get(user_details_url)
-    display_phone_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.pk, "phone"))
+    display_phone_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "phone"))
     assertContains(response, display_phone_url)
-    display_email_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.pk, "email"))
+    display_email_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "email"))
     assertContains(response, display_email_url)
 
     simulated_page = parse_response_to_soup(
         response,
-        selector=f"#card-{target_participant.pk}",
-        replace_in_attr=[("id", f"card-{target_participant.pk}", "card'[PK of target_participant]")],
+        selector=f"#card-{target_participant.public_id}",
+        replace_in_attr=[("id", f"card-{target_participant.public_id}", "card'[Public ID of target_participant]")],
     )
 
     response = client.post(display_phone_url)
@@ -293,8 +301,8 @@ def test_display_participant_contact_info_not_allowed(client):
 
     client.force_login(prescriber)
 
-    display_phone_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.pk, "phone"))
-    display_email_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.pk, "email"))
+    display_phone_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "phone"))
+    display_email_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "email"))
 
     response = client.post(display_phone_url)
     assert response.status_code == 404
