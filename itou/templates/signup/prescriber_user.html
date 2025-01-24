@@ -20,7 +20,7 @@
                 <div class="col-12 col-lg-8">
 
                     {% if prescriber_org_data %}
-                        <div class="c-box">
+                        <div class="c-box mb-3 mb-md-4">
                             {% if join_authorized_org and kind_label and not kind_is_other %}
                                 {# Display kind's full name if known. #}
                                 <p>
@@ -41,7 +41,6 @@
                             {{ prescriber_org_data.post_code }} {{ prescriber_org_data.city }}
                         </div>
                     {% endif %}
-
                     {% include "pro_connect/includes/description.html" %}
                 </div>
             </div>
