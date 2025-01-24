@@ -87,6 +87,9 @@ xlrd==2.0.*  # https://pypi.org/project/xlrd/
 # Third-party applications
 # ------------------------------------------------------------------------------
 
+# Django dependency that we directly use for a future-proof threading.local equivalent
+asgiref  # https://github.com/django/asgiref/
+
 # Huey for async processing
 # https://huey.readthedocs.io/en/latest/
 huey  # https://github.com/coleifer/huey

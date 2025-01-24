@@ -2,6 +2,8 @@ import logging
 
 from django_datadog_logger.formatters import datadog
 
+from itou.utils.command import get_current_command_info
+
 
 logger = logging.getLogger(__name__)
 
@@ -36,4 +38,7 @@ class ItouDataDogJSONFormatter(datadog.DataDogJSONFormatter):
                         logger.warning(
                             "Request using token (%r) without datadog_info() method: please define one", token
                         )
+        if (command_info := get_current_command_info()) is not None:
+            log_entry_dict["command.run_uid"] = command_info.run_uid
+            log_entry_dict["command.name"] = command_info.name
         return log_entry_dict
