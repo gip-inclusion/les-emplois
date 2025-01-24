@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.conf import settings
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.http import base36_to_int, int_to_base36
 
@@ -12,8 +13,6 @@ class CompanySignupTokenGenerator:
     """
     Strategy object used to generate and check tokens for the secure
     company signup mechanism.
-    Heavily inspired from django PasswordResetTokenGenerator :
-    https://github.com/django/django/blob/master/django/contrib/auth/tokens.py
     """
 
     key_salt = "itou.utils.tokens.SiaeSignupTokenGenerator"
@@ -81,3 +80,16 @@ class CompanySignupTokenGenerator:
 
 
 company_signup_token_generator = CompanySignupTokenGenerator()
+
+
+class EmailAwarePasswordResetTokenGenerator(PasswordResetTokenGenerator):
+    def _make_hash_value(self, user, timestamp):
+        from itou.emails.models import EmailAddress
+        from itou.utils.emails import sync_user_email_addresses
+
+        ret = super()._make_hash_value(user, timestamp)
+        sync_user_email_addresses(user)
+        emails = set([user.email])
+        emails.update(EmailAddress.objects.filter(user=user).values_list("email", flat=True))
+        ret += "|".join(sorted(emails))
+        return ret

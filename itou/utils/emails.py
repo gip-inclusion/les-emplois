@@ -77,3 +77,19 @@ def redact_email_address(email):
     else:
         redacted_domain = redact_part(domain_part)
     return f"{redacted_user}@{redacted_domain}"
+
+
+def sync_user_email_addresses(user):
+    """
+    Keep user.email in sync with user.emailaddress_set.
+
+    Under some circumstances the user.email may not have ended up as
+    an EmailAddress record, e.g. in the case of manually created admin
+    users.
+    """
+    from itou.emails.models import EmailAddress
+
+    email = user.email
+    if not EmailAddress.objects.filter(user=user, email=email).exists():
+        # get_or_create() to gracefully handle races
+        EmailAddress.objects.get_or_create(user=user, email=email, defaults={"primary": False, "verified": False})
