@@ -5,7 +5,6 @@ from django.views.generic import RedirectView
 from itou.www.accounts import views as account_views
 from itou.www.login import views as login_views
 from itou.www.logout import views as logout_views
-from itou.www.signup import views as signup_views
 
 
 app_name = "accounts"
@@ -22,7 +21,7 @@ urlpatterns = [
     path("inactive", account_views.AccountInactiveView.as_view(), name="account_inactive"),
     path("password/change", account_views.PasswordChangeView.as_view(), name="account_change_password"),
     # Avoid user enumeration via password reset page.
-    path("password/reset", signup_views.ItouPasswordResetView.as_view(), name="account_reset_password"),
+    path("password/reset", account_views.PasswordResetView.as_view(), name="account_reset_password"),
     path(
         "password/reset/done/",
         account_views.PasswordResetDoneView.as_view(),
@@ -30,7 +29,7 @@ urlpatterns = [
     ),
     re_path(
         r"^password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
-        signup_views.ItouPasswordResetFromKeyView.as_view(),
+        account_views.PasswordResetFromKeyView.as_view(),
         name="account_reset_password_from_key",
     ),
     path(

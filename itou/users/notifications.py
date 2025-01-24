@@ -29,3 +29,21 @@ class PasswordChangedNotification(EmailNotification):
     subject_template = "account/email/password_changed_subject.txt"
     body_template = "account/email/password_changed_message.txt"
     can_be_disabled = False
+
+
+@notifications_registry.register
+class PasswordResetKeyNotification(EmailNotification):
+    name = "Réinitialisation du mot de passe"
+    category = NotificationCategory.ACCOUNT
+    subject_template = "account/email/password_reset_key_subject.txt"
+    body_template = "account/email/password_reset_key_message.txt"
+    can_be_disabled = False
+
+
+@notifications_registry.register
+class PasswordResetSuccessNotification(EmailNotification):
+    name = "Mot de passe réinitialisé avec succès"
+    category = NotificationCategory.ACCOUNT
+    subject_template = "account/email/password_reset_subject.txt"
+    body_template = "account/email/password_reset_message.txt"
+    can_be_disabled = False

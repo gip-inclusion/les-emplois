@@ -19,6 +19,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
+from django.utils.http import base36_to_int, int_to_base36
 from django.utils.safestring import mark_safe
 
 from itou.approvals.models import PoleEmploiApproval
@@ -658,7 +659,7 @@ class User(AbstractUser, AddressMixin):
             creator_org=acting_organization,
             account_activation_link=get_absolute_url(
                 reverse(
-                    "account_reset_password_from_key",
+                    "accounts:account_reset_password_from_key",
                     kwargs={"uidb36": user_pk_to_url_str(user), "key": default_token_generator.make_token(user)},
                 )
             ),
@@ -692,6 +693,14 @@ class User(AbstractUser, AddressMixin):
 
     def get_kind_display(self):
         return UserKind(self.kind).label
+
+    @property
+    def pk_to_url_str(self):
+        return int_to_base36(int(self.pk))
+
+    @classmethod
+    def url_str_to_pk(cls, pk_str):
+        return base36_to_int(pk_str)
 
 
 class JobSeekerProfile(models.Model):

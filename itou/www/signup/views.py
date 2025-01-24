@@ -5,10 +5,10 @@ Handle multiple user types sign up with django-allauth.
 import logging
 
 from allauth.account.adapter import get_adapter
-from allauth.account.views import PasswordResetFromKeyView, PasswordResetView, SignupView
+from allauth.account.views import SignupView
 from django.conf import settings
 from django.contrib import auth, messages
-from django.contrib.auth import REDIRECT_FIELD_NAME, login
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import PermissionDenied
 from django.db import Error, transaction
@@ -37,48 +37,6 @@ from itou.www.signup.errors import JobSeekerSignupConflictModalResolver
 logger = logging.getLogger(__name__)
 
 ITOU_SESSION_FACILITATOR_SIGNUP_KEY = "facilitator_signup"
-
-
-class ItouPasswordResetView(PasswordResetView):
-    def form_valid(self, form):
-        form.save(self.request)
-        # Pass the email in the querystring so that it can displayed in the template.
-        args = urlencode({"email": form.data["email"]})
-        return HttpResponseRedirect(f"{self.get_success_url()}?{args}")
-
-    def form_invalid(self, form):
-        """
-        Avoid user enumeration: django-allauth displays an error message to the user
-        when an email does not exist. We deliberately hide it by redirecting to the
-        success page in all cases.
-        """
-        # Pass the email in the querystring so that it can displayed in the template.
-        args = urlencode({"email": form.data.get("email", "")})
-        return HttpResponseRedirect(f"{self.get_success_url()}?{args}")
-
-
-class ItouPasswordResetFromKeyView(PasswordResetFromKeyView):
-    _user_is_new = None
-
-    def user_is_new(self):
-        if self._user_is_new is None:
-            self._user_is_new = self.reset_user and not self.reset_user.last_login
-        return self._user_is_new
-
-    def get_context_data(self, **kwargs):
-        ret = super().get_context_data(**kwargs)
-        ret["user_is_new"] = self.user_is_new()
-        ret["action_text"] = f"{'Enregistrer' if self.user_is_new() else 'Modifier'} le mot de passe"
-        return ret
-
-    def get_success_url(self):
-        if self.user_is_new():
-            # clear any pre-existing session and login the user
-            self.request.session.clear()
-            self.reset_user.emailaddress_set.filter(email=self.reset_user.email).update(verified=True)
-            login(self.request, self.reset_user, backend="django.contrib.auth.backends.ModelBackend")
-            return reverse("welcoming_tour:index")
-        return super().get_success_url()
 
 
 class ChooseUserKindSignupView(LoginNotRequiredMixin, FormView):

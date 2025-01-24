@@ -1,7 +1,5 @@
 from unittest import mock
 
-from allauth.account.forms import default_token_generator
-from allauth.account.utils import user_pk_to_url_str
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user
@@ -11,28 +9,29 @@ from django.utils.http import urlencode
 from freezegun import freeze_time
 from pytest_django.asserts import assertMessages, assertRedirects
 
+from itou.utils.tokens import EmailAwarePasswordResetTokenGenerator
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from tests.utils.test import parse_response_to_soup
 
 
 class TestPasswordReset:
     def _get_password_change_from_key_url(self, user):
-        uidb36 = user_pk_to_url_str(user)
-        key = default_token_generator.make_token(user)
-        return reverse("account_reset_password_from_key", kwargs={"uidb36": uidb36, "key": key})
+        uidb36 = user.pk_to_url_str
+        key = EmailAwarePasswordResetTokenGenerator().make_token(user)
+        return reverse("accounts:account_reset_password_from_key", kwargs={"uidb36": uidb36, "key": key})
 
     def test_password_reset_flow(self, client, mailoutbox):
-        user = JobSeekerFactory(last_login=timezone.now(), password="somethingElse%")
+        user = JobSeekerFactory(last_login=timezone.now(), password="somethingElse%", with_verified_email=True)
 
         # Ask for password reset.
-        url = reverse("account_reset_password")
+        url = reverse("accounts:account_reset_password")
         response = client.get(url)
         assert response.status_code == 200
 
         post_data = {"email": user.email}
         response = client.post(url, data=post_data)
         args = urlencode({"email": user.email})
-        next_url = reverse("account_reset_password_done")
+        next_url = reverse("accounts:account_reset_password_done")
         assertRedirects(response, f"{next_url}?{args}")
 
         # Check sent email.
@@ -53,7 +52,7 @@ class TestPasswordReset:
         password_change_url_with_hidden_key = response.url
         post_data = {"password1": DEFAULT_PASSWORD, "password2": DEFAULT_PASSWORD}
         response = client.post(password_change_url_with_hidden_key, data=post_data)
-        assertRedirects(response, reverse("account_reset_password_from_key_done"))
+        assertRedirects(response, reverse("accounts:account_reset_password_from_key_done"))
 
         # User can log in with their new password.
         assert client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -63,13 +62,13 @@ class TestPasswordReset:
         """
         Avoid user enumeration: redirect to the success page even with a nonexistent email.
         """
-        url = reverse("account_reset_password")
+        url = reverse("accounts:account_reset_password")
         response = client.get(url)
         assert response.status_code == 200
         post_data = {"email": "nonexistent@email.com"}
         response = client.post(url, data=post_data)
         args = urlencode({"email": post_data["email"]})
-        next_url = reverse("account_reset_password_done")
+        next_url = reverse("accounts:account_reset_password_done")
         assert response.url == f"{next_url}?{args}"
 
     def test_password_reset_user_creation(self, client, snapshot):
@@ -101,7 +100,7 @@ class TestPasswordReset:
         post_data = {"password1": DEFAULT_PASSWORD, "password2": DEFAULT_PASSWORD}
         response = client.post(password_change_url_with_hidden_key, data=post_data)
         assertRedirects(response, reverse("welcoming_tour:index"))
-        assert response.context["request"].user.is_authenticated
+        assert get_user(client).is_authenticated is True
 
         # User can log in with their new password.
         client.logout()
