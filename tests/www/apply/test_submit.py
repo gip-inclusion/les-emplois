@@ -40,7 +40,7 @@ from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
-from tests.approvals.factories import PoleEmploiApprovalFactory
+from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.asp.factories import CommuneFactory, CountryFranceFactory
 from tests.cities.factories import create_city_geispolsheim, create_city_in_zrr, create_test_cities
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWithMembershipAndJobsFactory
@@ -5170,6 +5170,57 @@ class TestHireConfirmation:
         post_data = post_data | {"confirmed": "True"}
         response = client.post(
             self._reverse("apply:hire_confirmation"), headers={"hx-request": "true"}, data=post_data
+        )
+
+        job_application = JobApplication.objects.select_related("job_seeker").get(
+            sender=self.company.members.first(), to_company=self.company
+        )
+        next_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
+        assertRedirects(response, next_url, status_code=200)
+
+        assert job_application.job_seeker == self.job_seeker
+        assert job_application.sender_kind == SenderKind.EMPLOYER
+        assert job_application.sender_company == self.company
+        assert job_application.sender_prescriber_organization is None
+        assert job_application.state == JobApplicationState.ACCEPTED
+        assert job_application.message == ""
+        assert list(job_application.selected_jobs.all()) == []
+        assert job_application.resume_link == ""
+
+    def test_as_company_elibility_diagnosis_from_another_company(self, client, snapshot):
+        eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_employer=True, job_seeker=self.job_seeker)
+        ApprovalFactory(eligibility_diagnosis=eligibility_diagnosis, user=self.job_seeker)
+        self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
+        client.force_login(self.company.members.get())
+
+        response = client.get(self._reverse("apply:hire_confirmation"))
+        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, "PASS IAE valide")
+
+        hiring_start_at = timezone.localdate()
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": "",
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
+            "birthdate": self.job_seeker.jobseeker_profile.birthdate.isoformat(),
+            "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
+            "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
+            "answer": "",
+            "ban_api_resolved_address": self.job_seeker.geocoding_address,
+            "address_line_1": self.job_seeker.address_line_1,
+            "post_code": self.city.post_codes[0],
+            "insee_code": self.city.code_insee,
+            "city": self.city.name,
+            "phone": self.job_seeker.phone,
+            "fill_mode": "ban_api",
+            "address_for_autocomplete": "0",
+            "confirmed": "True",
+        }
+        response = client.post(
+            self._reverse("apply:hire_confirmation"),
+            data=post_data,
+            headers={"hx-request": "true"},
         )
 
         job_application = JobApplication.objects.select_related("job_seeker").get(
