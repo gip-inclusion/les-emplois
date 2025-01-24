@@ -1,10 +1,12 @@
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import get_user
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertMessages, assertRedirects
 
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from tests.utils.test import parse_response_to_soup
@@ -122,14 +124,18 @@ class TestPasswordChange:
         client.force_login(user)
 
         # Change password.
-        url = reverse("account_change_password")
+        url = reverse("accounts:account_change_password")
         response = client.get(url)
         assert response.status_code == 200
         new_password = "Mlkjhgf!sq2a'4"
         post_data = {"oldpassword": DEFAULT_PASSWORD, "password1": new_password, "password2": new_password}
         response = client.post(url, data=post_data)
-        assert response.status_code == 302
         assertRedirects(response, reverse("dashboard:index"))
+
+        assertMessages(response, [messages.Message(messages.SUCCESS, "Mot de passe modifié avec succès.")])
+
+        # User is not logged out.
+        assert get_user(client).is_authenticated is True
 
         # User can log in with their new password.
         client.logout()

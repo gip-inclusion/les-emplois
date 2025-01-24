@@ -1,21 +1,44 @@
-from allauth.account.views import PasswordChangeView
 from django.conf import settings
-from django.contrib.auth import logout
+from django.contrib import messages
+from django.contrib.auth import logout, update_session_auth_hash
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
+from django.utils.decorators import method_decorator
+from django.views.decorators.debug import sensitive_post_parameters
+from django.views.generic import FormView, TemplateView
 
 from itou.emails.models import EmailConfirmation
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.views import NextRedirectMixin
+from itou.www.accounts.forms import ChangePasswordForm
 
 
-class ItouPasswordChangeView(PasswordChangeView):
-    """
-    https://github.com/pennersr/django-allauth/issues/468
-    """
-
+# TODO: migrate rate_limit functionality from allauth, or replace it.
+# @method_decorator(rate_limit(action="change_password"), name="dispatch")
+@method_decorator(sensitive_post_parameters("oldpassword", "password", "password1", "password2"), name="dispatch")
+class PasswordChangeView(NextRedirectMixin, FormView):
+    template_name = "account/password_change.html"
+    form_class = ChangePasswordForm
     success_url = reverse_lazy("dashboard:index")
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+
+        # Default behavior of Django to invalidate all sessions on password change, but we preserve the session.
+        user = form.user
+        update_session_auth_hash(self.request, user)
+
+        messages.add_message(self.request, messages.SUCCESS, "Mot de passe modifié avec succès.")
+
+        # TODO: reinstante password changed notification
+        # adapter.send_notification_mail("account/email/password_changed", user)
+
+        return super().form_valid(form)
 
 
 class PasswordResetDoneView(LoginNotRequiredMixin, TemplateView):

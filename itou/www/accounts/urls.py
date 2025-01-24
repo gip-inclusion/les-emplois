@@ -20,7 +20,7 @@ urlpatterns = [
     path("login", login_views.ItouLoginView.as_view(), name="account_login"),
     path("logout", logout_views.LogoutView.as_view(), name="account_logout"),
     path("inactive", account_views.AccountInactiveView.as_view(), name="account_inactive"),
-    path("password/change", account_views.ItouPasswordChangeView.as_view(), name="account_change_password"),
+    path("password/change", account_views.PasswordChangeView.as_view(), name="account_change_password"),
     # Avoid user enumeration via password reset page.
     path("password/reset", signup_views.ItouPasswordResetView.as_view(), name="account_reset_password"),
     path(

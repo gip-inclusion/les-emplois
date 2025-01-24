@@ -1,6 +1,5 @@
 import uuid
 
-from allauth.account.views import PasswordChangeView
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
@@ -192,14 +191,6 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
             else None
         )
     return render(request, template_name, context)
-
-
-class ItouPasswordChangeView(PasswordChangeView):
-    """
-    https://github.com/pennersr/django-allauth/issues/468
-    """
-
-    success_url = reverse_lazy("dashboard:index")
 
 
 def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
