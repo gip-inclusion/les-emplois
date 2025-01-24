@@ -24,14 +24,7 @@
                             <br>
                             <strong>{{ user.email }}</strong>
                         </p>
-                        <div class="text-center">
-                            <a href="{{ pro_connect_url }}" class="proconnect-button" {% matomo_event "connexion "|add:matomo_account_type "clic" "se-connecter-avec-pro-connect" %}>
-                            </a>
-                        </div>
-                        <a class="btn btn-link btn-block" href="https://proconnect.gouv.fr/" aria-label="Plus d'infos concernant ProConnect" rel="noopener" target="_blank">
-                            <span>Plus d'infos</span>
-                            <i class="ri-external-link-line ri-lg"></i>
-                        </a>
+                        {% include "pro_connect/includes/button.html" with login=True %}
                     </div>
                 </div>
                 <div class="s-section__col d-none d-lg-flex col-lg-6 p-lg-6 justify-content-center align-items-center bg-light">
