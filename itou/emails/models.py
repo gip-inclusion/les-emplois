@@ -1,7 +1,5 @@
 import datetime
 
-from allauth.account import signals
-from allauth.account.internal.flows.manage_email import emit_email_changed
 from citext import CIEmailField
 from django.conf import settings
 from django.contrib import messages
@@ -16,6 +14,7 @@ from django.utils.html import escape
 
 from itou.emails import notifications
 from itou.emails.managers import EmailAddressManager, EmailConfirmationManager
+from itou.utils.requests import get_client_ip, get_http_user_agent
 from itou.utils.urls import get_absolute_url
 
 
@@ -220,15 +219,17 @@ class EmailConfirmation(models.Model):
         for instance in EmailAddress.objects.filter(user_id=email_address.user_id).exclude(pk=email_address.pk):
             instance.remove()
 
-        # TODO: replace emit_email_changed. It sends a signal and an email
-        # NOTE: email_confirmation_sent is unused, you might be able to remove it.
-        emit_email_changed(request, from_email_address, email_address)
+        # Send a notification about email change
+        if from_email_address:
+            notifications.EmailChangedNotification(
+                from_email_address.user,
+                from_email=from_email_address.email,
+                to_email=self.email_address.email,
+                timestamp=timezone.now(),
+                ip=get_client_ip(request),
+                user_agent=get_http_user_agent(request),
+            ).send()
 
-        signals.email_confirmed.send(
-            sender=EmailAddress,
-            request=request,
-            email_address=email_address,
-        )
         messages.add_message(request, messages.SUCCESS, f"Vous avez confirmé {escape(email_address.email)}")
 
         if perform_login_on_success:

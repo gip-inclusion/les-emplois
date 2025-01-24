@@ -16,3 +16,12 @@ class EmailConfirmationSignupNotification(EmailConfirmationNotification):
     name = "Confirmation d'adresse e-mail pendant inscription"
     subject_template = "account/email/email_confirmation_signup_subject.txt"
     body_template = "account/email/email_confirmation_signup_message.txt"
+
+
+@notifications_registry.register
+class EmailChangedNotification(EmailNotification):
+    name = "Changement d'adresse e-mail"
+    category = NotificationCategory.ACCOUNT
+    subject_template = "account/email/email_changed_subject.txt"
+    body_template = "account/email/email_changed_message.txt"
+    can_be_disabled = False

@@ -4,7 +4,7 @@ import random
 import string
 
 import factory.fuzzy
-from allauth.account import models as allauth_models
+from allauth.account.models import EmailAddress as AllauthEmailAddress
 from django.contrib.auth.hashers import make_password
 from django.utils.text import slugify
 
@@ -12,6 +12,7 @@ from itou.asp.models import AllocationDuration, EducationLevel, EITIContribution
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.communications.models import NotificationRecord, NotificationSettings
+from itou.emails.models import EmailAddress
 from itou.users import models
 from itou.users.enums import IdentityProvider, Title, UserKind
 from itou.utils.mocks.address_format import (
@@ -39,10 +40,14 @@ def _verify_emails_for_user(self, create, extracted, **kwargs):
 
     emails = extracted or [self.email]
     for email in emails:
-        email_address, _ = allauth_models.EmailAddress.objects.get_or_create(user=self, email=email)
+        email_address, _ = EmailAddress.objects.get_or_create(user=self, email=email)
         email_address.verified = True
         email_address.primary = True
         email_address.save()
+        self.email_addresses.add(email_address)
+
+        # TODO: remove django-allauth email address model
+        email_address, _ = AllauthEmailAddress.objects.get_or_create(user=self, email=email)
         self.emailaddress_set.add(email_address)
 
 

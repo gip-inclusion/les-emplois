@@ -1,4 +1,24 @@
 # serializer version: 1
+# name: TestConfirmEmailView.test_confirm_changed_email[email body]
+  '''
+  Bonjour, c'est les emplois de l'inclusion !
+  
+  Vous recevez cet e-mail car la modification suivante a été apportée à votre compte :
+  
+  Votre adresse e-mail a été modifiée de jane.doe@test.local à newemail@test.org.
+  
+  Si vous ne reconnaissez pas ce changement, veuillez prendre immédiatement les mesures de sécurité qui s'imposent. La modification de votre compte provient de :
+  
+  - L'adresse IP : 127.0.0.1
+  - Navigateur : Unspecified
+  - Date : 31 août 2023 14:34
+  
+  Merci d'utiliser les emplois de l'inclusion !
+  '''
+# ---
+# name: TestConfirmEmailView.test_confirm_changed_email[email subject]
+  '[DEV] E-mail modifié'
+# ---
 # name: TestConfirmEmailView.test_invalid_url
   '''
   <main class="s-main" id="main" role="main">

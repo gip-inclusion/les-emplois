@@ -1,6 +1,9 @@
+from unittest import mock
+
 from django.contrib import messages
 from django.contrib.auth import get_user
 from django.urls import reverse
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains
 
 from itou.emails.models import EmailAddress, EmailConfirmation
@@ -44,6 +47,57 @@ class TestConfirmEmailView:
         confirmation = EmailConfirmation.objects.get(email_address=email_address)
         assert confirmation.used
         assert not confirmation.can_confirm_email()
+
+    @freeze_time("2023-08-31 12:34:56")
+    def test_confirm_changed_email(self, client, snapshot):
+        # I confirm an email when I already have another email associated with my account
+        sent_emails = []
+
+        def mock_send_email(self, **kwargs):
+            sent_emails.append(self)
+
+        user = JobSeekerFactory(for_snapshot=True, with_verified_email=True)
+        new_email = "newemail@test.org"
+        old_email = user.email
+        with mock.patch("django.core.mail.EmailMessage.send", mock_send_email):
+            new_email_address = user.email_addresses.add_new_email(user, new_email, send_confirmation=True)
+            assert not new_email_address.verified
+            assert not new_email_address.primary
+
+            # Email not changed until it is verified.
+            user.refresh_from_db()
+            assert user.email == old_email
+            assert user.email_addresses.count() == 2
+
+            assert len(sent_emails) == 1  # Confirmation email.
+            email_confirmation = EmailConfirmation.objects.get(email_address=new_email_address)
+            assert email_confirmation.can_confirm_email()
+
+            # Simulate request and confirmation.
+            response = client.post(email_confirmation.get_confirmation_url(), {})
+            assert get_user(client).is_authenticated
+            assertMessages(response, [messages.Message(messages.SUCCESS, f"Vous avez confirmé {new_email}")])
+
+            email_confirmation.refresh_from_db()
+            assert email_confirmation.used
+
+            # Received a notification that email has changed.
+            assert len(sent_emails) == 2
+            assert sent_emails[1].to == [new_email]
+            assert sent_emails[1].subject == snapshot(name="email subject")
+            assert sent_emails[1].body == snapshot(name="email body")
+
+            # User e-mail has been replaced.
+            new_email_address.refresh_from_db()
+            assert new_email_address.verified
+            assert new_email_address.primary
+
+            user.refresh_from_db()
+            assert user.email == new_email
+
+            # Old email has been released.
+            assert user.email_addresses.count() == 1
+            assert not EmailAddress.objects.filter(email=old_email).exists()
 
     def test_logs_out_existing_session(self, client, snapshot):
         """

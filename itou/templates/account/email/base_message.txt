@@ -1,0 +1,6 @@
+{% autoescape off %}Bonjour, c'est les emplois de l'inclusion !
+
+{% block content %}{% endblock content %}
+
+Merci d'utiliser les emplois de l'inclusion !
+{% endautoescape %}
