@@ -3,12 +3,15 @@ from django.contrib import messages
 from django.contrib.auth import logout, update_session_auth_hash
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import FormView, TemplateView
 
 from itou.emails.models import EmailConfirmation
+from itou.users.notifications import PasswordChangedNotification
 from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.requests import get_client_ip, get_http_user_agent
 from itou.utils.views import NextRedirectMixin
 from itou.www.accounts.forms import ChangePasswordForm
 
@@ -33,10 +36,14 @@ class PasswordChangeView(NextRedirectMixin, FormView):
         user = form.user
         update_session_auth_hash(self.request, user)
 
+        # Notify the user in-site and by email.
         messages.add_message(self.request, messages.SUCCESS, "Mot de passe modifié avec succès.")
-
-        # TODO: reinstante password changed notification
-        # adapter.send_notification_mail("account/email/password_changed", user)
+        PasswordChangedNotification(
+            user,
+            timestamp=timezone.now(),
+            ip=get_client_ip(self.request),
+            user_agent=get_http_user_agent(self.request),
+        ).send()
 
         return super().form_valid(form)
 

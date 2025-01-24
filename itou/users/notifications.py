@@ -20,3 +20,12 @@ class JobSeekerCreatedByProxyNotification(EmailNotification):
     subject_template = "account/email/email_jobseeker_created_by_third_party_subject.txt"
     body_template = "account/email/email_jobseeker_created_by_third_party_body.txt"
     can_be_disabled = False
+
+
+@notifications_registry.register
+class PasswordChangedNotification(EmailNotification):
+    name = "Changement du mot de passe"
+    category = NotificationCategory.ACCOUNT
+    subject_template = "account/email/password_changed_subject.txt"
+    body_template = "account/email/password_changed_message.txt"
+    can_be_disabled = False

@@ -1,3 +1,5 @@
+from unittest import mock
+
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str
 from django.conf import settings
@@ -6,6 +8,7 @@ from django.contrib.auth import get_user
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
+from freezegun import freeze_time
 from pytest_django.asserts import assertMessages, assertRedirects
 
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
@@ -107,18 +110,24 @@ class TestPasswordReset:
     def test_password_reset_token_invalid_content(self, client, snapshot):
         # user creation differs because they are logged in and redirected to the welcoming tour on creation
         password_change_url = reverse(
-            "account_reset_password_from_key", kwargs={"uidb36": "something", "key": "invalid"}
+            "accounts:account_reset_password_from_key", kwargs={"uidb36": "something", "key": "invalid"}
         )
         response = client.get(password_change_url)
         assert str(parse_response_to_soup(response, "#main")) == snapshot
 
 
 class TestPasswordChange:
-    def test_password_change_flow(self, client):
+    @freeze_time("2023-08-31 12:34:56")
+    def test_password_change_flow(self, client, snapshot):
         """
         Ensure that the default allauth account_change_password URL is overridden
         and redirects to the right place.
         """
+
+        sent_emails = []
+
+        def mock_send_email(self, **kwargs):
+            sent_emails.append(self)
 
         user = JobSeekerFactory(with_address=True)
         client.force_login(user)
@@ -129,10 +138,16 @@ class TestPasswordChange:
         assert response.status_code == 200
         new_password = "Mlkjhgf!sq2a'4"
         post_data = {"oldpassword": DEFAULT_PASSWORD, "password1": new_password, "password2": new_password}
-        response = client.post(url, data=post_data)
+        with mock.patch("django.core.mail.EmailMessage.send", mock_send_email):
+            response = client.post(url, data=post_data)
         assertRedirects(response, reverse("dashboard:index"))
 
+        # User is notified of confirmation in-site and by email.
         assertMessages(response, [messages.Message(messages.SUCCESS, "Mot de passe modifié avec succès.")])
+        assert len(sent_emails) == 1
+        assert sent_emails[0].to == [user.email]
+        assert sent_emails[0].subject == snapshot(name="email subject")
+        assert sent_emails[0].body == snapshot(name="email body")
 
         # User is not logged out.
         assert get_user(client).is_authenticated is True
