@@ -45,7 +45,7 @@
                     {% endif %}
                     <div class="row">
                         <div class="col-2">
-                            <form method="post" action="{% url 'account_logout' %}" class="js-prevent-multiple-submit">
+                            <form method="post" action="{% url 'accounts:account_logout' %}" class="js-prevent-multiple-submit">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-block btn-primary" aria-label="Se déconnecter">
                                     <span>Se déconnecter</span>

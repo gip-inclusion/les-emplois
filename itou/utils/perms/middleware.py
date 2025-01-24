@@ -135,7 +135,7 @@ class ItouCurrentOrganizationMiddleware:
             request.path.startswith("/signup/siae/join"),  # employer about to join a company
             request.path.startswith("/signup/facilitator/join"),  # facilitator about to join a company
             request.path.startswith("/signup/prescriber/join"),  # prescriber about to join a organization
-            request.path in [reverse("account_login"), reverse("account_logout")],
+            request.path in [reverse("accounts:account_login"), reverse("accounts:account_logout")],
             request.path.startswith("/hijack/release"),  # Allow to release hijack
             request.path.startswith("/api"),  # APIs should handle those errors
         ]

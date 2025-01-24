@@ -1,4 +1,3 @@
-{# django-allauth template override. #}
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
 {% load redirection_fields %}
@@ -15,7 +14,7 @@
                 <div class="col-12 col-lg-8">
                     <div class="alert alert-info" role="status">
                         <p>Voulez-vous vraiment vous déconnecter ?</p>
-                        <form method="post" action="{% url 'account_logout' %}" class="js-prevent-multiple-submit">
+                        <form method="post" action="{% url 'accounts:account_logout' %}" class="js-prevent-multiple-submit">
 
                             {% csrf_token %}
 

@@ -202,7 +202,7 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
         request.user.save()
         request.user.emailaddress_set.all().delete()
         auth.logout(request)
-        return HttpResponseRedirect(reverse("account_logout"))
+        return HttpResponseRedirect(reverse("accounts:account_logout"))
 
     context = {
         "form": form,
