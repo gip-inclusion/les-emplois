@@ -188,9 +188,10 @@ def test_beneficiary_details(client, snapshot):
     response = client.get(user_details_url)
     html_details = parse_response_to_soup(
         response,
-        selector="#beneficiary_details_container",
+        selector="#main",
         replace_in_attr=[
             ("href", f"user_id={prescriber.pk}", "user_id=[PK of user]"),
+            ("data-bs-confirm-url", f"/gps/groups/{group.pk}/", "/gps/groups/[PK of group]/"),
             (
                 "href",
                 f"user_organization_id={prescriber.prescribermembership_set.get().organization_id}",

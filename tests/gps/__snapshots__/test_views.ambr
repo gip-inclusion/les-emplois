@@ -1,7 +1,69 @@
 # serializer version: 1
 # name: test_beneficiary_details
   '''
-  <div class="col-12" id="beneficiary_details_container">
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/gps/groups">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
+          <h1 class="m-0">Jane DOE</h1>
+          <div aria-label="Actions sur le bénéficiaire" class="d-flex flex-column flex-md-row gap-3" role="group">
+              
+              <a aria-label="Ne plus suivre Jane DOE" class="btn btn-lg btn-outline-primary btn-ico" data-bs-body="Vous pourrez toujours suivre ce bénéficiaire de nouveau plus tard." data-bs-confirm-text="Ne plus suivre" data-bs-confirm-url="/gps/groups/[PK of group]/leave" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de ne plus vouloir suivre Jane DOE ?" data-bs-toggle="modal" href="/gps/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                  <i aria-hidden="true" class="ri-user-unfollow-line fw-medium"></i>
+                  <span>Ne plus suivre</span>
+              </a>
+  
+              
+                  
+                  <a aria-label="Ne plus être référent de Jane DOE" class="btn btn-lg btn-primary btn-ico" data-bs-body="Vous pourrez toujours devenir référent de ce bénéficiaire plus tard." data-bs-confirm-text="Ne plus être référent" data-bs-confirm-url="/gps/groups/[PK of group]/toggle_referent" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de ne plus vouloir être référent de Jane DOE ?" data-bs-toggle="modal" href="/gps/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                      <i aria-hidden="true" class="ri-map-pin-user-line fw-medium"></i>
+                      <span>Ne plus être référent</span>
+                  </a>
+              
+  
+              
+          </div>
+      </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12" id="beneficiary_details_container">
                       
                       <div class="c-box">
                           <h2>Données administratives</h2>
@@ -97,6 +159,98 @@
                           </div>
                       </div>
                   </div>
+              </div>
+          </div>
+      </section>
+  
+      
+  
+  
+  
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12" id="gps_intervenants">
+                  <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
+                      <h2 class="mb-0">Intervenants</h2>
+                      <a class="btn btn-ico btn-primary" href="https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?user_name=Pierre+DUPONT&amp;user_id=[PK of user]&amp;user_email=pierre.dupont%40test.local&amp;user_organization_name=Les+Olivades&amp;user_organization_id=[PK of organization]&amp;user_type=prescriber&amp;beneficiary_name=Jane+DOE&amp;beneficiary_id=[PK of beneficiary]&amp;beneficiary_email=jane.doe%40test.local&amp;success_url=http%3A%2F%2Ftestserver%2Fgps%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a" id="request-new-participant-link">
+                          <i aria-hidden="true" class="ri-user-add-line"></i>
+                          <span>Ajouter un intervenant existant</span>
+                      </a>
+                  </div>
+                  <form>
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      
+                          <div class="c-box c-box--results has-links-inside my-md-4" id="card-03580247-b036-4578-bf9d-f92c9c2f68cd">
+                              <div class="c-box--results__header">
+                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+                                      <p class="fs-sm mb-0 flex-grow-1">
+                                          <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
+                                          Membre du groupe de suivi depuis le 21/06/2024
+                                      </p>
+                                      
+                                          <div>
+                                              <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
+                                                  <i class="ri-map-pin-user-line"></i>
+                                                  Référent⸱e
+                                              </span>
+                                          </div>
+                                      
+                                  </div>
+                                  <div class="c-box--results__summary">
+                                      
+                                          <i aria-hidden="true" class="ri-home-smile-line"></i>
+                                      
+                                      <div>
+                                          <h3>Pierre DUPONT</h3>
+                                          <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                                              Prescripteur
+                                              pour Les Olivades
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <hr class="m-0"/>
+                              <div class="c-box--results__body">
+                                  <ul class="list-data list-data__two-column-md">
+                                      <li>
+                                          <small>Adresse e-mail</small>
+                                          <button class="btn-link btn-ico has-btn-with-spinner-loading-text" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_email" hx-post="/gps/display/[PK of group]/[Public ID of prescriber]/email" hx-swap="outerHTML" id="email-[PK of prescriner]">
+                                              <span>Afficher l'email</span>
+                                              <div class="stable-text">
+                                                  <i aria-hidden="true" class="ri-mail-line fw-medium"></i>
+                                              </div>
+                                              <div class="loading-text">
+                                                  <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+                                              </div>
+                                          </button>
+                                      </li>
+                                      <li>
+                                          <small>Téléphone</small>
+                                          
+                                              <button class="btn-link btn-ico has-btn-with-spinner-loading-text" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_phone" hx-post="/gps/display/[PK of group]/[Public ID of prescriber]/phone" hx-swap="outerHTML" id="phone-[PK of prescriber]">
+                                                  <span>Afficher le téléphone</span>
+                                                  <div class="stable-text">
+                                                      <i aria-hidden="true" class="ri-phone-line fw-medium"></i>
+                                                  </div>
+                                                  <div class="loading-text">
+                                                      <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+                                                  </div>
+                                              </button>
+                                          
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      
+                  </form>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  
+          </main>
   '''
 # ---
 # name: test_contact_information_display[info_displayed]
