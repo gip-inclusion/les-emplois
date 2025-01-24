@@ -6,6 +6,7 @@ from django.utils.module_loading import autodiscover_modules
 
 
 class NotificationCategory(StrEnum):
+    ACCOUNT = "Gestion de compte"
     IAE_PASS = "PASS IAE"
     MEMBERS_MANAGEMENT = "Gestion des collaborateurs"
     JOB_APPLICATION = "Candidature"
