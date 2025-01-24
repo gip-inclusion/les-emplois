@@ -1,5 +1,4 @@
 import datetime
-import io
 import json
 from unittest.mock import patch
 
@@ -556,8 +555,7 @@ class TestApprovalsSendToPeManagement:
     @patch("itou.approvals.management.commands.send_approvals_to_pe.sleep")
     # smaller batch to ease testing
     @patch("itou.approvals.management.commands.send_approvals_to_pe.MAX_APPROVALS_PER_RUN", 10)
-    def test_invalid_job_seeker_for_pole_emploi(self, sleep_mock, notify_mock, cancelled_notify_mock):
-        stdout = io.StringIO()
+    def test_invalid_job_seeker_for_pole_emploi(self, sleep_mock, notify_mock, cancelled_notify_mock, caplog):
         # create ignored Approvals, will not even be counted in the batch. the cron will wait for
         # the database to have the necessary job application, nir, or start date to fetch them.
         no_jobapp = ApprovalFactory(with_jobapplication=False)
@@ -598,9 +596,8 @@ class TestApprovalsSendToPeManagement:
             "send_approvals_to_pe",
             wet_run=True,
             delay=3,
-            stdout=stdout,
         )
-        assert stdout.getvalue().split("\n") == [
+        assert caplog.messages[:-1] == [
             "approvals needing to be sent count=3, batch count=10",
             f"approvals={pending_approval} start_at={pending_approval.start_at.isoformat()} "
             "pe_state=notification_ready",
@@ -613,9 +610,11 @@ class TestApprovalsSendToPeManagement:
             f"cancelled_approval={cancelled_approval} start_at={cancelled_approval.start_at.isoformat()} "
             "pe_state=notification_ready"
             for cancelled_approval in cancelled_approvals[:7]
-        ] + [
-            "",
         ]
+        # Last log shows the timing: use startswith
+        assert caplog.messages[-1].startswith(
+            "Management command itou.approvals.management.commands.send_approvals_to_pe succeeded in "
+        )
         sleep_mock.assert_called_with(3)
         assert sleep_mock.call_count == 10
         assert notify_mock.call_count == 3
