@@ -17,7 +17,7 @@ class TestEmailConfirmation:
         user = JobSeekerFactory()
         email_confirmation = EmailConfirmation.create(EmailAddress.objects.create(user=user, email=user.email))
         with mock.patch("django.core.mail.EmailMessage.send", mock_send_email):
-            email_confirmation.send(None)
+            email_confirmation.send()
 
         assert len(sent_emails) == 1
         assert sent_emails[0].to == [user.email]
@@ -42,7 +42,7 @@ class TestEmailConfirmation:
         user = JobSeekerFactory()
         email_confirmation = EmailConfirmation.create(EmailAddress.objects.create(user=user, email=user.email))
         with mock.patch("django.core.mail.EmailMessage.send", mock_send_email):
-            email_confirmation.send(None, signup=True)
+            email_confirmation.send(signup=True)
 
         assert len(sent_emails) == 1
         assert sent_emails[0].to == [user.email]

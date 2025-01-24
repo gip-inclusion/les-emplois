@@ -13,7 +13,7 @@ class EmailAddressManager(models.Manager):
         """
         return self.model.objects.filter(user=user, verified=False).last()
 
-    def add_new_email(self, request, user, email, send_confirmation=True, signup=False):
+    def add_new_email(self, user, email, send_confirmation=True, signup=False):
         """
         Adds email address to user, non-verified and optionally sends a confirmation email.
         If an existing non-verified email exists for the user, it will be replaced.
@@ -31,7 +31,7 @@ class EmailAddressManager(models.Manager):
 
         # Send confirmation email
         if send_confirmation:
-            instance.send_confirmation(request, signup=signup)
+            instance.send_confirmation(signup=signup)
 
         return instance
 

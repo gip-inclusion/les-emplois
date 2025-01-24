@@ -115,9 +115,9 @@ class EmailAddress(models.Model):
         user_email(self.user, self.email, commit=True)
         return True
 
-    def send_confirmation(self, request, signup=False):
+    def send_confirmation(self, signup=False):
         confirmation = EmailConfirmation.create(self)
-        confirmation.send(request, signup=signup)
+        confirmation.send(signup=signup)
         return confirmation
 
     def remove(self):
@@ -235,7 +235,7 @@ class EmailConfirmation(models.Model):
             login(request, email_address.user, backend="django.contrib.auth.backends.ModelBackend")
         return email_address
 
-    def send(self, request, signup=False):
+    def send(self, signup=False):
         # Send email notification.
         if signup:
             notification_class = notifications.EmailConfirmationSignupNotification
