@@ -17,7 +17,7 @@
                     {% endif %}
                     <div class="c-form mb-5">
                         {% if uses_pro_connect %}
-                            {% include "account/includes/login_pro_connect.html" %}
+                            {% include "pro_connect/includes/button.html" with login=True %}
                             <hr class="my-5" data-it-text="ou">
                             <div class="text-center">
                                 <button class="btn btn-link collapseConnectionForm mb-3{% if form.errors %} d-none{% else %} show has-no-transition{% endif %}"

@@ -19,9 +19,9 @@
                             <div class="alert alert-important">
                                 <p class="mb-0">Inclusion Connect devient ProConnect</p>
                             </div>
-                            {% include "account/includes/login_pro_connect.html" %}
+                            {% include "pro_connect/includes/button.html" with login=True %}
                         {% elif login_provider == "PC" %}
-                            {% include "account/includes/login_pro_connect.html" %}
+                            {% include "pro_connect/includes/button.html" with login=True %}
                         {% elif login_provider == "FC" %}
                             <p class="h4">Se connecter avec FranceConnect</p>
                             {% if show_france_connect %}
