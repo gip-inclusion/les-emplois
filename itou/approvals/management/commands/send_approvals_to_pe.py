@@ -62,12 +62,15 @@ class Command(BaseCommand):
         ).order_by("-start_at")
 
         nb_approvals = queryset.count()
-        self.stdout.write(f"approvals needing to be sent count={nb_approvals}, batch count={MAX_APPROVALS_PER_RUN}")
+        self.logger.info("approvals needing to be sent count=%s, batch count=%s", nb_approvals, MAX_APPROVALS_PER_RUN)
         nb_approvals_to_send = min(nb_approvals, MAX_APPROVALS_PER_RUN)
 
         for approval in queryset[:nb_approvals_to_send]:
-            self.stdout.write(
-                f"approvals={approval} start_at={approval.start_at} pe_state={approval.pe_notification_status}"
+            self.logger.info(
+                "approvals=%s start_at=%s pe_state=%s",
+                approval,
+                approval.start_at,
+                approval.pe_notification_status,
             )
             if wet_run:
                 approval.notify_pole_emploi()
@@ -81,13 +84,17 @@ class Command(BaseCommand):
                 api_enums.PEApiNotificationStatus.SHOULD_RETRY,
             ],
         ).order_by("-start_at")
-        self.stdout.write(
-            f"cancelled approvals needing to be sent count={cancelled_queryset.count()}, batch count={batch_left}"
+        self.logger.info(
+            "cancelled approvals needing to be sent count=%s, batch count=%s",
+            cancelled_queryset.count(),
+            batch_left,
         )
         for cancelled_approval in cancelled_queryset[:batch_left]:
-            self.stdout.write(
-                f"cancelled_approval={cancelled_approval} start_at={cancelled_approval.start_at} "
-                f"pe_state={cancelled_approval.pe_notification_status}"
+            self.logger.info(
+                "cancelled_approval=%s start_at=%s pe_state=%s",
+                cancelled_approval,
+                cancelled_approval.start_at,
+                cancelled_approval.pe_notification_status,
             )
             if wet_run:
                 cancelled_approval.notify_pole_emploi()
