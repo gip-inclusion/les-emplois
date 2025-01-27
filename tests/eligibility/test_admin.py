@@ -122,6 +122,20 @@ class TestAdminForm:
             assert diagnostic.expires_at == datetime.date(2025, 4, 23)  # 92 days
         assert diagnostic.administrative_criteria.count() == 1
 
+    @freeze_time("2025-01-21")
+    @pytest.mark.parametrize("user_kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
+    def test_add_eligibility_diagnostic_old_membership(self, admin_client, kind, user_kind):
+        # Allow inactive memberships
+        author = self.user_factory(kind, user_kind)
+        author.prescribermembership_set.update(is_active=False)
+        author.companymembership_set.update(is_active=False)
+        post_data = self.build_post_data(kind, author=author, job_seeker=JobSeekerFactory())
+        response = admin_client.post(self.get_add_url(kind), data=post_data)
+        assertRedirects(response, self.get_list_url(kind))
+
+        diagnostic = self.get_diag_model(kind).objects.get()
+        assert diagnostic.administrative_criteria.count() == 1
+
     def test_add_eligibility_diagnostic_no_criteria(self, admin_client, kind):
         author = PrescriberFactory(membership=True, membership__organization__is_authorized=True)
         post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)

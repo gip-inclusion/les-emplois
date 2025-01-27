@@ -41,8 +41,9 @@ class AbstractEligibilityDiagnosisAdminForm(forms.ModelForm):
                     )
                 if (
                     author_prescriber_organization
-                    and not author_prescriber_organization.memberships.filter(user=author, is_active=True).exists()
+                    and not author_prescriber_organization.memberships.filter(user=author).exists()
                 ):
+                    # Allow inactive membership as we may want to fix old diagnoses
                     self.add_error("author_prescriber_organization", "L'auteur n'appartient pas à cette organisation.")
             elif author.kind == UserKind.EMPLOYER:
                 if not author_kind == self.author_company_kind:
@@ -55,7 +56,8 @@ class AbstractEligibilityDiagnosisAdminForm(forms.ModelForm):
                     self.add_error(
                         self.author_company_fieldname, f"Une {company_name} est obligatoire pour cet auteur."
                     )
-                elif not author_company.memberships.filter(user=author, is_active=True).exists():
+                elif not author_company.memberships.filter(user=author).exists():
+                    # Allow inactive membership as we may want to fix old diagnoses
                     self.add_error(self.author_company_fieldname, "L'auteur n'appartient pas à cette structure.")
             else:
                 self.add_error("author", "Seul un prescripteur ou employeur peut être auteur d'un diagnostic.")
