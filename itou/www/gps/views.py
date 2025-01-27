@@ -137,7 +137,7 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
             FollowUpGroupMembership.objects.with_members_organizations_names()
             .filter(follow_up_group=self.object.follow_up_group)
             .filter(is_active=True)
-            .order_by("-is_referent")
+            .order_by("-created_at")
             .select_related("follow_up_group", "member")
         )
 

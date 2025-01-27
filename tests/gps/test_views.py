@@ -3,6 +3,7 @@ from functools import partial
 import freezegun
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
@@ -234,6 +235,22 @@ def test_beneficiary_details(client, snapshot):
 
     assertContains(response, "Ajouter un intervenant")
     assertContains(response, "https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant")
+
+
+def test_beneficiary_details_members_order(client):
+    prescriber = PrescriberFactory(membership=True, membership__organization__authorized=True)
+    beneficiary = JobSeekerFactory(for_snapshot=True)
+    group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
+    participant = FollowUpGroupMembershipFactory(follow_up_group=group, created_at=timezone.now()).member
+
+    client.force_login(prescriber)
+    user_details_url = reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id})
+    response = client.get(user_details_url)
+
+    html_details = parse_response_to_soup(response, selector="#gps_intervenants")
+    cards = html_details.find_all("div", attrs={"class": "c-box c-box--results has-links-inside my-md-4"})
+    participant_pks = [card.attrs["id"].split("card-")[1] for card in cards]
+    assert participant_pks == [str(participant.public_id), str(prescriber.public_id)]
 
 
 @freezegun.freeze_time("2025-01-20")
