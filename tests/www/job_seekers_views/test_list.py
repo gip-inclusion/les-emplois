@@ -5,6 +5,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertRedirects
 
+from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
@@ -20,7 +21,11 @@ def test_anonymous_user(client):
 def test_refused_access(client):
     url = reverse("job_seekers_views:list")
 
-    for user in [JobSeekerFactory(), LaborInspectorFactory(membership=True)]:
+    for user in [
+        JobSeekerFactory(),
+        LaborInspectorFactory(membership=True),
+        CompanyWithMembershipAndJobsFactory().members.first(),
+    ]:
         client.force_login(user)
         response = client.get(url)
         assert response.status_code == 403
