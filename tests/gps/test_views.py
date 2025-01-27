@@ -182,6 +182,12 @@ def test_beneficiary_details(client, snapshot):
     )
     beneficiary = JobSeekerFactory(for_snapshot=True)
     group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
+    participant = FollowUpGroupMembershipFactory(
+        member__first_name="François",
+        member__last_name="Le Français",
+        follow_up_group=group,
+        created_at=timezone.now(),
+    ).member
 
     client.force_login(prescriber)
 
@@ -199,19 +205,20 @@ def test_beneficiary_details(client, snapshot):
                 "user_organization_id=[PK of organization]",
             ),
             ("href", f"beneficiary_id={beneficiary.pk}", "beneficiary_id=[PK of beneficiary]"),
+            ("id", f"card-{prescriber.public_id}", "card-[PK of prescriber]"),
+            ("id", f"card-{participant.public_id}", "card-[PK of participant]"),
             (
                 "hx-post",
-                f"/gps/display/{group.pk}/{prescriber.public_id}/phone",
-                "/gps/display/[PK of group]/[Public ID of prescriber]/phone",
+                f"/gps/display/{group.pk}/{participant.public_id}/phone",
+                "/gps/display/[PK of group]/[Public ID of participant]/phone",
             ),
             (
                 "hx-post",
-                f"/gps/display/{group.pk}/{prescriber.public_id}/email",
-                "/gps/display/[PK of group]/[Public ID of prescriber]/email",
+                f"/gps/display/{group.pk}/{participant.public_id}/email",
+                "/gps/display/[PK of group]/[Public ID of participant]/email",
             ),
-            ("id", f"phone-{prescriber.pk}", "phone-[PK of prescriber]"),
-            ("id", f"email-{prescriber.pk}", "email-[PK of prescriner]"),
-            ("id", f"card-{prescriber.pk}", "card-[PK of prescriber]"),
+            ("id", f"phone-{participant.pk}", "phone-[PK of participant]"),
+            ("id", f"email-{participant.pk}", "email-[PK of participant]"),
         ],
     )
     assert str(html_details) == snapshot
@@ -227,8 +234,8 @@ def test_beneficiary_details(client, snapshot):
     assertContains(response, display_phone_txt)
 
     # Membership card: missing member information.
-    prescriber.phone = ""
-    prescriber.save()
+    participant.phone = ""
+    participant.save()
     response = client.get(user_details_url)
     assertContains(response, display_email_txt)
     assertNotContains(response, display_phone_txt)
@@ -249,8 +256,8 @@ def test_beneficiary_details_members_order(client):
 
     html_details = parse_response_to_soup(response, selector="#gps_intervenants")
     cards = html_details.find_all("div", attrs={"class": "c-box c-box--results has-links-inside my-md-4"})
-    participant_pks = [card.attrs["id"].split("card-")[1] for card in cards]
-    assert participant_pks == [str(participant.public_id), str(prescriber.public_id)]
+    participant_ids = [card.attrs["id"].split("card-")[1] for card in cards]
+    assert participant_ids == [str(participant.public_id), str(prescriber.public_id)]
 
 
 @freezegun.freeze_time("2025-01-20")
