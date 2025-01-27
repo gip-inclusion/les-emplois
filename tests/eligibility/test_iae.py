@@ -8,7 +8,6 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.eligibility.enums import (
-    CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
     AdministrativeCriteriaKind,
     AdministrativeCriteriaLevel,
     AuthorKind,
@@ -529,14 +528,18 @@ class TestAdministrativeCriteriaModel:
     ],
 )
 def test_certifiable(AdministrativeCriteriaClass):
+    certifiable_kinds = [
+        AdministrativeCriteriaKind.RSA,
+    ]
     for criterion in AdministrativeCriteriaClass.objects.all():
         assert AdministrativeCriteriaKind(criterion.kind)
 
-    certifiable_criterion = AdministrativeCriteriaClass.objects.get(kind=AdministrativeCriteriaKind.RSA)
-    not_certifiable_criteria = AdministrativeCriteriaClass.objects.exclude(kind=AdministrativeCriteriaKind.RSA).all()
+    certifiable_criteria = AdministrativeCriteriaClass.objects.filter(kind__in=certifiable_kinds)
+    not_certifiable_criteria = AdministrativeCriteriaClass.objects.exclude(kind__in=certifiable_kinds).all()
 
-    assert certifiable_criterion in AdministrativeCriteriaClass.objects.certifiable()
-    assert certifiable_criterion.is_certifiable
+    for criterion in certifiable_criteria:
+        assert criterion in AdministrativeCriteriaClass.objects.certifiable()
+        assert criterion.is_certifiable
 
     for criterion in not_certifiable_criteria:
         assert criterion in not_certifiable_criteria
@@ -544,36 +547,48 @@ def test_certifiable(AdministrativeCriteriaClass):
 
 
 @pytest.mark.parametrize(
-    "EligibilityDiagnosisFactory",
+    "EligibilityDiagnosisFactory,AdministrativeCriteriaModel",
     [
         pytest.param(
             partial(IAEEligibilityDiagnosisFactory, from_employer=True),
+            AdministrativeCriteria,
             id="test_eligibility_diagnosis_certify_criteria_iae",
         ),
         pytest.param(
             partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            GEIQAdministrativeCriteria,
             id="test_eligibility_diagnosis_certify_criteria_geiq",
         ),
     ],
 )
+@pytest.mark.parametrize(
+    "CRITERIA_KIND,api_returned_payload",
+    [
+        pytest.param(AdministrativeCriteriaKind.RSA, rsa_certified_mocker(), id="rsa"),
+    ],
+)
 @freeze_time("2024-09-12")
-def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFactory):
+def test_eligibility_diagnosis_certify_criteria(
+    mocker, EligibilityDiagnosisFactory, AdministrativeCriteriaModel, CRITERIA_KIND, api_returned_payload
+):
     mocker.patch(
         "itou.utils.apis.api_particulier._request",
-        return_value=rsa_certified_mocker(),
+        return_value=api_returned_payload,
     )
     job_seeker = JobSeekerFactory(with_address=True, born_in_france=True)
-    eligibility_diagnosis = EligibilityDiagnosisFactory(with_certifiable_criteria=True, job_seeker=job_seeker)
+    eligibility_diagnosis = EligibilityDiagnosisFactory(job_seeker=job_seeker)
+    admin_criteria = AdministrativeCriteriaModel.objects.filter(kind=CRITERIA_KIND)
+    eligibility_diagnosis.administrative_criteria.add(*admin_criteria)
     eligibility_diagnosis.certify_criteria()
 
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
     criterion = SelectedAdministrativeCriteria.objects.get(
-        administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
+        administrative_criteria__kind=CRITERIA_KIND,
         eligibility_diagnosis=eligibility_diagnosis,
     )
     assert criterion.certified is True
     assert criterion.certified_at == timezone.now()
-    assert criterion.data_returned_by_api == rsa_certified_mocker()
+    assert criterion.data_returned_by_api == api_returned_payload
     assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13))
 
 
