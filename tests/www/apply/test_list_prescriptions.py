@@ -45,7 +45,7 @@ def test_get(client):
     organization = job_application.sender_prescriber_organization
     client.force_login(job_application.sender)
 
-    response = client.get(reverse("apply:list_prescriptions"))
+    response = client.get(reverse("apply:list_prescriptions"), {"display": JobApplicationsDisplayKind.LIST})
     # Has link to export with back_url set
     exports_link = unquote(
         add_url_params(reverse("apply:list_prescriptions_exports"), {"back_url": reverse("apply:list_prescriptions")})
@@ -95,7 +95,7 @@ def test_as_unauthorized_prescriber(client, snapshot):
 
     list_url = reverse("apply:list_prescriptions")
     with assertSnapshotQueries(snapshot(name="SQL queries for prescriptions list")):
-        response = client.get(list_url)
+        response = client.get(list_url, {"display": JobApplicationsDisplayKind.LIST})
 
     assertContains(response, "<h3>S… U…</h3>")
     assertNotContains(response, "Supersecretname")
@@ -224,8 +224,8 @@ def test_list_display_kind(client):
     LIST_VIEW_MARKER = '<div class="c-box--results__header">'
 
     for display_param, expected_marker in [
-        ({}, LIST_VIEW_MARKER),
-        ({"display": "invalid"}, LIST_VIEW_MARKER),
+        ({}, TABLE_VIEW_MARKER),
+        ({"display": "invalid"}, TABLE_VIEW_MARKER),
         ({"display": JobApplicationsDisplayKind.LIST}, LIST_VIEW_MARKER),
         ({"display": JobApplicationsDisplayKind.TABLE}, TABLE_VIEW_MARKER),
     ]:
@@ -240,7 +240,7 @@ def test_list_display_kind(client):
 def test_filters(client, snapshot):
     client.force_login(PrescriberFactory())
 
-    response = client.get(reverse("apply:list_prescriptions"))
+    response = client.get(reverse("apply:list_prescriptions"), {"display": JobApplicationsDisplayKind.LIST})
     assert response.status_code == 200
     filter_form = parse_response_to_soup(response, "#offcanvasApplyFilters")
     assert str(filter_form) == snapshot()
@@ -260,24 +260,29 @@ def test_archived(client):
     </span>
     """
     client.force_login(prescriber)
+    filter_params = {"display": JobApplicationsDisplayKind.LIST}
     url = reverse("apply:list_prescriptions")
-    response = client.get(url)
+    response = client.get(url, data=filter_params)
     assertContains(response, active.pk)
     assertNotContains(response, archived.pk)
     assertNotContains(response, archived_badge_html, html=True)
-    response = client.get(url, data={"archived": ""})
+    filter_params["archived"] = ""
+    response = client.get(url, data=filter_params)
     assertContains(response, active.pk)
     assertNotContains(response, archived.pk)
     assertNotContains(response, archived_badge_html, html=True)
-    response = client.get(url, data={"archived": "archived"})
+    filter_params["archived"] = "archived"
+    response = client.get(url, data=filter_params)
     assertNotContains(response, active.pk)
     assertContains(response, archived.pk)
     assertContains(response, archived_badge_html, html=True, count=1)
-    response = client.get(url, data={"archived": "all"})
+    filter_params["archived"] = "all"
+    response = client.get(url, data=filter_params)
     assertContains(response, active.pk)
     assertContains(response, archived.pk)
     assertContains(response, archived_badge_html, html=True, count=1)
-    response = client.get(url, data={"archived": "invalid"})
+    filter_params["archived"] = "invalid"
+    response = client.get(url, data=filter_params)
     assertContains(response, active.pk)
     assertContains(response, archived.pk)
     assertContains(response, archived_badge_html, html=True, count=1)
@@ -531,7 +536,7 @@ def test_reset_filter_button_snapshot(client, snapshot):
     job_application = JobApplicationFactory()
     client.force_login(job_application.sender)
 
-    filter_params = {"states": [job_application.state]}
+    filter_params = {"states": [job_application.state], "display": JobApplicationsDisplayKind.LIST}
     response = client.get(reverse("apply:list_prescriptions"), filter_params)
 
     assert str(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
