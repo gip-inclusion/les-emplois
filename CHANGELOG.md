@@ -1,5 +1,42 @@
 # Journal des modifications
 
+## 2025-01-27
+
+### Ajouté
+
+- [Tableau de bord: Ajout d'une popup Tally sur la dashboard prescripteurs habilités et employeurs](https://github.com/gip-inclusion/les-emplois/pull/5456)
+
+### Modifié
+
+- [Admin: Ajout du référent FT sur la page de profil de demandeur d'emploi](https://github.com/gip-inclusion/les-emplois/pull/5447)
+- [Administration: Ajout d'un champs de recherche par bénéficiaire d'un groupe de suivi (GPS)](https://github.com/gip-inclusion/les-emplois/pull/5437)
+- [Candidature: conserver le mode d'affichage (Tableau/Liste) quand on efface tous les filtres](https://github.com/gip-inclusion/les-emplois/pull/5435)
+- [Candidature: Corriger le bouton "Retour" de la modale d'acceptation de candidature](https://github.com/gip-inclusion/les-emplois/pull/5390)
+- [Connexion: Petites améliorations de formulation et de mise en page](https://github.com/gip-inclusion/les-emplois/pull/5458)
+- [GPS: Amélioration de l'affichage des résultat de l'ajout de bénéficiaires](https://github.com/gip-inclusion/les-emplois/pull/5411)
+- [GPS: Ne plus afficher le NIR sur le détail des bénéficiaires](https://github.com/gip-inclusion/les-emplois/pull/5460)
+- [GPS: Suivi des consultations des informations de contacts des intervenants](https://github.com/gip-inclusion/les-emplois/pull/5414)
+- [Inscription: Bug lors d'un conflit avec un non-candidat pendant l'inscription candidat](https://github.com/gip-inclusion/les-emplois/pull/5416)
+- [Recherche employeyr: Le badge 20+ candidatures sur les résultats de recherche ne doit pas inclure de candidatures archivées](https://github.com/gip-inclusion/les-emplois/pull/5378)
+- [Recherche employeur: ne jamais afficher de bouton Postuler quand l'employeur a bloqué l'envoi de candidatures](https://github.com/gip-inclusion/les-emplois/pull/5413) 🖼
+- [UX/UI: Lorsque je consulte une candidature depuis l’onglet “candidat” d’une fiche candidat, je devrais revenir sur ce même onglet](https://github.com/gip-inclusion/les-emplois/pull/5310)
+- [UX/UI: Correction des attributs sur les tooltips](https://github.com/gip-inclusion/les-emplois/pull/5438)
+- [UX/UI: corrections UI des templates "eligibility"](https://github.com/gip-inclusion/les-emplois/pull/5442) 🖼
+
+### Supprimé
+
+- [Connexion: Suppression du code de connexion via Inclusion Connect](https://github.com/gip-inclusion/les-emplois/pull/5443)
+- [GPS: Suppression de la fonctionnalité « Ajouter un bénéficiaire »](https://github.com/gip-inclusion/les-emplois/pull/5445)
+
+### Tech
+
+- [Inscription: Fusionner les vues d'inscription sans type d'utilisateur](https://github.com/gip-inclusion/les-emplois/pull/5394)
+- [Préférer des emails en @inclusion.gouv.fr](https://github.com/gip-inclusion/les-emplois/pull/5433)
+- [Refactor: remplacement d'imports relatifs](https://github.com/gip-inclusion/les-emplois/pull/5441)
+- [Sécurité: IDOR sécurisation des urls de fusion de membres](https://github.com/gip-inclusion/les-emplois/pull/5420)
+- [Sécurité: IDOR sécurisation des urls de consultation des PASS IAE - part 1](https://github.com/gip-inclusion/les-emplois/pull/5446)
+- [Technique: Typage manquants d'arguments des urls de `employee_record_views`](https://github.com/gip-inclusion/les-emplois/pull/5444)
+
 ## 2025-01-20
 
 ### Ajouté
