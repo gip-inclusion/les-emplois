@@ -179,7 +179,8 @@ class AbstractEligibilityDiagnosisAdmin(ItouModelAdmin):
         return None
 
     def save_model(self, request, obj, form, change):
-        obj.expires_at = self.model._expiration_date(obj.author)
+        if not obj.pk:
+            obj.expires_at = self.model._expiration_date(obj.author)
         return super().save_model(request, obj, form, change)
 
 

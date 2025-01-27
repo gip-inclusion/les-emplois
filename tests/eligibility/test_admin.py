@@ -90,6 +90,11 @@ class TestAdminForm:
             return reverse("admin:eligibility_eligibilitydiagnosis_changelist")
         return reverse("admin:eligibility_geiqeligibilitydiagnosis_changelist")
 
+    def get_change_url(self, kind, pk):
+        if kind == "iae":
+            return reverse("admin:eligibility_eligibilitydiagnosis_change", args=(pk,))
+        return reverse("admin:eligibility_geiqeligibilitydiagnosis_change", args=(pk,))
+
     def user_factory(self, kind, user_kind):
         if user_kind == UserKind.PRESCRIBER:
             return PrescriberFactory(membership=True, membership__organization__is_authorized=True)
@@ -251,3 +256,19 @@ class TestAdminForm:
             expected_errors[0].append("Le diagnostic d'éligibilité GEIQ ne peut avoir 2 structures pour auteur")
         assert response.context["errors"] == expected_errors
         assert not self.get_diag_model(kind).objects.exists()
+
+    def test_dont_edit_eligibility_diagnostic_expires_at(self, admin_client, kind):
+        author = self.user_factory(kind, UserKind.PRESCRIBER)
+        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+
+        with freeze_time("2025-01-21"):
+            response = admin_client.post(self.get_add_url(kind), data=post_data)
+            assertRedirects(response, self.get_list_url(kind))
+            diagnostic = self.get_diag_model(kind).objects.get()
+            assert diagnostic.expires_at == datetime.date(2025, 7, 21)
+
+        with freeze_time("2025-01-22"):
+            response = admin_client.post(self.get_change_url(kind, diagnostic.pk), data=post_data)
+            assertRedirects(response, self.get_list_url(kind))
+            diagnostic = self.get_diag_model(kind).objects.get()
+            assert diagnostic.expires_at == datetime.date(2025, 7, 21)
