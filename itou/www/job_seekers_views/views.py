@@ -126,6 +126,7 @@ class JobSeekerListView(UserPassesTestMixin, ListView):
             self.form = FilterForm(
                 User.objects.filter(kind=UserKind.JOB_SEEKER).filter(Exists(self._get_user_job_applications())),
                 self.request.GET or None,
+                request_user=request.user,
             )
 
     def test_func(self):
