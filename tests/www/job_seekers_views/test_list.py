@@ -187,3 +187,40 @@ def test_htmx_job_seeker_filter(client):
     assertContains(response, "1 résultat")
     fresh_page = parse_response_to_soup(response)
     assertSoupEqual(simulated_page, fresh_page)
+
+
+def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
+    prescriber = PrescriberFactory()
+    a_b_job_seeker = JobApplicationFactory(
+        sender=prescriber, job_seeker__first_name="A_something", job_seeker__last_name="B_something"
+    ).job_seeker
+    created_job_seeker = JobApplicationFactory(
+        sender=prescriber,
+        job_seeker__created_by=prescriber,
+        job_seeker__first_name="Zorro",
+        job_seeker__last_name="Martin",
+    ).job_seeker
+    c_d_job_seeker = JobApplicationFactory(
+        sender=prescriber,
+        job_seeker__created_by=prescriber,
+        job_seeker__last_login=timezone.now(),
+        job_seeker__first_name="C_something",
+        job_seeker__last_name="D_something",
+    ).job_seeker
+    client.force_login(prescriber)
+
+    url = reverse("job_seekers_views:list")
+    response = client.get(url, {"job_seeker": created_job_seeker.pk})
+    job_seekers = response.context["page_obj"].object_list
+    assert len(job_seekers) == 1
+    assert job_seekers[0].pk == created_job_seeker.pk
+
+    response = client.get(url)
+    job_seekers = response.context["page_obj"].object_list
+    assert len(job_seekers) == 3
+    filters_form = response.context["filters_form"]
+    assert filters_form.fields["job_seeker"].choices == [
+        (a_b_job_seeker.pk, "A… B…"),
+        (c_d_job_seeker.pk, "C… D…"),
+        (created_job_seeker.pk, "Zorro MARTIN"),
+    ]
