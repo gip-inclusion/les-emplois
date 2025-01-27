@@ -232,7 +232,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
         approval = ApprovalFactory(user=job_seeker, with_jobapplication=True)
         with freeze_time() as frozen_now:
             return_status = approval.notify_pole_emploi()
-        assert return_status is None
+        assert return_status == api_enums.PEApiNotificationStatus.SHOULD_RETRY
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_should_retry"
         assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
@@ -248,7 +248,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
         approval = ApprovalFactory(user=job_seeker, with_jobapplication=True)
         with freeze_time() as frozen_now:
             return_status = approval.notify_pole_emploi()
-        assert return_status is None
+        assert return_status == api_enums.PEApiNotificationStatus.ERROR
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_error"
         assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
@@ -517,7 +517,7 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
         cancelled_approval = CancelledApprovalFactory()
         with freeze_time() as frozen_now:
             return_status = cancelled_approval.notify_pole_emploi()
-        assert return_status is None
+        assert return_status == api_enums.PEApiNotificationStatus.SHOULD_RETRY
         cancelled_approval.refresh_from_db()
         assert cancelled_approval.pe_notification_status == "notification_should_retry"
         assert cancelled_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
@@ -532,7 +532,7 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
         cancelled_approval = CancelledApprovalFactory()
         with freeze_time() as frozen_now:
             return_status = cancelled_approval.notify_pole_emploi()
-        assert return_status is None
+        assert return_status == api_enums.PEApiNotificationStatus.ERROR
         cancelled_approval.refresh_from_db()
         assert cancelled_approval.pe_notification_status == "notification_error"
         assert cancelled_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
