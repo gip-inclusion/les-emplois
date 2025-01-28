@@ -16,11 +16,7 @@
     </div>
 {% endblock %}
 
-{% block title_content %}
-    <h1>
-        Informations personnelles de <span class="text-muted">{{ job_seeker.get_full_name }}</span>
-    </h1>
-{% endblock %}
+{% block title_content %}<h1>Informations personnelles de {{ job_seeker.get_full_name }}</h1>{% endblock %}
 
 {% block content %}
     <section class="s-section">

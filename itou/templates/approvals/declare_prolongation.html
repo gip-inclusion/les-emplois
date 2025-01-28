@@ -5,11 +5,7 @@
 {% block title %}Déclarer une prolongation de PASS IAE {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1>
-        Déclarer une prolongation de PASS IAE
-        <br>
-        <span class="text-muted">{{ approval.user.get_full_name }}</span>
-    </h1>
+    <h1>Déclarer une prolongation de PASS IAE pour {{ approval.user.get_full_name }}</h1>
 {% endblock %}
 
 {% block content %}
