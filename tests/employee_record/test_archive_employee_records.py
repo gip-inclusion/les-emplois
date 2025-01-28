@@ -1,5 +1,3 @@
-import io
-
 import pytest
 from django.core.management import call_command
 
@@ -11,10 +9,10 @@ from tests.employee_record import factories
 
 @pytest.fixture(name="command")
 def command_fixture():
-    return archive_employee_records.Command(stdout=io.StringIO(), stderr=io.StringIO())
+    return archive_employee_records.Command()
 
 
-def test_management_command_default_run(command, snapshot):
+def test_management_command_default_run(command, snapshot, caplog):
     employee_record = factories.EmployeeRecordFactory(pk=42, archivable=True)
     assert list(EmployeeRecord.objects.archivable()) == [employee_record]
 
@@ -22,10 +20,10 @@ def test_management_command_default_run(command, snapshot):
     employee_record.refresh_from_db()
 
     assert employee_record.status != Status.ARCHIVED
-    assert command.stdout.getvalue() == snapshot
+    assert caplog.messages == snapshot
 
 
-def test_management_command_wet_run(command, snapshot):
+def test_management_command_wet_run(command, snapshot, caplog):
     employee_record = factories.EmployeeRecordFactory(pk=42, archivable=True)
 
     command.handle(wet_run=True)
@@ -33,7 +31,7 @@ def test_management_command_wet_run(command, snapshot):
 
     assert employee_record.status == Status.ARCHIVED
     assert employee_record.archived_json is None
-    assert command.stdout.getvalue() == snapshot
+    assert caplog.messages == snapshot
 
 
 def test_management_command_name():
