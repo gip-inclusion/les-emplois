@@ -17,4 +17,4 @@ class Command(BaseCommand):
             updated_at__lte=now - datetime.timedelta(days=180),
         ).update(archived_at=now)
         s = pluralize(count)
-        self.stdout.write(f"Archived {count} job application{s}.")
+        self.logger.info(f"Archived {count} job application{s}")
