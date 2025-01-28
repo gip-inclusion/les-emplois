@@ -16,13 +16,14 @@ that we can ask the users to fix it.
 
 import logging
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import CommandError
 
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE, resolve_insee_city
 from itou.companies.models import Company
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.command import BaseCommand
 
 
 logger = logging.getLogger(__name__)
@@ -63,6 +64,8 @@ class Command(BaseCommand):
             queryset = User.objects.filter(is_active=True, kind=UserKind.JOB_SEEKER)
             model = User
             model_name = "JobSeeker"
+        else:
+            raise CommandError(f"Unknown {mode=}")
 
         updated_items = []
         failed_items = []
@@ -81,7 +84,7 @@ class Command(BaseCommand):
                 item.insee_city = insee_city
                 updated_items.append(item)
             else:
-                self.stdout.write(f"! failed to find matching city for {item.city=} {item.post_code=}")
+                self.logger.warning(f"Failed to find matching city for {item.city=} {item.post_code=}")
                 item.geocoding_score = 0  # reset the score to not see them again next run of the cron
                 failed_items.append(item)
         if wet_run:
@@ -95,7 +98,7 @@ class Command(BaseCommand):
                 ["geocoding_score"],
                 batch_size=self.BATCH_UPDATE_SIZE,
             )
-            self.stdout.write(
-                f"> count={len(updated_items)} {model_name} updated. "
+            self.logger.info(
+                f"count={len(updated_items)} {model_name} updated and "
                 f"err_count={len(failed_items)} {model_name} without a resolution."
             )
