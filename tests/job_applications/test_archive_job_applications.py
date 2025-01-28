@@ -9,7 +9,7 @@ from itou.job_applications.models import JobApplication
 from tests.job_applications.factories import JobApplicationFactory
 
 
-def test_archive(capsys):
+def test_archive(caplog):
     real_now = timezone.now()
     for state in JobApplicationState.values:
         JobApplicationFactory(state=state)
@@ -42,6 +42,7 @@ def test_archive(capsys):
         ],
         ordered=False,
     )
-    captured = capsys.readouterr()
-    assert captured.out == f"Archived {len(ARCHIVABLE_JOB_APPLICATION_STATES)} job applications.\n"
-    assert captured.err == ""
+    assert caplog.messages[:-1] == [f"Archived {len(ARCHIVABLE_JOB_APPLICATION_STATES)} job applications"]
+    assert caplog.messages[-1].startswith(
+        "Management command itou.job_applications.management.commands.archive_job_applications succeeded in"
+    )
