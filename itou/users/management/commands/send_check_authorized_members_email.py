@@ -65,7 +65,7 @@ class Command(BaseCommand):
         # Companies
         companies = self.build_query(Company.objects.active())
         companies_members_url = get_absolute_url(reverse("companies_views:members"))
-        self.stdout.write(f"Processing {len(companies)} companies")
+        self.logger.info("Processing %d companies", len(companies))
         for company in companies:
             with transaction.atomic():
                 for member in company.admin_members:
@@ -75,14 +75,18 @@ class Command(BaseCommand):
                         active_admins_count=len(company.admin_members),
                         members_url=companies_members_url,
                     ).send()
-                    self.stdout.write(f"  - Sent reminder notification to user #{member.pk} for company #{company.pk}")
+                    self.logger.info(
+                        "Sent reminder notification to user %d for company %d",
+                        member.pk,
+                        company.pk,
+                    )
                 company.active_members_email_reminder_last_sent_at = NOW
                 company.save(update_fields=["active_members_email_reminder_last_sent_at"])
 
         # Prescriber organizations
         prescriber_organizations = self.build_query(PrescriberOrganization.objects.all())
         prescriber_organizations_members_url = get_absolute_url(reverse("prescribers_views:members"))
-        self.stdout.write(f"Processing {len(prescriber_organizations)} prescriber organizations")
+        self.logger.info("Processing %d prescriber organizations", len(prescriber_organizations))
         for prescriber_organization in prescriber_organizations:
             with transaction.atomic():
                 for member in prescriber_organization.admin_members:
@@ -92,9 +96,10 @@ class Command(BaseCommand):
                         active_admins_count=len(prescriber_organization.admin_members),
                         members_url=prescriber_organizations_members_url,
                     ).send()
-                    self.stdout.write(
-                        f"  - Sent reminder notification to user #{member.pk} "
-                        f"for prescriber organization #{prescriber_organization.pk}"
+                    self.logger.info(
+                        "Sent reminder notification to user %d for prescriber organization %d",
+                        member.pk,
+                        prescriber_organization.pk,
                     )
                 prescriber_organization.active_members_email_reminder_last_sent_at = NOW
                 prescriber_organization.save(update_fields=["active_members_email_reminder_last_sent_at"])
@@ -102,7 +107,7 @@ class Command(BaseCommand):
         # Institutions
         institutions = self.build_query(Institution.objects.all())
         institutions_members_url = get_absolute_url(reverse("institutions_views:members"))
-        self.stdout.write(f"Processing {len(institutions)} institutions")
+        self.logger.info("Processing %d institutions", len(institutions))
         for institution in institutions:
             with transaction.atomic():
                 for member in institution.admin_members:
@@ -112,8 +117,8 @@ class Command(BaseCommand):
                         active_admins_count=len(institution.admin_members),
                         members_url=institutions_members_url,
                     ).send()
-                    self.stdout.write(
-                        f"  - Sent reminder notification to user #{member.pk} for institution #{institution.pk}"
+                    self.logger.info(
+                        "Sent reminder notification to user %d for institution %d", member.pk, institution.pk
                     )
                 institution.active_members_email_reminder_last_sent_at = NOW
                 institution.save(update_fields=["active_members_email_reminder_last_sent_at"])
