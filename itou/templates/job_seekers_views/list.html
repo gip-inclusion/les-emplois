@@ -4,6 +4,7 @@
 {% load static %}
 {% load str_filters %}
 {% load format_filters %}
+{% load url_add_query %}
 
 {% block title %}Candidats {{ block.super }}{% endblock %}
 
@@ -11,6 +12,11 @@
     <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
         <h1 class="m-0">Candidats</h1>
         <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur les candidatures">
+            {% url "job_seekers_views:get_or_create_start" as get_or_create_url %}
+            <a href="{% url_add_query get_or_create_url tunnel='standalone' from_url=request.path|urlencode %}" class="btn btn-lg btn-secondary btn-ico">
+                <i class="ri-user-add-line fw-medium" aria-hidden="true"></i>
+                <span>Créer un compte candidat</span>
+            </a>
             <a href="{% url 'search:employers_results' %}" class="btn btn-lg btn-primary btn-ico">
                 <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
                 <span>Postuler pour un candidat</span>
