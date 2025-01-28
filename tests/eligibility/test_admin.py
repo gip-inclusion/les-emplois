@@ -1,6 +1,7 @@
 import datetime
 
 import pytest
+from django.contrib import messages
 from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertRedirects
@@ -200,15 +201,17 @@ class TestAdminForm:
         ]
         assert not self.get_diag_model(kind).objects.exists()
 
-    def test_add_eligibility_diagnostic_unauthorized_prescriber(self, admin_client, kind, caplog):
+    def test_add_eligibility_diagnostic_unauthorized_prescriber(self, admin_client, kind):
         author = PrescriberFactory(membership=True)
         post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
 
-        response = admin_client.post(self.get_add_url(kind), data=post_data)
+        response = admin_client.post(self.get_add_url(kind), data=post_data, follow=True)
         assertRedirects(response, self.get_list_url(kind))
 
         assert self.get_diag_model(kind).objects.count() == 1
-        assert caplog.messages[0] == "L'organization prescriptrice n'est actuellement pas habilité."
+        assert list(response.context["messages"])[0] == messages.Message(
+            messages.WARNING, "L'organisation prescriptrice n'est actuellement pas habilitée."
+        )
 
     def test_add_eligibility_diagnostic_employer_bad_author_kind(self, admin_client, kind):
         author = self.user_factory(kind, UserKind.EMPLOYER)

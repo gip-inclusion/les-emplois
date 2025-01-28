@@ -47,8 +47,6 @@ class AbstractEligibilityDiagnosisAdminForm(forms.ModelForm):
                 elif not author_prescriber_organization.memberships.filter(user=author).exists():
                     # Allow inactive membership as we may want to fix old diagnoses
                     self.add_error("author_prescriber_organization", "L'auteur n'appartient pas à cette organisation.")
-                if author_prescriber_organization and not author_prescriber_organization.is_authorized:
-                    logger.warning("L'organization prescriptrice n'est actuellement pas habilité.")
             elif author.kind == UserKind.EMPLOYER:
                 if not author_kind == self.author_company_kind:
                     self.add_error("author_kind", "Le type ne correspond pas à l'auteur.")
