@@ -41,7 +41,7 @@ class TestEmployeeDetailView:
         )
         assert job_application.is_sent_by_authorized_prescriber
         IAEEligibilityDiagnosisFactory(
-            from_prescriber=True, job_seeker=approval.user, author_siae=job_application.to_company
+            from_employer=True, job_seeker=approval.user, author_siae=job_application.to_company
         )
 
         # Another job applcation on the same SIAE, by a non authorized prescriber
@@ -90,7 +90,7 @@ class TestEmployeeDetailView:
         employer = company.members.first()
         # Make sure the job seeker infos can be edited by the siae member
         approval = ApprovalFactory(user__created_by=employer)
-        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=approval.user, author_siae=company)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=approval.user)
 
         client.force_login(employer)
 

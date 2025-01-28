@@ -258,7 +258,7 @@ class TestCouldSiaeBeDeleted:
         assert could_siae_be_deleted(company)
 
         # Approval with eligibility diagnosis authored by SIAE
-        ApprovalFactory(eligibility_diagnosis__author_siae=company)
+        ApprovalFactory(eligibility_diagnosis__author_siae=company, eligibility_diagnosis__from_employer=True)
         assert not could_siae_be_deleted(company)
 
     def test_with_job_app(self):

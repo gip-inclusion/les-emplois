@@ -91,7 +91,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         constraints = [
             models.CheckConstraint(
                 name="author_kind_coherence",
-                violation_error_message="Le diagnostic d'éligibilité GEIQ ne peut avoir 2 structures pour auteur",
+                violation_error_message="La structure de l'auteur ne correspond pas à son type",
                 condition=models.Q(
                     author_kind=AuthorKind.GEIQ,
                     author_geiq__isnull=False,

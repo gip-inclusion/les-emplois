@@ -134,7 +134,7 @@ def test_geiq_eligibility_diagnosis_validation():
 
     with pytest.raises(
         ValidationError,
-        match="Le diagnostic d'éligibilité GEIQ ne peut avoir 2 structures pour auteur",
+        match="La structure de l'auteur ne correspond pas à son type",
     ):
         GEIQEligibilityDiagnosis(
             author_geiq=geiq,

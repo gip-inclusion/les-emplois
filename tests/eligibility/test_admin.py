@@ -260,10 +260,13 @@ class TestAdminForm:
 
         response = admin_client.post(self.get_add_url(kind), data=post_data)
         assert response.status_code == 200
-        expected_errors = [["Vous ne pouvez pas saisir une entreprise et une organisation prescriptrice."]]
-        if kind == "geiq":
-            # Additional error thanks to the db constraint
-            expected_errors[0].append("Le diagnostic d'éligibilité GEIQ ne peut avoir 2 structures pour auteur")
+        expected_errors = [
+            [
+                "Vous ne pouvez pas saisir une entreprise et une organisation prescriptrice.",
+                "La structure de l'auteur ne correspond pas à son type",
+            ]
+        ]
+
         assert response.context["errors"] == expected_errors
         assert not self.get_diag_model(kind).objects.exists()
 

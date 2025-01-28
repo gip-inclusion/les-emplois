@@ -103,6 +103,7 @@ class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
         from_employer = factory.Trait(
             author_kind=AuthorKind.EMPLOYER,
             author_siae=factory.SubFactory(CompanyFactory, subject_to_eligibility=True, with_membership=True),
+            author_prescriber_organization=None,
             author=factory.LazyAttribute(lambda obj: obj.author_siae.members.first()),
         )
         with_certifiable_criteria = factory.Trait(romes=factory.PostGeneration(_get_iae_certifiable_criteria))

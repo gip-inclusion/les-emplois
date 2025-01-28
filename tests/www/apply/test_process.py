@@ -1840,7 +1840,7 @@ class TestProcessAcceptViews:
             kwargs = {
                 "eligibility_diagnosis__with_certifiable_criteria": True,
                 "eligibility_diagnosis__author_siae": self.company,
-                "eligibility_diagnosis__author_kind": AuthorKind.EMPLOYER,
+                "eligibility_diagnosis__from_employer": True,
             } | kwargs
         return JobApplicationSentByJobSeekerFactory(**kwargs)
 

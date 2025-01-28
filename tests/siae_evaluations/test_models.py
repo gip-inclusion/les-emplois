@@ -39,6 +39,7 @@ from tests.institutions.factories import (
     InstitutionWith2MembershipFactory,
 )
 from tests.job_applications.factories import JobApplicationFactory
+from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
@@ -54,7 +55,7 @@ def create_batch_of_job_applications(company):
     for _ in range(evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN):
         approval = ApprovalFactory(
             start_at=start,
-            eligibility_diagnosis__author_kind=AuthorKind.EMPLOYER,
+            eligibility_diagnosis__from_employer=True,
             eligibility_diagnosis__author_siae=company,
         )
         JobApplicationFactory.create(
@@ -244,6 +245,10 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         evaluation_campaign = EvaluationCampaignFactory()
         diag = campaign_eligible_job_app_objects["diag"]
         diag.author_kind = AuthorKind.PRESCRIBER
+        membership = PrescriberMembershipFactory()
+        diag.author_prescriber_organization = membership.organization
+        diag.author_siae = None
+        diag.author = membership.user
         diag.save()
         assert [] == list(evaluation_campaign.eligible_job_applications())
         assert _eligible_to_siae_evaluations(campaign_eligible_job_app_objects["job_app"]) == "non"
@@ -347,18 +352,18 @@ class TestEvaluationCampaignManager:
         evaluation_campaign = EvaluationCampaignFactory()
 
         # company_1 got 1 job application
-        company_1 = CompanyFactory(department="14")
+        company_1 = CompanyFactory(department="14", with_membership=True)
         JobApplicationFactory(
             with_approval=True,
             to_company=company_1,
             sender_company=company_1,
-            eligibility_diagnosis__author_kind=AuthorKind.EMPLOYER,
+            eligibility_diagnosis__from_employer=True,
             eligibility_diagnosis__author_siae=company_1,
             hiring_start_at=timezone.localdate() - relativedelta(months=2),
         )
 
         # company_2 got 2 job applications
-        company_2 = CompanyFactory(department="14")
+        company_2 = CompanyFactory(department="14", with_membership=True)
         create_batch_of_job_applications(company_2)
 
         eligible_siaes_res = evaluation_campaign.eligible_siaes()
@@ -387,7 +392,7 @@ class TestEvaluationCampaignManager:
         before_evaluated_period = datetime.date(2022, 4, 4)
         approval1 = ApprovalFactory(
             start_at=before_evaluated_period,  # Before evaluated period.
-            eligibility_diagnosis__author_kind=AuthorKind.EMPLOYER,
+            eligibility_diagnosis__from_employer=True,
             eligibility_diagnosis__author_siae=company,
         )
         job_app_approval1_args = {
@@ -406,7 +411,7 @@ class TestEvaluationCampaignManager:
         within_evaluated_period = datetime.date(2023, 2, 1)
         approval2 = ApprovalFactory(
             start_at=within_evaluated_period,
-            eligibility_diagnosis__author_kind=AuthorKind.EMPLOYER,
+            eligibility_diagnosis__from_employer=True,
             eligibility_diagnosis__author_siae=company,
         )
         JobApplicationFactory.create(
@@ -424,13 +429,13 @@ class TestEvaluationCampaignManager:
         assert 0 == evaluation_campaign.number_of_siaes_to_select()
 
         for _ in range(3):
-            company = CompanyFactory(department="14")
+            company = CompanyFactory(department="14", with_membership=True)
             create_batch_of_job_applications(company)
 
         assert 1 == evaluation_campaign.number_of_siaes_to_select()
 
         for _ in range(3):
-            company = CompanyFactory(department="14")
+            company = CompanyFactory(department="14", with_membership=True)
             create_batch_of_job_applications(company)
 
         assert 2 == evaluation_campaign.number_of_siaes_to_select()
@@ -439,7 +444,7 @@ class TestEvaluationCampaignManager:
         evaluation_campaign = EvaluationCampaignFactory()
 
         for _ in range(6):
-            company = CompanyFactory(department="14")
+            company = CompanyFactory(department="14", with_membership=True)
             create_batch_of_job_applications(company)
 
         assert 2 == evaluation_campaign.eligible_siaes_under_ratio().count()
