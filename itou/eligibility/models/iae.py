@@ -146,6 +146,22 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         verbose_name = "diagnostic d'éligibilité IAE"
         verbose_name_plural = "diagnostics d'éligibilité IAE"
         ordering = ["-created_at"]
+        constraints = [
+            models.CheckConstraint(
+                name="eligibility_iae_diagnosis_author_kind_coherence",
+                violation_error_message="La structure de l'auteur ne correspond pas à son type",
+                condition=models.Q(
+                    author_kind=AuthorKind.EMPLOYER,
+                    author_siae__isnull=False,
+                    author_prescriber_organization__isnull=True,
+                )
+                | models.Q(
+                    author_kind=AuthorKind.PRESCRIBER,
+                    author_prescriber_organization__isnull=False,
+                    author_siae__isnull=True,
+                ),
+            ),
+        ]
 
     @property
     def author_organization(self):
