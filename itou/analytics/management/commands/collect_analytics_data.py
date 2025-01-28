@@ -1,6 +1,5 @@
 import datetime
 
-import sentry_sdk
 from django import db
 from django.db import transaction
 from django.forms import models
@@ -22,10 +21,10 @@ class Command(BaseCommand):
         before = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(
             days=options["offset"]
         )
-        self.stderr.write(f"Collecting analytics data before '{before!s}'.")
+        self.logger.info(f"Collecting analytics data before '{before!s}'.")
 
         data = self._get_data(before)
-        self.stderr.write("Analytics data computed.")
+        self.logger.info("Analytics data computed.")
 
         self.show_data(data)
         if options["save"]:
@@ -43,11 +42,11 @@ class Command(BaseCommand):
 
     def show_data(self, data):
         for code, value in data.items():
-            self.stdout.write(f"{code.label} ({code.value}): {value}")
+            self.logger.info(f"{code.label} ({code.value}): {value}")
 
     def save_data(self, data, before):
         bucket = (before.date() - datetime.timedelta(days=1)).isoformat()
-        self.stderr.write(f"Saving analytics data in bucket '{bucket}'.")
+        self.logger.info(f"Saving analytics data in bucket '{bucket}'.")
         for code, value in data.items():
             datum = Datum(
                 code=code.value,
@@ -58,13 +57,12 @@ class Command(BaseCommand):
                 with transaction.atomic():
                     datum.save()
             except db.IntegrityError:
-                self.stderr.write(f"Failed to save code={code.value} for bucket={bucket} because it already exists.")
+                self.logger.warning(f"Failed to save code={code.value} for bucket={bucket} because it already exists.")
             except models.ValidationError as error:
                 message = (
                     f"Failed to save code={code.value} for bucket={bucket} because of a ValidationError: "
                     f"{error.message}"
                 )
-                sentry_sdk.capture_message(message, "error")
-                self.stderr.write(message)
+                self.logger.error(message)
             else:
-                self.stdout.write(f"Successfully saved code={code.value} bucket={bucket} value={value}.")
+                self.logger.info(f"Successfully saved code={code.value} bucket={bucket} value={value}.")
