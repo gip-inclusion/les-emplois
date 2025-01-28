@@ -1,6 +1,3 @@
-import io
-import textwrap
-
 import factory
 import pytest
 from django import urls
@@ -96,21 +93,22 @@ class TestProbeStatusModel:
 class TestRunStatusProbesCommand:
     @pytest.fixture()
     def cmd(self):
-        return run_status_probes.Command(stdout=io.StringIO(), stderr=io.StringIO())
+        return run_status_probes.Command()
 
-    def test_calling_by_name(self, mocker):
+    def test_calling_by_name(self, mocker, caplog):
         mocker.patch("itou.status.probes.get_probes_classes", return_value=[])
-        stdout = io.StringIO()
 
-        management.call_command("run_status_probes", stdout=stdout, stderr=io.StringIO())
-        assert stdout.getvalue() == textwrap.dedent(
-            """\
-                Start probing
-                Check dangling probes
-                No dangling probes found
-                Running probes
-                Finished probing
-                """
+        management.call_command("run_status_probes")
+        assert caplog.messages[:-1] == [
+            "Start probing",
+            "Checking dangling probes",
+            "No dangling probes found",
+            "Running probes - count=0",
+            "Finished probing",
+        ]
+        # Last log contains a timing: only check its start
+        assert caplog.messages[-1].startswith(
+            "Management command itou.status.management.commands.run_status_probes succeeded in"
         )
 
     def test_run_probes_when_probe_is_successful(self, subtests, cmd):
@@ -144,8 +142,9 @@ class TestRunStatusProbesCommand:
         assert status.last_success_at is None
         assert status.last_success_info is None
 
-        assert caplog.records[0].message == f"Probe {ExceptionProbe.name!r} failed"
-        assert caplog.records[0].exc_info[0] is Exception
+        assert caplog.records[0].message == "Running probes - count=1"
+        assert caplog.records[1].message == f"Probe {ExceptionProbe.name!r} failed"
+        assert caplog.records[1].exc_info[0] is Exception
 
     def test_run_probes_when_everything_is_empty(self, cmd):
         assert models.ProbeStatus.objects.count() == 0
@@ -173,15 +172,15 @@ class TestRunStatusProbesCommand:
 
         assert models.ProbeStatus.objects.count() == 5
 
-    def test_check_and_remove_dangling_probes_when_everything_is_empty(self, cmd):
+    def test_check_and_remove_dangling_probes_when_everything_is_empty(self, cmd, caplog):
         assert models.ProbeStatus.objects.count() == 0
 
         cmd._check_and_remove_dangling_probes([])
 
         assert models.ProbeStatus.objects.count() == 0
-        assert cmd.stdout.getvalue() == "Check dangling probes\nNo dangling probes found\n"
+        assert caplog.messages == ["Checking dangling probes", "No dangling probes found"]
 
-    def test_check_and_remove_dangling_probes_with_existing_probes(self, cmd):
+    def test_check_and_remove_dangling_probes_with_existing_probes(self, cmd, caplog):
         non_dangling_probes = factories.ProbeStatusFactory.create_batch(3)
 
         cmd._check_and_remove_dangling_probes(non_dangling_probes)
@@ -189,18 +188,18 @@ class TestRunStatusProbesCommand:
         assert set(models.ProbeStatus.objects.values_list("name", flat=True)) == {
             probe.name for probe in non_dangling_probes
         }
-        assert cmd.stdout.getvalue() == "Check dangling probes\nNo dangling probes found\n"
+        assert caplog.messages == ["Checking dangling probes", "No dangling probes found"]
 
-    def test_check_and_remove_dangling_probes_when_adding_probes(self, cmd):
+    def test_check_and_remove_dangling_probes_when_adding_probes(self, cmd, caplog):
         old_probes = factories.ProbeStatusFactory.create_batch(3)
         new_probes = factories.ProbeStatusFactory.build_batch(2)
 
         cmd._check_and_remove_dangling_probes(old_probes + new_probes)
 
         assert set(models.ProbeStatus.objects.values_list("name", flat=True)) == {probe.name for probe in old_probes}
-        assert cmd.stdout.getvalue() == "Check dangling probes\nNo dangling probes found\n"
+        assert caplog.messages == ["Checking dangling probes", "No dangling probes found"]
 
-    def test_check_and_remove_dangling_probes_when_removing_probes(self, cmd):
+    def test_check_and_remove_dangling_probes_when_removing_probes(self, cmd, caplog):
         all_probes = factories.ProbeStatusFactory.create_batch(5)
         probes_kept, probes_removed = all_probes[:3], all_probes[3:]
 
@@ -208,9 +207,9 @@ class TestRunStatusProbesCommand:
 
         assert set(models.ProbeStatus.objects.values_list("name", flat=True)) == {probe.name for probe in probes_kept}
         expected_dangling_names = set(sorted({probe.name for probe in probes_removed}))
-        assert cmd.stdout.getvalue() == f"Check dangling probes\nRemoving dangling probes: {expected_dangling_names}\n"
+        assert caplog.messages == ["Checking dangling probes", f"Removing dangling probes: {expected_dangling_names}"]
 
-    def test_check_and_remove_dangling_probes_when_replacing_all_probes(self, cmd):
+    def test_check_and_remove_dangling_probes_when_replacing_all_probes(self, cmd, caplog):
         old_probes = factories.ProbeStatusFactory.create_batch(3)
         new_probes = factories.ProbeStatusFactory.build_batch(2)
 
@@ -218,7 +217,7 @@ class TestRunStatusProbesCommand:
 
         assert models.ProbeStatus.objects.count() == 0
         expected_dangling_names = set(sorted({probe.name for probe in old_probes}))
-        assert cmd.stdout.getvalue() == f"Check dangling probes\nRemoving dangling probes: {expected_dangling_names}\n"
+        assert caplog.messages == ["Checking dangling probes", f"Removing dangling probes: {expected_dangling_names}"]
 
 
 class TestViews:
