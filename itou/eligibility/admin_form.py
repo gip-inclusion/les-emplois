@@ -1,7 +1,12 @@
+import logging
+
 from django import forms
 
 from itou.eligibility.enums import AuthorKind
 from itou.users.enums import UserKind
+
+
+logger = logging.getLogger(__name__)
 
 
 class AbstractEligibilityDiagnosisAdminForm(forms.ModelForm):
@@ -34,17 +39,16 @@ class AbstractEligibilityDiagnosisAdminForm(forms.ModelForm):
             if author.kind == UserKind.PRESCRIBER:
                 if not author_kind == AuthorKind.PRESCRIBER:
                     self.add_error("author_kind", "Le type ne correspond pas à l'auteur.")
-                if not author_prescriber_organization or not author_prescriber_organization.is_authorized:
+                if not author_prescriber_organization:
                     self.add_error(
                         "author_prescriber_organization",
-                        "Une organisation prescriptrice habilitée est obligatoire pour cet auteur.",
+                        "Une organisation prescriptrice est obligatoire pour cet auteur.",
                     )
-                if (
-                    author_prescriber_organization
-                    and not author_prescriber_organization.memberships.filter(user=author).exists()
-                ):
+                elif not author_prescriber_organization.memberships.filter(user=author).exists():
                     # Allow inactive membership as we may want to fix old diagnoses
                     self.add_error("author_prescriber_organization", "L'auteur n'appartient pas à cette organisation.")
+                if author_prescriber_organization and not author_prescriber_organization.is_authorized:
+                    logger.warning("L'organization prescriptrice n'est actuellement pas habilité.")
             elif author.kind == UserKind.EMPLOYER:
                 if not author_kind == self.author_company_kind:
                     self.add_error("author_kind", "Le type ne correspond pas à l'auteur.")

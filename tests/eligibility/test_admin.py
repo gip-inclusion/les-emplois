@@ -196,12 +196,19 @@ class TestAdminForm:
         assert response.status_code == 200
         assert response.context["errors"] == [
             ["Le type ne correspond pas à l'auteur."],
-            [
-                "Une organisation prescriptrice habilitée est obligatoire pour cet auteur.",
-                "L'auteur n'appartient pas à cette organisation.",
-            ],
+            ["L'auteur n'appartient pas à cette organisation."],
         ]
         assert not self.get_diag_model(kind).objects.exists()
+
+    def test_add_eligibility_diagnostic_unauthorized_prescriber(self, admin_client, kind, caplog):
+        author = PrescriberFactory(membership=True)
+        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+
+        response = admin_client.post(self.get_add_url(kind), data=post_data)
+        assertRedirects(response, self.get_list_url(kind))
+
+        assert self.get_diag_model(kind).objects.count() == 1
+        assert caplog.messages[0] == "L'organization prescriptrice n'est actuellement pas habilité."
 
     def test_add_eligibility_diagnostic_employer_bad_author_kind(self, admin_client, kind):
         author = self.user_factory(kind, UserKind.EMPLOYER)
