@@ -37,21 +37,13 @@ class Command(BaseCommand):
         )
         count_no_approval = no_approval.count()
 
-        self.stdout.write("* Checking missing employee records approval:")
-
-        if count_no_approval == 0:
-            self.stdout.write(" - no missing approval (great!)")
-        else:
-            self.stdout.write(f" - found {count_no_approval} missing approval(s)")
-
+        self.logger.info("found %d employee records with missing approval", count_no_approval)
+        if count_no_approval:
             if dry_run:
                 return
 
-            self.stdout.write(" - fixing missing approvals: DELETING employee records")
-
-            no_approval.delete()
-
-            self.stdout.write(" - done!")
+            delete_nb, _delete_info = no_approval.delete()
+            self.logger.info("deleted %d/%d employee records with missing approval", delete_nb, count_no_approval)
 
     @transaction.atomic()
     def _check_missed_notifications(self, dry_run):
@@ -80,7 +72,9 @@ class Command(BaseCommand):
             )
         )
 
-        self.stdout.write(f" - found {len(employee_record_with_missing_notification)} missing notification(s)")
+        self.logger.info(
+            "found %d missed employee records notifications", len(employee_record_with_missing_notification)
+        )
 
         total_created = 0
         if not dry_run:
@@ -94,16 +88,17 @@ class Command(BaseCommand):
                 # Unarchive the employee record so next time we don't miss the notification
                 if employee_record.status == Status.ARCHIVED:
                     employee_record.unarchive()
-            self.stdout.write(f" - {total_created} notification(s) created")
-        self.stdout.write(" - done!")
+            self.logger.info(
+                "%d/%d notifications created", total_created, len(employee_record_with_missing_notification)
+            )
 
     def handle(self, *, dry_run, **options):
-        self.stdout.write("+ Checking employee records coherence before transferring to ASP")
+        self.logger.info("Checking employee records coherence before transferring to ASP")
 
         if dry_run:
-            self.stdout.write(" - DRY-RUN mode: not fixing, just reporting")
+            self.logger.info("DRY-RUN mode: not fixing, just reporting")
 
         self._check_approvals(dry_run)
         self._check_missed_notifications(dry_run)
 
-        self.stdout.write("+ Employee records sanitizing done. Have a great day!")
+        self.logger.info("Employee records sanitizing done. Have a great day!")
