@@ -117,7 +117,7 @@ class TestMoveCompanyData:
         assert f"INTO company.id={company2.pk}" in stdout
 
 
-def test_update_companies_job_app_score():
+def test_update_companies_job_app_score(caplog):
     company_1 = companies_factories.CompanyFactory()
     company_2 = JobApplicationFactory(to_company__with_jobs=True).to_company
 
@@ -125,9 +125,9 @@ def test_update_companies_job_app_score():
     assert company_2.job_app_score is None
 
     stdout = io.StringIO()
-    management.call_command("update_companies_job_app_score", stdout=stdout)
+    management.call_command("update_companies_job_app_score")
     # company_1 did not change (from None to None)
-    assert "Updated 1 companies" in stdout.getvalue()
+    assert caplog.messages[0] == "Updated 1 companies"
 
     company_1.refresh_from_db()
     company_2.refresh_from_db()
@@ -142,10 +142,10 @@ def test_update_companies_job_app_score():
     # Deleting job descriptions should bring score back to None.
     for jd in company_2.job_description_through.all():
         jd.delete()
-    stdout = io.StringIO()
+    caplog.clear()
     management.call_command("update_companies_job_app_score", stdout=stdout)
     # company_2 changed
-    assert "Updated 1 companies" in stdout.getvalue()
+    assert caplog.messages[0] == "Updated 1 companies"
 
     company_1.refresh_from_db()
     company_2.refresh_from_db()
