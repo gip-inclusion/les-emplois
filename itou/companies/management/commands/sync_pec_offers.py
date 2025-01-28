@@ -45,7 +45,7 @@ class NoZipCodeException(Exception):
     pass
 
 
-def pe_offer_to_job_description(data):
+def pe_offer_to_job_description(data, logger):
     source_id = data["id"]
     rome_code = data["romeCode"]
     appellation_label = data["appellationlibelle"]
@@ -53,16 +53,16 @@ def pe_offer_to_job_description(data):
     if appellation is None:
         appellation = Appellation.objects.autocomplete(search_string=appellation_label, rome_code=rome_code).first()
         if appellation is None:
-            print(f"! no appellation match found ({rome_code=} {appellation_label=}) skipping {source_id=}")
+            logger.warning(f"no appellation match found ({rome_code=} {appellation_label=}) skipping {source_id=}")
             return None
 
     if "codePostal" not in data["lieuTravail"]:
-        print(f"! no zipcode in raw offer, skipping {source_id=}")
+        logger.warning(f"no zipcode in raw offer, skipping {source_id=}")
         return None
 
     source_url = data.get("origineOffre", {}).get("urlOrigine")
     if not source_url:
-        print(f"! no job URL in raw offer, skipping {source_id=}")
+        logger.warning(f"no job URL in raw offer, skipping {source_id=}")
         return None
 
     code_postal = int(data["lieuTravail"]["codePostal"])
@@ -119,7 +119,7 @@ class Command(BaseCommand):
         for i in range(OFFERS_MIN_INDEX, OFFERS_MAX_INDEX, OFFERS_MAX_RANGE):
             max_range = min(OFFERS_MAX_INDEX, i + OFFERS_MAX_RANGE - 1)
             offers = pe_client.offres(natureContrat=pe_api_enums.NATURE_CONTRAT_PEC, range=f"{i}-{max_range}")
-            self.stdout.write(f"retrieved count={len(offers)} PEC offers from PE API")
+            self.logger.info(f"retrieved count={len(offers)} PEC offers from PE API")
             if not offers:
                 break
             raw_offers.extend(offers)
@@ -138,7 +138,7 @@ class Command(BaseCommand):
             )
             for item in yield_sync_diff(raw_offers, "id", pe_offers, "source_id", []):
                 if item.kind in [DiffItemKind.ADDITION, DiffItemKind.EDITION]:
-                    job = pe_offer_to_job_description(item.raw)
+                    job = pe_offer_to_job_description(item.raw, self.logger)
                     if job:
                         job.company = pe_siae
                         if item.kind == DiffItemKind.ADDITION:
@@ -151,7 +151,7 @@ class Command(BaseCommand):
 
             if wet_run:
                 objs = JobDescription.objects.bulk_create(added_offers)
-                self.stdout.write(f"> successfully created count={len(objs)} PE job offers")
+                self.logger.info("successfully created count=%d PE job offers", len(objs))
                 n_objs = JobDescription.objects.bulk_update(
                     updated_offers,
                     fields=[
@@ -169,11 +169,11 @@ class Command(BaseCommand):
                         "source_url",
                     ],
                 )
-                self.stdout.write(f"> successfully updated count={n_objs} PE job offers")
+                self.logger.info("successfully updated count=%d PE job offers", n_objs)
                 # Do not deactivate: for now it's not very relevant to keep objects that we
                 # are not the source or master of. We'll see if that makes sense on the analytics
                 # side someday, but remove them entirely for now.
                 n_objs, _ = JobDescription.objects.filter(
                     source_kind=JobSource.PE_API, source_id__in=offers_to_remove
                 ).delete()
-                self.stdout.write(f"> successfully deleted count={n_objs} PE job offers")
+                self.logger.info("successfully deleted count=%d PE job offers", n_objs)

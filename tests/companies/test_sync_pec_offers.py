@@ -18,7 +18,7 @@ from itou.utils.mocks.pole_emploi import API_OFFRES
     }
 )
 @pytest.mark.django_db(transaction=True)
-def test_sync_pec_offers(capsys, respx_mock, monkeypatch):
+def test_sync_pec_offers(caplog, respx_mock, monkeypatch):
     city = City.objects.create(
         slug="slug",
         department="89",
@@ -49,15 +49,16 @@ def test_sync_pec_offers(capsys, respx_mock, monkeypatch):
     respx_mock.get(f"{base_url}&range=1050-1149").respond(204)
 
     management.call_command("sync_pec_offers", wet_run=True, delay=0)
-    stdout, stderr = capsys.readouterr()
-    assert stderr == ""
-    assert stdout.splitlines() == [
+    assert caplog.messages[-1].startswith(
+        "Management command itou.companies.management.commands.sync_pec_offers succeeded in "
+    )
+    assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == [
         "retrieved count=2 PEC offers from PE API",
         "retrieved count=0 PEC offers from PE API",
-        "! no appellation match found (rome_code='M1607' appellation_label='Secrétaire') skipping source_id='OHNOES'",
-        "> successfully created count=1 PE job offers",
-        "> successfully updated count=0 PE job offers",
-        "> successfully deleted count=0 PE job offers",
+        "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') skipping source_id='OHNOES'",
+        "successfully created count=1 PE job offers",
+        "successfully updated count=0 PE job offers",
+        "successfully deleted count=0 PE job offers",
     ]
 
     job_description = JobDescription.objects.get()
@@ -75,33 +76,41 @@ def test_sync_pec_offers(capsys, respx_mock, monkeypatch):
     assert job_description.contract_nature == "PEC_OFFER"
 
     # test the update
+    caplog.clear()
     monkeypatch.setitem(API_OFFRES[0], "intitule", "NOUVEAU INTITULE")
     respx_mock.get("https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=FT&range=0-149").respond(
         206,
         json={"resultats": API_OFFRES},
     )
     management.call_command("sync_pec_offers", wet_run=True, delay=0)
-    stdout, stderr = capsys.readouterr()
-    assert stderr == ""
-    assert stdout.splitlines()[-3:] == [
-        "> successfully created count=0 PE job offers",
-        "> successfully updated count=1 PE job offers",
-        "> successfully deleted count=0 PE job offers",
+    assert caplog.messages[-1].startswith(
+        "Management command itou.companies.management.commands.sync_pec_offers succeeded in "
+    )
+    assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == [
+        "retrieved count=2 PEC offers from PE API",
+        "retrieved count=0 PEC offers from PE API",
+        "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') skipping source_id='OHNOES'",
+        "successfully created count=0 PE job offers",
+        "successfully updated count=1 PE job offers",
+        "successfully deleted count=0 PE job offers",
     ]
     job_description.refresh_from_db()
     assert job_description.custom_name == "NOUVEAU INTITULE"
 
     # test the deletion
+    caplog.clear()
     respx_mock.get("https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=FT&range=0-149").respond(
         206,
         json={"resultats": []},
     )
     management.call_command("sync_pec_offers", wet_run=True, delay=0)
-    stdout, stderr = capsys.readouterr()
-    assert stderr == ""
-    assert stdout.splitlines()[-3:] == [
-        "> successfully created count=0 PE job offers",
-        "> successfully updated count=0 PE job offers",
-        "> successfully deleted count=1 PE job offers",
+    assert caplog.messages[-1].startswith(
+        "Management command itou.companies.management.commands.sync_pec_offers succeeded in "
+    )
+    assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == [
+        "retrieved count=0 PEC offers from PE API",
+        "successfully created count=0 PE job offers",
+        "successfully updated count=0 PE job offers",
+        "successfully deleted count=1 PE job offers",
     ]
     assert JobDescription.objects.count() == 0
