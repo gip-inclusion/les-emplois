@@ -55,10 +55,13 @@
                                 L'adresse {{ form.email.value }} est associée au compte de <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>.
                             </p>
                             <p>
-                                L'identité du candidat est une information clé pour la structure.
                                 {% if is_gps|default:False %}
+                                    L'identité du candidat est une information clé pour la structure.
                                     Si vous ne souhaitez pas suivre <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Suivre un autre bénéficiaire » afin d'enregistrer ses informations personnelles.
+                                {% elif standalone_creation|default:False %}
+                                    Le compte de ce candidat sera ajouté à votre liste une fois que vous aurez postulé pour lui.
                                 {% else %}
+                                    L'identité du candidat est une information clé pour la structure.
                                     Si cette candidature n'est pas pour <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
                                     « Ce n'est pas mon candidat » afin d'enregistrer ses informations
                                     personnelles.

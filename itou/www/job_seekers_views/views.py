@@ -203,7 +203,7 @@ class GetOrCreateJobSeekerStartView(View):
         super().setup(request, *args, **kwargs)
 
         self.tunnel = request.GET.get("tunnel")
-        if self.tunnel not in ("sender", "hire", "gps"):
+        if self.tunnel not in ("sender", "hire", "gps", "standalone"):
             raise Http404
         self.from_url = get_safe_url(request, "from_url")
         if not self.from_url:
@@ -233,7 +233,7 @@ class GetOrCreateJobSeekerStartView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        if self.tunnel == "sender" or self.tunnel == "gps":
+        if self.tunnel in ("sender", "gps", "standalone"):
             view_name = "job_seekers_views:check_nir_for_sender"
         elif self.tunnel == "hire":
             view_name = "job_seekers_views:check_nir_for_hire"
@@ -278,6 +278,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         self.hire_process = None
         self.prescription_proces = None
         self.auto_prescription_process = None
+        self.standalone_creation = None
         self.is_gps = False
 
     def setup(self, request, *args, hire_process=False, **kwargs):
@@ -286,10 +287,12 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         if company_pk := self.job_seeker_session.get("apply", {}).get("company_pk"):
             if not self.is_gps:
                 self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
+        self.standalone_creation = not self.is_gps and self.company is None
         self.hire_process = hire_process
         self.prescription_process = (
             not self.hire_process
             and not self.is_gps
+            and not self.standalone_creation
             and (
                 request.user.is_prescriber
                 or (request.user.is_employer and self.company != request.current_organization)
@@ -298,6 +301,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         self.auto_prescription_process = (
             not self.hire_process
             and not self.is_gps
+            and not self.standalone_creation
             and request.user.is_employer
             and self.company == request.current_organization
         )
@@ -305,6 +309,8 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
     def get_exit_url(self, job_seeker_public_id, created=False):
         if self.is_gps:
             return reverse("gps:my_groups")
+        if self.standalone_creation:
+            return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker_public_id})
 
         kwargs = {"company_pk": self.company.pk, "job_seeker_public_id": job_seeker_public_id}
         if created and self.hire_process:
@@ -330,6 +336,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             "hire_process": self.hire_process,
             "prescription_process": self.prescription_process,
             "auto_prescription_process": self.auto_prescription_process,
+            "standalone_creation": self.standalone_creation,
             "is_gps": self.is_gps,
         }
 
@@ -792,6 +799,13 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                     setattr(self.profile, k, v)
                 if request.user.is_prescriber:
                     self.profile.created_by_prescriber_organization = request.current_organization
+                if self.standalone_creation:
+                    messages.success(
+                        request,
+                        f"Le compte du candidat {self.profile.user.get_full_name()} a "
+                        "bien été créé et ajouté à votre liste de candidats.",
+                        extra_tags="toast",
+                    )
                 self.profile.save()
         except ValidationError as e:
             messages.error(request, " ".join(e.messages))

@@ -14,6 +14,8 @@
 {% elif prescription_process %}
     Postuler
     {% if job_seeker %}pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}{% endif %}
+{% elif standalone_creation|default:False %}
+    Créer un compte candidat
 {% else %}
     Postuler
 {% endif %}

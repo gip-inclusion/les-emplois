@@ -94,6 +94,8 @@
                             <p>
                                 {% if is_gps|default:False %}
                                     Si ce n'est pas le bénéficiaire que vous souhaitez suivre, cliquez sur « Suivre un autre bénéficiaire » afin de modifier le numéro de sécurité sociale.
+                                {% elif standalone_creation|default:False %}
+                                    Le compte de ce candidat sera ajouté à votre liste une fois que vous aurez postulé pour lui.
                                 {% else %}
                                     Si cette candidature n'est pas pour <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
                                 {% endif %}
