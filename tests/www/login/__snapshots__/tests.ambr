@@ -96,35 +96,6 @@
                       </div>
   '''
 # ---
-# name: TestExistingUserLogin.test_login[IC]
-  '''
-  <div class="c-form mb-5">
-                          
-                              
-                                  <div class="alert alert-important">
-                                      <p class="mb-0">Inclusion Connect devient ProConnect</p>
-                                  </div>
-                                  
-  
-  
-  
-  
-      <div class="text-center">
-          <a class="proconnect-button" data-matomo-action="clic" data-matomo-category="connexion prescripteur" data-matomo-event="true" data-matomo-option="se-connecter-avec-pro-connect" href="/pro_connect/authorize?user_kind=prescriber&amp;previous_url=%2Flogin%2Fexisting%2Fc0fee70e-cf34-4d37-919d-a1ae3e3bf7e5%3Fback_url%3D%2Fsignup%2F">
-          </a>
-          <p>
-              <a href="https://proconnect.gouv.fr/" rel="noopener noreferrer" target="_blank" title="Qu’est-ce que AgentConnect ? - nouvelle fenêtre">
-                  Qu’est-ce que ProConnect ?
-              </a>
-          </p>
-      </div>
-  
-  
-                              
-                          
-                      </div>
-  '''
-# ---
 # name: TestExistingUserLogin.test_login[PC]
   '''
   <div class="c-form mb-5">
@@ -239,31 +210,6 @@
                                   <div class="alert alert-info" role="status">
                                       <p class="mb-0">FranceConnect est désactivé.</p>
                                   </div>
-                              
-                          
-                      </div>
-  '''
-# ---
-# name: TestExistingUserLogin.test_login_disabled_provider[IC]
-  '''
-  <div class="c-form mb-5">
-                          
-                              
-                                  
-  
-  
-  
-  
-      <div class="alert alert-info" role="status">
-          <p class="mb-2">
-              <strong>Inclusion Connect est momentanément désactivé.</strong>
-          </p>
-          <p class="mb-0">
-              Afin de demander un PASS IAE en urgence, <a class="has-external-link" href="https://tally.so/r/nrj0V5" target="_blank">remplissez ce formulaire.</a>
-          </p>
-      </div>
-  
-  
                               
                           
                       </div>

@@ -10,7 +10,7 @@
 {% block title_content %}
     <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
         <div class="d-xl-flex align-items-xl-center">
-            <h1 class="mb-0 me-3 text-md-nowrap">Bilan d’exécution - {{ assessment.campaign.year }}</h1>
+            <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - {{ assessment.campaign.year }}</h1>
             {% if not assessment.submitted_at %}
                 <span class="badge badge-base rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>
             {% elif not assessment.reviewed_at %}
