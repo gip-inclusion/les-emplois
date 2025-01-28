@@ -1,16 +1,19 @@
 import datetime
+import uuid
 
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.users.models import User, UserKind
 from itou.utils.templatetags.str_filters import mask_unless
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
+    PrescriberOrganizationWithMembershipFactory,
 )
 from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
@@ -246,6 +249,79 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         # Job seeker not displayed for the prescriber
         assertNotContains(response, edouard.get_full_name())
         assertNotContains(response, reverse("job_seekers_views:details", kwargs={"public_id": edouard.public_id}))
+
+
+def test_job_seeker_created_for_prescription_is_shown(client):
+    organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+    company = CompanyWithMembershipAndJobsFactory()
+    company_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+    prescriber = organization.members.first()
+    client.force_login(prescriber)
+    client.get(company_url)
+
+    # Init complete session
+    session = client.session
+    session_name = str(uuid.uuid4())
+    session[session_name] = {
+        "config": {
+            "tunnel": "sender",
+            "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+            "session_kind": "job-seeker-get-or-create",
+        },
+        "apply": {"company_pk": company.pk},
+        "user": {
+            "email": "jeandujardin@inclusion.gouv.fr",
+            "title": "M",
+            "first_name": "Jean",
+            "last_name": "Dujardin",
+            "lack_of_nir": True,
+            "address_line_1": "Moullé",
+            "address_line_2": "",
+            "post_code": "32150",
+            "city": "Cazaubon",
+            "ban_api_resolved_address": "Moullé 32150 Cazaubon",
+            "phone": "",
+            "insee_code": "32096",
+            "fill_mode": "ban_api",
+            "address_for_autocomplete": "32096_quuf69",
+        },
+        "profile": {
+            "nir": "",
+            "birth_country": 91,
+            "birthdate": datetime.date(2000, 1, 1),
+            "lack_of_nir_reason": "TEMPORARY_NUMBER",
+            "education_level": "00",
+            "resourceless": True,
+            "pole_emploi_id": "",
+            "pole_emploi_since": "",
+            "unemployed_since": "",
+            "rqth_employee": False,
+            "oeth_employee": False,
+            "has_rsa_allocation": "NON",
+            "rsa_allocation_since": "",
+            "ass_allocation_since": "",
+            "aah_allocation_since": "",
+            "pole_emploi": False,
+            "unemployed": False,
+            "rsa_allocation": False,
+            "ass_allocation": False,
+            "aah_allocation": False,
+            "pole_emploi_id_forgotten": "",
+            "lack_of_pole_emploi_id_reason": "NOT_REGISTERED",
+        },
+    }
+    session.save()
+
+    # Create job seeker step end
+    next_url = reverse(
+        "job_seekers_views:create_job_seeker_step_end_for_sender", kwargs={"session_uuid": session_name}
+    )
+    client.post(next_url)
+    job_seeker = User.objects.get(kind=UserKind.JOB_SEEKER, email="jeandujardin@inclusion.gouv.fr")
+
+    # Check that job seeker is in list
+    response = client.get(reverse("job_seekers_views:list"))
+    assert_contains_job_seeker(response, job_seeker, with_personal_information=True)
 
 
 @freeze_time("2024-08-30")

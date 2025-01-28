@@ -1085,6 +1085,7 @@ class TestApplyAsAuthorizedPrescriber:
 
         assert new_job_seeker.jobseeker_profile.advisor_information.name == "Jean BON"
         assert new_job_seeker.jobseeker_profile.advisor_information.email == "jean.bon@francetravail.fr"
+        assert new_job_seeker.jobseeker_profile.created_by_prescriber_organization == prescriber_organization
 
         next_url = reverse(
             "apply:application_jobs",
@@ -1387,6 +1388,8 @@ class TestApplyAsAuthorizedPrescriber:
 
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
+
+        assert new_job_seeker.jobseeker_profile.created_by_prescriber_organization == prescriber_organization
 
         next_url = reverse(
             "apply:application_jobs",
@@ -1894,6 +1897,8 @@ class TestApplyAsPrescriber:
 
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
+
+        assert new_job_seeker.jobseeker_profile.created_by_prescriber_organization is None
 
         next_url = reverse(
             "apply:application_jobs",

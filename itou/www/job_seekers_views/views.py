@@ -790,6 +790,8 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 self.profile = user.jobseeker_profile
                 for k, v in self._get_profile_data_from_session().items():
                     setattr(self.profile, k, v)
+                if request.user.is_prescriber:
+                    self.profile.created_by_prescriber_organization = request.current_organization
                 self.profile.save()
         except ValidationError as e:
             messages.error(request, " ".join(e.messages))
