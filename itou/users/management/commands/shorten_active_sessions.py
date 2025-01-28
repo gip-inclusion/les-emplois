@@ -18,5 +18,5 @@ class Command(BaseCommand):
         engine = import_module(settings.SESSION_ENGINE)
         new_expire = timezone.now() + relativedelta(hours=1)
         active_sessions_qs = engine.SessionStore.get_model_class().objects.filter(expire_date__gte=new_expire)
-        self.stdout.write(f"Found {len(active_sessions_qs)} active sessions to shorten")
+        self.logger.info("Found %d active sessions to shorten", len(active_sessions_qs))
         active_sessions_qs.update(expire_date=new_expire)
