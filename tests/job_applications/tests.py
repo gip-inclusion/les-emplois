@@ -792,38 +792,37 @@ class TestJobApplicationNotifications:
         email = job_application.email_manual_approval_delivery_required_notification(accepted_by)
         assert "Date de fin du contrat : Non renseigné" in email.body
 
-    def test_refuse(self):
-        # When sent by authorized prescriber.
-        job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
-            refusal_reason=RefusalReason.DID_NOT_COME,
-            answer_to_prescriber="Le candidat n'est pas venu.",
-        )
-        email = job_application.notifications_refuse_for_proxy.build()
-        # To.
-        assert job_application.sender.email in email.to
-        assert len(email.to) == 1
-        # Body.
-        assert job_application.sender.get_full_name() in email.body
-        assert job_application.job_seeker.get_full_name() in email.body
-        assert job_application.to_company.display_name in email.body
-        assert job_application.answer in email.body
-        assert job_application.answer_to_prescriber in email.body
+    @pytest.mark.parametrize("is_sent_by_proxy", [True, False])
+    @pytest.mark.parametrize("is_shared_with_job_seeker", [True, False])
+    def test_refuse(self, is_sent_by_proxy, is_shared_with_job_seeker, snapshot):
+        extra_kwargs = {}
+        if is_sent_by_proxy:
+            extra_kwargs = {
+                "sender_prescriber_organization__membership__user__for_snapshot": True,
+                "answer_to_prescriber": "Le candidat n'est pas venu.",
+            }
 
-        # When sent by jobseeker.
-        job_application = JobApplicationSentByJobSeekerFactory(
-            refusal_reason=RefusalReason.DID_NOT_COME,
-            answer_to_prescriber="Le candidat n'est pas venu.",
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=is_sent_by_proxy,
+            refusal_reason_shared_with_job_seeker=is_shared_with_job_seeker,
+            refusal_reason=RefusalReason.DID_NOT_COME_TO_INTERVIEW,
+            answer="Pas venu",
+            for_snapshot=True,
+            **extra_kwargs,
         )
+
+        # Notification content sent to job seeker.
         email = job_application.notifications_refuse_for_job_seeker.build()
-        # To.
-        assert job_application.job_seeker.email == job_application.sender.email
         assert job_application.job_seeker.email in email.to
         assert len(email.to) == 1
-        # Body.
-        assert job_application.to_company.display_name in email.body
-        assert job_application.answer in email.body
-        assert job_application.answer_to_prescriber not in email.body
+        assert email.body == snapshot(name="job_seeker_email")
+
+        if is_sent_by_proxy:
+            # Notification content sent to authorized prescriber.
+            email = job_application.notifications_refuse_for_proxy.build()
+            assert job_application.sender.email in email.to
+            assert len(email.to) == 1
+            assert email.body == snapshot(name="prescriber_email")
 
     def test_refuse_without_sender(self, django_capture_on_commit_callbacks, mailoutbox):
         # When sent by authorized prescriber.
