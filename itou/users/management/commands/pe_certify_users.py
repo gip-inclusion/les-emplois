@@ -60,12 +60,12 @@ class Command(BaseCommand):
             .exclude(jobseeker_profile__pe_last_certification_attempt_at__gt=timezone.now() - RETRY_DELAY)
             .select_related("jobseeker_profile")
         )
-        self.stdout.write(f"> about to resolve first_name and last_name for count={active_job_seekers.count()} users.")
+        self.logger.info("about to resolve first_name and last_name for count=%d users", active_job_seekers.count())
 
         eligible_users = active_job_seekers.exclude(
             Q(jobseeker_profile__nir="") | Q(jobseeker_profile__birthdate=None) | Q(first_name="") | Q(last_name="")
         )
-        self.stdout.write(f"> only count={eligible_users.count()} users have the necessary data to be resolved.")
+        self.logger.info("only count=%d users have the necessary data to be resolved", eligible_users.count())
 
         examined_profiles = []
         certified_profiles = []
@@ -74,7 +74,7 @@ class Command(BaseCommand):
         def certify_user(user, id_certifie):
             user.jobseeker_profile.pe_obfuscated_nir = id_certifie
             certified_profiles.append(user.jobseeker_profile)
-            self.stdout.write(f"> certified user pk={user.pk} id_certifie={id_certifie}")
+            self.logger.info("certified user pk=%d", user.pk)
 
         for user in eligible_users.order_by(
             F("jobseeker_profile__pe_last_certification_attempt_at").asc(nulls_first=True)
@@ -84,15 +84,15 @@ class Command(BaseCommand):
             try:
                 response = pe_check_user_details(user)
             except (RequestError, PoleEmploiAPIException, PoleEmploiAPIBadResponse) as exc:
-                self.stdout.write(f"! could not find a match for pk={user.pk} error={exc}")
+                self.logger.warning(f"could not find a match for pk={user.pk} error={exc}")
                 try:
                     response2 = pe_check_user_details(user, swap=True)
                 except (RequestError, PoleEmploiAPIException, PoleEmploiAPIBadResponse) as exc:
-                    self.stdout.write(
-                        f"! no match found either for pk={user.pk} when swapping last and first names exc={exc}"
+                    self.logger.warning(
+                        f"no match found either for pk={user.pk} when swapping last and first names exc={exc}"
                     )
                 else:
-                    self.stdout.write(f"> SWAP DETECTED! user pk={user.pk} id_certifie={response2}")
+                    self.logger.info("SWAP DETECTED: user pk=%d", user.pk)
                     user.last_name, user.first_name = user.first_name, user.last_name
                     certify_user(user, response2)
                     swapped_users.append(user)
@@ -100,12 +100,12 @@ class Command(BaseCommand):
                 certify_user(user, response)
 
         if wet_run:
-            self.stdout.write(f"> count={len(examined_profiles)} users have been examined.")
+            self.logger.info("count=%d users have been examined.", len(examined_profiles))
 
             JobSeekerProfile.objects.bulk_update(
                 certified_profiles, ["pe_obfuscated_nir", "pe_last_certification_attempt_at"], batch_size=1000
             )
-            self.stdout.write(f"> count={len(certified_profiles)} users have been certified.")
+            self.logger.info("count=%d users have been certified", len(certified_profiles))
 
             not_certified = set(examined_profiles) - set(certified_profiles)
             JobSeekerProfile.objects.bulk_update(
@@ -113,7 +113,7 @@ class Command(BaseCommand):
                 ["pe_last_certification_attempt_at"],
                 batch_size=1000,
             )
-            self.stdout.write(f"> count={len(not_certified)} users could not be certified.")
+            self.logger.info("count=%d users could not be certified.", len(not_certified))
 
             User.objects.bulk_update(swapped_users, ["first_name", "last_name"], batch_size=1000)
-            self.stdout.write(f"> count={len(swapped_users)} users have been swapped.")
+            self.logger.info("count=%d users have been swapped", len(swapped_users))

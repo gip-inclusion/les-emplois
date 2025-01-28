@@ -730,7 +730,7 @@ def test_update_job_seeker_coords(settings, capsys, respx_mock):
 
 
 @freeze_time("2022-09-13")
-def test_pe_certify_users(settings, respx_mock, capsys, snapshot):
+def test_pe_certify_users(settings, respx_mock, caplog, snapshot):
     user = JobSeekerFactory(
         pk=424242,
         first_name="Yoder",
@@ -753,9 +753,10 @@ def test_pe_certify_users(settings, respx_mock, capsys, snapshot):
         200, json=API_RECHERCHE_ERROR
     )
     call_command("pe_certify_users", wet_run=True)
-    stdout, stderr = capsys.readouterr()
-    assert stderr == ""
-    assert stdout == snapshot()
+    assert caplog.messages[-1].startswith(
+        "Management command itou.users.management.commands.pe_certify_users succeeded in "
+    )
+    assert caplog.messages[:-1] == snapshot()
 
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
@@ -768,13 +769,15 @@ def test_pe_certify_users(settings, respx_mock, capsys, snapshot):
     user.jobseeker_profile.save(update_fields=["pe_last_certification_attempt_at"])
 
     # user found immediately
+    caplog.clear()
     respx_mock.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
         200, json=API_RECHERCHE_RESULT_KNOWN
     )
     call_command("pe_certify_users", wet_run=True)
-    stdout, stderr = capsys.readouterr()
-    assert stderr == ""
-    assert stdout.splitlines() == snapshot()
+    assert caplog.messages[-1].startswith(
+        "Management command itou.users.management.commands.pe_certify_users succeeded in "
+    )
+    assert caplog.messages[:-1] == snapshot()
 
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
@@ -784,7 +787,7 @@ def test_pe_certify_users(settings, respx_mock, capsys, snapshot):
 
 
 @freeze_time("2022-09-13")
-def test_pe_certify_users_with_swap(settings, respx_mock, capsys, snapshot):
+def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
     user = JobSeekerFactory(
         pk=424243,
         first_name="Balthazar",
@@ -820,9 +823,10 @@ def test_pe_certify_users_with_swap(settings, respx_mock, capsys, snapshot):
         },
     ).respond(200, json=API_RECHERCHE_RESULT_KNOWN)
     call_command("pe_certify_users", wet_run=True)
-    stdout, stderr = capsys.readouterr()
-    assert stderr == ""
-    assert stdout.splitlines() == snapshot()
+    assert caplog.messages[-1].startswith(
+        "Management command itou.users.management.commands.pe_certify_users succeeded in "
+    )
+    assert caplog.messages[:-1] == snapshot()
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
         2022, 9, 13, 0, 0, tzinfo=datetime.UTC
@@ -834,7 +838,7 @@ def test_pe_certify_users_with_swap(settings, respx_mock, capsys, snapshot):
     assert user.last_name == "Balthazar"
 
 
-def test_pe_certify_users_retry(capsys, snapshot):
+def test_pe_certify_users_retry(caplog, snapshot):
     new_user = JobSeekerFactory(jobseeker_profile__pe_last_certification_attempt_at=None)
     old_failure = JobSeekerFactory(
         jobseeker_profile__pe_last_certification_attempt_at=timezone.now() - datetime.timedelta(days=90),
@@ -849,7 +853,6 @@ def test_pe_certify_users_retry(capsys, snapshot):
         "itou.utils.apis.PoleEmploiApiClient.recherche_individu_certifie", side_effect=PoleEmploiAPIBadResponse("R010")
     ) as recherche:
         call_command("pe_certify_users", wet_run=True)
-    stdout, stderr = capsys.readouterr()
 
     def recherche_call(user, swap):
         return mock.call(
