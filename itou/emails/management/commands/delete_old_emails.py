@@ -21,4 +21,4 @@ class Command(BaseCommand):
         else:
             prefix = "Would delete"
             count = qs.count()
-        self.stdout.write(f"{prefix} {count} email{pluralize(count)}.")
+        self.logger.info(f"{prefix} {count} email{pluralize(count)}")
