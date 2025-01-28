@@ -1,5 +1,4 @@
 import contextlib
-import io
 import itertools
 
 import pytest
@@ -17,7 +16,7 @@ from tests.users.factories import PrescriberFactory
 
 @pytest.fixture(name="command")
 def command_fixture():
-    return prolongation_requests_chores.Command(stdout=io.StringIO(), stderr=io.StringIO())
+    return prolongation_requests_chores.Command()
 
 
 def test_unique_approval_for_pending_constraint():
@@ -95,7 +94,7 @@ def test_deny(django_capture_on_commit_callbacks, mailoutbox):
     ],
 )
 def test_chores_send_reminder_to_prescriber_organization_other_members(
-    snapshot, mailoutbox, command, django_capture_on_commit_callbacks, wet_run, expected
+    snapshot, mailoutbox, caplog, command, django_capture_on_commit_callbacks, wet_run, expected
 ):
     parameters = itertools.product(
         ProlongationRequestStatus,
@@ -114,7 +113,7 @@ def test_chores_send_reminder_to_prescriber_organization_other_members(
             command.handle(command="email_reminder", wet_run=wet_run)
         assert len(mailoutbox) == expected
         assert ProlongationRequest.objects.filter(reminder_sent_at=timezone.now()).count() == expected
-    assert command.stdout.getvalue() == snapshot
+    assert caplog.messages == snapshot()
 
 
 def test_chores_send_reminder_to_prescriber_organization_other_members_every_ten_days_for_thirty_days(
