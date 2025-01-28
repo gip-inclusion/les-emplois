@@ -1,5 +1,4 @@
 import datetime
-import io
 import json
 import logging
 from unittest import mock
@@ -890,21 +889,23 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
 
     @pytest.fixture(name="command")
     def command_fixture(self):
-        return send_check_authorized_members_email.Command(stdout=io.StringIO(), stderr=io.StringIO())
+        return send_check_authorized_members_email.Command()
 
     def test_send_check_authorized_members_email_management_command_not_enough_members(
-        self, django_capture_on_commit_callbacks, command, mailoutbox
+        self, django_capture_on_commit_callbacks, command, mailoutbox, caplog
     ):
         # Nothing to do (only one member per organization)
         with django_capture_on_commit_callbacks(execute=True):
             command.handle()
         assert len(mailoutbox) == 0
-        assert command.stdout.getvalue() == (
-            "Processing 0 companies\nProcessing 0 prescriber organizations\nProcessing 0 institutions\n"
-        )
+        assert caplog.messages == [
+            "Processing 0 companies",
+            "Processing 0 prescriber organizations",
+            "Processing 0 institutions",
+        ]
 
     def test_send_check_authorized_members_email_management_command_created_at(
-        self, django_capture_on_commit_callbacks, command, mailoutbox
+        self, django_capture_on_commit_callbacks, command, mailoutbox, caplog
     ):
         employer_2 = CompanyMembershipFactory(company=self.employer_1.company)
         prescriber_2 = PrescriberMembershipFactory(organization=self.prescriber_1.organization)
@@ -915,49 +916,55 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         # Labor inspector's institution has been created less than 3 months ago
         with django_capture_on_commit_callbacks(execute=True):
             command.handle()
-        expected_output = (
-            "Processing 0 companies\n"
-            "Processing 1 prescriber organizations\n"
-            f"  - Sent reminder notification to user #{self.prescriber_1.user_id} "
-            f"for prescriber organization #{self.prescriber_1.organization_id}\n"
-            f"  - Sent reminder notification to user #{prescriber_2.user_id} "
-            f"for prescriber organization #{prescriber_2.organization_id}\n"
-            "Processing 0 institutions\n"
-        )
+        assert caplog.messages == [
+            "Processing 0 companies",
+            "Processing 1 prescriber organizations",
+            f"Sent reminder notification to user {self.prescriber_1.user_id} "
+            f"for prescriber organization {self.prescriber_1.organization_id}",
+            f"Sent reminder notification to user {prescriber_2.user_id} "
+            f"for prescriber organization {prescriber_2.organization_id}",
+            "Processing 0 institutions",
+        ]
         assert len(mailoutbox) == 2
-        assert command.stdout.getvalue() == expected_output
 
         # Subsequent calls should not send other notifications
+        caplog.clear()
         with django_capture_on_commit_callbacks(execute=True):
             command.handle()
-        expected_output += "Processing 0 companies\nProcessing 0 prescriber organizations\nProcessing 0 institutions\n"
+        assert caplog.messages == [
+            "Processing 0 companies",
+            "Processing 0 prescriber organizations",
+            "Processing 0 institutions",
+        ]
         assert len(mailoutbox) == 2
-        assert command.stdout.getvalue() == expected_output
 
         # Update company and institution creation dates far in the past
+        caplog.clear()
         self.employer_1.company.created_at -= relativedelta(months=5)
         self.employer_1.company.save(update_fields=["created_at"])
         self.labor_inspector_1.institution.created_at -= relativedelta(months=5)
         self.labor_inspector_1.institution.save(update_fields=["created_at"])
         with django_capture_on_commit_callbacks(execute=True):
             command.handle()
-        expected_output += (
-            "Processing 1 companies\n"
-            f"  - Sent reminder notification to user #{self.employer_1.user_id} "
-            f"for company #{self.employer_1.company_id}\n"
-            f"  - Sent reminder notification to user #{employer_2.user_id} for company #{employer_2.company_id}\n"
-            "Processing 0 prescriber organizations\n"
-            "Processing 1 institutions\n"
-            f"  - Sent reminder notification to user #{self.labor_inspector_1.user_id} "
-            f"for institution #{self.labor_inspector_1.institution_id}\n"
-            f"  - Sent reminder notification to user #{labor_inspector_2.user_id} "
-            f"for institution #{labor_inspector_2.institution_id}\n"
-        )
+        assert caplog.messages == [
+            "Processing 1 companies",
+            f"Sent reminder notification to user {self.employer_1.user_id} for company {self.employer_1.company_id}",
+            f"Sent reminder notification to user {employer_2.user_id} for company {employer_2.company_id}",
+            "Processing 0 prescriber organizations",
+            "Processing 1 institutions",
+            (
+                f"Sent reminder notification to user {self.labor_inspector_1.user_id} "
+                f"for institution {self.labor_inspector_1.institution_id}"
+            ),
+            (
+                f"Sent reminder notification to user {labor_inspector_2.user_id} "
+                f"for institution {labor_inspector_2.institution_id}"
+            ),
+        ]
         assert len(mailoutbox) == 6
-        assert command.stdout.getvalue() == expected_output
 
     def test_send_check_authorized_members_email_management_command_active_members_email_reminder_last_sent_at(
-        self, django_capture_on_commit_callbacks, command, mailoutbox
+        self, django_capture_on_commit_callbacks, command, mailoutbox, caplog
     ):
         employer_2 = CompanyMembershipFactory(company=self.employer_1.company)
         prescriber_2 = PrescriberMembershipFactory(organization=self.prescriber_1.organization)
@@ -984,55 +991,69 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         # Should send 4 notifications to the 2 employers and the 2 labor inspectors
         with django_capture_on_commit_callbacks(execute=True):
             command.handle()
-        expected_output = (
-            "Processing 1 companies\n"
-            f"  - Sent reminder notification to user #{self.employer_1.user_id} "
-            f"for company #{self.employer_1.company_id}\n"
-            f"  - Sent reminder notification to user #{employer_2.user_id} for company #{employer_2.company_id}\n"
-            "Processing 0 prescriber organizations\n"
-            "Processing 1 institutions\n"
-            f"  - Sent reminder notification to user #{self.labor_inspector_1.user_id} "
-            f"for institution #{self.labor_inspector_1.institution_id}\n"
-            f"  - Sent reminder notification to user #{labor_inspector_2.user_id} "
-            f"for institution #{labor_inspector_2.institution_id}\n"
-        )
+        assert caplog.messages == [
+            "Processing 1 companies",
+            f"Sent reminder notification to user {self.employer_1.user_id} for company {self.employer_1.company_id}",
+            f"Sent reminder notification to user {employer_2.user_id} for company {employer_2.company_id}",
+            "Processing 0 prescriber organizations",
+            "Processing 1 institutions",
+            (
+                f"Sent reminder notification to user {self.labor_inspector_1.user_id} "
+                f"for institution {self.labor_inspector_1.institution_id}"
+            ),
+            (
+                f"Sent reminder notification to user {labor_inspector_2.user_id} "
+                f"for institution {labor_inspector_2.institution_id}"
+            ),
+        ]
         assert len(mailoutbox) == 4
-        assert command.stdout.getvalue() == expected_output
 
         # Subsequent calls should not send other notifications
+        caplog.clear()
         with django_capture_on_commit_callbacks(execute=True):
             command.handle()
-        expected_output += "Processing 0 companies\nProcessing 0 prescriber organizations\nProcessing 0 institutions\n"
+        assert caplog.messages == [
+            "Processing 0 companies",
+            "Processing 0 prescriber organizations",
+            "Processing 0 institutions",
+        ]
         assert len(mailoutbox) == 4
-        assert command.stdout.getvalue() == expected_output
 
         # Update prescriber organization creation date enough in the past
         # Should not send any notification: only active_members_email_reminder_last_sent_at must be considered
+        caplog.clear()
         self.prescriber_1.organization.created_at -= relativedelta(days=1)
         self.prescriber_1.organization.save(update_fields=["created_at"])
         with django_capture_on_commit_callbacks(execute=True):
             command.handle()
-        expected_output += "Processing 0 companies\nProcessing 0 prescriber organizations\nProcessing 0 institutions\n"
+        assert caplog.messages == [
+            "Processing 0 companies",
+            "Processing 0 prescriber organizations",
+            "Processing 0 institutions",
+        ]
         assert len(mailoutbox) == 4
-        assert command.stdout.getvalue() == expected_output
 
         # Update prescriber organization last sent reminder date enough in the past
         # Should now send notification to prescribers
+        caplog.clear()
         self.prescriber_1.organization.active_members_email_reminder_last_sent_at -= relativedelta(days=1)
         self.prescriber_1.organization.save(update_fields=["active_members_email_reminder_last_sent_at"])
         with django_capture_on_commit_callbacks(execute=True):
             command.handle()
-        expected_output += (
-            "Processing 0 companies\n"
-            "Processing 1 prescriber organizations\n"
-            f"  - Sent reminder notification to user #{self.prescriber_1.user_id} "
-            f"for prescriber organization #{self.prescriber_1.organization_id}\n"
-            f"  - Sent reminder notification to user #{prescriber_2.user_id} "
-            f"for prescriber organization #{prescriber_2.organization_id}\n"
-            "Processing 0 institutions\n"
-        )
+        assert caplog.messages == [
+            "Processing 0 companies",
+            "Processing 1 prescriber organizations",
+            (
+                f"Sent reminder notification to user {self.prescriber_1.user_id} "
+                f"for prescriber organization {self.prescriber_1.organization_id}"
+            ),
+            (
+                f"Sent reminder notification to user {prescriber_2.user_id} "
+                f"for prescriber organization {prescriber_2.organization_id}"
+            ),
+            "Processing 0 institutions",
+        ]
         assert len(mailoutbox) == 6
-        assert command.stdout.getvalue() == expected_output
 
     def test_check_authorized_members_email_content_two_admins(
         self, django_capture_on_commit_callbacks, command, snapshot, mailoutbox
