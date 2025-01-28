@@ -1,4 +1,3 @@
-import logging
 from itertools import batched
 from math import ceil
 
@@ -9,9 +8,6 @@ from itou.gps.utils import create_or_update_advisor, parse_gps_advisors_file
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.command import BaseCommand
-
-
-logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -41,7 +37,7 @@ class Command(BaseCommand):
         beneficiaries_pks = User.objects.filter(
             kind=UserKind.JOB_SEEKER, jobseeker_profile__nir__in=nir_to_contact
         ).values_list("pk", flat=True)
-        logger.info(f"Matched {len(beneficiaries_pks)} users in the database")
+        self.logger.info(f"Matched {len(beneficiaries_pks)} users in the database")
 
         chunk_size = 1000
         chunks_total = ceil(len(beneficiaries_pks) / chunk_size)
@@ -74,17 +70,17 @@ class Command(BaseCommand):
             created_rows_count += len(contacts_to_create)
             updated_rows_count += len(contacts_to_update)
 
-            logger.info(f"{chunk_idx / chunks_total * 100:.2f}%")
+            self.logger.info(f"{chunk_idx / chunks_total * 100:.2f}%")
 
-        logger.info("-" * 80)
-        logger.info(
+        self.logger.info("-" * 80)
+        self.logger.info(
             f"Import complete. {created_rows_count} contact details were created "
             f"and {updated_rows_count} were updated."
         )
         missing_contact_details = JobSeekerProfile.objects.filter(advisor_information__isnull=True).count()
         if missing_contact_details > 0:
-            logger.info(f"{missing_contact_details} profiles are still missing contact details.")
+            self.logger.info(f"{missing_contact_details} profiles are still missing contact details.")
         if not wet_run:
-            logger.warning(
+            self.logger.warning(
                 "This was a dry run, nothing was committed. Execute the command with --wet-run to change this."
             )
