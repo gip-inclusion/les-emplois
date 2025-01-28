@@ -275,6 +275,7 @@ def test_create_job_seeker(_mock, client):
     assertRedirects(response, reverse("gps:my_groups"))
     created_job_seeker = User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("follow_up_group").get()
     assert created_job_seeker.email == dummy_job_seeker.email
+    assert created_job_seeker.jobseeker_profile.created_by_prescriber_organization == prescriber_organization
     assert list(created_job_seeker.follow_up_group.members.all()) == [user]
 
 
