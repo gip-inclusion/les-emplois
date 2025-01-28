@@ -3,17 +3,19 @@
 {% load format_filters %}
 {% load django_bootstrap5 %}
 
-{% block title %}
-    Détail fiche salarié ASP - {{ request.current_organization.display_name }} {{ block.super }}
-{% endblock %}
+{% block title %}Fiche salarié ASP - {{ request.current_organization.display_name }} {{ block.super }}{% endblock %}
 
 {% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
 {% block title_content %}
-    <h1>Détail fiche salarié ASP: {{ employee_record.job_application.job_seeker.get_full_name }}</h1>
-    <p>{% include 'employee_record/includes/_status.html' with employee_record=employee_record only %}</p>
+    <div class="d-xl-flex align-items-xl-center">
+        <h1 class="mb-1 mb-xl-0 me-xl-3">
+            Fiche salarié ASP : {{ employee_record.job_application.job_seeker.get_full_name }}
+        </h1>
+        {% include 'employee_record/includes/_status.html' with employee_record=employee_record only %}
+    </div>
 {% endblock %}
 
 {% block content %}

@@ -4869,7 +4869,8 @@ class TestCheckJobSeekerInformationsForHire:
         response = client.get(url_check_infos)
         assertContains(
             response,
-            '<h1 class="mb-0 me-3 text-md-nowrap">Informations personnelles de Son Prénom Son Nom De Famille</h1>',
+            """<h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">
+            Informations personnelles de Son Prénom Son Nom De Famille</h1>""",
             html=True,
         )
         assertTemplateNotUsed(response, "approvals/includes/box.html")
@@ -4913,7 +4914,8 @@ class TestCheckJobSeekerInformationsForHire:
         response = client.get(url_check_infos)
         assertContains(
             response,
-            '<h1 class="mb-0 me-3 text-md-nowrap">Informations personnelles de Son Prénom Son Nom De Famille</h1>',
+            """<h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">
+            Informations personnelles de Son Prénom Son Nom De Famille</h1>""",
             html=True,
         )
         assertTemplateNotUsed(response, "approvals/includes/box.html")
