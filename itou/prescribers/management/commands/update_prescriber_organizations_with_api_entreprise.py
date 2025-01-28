@@ -1,5 +1,4 @@
 import datetime
-import logging
 
 from django.utils import timezone
 
@@ -40,23 +39,7 @@ class Command(BaseCommand):
             default=7,
         )
 
-    def set_logger(self, verbosity):
-        """
-        Set logger level based on the verbosity option.
-        """
-        handler = logging.StreamHandler(self.stdout)
-
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
-        self.logger.addHandler(handler)
-
-        self.logger.setLevel(logging.INFO)
-        if verbosity > 1:
-            self.logger.setLevel(logging.DEBUG)
-
     def handle(self, *, days, n_organizations, verbosity, **options):
-        self.set_logger(verbosity)
-
         prescriber_orgs = PrescriberOrganization.objects.filter(
             updated_at__lte=timezone.now() - datetime.timedelta(days=days)
         ).exclude(siret__isnull=True)[:n_organizations]
@@ -64,9 +47,9 @@ class Command(BaseCommand):
             self.logger.info("ID %s - SIRET %s - %s", prescriber_org.pk, prescriber_org.siret, prescriber_org.name)
             etablissement, error = etablissement_get_or_error(prescriber_org.siret)
             if error:
-                self.logger.error("| Unable to fetch information: %s", error)
+                self.logger.error("Unable to fetch information: %s", error)
             elif prescriber_org.is_head_office != etablissement.is_head_office:
-                self.logger.debug("| New status of head office: %s", etablissement.is_head_office)
+                self.logger.info("New status of head office: %s", etablissement.is_head_office)
                 prescriber_org.is_head_office = etablissement.is_head_office
 
             # Organization is saved to set updated_at field even if no changes because we don't want
