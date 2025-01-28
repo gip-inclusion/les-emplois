@@ -14,20 +14,19 @@ def command_fixture():
     return sanitize_employee_records.Command(stdout=io.StringIO(), stderr=io.StringIO())
 
 
-def test_handle_dry_run_option(mocker, command):
+def test_handle_dry_run_option(mocker, command, caplog):
     mocker.patch.object(command, "_check_approvals")
     mocker.patch.object(command, "_check_missed_notifications")
 
     command.handle(dry_run=True)
-    assert command.stdout.getvalue().split("\n") == [
-        "+ Checking employee records coherence before transferring to ASP",
-        " - DRY-RUN mode: not fixing, just reporting",
-        "+ Employee records sanitizing done. Have a great day!",
-        "",
+    assert caplog.messages == [
+        "Checking employee records coherence before transferring to ASP",
+        "DRY-RUN mode: not fixing, just reporting",
+        "Employee records sanitizing done. Have a great day!",
     ]
 
 
-def test_missing_approvals(command):
+def test_missing_approvals(command, caplog):
     # Check for employee record without approval (through job application)
 
     employee_record = factories.EmployeeRecordFactory()
@@ -37,16 +36,13 @@ def test_missing_approvals(command):
     command._check_approvals(dry_run=False)
 
     assert models.EmployeeRecord.objects.count() == 0
-    assert command.stdout.getvalue().split("\n") == [
-        "* Checking missing employee records approval:",
-        " - found 1 missing approval(s)",
-        " - fixing missing approvals: DELETING employee records",
-        " - done!",
-        "",
+    assert caplog.messages == [
+        "found 1 employee records with missing approval",
+        "deleted 1/1 employee records with missing approval",
     ]
 
 
-def test_missed_notifications(command, faker):
+def test_missed_notifications(command, faker, caplog):
     # Approval() updated after the last employee record snapshot are what we want
     employee_record_before_approval = factories.EmployeeRecordFactory(
         status=models.Status.ARCHIVED,
@@ -84,16 +80,13 @@ def test_missed_notifications(command, faker):
     assert employee_record_before_approval.update_notifications.count() == 1
     employee_record_before_approval.refresh_from_db()
     assert employee_record_before_approval.status != Status.ARCHIVED
-    assert command.stdout.getvalue().split("\n") == [
-        "* Checking missing employee records notifications:",
-        " - found 1 missing notification(s)",
-        " - 1 notification(s) created",
-        " - done!",
-        "",
+    assert caplog.messages == [
+        "found 1 missed employee records notifications",
+        "1/1 notifications created",
     ]
 
 
-def test_missed_notifications_limit(faker, mocker, snapshot, command):
+def test_missed_notifications_limit(faker, mocker, snapshot, command, caplog):
     mocker.patch.object(command, "MAX_MISSED_NOTIFICATIONS_CREATED", 2)
     factories.EmployeeRecordFactory.create_batch(
         3,
@@ -107,4 +100,4 @@ def test_missed_notifications_limit(faker, mocker, snapshot, command):
     command._check_missed_notifications(dry_run=False)
 
     assert models.EmployeeRecordUpdateNotification.objects.count() == 2
-    assert command.stdout.getvalue() == snapshot
+    assert caplog.messages == snapshot
