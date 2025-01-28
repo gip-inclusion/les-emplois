@@ -15,37 +15,40 @@ from tests.siae_evaluations.factories import (
 
 
 class TestManagementCommand:
-    def test_no_campaign(self, capsys, django_capture_on_commit_callbacks, mailoutbox):
+    def test_no_campaign(self, caplog, django_capture_on_commit_callbacks, mailoutbox):
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        stdout, stderr = capsys.readouterr()
-        assert stdout == ""
-        assert stderr == ""
+        assert caplog.messages[:-1] == []
+        assert caplog.messages[-1].startswith(
+            "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
+        )
         assert mailoutbox == []
 
-    def test_no_notification_for_new_campaigns(self, capsys, django_capture_on_commit_callbacks, mailoutbox):
+    def test_no_notification_for_new_campaigns(self, caplog, django_capture_on_commit_callbacks, mailoutbox):
         EvaluationCampaignFactory()
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        stdout, stderr = capsys.readouterr()
-        assert stdout == ""
-        assert stderr == ""
+        assert caplog.messages[:-1] == []
+        assert caplog.messages[-1].startswith(
+            "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
+        )
         assert mailoutbox == []
 
-    def test_no_notification_for_closed_campaigns(self, capsys, django_capture_on_commit_callbacks, mailoutbox):
+    def test_no_notification_for_closed_campaigns(self, caplog, django_capture_on_commit_callbacks, mailoutbox):
         EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(days=30),
             ended_at=timezone.now(),
         )
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        stdout, stderr = capsys.readouterr()
-        assert stdout == ""
-        assert stderr == ""
+        assert caplog.messages[:-1] == []
+        assert caplog.messages[-1].startswith(
+            "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
+        )
         assert mailoutbox == []
 
     @freeze_time("2022-12-07 11:11:11")
-    def test_notifies_all_campaigns(self, capsys, django_capture_on_commit_callbacks, mailoutbox):
+    def test_notifies_all_campaigns(self, caplog, django_capture_on_commit_callbacks, mailoutbox):
         campaign1 = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(days=30),
             evaluated_period_start_at=datetime.date(2022, 1, 1),
@@ -77,12 +80,13 @@ class TestManagementCommand:
         )
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        stdout, stderr = capsys.readouterr()
-        assert sorted(stdout.splitlines()) == [
-            "Emailed first reminders to 1 SIAE which did not submit proofs to DDETS 01 - Campagne 1.",
-            "Emailed first reminders to 2 SIAE which did not submit proofs to DDETS 02 - Campagne 1.",
+        assert sorted(caplog.messages[:-1]) == [
+            "Emailed first reminders to 1 SIAE which did not submit proofs to DDETS 01 - Campagne 1",
+            "Emailed first reminders to 2 SIAE which did not submit proofs to DDETS 02 - Campagne 1",
         ]
-        assert stderr == ""
+        assert caplog.messages[-1].startswith(
+            "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
+        )
         # EvaluatedSiae are not ordered.
         [mail1, mail2, mail3] = sorted(mailoutbox, key=lambda mail: (mail.subject, mail.body))
         assert mail1.subject == (
@@ -133,7 +137,7 @@ class TestManagementCommand:
         assert f"http://localhost:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae3.pk}/" in mail3.body
 
     @freeze_time("2022-12-07 11:11:11")
-    def test_notify_fallback(self, capsys, django_capture_on_commit_callbacks, mailoutbox):
+    def test_notify_fallback(self, caplog, django_capture_on_commit_callbacks, mailoutbox):
         "Crons did not run at D+30, the system should catch up."
         campaign = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(days=31),
@@ -149,11 +153,12 @@ class TestManagementCommand:
         )
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        stdout, stderr = capsys.readouterr()
-        assert stdout.splitlines() == [
-            "Emailed first reminders to 1 SIAE which did not submit proofs to DDETS 01 - Campagne 1."
+        assert caplog.messages[:-1] == [
+            "Emailed first reminders to 1 SIAE which did not submit proofs to DDETS 01 - Campagne 1"
         ]
-        assert stderr == ""
+        assert caplog.messages[-1].startswith(
+            "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
+        )
         [mail] = mailoutbox
         assert mail.subject == (
             "[DEV] Contrôle a posteriori des auto-prescriptions : "
@@ -171,7 +176,7 @@ class TestManagementCommand:
         assert f"http://localhost:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae.pk}/" in mail.body
 
     @freeze_time("2022-12-07 11:11:11")
-    def test_does_not_notify_twice(self, capsys, django_capture_on_commit_callbacks, mailoutbox):
+    def test_does_not_notify_twice(self, caplog, django_capture_on_commit_callbacks, mailoutbox):
         campaign = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(days=31),
             evaluated_period_start_at=datetime.date(2022, 1, 1),
@@ -187,13 +192,14 @@ class TestManagementCommand:
         )
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        stdout, stderr = capsys.readouterr()
-        assert stdout == ""
-        assert stderr == ""
+        assert caplog.messages[:-1] == []
+        assert caplog.messages[-1].startswith(
+            "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
+        )
         assert mailoutbox == []
 
     @freeze_time("2022-12-07 11:11:11")
-    def test_no_notification(self, capsys, django_capture_on_commit_callbacks, mailoutbox):
+    def test_no_notification(self, caplog, django_capture_on_commit_callbacks, mailoutbox):
         campaign = EvaluationCampaignFactory(evaluations_asked_at=timezone.now() - relativedelta(days=30))
         evaluated_job_app_submitted = EvaluatedJobApplicationFactory(evaluated_siae__evaluation_campaign=campaign)
         EvaluatedAdministrativeCriteriaFactory(
@@ -245,13 +251,14 @@ class TestManagementCommand:
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        stdout, stderr = capsys.readouterr()
-        assert stdout == ""
-        assert stderr == ""
+        assert caplog.messages[:-1] == []
+        assert caplog.messages[-1].startswith(
+            "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
+        )
         assert mailoutbox == []
 
     @freeze_time("2022-12-07 11:11:11")
-    def test_notification_for_siaes_without_proofs(self, capsys, django_capture_on_commit_callbacks, mailoutbox):
+    def test_notification_for_siaes_without_proofs(self, caplog, django_capture_on_commit_callbacks, mailoutbox):
         campaign = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(days=30),
             evaluated_period_start_at=datetime.date(2022, 1, 1),
@@ -280,11 +287,12 @@ class TestManagementCommand:
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        stdout, stderr = capsys.readouterr()
-        assert (
-            stdout == "Emailed first reminders to 2 SIAE which did not submit proofs to DDETS 01 - Campagne de test.\n"
+        assert caplog.messages[:-1] == [
+            "Emailed first reminders to 2 SIAE which did not submit proofs to DDETS 01 - Campagne de test"
+        ]
+        assert caplog.messages[-1].startswith(
+            "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
         )
-        assert stderr == ""
         mail1, mail2 = mailoutbox
         if mail1.body > mail2.body:
             # EvaluatedSiae are not ordered, email order is not deterministic.
@@ -327,7 +335,7 @@ class TestManagementCommand:
     # Campaign started on 2022-07-11.
     @freeze_time("2023-01-18 11:11:11")
     def test_second_notification_for_siaes_without_proofs(
-        self, capsys, django_capture_on_commit_callbacks, mailoutbox
+        self, caplog, django_capture_on_commit_callbacks, mailoutbox
     ):
         campaign = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6, days=30),
@@ -379,12 +387,12 @@ class TestManagementCommand:
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        stdout, stderr = capsys.readouterr()
-        assert (
-            stdout
-            == "Emailed second reminders to 2 SIAE which did not submit proofs to DDETS 01 - Campagne de test.\n"
+        assert caplog.messages[:-1] == [
+            "Emailed second reminders to 2 SIAE which did not submit proofs to DDETS 01 - Campagne de test"
+        ]
+        assert caplog.messages[-1].startswith(
+            "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
         )
-        assert stderr == ""
         # EvaluatedSiae are not ordered, email order is not deterministic.
         mail1, mail2 = mailoutbox
         if mail1.body > mail2.body:
@@ -427,7 +435,7 @@ class TestManagementCommand:
         )
 
     @freeze_time("2023-01-18 11:11:11")
-    def test_second_notification_does_not_notify_twice(self, capsys, django_capture_on_commit_callbacks, mailoutbox):
+    def test_second_notification_does_not_notify_twice(self, caplog, django_capture_on_commit_callbacks, mailoutbox):
         campaign = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6, days=30),
             evaluated_period_start_at=datetime.date(2022, 1, 1),
@@ -446,14 +454,15 @@ class TestManagementCommand:
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_no_answer)
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        stdout, stderr = capsys.readouterr()
-        assert stdout == ""
-        assert stderr == ""
+        assert caplog.messages[:-1] == []
+        assert caplog.messages[-1].startswith(
+            "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
+        )
         assert mailoutbox == []
 
     @freeze_time("2023-01-18 11:11:11")
     def test_second_notification_not_fired_for_siae_with_final_state(
-        self, capsys, django_capture_on_commit_callbacks, mailoutbox
+        self, caplog, django_capture_on_commit_callbacks, mailoutbox
     ):
         campaign = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6, days=30),
@@ -488,14 +497,15 @@ class TestManagementCommand:
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        stdout, stderr = capsys.readouterr()
-        assert stdout == ""
-        assert stderr == ""
+        assert caplog.messages[:-1] == []
+        assert caplog.messages[-1].startswith(
+            "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
+        )
         assert mailoutbox == []
 
     @freeze_time("2023-01-18 11:11:11")
     def test_institution_submission_freeze_reminder(
-        self, capsys, django_capture_on_commit_callbacks, mailoutbox, snapshot
+        self, caplog, django_capture_on_commit_callbacks, mailoutbox, snapshot
     ):
         campaign = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(weeks=3),
@@ -509,25 +519,28 @@ class TestManagementCommand:
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        stdout, stderr = capsys.readouterr()
-        assert stdout == ""
-        assert stderr == ""
+        assert caplog.messages[:-1] == []
+        assert caplog.messages[-1].startswith(
+            "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
+        )
         assert mailoutbox == []
 
+        caplog.clear()
         one_day_later = timezone.now() + relativedelta(days=1)
         with freeze_time(one_day_later):  # It has now been 7 days since last notification
             with django_capture_on_commit_callbacks(execute=True):
                 call_command("evaluation_campaign_notify")
-        stdout, stderr = capsys.readouterr()
-        assert stdout == "Reminded “DDETS 01” to control SIAE during the submission freeze.\n"
-        assert stderr == ""
+        assert caplog.messages[:-1] == ["Reminded “DDETS 01” to control SIAE during the submission freeze."]
+        assert caplog.messages[-1].startswith(
+            "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
+        )
         [email] = mailoutbox
         assert email.subject == "[DEV] [Contrôle a posteriori] Rappel : Contrôle des justificatifs à finaliser"
         assert email.body == snapshot()
 
     @freeze_time("2023-01-18 11:11:11")
     def test_institution_submission_freeze_notification_ignores_closed_campaigns(
-        self, capsys, django_capture_on_commit_callbacks, mailoutbox
+        self, caplog, django_capture_on_commit_callbacks, mailoutbox
     ):
         campaign = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
@@ -541,7 +554,8 @@ class TestManagementCommand:
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
-        stdout, stderr = capsys.readouterr()
-        assert stdout == ""
-        assert stderr == ""
+        assert caplog.messages[:-1] == []
+        assert caplog.messages[-1].startswith(
+            "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
+        )
         assert mailoutbox == []

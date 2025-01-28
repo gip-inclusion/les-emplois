@@ -34,8 +34,8 @@ class Command(BaseCommand):
             if emails:
                 send_email_messages(emails)
                 evaluated_siaes.update(reminder_sent_at=timezone.now())
-                self.stdout.write(
-                    f"Emailed first reminders to {len(emails)} SIAE which did not submit proofs to {campaign}."
+                self.logger.info(
+                    "Emailed first reminders to %d SIAE which did not submit proofs to %s", len(emails), campaign
                 )
 
         for campaign in campaigns.filter(calendar__adversarial_stage_start__lte=today - relativedelta(days=30)):
@@ -58,8 +58,8 @@ class Command(BaseCommand):
             if emails:
                 send_email_messages(emails)
                 evaluated_siaes.update(reminder_sent_at=timezone.now())
-                self.stdout.write(
-                    f"Emailed second reminders to {len(emails)} SIAE which did not submit proofs to {campaign}."
+                self.logger.info(
+                    "Emailed second reminders to %d SIAE which did not submit proofs to %s", len(emails), campaign
                 )
 
         # When a campaign is frozen, a notification is sent to institutions synchronously
@@ -72,4 +72,4 @@ class Command(BaseCommand):
             send_email_messages([CampaignEmailFactory(campaign).submission_frozen_reminder()])
             campaign.submission_freeze_notified_at = timezone.now()
             campaign.save(update_fields=["submission_freeze_notified_at"])
-            self.stdout.write(f"Reminded “{campaign.institution}” to control SIAE during the submission freeze.")
+            self.logger.info("Reminded “%s” to control SIAE during the submission freeze.", campaign.institution)
