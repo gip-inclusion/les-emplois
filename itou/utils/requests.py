@@ -1,8 +1,8 @@
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
-from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.utils.http import url_has_allowed_host_and_scheme
+
+from itou.utils.urls import get_safe_url
 
 
 def add_query_params(url, params):
@@ -23,19 +23,6 @@ def add_query_params(url, params):
     return new_url
 
 
-# TODO(calum): Replace usage with get_safe_url from itou.utils
-def is_safe_url(request, url):
-    # get_host already validates the given host, so no need to check it again
-    allowed_hosts = {request.get_host()} | set(settings.ALLOWED_HOSTS)
-
-    if "*" in allowed_hosts:
-        parsed_host = urlparse(url).netloc
-        allowed_host = {parsed_host} if parsed_host else None
-        return url_has_allowed_host_and_scheme(url, allowed_hosts=allowed_host)
-
-    return url_has_allowed_host_and_scheme(url, allowed_hosts=allowed_hosts)
-
-
 def get_request_param(request, param, default=None):
     if request is None:
         return default
@@ -48,7 +35,7 @@ def get_next_redirect_url(request, redirect_field_name=REDIRECT_FIELD_NAME) -> s
     via the request.
     """
     redirect_to = get_request_param(request, redirect_field_name)
-    if redirect_to and not is_safe_url(request, redirect_to):
+    if redirect_to and get_safe_url(request, url=redirect_to) is None:
         redirect_to = None
     return redirect_to
 
