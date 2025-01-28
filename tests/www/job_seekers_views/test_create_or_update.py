@@ -2,20 +2,26 @@ import datetime
 import uuid
 
 import pytest
+from django.contrib import messages
 from django.template.defaultfilters import urlencode
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
-from itou.asp.models import Commune, Country
-from itou.users.enums import Title
+from itou.asp.models import Commune, Country, RSAAllocation
+from itou.users.enums import LackOfPoleEmploiId, Title
+from itou.users.models import JobSeekerProfile, User
+from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.session import SessionNamespace
+from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.urls import add_url_params
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
+from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.test import KNOWN_SESSION_KEYS
+from tests.www.apply.test_submit import CONFIRM_RESET_MARKUP, LINK_RESET_MARKUP
 
 
 class TestGetOrCreateAsOther:
@@ -173,6 +179,8 @@ class TestGetOrCreateForSender:
             # Valid parameters
             pytest.param("valid", "valid", "valid", 302, id="valid_values"),
             pytest.param("valid", "valid_hire", "valid", 302, id="valid_values_hire"),
+            pytest.param(None, "valid_standalone", "valid", 302, id="valid_values_standalone"),
+            pytest.param("valid", "valid_standalone", "valid", 302, id="valid_values_standalone"),
             # Invalid parameters
             pytest.param(None, "valid", "valid", 404, id="missing_company"),
             pytest.param(None, "valid", "valid_hire", 404, id="missing_company_hire"),
@@ -208,6 +216,8 @@ class TestGetOrCreateForSender:
                 tunnel = "sender"
             case "valid_hire":
                 tunnel = "hire"
+            case "valid_standalone":
+                tunnel = "standalone"
             case "invalid":
                 tunnel = "invalid-tunnel"
             case _:
@@ -233,8 +243,13 @@ class TestGetOrCreateForSender:
 
         if expected_status_code == 302:
             [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+            view_name = (
+                "job_seekers_views:check_nir_for_hire"
+                if tunnel == "hire"
+                else "job_seekers_views:check_nir_for_sender"
+            )
             next_url = reverse(
-                f"job_seekers_views:check_nir_for_{tunnel}",
+                view_name,
                 kwargs={"session_uuid": job_seeker_session_name},
             )
 
@@ -397,6 +412,346 @@ class TestGetOrCreateForSender:
             </div>""",
             html=True,
             count=1,
+        )
+
+
+class TestStandaloneCreateAsPrescriber:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, settings, mocker):
+        [self.city] = create_test_cities(["67"], num_per_department=1)
+        settings.API_BAN_BASE_URL = "http://ban-api"
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+        )
+
+    def test_standalone_creation_as_prescriber_existing_nir(self, client):
+        from_url = reverse("job_seekers_views:list")
+        user = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        client.force_login(user)
+
+        existing_job_seeker = JobSeekerFactory(
+            jobseeker_profile__with_hexa_address=True,
+            jobseeker_profile__with_education_level=True,
+            with_ban_geoloc_address=True,
+            jobseeker_profile__nir="178122978200508",
+            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            title="M",
+        )
+
+        # Entry point.
+        # ----------------------------------------------------------------------
+
+        params = {"tunnel": "standalone", "from_url": from_url}
+        start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+        client.get(start_url)
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
+
+        # Step determine the job seeker with a NIR.
+        # ----------------------------------------------------------------------
+
+        response = client.post(next_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "preview": 1})
+        assertContains(
+            response,
+            f"""
+            <div class="modal-body">
+                <p>
+                    Le numéro {format_nir(existing_job_seeker.jobseeker_profile.nir)} est associé au compte
+                    de <b>{existing_job_seeker.get_full_name()}</b>.
+                </p>
+                <p>
+                    Le compte de ce candidat sera ajouté à votre liste une fois que vous aurez postulé pour lui.
+                </p>
+            </div>
+           """,
+            html=True,
+        )
+        response = client.post(next_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "confirm": 1})
+
+        assertRedirects(
+            response,
+            reverse(
+                "job_seekers_views:details",
+                kwargs={"public_id": existing_job_seeker.public_id},
+            ),
+        )
+
+    def test_standalone_creation_as_prescriber_existing_email(self, client):
+        from_url = reverse("job_seekers_views:list")
+        user = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        client.force_login(user)
+
+        existing_job_seeker = JobSeekerFactory(
+            jobseeker_profile__with_hexa_address=True,
+            jobseeker_profile__with_education_level=True,
+            with_ban_geoloc_address=True,
+            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            email="someemail@inclusion.gouv.fr",
+            title="M",
+        )
+
+        # Entry point.
+        # ----------------------------------------------------------------------
+
+        params = {"tunnel": "standalone", "from_url": from_url}
+        start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+        client.get(start_url)
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        next_url = reverse(
+            "job_seekers_views:search_by_email_for_sender", kwargs={"session_uuid": job_seeker_session_name}
+        )
+
+        # Step determine the job seeker with an email (skipping the NIR)
+        # ----------------------------------------------------------------------
+
+        response = client.post(next_url, data={"email": existing_job_seeker.email, "preview": 1})
+        assertContains(
+            response,
+            f"""
+            <div class="modal-body">
+                <p>
+                    L'adresse {existing_job_seeker.email} est associée au compte de
+                    <b>{existing_job_seeker.get_full_name()}</b>.
+                </p>
+                <p>
+                    Le compte de ce candidat sera ajouté à votre liste une fois que vous aurez postulé pour lui.
+                </p>
+            </div>
+           """,
+            html=True,
+        )
+        response = client.post(next_url, data={"email": existing_job_seeker.email, "confirm": 1})
+
+        assertRedirects(
+            response,
+            reverse(
+                "job_seekers_views:details",
+                kwargs={"public_id": existing_job_seeker.public_id},
+            ),
+        )
+
+    @pytest.mark.ignore_unknown_variable_template_error("confirmation_needed", "job_seeker")
+    def test_standalone_creation_as_prescriber(self, client):
+        from_url = reverse("job_seekers_views:list")
+        user = PrescriberOrganizationWithMembershipFactory().members.first()
+        client.force_login(user)
+
+        dummy_job_seeker = JobSeekerFactory.build(
+            jobseeker_profile__with_hexa_address=True,
+            jobseeker_profile__with_education_level=True,
+            with_ban_geoloc_address=True,
+            jobseeker_profile__nir="178122978200508",
+            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            title="M",
+        )
+
+        # Entry point.
+        # ----------------------------------------------------------------------
+
+        params = {"tunnel": "standalone", "from_url": from_url}
+        start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+        client.get(start_url)
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
+
+        # Step determine the job seeker with a NIR.
+        # ----------------------------------------------------------------------
+
+        response = client.get(next_url)
+        assertContains(response, LINK_RESET_MARKUP % from_url)
+
+        response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
+
+        next_url = reverse(
+            "job_seekers_views:search_by_email_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        assertRedirects(response, next_url)
+
+        expected_job_seeker_session = {
+            "config": {
+                "tunnel": "standalone",
+                "from_url": from_url,
+                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
+            },
+            "profile": {"nir": dummy_job_seeker.jobseeker_profile.nir},
+        }
+
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        # Step get job seeker e-mail.
+        # ----------------------------------------------------------------------
+
+        response = client.get(next_url)
+        assertContains(response, CONFIRM_RESET_MARKUP % from_url)
+
+        response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
+
+        expected_job_seeker_session |= {
+            "user": {
+                "email": dummy_job_seeker.email,
+            },
+        }
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "job_seekers_views:create_job_seeker_step_1_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        assertRedirects(response, next_url)
+
+        # Step create a job seeker.
+        # ----------------------------------------------------------------------
+
+        response = client.get(next_url)
+        # The NIR is prefilled
+        assertContains(response, dummy_job_seeker.jobseeker_profile.nir)
+        # Check that the back url is correct
+        assertContains(
+            response,
+            reverse(
+                "job_seekers_views:search_by_email_for_sender",
+                kwargs={"session_uuid": job_seeker_session_name},
+            ),
+        )
+        assertContains(response, CONFIRM_RESET_MARKUP % from_url)
+
+        geispolsheim = create_city_geispolsheim()
+        birthdate = dummy_job_seeker.jobseeker_profile.birthdate
+
+        # Let's check for consistency between the NIR, the birthdate and the title.
+        # ----------------------------------------------------------------------
+
+        post_data = {
+            "title": "MME",  # inconsistent title
+            "first_name": dummy_job_seeker.first_name,
+            "last_name": dummy_job_seeker.last_name,
+            "birthdate": birthdate,
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
+        }
+        response = client.post(next_url, data=post_data)
+        assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE % "")
+
+        post_data = {
+            "title": "M",
+            "first_name": dummy_job_seeker.first_name,
+            "last_name": dummy_job_seeker.last_name,
+            "birthdate": datetime.date(1978, 11, 20),  # inconsistent birthdate
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
+        }
+        response = client.post(next_url, data=post_data)
+        assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
+
+        # Resume to valid data and proceed with "normal" flow.
+        # ----------------------------------------------------------------------
+
+        post_data = {
+            "title": dummy_job_seeker.title,
+            "first_name": dummy_job_seeker.first_name,
+            "last_name": dummy_job_seeker.last_name,
+            "birthdate": birthdate,
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
+            "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+            "birth_country": Country.france_id,
+        }
+        response = client.post(next_url, data=post_data)
+        expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
+        expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
+        expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
+        expected_job_seeker_session["profile"]["birth_country"] = post_data.pop("birth_country")
+        expected_job_seeker_session["user"] |= post_data
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "job_seekers_views:create_job_seeker_step_2_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        assertRedirects(response, next_url)
+
+        response = client.get(next_url)
+        assertContains(response, CONFIRM_RESET_MARKUP % from_url)
+
+        post_data = {
+            "ban_api_resolved_address": dummy_job_seeker.geocoding_address,
+            "address_line_1": dummy_job_seeker.address_line_1,
+            "post_code": self.city.post_codes[0],
+            "insee_code": self.city.code_insee,
+            "city": self.city.name,
+            "phone": dummy_job_seeker.phone,
+            "fill_mode": "ban_api",
+        }
+        response = client.post(next_url, data=post_data)
+        expected_job_seeker_session["user"] |= post_data | {"address_line_2": "", "address_for_autocomplete": None}
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "job_seekers_views:create_job_seeker_step_3_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        assertRedirects(response, next_url)
+
+        response = client.get(next_url)
+        assertContains(response, CONFIRM_RESET_MARKUP % from_url)
+
+        post_data = {
+            "education_level": dummy_job_seeker.jobseeker_profile.education_level,
+        }
+        response = client.post(next_url, data=post_data)
+        expected_job_seeker_session["profile"] |= post_data | {
+            "pole_emploi_id": "",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED.value,
+            "resourceless": False,
+            "rqth_employee": False,
+            "oeth_employee": False,
+            "pole_emploi": False,
+            "pole_emploi_id_forgotten": "",
+            "pole_emploi_since": "",
+            "unemployed": False,
+            "unemployed_since": "",
+            "rsa_allocation": False,
+            "has_rsa_allocation": RSAAllocation.NO.value,
+            "rsa_allocation_since": "",
+            "ass_allocation": False,
+            "ass_allocation_since": "",
+            "aah_allocation": False,
+            "aah_allocation_since": "",
+        }
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "job_seekers_views:create_job_seeker_step_end_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        assertRedirects(response, next_url)
+
+        response = client.get(next_url)
+        assertContains(response, "Créer le compte candidat")
+
+        response = client.post(next_url)
+        assert job_seeker_session_name not in client.session
+        new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
+        assert (
+            new_job_seeker.jobseeker_profile.created_by_prescriber_organization
+            == user.prescriberorganization_set.first()
+        )
+        next_url = reverse(
+            "job_seekers_views:details",
+            kwargs={"public_id": new_job_seeker.public_id},
+        )
+        assertRedirects(response, next_url)
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.SUCCESS,
+                    f"Le compte du candidat {new_job_seeker.get_full_name()} a "
+                    "bien été créé et ajouté à votre liste de candidats.",
+                )
+            ],
         )
 
 
