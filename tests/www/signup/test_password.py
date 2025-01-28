@@ -58,7 +58,7 @@ class TestPasswordReset:
         assert client.login(username=user.email, password=DEFAULT_PASSWORD)
         client.logout()
 
-    def test_password_reset_with_nonexistent_email(self, client):
+    def test_password_reset_with_nonexistent_email(self, client, mailoutbox, snapshot):
         """
         Avoid user enumeration: redirect to the success page even with a nonexistent email.
         """
@@ -69,7 +69,15 @@ class TestPasswordReset:
         response = client.post(url, data=post_data)
         args = urlencode({"email": post_data["email"]})
         next_url = reverse("accounts:account_reset_password_done")
-        assert response.url == f"{next_url}?{args}"
+        assertRedirects(response, f"{next_url}?{args}")
+
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+        assert email.subject == snapshot(name="email subject")
+        assert email.body == snapshot(name="email body")
+        assert email.from_email == settings.DEFAULT_FROM_EMAIL
+        assert len(email.to) == 1
+        assert email.to[0] == post_data["email"]
 
     def test_password_reset_user_creation(self, client, snapshot):
         # user creation differs because they are logged in and redirected to the welcoming tour on creation

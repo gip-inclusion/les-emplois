@@ -67,9 +67,7 @@ class PasswordResetView(LoginNotRequiredMixin, NextRedirectMixin, FormView):
 
     def form_invalid(self, form):
         """
-        Avoid user enumeration: django-allauth displays an error message to the user
-        when an email does not exist. We deliberately hide it by redirecting to the
-        success page in all cases.
+        Avoid user enumeration: We deliberately hide a non-existing email error by redirecting to the success page.
         """
         # Pass the email in the querystring so that it can displayed in the template.
         args = urlencode({"email": form.data.get("email", "")})

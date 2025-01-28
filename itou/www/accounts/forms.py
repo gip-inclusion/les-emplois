@@ -10,6 +10,7 @@ from django.urls import reverse
 from itou.emails.models import EmailAddress
 from itou.users.models import User
 from itou.users.notifications import PasswordResetKeyNotification
+from itou.utils.emails import get_email_message, send_email_messages
 from itou.utils.tokens import EmailAwarePasswordResetTokenGenerator
 from itou.utils.urls import get_absolute_url
 
@@ -86,6 +87,23 @@ class ResetPasswordForm(forms.Form):
         ),
     )
 
+    def user_does_not_exist(self):
+        # Send email to intended recipient, and raise a ValidationError.
+        send_email_messages(
+            [
+                get_email_message(
+                    (self.cleaned_data["email"],),
+                    {
+                        "site_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/",
+                        "signup_url": get_absolute_url(reverse("signup:choose_user_kind")),
+                    },
+                    "account/email/unknown_account_subject.txt",
+                    "account/email/unknown_account_message.txt",
+                )
+            ]
+        )
+        raise ValidationError("Cette adresse e-mail n'est pas associée à un compte utilisateur", code="unknown_email")
+
     def clean_email(self):
         email = self.cleaned_data["email"].lower()
         try:
@@ -94,16 +112,12 @@ class ResetPasswordForm(forms.Form):
             # and insodoing confirm their email address?
             self.user = EmailAddress.objects.get(email=email).user
         except EmailAddress.DoesNotExist:
-            raise ValidationError(
-                "Cette adresse e-mail n'est pas associée à un compte utilisateur", code="unknown_email"
-            )
+            self.user_does_not_exist()
         return self.cleaned_data["email"]
 
     def save(self, request, **kwargs):
         if not self.user:
-            # TODO: reinstate email notification
-            # flows.signup.send_unknown_account_mail(request, email)
-            return
+            self.user_does_not_exist()
 
         # Send the password reset email.
         uid = self.user.pk_to_url_str
