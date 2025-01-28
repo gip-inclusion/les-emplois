@@ -2058,7 +2058,9 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotify
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}", count=1)
+        assertContains(
+            response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}", html=True, count=1
+        )
         assertContains(
             response,
             f"""
