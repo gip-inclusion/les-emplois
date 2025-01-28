@@ -573,8 +573,8 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
 
 
 class TestApprovalsSendToPeManagement:
-    @patch.object(CancelledApproval, "notify_pole_emploi")
-    @patch.object(Approval, "notify_pole_emploi")
+    @patch.object(CancelledApproval, "notify_pole_emploi", return_value=api_enums.PEApiNotificationStatus.ERROR)
+    @patch.object(Approval, "notify_pole_emploi", return_value=api_enums.PEApiNotificationStatus.SHOULD_RETRY)
     @patch("itou.approvals.management.commands.send_approvals_to_pe.sleep")
     # smaller batch to ease testing
     @patch("itou.approvals.management.commands.send_approvals_to_pe.MAX_APPROVALS_PER_RUN", 10)
@@ -633,6 +633,9 @@ class TestApprovalsSendToPeManagement:
             f"cancelled_approval={cancelled_approval} start_at={cancelled_approval.start_at.isoformat()} "
             "pe_state=notification_ready"
             for cancelled_approval in cancelled_approvals[:7]
+        ] + [
+            "Sent 3 approvals with new pe_notification_status=notification_should_retry",
+            "Sent 7 approvals with new pe_notification_status=notification_error",
         ]
         # Last log shows the timing: use startswith
         assert caplog.messages[-1].startswith(
@@ -653,6 +656,40 @@ class TestApprovalsSendToPeManagement:
         for approval in [pending_approval, error_approval_with_obfuscated_nir, *cancelled_approvals]:
             approval.refresh_from_db()
             assert approval.pe_notification_status == api_enums.PEApiNotificationStatus.READY
+
+    @patch.object(Approval, "notify_pole_emploi", return_value=api_enums.PEApiNotificationStatus.SHOULD_RETRY)
+    @patch("itou.approvals.management.commands.send_approvals_to_pe.sleep")
+    # smaller batch to ease testing
+    @patch("itou.approvals.management.commands.send_approvals_to_pe.MAX_APPROVALS_PER_RUN", 1)
+    def test_error_log(self, sleep_mock, notify_mock, caplog):
+        retry_approval = ApprovalFactory(
+            start_at=datetime.datetime.today().date() - datetime.timedelta(days=1),
+            with_jobapplication=True,
+            pe_notification_status="notification_should_retry",
+        )
+        management.call_command(
+            "send_approvals_to_pe",
+            wet_run=True,
+            delay=3,
+        )
+        assert caplog.messages[:-1] == [
+            "approvals needing to be sent count=1, batch count=1",
+            f"approvals={retry_approval} start_at={retry_approval.start_at.isoformat()} "
+            "pe_state=notification_should_retry",
+            "cancelled approvals needing to be sent count=0, batch count=0",
+            "Sent 1 approvals with new pe_notification_status=notification_should_retry",
+            "All sent approvals ended with pe_notification_status=notification_should_retry - something must be wrong",
+        ]
+        # Last log shows the timing: use startswith
+        assert caplog.messages[-1].startswith(
+            "Management command itou.approvals.management.commands.send_approvals_to_pe succeeded in "
+        )
+        sleep_mock.assert_called_with(3)
+        assert sleep_mock.call_count == 1
+        assert notify_mock.call_count == 1
+        # Since the notify_pole_emploi have been mocked, the READY/SHOULD_RETRY approvals kept their statuses
+        retry_approval.refresh_from_db()
+        assert retry_approval.pe_notification_status == api_enums.PEApiNotificationStatus.SHOULD_RETRY
 
 
 class TestPoleEmploiApprovalNotifyPoleEmploiIntegration:
