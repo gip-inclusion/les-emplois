@@ -1,4 +1,5 @@
 from dateutil.relativedelta import relativedelta
+from django.core.management.base import CommandError
 from django.db import transaction
 from django.db.models import F, Q
 from django.template.defaultfilters import pluralize
@@ -27,7 +28,7 @@ class Command(BaseCommand):
             # Only send reminders in the first 30 days
             created_at__date__gte=timezone.localdate() - relativedelta(days=30),
         )
-        self.stdout.write(f"{len(queryset)} prolongation request{pluralize(queryset)} can be reminded")
+        self.logger.info(f"{len(queryset)} prolongation request{pluralize(queryset)} can be reminded")
 
         prolongation_reminded = 0
         for prolongation_request in queryset:
@@ -57,10 +58,10 @@ class Command(BaseCommand):
                 prolongation_request.reminder_sent_at = timezone.now()
                 prolongation_request.save(update_fields=["reminder_sent_at"])
                 prolongation_reminded += 1
-        self.stdout.write(
-            f"{prolongation_reminded}/{len(queryset)} prolongation request{pluralize(queryset)} reminded"
-        )
+        self.logger.info(f"{prolongation_reminded}/{len(queryset)} prolongation request{pluralize(queryset)} reminded")
 
     def handle(self, *, command, wet_run, **options):
         if command == "email_reminder":
             self.send_reminder_to_prescriber_organization_other_members(wet_run=wet_run)
+        else:
+            raise CommandError(f"Unknown {command=}")

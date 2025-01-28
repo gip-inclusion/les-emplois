@@ -1,17 +1,15 @@
 # serializer version: 1
 # name: test_chores_send_reminder_to_prescriber_organization_other_members[False-0]
-  '''
-  2 prolongation requests can be reminded
-  0/2 prolongation requests reminded
-  
-  '''
+  list([
+    '2 prolongation requests can be reminded',
+    '0/2 prolongation requests reminded',
+  ])
 # ---
 # name: test_chores_send_reminder_to_prescriber_organization_other_members[True-2]
-  '''
-  2 prolongation requests can be reminded
-  2/2 prolongation requests reminded
-  
-  '''
+  list([
+    '2 prolongation requests can be reminded',
+    '2/2 prolongation requests reminded',
+  ])
 # ---
 # name: test_chores_send_reminder_to_prescriber_organization_other_members_copy_limit[body]
   '''
