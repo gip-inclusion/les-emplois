@@ -209,15 +209,16 @@ def test_sync_cities(settings, capsys, respx_mock):
     )
 
 
-def test_resolve_insee_cities(capsys, snapshot):
+def test_resolve_insee_cities(caplog, snapshot):
     guerande = create_city_guerande()  # Guérande, 44350
     user = JobSeekerFactory(city="GUERAND", post_code="44350", geocoding_score=0.9)
     non_resolved_user_1 = JobSeekerFactory(city="Guérande", post_code="54350", geocoding_score=0.9)
     non_resolved_user_2 = JobSeekerFactory(city="ERAND", post_code="44350", geocoding_score=0.9)
     call_command("resolve_insee_cities", wet_run=True, mode="job_seekers")
-    stdout, stderr = capsys.readouterr()
-    assert stderr == ""
-    assert stdout.splitlines() == snapshot(name="first_pass")
+    assert caplog.messages[:-1] == snapshot(name="first_pass")
+    assert caplog.messages[-1].startswith(
+        "Management command itou.cities.management.commands.resolve_insee_cities succeeded in "
+    )
 
     user.refresh_from_db()
     assert user.insee_city == guerande
@@ -226,8 +227,10 @@ def test_resolve_insee_cities(capsys, snapshot):
     non_resolved_user_2.refresh_from_db()
     non_resolved_user_2.geocoding_score = 0.0
 
+    caplog.clear()
     # no users selected: they either have a city or a low geocoding score.
     call_command("resolve_insee_cities", wet_run=True, mode="job_seekers")
-    stdout, stderr = capsys.readouterr()
-    assert stderr == ""
-    assert stdout.splitlines() == snapshot(name="second_pass")
+    assert caplog.messages[:-1] == snapshot(name="second_pass")
+    assert caplog.messages[-1].startswith(
+        "Management command itou.cities.management.commands.resolve_insee_cities succeeded in "
+    )
