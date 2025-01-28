@@ -1,10 +1,8 @@
-from django.contrib import messages
-from django.contrib.auth import logout
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
 
 from itou.utils.auth import get_logout_redirect_url
-from itou.utils.views import NextRedirectMixin
+from itou.utils.views import NextRedirectMixin, logout_with_message
 from itou.www.logout.enums import LogoutWarning
 
 
@@ -20,9 +18,7 @@ class LogoutView(NextRedirectMixin, TemplateView):
     def post(self, *args, **kwargs):
         url = self.get_redirect_url()
         if self.request.user.is_authenticated:
-            # Logout.
-            messages.add_message(self.request, messages.SUCCESS, "Vous êtes déconnecté(e).")
-            logout(self.request)
+            logout_with_message(self.request)
         return redirect(url)
 
     def get_redirect_url(self):

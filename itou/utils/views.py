@@ -1,4 +1,5 @@
-from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib import messages
+from django.contrib.auth import REDIRECT_FIELD_NAME, logout
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.html import format_html
 
@@ -66,3 +67,8 @@ class NextRedirectMixin:
 
     def passthrough_next_url(self, url):
         return passthrough_next_redirect_url(self.request, url, self.redirect_field_name)
+
+
+def logout_with_message(request):
+    messages.add_message(request, messages.SUCCESS, "Vous êtes déconnecté(e).")
+    logout(request)
