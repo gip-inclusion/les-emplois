@@ -1,3 +1,4 @@
+import collections
 from time import sleep
 
 from django.db.models import Q
@@ -24,6 +25,7 @@ class Command(BaseCommand):
 
     def handle(self, *, wet_run, delay, **options):
         today = timezone.localdate()
+        results = []
 
         # Check if approvals in ERROR on endpoint rech_individu are now linked to an user
         # with a pe_obfuscated_nir (meaning the error is likely to be fixed)
@@ -73,7 +75,7 @@ class Command(BaseCommand):
                 approval.pe_notification_status,
             )
             if wet_run:
-                approval.notify_pole_emploi()
+                results.append(approval.notify_pole_emploi())
                 sleep(delay)
 
         # Send READY CancelledApprovals
@@ -97,5 +99,16 @@ class Command(BaseCommand):
                 cancelled_approval.pe_notification_status,
             )
             if wet_run:
-                cancelled_approval.notify_pole_emploi()
+                results.append(cancelled_approval.notify_pole_emploi())
                 sleep(delay)
+
+        status_counter = collections.Counter(results)
+        for status, nb in status_counter.items():
+            self.logger.info("Sent %s approvals with new pe_notification_status=%s", nb, status)
+            if nb == MAX_APPROVALS_PER_RUN and status in (
+                api_enums.PEApiNotificationStatus.ERROR,
+                api_enums.PEApiNotificationStatus.SHOULD_RETRY,
+            ):
+                self.logger.error(
+                    "All sent approvals ended with pe_notification_status=%s - something must be wrong", status
+                )
