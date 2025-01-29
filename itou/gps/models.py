@@ -14,11 +14,13 @@ class BulkCreatedAtQuerysetProxy:
 
 
 class FollowUpGroupManager(models.Manager):
-    def follow_beneficiary(self, beneficiary, user, is_referent=False):
+    def follow_beneficiary(self, beneficiary, user, is_referent=None):
         with transaction.atomic():
             group, _ = FollowUpGroup.objects.get_or_create(beneficiary=beneficiary)
 
-            update_args = {"is_active": True, "is_referent": is_referent}
+            update_args = {"is_active": True}
+            if is_referent is not None:
+                update_args["is_referent"] = is_referent
             create_args = update_args | {"creator": user}
 
             FollowUpGroupMembership.objects.update_or_create(
