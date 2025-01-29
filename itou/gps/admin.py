@@ -37,7 +37,14 @@ class FollowUpGroupMembershipAdmin(ItouModelAdmin):
         "created_in_bulk",
     )
     raw_id_fields = ("follow_up_group", "member")
-    readonly_fields = ("creator", "created_at", "updated_at", "ended_at", "created_in_bulk")
+    readonly_fields = (
+        "creator",
+        "created_at",
+        "last_contact_at",
+        "updated_at",
+        "ended_at",
+        "created_in_bulk",
+    )
     ordering = ["-created_at"]
 
     def get_readonly_fields(self, request, obj=None):

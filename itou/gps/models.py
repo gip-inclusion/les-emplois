@@ -100,6 +100,8 @@ class FollowUpGroupMembership(models.Model):
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     created_in_bulk = models.BooleanField(verbose_name="créé massivement", default=False, db_index=True)
 
+    last_contact_at = models.DateTimeField(verbose_name="date de dernier contact", null=True)
+
     # Keep track of when the membership was ended
     ended_at = models.DateTimeField(verbose_name="date de désactivation", null=True)
 
