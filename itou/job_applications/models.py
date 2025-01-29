@@ -823,10 +823,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         else:
             return SenderKind(self.sender_kind).label
 
-    @property
-    def is_in_transferable_state(self):
-        return self.state in JobApplicationWorkflow.CAN_BE_TRANSFERRED_STATES
-
     def can_be_transferred(self, user, target_company):
         # User must be member of both origin and target companies to make a transfer
         if not (self.to_company.has_member(user) and target_company.has_member(user)):
@@ -836,7 +832,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             return False
         if not user.is_employer:
             return False
-        return self.is_in_transferable_state
+        return self.transfer.is_available()
 
     def get_eligibility_diagnosis(self):
         """
