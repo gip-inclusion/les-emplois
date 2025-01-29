@@ -18,16 +18,15 @@ class FollowUpGroupManager(models.Manager):
         with transaction.atomic():
             group, _ = FollowUpGroup.objects.get_or_create(beneficiary=beneficiary)
 
-            updated = FollowUpGroupMembership.objects.filter(member=user, follow_up_group=group).update(
-                is_active=True, is_referent=is_referent
+            update_args = {"is_active": True, "is_referent": is_referent}
+            create_args = update_args | {"creator": user}
+
+            FollowUpGroupMembership.objects.update_or_create(
+                follow_up_group=group,
+                member=user,
+                defaults=update_args,
+                create_defaults=create_args,
             )
-            if not updated:
-                FollowUpGroupMembership.objects.create(
-                    follow_up_group=group,
-                    member=user,
-                    creator=user,
-                    is_referent=is_referent,
-                )
 
 
 class FollowUpGroupQueryset(BulkCreatedAtQuerysetProxy, models.QuerySet):
