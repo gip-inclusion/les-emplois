@@ -402,6 +402,7 @@ def list_for_siae_actions(request):
         return response
     can_archive = all(job_application.can_be_archived for job_application in selected_job_applications)
     can_postpone = all(job_application.postpone.is_available() for job_application in selected_job_applications)
+    can_refuse = all(job_application.refuse.is_available() for job_application in selected_job_applications)
     can_transfer = all(job_application.transfer.is_available() for job_application in selected_job_applications)
     context = {
         "batch_mode": bool(selected_job_applications),
@@ -409,6 +410,7 @@ def list_for_siae_actions(request):
         "selected_application_ids": [job_app.pk for job_app in selected_job_applications],
         "can_archive": can_archive,
         "can_postpone": can_postpone,
+        "can_refuse": can_refuse,
         "can_transfer": can_transfer,
         "postpone_form": BatchPostponeForm(
             job_seeker_nb=len(set(job_application.job_seeker_id for job_application in selected_job_applications))

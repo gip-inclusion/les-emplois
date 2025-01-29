@@ -1,19 +1,23 @@
+import random
 import uuid
 
 from django.contrib import messages
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertMessages, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
-from itou.job_applications.enums import JobApplicationState
+from itou.job_applications import enums as job_applications_enums
+from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.utils.urls import add_url_params
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
 )
 from tests.users.factories import (
+    JobSeekerFactory,
     LaborInspectorFactory,
 )
+from tests.utils.test import KNOWN_SESSION_KEYS
 
 
 class TestBatchArchive:
@@ -535,6 +539,579 @@ class TestBatchPostpone:
                 messages.Message(
                     messages.SUCCESS, "2 candidatures ont bien été mises en attente.", extra_tags="toast"
                 ),
+            ],
+        )
+
+
+class TestBatchRefuse:
+    FAKE_JOB_SEEKER_ANSWER = "Lorem ipsum candidatum"
+    FAKE_PRESCRIBER_ANSWER = "Lorem ipsum prescribum"
+
+    def test_invalid_access(self, client):
+        refusable_app = JobApplicationFactory(state=JobApplicationState.NEW)
+        assert refusable_app.refuse.is_available()
+        for user in [refusable_app.job_seeker, refusable_app.sender, LaborInspectorFactory(membership=True)]:
+            client.force_login(user)
+            response = client.post(
+                reverse("apply:batch_refuse"),
+                data={"application_ids": [refusable_app.pk]},
+            )
+            assert response.status_code == 403
+
+    def test_no_next_url(self, client):
+        refusable_app = JobApplicationFactory(sent_by_another_employer=True, state=JobApplicationState.NEW)
+        assert refusable_app.refuse.is_available()
+
+        client.force_login(refusable_app.sender)
+        response = client.post(reverse("apply:batch_refuse"), data={"application_ids": [refusable_app.pk]})
+        assert response.status_code == 404
+
+    def test_sent_application(self, client):
+        refusable_app = JobApplicationFactory(sent_by_another_employer=True, state=JobApplicationState.NEW)
+        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "NEW"})
+        assert refusable_app.refuse.is_available()
+
+        client.force_login(refusable_app.sender)
+        response = client.post(
+            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            data={"application_ids": [refusable_app.pk]},
+        )
+        assertRedirects(response, next_url)
+        refusable_app.refresh_from_db()
+        assert refusable_app.state == JobApplicationState.NEW
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Une candidature sélectionnée n’existe plus ou a été transférée.",
+                ),
+            ],
+        )
+
+    def test_unexisting_app(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "NEW"})
+        client.force_login(employer)
+
+        response = client.post(
+            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            data={"application_ids": [uuid.uuid4()]},
+        )
+        assertRedirects(response, next_url)
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Une candidature sélectionnée n’existe plus ou a été transférée.",
+                ),
+            ],
+        )
+
+    def test_unrefusable_app(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "NEW"})
+        client.force_login(employer)
+
+        unrefusable_app = JobApplicationFactory(
+            job_seeker__first_name="Jean",
+            job_seeker__last_name="BOND",
+            to_company=company,
+            state=JobApplicationState.ACCEPTED,
+        )
+        response = client.post(
+            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            data={"application_ids": [unrefusable_app.pk]},
+        )
+        assertRedirects(response, next_url)
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    (
+                        "La candidature de Jean BOND ne peut pas être refusée car elle est au statut "
+                        "« Candidature acceptée »."
+                    ),
+                    extra_tags="toast",
+                ),
+            ],
+        )
+
+    def test_single_app_from_orienter(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "NEW"})
+        client.force_login(employer)
+
+        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
+        refusable_app = JobApplicationFactory(
+            job_seeker__first_name="Jean",
+            job_seeker__last_name="BOND",
+            to_company=company,
+            state=JobApplicationState.PROCESSING,
+        )
+
+        # Start view
+        response = client.post(
+            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            data={"application_ids": [refusable_app.pk]},
+        )
+        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        expected_session = {
+            "config": {
+                "session_kind": "job-applications-batch-refuse",
+                "reset_url": next_url,
+            },
+            "application_ids": [refusable_app.pk],
+        }
+        assert client.session[refuse_session_name] == expected_session
+        refusal_reason_url = reverse(
+            "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "reason"}
+        )
+        # Check redirect
+        assertRedirects(response, refusal_reason_url, fetch_redirect_response=False)
+
+        # Reason step
+        response = client.get(refusal_reason_url)
+        assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
+
+        post_data = {
+            "refusal_reason": reason,
+            "refusal_reason_shared_with_job_seeker": True,
+        }
+        response = client.post(refusal_reason_url, data=post_data, follow=True)
+        expected_session["reason"] = post_data
+        assert client.session[refuse_session_name] == expected_session
+        job_seeker_answer_url = reverse(
+            "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "job-seeker-answer"}
+        )
+        assertRedirects(response, job_seeker_answer_url)
+
+        # Job seeker answer step
+        assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
+        assertContains(response, "Réponse au candidat")
+        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        post_data = {"job_seeker_answer": self.FAKE_JOB_SEEKER_ANSWER}
+        response = client.post(job_seeker_answer_url, data=post_data, follow=True)
+        expected_session["job-seeker-answer"] = post_data
+        assert client.session[refuse_session_name] == expected_session
+        prescriber_answer_url = reverse(
+            "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "prescriber-answer"}
+        )
+        assertRedirects(response, prescriber_answer_url)
+
+        # Prescriber answer step
+        assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
+        assertContains(response, "Réponse à l’orienteur")
+        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        post_data = {"prescriber_answer": self.FAKE_PRESCRIBER_ANSWER}
+        response = client.post(prescriber_answer_url, data=post_data, follow=True)
+        assertRedirects(response, next_url)
+        # Session has been cleaned
+        assert refuse_session_name not in client.session
+        refusable_app.refresh_from_db()
+        assert refusable_app.state == JobApplicationState.REFUSED
+        assert refusable_app.answer == self.FAKE_JOB_SEEKER_ANSWER
+        assert refusable_app.answer_to_prescriber == self.FAKE_PRESCRIBER_ANSWER
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.SUCCESS, "La candidature de Jean BOND a bien été refusée.", extra_tags="toast"
+                )
+            ],
+        )
+
+    def test_multiple_apps_from_authorized_prescribers(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        client.force_login(employer)
+
+        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
+        refusable_apps = [
+            JobApplicationFactory(
+                to_company=company,
+                state=JobApplicationState.PROCESSING,
+                sent_by_authorized_prescriber_organisation=True,
+            ),
+            JobApplicationFactory(
+                to_company=company,
+                state=JobApplicationState.PROCESSING,
+                sent_by_authorized_prescriber_organisation=True,
+            ),
+        ]
+
+        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+
+        # Start view
+        response = client.post(
+            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            data={"application_ids": [refusable_app.pk for refusable_app in refusable_apps]},
+        )
+        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        expected_session = {
+            "config": {
+                "session_kind": "job-applications-batch-refuse",
+                "reset_url": next_url,
+            },
+            "application_ids": [refusable_apps[1].pk, refusable_apps[0].pk],  # default application ordering
+        }
+        assert client.session[refuse_session_name] == expected_session
+        refusal_reason_url = reverse(
+            "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "reason"}
+        )
+        # Check redirect
+        assertRedirects(response, refusal_reason_url, fetch_redirect_response=False)
+
+        # Reason step
+        response = client.get(refusal_reason_url)
+        assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
+
+        post_data = {
+            "refusal_reason": reason,
+            "refusal_reason_shared_with_job_seeker": True,
+        }
+        response = client.post(refusal_reason_url, data=post_data, follow=True)
+        expected_session["reason"] = post_data
+        assert client.session[refuse_session_name] == expected_session
+        job_seeker_answer_url = reverse(
+            "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "job-seeker-answer"}
+        )
+        assertRedirects(response, job_seeker_answer_url)
+
+        # Job seeker answer step
+        assertContains(response, "<strong>Étape 2</strong>/3 : Message aux candidats", html=True)
+        assertContains(response, "Réponse aux candidats")
+        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        post_data = {"job_seeker_answer": self.FAKE_JOB_SEEKER_ANSWER}
+        response = client.post(job_seeker_answer_url, data=post_data, follow=True)
+        expected_session["job-seeker-answer"] = post_data
+        assert client.session[refuse_session_name] == expected_session
+        prescriber_answer_url = reverse(
+            "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "prescriber-answer"}
+        )
+        assertRedirects(response, prescriber_answer_url)
+
+        # Prescriber answer step
+        assertContains(response, "<strong>Étape 3</strong>/3 : Message aux prescripteurs", html=True)
+        assertContains(response, "Réponse aux prescripteurs")
+        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        post_data = {"prescriber_answer": self.FAKE_PRESCRIBER_ANSWER}
+        response = client.post(prescriber_answer_url, data=post_data, follow=True)
+        assertRedirects(response, next_url)
+        # Session has been cleaned
+        assert refuse_session_name not in client.session
+        for refusable_app in refusable_apps:
+            refusable_app.refresh_from_db()
+            assert refusable_app.state == JobApplicationState.REFUSED
+            assert refusable_app.answer == self.FAKE_JOB_SEEKER_ANSWER
+            assert refusable_app.answer_to_prescriber == self.FAKE_PRESCRIBER_ANSWER
+        assertMessages(
+            response,
+            [messages.Message(messages.SUCCESS, "2 candidatures ont bien été refusées.", extra_tags="toast")],
+        )
+
+    def test_multiple_apps_from_same_job_seeker(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        client.force_login(employer)
+
+        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
+        job_seeker = JobSeekerFactory()
+        refusable_apps = JobApplicationFactory.create_batch(
+            2,
+            to_company=company,
+            state=JobApplicationState.PROCESSING,
+            job_seeker=job_seeker,
+            sender=job_seeker,
+            sender_kind=SenderKind.JOB_SEEKER,
+        )
+
+        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+
+        # Start view
+        response = client.post(
+            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            data={"application_ids": [refusable_app.pk for refusable_app in refusable_apps]},
+        )
+        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        expected_session = {
+            "config": {
+                "session_kind": "job-applications-batch-refuse",
+                "reset_url": next_url,
+            },
+            "application_ids": [refusable_apps[1].pk, refusable_apps[0].pk],  # default application ordering
+        }
+        assert client.session[refuse_session_name] == expected_session
+        refusal_reason_url = reverse(
+            "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "reason"}
+        )
+        # Check redirect
+        assertRedirects(response, refusal_reason_url, fetch_redirect_response=False)
+
+        # Reason step
+        response = client.get(refusal_reason_url)
+        assertContains(response, "<strong>Étape 1</strong>/2 : Choix du motif de refus", html=True)
+
+        post_data = {
+            "refusal_reason": reason,
+            "refusal_reason_shared_with_job_seeker": False,
+        }
+        response = client.post(refusal_reason_url, data=post_data, follow=True)
+        expected_session["reason"] = post_data
+        assert client.session[refuse_session_name] == expected_session
+        job_seeker_answer_url = reverse(
+            "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "job-seeker-answer"}
+        )
+        assertRedirects(response, job_seeker_answer_url)
+
+        # Job seeker answer step
+        assertContains(response, "<strong>Étape 2</strong>/2 : Message au candidat", html=True)
+        assertContains(response, "Réponse au candidat")
+        assertContains(
+            response,
+            f"<strong>Motif de refus :</strong> {reason_label} <em>(Motif non communiqué au candidat)</em>",
+            html=True,
+        )
+        post_data = {"job_seeker_answer": self.FAKE_JOB_SEEKER_ANSWER}
+        response = client.post(job_seeker_answer_url, data=post_data, follow=True)
+        assertRedirects(response, next_url)
+        # Session has been cleaned
+        assert refuse_session_name not in client.session
+        for refusable_app in refusable_apps:
+            refusable_app.refresh_from_db()
+            assert refusable_app.state == JobApplicationState.REFUSED
+            assert refusable_app.answer == self.FAKE_JOB_SEEKER_ANSWER
+        assertMessages(
+            response,
+            [messages.Message(messages.SUCCESS, "2 candidatures ont bien été refusées.", extra_tags="toast")],
+        )
+
+    def test_refuse_step_bypass(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+        client.force_login(employer)
+
+        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
+        refusable_app = JobApplicationFactory(
+            job_seeker__first_name="Jean",
+            job_seeker__last_name="BOND",
+            to_company=company,
+            state=JobApplicationState.PROCESSING,
+        )
+
+        # Start view
+        response = client.post(
+            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            data={"application_ids": [refusable_app.pk]},
+        )
+        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        expected_session = {
+            "config": {
+                "session_kind": "job-applications-batch-refuse",
+                "reset_url": next_url,
+            },
+            "application_ids": [refusable_app.pk],
+        }
+        assert client.session[refuse_session_name] == expected_session
+        refusal_reason_url = reverse(
+            "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "reason"}
+        )
+        job_seeker_answer_url = reverse(
+            "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "job-seeker-answer"}
+        )
+        prescriber_answer_url = reverse(
+            "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "prescriber-answer"}
+        )
+        # Check redirect
+        assertRedirects(response, refusal_reason_url, fetch_redirect_response=False)
+
+        # Direct access to following steps redirect to 1st one
+        for step_url in [job_seeker_answer_url, prescriber_answer_url]:
+            response = client.get(step_url)
+            assertRedirects(response, refusal_reason_url, fetch_redirect_response=False)
+
+        # Fill 1st step data
+        post_data = {
+            "refusal_reason": reason,
+            "refusal_reason_shared_with_job_seeker": False,
+        }
+        response = client.post(refusal_reason_url, data=post_data)
+        expected_session["reason"] = post_data
+        assert client.session[refuse_session_name] == expected_session
+
+        # Step 3 redirects to unfilled step 2
+        response = client.get(prescriber_answer_url)
+        assertRedirects(response, job_seeker_answer_url, fetch_redirect_response=False)
+
+    def test_single_app_transfered_concurrently(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+        client.force_login(employer)
+
+        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
+        refusable_app = JobApplicationFactory(
+            job_seeker__first_name="Jean",
+            job_seeker__last_name="BOND",
+            to_company=company,
+            state=JobApplicationState.PROCESSING,
+        )
+
+        # Start view
+        response = client.post(
+            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            data={"application_ids": [refusable_app.pk]},
+        )
+        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        expected_session = {
+            "config": {
+                "session_kind": "job-applications-batch-refuse",
+                "reset_url": next_url,
+            },
+            "application_ids": [refusable_app.pk],
+        }
+        assert client.session[refuse_session_name] == expected_session
+        refusal_reason_url = reverse(
+            "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "reason"}
+        )
+        # Check redirect
+        assertRedirects(response, refusal_reason_url, fetch_redirect_response=False)
+
+        # Reason step
+        response = client.get(refusal_reason_url)
+        assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
+
+        refusable_app.to_company = CompanyFactory()
+        refusable_app.save(update_fields=("to_company",))
+
+        post_data = {
+            "refusal_reason": reason,
+            "refusal_reason_shared_with_job_seeker": True,
+        }
+        response = client.post(refusal_reason_url, data=post_data, follow=True)
+        assert response.status_code == 404
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Une candidature sélectionnée n’existe plus ou a été transférée.",
+                    extra_tags="toast",
+                )
+            ],
+        )
+
+    def test_multiple_apps_deleted_concurrently(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        client.force_login(employer)
+
+        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
+        refusable_apps = [
+            JobApplicationFactory(
+                to_company=company,
+                state=JobApplicationState.PROCESSING,
+                sent_by_authorized_prescriber_organisation=True,
+            ),
+            JobApplicationFactory(
+                job_seeker__first_name="Jean",
+                job_seeker__last_name="BOND",
+                to_company=company,
+                state=JobApplicationState.PROCESSING,
+                sent_by_authorized_prescriber_organisation=True,
+            ),
+        ]
+
+        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+
+        # Start view
+        response = client.post(
+            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            data={"application_ids": [refusable_app.pk for refusable_app in refusable_apps]},
+        )
+        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        expected_session = {
+            "config": {
+                "session_kind": "job-applications-batch-refuse",
+                "reset_url": next_url,
+            },
+            "application_ids": [refusable_apps[1].pk, refusable_apps[0].pk],  # default application ordering
+        }
+        assert client.session[refuse_session_name] == expected_session
+        refusal_reason_url = reverse(
+            "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "reason"}
+        )
+        # Check redirect
+        assertRedirects(response, refusal_reason_url, fetch_redirect_response=False)
+
+        # Reason step
+        response = client.get(refusal_reason_url)
+        assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
+
+        # One of the application is removed (or transfered)
+        refusable_apps[0].delete()
+
+        post_data = {
+            "refusal_reason": reason,
+            "refusal_reason_shared_with_job_seeker": True,
+        }
+        response = client.post(refusal_reason_url, data=post_data, follow=True)
+        expected_session["reason"] = post_data
+        expected_session["application_ids"] = [refusable_apps[1].pk]  # refusable_apps[0].pk has been removed
+        assert client.session[refuse_session_name] == expected_session
+        job_seeker_answer_url = reverse(
+            "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "job-seeker-answer"}
+        )
+        assertRedirects(response, job_seeker_answer_url)
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Une candidature sélectionnée n’existe plus ou a été transférée.",
+                    extra_tags="toast",
+                )
+            ],
+        )
+
+        # Job seeker answer step
+        assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
+        assertContains(response, "Réponse au candidat")
+        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        post_data = {"job_seeker_answer": self.FAKE_JOB_SEEKER_ANSWER}
+        response = client.post(job_seeker_answer_url, data=post_data, follow=True)
+        expected_session["job-seeker-answer"] = post_data
+        assert client.session[refuse_session_name] == expected_session
+        prescriber_answer_url = reverse(
+            "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "prescriber-answer"}
+        )
+        assertRedirects(response, prescriber_answer_url)
+
+        # Prescriber answer step
+        assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
+        assertContains(response, "Réponse au prescripteur")
+        assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        post_data = {"prescriber_answer": self.FAKE_PRESCRIBER_ANSWER}
+        response = client.post(prescriber_answer_url, data=post_data, follow=True)
+        assertRedirects(response, next_url)
+        # Session has been cleaned
+        assert refuse_session_name not in client.session
+        refusable_apps[1].refresh_from_db()
+        assert refusable_apps[1].state == JobApplicationState.REFUSED
+        assert refusable_apps[1].answer == self.FAKE_JOB_SEEKER_ANSWER
+        assert refusable_apps[1].answer_to_prescriber == self.FAKE_PRESCRIBER_ANSWER
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.SUCCESS, "La candidature de Jean BOND a bien été refusée.", extra_tags="toast"
+                )
             ],
         )
 
