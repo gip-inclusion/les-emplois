@@ -108,6 +108,12 @@ urlpatterns = [
     path("siae/list/actions", list_views.list_for_siae_actions, name="list_for_siae_actions"),
     path("company/batch/archive", batch_views.archive, name="batch_archive"),
     path("company/batch/postpone", batch_views.postpone, name="batch_postpone"),
+    path("company/batch/refuse", batch_views.refuse, name="batch_refuse"),
+    path(
+        "company/batch/refuse/<uuid:session_uuid>/<slug:step>",
+        batch_views.RefuseWizardView.as_view(url_name="apply:batch_refuse_steps"),
+        name="batch_refuse_steps",
+    ),
     path("company/batch/transfer", batch_views.transfer, name="batch_transfer"),
     # Process.
     path(

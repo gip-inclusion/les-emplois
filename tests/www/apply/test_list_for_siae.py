@@ -1355,3 +1355,98 @@ def test_list_for_siae_select_applications_batch_postpone(client, snapshot):
     assert get_postpone_modal() is None
     postpone_button = get_postpone_button()
     assert str(postpone_button) == snapshot(name="inactive postpone button as GEIQ")
+
+
+def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
+    company = CompanyFactory(with_membership=True)
+    employer = company.members.first()
+
+    refusable_app_1 = JobApplicationFactory(
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"), to_company=company, state=JobApplicationState.NEW
+    )
+    assert refusable_app_1.refuse.is_available()
+    refusable_app_2 = JobApplicationFactory(
+        pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
+        to_company=company,
+        state=JobApplicationState.PRIOR_TO_HIRE,
+    )
+    assert refusable_app_2.refuse.is_available()
+    refused_app = JobApplicationFactory(
+        to_company=company, state=JobApplicationState.REFUSED, archived_at=timezone.now()
+    )
+    assert not refused_app.refuse.is_available()
+
+    unrefusable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
+    assert not unrefusable_app.refuse.is_available()
+
+    client.force_login(employer)
+    table_url = add_url_params(reverse("apply:list_for_siae"), {"display": "table", "start_date": "2015-01-01"})
+
+    response = client.get(table_url)
+    simulated_page = parse_response_to_soup(
+        response,
+        # We need the whole body to be able to check modals
+        selector="body",
+    )
+    [action_form] = simulated_page.find_all(
+        "form", attrs={"hx-get": lambda attr: attr and attr.startswith(reverse("apply:list_for_siae_actions"))}
+    )
+    action_url = action_form["hx-get"]
+    assert parse_qs(urlsplit(action_url).query) == {"list_url": [table_url]}
+    assert simulated_page.find(id="batch-action-box").contents == []
+
+    def simulate_applications_selection(application_list):
+        response = client.get(
+            action_url,
+            # Explicitly redefine list_url since Django test client swallows it otherwise
+            query_params={"list_url": table_url, "selected-application": application_list},
+            headers={"HX-Request": "true"},
+        )
+        update_page_with_htmx(simulated_page, f"form[hx-get='{action_url}']", response)
+
+    def get_refuse_button():
+        refuse_buttons = [
+            span.parent
+            for span in simulated_page.find(id="batch-action-box").select("button > span")
+            if span.contents == ["Décliner"]
+        ]
+        if not refuse_buttons:
+            return None
+        [refuse_button] = refuse_buttons
+        return refuse_button
+
+    assert get_refuse_button() is None
+
+    # Select 1 postponable application
+    simulate_applications_selection([refusable_app_1.pk])
+    refuse_button = get_refuse_button()
+    assert refuse_button is not None
+    assert str(refuse_button) == snapshot(name="active refuse button")
+
+    # Check that the next_url is correctly transmitted
+    refuse_form_action = urlsplit(refuse_button.parent["action"])
+    assert refuse_form_action.path == reverse("apply:batch_refuse")
+    assert parse_qs(refuse_form_action.query) == {"next_url": [table_url]}
+
+    # Select 2 postponable applications
+    simulate_applications_selection([refusable_app_1.pk, refusable_app_2.pk])
+    refuse_button = get_refuse_button()
+    assert refuse_button is not None
+    assert str(refuse_button) == snapshot(name="active refuse button")
+
+    # Test with unpostponable batches
+    for app_list in [
+        [unrefusable_app.pk],
+        [refused_app.pk, refusable_app_1.pk],
+        [unrefusable_app.pk, refusable_app_2.pk],
+    ]:
+        simulate_applications_selection(app_list)
+        refuse_button = get_refuse_button()
+        assert str(refuse_button) == snapshot(name="inactive refuse button")
+
+    # Check as GEIQ
+    company.kind = CompanyKind.GEIQ
+    company.save(update_fields={"kind"})
+    simulate_applications_selection([refused_app.pk, refusable_app_1.pk])
+    refuse_button = get_refuse_button()
+    assert str(refuse_button) == snapshot(name="inactive refuse button as GEIQ")

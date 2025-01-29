@@ -2,6 +2,7 @@
 {% load django_bootstrap5 %}
 {% load theme_inclusion %}
 {% load buttons_form %}
+{% load str_filters %}
 
 {% block title %}
     {% if job_applications|length == 1 %}
@@ -169,6 +170,12 @@
             $(document).ready(function() {
                 manageWarningSection($('input[name="reason-refusal_reason"]:checked').val());
                 $('input[name="reason-refusal_reason"]').change(function() {
+                    manageWarningSection(this.value);
+                });
+
+                // Batch mode field names
+                manageWarningSection($('input[name="refusal_reason"]:checked').val());
+                $('input[name="refusal_reason"]').change(function() {
                     manageWarningSection(this.value);
                 });
             });

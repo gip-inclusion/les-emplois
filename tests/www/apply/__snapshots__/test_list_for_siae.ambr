@@ -2599,6 +2599,30 @@
               </div>
   '''
 # ---
+# name: test_list_for_siae_select_applications_batch_refuse[active refuse button]
+  '''
+  <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-refuse-applications-start-wizard" type="submit">
+                              <i aria-hidden="true" class="ri-close-line"></i>
+                              <span>Décliner</span>
+                          </button>
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_refuse[inactive refuse button as GEIQ]
+  '''
+  <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude », « Action préalable à l’embauche » et « En attente » peuvent être déclinées.²" data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-close-line"></i>
+                          <span>Décliner</span>
+                      </button>
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_refuse[inactive refuse button]
+  '''
+  <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude » et « En attente » peuvent être déclinées.²" data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-close-line"></i>
+                          <span>Décliner</span>
+                      </button>
+  '''
+# ---
 # name: test_list_for_siae_select_applications_batch_transfer[active transfer button]
   '''
   <div class="dropdown dropdown-structure text-end">

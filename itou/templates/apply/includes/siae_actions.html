@@ -5,6 +5,31 @@
         <h2 class="visually-hidden">Actions rapides</h2>
         <div class="form-row align-items-center gx-3">
             <div class="form-group col-12 col-lg-auto">
+                {% if can_refuse %}
+                    <form method="post" action="{% url 'apply:batch_refuse' %}?next_url={{ list_url|urlencode }}">
+                        {% csrf_token %}
+                        {% for application_id in selected_application_ids %}
+                            <input type="hidden" name="application_ids" value="{{ application_id }}" />
+                        {% endfor %}
+                        <button type="submit" class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" {% matomo_event "candidature" "submit" "batch-refuse-applications-start-wizard" %}>
+                            <i class="ri-close-line" aria-hidden="true"></i>
+                            <span>Décliner</span>
+                        </button>
+                    </form>
+                {% else %}
+                    <button type="button"
+                            class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center"
+                            disabled
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            data-bs-custom-class="c-box--action-tooltip"
+                            data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude »{% if request.current_organization.kind == CompanyKind.GEIQ %}, « Action préalable à l’embauche »{% endif %} et « En attente » peuvent être déclinées.²">
+                        <i class="ri-close-line" aria-hidden="true"></i>
+                        <span>Décliner</span>
+                    </button>
+                {% endif %}
+            </div>
+            <div class="form-group col-12 col-lg-auto">
                 {% if can_postpone %}
                     <button type="button"
                             class="btn btn-lg btn-link-white btn-block btn-ico"
