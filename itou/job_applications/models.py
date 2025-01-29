@@ -831,10 +831,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def is_in_acceptable_state(self):
         return self.state in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES
 
-    @property
-    def is_in_refusable_state(self):
-        return self.state in JobApplicationWorkflow.CAN_BE_REFUSED_STATES
-
     def can_be_transferred(self, user, target_company):
         # User must be member of both origin and target companies to make a transfer
         if not (self.to_company.has_member(user) and target_company.has_member(user)):
