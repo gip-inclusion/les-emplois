@@ -4,7 +4,7 @@
 
 {% block title_content %}
     <div class="d-xl-flex align-items-xl-center">
-        <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Informations personnelles de {{ job_seeker.get_full_name|title }}</h1>
+        <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Informations personnelles de {{ job_seeker.get_full_name }}</h1>
         {% include 'apply/includes/eligibility_badge.html' %}
     </div>
     <p>Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}</p>
