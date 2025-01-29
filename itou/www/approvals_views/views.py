@@ -10,7 +10,7 @@ from django.core.files.storage import default_storage
 from django.db import IntegrityError
 from django.db.models import Max, Prefetch
 from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views import View
@@ -71,17 +71,6 @@ class ApprovalBaseViewMixin:
         context = super().get_context_data(**kwargs)
         context["siae"] = self.siae
         return context
-
-
-# TODO(xfernandez): remove this redirect view in a few weeks
-def approval_detail_redirect_to_employee_view(request, pk):
-    siae = get_current_company_or_404(request)
-
-    if not siae.is_subject_to_eligibility_rules:
-        raise PermissionDenied
-
-    approval = get_object_or_404(Approval.objects.select_related("user"), pk=pk)
-    return redirect("employees:detail", public_id=approval.user.public_id)
 
 
 class ApprovalListView(ApprovalBaseViewMixin, ListView):

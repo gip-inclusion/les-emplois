@@ -28,25 +28,6 @@ from tests.users.factories import JobSeekerFactory, LaborInspectorFactory
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
-class TestRedirectToEmployeeView:
-    def test_anonymous_user(self, client):
-        approval = ApprovalFactory()
-        url = reverse("approvals:redirect_to_employee", kwargs={"pk": approval.pk})
-        response = client.get(url)
-        assertRedirects(response, reverse("account_login") + f"?next={url}")
-
-    def test_redirect(self, client):
-        membership = CompanyMembershipFactory()
-        client.force_login(membership.user)
-        approval = ApprovalFactory()
-        response = client.get(reverse("approvals:redirect_to_employee", kwargs={"pk": approval.pk}))
-        assertRedirects(
-            response,
-            reverse("employees:detail", kwargs={"public_id": approval.user.public_id}),
-            fetch_redirect_response=False,
-        )
-
-
 class TestApprovalDetailView:
     def test_anonymous_user(self, client):
         approval = JobApplicationFactory(with_approval=True).approval
