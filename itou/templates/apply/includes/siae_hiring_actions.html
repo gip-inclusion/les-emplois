@@ -61,7 +61,7 @@
         {% endif %}
 
         {# Transfer ------------------------------------------------------ #}
-        {% if job_application.is_in_transferable_state %}
+        {% if job_application.transfer.is_available %}
             <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
                 {% include "apply/includes/transfer_job_application.html" with job_application=job_application %}
             </div>

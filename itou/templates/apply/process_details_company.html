@@ -154,7 +154,7 @@
 {% block modals %}
     {{ block.super }}
     {# Job application transfer modals triggered by apply/includes/transfer_job_application.html #}
-    {% if job_application.is_in_transferable_state %}
+    {% if job_application.transfer.is_available %}
         {% for siae in request.organizations %}
             {% if siae != request.current_organization %}
                 <div id="transfer_confirmation_modal_{{ siae.pk }}" class="modal" tabindex="-1" aria-labelledby="modal_title_{{ siae.pk }}" aria-hidden="true">

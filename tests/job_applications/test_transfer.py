@@ -18,7 +18,7 @@ from tests.users.factories import JobSeekerFactory
 from tests.utils.test import assertSnapshotQueries
 
 
-def test_is_in_transferable_state(subtests):
+def test_transferable_states(subtests):
     # If job application is in ACCEPTED state
     # it can't be transfered
     evil_states = [JobApplicationState.ACCEPTED]
@@ -34,12 +34,12 @@ def test_is_in_transferable_state(subtests):
     for evil_state in evil_states:
         with subtests.test(evil_state.name):
             job_application = JobApplicationFactory(state=evil_state)
-            assert not job_application.is_in_transferable_state
+            assert not job_application.transfer.is_available()
 
     for good_state in good_states:
         with subtests.test(good_state.name):
             job_application = JobApplicationFactory(state=good_state)
-            assert job_application.is_in_transferable_state
+            assert job_application.transfer.is_available()
 
 
 def test_can_be_transferred():
