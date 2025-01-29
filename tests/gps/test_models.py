@@ -50,6 +50,17 @@ def test_follow_beneficiary():
     assert membership.is_active is True
     assert membership.is_referent is False
 
+    FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber)
+    membership.refresh_from_db()
+    assert membership.is_referent is False  # does not change
+
+    membership.is_referent = True
+    membership.save()
+
+    FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber)
+    membership.refresh_from_db()
+    assert membership.is_referent is True  # does not change
+
     other_member = EmployerFactory()
     FollowUpGroup.objects.follow_beneficiary(beneficiary, other_member, is_referent=True)
     assert group.memberships.count() == 2
