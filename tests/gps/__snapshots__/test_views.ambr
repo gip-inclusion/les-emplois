@@ -659,6 +659,7 @@
                  "gps_followupgroupmembership"."is_active",
                  "gps_followupgroupmembership"."created_at",
                  "gps_followupgroupmembership"."created_in_bulk",
+                 "gps_followupgroupmembership"."last_contact_at",
                  "gps_followupgroupmembership"."ended_at",
                  "gps_followupgroupmembership"."updated_at",
                  "gps_followupgroupmembership"."follow_up_group_id",
@@ -770,7 +771,8 @@
                  "col7",
                  "col8",
                  "col9",
-                 "col10"
+                 "col10",
+                 "col11"
           FROM
             (SELECT *
              FROM
@@ -779,11 +781,12 @@
                        "gps_followupgroupmembership"."is_active" AS "col3",
                        "gps_followupgroupmembership"."created_at" AS "col4",
                        "gps_followupgroupmembership"."created_in_bulk" AS "col5",
-                       "gps_followupgroupmembership"."ended_at" AS "col6",
-                       "gps_followupgroupmembership"."updated_at" AS "col7",
-                       "gps_followupgroupmembership"."follow_up_group_id" AS "col8",
-                       "gps_followupgroupmembership"."member_id" AS "col9",
-                       "gps_followupgroupmembership"."creator_id" AS "col10",
+                       "gps_followupgroupmembership"."last_contact_at" AS "col6",
+                       "gps_followupgroupmembership"."ended_at" AS "col7",
+                       "gps_followupgroupmembership"."updated_at" AS "col8",
+                       "gps_followupgroupmembership"."follow_up_group_id" AS "col9",
+                       "gps_followupgroupmembership"."member_id" AS "col10",
+                       "gps_followupgroupmembership"."creator_id" AS "col11",
                        ROW_NUMBER() OVER (PARTITION BY "gps_followupgroupmembership"."follow_up_group_id"
                                           ORDER BY RANDOM() ASC) AS "qual0",
                        RANDOM() AS "qual1"
