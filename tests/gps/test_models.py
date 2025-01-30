@@ -38,8 +38,7 @@ def test_follow_beneficiary():
     membership.save()
 
     FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=prescriber, is_referent=True)
-    group = FollowUpGroup.objects.get()
-    membership = group.memberships.get()
+    membership.refresh_from_db()
     assert membership.is_active is True
     assert membership.is_referent is True
 
@@ -47,8 +46,7 @@ def test_follow_beneficiary():
     membership.save()
 
     FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=prescriber, is_referent=False)
-    group = FollowUpGroup.objects.get()
-    membership = group.memberships.get()
+    membership.refresh_from_db()
     assert membership.is_active is True
     assert membership.is_referent is False
 
