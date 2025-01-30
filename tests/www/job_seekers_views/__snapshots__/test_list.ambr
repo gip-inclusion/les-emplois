@@ -244,15 +244,18 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
-                 AND EXISTS
-                   (SELECT %s AS "a"
-                    FROM "job_applications_jobapplication" U0
-                    WHERE (((U0."sender_id" = %s
-                             AND U0."sender_prescriber_organization_id" IS NULL)
-                            OR U0."sender_prescriber_organization_id" = %s)
-                           AND U0."job_seeker_id" = ("users_user"."id"))
-                    LIMIT 1))
+                 AND (EXISTS
+                        (SELECT %s AS "a"
+                         FROM "job_applications_jobapplication" U0
+                         WHERE (((U0."sender_id" = %s
+                                  AND U0."sender_prescriber_organization_id" IS NULL)
+                                 OR U0."sender_prescriber_organization_id" = %s)
+                                AND U0."job_seeker_id" = ("users_user"."id"))
+                         LIMIT 1)
+                      OR "users_user"."created_by_id" = %s
+                      OR "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s))
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
         ''',
@@ -285,15 +288,18 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
-                 AND EXISTS
-                   (SELECT %s AS "a"
-                    FROM "job_applications_jobapplication" U0
-                    WHERE (((U0."sender_id" = %s
-                             AND U0."sender_prescriber_organization_id" IS NULL)
-                            OR U0."sender_prescriber_organization_id" = %s)
-                           AND U0."job_seeker_id" = ("users_user"."id"))
-                    LIMIT 1))
+                 AND (EXISTS
+                        (SELECT %s AS "a"
+                         FROM "job_applications_jobapplication" U0
+                         WHERE (((U0."sender_id" = %s
+                                  AND U0."sender_prescriber_organization_id" IS NULL)
+                                 OR U0."sender_prescriber_organization_id" = %s)
+                                AND U0."job_seeker_id" = ("users_user"."id"))
+                         LIMIT 1)
+                      OR "users_user"."created_by_id" = %s
+                      OR "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s))
         ''',
       }),
       dict({
@@ -357,17 +363,57 @@
                     AND U0."author_kind" = %s
                     AND U0."job_seeker_id" = ("users_user"."id"))
              ORDER BY U0."created_at" DESC
-             LIMIT 1) AS "valid_eligibility_diagnosis"
+             LIMIT 1) AS "valid_eligibility_diagnosis",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
-                 AND EXISTS
-                   (SELECT %s AS "a"
-                    FROM "job_applications_jobapplication" U0
-                    WHERE (((U0."sender_id" = %s
-                             AND U0."sender_prescriber_organization_id" IS NULL)
-                            OR U0."sender_prescriber_organization_id" = %s)
-                           AND U0."job_seeker_id" = ("users_user"."id"))
-                    LIMIT 1))
+                 AND (EXISTS
+                        (SELECT %s AS "a"
+                         FROM "job_applications_jobapplication" U0
+                         WHERE (((U0."sender_id" = %s
+                                  AND U0."sender_prescriber_organization_id" IS NULL)
+                                 OR U0."sender_prescriber_organization_id" = %s)
+                                AND U0."job_seeker_id" = ("users_user"."id"))
+                         LIMIT 1)
+                      OR "users_user"."created_by_id" = %s
+                      OR "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s))
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
           LIMIT 4
@@ -555,6 +601,530 @@
                                       
                                   
                                   <a aria-label="Postuler pour ce candidat" class="btn btn-sm btn-link btn-ico-only" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=44444444-4444-4444-4444-444444444444">
+                                      <i aria-hidden="true" class="ri-draft-line" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip"></i>
+                                  </a>
+                              </td>
+                          </tr>
+                      
+                  </tbody>
+  '''
+# ---
+# name: test_multiple_with_job_seekers_created_by_organization.1
+  dict({
+    'num_queries': 13,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."is_head_office",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."is_authorized",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."user_id" = %s
+                 AND "prescribers_prescribermembership"."is_active")
+          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'FilterForm.__init__[www/job_seekers_views/forms.py]',
+          'JobSeekerListView.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+          WHERE ("users_user"."kind" = %s
+                 AND (EXISTS
+                        (SELECT %s AS "a"
+                         FROM "job_applications_jobapplication" U0
+                         WHERE (((U0."sender_id" = %s
+                                  AND U0."sender_prescriber_organization_id" IS NULL)
+                                 OR U0."sender_prescriber_organization_id" = %s)
+                                AND U0."job_seeker_id" = ("users_user"."id"))
+                         LIMIT 1)
+                      OR "users_user"."created_by_id" = %s
+                      OR "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s))
+          ORDER BY "users_user"."first_name" ASC,
+                   "users_user"."last_name" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.is_prescriber_with_authorized_org[users/models.py]',
+          'User.can_edit_personal_information[users/models.py]',
+          'User.can_view_personal_information[users/models.py]',
+          'FilterForm.__init__[www/job_seekers_views/forms.py]',
+          'JobSeekerListView.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."user_id" = %s
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescriberorganization"."is_authorized"
+                 AND "users_user"."is_active")
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
+          'JobSeekerListView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+          WHERE ("users_user"."kind" = %s
+                 AND (EXISTS
+                        (SELECT %s AS "a"
+                         FROM "job_applications_jobapplication" U0
+                         WHERE (((U0."sender_id" = %s
+                                  AND U0."sender_prescriber_organization_id" IS NULL)
+                                 OR U0."sender_prescriber_organization_id" = %s)
+                                AND U0."job_seeker_id" = ("users_user"."id"))
+                         LIMIT 1)
+                      OR "users_user"."created_by_id" = %s
+                      OR "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s))
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerListView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 COALESCE(
+                            (SELECT COUNT(U0."id") AS "count"
+                             FROM "job_applications_jobapplication" U0
+                             WHERE (((U0."sender_id" = %s
+                                      AND U0."sender_prescriber_organization_id" IS NULL)
+                                     OR U0."sender_prescriber_organization_id" = %s)
+                                    AND U0."job_seeker_id" = ("users_user"."id"))
+                             GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
+          
+            (SELECT MAX(U0."updated_at") AS "last_update"
+             FROM "job_applications_jobapplication" U0
+             WHERE (((U0."sender_id" = %s
+                      AND U0."sender_prescriber_organization_id" IS NULL)
+                     OR U0."sender_prescriber_organization_id" = %s)
+                    AND U0."job_seeker_id" = ("users_user"."id"))
+             GROUP BY U0."job_seeker_id") AS "last_updated_at",
+          
+            (SELECT U0."id"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE (U0."expires_at" > %s
+                    AND U0."author_kind" = %s
+                    AND U0."job_seeker_id" = ("users_user"."id"))
+             ORDER BY U0."created_at" DESC
+             LIMIT 1) AS "valid_eligibility_diagnosis",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id"
+          FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+          WHERE ("users_user"."kind" = %s
+                 AND (EXISTS
+                        (SELECT %s AS "a"
+                         FROM "job_applications_jobapplication" U0
+                         WHERE (((U0."sender_id" = %s
+                                  AND U0."sender_prescriber_organization_id" IS NULL)
+                                 OR U0."sender_prescriber_organization_id" = %s)
+                                AND U0."job_seeker_id" = ("users_user"."id"))
+                         LIMIT 1)
+                      OR "users_user"."created_by_id" = %s
+                      OR "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s))
+          ORDER BY "users_user"."first_name" ASC,
+                   "users_user"."last_name" ASC
+          LIMIT 4
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerListView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."user_id" IN (%s,
+                                                   %s,
+                                                   %s,
+                                                   %s)
+          ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          UPDATE "django_session"
+          SET "session_data" = %s,
+              "expire_date" = %s
+          WHERE "django_session"."session_key" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: test_multiple_with_job_seekers_created_by_organization[job seekers list tbody]
+  '''
+  <tbody>
+                      
+                          <tr>
+                              <td>
+                                  <a class="btn-link" href="/job-seekers/details/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list">Alain ZORRO</a>
+                              </td>
+                              <td>
+                                  
+  
+      
+                  <span class="badge badge-base rounded-pill bg-success-lighter text-success">
+              <i aria-hidden="true" class="ri-check-line"></i>
+              Éligible à l’IAE
+          </span>
+      
+  
+  
+                              </td>
+                              <td>0</td>
+                              <td></td>
+                              <td class="text-end w-50px">
+                                  
+                                  
+                                      
+                                  
+                                  <a aria-label="Postuler pour ce candidat" class="btn btn-sm btn-link btn-ico-only" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=11111111-1111-1111-1111-111111111111&amp;city=brest-29" id="introJsBtnPostuler">
+                                      <i aria-hidden="true" class="ri-draft-line" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip"></i>
+                                  </a>
+                              </td>
+                          </tr>
+                      
+                          <tr>
+                              <td>
+                                  <a class="btn-link" href="/job-seekers/details/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list">Bernard YGREC</a>
+                              </td>
+                              <td>
+                                  
+  
+      
+                  <span class="badge badge-base rounded-pill bg-warning-lighter text-warning">
+              <i aria-hidden="true" class="ri-error-warning-line"></i>
+              Éligibilité IAE à valider
+          </span>
+      
+  
+  
+                              </td>
+                              <td>0</td>
+                              <td></td>
+                              <td class="text-end w-50px">
+                                  
+                                  
+                                      
+                                  
+                                  <a aria-label="Postuler pour ce candidat" class="btn btn-sm btn-link btn-ico-only" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=22222222-2222-2222-2222-222222222222&amp;city=brest-29">
+                                      <i aria-hidden="true" class="ri-draft-line" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip"></i>
+                                  </a>
+                              </td>
+                          </tr>
+                      
+                          <tr>
+                              <td>
+                                  <a class="btn-link" href="/job-seekers/details/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list">Charlotte XERUS</a>
+                              </td>
+                              <td>
+                                  
+  
+      
+                  <span class="badge badge-base rounded-pill bg-warning-lighter text-warning">
+              <i aria-hidden="true" class="ri-error-warning-line"></i>
+              Éligibilité IAE à valider
+          </span>
+      
+  
+  
+                              </td>
+                              <td>0</td>
+                              <td></td>
+                              <td class="text-end w-50px">
+                                  
+                                  
+                                      
+                                  
+                                  <a aria-label="Postuler pour ce candidat" class="btn btn-sm btn-link btn-ico-only" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=33333333-3333-3333-3333-333333333333&amp;city=brest-29">
+                                      <i aria-hidden="true" class="ri-draft-line" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip"></i>
+                                  </a>
+                              </td>
+                          </tr>
+                      
+                          <tr>
+                              <td>
+                                  <a class="btn-link" href="/job-seekers/details/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list">David WATERFORD</a>
+                              </td>
+                              <td>
+                                  
+  
+      
+                  <span class="badge badge-base rounded-pill bg-warning-lighter text-warning">
+              <i aria-hidden="true" class="ri-error-warning-line"></i>
+              Éligibilité IAE à valider
+          </span>
+      
+  
+  
+                              </td>
+                              <td>0</td>
+                              <td></td>
+                              <td class="text-end w-50px">
+                                  
+                                  
+                                      
+                                  
+                                  <a aria-label="Postuler pour ce candidat" class="btn btn-sm btn-link btn-ico-only" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=44444444-4444-4444-4444-444444444444&amp;city=brest-29">
                                       <i aria-hidden="true" class="ri-draft-line" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip"></i>
                                   </a>
                               </td>
