@@ -176,6 +176,8 @@ class JobApplicationRefusalReasonForm(forms.Form):
                     job_applications_enums.RefusalReason.NON_ELIGIBLE,
                 ]
             )
+        if company.department == "69":
+            self.fields["refusal_reason"].required = False
 
 
 class JobApplicationRefusalJobSeekerAnswerForm(forms.Form):
