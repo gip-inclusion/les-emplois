@@ -472,9 +472,12 @@ class JobApplicationRefuseView(NamedUrlSessionWizardView):
         context = super().get_context_data(**kwargs)
         if self.steps.current != RefuseViewStep.REASON:
             cleaned_data = self.get_cleaned_data_for_step(RefuseViewStep.REASON)
-            context["refusal_reason_label"] = job_applications_enums.RefusalReason(
-                cleaned_data["refusal_reason"]
-            ).label
+            if cleaned_data.get("refusal_reason"):
+                context["refusal_reason_label"] = job_applications_enums.RefusalReason(
+                    cleaned_data["refusal_reason"]
+                ).label
+            else:
+                context["refusal_reason_label"] = "Non renseigné"
             context["refusal_reason_shared_with_job_seeker"] = cleaned_data["refusal_reason_shared_with_job_seeker"]
         return context | {
             "job_applications": [self.job_application],

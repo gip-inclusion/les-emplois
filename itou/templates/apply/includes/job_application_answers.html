@@ -4,7 +4,7 @@
     <div class="c-box mb-4">
         <h3>Réponse de l'employeur</h3>
         <ul class="list-data mb-3">
-            {% if job_application.refusal_reason %}
+            {% if job_application.refusal_reason or job_application.to_company.department == "69" %}
                 {% if not request.user.is_job_seeker or job_application.refusal_reason_shared_with_job_seeker %}
                     <li>
                         <div>
@@ -13,7 +13,7 @@
                             {% else %}
                                 <small>Motif de refus {{ job_application.refusal_reason_shared_with_job_seeker|yesno:"partagé,non partagé" }} avec le candidat</small>
                             {% endif %}
-                            <strong>{{ job_application.get_refusal_reason_display }}</strong>
+                            <strong>{{ job_application.get_refusal_reason_display|default:"Non renseigné" }}</strong>
                         </div>
                     </li>
                 {% endif %}

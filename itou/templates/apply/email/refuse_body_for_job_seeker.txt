@@ -12,7 +12,7 @@ Nous vous souhaitons bon courage dans votre recherche et sommes persuadés que v
 {% if job_application.refusal_reason_shared_with_job_seeker %}
 *Motif de refus* :
 
-{{ job_application.get_refusal_reason_display }}
+{{ job_application.get_refusal_reason_display|default:"Non renseigné" }}
 {% endif %}
 
 {% if job_application.answer %}
