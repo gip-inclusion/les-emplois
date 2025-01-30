@@ -1,3 +1,4 @@
+import enum
 import logging
 from collections import namedtuple
 
@@ -29,7 +30,6 @@ from itou.www.apply.forms import (
     JobApplicationRefusalReasonForm,
     _get_orienter_and_prescriber_nb,
 )
-from itou.www.apply.views.process_views import RefuseViewStep
 
 
 logger = logging.getLogger(__name__)
@@ -166,6 +166,18 @@ def postpone(request):
 
 
 BATCH_REFUSE_SESSION_KIND = "job-applications-batch-refuse"
+
+
+class RefuseViewStep(enum.StrEnum):
+    REASON = "reason"
+    JOB_SEEKER_ANSWER = "job-seeker-answer"
+    PRESCRIBER_ANSWER = "prescriber-answer"
+
+    # Make the Enum work in Django's templates
+    # See :
+    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
+    # - https://github.com/django/django/pull/12304
+    do_not_call_in_templates = enum.nonmember(True)
 
 
 @check_user(lambda user: user.is_employer)
