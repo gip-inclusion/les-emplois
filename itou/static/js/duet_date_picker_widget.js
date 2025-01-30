@@ -22,15 +22,19 @@ const initDuetDatePicker = function () {
     }
 
     // Automatically insert slashes '/' in date fields.
-    pickerInstance.addEventListener("keyup", event => {
-      // Do nothing when backspace was pressed.
-      if (event.which !== 8) {
-        const numChars = event.target.value.length
-        if (numChars === 2 || numChars === 5) {
-          event.target.value = `${event.target.value}/`
+    pickerInstance.addEventListener("input", event => {
+      if (event.inputType === "insertText") {
+        // Remove typed '/' after the automatically inserted '/'.
+        // When user inputs "01/", we don’t want the input value to be "01//".
+        if (event.target.value.slice(-2) === "//") {
+          event.target.value = event.target.value.slice(0, -1);
+        }
+
+        if ([2, 5].includes(event.target.value.length)) {
+          event.target.value = `${event.target.value}/`;
         }
       }
-    })
+    });
 
     pickerInstance.localization = {
       buttonLabel: "Choisir une date",
