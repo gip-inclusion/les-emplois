@@ -110,7 +110,8 @@
                  "users_jobseekerprofile"."hexa_post_code",
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
-                 "users_jobseekerprofile"."pe_last_certification_attempt_at"
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id"
           FROM "users_jobseekerprofile"
           WHERE "users_jobseekerprofile"."user_id" = %s
           LIMIT 21
