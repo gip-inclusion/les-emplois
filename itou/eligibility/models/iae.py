@@ -17,6 +17,7 @@ from itou.eligibility.models.common import (
     AdministrativeCriteriaQuerySet,
     CommonEligibilityDiagnosisQuerySet,
 )
+from itou.gps.models import FollowUpGroup
 
 
 logger = logging.getLogger(__name__)
@@ -214,6 +215,10 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         )
         if administrative_criteria:
             diagnosis.administrative_criteria.add(*administrative_criteria)
+
+        # Sync GPS groups
+        FollowUpGroup.objects.follow_beneficiary(job_seeker, author)
+
         return diagnosis
 
     @classmethod
