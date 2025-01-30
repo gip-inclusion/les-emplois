@@ -15,6 +15,7 @@ from itou.eligibility.models.common import (
     CommonEligibilityDiagnosisQuerySet,
 )
 from itou.eligibility.utils import geiq_allowance_amount
+from itou.gps.models import FollowUpGroup
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
 
@@ -206,6 +207,9 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
         if administrative_criteria:
             result.administrative_criteria.set(administrative_criteria)
+
+        # Sync GPS groups
+        FollowUpGroup.objects.follow_beneficiary(job_seeker, author)
 
         return result
 

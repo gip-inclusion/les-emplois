@@ -7,6 +7,7 @@ from django.db.models import Max
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel
 from itou.eligibility.models import GEIQAdministrativeCriteria, GEIQEligibilityDiagnosis
+from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -53,6 +54,11 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     )
 
     assert diagnosis.pk
+    group = FollowUpGroup.objects.get()
+    assert group.beneficiary == diagnosis.job_seeker
+    membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
+    assert membership.member == diagnosis.author
+    assert membership.creator == diagnosis.author
 
     diagnosis = GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
         job_seeker=JobSeekerFactory(),
@@ -62,6 +68,11 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     )
 
     assert diagnosis.pk
+    group = FollowUpGroup.objects.exclude(pk=group.pk).get()  # Get the newer group
+    assert group.beneficiary == diagnosis.job_seeker
+    membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
+    assert membership.member == diagnosis.author
+    assert membership.creator == diagnosis.author
 
     # bad cops:
 
