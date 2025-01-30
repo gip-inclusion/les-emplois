@@ -26,7 +26,7 @@ def test_follow_beneficiary():
     beneficiary = JobSeekerFactory()
     prescriber = PrescriberFactory(membership=True)
 
-    FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=prescriber, is_referent=True)
+    FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber, is_referent=True)
     group = FollowUpGroup.objects.get()
     membership = group.memberships.get()
     assert membership.is_active is True
@@ -37,7 +37,7 @@ def test_follow_beneficiary():
     membership.is_referent = False
     membership.save()
 
-    FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=prescriber, is_referent=True)
+    FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber, is_referent=True)
     membership.refresh_from_db()
     assert membership.is_active is True
     assert membership.is_referent is True
@@ -45,13 +45,13 @@ def test_follow_beneficiary():
     membership.is_active = False
     membership.save()
 
-    FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=prescriber, is_referent=False)
+    FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber, is_referent=False)
     membership.refresh_from_db()
     assert membership.is_active is True
     assert membership.is_referent is False
 
     other_member = EmployerFactory()
-    FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=other_member, is_referent=True)
+    FollowUpGroup.objects.follow_beneficiary(beneficiary, other_member, is_referent=True)
     assert group.memberships.count() == 2
     other_membership = group.memberships.get(member=other_member)
     assert other_membership.is_referent is True  # No limit to the number of referent

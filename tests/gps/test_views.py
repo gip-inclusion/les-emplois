@@ -86,7 +86,7 @@ def test_my_groups(snapshot, client):
         member__first_name="John",
         member__last_name="Doe",
     )
-    FollowUpGroup.objects.follow_beneficiary(beneficiary=group.beneficiary, user=user)
+    FollowUpGroup.objects.follow_beneficiary(group.beneficiary, user)
 
     with assertSnapshotQueries(snapshot):
         response = client.get(reverse("gps:my_groups"))
@@ -101,7 +101,7 @@ def test_my_groups(snapshot, client):
 
     # Test `is_referent` display.
     group = FollowUpGroupFactory(memberships=1, beneficiary__first_name="Janis", beneficiary__last_name="Joplin")
-    FollowUpGroup.objects.follow_beneficiary(beneficiary=group.beneficiary, user=user, is_referent=True)
+    FollowUpGroup.objects.follow_beneficiary(group.beneficiary, user, is_referent=True)
     response = client.get(reverse("gps:my_groups"))
     assertContains(response, "vous êtes référent")
 

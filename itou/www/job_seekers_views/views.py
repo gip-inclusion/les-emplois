@@ -432,9 +432,7 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
             # The NIR we found is correct
             if self.form.data.get("confirm"):
                 if self.is_gps:
-                    FollowUpGroup.objects.follow_beneficiary(
-                        beneficiary=job_seeker, user=request.user, is_referent=True
-                    )
+                    FollowUpGroup.objects.follow_beneficiary(job_seeker, request.user, is_referent=True)
                 return HttpResponseRedirect(self.get_exit_url(job_seeker.public_id))
 
             context = {
@@ -522,9 +520,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                     logger.exception("step_job_seeker: error when saving job_seeker=%s nir=%s", job_seeker, nir)
                 else:
                     if self.is_gps:
-                        FollowUpGroup.objects.follow_beneficiary(
-                            beneficiary=job_seeker, user=request.user, is_referent=True
-                        )
+                        FollowUpGroup.objects.follow_beneficiary(job_seeker, request.user, is_referent=True)
                     return HttpResponseRedirect(self.get_exit_url(job_seeker.public_id))
 
         return self.render_to_response(
@@ -796,7 +792,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             url = self.get_exit_url(self.profile.user.public_id, created=True)
 
             if self.is_gps:
-                FollowUpGroup.objects.follow_beneficiary(beneficiary=user, user=request.user, is_referent=True)
+                FollowUpGroup.objects.follow_beneficiary(user, request.user, is_referent=True)
 
         return HttpResponseRedirect(url)
 
