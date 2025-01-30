@@ -62,7 +62,7 @@ export CLEVER_SECRET=VOTRE_SECRET
 
 ## Systèmes externes
 
-### Inclusion Connect
+### ProConnect
 
 `FORCE_PROCONNECT_LOGIN` : Obliger les employeurs et prescripteurs à utiliser ProConnect
 

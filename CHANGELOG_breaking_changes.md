@@ -1,4 +1,8 @@
 # Journal des changements techniques majeurs
+## 2025-01-27
+
+- Utiliser `FORCE_PROCONNECT_LOGIN=False` en local au lieu de `FORCE_IC_LOGIN=False`.
+
 ## 2024-11-06
 
 - Mise à jour vers Python 3.12:
