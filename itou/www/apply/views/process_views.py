@@ -1,5 +1,4 @@
 import datetime
-import enum
 import logging
 from urllib.parse import quote, urljoin
 
@@ -42,6 +41,7 @@ from itou.www.apply.forms import (
     TransferJobApplicationForm,
 )
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
+from itou.www.apply.views.batch_views import RefuseViewStep
 from itou.www.apply.views.submit_views import ApplicationEndView, ApplicationJobsView, ApplicationResumeView
 from itou.www.companies_views.views import CompanyCardView, JobDescriptionCardView
 from itou.www.search.views import EmployerSearchView
@@ -380,18 +380,6 @@ def process(request, job_application_id):
 
 def _show_prescriber_answer_form(wizard):
     return wizard.job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER
-
-
-class RefuseViewStep(enum.StrEnum):
-    REASON = "reason"
-    JOB_SEEKER_ANSWER = "job-seeker-answer"
-    PRESCRIBER_ANSWER = "prescriber-answer"
-
-    # Make the Enum work in Django's templates
-    # See :
-    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
-    # - https://github.com/django/django/pull/12304
-    do_not_call_in_templates = enum.nonmember(True)
 
 
 class JobApplicationRefuseView(NamedUrlSessionWizardView):
