@@ -1,5 +1,4 @@
 import datetime
-from io import StringIO
 from unittest.mock import patch
 
 import numpy as np
@@ -36,24 +35,6 @@ class TestGpsManagementCommand:
         settings.GPS_GROUPS_CREATED_BY_EMAIL = "rocking@developer.com"
         ItouStaffFactory(email=settings.GPS_GROUPS_CREATED_BY_EMAIL)
 
-    def call_command(self, management_command_name=None, *args, **kwargs):
-        """Redirect standard outputs from management command to StringIO objects for testing purposes."""
-
-        out = StringIO()
-        err = StringIO()
-
-        assert management_command_name, "Management command name must be provided"
-
-        management.call_command(
-            management_command_name,
-            *args,
-            stdout=out,
-            stderr=err,
-            **kwargs,
-        )
-
-        return out.getvalue(), err.getvalue()
-
     def test_group_creation(self):
         should_be_created_groups_counter = 0
         should_be_created_memberships = 0
@@ -71,7 +52,7 @@ class TestGpsManagementCommand:
         should_be_created_memberships += 1  # eligibility diagnosis (new job_app sender)
         assert job_application.job_seeker.eligibility_diagnoses.count() == 1
 
-        self.call_command("init_follow_up_groups", wet_run=True)
+        management.call_command("init_follow_up_groups", wet_run=True)
 
         assert FollowUpGroup.objects.count() == should_be_created_groups_counter
         assert FollowUpGroupMembership.objects.count() == should_be_created_memberships
@@ -107,7 +88,7 @@ class TestGpsManagementCommand:
         # A group should not be created.
         JobApplicationSentByJobSeekerFactory(state=JobApplicationState.PROCESSING)
 
-        self.call_command("init_follow_up_groups", wet_run=True)
+        management.call_command("init_follow_up_groups", wet_run=True)
 
         # We should have created one follow-up group per job_application
         assert FollowUpGroup.objects.count() == should_be_created_groups_counter
@@ -138,7 +119,7 @@ class TestGpsManagementCommand:
         )
         should_be_created_groups_counter += 1
 
-        self.call_command("init_follow_up_groups", wet_run=True)
+        management.call_command("init_follow_up_groups", wet_run=True)
 
         # One more
         assert FollowUpGroup.objects.count() == should_be_created_groups_counter
@@ -161,7 +142,7 @@ class TestGpsManagementCommand:
             eligibility_diagnosis__author=prescriber,
         )
         should_be_created_groups_counter += 1
-        self.call_command("init_follow_up_groups", wet_run=True)
+        management.call_command("init_follow_up_groups", wet_run=True)
         assert FollowUpGroup.objects.count() == should_be_created_groups_counter
         beneficiary = job_application_sent_by_job_seeker.job_seeker
         group = FollowUpGroup.objects.get(beneficiary=beneficiary)
@@ -188,7 +169,7 @@ class TestGpsManagementCommand:
         assert FollowUpGroup.objects.count() == 0
         assert FollowUpGroupMembership.objects.count() == 0
 
-        self.call_command("init_follow_up_groups", wet_run=True)
+        management.call_command("init_follow_up_groups", wet_run=True)
 
         # We should have created one follow-up group per job_application
         assert FollowUpGroup.objects.count() == 2
@@ -210,7 +191,7 @@ class TestGpsManagementCommand:
         assert FollowUpGroup.objects.count() == 0
         assert FollowUpGroupMembership.objects.count() == 0
 
-        self.call_command("init_follow_up_groups", wet_run=True)
+        management.call_command("init_follow_up_groups", wet_run=True)
 
         # We should not create anything
         assert FollowUpGroup.objects.count() == 0
@@ -259,7 +240,7 @@ class TestGpsManagementCommand:
 
         assert FollowUpGroupMembership.objects.count() == 4
 
-        self.call_command("init_follow_up_groups", wet_run=True)
+        management.call_command("init_follow_up_groups", wet_run=True)
 
         # As we are already part of the first_beneficiary group, having a job application for it
         # should not create a new membership, but a membership for the second_job_application should
@@ -305,7 +286,7 @@ class TestGpsManagementCommand:
         assertQuerySetEqual(new_first_group.members.all(), [first_job_application.sender])
 
         # Calling the command twice should be ok
-        self.call_command("init_follow_up_groups", wet_run=True)
+        management.call_command("init_follow_up_groups", wet_run=True)
 
         assertQuerySetEqual(
             FollowUpGroupMembership.objects.filter(member=first_job_application.sender).all(),
@@ -370,7 +351,7 @@ class TestGpsManagementCommand:
             settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(10, 0, 0), tzinfo=datetime.UTC
         )
         with freeze_time(init_created_at):
-            self.call_command("init_follow_up_groups", wet_run=True)
+            management.call_command("init_follow_up_groups", wet_run=True)
 
         assert list(
             FollowUpGroup.objects.values_list("beneficiary_id", "created_at", "created_in_bulk", "updated_at")
@@ -389,7 +370,7 @@ class TestGpsManagementCommand:
         # Update created_at
         with freeze_time(timezone.now()):
             update_script_launched_at = timezone.now()
-            self.call_command("update_follow_up_groups_member_created_at", wet_run=True)
+            management.call_command("update_follow_up_groups_member_created_at", wet_run=True)
         assert list(
             FollowUpGroup.objects.values_list("beneficiary_id", "created_at", "created_in_bulk", "updated_at")
         ) == [
@@ -442,7 +423,7 @@ class TestGpsManagementCommand:
         )
 
         with patch("pandas.read_excel", return_value=mocked_pandas_dataset):
-            self.call_command("import_advisor_information", "example.xlsx", wet_run=True)
+            management.call_command("import_advisor_information", "example.xlsx", wet_run=True)
 
         assert FranceTravailContact.objects.count() == 2
         assert JobSeekerProfile.objects.filter(advisor_information__isnull=True).count() == 2
@@ -469,7 +450,7 @@ class TestGpsManagementCommand:
         print(str(profile.nir[:13]))
 
         with patch("pandas.read_excel", return_value=mocked_pandas_dataset):
-            self.call_command("import_advisor_information", "example.xlsx", wet_run=True)
+            management.call_command("import_advisor_information", "example.xlsx", wet_run=True)
 
         profile.refresh_from_db()
         assert profile.advisor_information.name == "Test MacTest"
