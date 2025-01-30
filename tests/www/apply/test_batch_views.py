@@ -661,6 +661,7 @@ class TestBatchRefuse:
         expected_session = {
             "config": {
                 "session_kind": "job-applications-batch-refuse",
+                "tunnel": "batch",
                 "reset_url": next_url,
             },
             "application_ids": [refusable_app.pk],
@@ -675,6 +676,8 @@ class TestBatchRefuse:
         # Reason step
         response = client.get(refusal_reason_url)
         assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
+        assert response.context["matomo_custom_title"] == "Candidatures refusées"
+        assert response.context["matomo_event_name"] == "batch-refuse-applications-reason-submit"
 
         post_data = {
             "refusal_reason": reason,
@@ -692,6 +695,8 @@ class TestBatchRefuse:
         assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
         assertContains(response, "Réponse au candidat")
         assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        assert response.context["matomo_custom_title"] == "Candidatures refusées"
+        assert response.context["matomo_event_name"] == "batch-refuse-applications-job-seeker-answer-submit"
         post_data = {"job_seeker_answer": self.FAKE_JOB_SEEKER_ANSWER}
         response = client.post(job_seeker_answer_url, data=post_data, follow=True)
         expected_session["job-seeker-answer"] = post_data
@@ -705,6 +710,8 @@ class TestBatchRefuse:
         assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
         assertContains(response, "Réponse à l’orienteur")
         assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        assert response.context["matomo_custom_title"] == "Candidatures refusées"
+        assert response.context["matomo_event_name"] == "batch-refuse-applications-prescriber-answer-submit"
         post_data = {"prescriber_answer": self.FAKE_PRESCRIBER_ANSWER}
         response = client.post(prescriber_answer_url, data=post_data, follow=True)
         assertRedirects(response, next_url)
@@ -753,6 +760,7 @@ class TestBatchRefuse:
         expected_session = {
             "config": {
                 "session_kind": "job-applications-batch-refuse",
+                "tunnel": "batch",
                 "reset_url": next_url,
             },
             "application_ids": [refusable_apps[1].pk, refusable_apps[0].pk],  # default application ordering
@@ -767,6 +775,8 @@ class TestBatchRefuse:
         # Reason step
         response = client.get(refusal_reason_url)
         assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
+        assert response.context["matomo_custom_title"] == "Candidatures refusées"
+        assert response.context["matomo_event_name"] == "batch-refuse-applications-reason-submit"
 
         post_data = {
             "refusal_reason": reason,
@@ -784,6 +794,8 @@ class TestBatchRefuse:
         assertContains(response, "<strong>Étape 2</strong>/3 : Message aux candidats", html=True)
         assertContains(response, "Réponse aux candidats")
         assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        assert response.context["matomo_custom_title"] == "Candidatures refusées"
+        assert response.context["matomo_event_name"] == "batch-refuse-applications-job-seeker-answer-submit"
         post_data = {"job_seeker_answer": self.FAKE_JOB_SEEKER_ANSWER}
         response = client.post(job_seeker_answer_url, data=post_data, follow=True)
         expected_session["job-seeker-answer"] = post_data
@@ -797,6 +809,8 @@ class TestBatchRefuse:
         assertContains(response, "<strong>Étape 3</strong>/3 : Message aux prescripteurs", html=True)
         assertContains(response, "Réponse aux prescripteurs")
         assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        assert response.context["matomo_custom_title"] == "Candidatures refusées"
+        assert response.context["matomo_event_name"] == "batch-refuse-applications-prescriber-answer-submit"
         post_data = {"prescriber_answer": self.FAKE_PRESCRIBER_ANSWER}
         response = client.post(prescriber_answer_url, data=post_data, follow=True)
         assertRedirects(response, next_url)
@@ -839,6 +853,7 @@ class TestBatchRefuse:
         expected_session = {
             "config": {
                 "session_kind": "job-applications-batch-refuse",
+                "tunnel": "batch",
                 "reset_url": next_url,
             },
             "application_ids": [refusable_apps[1].pk, refusable_apps[0].pk],  # default application ordering
@@ -853,6 +868,8 @@ class TestBatchRefuse:
         # Reason step
         response = client.get(refusal_reason_url)
         assertContains(response, "<strong>Étape 1</strong>/2 : Choix du motif de refus", html=True)
+        assert response.context["matomo_custom_title"] == "Candidatures refusées"
+        assert response.context["matomo_event_name"] == "batch-refuse-applications-reason-submit"
 
         post_data = {
             "refusal_reason": reason,
@@ -874,6 +891,8 @@ class TestBatchRefuse:
             f"<strong>Motif de refus :</strong> {reason_label} <em>(Motif non communiqué au candidat)</em>",
             html=True,
         )
+        assert response.context["matomo_custom_title"] == "Candidatures refusées"
+        assert response.context["matomo_event_name"] == "batch-refuse-applications-job-seeker-answer-submit"
         post_data = {"job_seeker_answer": self.FAKE_JOB_SEEKER_ANSWER}
         response = client.post(job_seeker_answer_url, data=post_data, follow=True)
         assertRedirects(response, next_url)
@@ -916,6 +935,7 @@ class TestBatchRefuse:
         expected_session = {
             "config": {
                 "session_kind": "job-applications-batch-refuse",
+                "tunnel": "batch",
                 "reset_url": next_url,
             },
             "application_ids": [refusable_app.pk],
@@ -974,6 +994,7 @@ class TestBatchRefuse:
         expected_session = {
             "config": {
                 "session_kind": "job-applications-batch-refuse",
+                "tunnel": "batch",
                 "reset_url": next_url,
             },
             "application_ids": [refusable_app.pk],
@@ -1041,6 +1062,7 @@ class TestBatchRefuse:
         expected_session = {
             "config": {
                 "session_kind": "job-applications-batch-refuse",
+                "tunnel": "batch",
                 "reset_url": next_url,
             },
             "application_ids": [refusable_apps[1].pk, refusable_apps[0].pk],  # default application ordering

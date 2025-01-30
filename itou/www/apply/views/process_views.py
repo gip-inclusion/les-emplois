@@ -386,6 +386,7 @@ def start_refuse_wizard(request, job_application_id):
         request,
         application_ids=[job_application_id],
         next_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application_id}),
+        from_detail_view=True,
     )
 
 

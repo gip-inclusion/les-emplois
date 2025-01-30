@@ -180,7 +180,12 @@ class RefuseViewStep(enum.StrEnum):
     do_not_call_in_templates = enum.nonmember(True)
 
 
-def _start_refuse_wizard(request, *, application_ids, next_url):
+class RefuseTunnel(enum.StrEnum):
+    SINGLE = "single"
+    BATCH = "batch"
+
+
+def _start_refuse_wizard(request, *, application_ids, next_url, from_detail_view=False):
     if next_url is None:
         # This is somewhat extreme but will force developpers to always provide a proper next_url
         raise Http404
@@ -204,7 +209,11 @@ def _start_refuse_wizard(request, *, application_ids, next_url):
     refuse_session = SessionNamespace.create_uuid_namespace(
         request.session,
         data={
-            "config": {"session_kind": BATCH_REFUSE_SESSION_KIND, "reset_url": next_url},
+            "config": {
+                "session_kind": BATCH_REFUSE_SESSION_KIND,
+                "reset_url": next_url,
+                "tunnel": RefuseTunnel.SINGLE if from_detail_view else RefuseTunnel.BATCH,
+            },
             "application_ids": application_ids,
         },
     )
@@ -246,6 +255,7 @@ class RefuseWizardView(UserPassesTestMixin, TemplateView):
             raise Http404
         self.wizard_session = wizard_session
         self.reset_url = wizard_session.get("config", {}).get("reset_url")
+        self.tunnel = wizard_session.get("config", {}).get("tunnel", RefuseTunnel.BATCH)
         if self.reset_url is None:
             # Session should have been initialized with a reset_url and this RefuseWizardView expects one
             raise Http404
@@ -351,11 +361,17 @@ class RefuseWizardView(UserPassesTestMixin, TemplateView):
             the_prescriber = "les prescripteurs/orienteurs"
 
         Steps = namedtuple("Steps", ["current", "step1", "count", "next", "prev"])
+        if self.tunnel == RefuseTunnel.BATCH:
+            matomo_custom_title = "Candidatures refusées"
+            matomo_event_name = f"batch-refuse-applications-{self.step}-submit"
+        else:
+            matomo_custom_title = "Candidature refusée"
+            matomo_event_name = f"batch-refuse-application-{self.step}-submit"
         context = super().get_context_data(**kwargs) | {
             "job_applications": self.applications,
             "can_view_personal_information": True,  # SIAE members have access to personal info
-            "matomo_custom_title": "Candidatures refusées",
-            "matomo_event_name": f"batch-refuse-applications-{self.step}-submit",
+            "matomo_custom_title": matomo_custom_title,
+            "matomo_event_name": matomo_event_name,
             # Compatibility with current process_refuse.html
             "wizard": {
                 "steps": Steps(
@@ -460,7 +476,7 @@ class RefuseWizardView(UserPassesTestMixin, TemplateView):
                 extra_tags="toast",
             )
         logger.info(
-            "user=%s batch refused %s applications: %s",
+            f"user=%s {self.tunnel} refused %s applications: %s",
             self.request.user.pk,
             refused_nb,
             ",".join(str(app_uid) for app_uid in refused_ids),
