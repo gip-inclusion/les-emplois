@@ -41,13 +41,14 @@
 
                     {% else %}
 
-                        {% url 'account_email' as email_url %}
-
                         <div class="alert alert-danger" role="status">
                             <p class="mb-2">Ce lien de confirmation d'adresse e-mail a expiré ou n'est pas valide.</p>
-                            <p class="mb-0">
-                                Veuillez lancer <a href="{{ email_url }}">une nouvelle demande de confirmation</a>.
-                            </p>
+                            {% if provided_key %}
+                                {% url 'account_resend_confirmation_email' provided_key as email_url %}
+                                <p class="mb-0">
+                                    Veuillez lancer <a href="{{ email_url }}">une nouvelle demande de confirmation</a>.
+                                </p>
+                            {% endif %}
                         </div>
 
                     {% endif %}
