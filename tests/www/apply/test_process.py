@@ -912,6 +912,7 @@ class TestProcessViews:
         assert client.session[refuse_session_name] == {
             "config": {
                 "session_kind": "job-applications-batch-refuse",
+                "tunnel": "single",
                 "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             },
             "application_ids": [job_application.pk],
@@ -928,6 +929,7 @@ class TestProcessViews:
         expected_session = {
             "config": {
                 "session_kind": "job-applications-batch-refuse",
+                "tunnel": "single",
                 "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             },
             "application_ids": [job_application.pk],
@@ -956,6 +958,7 @@ class TestProcessViews:
         assert client.session[refuse_session_name_2] == {
             "config": {
                 "session_kind": "job-applications-batch-refuse",
+                "tunnel": "single",
                 "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": job_application_2.pk}),
             },
             "application_ids": [job_application_2.pk],
@@ -984,6 +987,8 @@ class TestProcessViews:
         )
         assertRedirects(response, refusal_reason_url)
         assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
+        assert response.context["matomo_custom_title"] == "Candidature refusée"
+        assert response.context["matomo_event_name"] == "batch-refuse-application-reason-submit"
 
         post_data = {
             "refusal_reason": reason,
@@ -997,6 +1002,8 @@ class TestProcessViews:
         assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
         assertContains(response, "Réponse au candidat")
         assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        assert response.context["matomo_custom_title"] == "Candidature refusée"
+        assert response.context["matomo_event_name"] == "batch-refuse-application-job-seeker-answer-submit"
 
         post_data = {
             "job_seeker_answer": "Message au candidat",
@@ -1009,6 +1016,8 @@ class TestProcessViews:
         assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
         assertContains(response, "Réponse au prescripteur")
         assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
+        assert response.context["matomo_custom_title"] == "Candidature refusée"
+        assert response.context["matomo_event_name"] == "batch-refuse-application-prescriber-answer-submit"
 
         post_data = {
             "prescriber_answer": "Message au prescripteur",
@@ -1040,6 +1049,8 @@ class TestProcessViews:
         )
         assertRedirects(response, refusal_reason_url)
         assertContains(response, "<strong>Étape 1</strong>/2 : Choix du motif de refus", html=True)
+        assert response.context["matomo_custom_title"] == "Candidature refusée"
+        assert response.context["matomo_event_name"] == "batch-refuse-application-reason-submit"
 
         post_data = {
             "refusal_reason": reason,
@@ -1057,6 +1068,8 @@ class TestProcessViews:
             f"<strong>Motif de refus :</strong> {reason_label} <em>(Motif non communiqué au candidat)</em>",
             html=True,
         )
+        assert response.context["matomo_custom_title"] == "Candidature refusée"
+        assert response.context["matomo_event_name"] == "batch-refuse-application-job-seeker-answer-submit"
 
         post_data = {
             "job_seeker_answer": "Message au candidat",
@@ -3239,6 +3252,7 @@ def test_refuse_jobapplication_geiq_reasons(client, reason):
     assert client.session[refuse_session_name] == {
         "config": {
             "session_kind": "job-applications-batch-refuse",
+            "tunnel": "single",
             "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
         },
         "application_ids": [job_application.pk],
