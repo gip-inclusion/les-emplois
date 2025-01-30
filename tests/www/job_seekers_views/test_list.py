@@ -3,10 +3,15 @@ import datetime
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.utils.templatetags.str_filters import mask_unless
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.prescribers.factories import (
+    PrescriberOrganizationFactory,
+    PrescriberOrganizationWith2MembershipFactory,
+)
 from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
@@ -27,6 +32,20 @@ def assert_contains_button_apply_for(response, job_seeker, with_city=True, with_
                 <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip"
                 data-bs-title="Postuler pour ce candidat">
                 </i>
+            </a>
+        """,
+        count=1,
+        html=True,
+    )
+
+
+def assert_contains_job_seeker(response, job_seeker, with_personal_information=True):
+    assertContains(
+        response,
+        f"""
+            <a href="{reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})}?back_url={
+            reverse("job_seekers_views:list")
+        }" class="btn-link">{mask_unless(job_seeker.get_full_name(), with_personal_information)}
             </a>
         """,
         count=1,
@@ -138,6 +157,185 @@ def test_multiple(client, snapshot):
     response = client.get(url)
     parse_response_to_soup(response, selector="tbody")
     assert_contains_button_apply_for(response, job_app5.job_seeker, with_city=False, with_intro_js=True)
+
+
+@freeze_time("2024-08-30")
+def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
+    url = reverse("job_seekers_views:list")
+    organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
+    [prescriber, other_prescriber] = organization.members.all()
+
+    # Job seeker created by this prescriber
+    alain = JobSeekerFactory(
+        first_name="Alain",
+        last_name="Zorro",
+        public_id="11111111-1111-1111-1111-111111111111",
+        post_code="29200",
+        city="Brest",
+        created_by=prescriber,
+        jobseeker_profile__created_by_prescriber_organization=organization,
+    )
+
+    # Job seeker created by another member of the organization
+    bernard = JobSeekerFactory(
+        first_name="Bernard",
+        last_name="Ygrec",
+        public_id="22222222-2222-2222-2222-222222222222",
+        post_code="29200",
+        city="Brest",
+        created_by=other_prescriber,
+        jobseeker_profile__created_by_prescriber_organization=organization,
+    )
+
+    # Job seeker created by a member of the organization, but not in the organization anymore
+    prescriber_not_in_org_anymore = PrescriberFactory(
+        membership__organization=organization, membership__is_active=False
+    )
+    charlotte = JobSeekerFactory(
+        first_name="Charlotte",
+        last_name="Xerus",
+        public_id="33333333-3333-3333-3333-333333333333",
+        post_code="29200",
+        city="Brest",
+        created_by=prescriber_not_in_org_anymore,
+        jobseeker_profile__created_by_prescriber_organization=organization,
+    )
+
+    # When applying for a job seeker already in the list, he's not shown twice
+    JobApplicationFactory(
+        job_seeker=alain,
+        sender=prescriber,
+        sent_by_authorized_prescriber_organisation=True,
+        updated_at=timezone.now() - datetime.timedelta(days=1),
+    )
+
+    # Job seeker created by the prescriber but for another organization; will be shown
+    other_organization = PrescriberOrganizationFactory()
+    david = JobSeekerFactory(
+        first_name="David",
+        last_name="Waterford",
+        public_id="44444444-4444-4444-4444-444444444444",
+        post_code="29200",
+        city="Brest",
+        created_by=prescriber,
+        jobseeker_profile__created_by_prescriber_organization=other_organization,
+    )
+
+    # Job seeker created by someone else, for another organization
+    edouard = JobSeekerFactory(
+        first_name="Edouard",
+        last_name="Vivant",
+        public_id="55555555-5555-5555-5555-555555555555",
+        post_code="29200",
+        city="Brest",
+        created_by=other_prescriber,
+        jobseeker_profile__created_by_prescriber_organization=other_organization,
+    )
+
+    client.force_login(prescriber)
+    with assertSnapshotQueries(snapshot(name="job seekers created by organization list with SQL")):
+        response = client.get(url)
+        soup = parse_response_to_soup(response, selector="tbody")
+        assert str(soup) == snapshot(name="job seekers list tbody")
+
+        # Job seekers are displayed for the prescriber
+        for job_seeker in [alain, bernard, charlotte, david]:
+            assert_contains_job_seeker(response, job_seeker, with_personal_information=True)
+            assert_contains_button_apply_for(response, job_seeker, with_city=True, with_intro_js=job_seeker == alain)
+
+        # Job seeker not displayed for the prescriber
+        assertNotContains(response, edouard.get_full_name())
+        assertNotContains(response, reverse("job_seekers_views:details", kwargs={"public_id": edouard.public_id}))
+
+
+@freeze_time("2024-08-30")
+def test_multiple_with_job_seekers_created_by_unauthorized_organization(client):
+    url = reverse("job_seekers_views:list")
+    organization = PrescriberOrganizationWith2MembershipFactory(authorized=False)
+    [prescriber, other_prescriber] = organization.members.all()
+    client.force_login(prescriber)
+
+    # Job seeker created by this prescriber
+    alain = JobSeekerFactory(
+        first_name="Alain",
+        last_name="Zorro",
+        public_id="11111111-1111-1111-1111-111111111111",
+        post_code="29200",
+        city="Brest",
+        created_by=prescriber,
+        jobseeker_profile__created_by_prescriber_organization=organization,
+    )
+
+    # Job seeker created by another member of the organization
+    bernard = JobSeekerFactory(
+        first_name="Bernard",
+        last_name="Ygrec",
+        public_id="22222222-2222-2222-2222-222222222222",
+        post_code="29200",
+        city="Brest",
+        created_by=other_prescriber,
+        jobseeker_profile__created_by_prescriber_organization=organization,
+    )
+
+    response = client.get(url)
+    # A job seeker created by the user is shown with personal information
+    assert_contains_job_seeker(response, alain, with_personal_information=True)
+    assert_contains_button_apply_for(response, alain, with_city=True, with_intro_js=True)
+
+    # A job seeker created by a member of the unauthorized organization is shown *without* personal information
+    assert_contains_job_seeker(response, bernard, with_personal_information=False)
+    assert_contains_button_apply_for(response, bernard, with_city=False)
+
+
+def test_job_seeker_created_by_prescriber_without_org(client):
+    """
+    Check that a job seeker created by an "orienteur solo" is not shared among
+    all the "orienteurs solo"
+    """
+    prescriber = PrescriberFactory()
+    other_prescriber = PrescriberFactory()
+    organization = PrescriberOrganizationFactory()
+
+    # Job seeker created by another prescriber
+    alain = JobSeekerFactory(
+        first_name="Alain",
+        last_name="Zorro",
+        public_id="11111111-1111-1111-1111-111111111111",
+        post_code="29200",
+        city="Brest",
+        created_by=other_prescriber,
+    )
+    # Job seeker created by this prescriber
+    bernard = JobSeekerFactory(
+        first_name="Bernard",
+        last_name="Ygrec",
+        public_id="22222222-2222-2222-2222-222222222222",
+        post_code="29200",
+        city="Brest",
+        created_by=prescriber,
+    )
+    # Job seeker created by this prescriber when he was in an organization.
+    # He is not member of it anymore, but the job seeker is still displayed.
+    charlotte = JobSeekerFactory(
+        first_name="Charlotte",
+        last_name="Xerus",
+        public_id="33333333-3333-3333-3333-333333333333",
+        post_code="29200",
+        city="Brest",
+        created_by=prescriber,
+        jobseeker_profile__created_by_prescriber_organization=organization,
+    )
+
+    client.force_login(prescriber)
+    response = client.get(reverse("job_seekers_views:list"))
+    assertNotContains(response, alain.get_full_name())
+    assertNotContains(response, reverse("job_seekers_views:details", kwargs={"public_id": alain.public_id}))
+
+    assert_contains_job_seeker(response, bernard, with_personal_information=True)
+    assert_contains_button_apply_for(response, bernard, with_city=True, with_intro_js=True)
+
+    assert_contains_job_seeker(response, charlotte, with_personal_information=True)
+    assert_contains_button_apply_for(response, charlotte, with_city=True)
 
 
 def test_htmx_job_seeker_filter(client):

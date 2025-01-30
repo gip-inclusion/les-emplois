@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, Exists, IntegerField, Max, OuterRef, Subquery
+from django.db.models import Count, DateTimeField, Exists, IntegerField, Max, OuterRef, Q, Subquery
 from django.db.models.functions import Coalesce
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
@@ -111,7 +111,10 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
 class JobSeekerListView(UserPassesTestMixin, ListView):
     model = User
     queryset = (
-        User.objects.filter(kind=UserKind.JOB_SEEKER).order_by("first_name", "last_name").prefetch_related("approvals")
+        User.objects.filter(kind=UserKind.JOB_SEEKER)
+        .order_by("first_name", "last_name")
+        .prefetch_related("approvals")
+        .select_related("jobseeker_profile")
     )
     paginate_by = 10
     paginator_class = ItouPaginator
@@ -124,7 +127,9 @@ class JobSeekerListView(UserPassesTestMixin, ListView):
         super().setup(request, *args, **kwargs)
         if self.test_func():
             self.form = FilterForm(
-                User.objects.filter(kind=UserKind.JOB_SEEKER).filter(Exists(self._get_user_job_applications())),
+                User.objects.filter(kind=UserKind.JOB_SEEKER).filter(
+                    Exists(self._get_user_job_applications()) | self._get_user_jobseekers_created()
+                ),
                 self.request.GET or None,
                 request_user=request.user,
             )
@@ -152,9 +157,19 @@ class JobSeekerListView(UserPassesTestMixin, ListView):
             job_seeker=OuterRef("pk")
         )
 
+    def _get_user_jobseekers_created(self):
+        if self.request.user.is_prescriber:
+            filter = Q(created_by=self.request.user)
+            if self.request.current_organization:
+                filter |= Q(jobseeker_profile__created_by_prescriber_organization=self.request.current_organization)
+            return filter
+        else:
+            return Q()
+
     def get_queryset(self):
         queryset = super().get_queryset()
         user_applications = self._get_user_job_applications()
+        user_job_seekers_created_by_organization = self._get_user_jobseekers_created()
         subquery_count = Subquery(
             user_applications.values("job_seeker").annotate(count=Count("pk")).values("count"),
             output_field=IntegerField(),
@@ -171,7 +186,7 @@ class JobSeekerListView(UserPassesTestMixin, ListView):
             ),
             output_field=IntegerField(),
         )
-        query = queryset.filter(Exists(user_applications)).annotate(
+        query = queryset.filter(Exists(user_applications) | user_job_seekers_created_by_organization).annotate(
             job_applications_nb=Coalesce(subquery_count, 0),
             last_updated_at=subquery_last_update,
             valid_eligibility_diagnosis=subquery_diagnosis,
