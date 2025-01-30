@@ -1024,28 +1024,31 @@ def test_populate_enums():
         assert rows[0] == ("approval_expiration_too_close", "La date de fin du PASS IAE / agrément est trop proche")
 
 
-def test_data_inconsistencies(capsys):
+def test_data_inconsistencies(caplog):
     approval = ApprovalFactory()
 
     with assertNumQueries(1):  # Select the job seekers
         management.call_command("populate_metabase_emplois", mode="data_inconsistencies")
 
-    stdout, _ = capsys.readouterr()
-    out_lines = stdout.splitlines()
-    assert out_lines[0] == "Checking data for inconsistencies."
-    assert "timeit: method=report_data_inconsistencies completed in seconds=" in out_lines[1]
-    assert "timeit: method=handle completed in seconds=" in out_lines[2]
+    logs = caplog.messages
+    assert logs[0] == "Checking data for inconsistencies."
+    assert "timeit: method=report_data_inconsistencies completed in seconds=" in logs[1]
+    assert "timeit: method=handle completed in seconds=" in logs[2]
 
     approval.user.kind = UserKind.EMPLOYER
     approval.user.save()
 
+    caplog.clear()
     with pytest.raises(RuntimeError):
         management.call_command("populate_metabase_emplois", mode="data_inconsistencies")
-    stdout, _ = capsys.readouterr()
-    assert stdout.splitlines() == [
+    assert caplog.messages[:-1] == [
         "Checking data for inconsistencies.",
         "FATAL ERROR: At least one user has an approval but is not a job seeker",
+        "Error when executing itou.metabase.management.commands.populate_metabase_emplois",
     ]
+    assert caplog.messages[-1].startswith(
+        "Management command itou.metabase.management.commands.populate_metabase_emplois failed in"
+    )
 
 
 @freeze_time("2023-02-02")
