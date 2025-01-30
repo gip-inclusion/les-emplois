@@ -28,10 +28,9 @@ from itou.approvals.models import Approval, Suspension
 from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
-from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AuthorKind
+from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQSelectedAdministrativeCriteria
-from itou.eligibility.models.iae import SelectedAdministrativeCriteria
 from itou.employee_record.enums import Status
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType, SenderKind
@@ -1912,15 +1911,6 @@ class TestProcessAcceptViews:
             "to_company": self.company,
             "hiring_end_at": None,
         } | kwargs
-        if "with_geiq_eligibility_diagnosis" not in kwargs:
-            kwargs.setdefault("with_iae_eligibility_diagnosis", True)
-        if kwargs.get("with_certifiable_criteria"):
-            del kwargs["with_certifiable_criteria"]
-            kwargs = {
-                "eligibility_diagnosis__with_certifiable_criteria": True,
-                "eligibility_diagnosis__author_siae": self.company,
-                "eligibility_diagnosis__from_employer": True,
-            } | kwargs
         return JobApplicationSentByJobSeekerFactory(**kwargs)
 
     def _accept_view_post_data(self, job_application, post_data=None):
@@ -2042,7 +2032,7 @@ class TestProcessAcceptViews:
     )
     def test_nominal_case(self, client, hiring_end_at, state):
         today = timezone.localdate()
-        job_application = self.create_job_application(state=state)
+        job_application = self.create_job_application(state=state, with_iae_eligibility_diagnosis=True)
         previous_last_checked_at = self.job_seeker.last_checked_at
 
         employer = self.company.members.first()
@@ -2074,18 +2064,33 @@ class TestProcessAcceptViews:
         # last_checked_at has been updated
         assert job_application.job_seeker.last_checked_at > previous_last_checked_at
 
+    @pytest.mark.parametrize(
+        "CRITERIA_KIND,api_returned_payload",
+        [
+            pytest.param(
+                AdministrativeCriteriaKind.RSA,
+                rsa_certified_mocker(),
+                id="rsa",
+            ),
+        ],
+    )
     @freeze_time("2024-09-11")
-    def test_select_other_job_description_for_job_application(self, client, mocker):
-        rsa_certified_mock = mocker.patch(
+    def test_select_other_job_description_for_job_application(
+        self, CRITERIA_KIND, api_returned_payload, client, mocker
+    ):
+        mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=rsa_certified_mocker(),
+            return_value=api_returned_payload,
         )
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker=self.job_seeker,
+            author_siae=self.company,
+            certifiable=True,
+            criteria_kinds=[CRITERIA_KIND],
+        )
+        job_application = self.create_job_application(eligibility_diagnosis=diagnosis)
 
-        # Not sure if it's relevant to test it here.
-        # I'd rather test job applications' edge cases alone, without certifiable criteria,
-        # but test certifiable criteria aside to separate concerns.
-        job_application = self.create_job_application(with_certifiable_criteria=True)
         employer = self.company.members.first()
         client.force_login(employer)
 
@@ -2124,7 +2129,7 @@ class TestProcessAcceptViews:
         # Caution: should redirect after that point, but done via HTMX we get a 200 status code
         assert response.status_code == 200
         assert response.url == reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        rsa_certified_mock.assert_called_once()
+        mocked_request.assert_called_once()
 
         # Perform some checks on job description now attached to job application
         job_application.refresh_from_db()
@@ -2134,7 +2139,7 @@ class TestProcessAcceptViews:
         assert job_application.hired_job.description == "La structure n’a pas encore renseigné cette rubrique"
 
     def test_select_job_description_for_job_application(self, client, snapshot):
-        job_application = self.create_job_application()
+        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
         employer = self.company.members.first()
         client.force_login(employer)
 
@@ -2164,7 +2169,7 @@ class TestProcessAcceptViews:
 
     def test_no_job_description_for_job_application(self, client):
         self.company.jobs.clear()
-        job_application = self.create_job_application()
+        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
         employer = self.company.members.first()
         client.force_login(employer)
         response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
@@ -2174,7 +2179,7 @@ class TestProcessAcceptViews:
 
     def test_wrong_dates(self, client):
         today = timezone.localdate()
-        job_application = self.create_job_application()
+        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
         hiring_start_at = today
         hiring_end_at = Approval.get_default_end_date(hiring_start_at)
         # Force `hiring_start_at` in past.
@@ -2204,7 +2209,7 @@ class TestProcessAcceptViews:
         assertFormError(response.context["form_accept"], None, JobApplication.ERROR_END_IS_BEFORE_START)
 
     def test_no_address(self, client):
-        job_application = self.create_job_application()
+        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
         employer = self.company.members.first()
         client.force_login(employer)
 
@@ -2258,7 +2263,7 @@ class TestProcessAcceptViews:
         today = timezone.localdate()
         # Old job application of job seeker
         old_job_application = self.create_job_application(
-            with_approval=True, hiring_start_at=today - relativedelta(days=100)
+            with_iae_eligibility_diagnosis=True, with_approval=True, hiring_start_at=today - relativedelta(days=100)
         )
         job_seeker = old_job_application.job_seeker
         # Create suspension for the job seeker
@@ -2315,7 +2320,7 @@ class TestProcessAcceptViews:
         jobseeker_profile.pole_emploi_id = ""
         jobseeker_profile.lack_of_pole_emploi_id_reason = LackOfPoleEmploiId.REASON_FORGOTTEN
         jobseeker_profile.save()
-        job_application = self.create_job_application()
+        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
 
         employer = self.company.members.first()
         client.force_login(employer)
@@ -2422,7 +2427,7 @@ class TestProcessAcceptViews:
         assert job_app_starting_later.approval.start_at == job_app_starting_earlier.hiring_start_at
 
     def test_nir_readonly(self, client):
-        job_application = self.create_job_application()
+        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
 
         employer = self.company.members.first()
         client.force_login(employer)
@@ -2457,7 +2462,7 @@ class TestProcessAcceptViews:
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.save()
-        job_application = self.create_job_application()
+        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
 
         employer = self.company.members.first()
         client.force_login(employer)
@@ -2494,7 +2499,7 @@ class TestProcessAcceptViews:
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.save()
-        job_application = self.create_job_application()
+        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
         other_job_seeker = JobSeekerFactory(
             with_pole_emploi_id=True,
             with_ban_api_mocked_address=True,
@@ -2521,7 +2526,7 @@ class TestProcessAcceptViews:
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.save()
-        job_application = self.create_job_application()
+        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
 
         employer = self.company.members.first()
         client.force_login(employer)
@@ -2550,7 +2555,7 @@ class TestProcessAcceptViews:
         jobseeker_profile.nir = ""
         jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
         jobseeker_profile.save()
-        job_application = self.create_job_application()
+        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
 
         employer = self.company.members.first()
         client.force_login(employer)
@@ -2583,7 +2588,7 @@ class TestProcessAcceptViews:
         jobseeker_profile.nir = ""
         jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
         jobseeker_profile.save()
-        job_application = self.create_job_application()
+        job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
 
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -2609,7 +2614,9 @@ class TestProcessAcceptViews:
     def test_accept_after_cancel(self, client):
         # A canceled job application is not linked to an approval
         # unless the job seeker has an accepted job application.
-        job_application = self.create_job_application(state=job_applications_enums.JobApplicationState.CANCELLED)
+        job_application = self.create_job_application(
+            state=job_applications_enums.JobApplicationState.CANCELLED, with_iae_eligibility_diagnosis=True
+        )
 
         employer = self.company.members.first()
         client.force_login(employer)
@@ -2621,23 +2628,38 @@ class TestProcessAcceptViews:
         assert approval.start_at == job_application.hiring_start_at
         assert job_application.state.is_accepted
 
+    @pytest.mark.parametrize(
+        "CRITERIA_KIND,api_returned_payload",
+        [
+            pytest.param(
+                AdministrativeCriteriaKind.RSA,
+                rsa_certified_mocker(),
+                id="rsa",
+            ),
+        ],
+    )
     @freeze_time("2024-09-11")
-    def test_accept_iae__criteria_can_be_certified(self, client, mocker):
-        certify_rsa_mocker = mocker.patch(
+    def test_accept_iae__criteria_can_be_certified(self, CRITERIA_KIND, api_returned_payload, client, mocker):
+        mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=rsa_certified_mocker(),
+            return_value=api_returned_payload,
         )
-        ######### Case 1: if BRSA is one the diagnosis criteria,
+        ######### Case 1: if CRITERIA_KIND is one of the diagnosis criteria,
         ######### birth place and birth country are required.
         birthdate = datetime.date(1995, 12, 27)
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker=self.job_seeker,
+            author_siae=self.company,
+            certifiable=True,
+            criteria_kinds=[CRITERIA_KIND, AdministrativeCriteriaKind.CAP_BEP],
+        )
         job_application = self.create_job_application(
-            with_certifiable_criteria=True,
+            eligibility_diagnosis=diagnosis,
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
-        to_be_certified_criteria = SelectedAdministrativeCriteria.objects.filter(
-            administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
-            eligibility_diagnosis=job_application.eligibility_diagnosis,
-        ).all()
+        to_be_certified_criteria = diagnosis.selected_administrative_criteria.filter(
+            administrative_criteria__kind__in=CRITERIA_KIND
+        )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         employer = job_application.to_company.members.first()
@@ -2685,7 +2707,7 @@ class TestProcessAcceptViews:
             "birth_place": birth_place.pk,
         }
         self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
-        certify_rsa_mocker.assert_called_once()
+        mocked_request.assert_called_once()
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
         jobseeker_profile.refresh_from_db()
@@ -2696,24 +2718,39 @@ class TestProcessAcceptViews:
         for criterion in to_be_certified_criteria:
             criterion.refresh_from_db()
             assert criterion.certified
-            assert criterion.data_returned_by_api == rsa_certified_mocker()
+            assert criterion.data_returned_by_api == api_returned_payload
             assert criterion.certification_period == InclusiveDateRange(
                 datetime.date(2024, 8, 1), datetime.date(2024, 12, 12)
             )
             assert criterion.certified_at
 
+    @pytest.mark.parametrize(
+        "CRITERIA_KIND,api_returned_payload",
+        [
+            pytest.param(
+                AdministrativeCriteriaKind.RSA,
+                rsa_certified_mocker(),
+                id="rsa",
+            ),
+        ],
+    )
     @freeze_time("2024-09-11")
-    def test_accept_geiq__criteria_can_be_certified(self, client, mocker):
-        certify_rsa_mocker = mocker.patch(
+    def test_accept_geiq__criteria_can_be_certified(self, CRITERIA_KIND, api_returned_payload, client, mocker):
+        mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=rsa_certified_mocker(),
+            return_value=api_returned_payload,
         )
         birthdate = datetime.date(1995, 12, 27)
         self.company.kind = CompanyKind.GEIQ
         self.company.save()
+        diagnosis = GEIQEligibilityDiagnosisFactory(
+            job_seeker=self.job_seeker,
+            author_geiq=self.company,
+            from_geiq=True,
+            criteria_kinds=[CRITERIA_KIND],
+        )
         job_application = self.create_job_application(
-            with_geiq_eligibility_diagnosis=True,
-            geiq_eligibility_diagnosis__with_certifiable_criteria=True,
+            geiq_eligibility_diagnosis=diagnosis,
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
         to_be_certified_criteria = GEIQSelectedAdministrativeCriteria.objects.filter(
@@ -2750,7 +2787,7 @@ class TestProcessAcceptViews:
             "birth_place": birth_place.pk,
         }
         response, _ = self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
-        certify_rsa_mocker.assert_called_once()
+        mocked_request.assert_called_once()
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
         jobseeker_profile.refresh_from_db()
@@ -2761,7 +2798,7 @@ class TestProcessAcceptViews:
         for criterion in to_be_certified_criteria:
             criterion.refresh_from_db()
             assert criterion.certified
-            assert criterion.data_returned_by_api == rsa_certified_mocker()
+            assert criterion.data_returned_by_api == api_returned_payload
             assert criterion.certification_period == InclusiveDateRange(
                 datetime.date(2024, 8, 1), datetime.date(2024, 12, 12)
             )
@@ -2774,8 +2811,14 @@ class TestProcessAcceptViews:
             return_value=rsa_certified_mocker(),
         )
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True, with_jobs=True)
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker=self.job_seeker,
+            author_siae=self.company,
+            certifiable=True,
+            criteria_kinds=[AdministrativeCriteriaKind.RSA],
+        )
         job_application = self.create_job_application(
-            with_certifiable_criteria=True,
+            eligibility_diagnosis=diagnosis,
             selected_jobs=company.jobs.all(),
             to_company=company,
         )
@@ -2804,8 +2847,14 @@ class TestProcessAcceptViews:
             "itou.utils.apis.api_particulier._request",
             return_value=rsa_certified_mocker(),
         )
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker=self.job_seeker,
+            author_siae=self.company,
+            certifiable=True,
+            criteria_kinds=[AdministrativeCriteriaKind.RSA],
+        )
         # tests for a rare case where the birthdate will be cleaned for sharing between forms during the accept process
-        job_application = self.create_job_application(with_certifiable_criteria=True)
+        job_application = self.create_job_application(eligibility_diagnosis=diagnosis)
 
         # required assumptions for the test case
         assert self.company.is_subject_to_eligibility_rules
@@ -2865,8 +2914,14 @@ class TestProcessAcceptViews:
     @freeze_time("2024-09-11")
     def test_accept_born_in_france_no_birth_place(self, client, mocker):
         birthdate = datetime.date(1995, 12, 27)
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker=self.job_seeker,
+            author_siae=self.company,
+            certifiable=True,
+            criteria_kinds=[AdministrativeCriteriaKind.RSA],
+        )
         job_application = self.create_job_application(
-            with_certifiable_criteria=True,
+            eligibility_diagnosis=diagnosis,
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
         client.force_login(job_application.to_company.members.get())
@@ -2891,8 +2946,14 @@ class TestProcessAcceptViews:
     @freeze_time("2024-09-11")
     def test_accept_born_outside_of_france_specifies_birth_place(self, client, mocker):
         birthdate = datetime.date(1995, 12, 27)
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker=self.job_seeker,
+            author_siae=self.company,
+            certifiable=True,
+            criteria_kinds=[AdministrativeCriteriaKind.RSA],
+        )
         job_application = self.create_job_application(
-            with_certifiable_criteria=True,
+            eligibility_diagnosis=diagnosis,
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
         client.force_login(job_application.to_company.members.get())

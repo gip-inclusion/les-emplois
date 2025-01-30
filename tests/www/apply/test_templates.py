@@ -7,14 +7,17 @@ from django.utils.html import escape
 from freezegun import freeze_time
 from pytest_django.asserts import assertInHTML
 
-from itou.eligibility.enums import AdministrativeCriteriaLevel
+from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel
 from itou.eligibility.tasks import certify_criteria
 from itou.job_applications.enums import Origin
 from itou.jobs.models import Appellation
 from itou.utils.context_processors import expose_enums
 from itou.utils.mocks.api_particulier import rsa_certified_mocker
 from itou.www.apply.views.list_views import JobApplicationsDisplayKind, JobApplicationsListKind
-from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
+from tests.eligibility.factories import (
+    GEIQEligibilityDiagnosisFactory,
+    IAEEligibilityDiagnosisFactory,
+)
 from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByCompanyFactory,
@@ -219,24 +222,28 @@ class TestCertifiedBadgeIae:
         for criterion in diagnosis.administrative_criteria.all():
             assert escape(criterion.name) in rendered
 
-    def test_nominal_case(self, mocker):
+    @pytest.mark.parametrize(
+        "CRITERIA_KIND,criteria_level, api_returned_payload",
+        [
+            pytest.param(
+                AdministrativeCriteriaKind.RSA, AdministrativeCriteriaLevel.LEVEL_1, rsa_certified_mocker(), id="rsa"
+            ),
+        ],
+    )
+    def test_nominal_case(self, CRITERIA_KIND, criteria_level, api_returned_payload, mocker):
         # Eligibility diagnosis made by an employer and job application not sent by an authorized prescriber.
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=rsa_certified_mocker(),
+            return_value=api_returned_payload,
         )
-        diagnosis = IAEEligibilityDiagnosisFactory(
-            job_seeker__born_in_france=True,
-            with_certifiable_criteria=True,
-            from_employer=True,
-        )
+        diagnosis = IAEEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[CRITERIA_KIND])
         certify_criteria(diagnosis)
         rendered = self.template.render(
             Context(self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": False})
         )
 
         assert "Critères administratifs" in rendered
-        assert AdministrativeCriteriaLevel.LEVEL_1.label in rendered
+        assert criteria_level.label in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
         assert self.CERTIFIED_BADGE_TEXT in rendered
 
@@ -245,19 +252,27 @@ class TestCertifiedBadgeIae:
             Context(self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": True})
         )
         assert self.ELIGIBILITY_TITLE_FROM_PRESCRIBER in rendered
-        assert AdministrativeCriteriaLevel.LEVEL_1.label not in rendered
+        assert criteria_level.label not in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
         assert self.CERTIFIED_BADGE_TEXT in rendered
 
-    def test_diag_from_prescriber(self, mocker):
+    @pytest.mark.parametrize(
+        "CRITERIA_KIND,criteria_level,api_returned_payload",
+        [
+            pytest.param(
+                AdministrativeCriteriaKind.RSA, AdministrativeCriteriaLevel.LEVEL_1, rsa_certified_mocker(), id="rsa"
+            ),
+        ],
+    )
+    def test_diag_from_prescriber(self, CRITERIA_KIND, criteria_level, api_returned_payload, mocker):
         # Diagnosis from prescriber but job application not sent by an authorized prescriber.
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=rsa_certified_mocker(),
+            return_value=api_returned_payload,
         )
         diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker__born_in_france=True,
-            with_certifiable_criteria=True,
+            criteria_kinds=[CRITERIA_KIND],
             from_prescriber=True,
         )
         certify_criteria(diagnosis)
@@ -268,7 +283,7 @@ class TestCertifiedBadgeIae:
         assert self.ELIGIBILITY_TITLE_FROM_EMPLOYER in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
         assert self.CERTIFIED_BADGE_TEXT not in rendered
-        assert AdministrativeCriteriaLevel.LEVEL_1.label in rendered
+        assert criteria_level.label in rendered
 
         # Diagnosis from prescriber and application sent by an authorized prescriber.
         rendered = self.template.render(
@@ -277,14 +292,13 @@ class TestCertifiedBadgeIae:
         assert self.ELIGIBILITY_TITLE_FROM_PRESCRIBER in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
         assert self.CERTIFIED_BADGE_TEXT not in rendered
-        assert AdministrativeCriteriaLevel.LEVEL_1.label not in rendered
+        assert criteria_level.label not in rendered
 
     def test_no_certifiable_criteria(self):
         # No certifiable criteria
         diagnosis = IAEEligibilityDiagnosisFactory(
-            job_seeker__born_in_france=True,
-            with_not_certifiable_criteria=True,
-            from_employer=True,
+            certifiable=True,
+            criteria_kinds=[AdministrativeCriteriaKind.CAP_BEP],
         )
 
         rendered = self.template.render(Context(self.default_params(diagnosis)))
@@ -317,28 +331,19 @@ class TestCertifiedBadgeIae:
         certified_help_text = "Pourquoi certains de mes critères peuvent-ils être certifiés"
         # No certifiable criteria
         diagnosis = IAEEligibilityDiagnosisFactory(
-            job_seeker__born_in_france=True,
-            with_not_certifiable_criteria=True,
-            from_employer=True,
+            certifiable=True,
+            criteria_kinds=[AdministrativeCriteriaKind.CAP_BEP],
         )
         rendered = self.template.render(Context(self.default_params(diagnosis)))
         assert certified_help_text not in rendered
 
         # Certifiable criteria, even if not certified.
-        diagnosis = IAEEligibilityDiagnosisFactory(
-            job_seeker__born_in_france=True,
-            with_certifiable_criteria=True,
-            from_employer=True,
-        )
+        diagnosis = IAEEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         rendered = self.template.render(Context(self.default_params(diagnosis)))
         assert certified_help_text in rendered
 
         # Certifiable and certified.
-        diagnosis = IAEEligibilityDiagnosisFactory(
-            job_seeker__born_in_france=True,
-            with_certifiable_criteria=True,
-            from_employer=True,
-        )
+        diagnosis = IAEEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         certify_criteria(diagnosis)
         rendered = self.template.render(Context(self.default_params(diagnosis)))
         assert certified_help_text in rendered
@@ -377,15 +382,26 @@ class TestCertifiedBadgeGEIQ:
             job_application.save()
         return job_application
 
+    @pytest.mark.parametrize(
+        "CRITERIA_KIND,api_returned_payload",
+        [
+            pytest.param(AdministrativeCriteriaKind.RSA, rsa_certified_mocker(), id="rsa"),
+        ],
+    )
     @pytest.mark.ignore_unknown_variable_template_error("request")
-    def test_diag_from_prescriber(self):
+    def test_diag_from_prescriber(self, CRITERIA_KIND, api_returned_payload, mocker):
         """
         Nominal case
         Eligibility diagnosis is from a prescriber.
         Don't display a "certified" badge.
         """
+        mocker.patch(
+            "itou.utils.apis.api_particulier._request",
+            return_value=api_returned_payload,
+        )
         diagnosis = GEIQEligibilityDiagnosisFactory(
-            with_certifiable_criteria=True,
+            job_seeker__born_in_france=True,
+            criteria_kinds=[CRITERIA_KIND],
             from_prescriber=True,
         )
         job_application = self.create_job_application(diagnosis)
@@ -395,21 +411,23 @@ class TestCertifiedBadgeGEIQ:
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
         assert self.CERTIFIED_BADGE_TEXT not in rendered
 
+    @pytest.mark.parametrize(
+        "CRITERIA_KIND,api_returned_payload",
+        [
+            pytest.param(AdministrativeCriteriaKind.RSA, rsa_certified_mocker(), id="rsa"),
+        ],
+    )
     @freeze_time("2024-10-04")
-    def test_nominal_case(self, mocker):
+    def test_nominal_case(self, CRITERIA_KIND, api_returned_payload, mocker):
         """
         Eligibility diagnosis is from an employer.
         Display a "certified" badge.
         """
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=rsa_certified_mocker(),
+            return_value=api_returned_payload,
         )
-        diagnosis = GEIQEligibilityDiagnosisFactory(
-            job_seeker__born_in_france=True,
-            with_certifiable_criteria=True,
-            from_geiq=True,
-        )
+        diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[CRITERIA_KIND])
         job_application_with_certified_criteria = self.create_job_application(diagnosis)
         certify_criteria(diagnosis)
         rendered = self.template.render(
@@ -419,18 +437,20 @@ class TestCertifiedBadgeGEIQ:
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
         assert self.CERTIFIED_BADGE_TEXT in rendered
 
+    @pytest.mark.parametrize(
+        "CRITERIA_KIND,api_returned_payload",
+        [
+            pytest.param(AdministrativeCriteriaKind.RSA, rsa_certified_mocker(), id="rsa"),
+        ],
+    )
     @freeze_time("2024-10-04")
-    def test_hiring_date_nearly_out_of_boundaries(self, mocker):
+    def test_hiring_date_nearly_out_of_boundaries(self, CRITERIA_KIND, api_returned_payload, mocker):
         # Hiring start at starts 20 days after the certification period ending.
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=rsa_certified_mocker(),
+            return_value=api_returned_payload,
         )
-        diagnosis = GEIQEligibilityDiagnosisFactory(
-            job_seeker__born_in_france=True,
-            with_certifiable_criteria=True,
-            from_geiq=True,
-        )
+        diagnosis = GEIQEligibilityDiagnosisFactory(criteria_kinds=[CRITERIA_KIND], certifiable=True)
         job_application = self.create_job_application(diagnosis, hiring_start_at=datetime.date(2024, 11, 30))
         certify_criteria(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
@@ -438,17 +458,20 @@ class TestCertifiedBadgeGEIQ:
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
         assert self.CERTIFIED_BADGE_TEXT in rendered
 
-    @freeze_time("2024-10-04")
-    def test_hiring_date_out_of_boundaries(self, mocker):
+    @pytest.mark.parametrize(
+        "CRITERIA_KIND,api_returned_payload",
+        [
+            pytest.param(AdministrativeCriteriaKind.RSA, rsa_certified_mocker(), id="rsa"),
+        ],
+    )
+    @freeze_time("2024-08-01")
+    def test_hiring_date_out_of_boundaries(self, CRITERIA_KIND, api_returned_payload, mocker):
         # Hiring start at starts more than 90 days after the certification period ending.
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=rsa_certified_mocker(),
+            return_value=api_returned_payload,
         )
-        diagnosis = GEIQEligibilityDiagnosisFactory(
-            with_certifiable_criteria=True,
-            from_geiq=True,
-        )
+        diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[CRITERIA_KIND])
         job_application = self.create_job_application(diagnosis, hiring_start_at=datetime.date(2025, 2, 28))
         certify_criteria(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
@@ -459,8 +482,8 @@ class TestCertifiedBadgeGEIQ:
     def test_no_certified_criteria(self):
         # No certified criteria
         diagnosis = GEIQEligibilityDiagnosisFactory(
-            with_not_certifiable_criteria=True,
-            from_geiq=True,
+            certifiable=True,
+            criteria_kinds=[AdministrativeCriteriaKind.CAP_BEP],
         )
         job_application = self.create_job_application(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
@@ -471,17 +494,17 @@ class TestCertifiedBadgeGEIQ:
     def test_info_box(self, mocker):
         """Information box about why some criteria are certifiable."""
         certified_help_text = "Pourquoi certains de mes critères peuvent-ils être certifiés"
-        diagnosis = GEIQEligibilityDiagnosisFactory(with_not_certifiable_criteria=True, from_geiq=True)
+        diagnosis = GEIQEligibilityDiagnosisFactory(
+            certifiable=True,
+            criteria_kinds=[AdministrativeCriteriaKind.CAP_BEP],
+        )
         # No certifiable criteria
         job_application = self.create_job_application(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
         assert certified_help_text not in rendered
 
         # Certifiable criteria but not certified.
-        diagnosis = GEIQEligibilityDiagnosisFactory(
-            with_certifiable_criteria=True,
-            from_geiq=True,
-        )
+        diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         job_application = self.create_job_application(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
         assert certified_help_text in rendered
@@ -491,10 +514,7 @@ class TestCertifiedBadgeGEIQ:
             "itou.utils.apis.api_particulier._request",
             return_value=rsa_certified_mocker(),
         )
-        diagnosis = GEIQEligibilityDiagnosisFactory(
-            with_certifiable_criteria=True,
-            from_geiq=True,
-        )
+        diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         certify_criteria(diagnosis)
         job_application = self.create_job_application(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))

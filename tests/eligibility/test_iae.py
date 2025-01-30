@@ -8,6 +8,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.eligibility.enums import (
+    CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
     AdministrativeCriteriaKind,
     AdministrativeCriteriaLevel,
     AuthorKind,
@@ -441,25 +442,29 @@ class TestEligibilityDiagnosisModel:
         "factory_params,expected",
         [
             pytest.param(
-                {"from_prescriber": True, "with_certifiable_criteria": True}, False, id="prescriber_certified_criteria"
+                {"from_prescriber": True, "criteria_kinds": [AdministrativeCriteriaKind.RSA]},
+                False,
+                id="prescriber_certified_criteria",
             ),
             pytest.param(
-                {"from_prescriber": True, "with_not_certifiable_criteria": True},
+                {"from_prescriber": True, "criteria_kinds": [AdministrativeCriteriaKind.CAP_BEP]},
                 False,
                 id="prescriber_no_certified_criteria",
             ),
             pytest.param(
-                {"from_employer": True, "with_not_certifiable_criteria": True},
+                {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.CAP_BEP]},
                 False,
                 id="employer_no_certified_criteria",
             ),
             pytest.param(
-                {"from_employer": True, "with_certifiable_criteria": True}, True, id="employer_certified_criteria"
+                {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.RSA]},
+                True,
+                id="employer_certified_criteria",
             ),
         ],
     )
     def test_criteria_can_be_certified(self, factory_params, expected):
-        diagnosis = IAEEligibilityDiagnosisFactory(**factory_params)
+        diagnosis = IAEEligibilityDiagnosisFactory(job_seeker__born_in_france=True, **factory_params)
         assert diagnosis.criteria_can_be_certified() == expected
 
 
@@ -547,19 +552,7 @@ def test_certifiable(AdministrativeCriteriaClass):
 
 
 @pytest.mark.parametrize(
-    "EligibilityDiagnosisFactory,AdministrativeCriteriaModel",
-    [
-        pytest.param(
-            partial(IAEEligibilityDiagnosisFactory, from_employer=True),
-            AdministrativeCriteria,
-            id="test_eligibility_diagnosis_certify_criteria_iae",
-        ),
-        pytest.param(
-            partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
-            GEIQAdministrativeCriteria,
-            id="test_eligibility_diagnosis_certify_criteria_geiq",
-        ),
-    ],
+    "EligibilityDiagnosisFactory", [IAEEligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory]
 )
 @pytest.mark.parametrize(
     "CRITERIA_KIND,api_returned_payload",
@@ -569,16 +562,16 @@ def test_certifiable(AdministrativeCriteriaClass):
 )
 @freeze_time("2024-09-12")
 def test_eligibility_diagnosis_certify_criteria(
-    mocker, EligibilityDiagnosisFactory, AdministrativeCriteriaModel, CRITERIA_KIND, api_returned_payload
+    mocker, EligibilityDiagnosisFactory, CRITERIA_KIND, api_returned_payload
 ):
     mocker.patch(
         "itou.utils.apis.api_particulier._request",
         return_value=api_returned_payload,
     )
     job_seeker = JobSeekerFactory(with_address=True, born_in_france=True)
-    eligibility_diagnosis = EligibilityDiagnosisFactory(job_seeker=job_seeker)
-    admin_criteria = AdministrativeCriteriaModel.objects.filter(kind=CRITERIA_KIND)
-    eligibility_diagnosis.administrative_criteria.add(*admin_criteria)
+    eligibility_diagnosis = EligibilityDiagnosisFactory(
+        job_seeker=job_seeker, certifiable=True, criteria_kinds=[CRITERIA_KIND]
+    )
     eligibility_diagnosis.certify_criteria()
 
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
@@ -609,7 +602,11 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
     RSA_ENDPOINT = f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active"
     respx_mock.get(RSA_ENDPOINT).mock(side_effect=Exception)
     job_seeker = JobSeekerFactory()  # Missing data.
-    eligibility_diagnosis = EligibilityDiagnosisFactory(with_certifiable_criteria=True, job_seeker=job_seeker)
+    eligibility_diagnosis = EligibilityDiagnosisFactory(
+        job_seeker=job_seeker,
+        certifiable=True,
+        criteria_kinds=[AdministrativeCriteriaKind.RSA],
+    )
     eligibility_diagnosis.certify_criteria()
     assert len(respx_mock.calls) == 0
 
@@ -695,8 +692,10 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
 def test_selected_administrative_criteria_certified(
     expected, response, response_status, respx_mock, EligibilityDiagnosisFactory
 ):
-    job_seeker = JobSeekerFactory(with_address=True, born_in_france=True)
-    eligibility_diagnosis = EligibilityDiagnosisFactory(with_certifiable_criteria=True, job_seeker=job_seeker)
+    eligibility_diagnosis = EligibilityDiagnosisFactory(
+        certifiable=True,
+        criteria_kinds=[AdministrativeCriteriaKind.RSA],
+    )
     respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
         response_status, json=response
     )
@@ -722,7 +721,10 @@ def test_with_is_considered_certified():
             == expected
         )
 
-    diagnosis = IAEEligibilityDiagnosisFactory(with_certifiable_criteria=True, from_employer=True)
+    diagnosis = IAEEligibilityDiagnosisFactory(
+        certifiable=True,
+        criteria_kinds=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
+    )
     for selected_criterion in diagnosis.selected_administrative_criteria.all():
         selected_criterion.certified = True
         certification_period_start = timezone.now() - datetime.timedelta(days=10)

@@ -1,5 +1,4 @@
 import datetime
-import random
 
 import factory
 from dateutil.relativedelta import relativedelta
@@ -8,17 +7,13 @@ from faker import Faker
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility import models
-from itou.eligibility.enums import AdministrativeCriteriaAnnex, AuthorKind
+from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models.common import AbstractEligibilityDiagnosisModel
+from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
+from itou.eligibility.models.iae import AdministrativeCriteria
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
-
-
-def _add_administrative_criteria(self, create, extracted, qs, **kwargs):
-    # Pick random results.
-    criteria = qs.order_by("?")[: random.randint(2, 5)]
-    self.administrative_criteria.add(*criteria)
 
 
 faker = Faker()
@@ -51,18 +46,6 @@ class AbstractEligibilityDiagnosisModelFactory(factory.django.DjangoModelFactory
     job_seeker = factory.SubFactory(JobSeekerFactory)
 
 
-def _get_geiq_certifiable_criteria(self, create, extracted, **kwargs):
-    qs = models.GEIQAdministrativeCriteria.objects.exclude(annex=AdministrativeCriteriaAnnex.NO_ANNEX).certifiable()
-    _add_administrative_criteria(self, create, extracted, qs, **kwargs)
-
-
-def _get_geiq_not_certifiable_criteria(self, create, extracted, **kwargs):
-    qs = models.GEIQAdministrativeCriteria.objects.exclude(
-        annex=AdministrativeCriteriaAnnex.NO_ANNEX
-    ).not_certifiable()
-    _add_administrative_criteria(self, create, extracted, qs, **kwargs)
-
-
 class GEIQEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
     """Same as factories below, but :
     - with all possible author types
@@ -78,18 +61,16 @@ class GEIQEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
             author_geiq=factory.SubFactory(CompanyWith2MembershipsFactory, kind=CompanyKind.GEIQ, with_jobs=True),
             author=factory.LazyAttribute(lambda obj: obj.author_geiq.members.first()),
         )
-        with_certifiable_criteria = factory.Trait(romes=factory.PostGeneration(_get_geiq_certifiable_criteria))
-        with_not_certifiable_criteria = factory.Trait(romes=factory.PostGeneration(_get_geiq_not_certifiable_criteria))
+        certifiable = factory.Trait(
+            job_seeker__born_in_france=True,
+            from_geiq=True,
+        )
 
-
-def _get_iae_certifiable_criteria(self, create, extracted, **kwargs):
-    qs = models.AdministrativeCriteria.objects.certifiable()
-    _add_administrative_criteria(self, create, extracted, qs, **kwargs)
-
-
-def _get_iae_not_certifiable_criteria(self, create, extracted, **kwargs):
-    qs = models.AdministrativeCriteria.objects.not_certifiable()
-    _add_administrative_criteria(self, create, extracted, qs, **kwargs)
+    @factory.post_generation
+    def criteria_kinds(self, create, extracted, **kwargs):
+        if create and extracted:
+            admin_criterion = GEIQAdministrativeCriteria.objects.filter(kind__in=extracted)
+            self.administrative_criteria.add(*admin_criterion)
 
 
 class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
@@ -106,5 +87,13 @@ class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
             author_prescriber_organization=None,
             author=factory.LazyAttribute(lambda obj: obj.author_siae.members.first()),
         )
-        with_certifiable_criteria = factory.Trait(romes=factory.PostGeneration(_get_iae_certifiable_criteria))
-        with_not_certifiable_criteria = factory.Trait(romes=factory.PostGeneration(_get_iae_not_certifiable_criteria))
+        certifiable = factory.Trait(
+            job_seeker__born_in_france=True,
+            from_employer=True,
+        )
+
+    @factory.post_generation
+    def criteria_kinds(self, create, extracted, **kwargs):
+        if create and extracted:
+            admin_criterion = AdministrativeCriteria.objects.filter(kind__in=extracted)
+            self.administrative_criteria.add(*admin_criterion)

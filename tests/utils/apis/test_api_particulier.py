@@ -1,14 +1,13 @@
+import pytest
 from django.conf import settings
 
 from itou.asp.models import Commune
+from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.tasks import certify_criteria
 from itou.utils.apis import api_particulier
 from itou.utils.mocks.api_particulier import rsa_data_provider_error, rsa_not_found_mocker
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.users.factories import JobSeekerFactory
-
-
-RSA_ENDPOINT = f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active"
 
 
 def test_build_params_from(snapshot):
@@ -30,28 +29,49 @@ def test_build_params_from(snapshot):
     assert params["codePaysLieuDeNaissance"][2:] == job_seeker.jobseeker_profile.birth_country.code
 
 
-def test_not_found(respx_mock):
-    respx_mock.get(RSA_ENDPOINT).respond(404, json=rsa_not_found_mocker())
-    diag = IAEEligibilityDiagnosisFactory(
-        job_seeker__born_in_france=True,
-        from_employer=True,
-        with_certifiable_criteria=True,
-    )
+@pytest.mark.parametrize(
+    "endpoint,CRITERIA_KIND,api_returned_payload",
+    [
+        pytest.param(
+            f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active",
+            AdministrativeCriteriaKind.RSA,
+            rsa_not_found_mocker(),
+            id="test_not_found_rsa",
+        ),
+    ],
+)
+def test_not_found(respx_mock, caplog, endpoint, CRITERIA_KIND, api_returned_payload):
+    respx_mock.get(endpoint).respond(404, json=api_returned_payload)
+    diag = IAEEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[CRITERIA_KIND])
     certify_criteria(diag)
     crit = diag.selected_administrative_criteria.get()
-    assert crit.data_returned_by_api == rsa_not_found_mocker()
+    assert crit.data_returned_by_api == api_returned_payload
     assert crit.certified is None
     assert crit.certification_period is None
+    assert "Dossier allocataire inexistant. Le document ne peut être édité." in caplog.text
+    assert endpoint in caplog.text
 
 
-def test_service_unavailable(respx_mock, caplog):
-    reason = "La réponse retournée par le fournisseur de données est invalide et inconnue de notre service."
-    respx_mock.get(RSA_ENDPOINT).respond(503, json=rsa_data_provider_error())
-    diag = IAEEligibilityDiagnosisFactory(
-        job_seeker__born_in_france=True,
-        from_employer=True,
-        with_certifiable_criteria=True,
-    )
+@pytest.mark.parametrize(
+    "endpoint,CRITERIA_KIND,api_returned_payload",
+    [
+        pytest.param(
+            f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active",
+            AdministrativeCriteriaKind.RSA,
+            rsa_data_provider_error(),
+            id="test_service_unavailable_rsa",
+        ),
+    ],
+)
+def test_service_unavailable(respx_mock, caplog, endpoint, CRITERIA_KIND, api_returned_payload):
+    respx_mock.get(endpoint).respond(503, json=api_returned_payload)
+    diag = IAEEligibilityDiagnosisFactory(criteria_kinds=[CRITERIA_KIND], certifiable=True)
     certify_criteria(diag)
-    assert reason in caplog.text
-    assert RSA_ENDPOINT in caplog.text
+    crit = diag.selected_administrative_criteria.get()
+    assert crit.data_returned_by_api == api_returned_payload
+    assert crit.certified is None
+    assert crit.certification_period is None
+    assert (
+        "La réponse retournée par le fournisseur de données est invalide et inconnue de notre service." in caplog.text
+    )
+    assert endpoint in caplog.text

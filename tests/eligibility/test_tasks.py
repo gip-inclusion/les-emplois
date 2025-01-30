@@ -12,33 +12,19 @@ from itou.eligibility.tasks import async_certify_criteria
 from itou.utils.mocks.api_particulier import rsa_certified_mocker
 from itou.utils.types import InclusiveDateRange
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
-from tests.users.factories import JobSeekerFactory
-
-
-def create(factory, **kwargs):
-    job_seeker = JobSeekerFactory(with_address=True, born_in_france=True)
-    return factory(with_certifiable_criteria=True, job_seeker=job_seeker, **kwargs)
-
-
-def iae_eligibility_factory():
-    return create(IAEEligibilityDiagnosisFactory, from_employer=True)
-
-
-def geiq_eligibility_factory():
-    return create(GEIQEligibilityDiagnosisFactory, from_geiq=True)
 
 
 @pytest.mark.parametrize(
     "factory",
     [
-        pytest.param(iae_eligibility_factory, id="iae"),
-        pytest.param(geiq_eligibility_factory, id="geiq"),
+        pytest.param(IAEEligibilityDiagnosisFactory, id="iae"),
+        pytest.param(GEIQEligibilityDiagnosisFactory, id="geiq"),
     ],
 )
 class TestCertifyCriteria:
     @freeze_time("2025-01-06")
     def test_queue_task(self, factory, respx_mock):
-        eligibility_diagnosis = factory()
+        eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
             json=rsa_certified_mocker()
         )
@@ -60,7 +46,7 @@ class TestCertifyCriteria:
 
     def test_retry_task_rate_limits(self, factory, respx_mock):
         with freeze_time("2024-09-12T00:00:00Z"):
-            eligibility_diagnosis = factory()
+            eligibility_diagnosis = factory(criteria_kinds=[AdministrativeCriteriaKind.RSA], certifiable=True)
             respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").mock(
                 return_value=httpx.Response(429, headers={"Retry-After": "1"}, json={}),
             )
@@ -88,14 +74,14 @@ class TestCertifyCriteria:
         ],
     )
     def test_retry_task_on_http_error(self, data, exception, factory, respx_mock):
-        eligibility_diagnosis = factory()
+        eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(500, **data)
         with pytest.raises(exception):
             async_certify_criteria.call_local(eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk)
         # Huey catches the exception and retries the task.
 
     def test_no_retry_on_exception(self, caplog, factory, respx_mock):
-        eligibility_diagnosis = factory()
+        eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").mock(
             side_effect=TypeError("Programming error")
         )
