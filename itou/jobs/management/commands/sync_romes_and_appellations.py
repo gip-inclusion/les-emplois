@@ -38,7 +38,7 @@ class Command(BaseCommand):
 
         romes_data = pe_client.referentiel(pe_api_enums.REFERENTIEL_ROME)
         for item in yield_sync_diff(romes_data, "code", Rome.objects.all(), "code", [("libelle", "name")]):
-            self.stdout.write(item.label)
+            self.logger.info(item.label)
 
         if wet_run:
             romes = [pe_data_to_rome(item, now) for item in romes_data]
@@ -49,13 +49,13 @@ class Command(BaseCommand):
                 update_fields=("name", "updated_at"),
                 unique_fields=("code",),
             )
-            self.stdout.write(f"len={len(romes)} ROME entries have been created or updated.")
+            self.logger.info("len=%d ROME entries have been created or updated.", len(romes))
 
         appellations_data = pe_client.appellations()
         for item in yield_sync_diff(
             appellations_data, "code", Appellation.objects.all(), "code", [("libelle", "name")]
         ):
-            self.stdout.write(item.label)
+            self.logger.info(item.label)
 
         if wet_run:
             appellations = [pe_data_to_appellation(item, now) for item in appellations_data]
@@ -66,4 +66,4 @@ class Command(BaseCommand):
                 update_fields=("name", "updated_at", "rome_id"),
                 unique_fields=("code",),
             )
-            self.stdout.write(f"len={len(appellations)} Appellation entries have been created or updated.")
+            self.logger.info("len=%d Appellation entries have been created or updated.", len(appellations))
