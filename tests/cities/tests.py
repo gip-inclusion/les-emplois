@@ -16,7 +16,7 @@ def test_create_test_cities():
     assert City.objects.filter(department="93").count() == 10
 
 
-def test_sync_cities(settings, capsys, respx_mock):
+def test_sync_cities(settings, caplog, respx_mock):
     settings.API_GEO_BASE_URL = "https://geo.foo"
     respx_mock.get(
         "https://geo.foo/communes?fields=nom,code,codesPostaux,codeDepartement,codeRegion,centre&format=json"
@@ -82,9 +82,16 @@ def test_sync_cities(settings, capsys, respx_mock):
     City.objects.update(edition_mode=EditionModeChoices.AUTO)
 
     management.call_command("sync_cities", wet_run=True)
-    stdout, stderr = capsys.readouterr()
-    assert stderr == ""
-    assert stdout.splitlines() == [
+    assert caplog.messages[:-1] == [
+        (
+            "HTTP Request: GET https://geo.foo/communes"
+            '?fields=nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2CcodeRegion%2Ccentre&format=json "HTTP/1.1 200 OK"'
+        ),
+        (
+            "HTTP Request: GET https://geo.foo/communes?fields="
+            "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2CcodeRegion%2Ccentre&format=json"
+            '&type=arrondissement-municipal "HTTP/1.1 200 OK"'
+        ),
         "count=1 label=City had the same key in collection and queryset",
         "\tCHANGED name=Nouveau Nom de Ville changed to value=L'Abergement-Clémenciat",
         "\tCHANGED post_codes=['01234'] changed to value=['01234', '01400']",
@@ -101,10 +108,13 @@ def test_sync_cities(settings, capsys, respx_mock):
         '"codesPostaux": ["13002"], "nom": "Marseille 2e"}',
         "count=1 label=City removed by collection",
         "\tREMOVED Guérande (44)",
-        "> successfully deleted count=1 cities insee_codes={'44350'}",
-        "> successfully created count=3 new cities",
-        "> successfully updated count=1 cities",
+        "successfully deleted count=1 cities insee_codes={'44350'}",
+        "successfully created count=3 new cities",
+        "successfully updated count=1 cities",
     ]
+    assert caplog.messages[-1].startswith(
+        "Management command itou.cities.management.commands.sync_cities succeeded in"
+    )
 
     # Introduce a "bogus" item in the regular (non arrondissement) cities:
     # - "new" city in respect to its non-registered INSEE code yet
@@ -136,26 +146,37 @@ def test_sync_cities(settings, capsys, respx_mock):
 
     # Introduce a change in one of the arrondissements: the change is now permanent
     # and any new automatic sync update to it will be skipped.
+    caplog.clear()
     marseille_1er = City.objects.get(slug="marseille-1er-13")
     marseille_1er.name = "Marssssssssseillle bébé"
     marseille_1er.save()
 
     management.call_command("sync_cities", wet_run=True)
-    stdout, stderr = capsys.readouterr()
-    assert stderr == ""
-    assert stdout.splitlines() == [
+    assert caplog.messages[:-1] == [
+        (
+            "HTTP Request: GET https://geo.foo/communes"
+            '?fields=nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2CcodeRegion%2Ccentre&format=json "HTTP/1.1 200 OK"'
+        ),
+        (
+            "HTTP Request: GET https://geo.foo/communes?fields="
+            "nom%2Ccode%2CcodesPostaux%2CcodeDepartement%2CcodeRegion%2Ccentre&format=json"
+            '&type=arrondissement-municipal "HTTP/1.1 200 OK"'
+        ),
         "count=3 label=City had the same key in collection and queryset",
-        "! skipping manually edited city=Marssssssssseillle bébé (13) from update",
+        "skipping manually edited city=Marssssssssseillle bébé (13) from update",
         "count=1 label=City added by collection",
         '\tADDED {"centre": {"coordinates": [4.9306, 46.1517], "type": "Point"}, '
         '"code": "01003", "codeDepartement": "01", "codeRegion": "84", '
         '"codesPostaux": ["01400"], "nom": "L\'Abergement-de-Varey"}',
         "count=1 label=City removed by collection",
         "\tREMOVED L'Abergement-de-Varey (01)",
-        "> successfully deleted count=1 cities insee_codes={'01002'}",
-        "> successfully created count=1 new cities",
-        "> successfully updated count=0 cities",  # no update to post codes
+        "successfully deleted count=1 cities insee_codes={'01002'}",
+        "successfully created count=1 new cities",
+        "successfully updated count=0 cities",  # no update to post codes
     ]
+    assert caplog.messages[-1].startswith(
+        "Management command itou.cities.management.commands.sync_cities succeeded in"
+    )
 
     assertQuerySetEqual(
         City.objects.all().order_by("code_insee"),

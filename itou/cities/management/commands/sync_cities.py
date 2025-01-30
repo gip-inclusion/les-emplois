@@ -82,14 +82,14 @@ class Command(BaseCommand):
             elif item.kind == DiffItemKind.EDITION:
                 db_city = item.db_obj
                 if db_city.edition_mode != EditionModeChoices.AUTO:
-                    self.stdout.write(f"! skipping manually edited city={db_city} from update")
+                    self.logger.warning("skipping manually edited city=%s from update", db_city)
                     continue
                 city = api_city_to_db_city(item.raw)
                 city.pk = db_city.pk
                 cities_updated_by_api.append(city)
             elif item.kind == DiffItemKind.DELETION:
                 cities_removed_by_api.add(item.key)
-            self.stdout.write(item.label)
+            self.logger.info(item.label)
 
         if wet_run:
             with transaction.atomic():
@@ -97,10 +97,10 @@ class Command(BaseCommand):
                 # a City that is linked to one of our JobDescriptions would suddenly disappear. Handle that
                 # case as it happens, by "deactivating" the city by instance: the cron would crash.
                 n_objs, _ = City.objects.filter(code_insee__in=cities_removed_by_api).delete()
-                self.stdout.write(f"> successfully deleted count={n_objs} cities insee_codes={cities_removed_by_api}")
+                self.logger.info("successfully deleted count=%d cities insee_codes=%s", n_objs, cities_removed_by_api)
 
                 objs = City.objects.bulk_create(cities_added_by_api)
-                self.stdout.write(f"> successfully created count={len(objs)} new cities")
+                self.logger.info("successfully created count=%d new cities", len(objs))
 
                 n_objs = City.objects.bulk_update(
                     cities_updated_by_api,
@@ -114,4 +114,4 @@ class Command(BaseCommand):
                     ],
                     batch_size=1000,
                 )
-                self.stdout.write(f"> successfully updated count={n_objs} cities")
+                self.logger.info("successfully updated count=%d cities", n_objs)
