@@ -29,6 +29,7 @@ from itou.eligibility.models import (
     GEIQAdministrativeCriteria,
     GEIQEligibilityDiagnosis,
 )
+from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
@@ -502,6 +503,9 @@ class TestApplyAsJobSeeker:
         # + 1 in mobile header
         # + 1 in the page content
         assertContains(response, reverse("dashboard:edit_user_info"), count=3)
+
+        # GPS : a job seeker must not follow himself
+        assert not FollowUpGroup.objects.exists()
 
     def test_apply_as_job_seeker_temporary_nir(self, client):
         """
@@ -1374,6 +1378,14 @@ class TestApplyAsAuthorizedPrescriber:
         response = client.get(next_url)
         assert response.status_code == 200
 
+        # Check GPS group
+        # ----------------------------------------------------------------------
+        group = FollowUpGroup.objects.get()
+        assert group.beneficiary == new_job_seeker
+        membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
+        assert membership.member == user
+        assert membership.creator == user
+
     def test_cannot_create_job_seeker_with_pole_emploi_email(self, client):
         company = CompanyMembershipFactory().company
 
@@ -1844,6 +1856,14 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assert response.status_code == 200
+
+        # Check GPS group
+        # ----------------------------------------------------------------------
+        group = FollowUpGroup.objects.get()
+        assert group.beneficiary == new_job_seeker
+        membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
+        assert membership.member == user
+        assert membership.creator == user
 
     def test_check_info_as_prescriber_for_job_seeker_with_incomplete_info(self, client):
         company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
@@ -2414,6 +2434,14 @@ class TestApplyAsCompany:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assert response.status_code == 200
+
+        # Check GPS group
+        # ----------------------------------------------------------------------
+        group = FollowUpGroup.objects.get()
+        assert group.beneficiary == new_job_seeker
+        membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
+        assert membership.member == user
+        assert membership.creator == user
 
     @pytest.mark.ignore_unknown_variable_template_error("confirmation_needed", "job_seeker")
     def test_apply_as_employer(self, client, pdf_file):

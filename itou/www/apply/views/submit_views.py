@@ -17,6 +17,7 @@ from itou.companies.models import Company, JobDescription
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.files.models import File
+from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -662,6 +663,10 @@ class ApplicationResumeView(RequireApplySessionMixin, ApplicationBaseView):
         job_application.selected_jobs.set(selected_jobs)
         # The job application is now saved in DB, delete the session early to avoid any problems
         self.apply_session.delete()
+
+        if self.request.user.kind in [UserKind.EMPLOYER, UserKind.PRESCRIBER]:
+            # New job application -> sync GPS groups if the sender is not a jobseeker
+            FollowUpGroup.objects.follow_beneficiary(self.job_seeker, self.request.user)
 
         try:
             # Send notifications
