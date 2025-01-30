@@ -80,7 +80,7 @@ class TestMembers:
         guest = institution.members.filter(institutionmembership__is_admin=False).first()
 
         client.force_login(admin)
-        url = reverse("institutions_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
+        url = reverse("institutions_views:update_admin_role", kwargs={"action": "add", "public_id": guest.public_id})
 
         # Redirection to confirm page
         response = client.get(url)
@@ -131,7 +131,9 @@ class TestMembers:
         assert guest in institution.active_admin_members
 
         client.force_login(admin)
-        url = reverse("institutions_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
+        url = reverse(
+            "institutions_views:update_admin_role", kwargs={"action": "remove", "public_id": guest.public_id}
+        )
 
         # Redirection to confirm page
         response = client.get(url)

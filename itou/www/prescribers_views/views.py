@@ -72,9 +72,9 @@ def member_list(request, template_name="prescribers/members.html"):
     return render(request, template_name, context)
 
 
-def deactivate_member(request, user_id, template_name="prescribers/deactivate_member.html"):
+def deactivate_member(request, public_id, template_name="prescribers/deactivate_member.html"):
     organization = get_current_org_or_404(request)
-    target_member = User.objects.get(pk=user_id)
+    target_member = User.objects.get(public_id=public_id)
 
     if deactivate_org_member(request=request, target_member=target_member):
         return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))
@@ -87,9 +87,9 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
     return render(request, template_name, context)
 
 
-def update_admin_role(request, action, user_id, template_name="prescribers/update_admins.html"):
+def update_admin_role(request, action, public_id, template_name="prescribers/update_admins.html"):
     organization = get_current_org_or_404(request)
-    target_member = User.objects.get(pk=user_id)
+    target_member = User.objects.get(public_id=public_id)
 
     if update_org_admin_role(request=request, target_member=target_member, action=action):
         return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))

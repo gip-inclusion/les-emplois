@@ -85,7 +85,7 @@ class TestUserMembershipDeactivation:
         membership = memberships.first()
 
         client.force_login(admin)
-        url = reverse("companies_views:deactivate_member", kwargs={"user_id": admin.id})
+        url = reverse("companies_views:deactivate_member", kwargs={"public_id": admin.public_id})
         response = client.post(url)
         assert response.status_code == 403
 
@@ -108,7 +108,7 @@ class TestUserMembershipDeactivation:
         assert admin in company.active_admin_members
 
         client.force_login(admin)
-        url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("companies_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
 
@@ -134,7 +134,7 @@ class TestUserMembershipDeactivation:
         company = CompanyWith2MembershipsFactory()
         guest = company.members.filter(companymembership__is_admin=False).first()
         client.force_login(guest)
-        url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("companies_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 403
 
@@ -149,7 +149,7 @@ class TestUserMembershipDeactivation:
         guest = company.members.filter(companymembership__is_admin=False).first()
 
         client.force_login(admin)
-        url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("companies_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
         client.logout()
@@ -178,7 +178,7 @@ class TestUserMembershipDeactivation:
 
         # Admin remove guest from structure
         client.force_login(admin)
-        url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("companies_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
         client.logout()
@@ -205,7 +205,7 @@ class TestCompanyAdminMembersManagement:
         guest = company.members.filter(companymembership__is_admin=False).first()
 
         client.force_login(admin)
-        url = reverse("companies_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
+        url = reverse("companies_views:update_admin_role", kwargs={"action": "add", "public_id": guest.public_id})
 
         # Redirection to confirm page
         response = client.get(url)
@@ -232,7 +232,7 @@ class TestCompanyAdminMembersManagement:
         assert guest in company.active_admin_members
 
         client.force_login(admin)
-        url = reverse("companies_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
+        url = reverse("companies_views:update_admin_role", kwargs={"action": "remove", "public_id": guest.public_id})
 
         # Redirection to confirm page
         response = client.get(url)
@@ -254,7 +254,7 @@ class TestCompanyAdminMembersManagement:
         guest = company.members.filter(companymembership__is_admin=False).first()
 
         client.force_login(guest)
-        url = reverse("companies_views:update_admin_role", kwargs={"action": "remove", "user_id": admin.id})
+        url = reverse("companies_views:update_admin_role", kwargs={"action": "remove", "public_id": admin.public_id})
 
         # Redirection to confirm page
         response = client.get(url)
@@ -265,7 +265,7 @@ class TestCompanyAdminMembersManagement:
         assert response.status_code == 403
 
         # Add self as admin with no privilege
-        url = reverse("companies_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
+        url = reverse("companies_views:update_admin_role", kwargs={"action": "add", "public_id": guest.public_id})
 
         response = client.get(url)
         assert response.status_code == 403
@@ -285,4 +285,6 @@ class TestCompanyAdminMembersManagement:
         client.force_login(guest)
         # update: less test with RE_PATH
         with pytest.raises(NoReverseMatch):
-            reverse("companies_views:update_admin_role", kwargs={"action": suspicious_action, "user_id": admin.id})
+            reverse(
+                "companies_views:update_admin_role", kwargs={"action": suspicious_action, "public_id": admin.public_id}
+            )
