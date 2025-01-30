@@ -19,6 +19,7 @@ from itou.eligibility.models.common import (
     AdministrativeCriteriaQuerySet,
 )
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
+from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.utils.mocks.api_particulier import (
     rsa_certified_mocker,
     rsa_not_certified_mocker,
@@ -276,6 +277,14 @@ class TestEligibilityDiagnosisModel:
         assert diagnosis.administrative_criteria.count() == 0
         assert diagnosis.expires_at == datetime.date(2025, 3, 5)
 
+        # Check GPS group
+        # ----------------------------------------------------------------------
+        group = FollowUpGroup.objects.get()
+        assert group.beneficiary == job_seeker
+        membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
+        assert membership.member == user
+        assert membership.creator == user
+
     @freeze_time("2024-12-03")
     def test_create_diagnosis_prescriber(self):
         job_seeker = JobSeekerFactory()
@@ -295,6 +304,14 @@ class TestEligibilityDiagnosisModel:
         assert diagnosis.author_prescriber_organization == organization
         assert diagnosis.administrative_criteria.count() == 0
         assert diagnosis.expires_at == datetime.date(2025, 6, 3)
+
+        # Check GPS group
+        # ----------------------------------------------------------------------
+        group = FollowUpGroup.objects.get()
+        assert group.beneficiary == job_seeker
+        membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
+        assert membership.member == prescriber
+        assert membership.creator == prescriber
 
     def test_create_diagnosis_with_administrative_criteria(self):
         job_seeker = JobSeekerFactory()
