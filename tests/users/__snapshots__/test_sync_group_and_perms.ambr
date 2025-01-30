@@ -169,6 +169,17 @@
     'view_user',
   ])
 # ---
+# name: test_command[logs]
+  list([
+    'group name=gps-admin created',
+    'group name=gps-admin-readonly created',
+    'group name=itou-admin created',
+    'group name=itou-admin-readonly created',
+    'group name=pilotage-admin created',
+    'group name=pilotage-admin-readonly created',
+    'All done!',
+  ])
+# ---
 # name: test_command[pilotage-admin-readonly]
   list([
     'view_statsdashboardvisit',
@@ -211,16 +222,4 @@
     'hijack_user',
     'view_user',
   ])
-# ---
-# name: test_command[stdout]
-  '''
-  group name=gps-admin created
-  group name=gps-admin-readonly created
-  group name=itou-admin created
-  group name=itou-admin-readonly created
-  group name=pilotage-admin created
-  group name=pilotage-admin-readonly created
-  All done!
-  
-  '''
 # ---
