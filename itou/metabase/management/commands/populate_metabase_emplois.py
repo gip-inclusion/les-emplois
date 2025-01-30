@@ -466,7 +466,7 @@ class Command(BaseCommand):
 
     def populate_departments(self):
         table_name = "departements"
-        self.stdout.write(f"Preparing content for {table_name} table...")
+        self.logger.info("Preparing content for %s table...", table_name)
 
         rows = []
         for dpt_code, dpt_name in DEPARTMENTS.items():
@@ -493,7 +493,7 @@ class Command(BaseCommand):
             RefusalReason: "c1_ref_motif_de_refus",
         }
         for enum, table_name in enum_to_table.items():
-            self.stdout.write(f"Preparing content for {table_name} table...")
+            self.logger.info("Preparing content for %s table...", table_name)
             rows = [OrderedDict(code=str(item), label=item.label) for item in enum]
             df = get_df_from_rows(rows)
             store_df(df=df, table_name=table_name)
@@ -532,9 +532,9 @@ class Command(BaseCommand):
         fatal errors after having completed its job.
         """
         fatal_errors = 0
-        self.stdout.write("Checking data for inconsistencies.")
+        self.logger.info("Checking data for inconsistencies.")
         if Approval.objects.exclude(user__kind=UserKind.JOB_SEEKER).exists():
-            self.stdout.write("FATAL ERROR: At least one user has an approval but is not a job seeker")
+            self.logger.error("FATAL ERROR: At least one user has an approval but is not a job seeker")
             fatal_errors += 1
 
         if fatal_errors >= 1:

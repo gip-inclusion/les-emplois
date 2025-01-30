@@ -1,5 +1,9 @@
+import logging
 from functools import wraps
 from time import perf_counter
+
+
+logger = logging.getLogger(__name__)
 
 
 class Sentinel:
@@ -23,7 +27,7 @@ def timeit(f):
     def wrap(*args, **kw):
         ts = perf_counter()
         result = f(*args, **kw)
-        print(f"timeit: method={f.__name__} completed in seconds={perf_counter() - ts:.2f}")
+        logger.info("timeit: method=%s completed in seconds=%.2f", f.__name__, perf_counter() - ts)
         return result
 
     return wrap
