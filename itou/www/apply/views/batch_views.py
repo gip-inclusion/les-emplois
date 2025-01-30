@@ -180,14 +180,11 @@ class RefuseViewStep(enum.StrEnum):
     do_not_call_in_templates = enum.nonmember(True)
 
 
-@check_user(lambda user: user.is_employer)
-@require_POST
-def refuse(request):
-    next_url = get_safe_url(request, "next_url")
+def _start_refuse_wizard(request, *, application_ids, next_url):
     if next_url is None:
         # This is somewhat extreme but will force developpers to always provide a proper next_url
         raise Http404
-    applications = _get_and_lock_received_applications(request, request.POST.getlist("application_ids"), lock=False)
+    applications = _get_and_lock_received_applications(request, application_ids, lock=False)
     application_ids = []
     for job_application in applications:
         if job_application.refuse.is_available():
@@ -215,6 +212,14 @@ def refuse(request):
         reverse(
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session.name, "step": RefuseViewStep.REASON}
         )
+    )
+
+
+@check_user(lambda user: user.is_employer)
+@require_POST
+def refuse(request):
+    return _start_refuse_wizard(
+        request, application_ids=request.POST.getlist("application_ids"), next_url=get_safe_url(request, "next_url")
     )
 
 
