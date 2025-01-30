@@ -243,7 +243,8 @@
                  "users_jobseekerprofile"."hexa_post_code",
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
-                 "users_jobseekerprofile"."pe_last_certification_attempt_at"
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
@@ -541,7 +542,8 @@
                  "users_jobseekerprofile"."hexa_post_code",
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
-                 "users_jobseekerprofile"."pe_last_certification_attempt_at"
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s

@@ -765,6 +765,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
         "birth_place",
         "birth_country",
         "hexa_commune",
+        "created_by_prescriber_organization",
     )
 
     list_display = (
@@ -817,6 +818,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
                     "is_pe_certified",
                     "pe_obfuscated_nir",
                     "pe_last_certification_attempt_at",
+                    "created_by_prescriber_organization",
                     "disabled_notifications",
                 )
             },
