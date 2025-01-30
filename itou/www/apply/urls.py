@@ -137,13 +137,13 @@ urlpatterns = [
     ),
     path(
         "<uuid:job_application_id>/siae/refuse",
-        process_views.JobApplicationRefuseView.as_view(url_name="refuse"),
+        process_views.start_refuse_wizard,
         name="refuse",
     ),
+    # TODO(xfernandez): remove this path in a week
     path(
         "<uuid:job_application_id>/siae/refuse/<slug:step>",
         process_views.JobApplicationRefuseView.as_view(url_name="refuse"),
-        name="refuse",
     ),
     path("<uuid:job_application_id>/siae/postpone", process_views.postpone, name="postpone"),
     path("<uuid:job_application_id>/siae/accept", process_views.accept, name="accept"),

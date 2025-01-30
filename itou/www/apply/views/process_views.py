@@ -378,6 +378,17 @@ def process(request, job_application_id):
     return HttpResponseRedirect(next_url)
 
 
+@check_user(lambda user: user.is_employer)
+def start_refuse_wizard(request, job_application_id):
+    from itou.www.apply.views.batch_views import _start_refuse_wizard
+
+    return _start_refuse_wizard(
+        request,
+        application_ids=[job_application_id],
+        next_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application_id}),
+    )
+
+
 def _show_prescriber_answer_form(wizard):
     return wizard.job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER
 
