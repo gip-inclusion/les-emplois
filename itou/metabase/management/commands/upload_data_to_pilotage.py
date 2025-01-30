@@ -41,7 +41,7 @@ class Command(BaseCommand):
                 bytes_transferred += chunk_size
                 progress = int((bytes_transferred / file_size) * 100)
                 if progress > previous_progress and progress % 5 == 0:
-                    self.stdout.write(
+                    self.logger.info(
                         f"> {file.name}: {filesizeformat(bytes_transferred)}/{filesizeformat(file_size)} transferred ({progress}%)."  # noqa: E501
                     )
                     previous_progress = progress
@@ -65,14 +65,14 @@ class Command(BaseCommand):
             datastore_files.update(
                 metadata["Key"].replace(self.DATASTORE_DIRECTORY, "") for metadata in response["Contents"]
             )
-        self.stdout.write(f"Files in datastore's {self.DATASTORE_DIRECTORY!r}: {sorted(datastore_files)}")
+        self.logger.info(f"Files in datastore's {self.DATASTORE_DIRECTORY!r}: {sorted(datastore_files)}")
 
         local_files = set(file.name for file in directory.glob(f"{self.FILENAME_PREFIX}*.tar.gz"))
-        self.stdout.write(f"Files in local's {directory.name!r}: {sorted(local_files)}")
+        self.logger.info(f"Files in local's {directory.name!r}: {sorted(local_files)}")
 
         files_to_upload = local_files - datastore_files
-        self.stdout.write(f"Files to upload: {sorted(files_to_upload)}")
+        self.logger.info(f"Files to upload: {sorted(files_to_upload)}")
 
         for filename in files_to_upload:
-            self.stdout.write(f"Uploading {filename!r}...")
+            self.logger.info(f"Uploading {filename!r}...")
             self._upload_file(directory / filename, wet_run=wet_run)

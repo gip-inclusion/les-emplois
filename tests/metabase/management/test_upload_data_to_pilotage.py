@@ -1,5 +1,3 @@
-import io
-
 import pytest
 from django.core.management import call_command
 from django.utils import timezone
@@ -8,12 +6,13 @@ from itou.utils.storage.s3 import pilotage_s3_client
 
 
 @pytest.mark.usefixtures("temporary_bucket")
-def test_command_call(tmp_path, snapshot):
+def test_command_call(tmp_path, snapshot, caplog):
     tmp_path.joinpath("fluxIAE_ITOU_.tar.gz").write_bytes(b"Hello World")
-    stdout = io.StringIO()
-
-    call_command("upload_data_to_pilotage", tmp_path.as_posix(), "--wet-run", stdout=stdout)
-    assert stdout.getvalue() == snapshot
+    call_command("upload_data_to_pilotage", tmp_path.as_posix(), "--wet-run")
+    assert caplog.messages[:-1] == snapshot
+    assert caplog.messages[-1].startswith(
+        "Management command itou.metabase.management.commands.upload_data_to_pilotage succeeded in"
+    )
 
 
 @pytest.mark.usefixtures("temporary_bucket")
