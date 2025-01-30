@@ -30,6 +30,8 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
+    geiq_eligibility_with_criteria_factory,
+    iae_eligibility_with_criteria_factory,
 )
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
@@ -438,28 +440,36 @@ class TestEligibilityDiagnosisModel:
         assert diagnosis.is_considered_valid
 
     @pytest.mark.parametrize(
-        "factory_params,expected",
+        "factory_params,CRITERIA_KIND,expected",
         [
             pytest.param(
-                {"from_prescriber": True, "with_certifiable_criteria": True}, False, id="prescriber_certified_criteria"
+                {"from_prescriber": True}, AdministrativeCriteriaKind.RSA, False, id="prescriber_certified_criteria"
             ),
             pytest.param(
-                {"from_prescriber": True, "with_not_certifiable_criteria": True},
+                {"from_prescriber": True},
+                AdministrativeCriteriaKind.CAP_BEP,
                 False,
                 id="prescriber_no_certified_criteria",
             ),
             pytest.param(
-                {"from_employer": True, "with_not_certifiable_criteria": True},
+                {"from_employer": True},
+                AdministrativeCriteriaKind.CAP_BEP,
                 False,
                 id="employer_no_certified_criteria",
             ),
             pytest.param(
-                {"from_employer": True, "with_certifiable_criteria": True}, True, id="employer_certified_criteria"
+                {"from_employer": True}, AdministrativeCriteriaKind.RSA, True, id="employer_certified_criteria"
             ),
         ],
     )
-    def test_criteria_can_be_certified(self, factory_params, expected):
-        diagnosis = IAEEligibilityDiagnosisFactory(**factory_params)
+    def test_criteria_can_be_certified(self, factory_params, CRITERIA_KIND, expected):
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker__with_address=True,
+            job_seeker__born_in_france=True,
+            with_criteria_kind=True,
+            with_criteria_kind__criteria_kind=CRITERIA_KIND,
+            **factory_params,
+        )
         assert diagnosis.criteria_can_be_certified() == expected
 
 
@@ -598,33 +608,37 @@ def test_eligibility_diagnosis_certify_criteria(
 
 
 @pytest.mark.parametrize(
-    "EligibilityDiagnosisFactory",
+    "eligibility_diagnosis_factory",
     [
-        pytest.param(
-            partial(IAEEligibilityDiagnosisFactory, from_employer=True),
-            id="test_selected_administrative_criteria_certify_iae",
-        ),
-        pytest.param(
-            partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
-            id="test_selected_administrative_criteria_certify_geiq",
-        ),
+        iae_eligibility_with_criteria_factory,
+        geiq_eligibility_with_criteria_factory,
     ],
 )
-def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, EligibilityDiagnosisFactory):
+@pytest.mark.parametrize(
+    "CRITERIA_KIND",
+    [
+        AdministrativeCriteriaKind.RSA,
+        AdministrativeCriteriaKind.AAH,
+    ],
+)
+def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, CRITERIA_KIND, eligibility_diagnosis_factory):
     RSA_ENDPOINT = f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active"
     respx_mock.get(RSA_ENDPOINT).mock(side_effect=Exception)
     job_seeker = JobSeekerFactory()  # Missing data.
-    eligibility_diagnosis = EligibilityDiagnosisFactory(with_certifiable_criteria=True, job_seeker=job_seeker)
+    eligibility_diagnosis = eligibility_diagnosis_factory(
+        criteria_kind=CRITERIA_KIND,
+    )
+    eligibility_diagnosis.job_seeker = job_seeker
     eligibility_diagnosis.certify_criteria()
     assert len(respx_mock.calls) == 0
 
 
 @freeze_time("2024-09-12T00:00:00Z")
 @pytest.mark.parametrize(
-    "EligibilityDiagnosisFactory,expected,response_status,response",
+    "eligibility_diagnosis_factory,expected,response_status,response",
     [
         pytest.param(
-            partial(IAEEligibilityDiagnosisFactory, from_employer=True),
+            iae_eligibility_with_criteria_factory,
             {
                 "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13)),
                 "certified": True,
@@ -636,7 +650,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
             id="iae-certified",
         ),
         pytest.param(
-            partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            geiq_eligibility_with_criteria_factory,
             {
                 "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13)),
                 "certified": True,
@@ -648,7 +662,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
             id="geiq-certified",
         ),
         pytest.param(
-            partial(IAEEligibilityDiagnosisFactory, from_employer=True),
+            iae_eligibility_with_criteria_factory,
             {
                 "certification_period": None,
                 "certified": False,
@@ -660,7 +674,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
             id="iae-not-certified",
         ),
         pytest.param(
-            partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            geiq_eligibility_with_criteria_factory,
             {
                 "certification_period": None,
                 "certified": False,
@@ -672,7 +686,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
             id="geiq-not-certified",
         ),
         pytest.param(
-            partial(IAEEligibilityDiagnosisFactory, from_employer=True),
+            iae_eligibility_with_criteria_factory,
             {
                 "certification_period": None,
                 "certified": None,
@@ -684,7 +698,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
             id="iae-not-found",
         ),
         pytest.param(
-            partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            geiq_eligibility_with_criteria_factory,
             {
                 "certification_period": None,
                 "certified": None,
@@ -698,10 +712,9 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
     ],
 )
 def test_selected_administrative_criteria_certified(
-    expected, response, response_status, respx_mock, EligibilityDiagnosisFactory
+    expected, response, response_status, respx_mock, eligibility_diagnosis_factory
 ):
-    job_seeker = JobSeekerFactory(with_address=True, born_in_france=True)
-    eligibility_diagnosis = EligibilityDiagnosisFactory(with_certifiable_criteria=True, job_seeker=job_seeker)
+    eligibility_diagnosis = eligibility_diagnosis_factory(criteria_kind=AdministrativeCriteriaKind.RSA)
     respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
         response_status, json=response
     )
@@ -718,7 +731,14 @@ def test_selected_administrative_criteria_certified(
     assert len(respx_mock.calls) == 1
 
 
-def test_with_is_considered_certified():
+@pytest.mark.parametrize(
+    "CRITERIA_KIND",
+    [
+        AdministrativeCriteriaKind.RSA,
+        AdministrativeCriteriaKind.AAH,
+    ],
+)
+def test_with_is_considered_certified(CRITERIA_KIND):
     def assert_considered_valid_count(hiring_start_at, expected):
         assert (
             diagnosis.selected_administrative_criteria.with_is_considered_certified(hiring_start_at)
@@ -727,7 +747,11 @@ def test_with_is_considered_certified():
             == expected
         )
 
-    diagnosis = IAEEligibilityDiagnosisFactory(with_certifiable_criteria=True, from_employer=True)
+    # 2 selected criteria in total.
+    diagnosis = iae_eligibility_with_criteria_factory(criteria_kind=CRITERIA_KIND)
+    admin_criterion = AdministrativeCriteria.objects.get(kind=CRITERIA_KIND)
+    diagnosis.administrative_criteria.add(admin_criterion)
+
     for selected_criterion in diagnosis.selected_administrative_criteria.all():
         selected_criterion.certified = True
         certification_period_start = timezone.now() - datetime.timedelta(days=10)

@@ -5,7 +5,7 @@ from django.db import IntegrityError, transaction
 from django.db.models import Max
 
 from itou.companies.enums import CompanyKind
-from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel
+from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaKind, AdministrativeCriteriaLevel
 from itou.eligibility.models import GEIQAdministrativeCriteria, GEIQEligibilityDiagnosis
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
@@ -456,24 +456,32 @@ def test_administrativecriteria_level_annex_consistency():
 
 
 @pytest.mark.parametrize(
-    "factory_params,expected",
+    "factory_params,CRITERIA_KIND,expected",
     [
         pytest.param(
-            {"from_prescriber": True, "with_certifiable_criteria": True}, False, id="prescriber_certified_criteria"
+            {"from_prescriber": True}, AdministrativeCriteriaKind.RSA, False, id="prescriber_certified_criteria"
         ),
         pytest.param(
-            {"from_prescriber": True, "with_not_certifiable_criteria": True},
+            {"from_prescriber": True},
+            AdministrativeCriteriaKind.CAP_BEP,
             False,
             id="prescriber_no_certified_criteria",
         ),
         pytest.param(
-            {"from_geiq": True, "with_not_certifiable_criteria": True},
+            {"from_geiq": True},
+            AdministrativeCriteriaKind.CAP_BEP,
             False,
             id="employer_no_certified_criteria",
         ),
-        pytest.param({"from_geiq": True, "with_certifiable_criteria": True}, True, id="employer_certified_criteria"),
+        pytest.param({"from_geiq": True}, AdministrativeCriteriaKind.RSA, True, id="employer_certified_criteria"),
     ],
 )
-def test_criteria_can_be_certified(factory_params, expected):
-    diagnosis = GEIQEligibilityDiagnosisFactory(**factory_params)
+def test_criteria_can_be_certified(factory_params, CRITERIA_KIND, expected):
+    diagnosis = GEIQEligibilityDiagnosisFactory(
+        job_seeker__with_address=True,
+        job_seeker__born_in_france=True,
+        with_criteria_kind=True,
+        with_criteria_kind__criteria_kind=CRITERIA_KIND,
+        **factory_params,
+    )
     assert diagnosis.criteria_can_be_certified() == expected

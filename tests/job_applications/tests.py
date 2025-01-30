@@ -423,7 +423,6 @@ class TestJobApplicationQuerySet:
         )
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
             from_prescriber=True,
-            with_not_certifiable_criteria=True,
             job_seeker=job_application.job_seeker,
         )
 
@@ -439,7 +438,6 @@ class TestJobApplicationQuerySet:
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
             from_employer=True,
             author_siae=job_application.sender_company,
-            with_not_certifiable_criteria=True,
             job_seeker=job_application.job_seeker,
         )
 
@@ -454,7 +452,6 @@ class TestJobApplicationQuerySet:
         )
         IAEEligibilityDiagnosisFactory(
             from_employer=True,
-            with_not_certifiable_criteria=True,
             job_seeker=job_application.job_seeker,
         )
 

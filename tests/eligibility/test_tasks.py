@@ -11,28 +11,14 @@ from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.tasks import async_certify_criteria
 from itou.utils.mocks.api_particulier import rsa_certified_mocker
 from itou.utils.types import InclusiveDateRange
-from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
-from tests.users.factories import JobSeekerFactory
-
-
-def create(factory, **kwargs):
-    job_seeker = JobSeekerFactory(with_address=True, born_in_france=True)
-    return factory(with_certifiable_criteria=True, job_seeker=job_seeker, **kwargs)
-
-
-def iae_eligibility_factory():
-    return create(IAEEligibilityDiagnosisFactory, from_employer=True)
-
-
-def geiq_eligibility_factory():
-    return create(GEIQEligibilityDiagnosisFactory, from_geiq=True)
+from tests.eligibility.factories import geiq_eligibility_with_criteria_factory, iae_eligibility_with_criteria_factory
 
 
 @pytest.mark.parametrize(
     "factory",
     [
-        pytest.param(iae_eligibility_factory, id="iae"),
-        pytest.param(geiq_eligibility_factory, id="geiq"),
+        pytest.param(iae_eligibility_with_criteria_factory, id="iae"),
+        pytest.param(geiq_eligibility_with_criteria_factory, id="geiq"),
     ],
 )
 class TestCertifyCriteria:
