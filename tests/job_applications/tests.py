@@ -17,6 +17,7 @@ from itou.companies.enums import CompanyKind, ContractType
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
+from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import (
     JobApplicationState,
@@ -164,6 +165,21 @@ class TestJobApplicationModel:
         with pytest.raises(ValidationError) as excinfo:
             JobApplicationFactory(to_company__kind=CompanyKind.AI, inverted_vae_contract=True).clean()
         assert "Un contrat associé à une VAE inversée n'est possible que pour les GEIQ" in str(excinfo.value)
+
+    def test_accept_follow_up_group(self):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            state=JobApplicationState.PROCESSING,
+        )
+        user = job_application.to_company.members.first()
+        assert not FollowUpGroup.objects.exists()
+
+        job_application.accept(user=user)
+        group = FollowUpGroup.objects.get()
+        assert group.beneficiary == job_application.job_seeker
+        membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
+        assert membership.member == user
+        assert membership.creator == user
 
 
 class TestJobApplicationQueryset:
