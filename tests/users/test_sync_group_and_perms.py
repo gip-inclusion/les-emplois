@@ -1,4 +1,3 @@
-import io
 import itertools
 
 from django.contrib.auth.models import Group
@@ -7,10 +6,12 @@ from django.core.management import call_command
 from itou.users.management.commands import sync_group_and_perms
 
 
-def test_command(snapshot):
-    stdout = io.StringIO()
-    call_command("sync_group_and_perms", stdout=stdout)
-    assert stdout.getvalue() == snapshot(name="stdout")
+def test_command(snapshot, caplog):
+    call_command("sync_group_and_perms")
+    assert caplog.messages[:-1] == snapshot(name="logs")
+    assert caplog.messages[-1].startswith(
+        "Management command itou.users.management.commands.sync_group_and_perms succeeded in"
+    )
     assert Group.objects.all().count() == len(sync_group_and_perms.get_permissions_dict())
 
     for group in Group.objects.all():

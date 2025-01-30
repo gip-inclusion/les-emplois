@@ -151,7 +151,7 @@ class Command(BaseCommand):
             group.permissions.clear()
             group.permissions.add(*perms)
             if created:
-                self.stdout.write(f"group name={group} created")
+                self.logger.info(f"group name={group} created")
             else:
-                self.stdout.write(f"permissions of group={group} updated")
-        self.stdout.write("All done!")
+                self.logger.info(f"permissions of group={group} updated")
+        self.logger.info("All done!")
