@@ -14,6 +14,7 @@ from pytest_django.asserts import assertQuerySetEqual
 from itou.companies.enums import CompanyKind
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
 from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplicationTransitionLog
 from itou.users.models import JobSeekerProfile
 from tests.companies.factories import CompanyWith4MembershipsFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
@@ -86,7 +87,12 @@ class TestGpsManagementCommand:
         )
         # Needed to create the transition log entries
         user_who_accepted = job_application_with_approval.to_company.members.last()
-        job_application_with_approval.accept(user=user_who_accepted)
+        # Don't call accept that now creates a group and membership automatically
+        JobApplicationTransitionLog.objects.create(
+            job_application=job_application_with_approval,
+            to_state=JobApplicationState.ACCEPTED,
+            user=user_who_accepted,
+        )
         should_be_created_groups_counter += 1
         should_be_created_memberships += 3  # employer who accepted, employer who made the diagnosis and prescriber
 
@@ -172,7 +178,12 @@ class TestGpsManagementCommand:
             state=JobApplicationState.PROCESSING,
         )
         user = job_application_accepted.to_company.members.first()
-        job_application_accepted.accept(user=user)
+        # Don't call accept that now creates a group and membership automatically
+        JobApplicationTransitionLog.objects.create(
+            job_application=job_application_accepted,
+            to_state=JobApplicationState.ACCEPTED,
+            user=user,
+        )
 
         assert FollowUpGroup.objects.count() == 0
         assert FollowUpGroupMembership.objects.count() == 0
@@ -341,7 +352,12 @@ class TestGpsManagementCommand:
             # >>> Employer membership creation date
             employer_membership_date = timezone.now()
             # the employer accepts the last job app
-            accepted_job_app.accept(user=employer)
+            # Don't call accept that now creates a group and membership automatically
+            JobApplicationTransitionLog.objects.create(
+                job_application=accepted_job_app,
+                to_state=JobApplicationState.ACCEPTED,
+                user=employer,
+            )
         with freeze_time("2022-06-01 00:00:08"):
             # Another iae diag from the employer
             IAEEligibilityDiagnosisFactory(job_seeker=job_seeker, from_employer=True, author=employer)
