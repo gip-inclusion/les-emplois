@@ -18,4 +18,6 @@ PRO_CONNECT_TIMEOUT = 60
 
 PRO_CONNECT_SESSION_KEY = "pro_connect"
 
+# ProConnect tells us what identity provider is used behind.
+# the full list is here : https://grist.numerique.gouv.fr/o/docs/3kQ829mp7bTy
 PRO_CONNECT_FT_IDP_HINT = settings.PRO_CONNECT_FT_IDP_HINT
