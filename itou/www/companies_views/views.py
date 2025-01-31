@@ -23,7 +23,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiException
 from itou.utils.apis.exceptions import GeocodingDataError
-from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.auth import LoginNotRequiredMixin, check_user
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
@@ -635,19 +635,14 @@ def members(request, template_name="companies/members.html"):
     return render(request, template_name, context)
 
 
+@check_user(lambda user: user.is_employer)
 def deactivate_member(request, user_id, template_name="companies/deactivate_member.html"):
-    company = get_current_company_or_404(request)
-    target_member = User.objects.get(pk=user_id)
-
-    if deactivate_org_member(request=request, target_member=target_member):
-        return HttpResponseRedirect(reverse("companies_views:members"))
-
-    context = {
-        "structure": company,
-        "target_member": target_member,
-    }
-
-    return render(request, template_name, context)
+    return deactivate_org_member(
+        request,
+        user_id,
+        success_url=reverse("companies_views:members"),
+        template_name=template_name,
+    )
 
 
 def update_admin_role(request, action, user_id, template_name="companies/update_admins.html"):

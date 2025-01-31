@@ -11,6 +11,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
 from itou.utils.apis.exceptions import GeocodingDataError
+from itou.utils.auth import check_user
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.prescribers_views.forms import EditPrescriberOrganizationForm
@@ -72,19 +73,14 @@ def member_list(request, template_name="prescribers/members.html"):
     return render(request, template_name, context)
 
 
+@check_user(lambda user: user.is_prescriber)
 def deactivate_member(request, user_id, template_name="prescribers/deactivate_member.html"):
-    organization = get_current_org_or_404(request)
-    target_member = User.objects.get(pk=user_id)
-
-    if deactivate_org_member(request=request, target_member=target_member):
-        return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))
-
-    context = {
-        "structure": organization,
-        "target_member": target_member,
-    }
-
-    return render(request, template_name, context)
+    return deactivate_org_member(
+        request,
+        user_id,
+        success_url=reverse("prescribers_views:members"),
+        template_name=template_name,
+    )
 
 
 def update_admin_role(request, action, user_id, template_name="prescribers/update_admins.html"):
