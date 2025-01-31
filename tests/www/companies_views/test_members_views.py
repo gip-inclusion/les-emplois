@@ -138,6 +138,25 @@ class TestUserMembershipDeactivation:
         response = client.post(url)
         assert response.status_code == 403
 
+    def test_deactivate_user_from_another_organisation(self, client, mailoutbox):
+        my_company = CompanyFactory()
+        other_company = CompanyFactory()
+        my_membership = CompanyMembershipFactory(company=my_company, is_admin=True)
+        other_membership = CompanyMembershipFactory(company=other_company)
+
+        client.force_login(my_membership.user)
+        response = client.post(
+            reverse(
+                "companies_views:deactivate_member",
+                kwargs={"user_id": other_membership.user_id},
+            ),
+        )
+
+        assert response.status_code == 403
+        other_membership.refresh_from_db()
+        assert other_membership.is_active is True
+        assert mailoutbox == []
+
     def test_user_with_no_company_left(self, client):
         """
         Former employer with no membership left must not be able to log in.

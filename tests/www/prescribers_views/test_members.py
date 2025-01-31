@@ -125,6 +125,25 @@ class TestUserMembershipDeactivation:
         assert email.to[0] == guest.email
         assert email.body == snapshot
 
+    def test_deactivate_user_from_another_organisation(self, client, mailoutbox):
+        my_organization = PrescriberOrganizationFactory()
+        other_organization = PrescriberOrganizationFactory()
+        my_membership = PrescriberMembershipFactory(organization=my_organization, is_admin=True)
+        other_membership = PrescriberMembershipFactory(organization=other_organization)
+
+        client.force_login(my_membership.user)
+        response = client.post(
+            reverse(
+                "prescribers_views:deactivate_member",
+                kwargs={"user_id": other_membership.user_id},
+            ),
+        )
+
+        assert response.status_code == 403
+        other_membership.refresh_from_db()
+        assert other_membership.is_active is True
+        assert mailoutbox == []
+
     def test_deactivate_with_no_perms(self, client):
         """
         Non-admin user can't change memberships

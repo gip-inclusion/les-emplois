@@ -117,6 +117,25 @@ class TestMembers:
         assert email.to == [guest_membership.user.email]
         assert email.body == snapshot
 
+    def test_deactivate_user_from_another_organisation(self, client, mailoutbox):
+        my_institution = InstitutionFactory()
+        other_institution = InstitutionFactory()
+        my_membership = InstitutionMembershipFactory(institution=my_institution, is_admin=True)
+        other_membership = InstitutionMembershipFactory(institution=other_institution)
+
+        client.force_login(my_membership.user)
+        response = client.post(
+            reverse(
+                "institutions_views:deactivate_member",
+                kwargs={"user_id": other_membership.user_id},
+            ),
+        )
+
+        assert response.status_code == 403
+        other_membership.refresh_from_db()
+        assert other_membership.is_active is True
+        assert mailoutbox == []
+
     def test_remove_admin(self, client, mailoutbox):
         """
         Check the ability for an admin to remove another admin
