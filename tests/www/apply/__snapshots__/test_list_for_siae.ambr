@@ -2551,7 +2551,7 @@
                               <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
                           </div>
                           <form action="/apply/company/batch/postpone?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
-                              <div class="modal-body"><div class="form-group form-group-required"><label class="form-label" for="id_answer">Commentaire à envoyer au candidat</label><textarea class="form-control" cols="40" id="id_answer" name="answer" placeholder="Votre réponse sera visible par les candidats et les prescripteurs/orienteurs" required="" rows="10"></textarea></div></div>
+                              <div class="modal-body"><div class="form-group"><label class="form-label" for="id_answer">Commentaire à envoyer au candidat</label><textarea class="form-control" cols="40" id="id_answer" name="answer" placeholder="Votre réponse sera visible par les candidats et les prescripteurs/orienteurs" rows="10"></textarea></div></div>
                               <div class="modal-footer">
                                   <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">Retour</button>
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -2580,7 +2580,7 @@
                               <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
                           </div>
                           <form action="/apply/company/batch/postpone?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
-                              <div class="modal-body"><div class="form-group form-group-required"><label class="form-label" for="id_answer">Commentaire à envoyer aux 2 candidats</label><textarea class="form-control" cols="40" id="id_answer" name="answer" placeholder="Votre réponse sera visible par les candidats et les prescripteurs/orienteurs" required="" rows="10"></textarea></div></div>
+                              <div class="modal-body"><div class="form-group"><label class="form-label" for="id_answer">Commentaire à envoyer aux 2 candidats</label><textarea class="form-control" cols="40" id="id_answer" name="answer" placeholder="Votre réponse sera visible par les candidats et les prescripteurs/orienteurs" rows="10"></textarea></div></div>
                               <div class="modal-footer">
                                   <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">Retour</button>
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
