@@ -57,6 +57,8 @@
                             {% else %}
                                 {% if is_gps|default:False %}
                                     {% itou_buttons_form primary_label="Créer et suivre le bénéficiaire" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False %}
+                                {% elif standalone_creation|default:False %}
+                                    {% itou_buttons_form primary_label="Créer le compte candidat" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False matomo_category="compte-candidat" matomo_action="creation" matomo_name="standalone_creation" %}
                                 {% else %}
                                     {% itou_buttons_form primary_label="Créer le compte candidat" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False %}
                                 {% endif %}
