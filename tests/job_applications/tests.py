@@ -188,7 +188,7 @@ class TestJobApplicationQueryset:
         user = EmployerFactory()
         assert JobApplication.objects.is_active_company_member(user).count() == 0
 
-        job_application.to_company.add_or_activate_member(user)
+        job_application.to_company.add_or_activate_membership(user)
         assert JobApplication.objects.is_active_company_member(user).get() == job_application
 
         membership = job_application.to_company.memberships.filter(user=user).get()

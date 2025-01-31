@@ -48,27 +48,27 @@ class TestInstitutionModel:
 
         assert active_user_with_active_membership not in institution.active_members
 
-    def test_add_or_activate_member(self):
+    def test_add_or_activate_membership(self):
         institution = InstitutionFactory()
         assert 0 == institution.members.count()
         admin_user = LaborInspectorFactory()
-        institution.add_or_activate_member(admin_user)
+        institution.add_or_activate_membership(admin_user)
         assert 1 == institution.memberships.count()
         assert institution.memberships.get(user=admin_user).is_admin
 
         other_user = LaborInspectorFactory()
-        institution.add_or_activate_member(other_user)
+        institution.add_or_activate_membership(other_user)
         assert 2 == institution.memberships.count()
         assert not institution.memberships.get(user=other_user).is_admin
         assert institution.memberships.get(user=other_user).is_active
 
         institution.memberships.filter(user=other_user).update(is_active=False)
-        institution.add_or_activate_member(other_user)
+        institution.add_or_activate_membership(other_user)
         assert institution.memberships.get(user=other_user).is_active
 
         wrong_kind_user = PrescriberFactory()
         with pytest.raises(ValidationError):
-            institution.add_or_activate_member(wrong_kind_user)
+            institution.add_or_activate_membership(wrong_kind_user)
 
 
 def test_deactivate_last_admin(admin_client, mailoutbox):

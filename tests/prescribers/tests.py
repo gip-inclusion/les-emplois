@@ -170,26 +170,26 @@ class TestPrescriberOrganizationModel:
 
         assert active_user_with_active_membership not in org.active_members
 
-    def test_add_or_activate_member(self):
+    def test_add_or_activate_membership(self):
         org = PrescriberOrganizationFactory()
         assert 0 == org.members.count()
         admin_user = PrescriberFactory()
-        org.add_or_activate_member(admin_user)
+        org.add_or_activate_membership(admin_user)
         assert 1 == org.memberships.count()
         assert org.memberships.get(user=admin_user).is_admin
 
         other_user = PrescriberFactory()
-        org.add_or_activate_member(other_user)
+        org.add_or_activate_membership(other_user)
         assert 2 == org.memberships.count()
         assert not org.memberships.get(user=other_user).is_admin
 
         org.memberships.filter(user=other_user).update(is_active=False)
-        org.add_or_activate_member(other_user)
+        org.add_or_activate_membership(other_user)
         assert org.memberships.get(user=other_user).is_active
 
         non_prescriber = EmployerFactory()
         with pytest.raises(ValidationError):
-            org.add_or_activate_member(non_prescriber)
+            org.add_or_activate_membership(non_prescriber)
 
     def test_merge_two_organizations(self):
         job_application_1 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory(
