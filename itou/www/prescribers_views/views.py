@@ -9,7 +9,6 @@ from django.urls import reverse, reverse_lazy
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.models import User
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.auth import check_user
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -83,20 +82,15 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
     )
 
 
+@check_user(lambda user: user.is_prescriber)
 def update_admin_role(request, action, user_id, template_name="prescribers/update_admins.html"):
-    organization = get_current_org_or_404(request)
-    target_member = User.objects.get(pk=user_id)
-
-    if update_org_admin_role(request=request, target_member=target_member, action=action):
-        return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))
-
-    context = {
-        "action": action,
-        "structure": organization,
-        "target_member": target_member,
-    }
-
-    return render(request, template_name, context)
+    return update_org_admin_role(
+        request,
+        action,
+        user_id,
+        success_url=reverse("prescribers_views:members"),
+        template_name=template_name,
+    )
 
 
 def list_accredited_organizations(request, template_name="prescribers/list_accredited_organizations.html"):
