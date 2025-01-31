@@ -55,17 +55,18 @@
                                     <li>
                                         <small>Adresse e-mail</small>
                                         {% if membership.member_id != request.user.pk %}
-                                            <button class="btn-link btn-ico has-btn-with-spinner-loading-text"
+                                            <button class="btn-link btn-ico"
                                                     id="email-{{ membership.member_id }}"
                                                     hx-post="{% url "gps:display_contact_info" beneficiary.follow_up_group.id membership.member.public_id "email" %}"
                                                     hx-swap="outerHTML"
                                                     {% matomo_event "gps" "clic" "displayed_member_email" %}>
-                                                <span>Afficher l'email</span>
                                                 <div class="stable-text">
                                                     <i class="ri-mail-line fw-medium" aria-hidden="true"></i>
+                                                    <span>Afficher l'email</span>
                                                 </div>
                                                 <div class="loading-text">
                                                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                    <span>Affichage en cours</span>
                                                 </div>
                                             </button>
                                         {% else %}
@@ -76,17 +77,18 @@
                                         <small>Téléphone</small>
                                         {% if membership.member.phone %}
                                             {% if membership.member_id != request.user.pk %}
-                                                <button class="btn-link btn-ico has-btn-with-spinner-loading-text"
+                                                <button class="btn-link btn-ico"
                                                         id="phone-{{ membership.member_id }}"
                                                         hx-post="{% url "gps:display_contact_info" beneficiary.follow_up_group.id membership.member.public_id "phone" %}"
                                                         hx-swap="outerHTML"
                                                         {% matomo_event "gps" "clic" "displayed_member_phone" %}>
-                                                    <span>Afficher le téléphone</span>
                                                     <div class="stable-text">
                                                         <i class="ri-phone-line fw-medium" aria-hidden="true"></i>
+                                                        <span>Afficher le téléphone</span>
                                                     </div>
                                                     <div class="loading-text">
                                                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                        <span>Affichage en cours</span>
                                                     </div>
                                                 </button>
                                             {% else %}
