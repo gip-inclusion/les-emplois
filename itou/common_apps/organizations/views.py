@@ -3,27 +3,27 @@ Functions used in organization views.
 """
 
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 
 
 def deactivate_org_member(request, target_member):
-    if not request.is_current_organization_admin or target_member not in request.current_organization.active_members:
+    if not request.is_current_organization_admin or request.user == target_member:
         raise PermissionDenied
 
-    membership = request.current_organization.memberships.get(user=target_member)
+    try:
+        membership = request.current_organization.memberships.get(user=target_member)
+    except ObjectDoesNotExist:
+        raise PermissionDenied
 
     if request.method == "POST":
-        if request.user != target_member and request.is_current_organization_admin:
-            if membership.is_active:
-                # Deactivate the membership without deleting it.
-                membership.deactivate_membership_by_user(request.user)
-                membership.save()
-                messages.success(
-                    request, f"{target_member.get_full_name()} a été retiré(e) des membres actifs de cette structure."
-                )
-                request.current_organization.member_deactivation_email(membership.user).send()
-        else:
-            raise PermissionDenied
+        if membership.is_active:
+            # Deactivate the membership without deleting it.
+            membership.deactivate_membership_by_user(request.user)
+            membership.save()
+            messages.success(
+                request, f"{target_member.get_full_name()} a été retiré(e) des membres actifs de cette structure."
+            )
+            request.current_organization.member_deactivation_email(membership.user).send()
         return True
 
     return False
