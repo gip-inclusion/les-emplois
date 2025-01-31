@@ -237,7 +237,7 @@ def create(request, job_application_id, template_name="employee_record/create.ht
         "steps": STEPS,
         "step": 1,
         "matomo_custom_title": "Nouvelle fiche salarié ASP - Étape 1",
-        "back_url": request.GET.get("back_url"),
+        "back_url": get_safe_url(request, "back_url"),
     }
 
     return render(request, template_name, context)
