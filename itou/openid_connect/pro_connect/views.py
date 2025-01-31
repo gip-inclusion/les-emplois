@@ -24,7 +24,7 @@ from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider, U
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.constants import ITOU_HELP_CENTER_URL
-from itou.utils.urls import add_url_params, get_absolute_url
+from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
 from itou.www.invitations_views.helpers import accept_all_pending_invitations
 
 
@@ -105,7 +105,7 @@ def _add_user_kind_error_message(request, existing_user, new_user_kind):
 def pro_connect_authorize(request):
     # Start a new session.
     user_kind = request.GET.get("user_kind")
-    previous_url = request.GET.get("previous_url", reverse("search:employers_home"))
+    previous_url = get_safe_url(request, "previous_url", fallback_url=reverse("search:employers_home"))
     next_url = request.GET.get("next_url")
     if next_url and not url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS, request.is_secure()):
         return _redirect_to_login_page_on_error(error_msg="Forbidden external url")
@@ -305,7 +305,7 @@ def pro_connect_callback(request):
 def pro_connect_logout(request):
     token = request.GET.get("token")
     post_logout_redirect_url = reverse("pro_connect:logout_callback")
-    redirect_url = request.GET.get("redirect_url", reverse("search:employers_home"))
+    redirect_url = get_safe_url(request, "redirect_url", fallback_url=reverse("search:employers_home"))
 
     # Fallback on session data.
     if not token:
