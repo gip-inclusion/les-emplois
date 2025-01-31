@@ -3,7 +3,7 @@ Functions used in organization views.
 """
 
 from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 
@@ -37,13 +37,11 @@ def update_org_admin_role(request, target_member, action):
     if not request.is_current_organization_admin or target_member == request.user:
         raise PermissionDenied
 
-    try:
-        membership = request.current_organization.memberships.select_related("user").get(
-            user=target_member,
-            is_active=True,
-        )
-    except ObjectDoesNotExist:
-        raise PermissionDenied
+    membership = get_object_or_404(
+        request.current_organization.memberships.select_related("user"),
+        user_id=target_member.pk,
+        is_active=True,
+    )
 
     if request.method == "POST":
         match action:
