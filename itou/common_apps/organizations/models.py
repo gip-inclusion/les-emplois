@@ -110,6 +110,11 @@ class OrganizationAbstract(models.Model):
             )
         membership.is_admin = admin
         membership.updated_by = updated_by
+        membership.save(update_fields=["is_admin", "updated_by"])
+        if admin:
+            self.add_admin_email(membership.user).send()
+        else:
+            self.remove_admin_email(membership.user).send()
 
     @property
     def active_members(self):
