@@ -17,13 +17,10 @@ def deactivate_org_member(request, target_member):
 
     if request.method == "POST":
         if membership.is_active:
-            # Deactivate the membership without deleting it.
-            membership.deactivate_membership_by_user(request.user)
-            membership.save()
+            request.current_organization.deactivate_membership(membership, updated_by=request.user)
             messages.success(
                 request, f"{target_member.get_full_name()} a été retiré(e) des membres actifs de cette structure."
             )
-            request.current_organization.member_deactivation_email(membership.user).send()
         return True
 
     return False
