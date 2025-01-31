@@ -85,20 +85,20 @@ class UserAdapter(DefaultAccountAdapter):
         Return an absolute url to be displayed in the email
         sent to users to confirm their email address.
         """
-        next_url = request.POST.get("next") or request.GET.get("next")
+        next_url = get_safe_url(request, "next")
         url = super().get_email_confirmation_url(request, emailconfirmation)
         if next_url:
-            url = f"{url}?next={get_safe_url(request, 'next')}"
+            url = f"{url}?next={next_url}"
         return url
 
     def get_email_verification_redirect_url(self, email_address):
         """
         Redirection performed after a user confirmed its email address.
         """
-        next_url = self.request.POST.get("next") or self.request.GET.get("next")
+        next_url = get_safe_url(self.request, "next")
         url = super().get_email_verification_redirect_url(email_address)
         if next_url:
-            url = get_safe_url(self.request, "next")
+            url = next_url
         return url
 
     def send_mail(self, template_prefix, email, context):
