@@ -140,7 +140,7 @@ class TestUserMembershipDeactivation:
             ),
         )
 
-        assert response.status_code == 403
+        assert response.status_code == 404
         other_membership.refresh_from_db()
         assert other_membership.is_active is True
         assert mailoutbox == []
@@ -169,7 +169,7 @@ class TestUserMembershipDeactivation:
         response = request(
             reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest_membership.user_id})
         )
-        assert response.status_code == 403
+        assert response.status_code == 404
         guest_membership.refresh_from_db()
         assert guest_membership.is_active is False
         assert mailoutbox == []
@@ -182,7 +182,7 @@ class TestUserMembershipDeactivation:
         client.force_login(admin_membership.user)
         request = getattr(client, method)
         response = request(reverse("prescribers_views:deactivate_member", kwargs={"user_id": other_user.pk}))
-        assert response.status_code == 403
+        assert response.status_code == 404
         assert mailoutbox == []
 
     def test_deactivated_prescriber_is_orienter(self, client):
