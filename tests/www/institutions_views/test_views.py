@@ -1,3 +1,4 @@
+import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 
@@ -7,6 +8,7 @@ from tests.institutions.factories import (
     InstitutionMembershipFactory,
     InstitutionWith2MembershipFactory,
     InstitutionWithMembershipFactory,
+    LaborInspectorFactory,
 )
 
 
@@ -134,6 +136,32 @@ class TestMembers:
         assert response.status_code == 403
         other_membership.refresh_from_db()
         assert other_membership.is_active is True
+
+    @pytest.mark.parametrize("method", ["get", "post"])
+    def test_deactivate_inactive_member(self, client, method, mailoutbox):
+        institution = InstitutionFactory()
+        admin_membership = InstitutionMembershipFactory(institution=institution, is_admin=True)
+        guest_membership = InstitutionMembershipFactory(institution=institution, is_active=False)
+
+        client.force_login(admin_membership.user)
+        request = getattr(client, method)
+        response = request(
+            reverse("institutions_views:deactivate_member", kwargs={"user_id": guest_membership.user_id})
+        )
+        assert response.status_code == 403
+        guest_membership.refresh_from_db()
+        assert guest_membership.is_active is False
+        assert mailoutbox == []
+
+    @pytest.mark.parametrize("method", ["get", "post"])
+    def test_deactivate_non_member(self, client, method, mailoutbox):
+        institution = InstitutionFactory()
+        admin_membership = InstitutionMembershipFactory(institution=institution, is_admin=True)
+        other_user = LaborInspectorFactory()
+        client.force_login(admin_membership.user)
+        request = getattr(client, method)
+        response = request(reverse("institutions_views:deactivate_member", kwargs={"user_id": other_user.pk}))
+        assert response.status_code == 403
         assert mailoutbox == []
 
     def test_remove_admin(self, client, mailoutbox):

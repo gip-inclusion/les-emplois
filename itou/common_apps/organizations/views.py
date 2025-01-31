@@ -11,7 +11,7 @@ def deactivate_org_member(request, target_member):
         raise PermissionDenied
 
     try:
-        membership = request.current_organization.memberships.get(user=target_member)
+        membership = request.current_organization.memberships.get(user=target_member, is_active=True)
     except ObjectDoesNotExist:
         raise PermissionDenied
 
