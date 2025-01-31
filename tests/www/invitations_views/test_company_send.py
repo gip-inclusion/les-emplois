@@ -203,19 +203,14 @@ class TestSendInvitationToSpecialGuest:
         Admins can "deactivate" members of the organization (making the membership inactive).
         A deactivated member must be able to receive new invitations.
         """
-        guest = CompanyFactory(with_membership=True).members.first()
+        membership = CompanyMembershipFactory(company=self.sender_company, is_active=False)
+        old_user = membership.user
         client.force_login(self.sender)
-
-        # Deactivate user
-        membership = guest.companymembership_set.first()
-        membership.deactivate_membership_by_user(self.sender_company.members.first())
-        membership.save()
-
         self.post_data.update(
             {
-                "form-0-first_name": guest.first_name,
-                "form-0-last_name": guest.last_name,
-                "form-0-email": guest.email,
+                "form-0-first_name": old_user.first_name,
+                "form-0-last_name": old_user.last_name,
+                "form-0-email": old_user.email,
             }
         )
         response = client.post(INVITATION_URL, data=self.post_data, follow=True)
