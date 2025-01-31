@@ -102,6 +102,15 @@ class OrganizationAbstract(models.Model):
         membership.save(update_fields=["is_active", "is_admin", "updated_by"])
         self.member_deactivation_email(membership.user).send()
 
+    def set_admin_role(self, membership, admin, *, updated_by):
+        membership_organization_id = getattr(membership, f"{self.members.source_field_name}_id")
+        if membership_organization_id != self.pk:
+            raise ValueError(
+                f"Cannot set admin role for other organizations. {membership_organization_id=} {self.pk=}."
+            )
+        membership.is_admin = admin
+        membership.updated_by = updated_by
+
     @property
     def active_members(self):
         memberships = self.memberships.active()
@@ -256,10 +265,6 @@ class MembershipAbstract(models.Model):
 
     class Meta:
         abstract = True
-
-    def set_admin_role(self, is_admin, updated_by):
-        self.is_admin = is_admin
-        self.updated_by = updated_by
 
     def clean(self, *args, **kwargs):
         super().clean()
