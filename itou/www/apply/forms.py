@@ -927,7 +927,6 @@ class CheckJobSeekerGEIQEligibilityForm(forms.Form):
 class BatchPostponeForm(AnswerForm):
     def __init__(self, *args, job_seeker_nb, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["answer"].required = True
         self.fields["answer"].widget.attrs["placeholder"] = (
             "Votre réponse sera visible par les candidats et les prescripteurs/orienteurs"
         )

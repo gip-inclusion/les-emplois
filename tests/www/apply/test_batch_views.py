@@ -392,15 +392,11 @@ class TestBatchPostpone:
         )
         assertRedirects(response, next_url)
         postponable_app.refresh_from_db()
-        assert postponable_app.state != JobApplicationState.POSTPONED
-        assert not postponable_app.answer
+        assert postponable_app.state == JobApplicationState.POSTPONED
+        assert postponable_app.answer == ""
         assertMessages(
             response,
-            [
-                messages.Message(
-                    messages.ERROR, "Les candidatures n’ont pas pu être mises en attente.", extra_tags="toast"
-                )
-            ],
+            [messages.Message(messages.SUCCESS, "La candidature a bien été mise en attente.", extra_tags="toast")],
         )
 
     def test_unpostponable(self, client):
