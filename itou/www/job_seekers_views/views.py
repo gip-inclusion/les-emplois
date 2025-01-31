@@ -275,13 +275,13 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             and self.company == request.current_organization
         )
 
-    def get_exit_url(self, job_seeker_public_id, created=False):
+    def get_exit_url(self, job_seeker, created=False):
         if self.is_gps:
             return reverse("gps:group_list")
         if self.standalone_creation:
-            return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker_public_id})
+            return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
-        kwargs = {"company_pk": self.company.pk, "job_seeker_public_id": job_seeker_public_id}
+        kwargs = {"company_pk": self.company.pk, "job_seeker_public_id": job_seeker.public_id}
         if created and self.hire_process:
             # The job seeker was just created, we don't need to check info if we are hiring
             if self.company.kind == CompanyKind.GEIQ:
@@ -424,7 +424,7 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
             if self.form.data.get("confirm"):
                 if self.is_gps:
                     FollowUpGroup.objects.follow_beneficiary(job_seeker, request.user, is_referent=True)
-                return HttpResponseRedirect(self.get_exit_url(job_seeker.public_id))
+                return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
             context = {
                 # Ask the sender to confirm the NIR we found is associated to the correct user
@@ -493,7 +493,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
             # The email we found is correct
             if self.form.data.get("confirm"):
                 if not can_add_nir:
-                    return HttpResponseRedirect(self.get_exit_url(job_seeker.public_id))
+                    return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
                 try:
                     job_seeker.jobseeker_profile.nir = nir
@@ -512,7 +512,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                 else:
                     if self.is_gps:
                         FollowUpGroup.objects.follow_beneficiary(job_seeker, request.user, is_referent=True)
-                    return HttpResponseRedirect(self.get_exit_url(job_seeker.public_id))
+                    return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
         return self.render_to_response(
             self.get_context_data(**kwargs)
@@ -791,7 +791,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 user.save()
 
             self.job_seeker_session.delete()
-            url = self.get_exit_url(self.profile.user.public_id, created=True)
+            url = self.get_exit_url(self.profile.user, created=True)
 
             if self.is_gps:
                 FollowUpGroup.objects.follow_beneficiary(user, request.user, is_referent=True)
