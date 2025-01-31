@@ -60,7 +60,7 @@ class UserKindLoginMixin:
         return context | extra_context
 
     def dispatch(self, request, *args, **kwargs):
-        if next_url := request.GET.get("next"):
+        if next_url := get_safe_url(request, "next"):
             if get_url_param_value(next_url, "channel") == ProConnectChannel.MAP_CONSEILLER:
                 params = {
                     "user_kind": UserKind.PRESCRIBER,
