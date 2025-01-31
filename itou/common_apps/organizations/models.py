@@ -83,6 +83,25 @@ class OrganizationAbstract(models.Model):
             is_admin = not self.members.exists()
             self.memberships.create(user=user, is_admin=is_admin)
 
+    def deactivate_membership(self, membership, *, updated_by):
+        """
+        Deleting the membership was a possibility but we would have lost
+        the member activity history. We need it to show to other members
+        which job applications this user was managing before leaving the organization.
+        """
+        membership_organization_id = getattr(membership, f"{self.members.source_field_name}_id")
+        if membership_organization_id != self.pk:
+            raise ValueError(
+                f"Cannot deactivate users from other organizations. {membership_organization_id=} {self.pk=}."
+            )
+        membership.is_active = False
+        # If this member is invited again, he should no still be an administrator.
+        # Remove admin rights as a precaution.
+        membership.is_admin = False
+        membership.updated_by = updated_by
+        membership.save(update_fields=["is_active", "is_admin", "updated_by"])
+        self.member_deactivation_email(membership.user).send()
+
     @property
     def active_members(self):
         memberships = self.memberships.active()
@@ -237,19 +256,6 @@ class MembershipAbstract(models.Model):
 
     class Meta:
         abstract = True
-
-    def deactivate_membership_by_user(self, updated_by):
-        """
-        Deleting the membership was a possibility but we would have lost
-        the member activity history. We need it to show to other members
-        which job applications this user was managing before leaving the organization.
-        """
-        self.is_active = False
-        # If this member is invited again, he should no still be an administrator.
-        # Remove admin rights as a precaution.
-        self.is_admin = False
-        self.updated_by = updated_by
-        return True
 
     def set_admin_role(self, is_admin, updated_by):
         self.is_admin = is_admin

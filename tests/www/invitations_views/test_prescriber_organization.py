@@ -98,8 +98,7 @@ class TestSendPrescriberWithOrgInvitation:
         self.organization.members.add(guest)
         guest.save()
         membership = guest.prescribermembership_set.first()
-        membership.deactivate_membership_by_user(self.organization.members.first())
-        membership.save()
+        self.organization.deactivate_membership(membership, updated_by=self.organization.members.first())
         assert guest not in self.organization.active_members
         # Invite user (the revenge)
         response = client.post(INVITATION_URL, data=self.post_data, follow=True)
