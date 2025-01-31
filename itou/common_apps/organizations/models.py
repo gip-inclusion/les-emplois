@@ -74,7 +74,7 @@ class OrganizationAbstract(models.Model):
     def has_admin(self, user):
         return self.active_admin_members.filter(pk=user.pk).exists()
 
-    def add_or_activate_member(self, user):
+    def add_or_activate_membership(self, user):
         """Add user to organization members, or activate membership if already there"""
 
         updated = self.memberships.filter(user=user).update(is_active=True)

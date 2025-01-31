@@ -645,7 +645,7 @@ class TestProConnectCallbackView:
             **dataclasses.asdict(ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo))
         )
         org = PrescriberPoleEmploiFactory(code_safir_pole_emploi="00000")
-        org.add_or_activate_member(user)
+        org.add_or_activate_membership(user)
 
         oidc_userinfo = pro_connect.oidc_userinfo_with_safir.copy()
         oidc_userinfo["email"] = "prenom.nom@francetravail.fr"

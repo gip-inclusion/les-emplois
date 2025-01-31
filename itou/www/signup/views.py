@@ -775,7 +775,7 @@ def prescriber_join_org(request):
                 }
                 prescriber_org = PrescriberOrganization.objects.create_organization(attributes=org_attributes)
 
-            prescriber_org.add_or_activate_member(user=request.user)
+            prescriber_org.add_or_activate_membership(user=request.user)
 
     except Error:
         messages.error(request, "L'organisation n'a pas pu être créée")

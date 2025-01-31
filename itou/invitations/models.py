@@ -176,7 +176,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
 
     def add_invited_user_to_organization(self):
         user = User.objects.get(email=self.email)
-        self.organization.add_or_activate_member(user)
+        self.organization.add_or_activate_membership(user)
         user.save()
 
     def guest_can_join_organization(self, request):
@@ -243,7 +243,7 @@ class EmployerInvitation(InvitationAbstract):
 
     def add_invited_user_to_company(self):
         user = User.objects.get(email=self.email)
-        self.company.add_or_activate_member(user)
+        self.company.add_or_activate_membership(user)
         user.save()
 
     def guest_can_join_company(self, request):
@@ -315,7 +315,7 @@ class LaborInspectorInvitation(InvitationAbstract):
 
     def add_invited_user_to_institution(self):
         user = User.objects.get(email=self.email)
-        self.institution.add_or_activate_member(user)
+        self.institution.add_or_activate_membership(user)
         user.save()
 
     def guest_can_join_institution(self, request):

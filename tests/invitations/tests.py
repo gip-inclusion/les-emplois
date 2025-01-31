@@ -96,7 +96,7 @@ class TestInvitationEmails:
 
 
 class TestPrescriberWithOrgInvitation:
-    def test_add_or_activate_member_to_organization(self):
+    def test_add_or_activate_membership_to_organization(self):
         invitation = PrescriberWithOrgSentInvitationFactory(email="hey@you.com")
         PrescriberFactory(email=invitation.email)
         org_members = invitation.organization.members.count()
@@ -154,7 +154,7 @@ class TestPrescriberWithOrgInvitationEmails:
 
 
 class TestCompanyInvitation:
-    def test_add_or_activate_member_to_company(self):
+    def test_add_or_activate_membership_to_company(self):
         invitation = EmployerInvitationFactory(email="hey@you.com")
         EmployerFactory(email=invitation.email)
         employers = invitation.company.members.count()

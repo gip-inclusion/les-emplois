@@ -37,7 +37,7 @@ class ProConnectUserData(OIDConnectUserData):
             logger.error(f"Organization with SAFIR {safir} does not exist. Unable to add user {user.email}.")
             raise
         if not organization.has_member(user):
-            organization.add_or_activate_member(user)
+            organization.add_or_activate_membership(user)
 
 
 @dataclasses.dataclass

@@ -248,26 +248,26 @@ class TestCompanyModel:
         company.kind = CompanyKind.OPCS
         assert company.is_opcs
 
-    def test_add_or_activate_member(self):
+    def test_add_or_activate_membership(self):
         company = CompanyFactory()
         assert 0 == company.members.count()
         admin_user = EmployerFactory()
-        company.add_or_activate_member(admin_user)
+        company.add_or_activate_membership(admin_user)
         assert 1 == company.memberships.count()
         assert company.memberships.get(user=admin_user).is_admin
 
         other_user = EmployerFactory()
-        company.add_or_activate_member(other_user)
+        company.add_or_activate_membership(other_user)
         assert 2 == company.memberships.count()
         assert not company.memberships.get(user=other_user).is_admin
 
         company.memberships.filter(user=other_user).update(is_active=False)
-        company.add_or_activate_member(other_user)
+        company.add_or_activate_membership(other_user)
         assert company.memberships.get(user=other_user).is_active
 
         non_employer = PrescriberFactory()
         with pytest.raises(ValidationError):
-            company.add_or_activate_member(non_employer)
+            company.add_or_activate_membership(non_employer)
 
 
 class TestCompanyQuerySet:
