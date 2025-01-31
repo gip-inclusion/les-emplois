@@ -36,18 +36,21 @@ def update_org_admin_role(request, target_member, action):
         raise PermissionDenied
 
     if request.method == "POST":
-        if action == "add":
-            request.current_organization.set_admin_role(membership, admin=True, updated_by=request.user)
-            messages.success(
-                request, f"{target_member.get_full_name()} a été ajouté(e) aux administrateurs de cette structure."
-            )
-            request.current_organization.add_admin_email(target_member).send()
-        if action == "remove":
-            request.current_organization.set_admin_role(membership, admin=False, updated_by=request.user)
-            messages.success(
-                request, f"{target_member.get_full_name()} a été retiré(e) des administrateurs de cette structure."
-            )
-            request.current_organization.remove_admin_email(target_member).send()
+        match action:
+            case "add":
+                request.current_organization.set_admin_role(membership, admin=True, updated_by=request.user)
+                messages.success(
+                    request, f"{target_member.get_full_name()} a été ajouté(e) aux administrateurs de cette structure."
+                )
+                request.current_organization.add_admin_email(target_member).send()
+            case "remove":
+                request.current_organization.set_admin_role(membership, admin=False, updated_by=request.user)
+                messages.success(
+                    request, f"{target_member.get_full_name()} a été retiré(e) des administrateurs de cette structure."
+                )
+                request.current_organization.remove_admin_email(target_member).send()
+            case _:
+                raise ValueError(f"Unknown {action=}")
         membership.save()
         return True
 
