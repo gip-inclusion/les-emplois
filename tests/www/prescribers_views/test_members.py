@@ -1,3 +1,4 @@
+import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 
@@ -156,6 +157,33 @@ class TestUserMembershipDeactivation:
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
         response = client.post(url)
         assert response.status_code == 403
+
+    @pytest.mark.parametrize("method", ["get", "post"])
+    def test_deactivate_inactive_member(self, client, method, mailoutbox):
+        organization = PrescriberOrganizationFactory()
+        admin_membership = PrescriberMembershipFactory(organization=organization, is_admin=True)
+        guest_membership = PrescriberMembershipFactory(organization=organization, is_active=False)
+
+        client.force_login(admin_membership.user)
+        request = getattr(client, method)
+        response = request(
+            reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest_membership.user_id})
+        )
+        assert response.status_code == 403
+        guest_membership.refresh_from_db()
+        assert guest_membership.is_active is False
+        assert mailoutbox == []
+
+    @pytest.mark.parametrize("method", ["get", "post"])
+    def test_deactivate_non_member(self, client, method, mailoutbox):
+        organization = PrescriberOrganizationFactory()
+        admin_membership = PrescriberMembershipFactory(organization=organization, is_admin=True)
+        other_user = PrescriberFactory()
+        client.force_login(admin_membership.user)
+        request = getattr(client, method)
+        response = request(reverse("prescribers_views:deactivate_member", kwargs={"user_id": other_user.pk}))
+        assert response.status_code == 403
+        assert mailoutbox == []
 
     def test_deactivated_prescriber_is_orienter(self, client):
         """

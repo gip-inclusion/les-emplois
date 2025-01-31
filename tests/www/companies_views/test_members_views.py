@@ -8,6 +8,7 @@ from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
     CompanyWith2MembershipsFactory,
+    EmployerFactory,
 )
 
 
@@ -155,6 +156,30 @@ class TestUserMembershipDeactivation:
         assert response.status_code == 403
         other_membership.refresh_from_db()
         assert other_membership.is_active is True
+
+    @pytest.mark.parametrize("method", ["get", "post"])
+    def test_deactivate_inactive_member(self, client, method, mailoutbox):
+        company = CompanyFactory()
+        admin_membership = CompanyMembershipFactory(company=company, is_admin=True)
+        guest_membership = CompanyMembershipFactory(company=company, is_active=False)
+
+        client.force_login(admin_membership.user)
+        request = getattr(client, method)
+        response = request(reverse("companies_views:deactivate_member", kwargs={"user_id": guest_membership.user_id}))
+        assert response.status_code == 403
+        guest_membership.refresh_from_db()
+        assert guest_membership.is_active is False
+        assert mailoutbox == []
+
+    @pytest.mark.parametrize("method", ["get", "post"])
+    def test_deactivate_non_member(self, client, method, mailoutbox):
+        company = CompanyFactory()
+        admin_membership = CompanyMembershipFactory(company=company, is_admin=True)
+        other_user = EmployerFactory()
+        client.force_login(admin_membership.user)
+        request = getattr(client, method)
+        response = request(reverse("companies_views:deactivate_member", kwargs={"user_id": other_user.pk}))
+        assert response.status_code == 403
         assert mailoutbox == []
 
     def test_user_with_no_company_left(self, client):
