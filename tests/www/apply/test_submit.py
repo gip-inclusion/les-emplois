@@ -1857,13 +1857,9 @@ class TestApplyAsPrescriber:
         response = client.get(next_url)
         assert response.status_code == 200
 
-        # Check GPS group
+        # GPS : no following for not authorized prescribers
         # ----------------------------------------------------------------------
-        group = FollowUpGroup.objects.get()
-        assert group.beneficiary == new_job_seeker
-        membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
-        assert membership.member == user
-        assert membership.creator == user
+        assert not FollowUpGroup.objects.exists()
 
     def test_check_info_as_prescriber_for_job_seeker_with_incomplete_info(self, client):
         company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
