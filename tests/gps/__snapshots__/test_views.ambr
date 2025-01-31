@@ -271,13 +271,14 @@
                                       <li>
                                           <small>Adresse e-mail</small>
                                           
-                                              <button class="btn-link btn-ico has-btn-with-spinner-loading-text" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_email" hx-post="/gps/display/[PK of group]/[Public ID of participant]/email" hx-swap="outerHTML" id="email-[PK of participant]">
-                                                  <span>Afficher l'email</span>
+                                              <button class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_email" hx-post="/gps/display/[PK of group]/[Public ID of participant]/email" hx-swap="outerHTML" id="email-[PK of participant]">
                                                   <div class="stable-text">
                                                       <i aria-hidden="true" class="ri-mail-line fw-medium"></i>
+                                                      <span>Afficher l'email</span>
                                                   </div>
                                                   <div class="loading-text">
                                                       <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+                                                      <span>Affichage en cours</span>
                                                   </div>
                                               </button>
                                           
@@ -286,13 +287,14 @@
                                           <small>Téléphone</small>
                                           
                                               
-                                                  <button class="btn-link btn-ico has-btn-with-spinner-loading-text" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_phone" hx-post="/gps/display/[PK of group]/[Public ID of participant]/phone" hx-swap="outerHTML" id="phone-[PK of participant]">
-                                                      <span>Afficher le téléphone</span>
+                                                  <button class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_phone" hx-post="/gps/display/[PK of group]/[Public ID of participant]/phone" hx-swap="outerHTML" id="phone-[PK of participant]">
                                                       <div class="stable-text">
                                                           <i aria-hidden="true" class="ri-phone-line fw-medium"></i>
+                                                          <span>Afficher le téléphone</span>
                                                       </div>
                                                       <div class="loading-text">
                                                           <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+                                                          <span>Affichage en cours</span>
                                                       </div>
                                                   </button>
                                               
