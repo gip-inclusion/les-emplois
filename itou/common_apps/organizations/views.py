@@ -33,13 +33,13 @@ def deactivate_org_member(request, user_id, *, success_url, template_name):
     return render(request, template_name, context)
 
 
-def update_org_admin_role(request, target_member, action):
-    if not request.is_current_organization_admin or target_member == request.user:
+def update_org_admin_role(request, action, user_id, *, success_url, template_name):
+    if not request.is_current_organization_admin or request.user.pk == user_id:
         raise PermissionDenied
 
     membership = get_object_or_404(
         request.current_organization.memberships.select_related("user"),
-        user_id=target_member.pk,
+        user_id=user_id,
         is_active=True,
     )
 
@@ -55,8 +55,13 @@ def update_org_admin_role(request, target_member, action):
                 raise ValueError(f"Unknown {action=}")
         request.current_organization.set_admin_role(membership, admin, updated_by=request.user)
         messages.success(
-            request, f"{target_member.get_full_name()} a été {action_label} administrateurs de cette structure."
+            request, f"{membership.user.get_full_name()} a été {action_label} administrateurs de cette structure."
         )
-        return True
+        return HttpResponseRedirect(success_url)
 
-    return False
+    context = {
+        "action": action,
+        "structure": request.current_organization,
+        "target_member": membership.user,
+    }
+    return render(request, template_name, context)
