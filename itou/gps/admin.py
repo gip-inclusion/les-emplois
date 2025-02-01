@@ -72,6 +72,7 @@ class FollowUpGroupMembershipAdmin(ItouModelAdmin):
     def save_model(self, request, obj, form, change):
         if not change:
             obj.creator = request.user
+            obj.last_contact_at = obj.created_at
 
         else:
             if not form.cleaned_data["is_active"] and form.initial["is_active"]:
