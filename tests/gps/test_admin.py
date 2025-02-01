@@ -82,3 +82,4 @@ def test_create_follow_up_membership(admin_client):
 
     membership.refresh_from_db()
     assert membership.ended_at is not None
+    assert membership.created_at == membership.last_contact_at
