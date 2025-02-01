@@ -11,13 +11,14 @@ class MemberInline(admin.TabularInline):
     can_delete = False
     readonly_fields = [
         "is_active",
-        "ended_at",
         "is_referent",
         "member",
-        "updated_at",
-        "created_in_bulk",
         "created_at",
+        "last_contact_at",
+        "ended_at",
         "creator",
+        "created_in_bulk",
+        "updated_at",
     ]
 
     show_change_link = True
@@ -37,13 +38,24 @@ class FollowUpGroupMembershipAdmin(ItouModelAdmin):
         "created_in_bulk",
     )
     raw_id_fields = ("follow_up_group", "member")
-    readonly_fields = (
-        "creator",
+    fields = (
+        "is_referent",
+        "is_active",
+        "follow_up_group",
+        "member",
         "created_at",
         "last_contact_at",
-        "updated_at",
         "ended_at",
+        "creator",
         "created_in_bulk",
+        "updated_at",
+    )
+    readonly_fields = (
+        "last_contact_at",
+        "ended_at",
+        "creator",
+        "created_in_bulk",
+        "updated_at",
     )
     ordering = ["-created_at"]
 
