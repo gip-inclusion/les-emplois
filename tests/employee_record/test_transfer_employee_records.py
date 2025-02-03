@@ -1,5 +1,5 @@
-import io
 import json
+import re
 import uuid
 
 import freezegun
@@ -26,7 +26,7 @@ def command_fixture(mocker, settings, sftp_directory, sftp_client_factory):
     sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR).mkdir()
 
     # Create the management command and mock the SFTP connection
-    command = transfer_employee_records.Command(stdout=io.StringIO(), stderr=io.StringIO())
+    command = transfer_employee_records.Command()
     mocker.patch("itou.utils.asp.get_sftp_connection", sftp_client_factory)
 
     return command
@@ -45,17 +45,17 @@ def process_incoming_file(sftp_directory, code, message):
 
 
 @override_settings(ASP_SFTP_HOST="")
-def test_missing_environment_asp_sftp_host(snapshot, command):
+def test_missing_environment_asp_sftp_host(snapshot, command, caplog):
     command.handle(upload=False, download=True, preflight=False, wet_run=False)
-    assert command.stdout.getvalue() == snapshot
+    assert caplog.messages == snapshot
 
 
-def test_option_asp_test(snapshot, command):
+def test_option_asp_test(snapshot, command, caplog):
     command.handle(asp_test=True, upload=False, download=True, preflight=False, wet_run=False)
-    assert command.stdout.getvalue() == snapshot
+    assert caplog.messages == snapshot
 
 
-def test_connection_error(mocker, command):
+def test_connection_error(mocker, command, caplog):
     mocker.patch("itou.utils.asp.get_sftp_connection", side_effect=Exception)
     employee_record = EmployeeRecordFactory(ready_for_transfer=True)
 
@@ -64,22 +64,22 @@ def test_connection_error(mocker, command):
 
     employee_record.refresh_from_db()
     assert employee_record.status == Status.READY
-    assert command.stdout.getvalue() == ""
+    assert caplog.messages == []
 
 
-def test_preflight(snapshot, command):
+def test_preflight(snapshot, command, caplog):
     EmployeeRecordFactory.create_batch(3, ready_for_transfer=True)
 
     command.handle(preflight=True, upload=False, download=False, wet_run=False)
-    assert command.stdout.getvalue() == snapshot
+    assert caplog.messages == snapshot
 
 
-def test_preflight_without_object(snapshot, command):
+def test_preflight_without_object(snapshot, command, caplog):
     command.handle(preflight=True, upload=False, download=False, wet_run=False)
-    assert command.stdout.getvalue() == snapshot
+    assert caplog.messages == snapshot
 
 
-def test_preflight_with_error(snapshot, command):
+def test_preflight_with_error(snapshot, command, caplog):
     EmployeeRecordFactory(
         ready_for_transfer=True,
         approval_number="",
@@ -94,11 +94,11 @@ def test_preflight_with_error(snapshot, command):
     )
 
     command.handle(preflight=True, upload=False, download=False, wet_run=False)
-    assert command.stdout.getvalue() == snapshot
+    assert caplog.messages == snapshot
 
 
 @freezegun.freeze_time("2021-09-27")
-def test_upload_file_error(faker, snapshot, sftp_directory, command):
+def test_upload_file_error(faker, snapshot, sftp_directory, command, caplog):
     employee_record = EmployeeRecordFactory(ready_for_transfer=True)
     sftp_directory.joinpath(REMOTE_UPLOAD_DIR).rmdir()
 
@@ -106,18 +106,18 @@ def test_upload_file_error(faker, snapshot, sftp_directory, command):
 
     employee_record.refresh_from_db()
     assert employee_record.status == Status.READY
-    assert command.stdout.getvalue() == snapshot
+    assert caplog.messages == snapshot
 
 
 @freezegun.freeze_time("2021-09-27")
-def test_upload_only_create_a_limited_number_of_files(mocker, snapshot, sftp_directory, command):
+def test_upload_only_create_a_limited_number_of_files(mocker, snapshot, sftp_directory, command, caplog):
     mocker.patch.object(EmployeeRecordBatch, "MAX_EMPLOYEE_RECORDS", 1)
     EmployeeRecordFactory.create_batch(2, ready_for_transfer=True)
 
     command.handle(upload=True, download=False, preflight=False, wet_run=True)
     assert len(list(sftp_directory.joinpath(REMOTE_UPLOAD_DIR).iterdir())) == command.MAX_UPLOADED_FILES
 
-    assert command.stdout.getvalue() == snapshot
+    assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == snapshot()
 
 
 @freezegun.freeze_time("2021-09-27")
@@ -130,11 +130,11 @@ def test_upload_only_send_a_limited_number_of_rows(mocker, snapshot, sftp_direct
         assert len(file.read_text().splitlines()) == 1
 
 
-def test_download_file_error(faker, snapshot, sftp_directory, command):
+def test_download_file_error(faker, snapshot, sftp_directory, command, caplog):
     sftp_directory.joinpath("retrait/RIAE_FS_00000000000000_FichierRetour.json").touch(0o000)
 
     command.handle(upload=False, download=True, preflight=False, wet_run=True)
-    assert command.stdout.getvalue() == snapshot
+    assert caplog.messages == snapshot
 
 
 @freezegun.freeze_time("2021-09-27")
@@ -147,7 +147,7 @@ def test_dry_run_upload_and_download(command):
 
 
 @freezegun.freeze_time("2021-09-27")
-def test_upload_and_download(snapshot, sftp_directory, command):
+def test_upload_and_download(snapshot, sftp_directory, command, caplog):
     employee_record = EmployeeRecordFactory(ready_for_transfer=True)
 
     command.handle(upload=True, download=False, preflight=False, wet_run=True)
@@ -164,7 +164,7 @@ def test_upload_and_download(snapshot, sftp_directory, command):
     assert employee_record.asp_processing_code == "0000"
     assert employee_record.archived_json.get("libelleTraitement") == "OK"
 
-    assert command.stdout.getvalue() == snapshot()
+    assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == snapshot()
 
 
 def test_duplicates_automatic_processing(sftp_directory, command):
