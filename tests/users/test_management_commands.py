@@ -13,7 +13,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
+from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -230,7 +230,7 @@ class TestCommandNewUsersToBrevo:
     def test_wet_run_siae(self, caplog, respx_mock):
         # Job seekers are ignored.
         JobSeekerFactory(with_verified_email=True)
-        for kind in set(CompanyKind) - set(SIAE_WITH_CONVENTION_KINDS):
+        for kind in set(CompanyKind) - set(CompanyKind.siae_kinds()):
             CompanyMembershipFactory(company__kind=kind, user__identity_provider=IdentityProvider.PRO_CONNECT)
         # Missing verified email and not using IC
         CompanyMembershipFactory(company__kind=CompanyKind.EI, user__identity_provider=IdentityProvider.DJANGO)

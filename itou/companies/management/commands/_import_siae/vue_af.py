@@ -24,7 +24,7 @@ from collections import defaultdict
 
 from django.utils import timezone
 
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
+from itou.companies.enums import CompanyKind
 from itou.companies.management.commands._import_siae.utils import get_fluxiae_df, remap_columns
 from itou.companies.models import SiaeFinancialAnnex
 from itou.utils.validators import validate_af_number
@@ -81,7 +81,7 @@ def get_vue_af_df():
     df["kind"] = df["kind"].str.replace("_DC", "")
 
     # Filter out rows with irrelevant kind.
-    df = df[df.kind.isin(SIAE_WITH_CONVENTION_KINDS)]
+    df = df[df.kind.isin(CompanyKind.siae_kinds())]
 
     # Build complete AF number.
     df["number"] = df.number_prefix + "A" + df.renewal_number.astype(str) + "M" + df.modification_number.astype(str)
