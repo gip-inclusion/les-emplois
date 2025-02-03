@@ -50,16 +50,14 @@ class IdentityProvider(models.TextChoices):
     PRO_CONNECT = "PC", "ProConnect"
     PE_CONNECT = "PEC", "Pôle emploi Connect"
 
-    @classmethod
-    @property
-    def supported_user_kinds(cls):
-        return {
-            cls.DJANGO: tuple(UserKind.values),
-            cls.FRANCE_CONNECT: (UserKind.JOB_SEEKER,),
-            cls.INCLUSION_CONNECT: (),  # Not supported anymore
-            cls.PE_CONNECT: (UserKind.JOB_SEEKER,),
-            cls.PRO_CONNECT: (UserKind.PRESCRIBER, UserKind.EMPLOYER),
-        }
+
+IDENTITY_PROVIDER_SUPPORTED_USER_KIND = {
+    IdentityProvider.DJANGO: tuple(UserKind.values),
+    IdentityProvider.FRANCE_CONNECT: (UserKind.JOB_SEEKER,),
+    IdentityProvider.INCLUSION_CONNECT: (),  # Not supported anymore
+    IdentityProvider.PE_CONNECT: (UserKind.JOB_SEEKER,),
+    IdentityProvider.PRO_CONNECT: (UserKind.PRESCRIBER, UserKind.EMPLOYER),
+}
 
 
 class LackOfNIRReason(models.TextChoices):

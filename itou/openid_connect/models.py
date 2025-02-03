@@ -9,7 +9,7 @@ from django.utils import crypto, timezone
 from django.utils.html import format_html
 
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP, OIDC_STATE_EXPIRATION
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils.constants import ITOU_HELP_CENTER_URL
 
@@ -131,7 +131,7 @@ class OIDConnectUserData:
 
     @property
     def login_allowed_user_kinds(self) -> tuple[UserKind]:
-        return IdentityProvider.supported_user_kinds[self.identity_provider]
+        return IDENTITY_PROVIDER_SUPPORTED_USER_KIND[self.identity_provider]
 
     def check_valid_kind(self, user, user_data_dict, is_login):
         if user.kind not in self.login_allowed_user_kinds or (user.kind != user_data_dict["kind"] and not is_login):

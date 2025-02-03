@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.views.generic.edit import FormView
 
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
-from itou.users.enums import MATOMO_ACCOUNT_TYPE, IdentityProvider, UserKind
+from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, MATOMO_ACCOUNT_TYPE, IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.urls import add_url_params, get_safe_url, get_url_param_value
@@ -34,7 +34,7 @@ class UserKindLoginMixin:
         if not settings.PRO_CONNECT_BASE_URL:
             return None
 
-        if self.user_kind not in IdentityProvider.supported_user_kinds[IdentityProvider.PRO_CONNECT]:
+        if self.user_kind not in IDENTITY_PROVIDER_SUPPORTED_USER_KIND[IdentityProvider.PRO_CONNECT]:
             return None
 
         params = {
