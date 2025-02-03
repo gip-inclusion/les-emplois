@@ -186,9 +186,7 @@ class TestProConnectModel:
         with pytest.raises(PrescriberOrganization.DoesNotExist):
             pc_user_data.join_org(user=user, safir=safir)
 
-        assert (
-            f"Organization with SAFIR {safir} does not exist. Unable to add user {user.email}." in caplog.messages[0]
-        )
+        assert f"Organization with SAFIR {safir} does not exist. Unable to add user {user.email}." in caplog.messages
         assert organization.active_members.count() == 1
         assert organization.has_admin(user)
 
