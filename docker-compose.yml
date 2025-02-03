@@ -70,7 +70,7 @@ services:
       args:
         APP_USER: app
         APP_DIR: /app
-        PYTHON_VERSION: 3.12
+        PYTHON_VERSION: 3.13
         PG_MAJOR: 15
     volumes:
       # Mount the current directory into `/app` inside the running container.
