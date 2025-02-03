@@ -29,7 +29,7 @@ class EmployerInvitationFactory(factory.django.DjangoModelFactory):
     sender = factory.LazyAttribute(lambda o: o.company.members.first())
 
 
-class PrescriberWithOrgSentInvitationFactory(factory.django.DjangoModelFactory):
+class PrescriberWithOrgInvitationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.PrescriberWithOrgInvitation
 

@@ -6,7 +6,7 @@ from itou.users.enums import KIND_EMPLOYER
 from tests.companies.factories import CompanyMembershipFactory
 from tests.invitations.factories import (
     EmployerInvitationFactory,
-    PrescriberWithOrgSentInvitationFactory,
+    PrescriberWithOrgInvitationFactory,
 )
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
@@ -97,7 +97,7 @@ class TestInvitationEmails:
 
 class TestPrescriberWithOrgInvitation:
     def test_add_or_activate_membership_to_organization(self):
-        invitation = PrescriberWithOrgSentInvitationFactory(email="hey@you.com")
+        invitation = PrescriberWithOrgInvitationFactory(email="hey@you.com")
         PrescriberFactory(email=invitation.email)
         org_members = invitation.organization.members.count()
         invitation.add_invited_user_to_organization()
@@ -105,7 +105,7 @@ class TestPrescriberWithOrgInvitation:
         assert org_members + 1 == org_members_after
 
     def test_add_inactive_member_back_to_organization(self):
-        invitation = PrescriberWithOrgSentInvitationFactory(email="hey@you.com")
+        invitation = PrescriberWithOrgInvitationFactory(email="hey@you.com")
         PrescriberMembershipFactory(
             organization=invitation.organization, user__email=invitation.email, is_active=False
         )
@@ -120,7 +120,7 @@ class TestPrescriberWithOrgInvitation:
 
 class TestPrescriberWithOrgInvitationEmails:
     def test_accepted_notif_sender(self):
-        invitation = PrescriberWithOrgSentInvitationFactory()
+        invitation = PrescriberWithOrgInvitationFactory()
         email = invitation.notifications_accepted_notif_sender.build()
 
         # Subject
@@ -137,7 +137,7 @@ class TestPrescriberWithOrgInvitationEmails:
         assert invitation.sender.email in email.to
 
     def test_email_invitation(self):
-        invitation = PrescriberWithOrgSentInvitationFactory()
+        invitation = PrescriberWithOrgInvitationFactory()
         email = invitation.email_invitation
 
         # Subject

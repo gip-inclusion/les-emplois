@@ -7,7 +7,7 @@ from itou.www.invitations_views.helpers import accept_all_pending_invitations
 from tests.invitations.factories import (
     EmployerInvitationFactory,
     LaborInspectorInvitationFactory,
-    PrescriberWithOrgSentInvitationFactory,
+    PrescriberWithOrgInvitationFactory,
 )
 from tests.users.factories import EmployerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.tests import get_response_for_middlewaremixin
@@ -31,11 +31,11 @@ def test_accept_prescriber_invitations():
     prescriber = PrescriberFactory()
     request.user = prescriber
 
-    valid_invitation_1 = PrescriberWithOrgSentInvitationFactory(email=prescriber.email)
-    valid_invitation_2 = PrescriberWithOrgSentInvitationFactory(email=prescriber.email)
+    valid_invitation_1 = PrescriberWithOrgInvitationFactory(email=prescriber.email)
+    valid_invitation_2 = PrescriberWithOrgInvitationFactory(email=prescriber.email)
     # non pending invitations
-    PrescriberWithOrgSentInvitationFactory(email=prescriber.email, expired=True)
-    PrescriberWithOrgSentInvitationFactory(email=prescriber.email, accepted=True)
+    PrescriberWithOrgInvitationFactory(email=prescriber.email, expired=True)
+    PrescriberWithOrgInvitationFactory(email=prescriber.email, accepted=True)
     # other user kind invitations
     EmployerInvitationFactory(email=prescriber.email)
     LaborInspectorInvitationFactory(email=prescriber.email)
@@ -54,7 +54,7 @@ def test_accept_employer_invitations():
     EmployerInvitationFactory(email=prescriber.email, expired=True)
     EmployerInvitationFactory(email=prescriber.email, accepted=True)
     # other user kind invitations
-    PrescriberWithOrgSentInvitationFactory(email=prescriber.email)
+    PrescriberWithOrgInvitationFactory(email=prescriber.email)
     LaborInspectorInvitationFactory(email=prescriber.email)
 
     assert accept_all_pending_invitations(request) == [valid_invitation_1, valid_invitation_2]
@@ -72,6 +72,6 @@ def test_accept_labor_inspector_invitations():
     LaborInspectorInvitationFactory(email=prescriber.email, accepted=True)
     # other user kind invitations
     EmployerInvitationFactory(email=prescriber.email)
-    PrescriberWithOrgSentInvitationFactory(email=prescriber.email)
+    PrescriberWithOrgInvitationFactory(email=prescriber.email)
 
     assert accept_all_pending_invitations(request) == [valid_invitation_1, valid_invitation_2]

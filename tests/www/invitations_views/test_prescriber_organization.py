@@ -23,7 +23,7 @@ from itou.utils import constants as global_constants
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.urls import add_url_params
 from tests.companies.factories import CompanyFactory
-from tests.invitations.factories import PrescriberWithOrgSentInvitationFactory
+from tests.invitations.factories import PrescriberWithOrgInvitationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import ItouClient, assert_previous_step
@@ -256,7 +256,7 @@ class TestAcceptPrescriberWithOrgInvitation:
 
     @respx.mock
     def test_accept_prescriber_org_invitation(self, client, mailoutbox, pro_connect):
-        invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
+        invitation = PrescriberWithOrgInvitationFactory(sender=self.sender, organization=self.organization)
         response = client.get(invitation.acceptance_link)
         pro_connect.assertContainsButton(response)
 
@@ -319,7 +319,7 @@ class TestAcceptPrescriberWithOrgInvitation:
 
     @respx.mock
     def test_accept_prescriber_org_invitation_returns_on_other_browser(self, client, mailoutbox, pro_connect):
-        invitation = PrescriberWithOrgSentInvitationFactory(
+        invitation = PrescriberWithOrgInvitationFactory(
             email=pro_connect.oidc_userinfo["email"],
             sender=self.sender,
             organization=self.organization,
@@ -359,7 +359,7 @@ class TestAcceptPrescriberWithOrgInvitation:
     @respx.mock
     def test_accept_prescriber_org_invitation_without_link(self, client, mailoutbox, pro_connect):
         # The user's invitations are automatically accepted at login
-        invitation = PrescriberWithOrgSentInvitationFactory(
+        invitation = PrescriberWithOrgInvitationFactory(
             email=pro_connect.oidc_userinfo["email"],
             sender=self.sender,
             organization=self.organization,
@@ -378,7 +378,7 @@ class TestAcceptPrescriberWithOrgInvitation:
 
     def test_accept_existing_user_is_prescriber_without_org(self, client, mailoutbox):
         user = PrescriberFactory(has_completed_welcoming_tour=True)
-        invitation = PrescriberWithOrgSentInvitationFactory(
+        invitation = PrescriberWithOrgInvitationFactory(
             sender=self.sender,
             organization=self.organization,
             first_name=user.first_name,
@@ -394,7 +394,7 @@ class TestAcceptPrescriberWithOrgInvitation:
 
     def test_accept_existing_user_email_different_case(self, client, mailoutbox):
         user = PrescriberFactory(has_completed_welcoming_tour=True, email="HEY@example.com")
-        invitation = PrescriberWithOrgSentInvitationFactory(
+        invitation = PrescriberWithOrgInvitationFactory(
             sender=self.sender,
             organization=self.organization,
             first_name=user.first_name,
@@ -410,7 +410,7 @@ class TestAcceptPrescriberWithOrgInvitation:
         user = PrescriberOrganizationWithMembershipFactory().members.first()
         user.has_completed_welcoming_tour = True
         user.save()
-        invitation = PrescriberWithOrgSentInvitationFactory(
+        invitation = PrescriberWithOrgInvitationFactory(
             sender=self.sender,
             organization=self.organization,
             first_name=user.first_name,
@@ -424,7 +424,7 @@ class TestAcceptPrescriberWithOrgInvitation:
 
     @respx.mock
     def test_accept_existing_user_not_logged_in_using_PC(self, client, mailoutbox, pro_connect):
-        invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
+        invitation = PrescriberWithOrgInvitationFactory(sender=self.sender, organization=self.organization)
         user = PrescriberFactory(
             username=pro_connect.oidc_userinfo["sub"],
             email=pro_connect.oidc_userinfo["email"],
@@ -432,7 +432,7 @@ class TestAcceptPrescriberWithOrgInvitation:
         )
         # The user verified its email
         EmailAddress(user_id=user.pk, email=user.email, verified=True, primary=True).save()
-        invitation = PrescriberWithOrgSentInvitationFactory(
+        invitation = PrescriberWithOrgInvitationFactory(
             sender=self.sender,
             organization=self.organization,
             first_name=user.first_name,
@@ -468,11 +468,11 @@ class TestAcceptPrescriberWithOrgInvitation:
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox, new_user=False)
 
     def test_accept_existing_user_not_logged_in_using_django_auth(self, client, mailoutbox):
-        invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
+        invitation = PrescriberWithOrgInvitationFactory(sender=self.sender, organization=self.organization)
         user = PrescriberFactory(has_completed_welcoming_tour=True, identity_provider="DJANGO")
         # The user verified its email
         EmailAddress(user_id=user.pk, email=user.email, verified=True, primary=True).save()
-        invitation = PrescriberWithOrgSentInvitationFactory(
+        invitation = PrescriberWithOrgInvitationFactory(
             sender=self.sender,
             organization=self.organization,
             first_name=user.first_name,
@@ -501,7 +501,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions:
 
     def test_existing_user_is_not_prescriber(self, client):
         user = CompanyFactory(with_membership=True).members.first()
-        invitation = PrescriberWithOrgSentInvitationFactory(
+        invitation = PrescriberWithOrgInvitationFactory(
             sender=self.sender,
             organization=self.organization,
             first_name=user.first_name,
@@ -516,7 +516,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions:
         assert not invitation.accepted_at
 
     def test_connected_user_is_not_the_invited_user(self, client):
-        invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
+        invitation = PrescriberWithOrgInvitationFactory(sender=self.sender, organization=self.organization)
         client.force_login(self.sender)
         response = client.get(invitation.acceptance_link, follow=True)
         assertRedirects(response, reverse("account_logout"))
@@ -525,7 +525,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions:
         assertContains(response, escape("Un utilisateur est déjà connecté."))
 
     def test_expired_invitation_with_new_user(self, client):
-        invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
+        invitation = PrescriberWithOrgInvitationFactory(sender=self.sender, organization=self.organization)
         invitation.sent_at -= timedelta(days=invitation.DEFAULT_VALIDITY_DAYS)
         invitation.save()
         assert invitation.has_expired
@@ -541,7 +541,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions:
 
     def test_expired_invitation_with_existing_user(self, client):
         user = PrescriberFactory()
-        invitation = PrescriberWithOrgSentInvitationFactory(
+        invitation = PrescriberWithOrgInvitationFactory(
             first_name=user.first_name,
             last_name=user.last_name,
             email=user.email,
