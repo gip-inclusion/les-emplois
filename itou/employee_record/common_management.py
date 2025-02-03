@@ -69,8 +69,8 @@ class EmployeeRecordTransferCommand(BaseCommand):
         remote_path = f"RIAE_FS_{timezone.now():%Y%m%d%H%M%S}.json"
 
         if dry_run:
-            self.stdout.write(f"DRY-RUN: (not) sending '{remote_path}' ({len(json_bytes)} bytes)")
-            self.stdout.write(f"Content: \n{json_bytes}")
+            self.logger.info(f"DRY-RUN: (not) sending '{remote_path}' ({len(json_bytes)} bytes)")
+            self.logger.info(f"Content: \n{json_bytes}")
 
             return remote_path
 
@@ -93,9 +93,9 @@ class EmployeeRecordTransferCommand(BaseCommand):
                 confirm=False,
             )
         except Exception as ex:
-            self.stdout.write(f"Could not upload file: {remote_path}, reason: {ex}")
+            self.logger.error("Could not upload file: %s, reason: %s", remote_path, ex)
             return
-        self.stdout.write(f"Successfully uploaded: {remote_path}")
+        self.logger.info("Successfully uploaded: %s", remote_path)
 
         return remote_path
 
@@ -103,7 +103,7 @@ class EmployeeRecordTransferCommand(BaseCommand):
         raise NotImplementedError()
 
     def download_json_file(self, sftp: paramiko.SFTPClient, dry_run: bool):
-        self.stdout.write("Starting DOWNLOAD of feedback files")
+        self.logger.info("Starting DOWNLOAD of feedback files")
 
         # Get into the download folder
         sftp.chdir(REMOTE_DOWNLOAD_DIR)
@@ -118,28 +118,28 @@ class EmployeeRecordTransferCommand(BaseCommand):
                 # Remote is shared, so only try to process files related to our management command
                 continue
 
-            self.stdout.write(f"Fetching file: {filename}")
+            self.logger.info("Fetching file: %s", filename)
             try:
                 with sftp.file(filename, mode="r") as result_file, transaction.atomic():
                     # Parse and update employee records with feedback
                     self._parse_feedback_file(filename, parser.parse(result_file), dry_run)
             except IgnoreFile as ex:
-                self.stdout.write(f"Ignoring {filename}: {ex}")
+                self.logger.info("Ignoring %s: %s", filename, ex)
                 continue
             except Exception as ex:
-                self.stdout.write(f"Error while parsing file {filename}: {ex=}")
-                self.stdout.write(f"Will not delete file '{filename}' because of errors.")
+                self.logger.error("Error while parsing file %s: ex=%s", filename, ex)
+                self.logger.warning("Will not delete file '%s' because of errors.", filename)
                 continue
             else:
                 successfully_parsed_files += 1
 
             # Everything was fine, we can delete feedback file from server
-            self.stdout.write(f"Successfully processed '{filename}', it can be deleted.")
+            self.logger.info("Successfully processed '%s', it can be deleted.", filename)
             if not dry_run:
-                self.stdout.write(f"Deleting '{filename}' from SFTP server")
+                self.logger.info("Deleting '%s' from SFTP server", filename)
                 sftp.remove(filename)
 
-        self.stdout.write(f"Successfully parsed {successfully_parsed_files}/{len(result_files)} files")
+        self.logger.info("Successfully parsed %d/%d files", successfully_parsed_files, len(result_files))
 
     def preflight(self, object_class):
         """Parse new notifications or employee records and attempt to tackle serialization errors.
@@ -166,12 +166,13 @@ class EmployeeRecordTransferCommand(BaseCommand):
         )
 
         if not new_objects:
-            self.stdout.write("No object to check. Exiting preflight.")
+            self.logger.info("No object to check. Exiting preflight.")
             return
 
-        self.stdout.write(
-            f"Found {len(new_objects)} object(s) to check, split in chunks of "
-            f"{EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS} objects."
+        self.logger.info(
+            "Found %d object(s) to check, split in chunks of %d objects.",
+            len(new_objects),
+            EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS,
         )
 
         errors = False
@@ -179,16 +180,19 @@ class EmployeeRecordTransferCommand(BaseCommand):
             # A batch + serializer must be created with notifications for correct serialization
             batch = EmployeeRecordBatch(elements)
 
-            self.stdout.write(f"Checking file #{idx} (chunk of {len(elements)} objects)")
+            self.logger.info("Checking file #%d (chunk of %d objects)", idx, len(elements))
 
             for obj in batch.elements:
                 try:
                     object_serializer(obj).data  # Invoke DRF serialization
                 except Exception as ex:
-                    self.stdout.write(f"ERROR: serialization of {obj} failed!")
-                    self.stdout.write("".join(f"> {line}" for line in str(ex).splitlines(keepends=True)))
+                    self.logger.exception(
+                        "Serialization of %s failed!\n%s",
+                        obj,
+                        "".join(f"> {line}" for line in str(ex).splitlines(keepends=True)),
+                    )
                     errors = True
 
         if not errors:
             # Good to go !
-            self.stdout.write("All serializations ok, you may skip preflight...")
+            self.logger.info("All serializations ok, you may skip preflight...")

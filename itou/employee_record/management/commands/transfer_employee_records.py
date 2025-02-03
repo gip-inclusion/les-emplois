@@ -32,10 +32,12 @@ class Command(EmployeeRecordTransferCommand):
         try:
             remote_path = self.upload_json_file(batch_data, sftp, dry_run)
         except SerializationError as ex:
-            self.stdout.write(
-                f"Employee records serialization error during upload, can't process.\n"
-                f"You may want to use --preflight option to check faulty employee record objects.\n"
-                f"Check batch details and error: {raw_batch=},\n{ex=}"
+            self.logger.error(
+                "Employee records serialization error during upload, can't process.\n"
+                "You may want to use --preflight option to check faulty employee record objects.\n"
+                "Check batch details and error: raw_batch=%s,\nex=%s",
+                raw_batch,
+                ex,
             )
             return
         except Exception as ex:
@@ -43,13 +45,13 @@ class Command(EmployeeRecordTransferCommand):
             raise ex from Exception(f"Unhandled error during upload phase for batch: {raw_batch=}")
         else:
             if not remote_path:
-                self.stdout.write("Could not upload file, exiting ...")
+                self.logger.warning("Could not upload file, exiting ...")
                 return
 
             # - update employee record notifications status (to SENT)
             # - store in which file they have been seen
             if dry_run:
-                self.stdout.write("DRY-RUN: Not *really* updating employee records statuses")
+                self.logger.info("DRY-RUN: Not *really* updating employee records statuses")
                 return
 
             # Now that file is transferred, update employee records status (SENT)
@@ -77,21 +79,21 @@ class Command(EmployeeRecordTransferCommand):
             line_number = raw_employee_record["numLigne"]
             processing_code = raw_employee_record["codeTraitement"]
             processing_label = raw_employee_record["libelleTraitement"]
-            self.stdout.write(f"Record: {line_number=}, {processing_code=}, {processing_label=}")
+            self.logger.info(f"Record: {line_number=}, {processing_code=}, {processing_label=}")
 
             # Now we must find the matching FS
             employee_record = EmployeeRecord.objects.find_by_batch(batch_filename, line_number).first()
             if not employee_record:
-                self.stdout.write(
+                self.logger.info(
                     f"Skipping, could not get existing employee record: {batch_filename=}, {line_number=}"
                 )
                 # Do not count as an error
                 continue
             if employee_record.status in [Status.PROCESSED, Status.REJECTED]:
-                self.stdout.write(f"Skipping, employee record is already {employee_record.status}")
+                self.logger.info(f"Skipping, employee record is already {employee_record.status}")
                 continue
             if employee_record.status != Status.SENT:
-                self.stdout.write(f"Skipping, incoherent status for {employee_record=}")
+                self.logger.info(f"Skipping, incoherent status for {employee_record=}")
                 continue
 
             archived_json = JSONRenderer().render(raw_employee_record)
@@ -99,7 +101,7 @@ class Command(EmployeeRecordTransferCommand):
                 if not dry_run:
                     employee_record.process(processing_code, processing_label, archived_json)
                 else:
-                    self.stdout.write(f"DRY-RUN: Accepted {employee_record=}, {processing_code=}, {processing_label=}")
+                    self.logger.info(f"DRY-RUN: Accepted {employee_record=}, {processing_code=}, {processing_label=}")
             else:  # Rejected by ASP
                 if not dry_run:
                     # One special case added for support concerns:
@@ -127,7 +129,7 @@ class Command(EmployeeRecordTransferCommand):
 
                     employee_record.reject(processing_code, processing_label, archived_json)
                 else:
-                    self.stdout.write(f"DRY-RUN: Rejected {employee_record=}, {processing_code=}, {processing_label=}")
+                    self.logger.info(f"DRY-RUN: Rejected {employee_record=}, {processing_code=}, {processing_label=}")
 
     @monitor(
         monitor_slug="transfer-employee-records-download",
@@ -159,7 +161,7 @@ class Command(EmployeeRecordTransferCommand):
         """
         Upload a file composed of all ready employee records
         """
-        self.stdout.write("Starting UPLOAD of employee records")
+        self.logger.info("Starting UPLOAD of employee records")
         ready_employee_records = EmployeeRecord.objects.filter(status=Status.READY)
         for batch in chunks(
             ready_employee_records, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS, max_chunk=self.MAX_UPLOADED_FILES
@@ -168,7 +170,7 @@ class Command(EmployeeRecordTransferCommand):
 
     def handle(self, *, upload, download, parse_file=None, preflight, wet_run, asp_test=False, debug=False, **options):
         if preflight:
-            self.stdout.write("Preflight activated, checking for possible serialization errors...")
+            self.logger.info("Preflight activated, checking for possible serialization errors...")
             self.preflight(EmployeeRecord)
         elif parse_file:
             # If we need to manually parse a feedback file then we probably have some kind of unexpected state,
@@ -177,16 +179,16 @@ class Command(EmployeeRecordTransferCommand):
                 self._parse_feedback_file(parse_file.name, JSONParser().parse(parse_file), dry_run=not wet_run)
         elif upload or download:
             if not settings.ASP_SFTP_HOST:
-                self.stdout.write("Your environment is missing ASP_SFTP_HOST to run this command.")
+                self.logger.info("Your environment is missing ASP_SFTP_HOST to run this command.")
                 return
 
             self.asp_test = asp_test
             if asp_test:
-                self.stdout.write("Using *TEST* JSON serializers (SIRET number mapping)")
+                self.logger.info("Using *TEST* JSON serializers (SIRET number mapping)")
 
             with asp_utils.get_sftp_connection() as sftp:
-                self.stdout.write(f'Connected to "{settings.ASP_SFTP_HOST}" as "{settings.ASP_SFTP_USER}"')
-                self.stdout.write(f'''Current remote dir is "{sftp.normalize(".")}"''')
+                self.logger.info(f'Connected to "{settings.ASP_SFTP_HOST}" as "{settings.ASP_SFTP_USER}"')
+                self.logger.info(f'''Current remote dir is "{sftp.normalize(".")}"''')
 
                 # Send files to ASP
                 if upload:
@@ -196,6 +198,6 @@ class Command(EmployeeRecordTransferCommand):
                 if download:
                     self.download(sftp, not wet_run)
 
-            self.stdout.write("Employee records processing done!")
+            self.logger.info("Employee records processing done!")
         else:
-            self.stdout.write("No valid options (upload, download or preflight) were given")
+            self.logger.info("No valid options (upload, download or preflight) were given")
