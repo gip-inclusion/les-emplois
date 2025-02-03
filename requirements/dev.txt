@@ -1095,9 +1095,9 @@ pluggy==1.5.0 \
     # via
     #   -r requirements/test.txt
     #   pytest
-pre-commit==4.0.1 \
-    --hash=sha256:80905ac375958c0444c65e9cebebd948b3cdb518f335a091a670a89d652139d2 \
-    --hash=sha256:efde913840816312445dc98787724647c65473daefe420785f885e8ed9a06878
+pre-commit==4.1.0 \
+    --hash=sha256:ae3f018575a588e30dfddfab9a05448bfbd6b73d78709617b5a2b853549716d4 \
+    --hash=sha256:d29e7cb346295bcc1cc75fc3e92e343495e3ea0196c9ec6ba53f49f10ab6ae7b
     # via -r requirements/dev.in
 prompt-toolkit==3.0.50 \
     --hash=sha256:544748f3860a2623ca5cd6d2795e7a14f3d0e1c3c9728359013f79877fc89bab \
