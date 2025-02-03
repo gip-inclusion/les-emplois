@@ -4,6 +4,8 @@ import logging
 import httpx
 from django.conf import settings
 
+from itou.eligibility.enums import AdministrativeCriteriaKind
+
 
 logger = logging.getLogger("APIParticulierClient")
 
@@ -50,12 +52,17 @@ def has_required_info(job_seeker):
     return all(required)
 
 
-def revenu_solidarite_active(client, job_seeker):
-    response = _request(client, "/v2/revenu-solidarite-active", job_seeker)
+def certify_criteria(criteria, client, job_seeker):
+    endpoint_mapping = {
+        AdministrativeCriteriaKind.RSA: "/v2/revenu-solidarite-active",
+    }
+    response = _request(client, endpoint_mapping[criteria], job_seeker)
+    # Endpoints from the "Prestations sociales" section share the same response schema.
+    # See https://particulier.api.gouv.fr/developpeurs/openapi#tag/Prestations-sociales
     certified = response["status"] == "beneficiaire"
     return {
         "start_at": datetime.date.fromisoformat(response["dateDebut"]) if certified else None,
-        # Do not expose end_at, it’s always null.
+        # When offered by the endpoint, the end_at field is always null. Ignore it.
         "is_certified": certified,
         "raw_response": response,
     }

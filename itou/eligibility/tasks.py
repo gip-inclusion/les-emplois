@@ -33,11 +33,9 @@ def certify_criteria(eligibility_diagnosis):
     )
     with api_particulier.client() as client:
         for criterion in criteria:
-            # Only the RSA criterion is certifiable at the moment,
-            # but this may change soon with the addition of `parent isolé` and `allocation adulte handicapé`.
             if criterion.administrative_criteria.kind == AdministrativeCriteriaKind.RSA:
                 try:
-                    data = api_particulier.revenu_solidarite_active(client, job_seeker)
+                    data = api_particulier.certify_criteria(criterion.administrative_criteria.kind, client, job_seeker)
                 except httpx.HTTPStatusError as exc:
                     criterion.data_returned_by_api = exc.response.json()
                     logger.error(
