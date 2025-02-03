@@ -7,7 +7,7 @@ from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
+from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.users.enums import LackOfNIRReason
@@ -38,7 +38,7 @@ def _get_user_form_data(user):
 
 class CreateEmployeeRecordTestMixin:
     URL_NAME = None
-    SIAE_KIND = random.choice(SIAE_WITH_CONVENTION_KINDS)
+    SIAE_KIND = random.choice(CompanyKind.siae_kinds)
 
     @pytest.fixture(autouse=True)
     def abstract_setup_method(self, mocker):
@@ -486,7 +486,7 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
     """
 
     URL_NAME = "employee_record_views:create_step_3"
-    SIAE_KIND = random.choice(list(set(SIAE_WITH_CONVENTION_KINDS) - {CompanyKind.EITI}))
+    SIAE_KIND = random.choice(list(set(CompanyKind.siae_kinds) - {CompanyKind.EITI}))
 
     @pytest.fixture(autouse=True)
     def setup_method(self, client):
@@ -706,7 +706,7 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
     """
 
     URL_NAME = "employee_record_views:create_step_5"
-    SIAE_KIND = random.choice(list(set(SIAE_WITH_CONVENTION_KINDS) - {CompanyKind.EITI}))
+    SIAE_KIND = random.choice(list(set(CompanyKind.siae_kinds) - {CompanyKind.EITI}))
 
     @pytest.fixture(autouse=True)
     def setup_method(self, client):
