@@ -4,6 +4,8 @@ import logging
 import httpx
 from django.conf import settings
 
+from itou.eligibility.enums import AdministrativeCriteriaKind
+
 
 logger = logging.getLogger("APIParticulierClient")
 
@@ -59,3 +61,10 @@ def revenu_solidarite_active(client, job_seeker):
         "is_certified": certified,
         "raw_response": response,
     }
+
+
+def call_endpoint_matching_criteria(criteria, client, job_seeker):
+    endpoint_mapping = {
+        AdministrativeCriteriaKind.RSA: revenu_solidarite_active,
+    }
+    return endpoint_mapping[criteria](client, job_seeker)
