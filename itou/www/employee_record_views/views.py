@@ -421,7 +421,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
 
     if request.method == "POST":
         back_url = f"{reverse('employee_record_views:list')}?status={employee_record.status}"
-        employee_record.ready()
+        employee_record.ready(user=request.user)
         toast_title, toast_message = (
             "La création de cette fiche salarié est terminée",
             "Vous pouvez suivre l'avancement de son traitement par l'ASP en sélectionnant les différents statuts.",
@@ -484,7 +484,7 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
         return HttpResponseRedirect(back_url)
 
     if request.method == "POST" and request.POST.get("confirm") == "true":
-        employee_record.disable()
+        employee_record.disable(user=request.user)
         messages.success(request, "La fiche salarié a bien été désactivée.", extra_tags="toast")
         return HttpResponseRedirect(back_url)
 
@@ -516,7 +516,7 @@ def reactivate(request, employee_record_id, template_name="employee_record/react
 
     if request.method == "POST" and request.POST.get("confirm") == "true":
         try:
-            employee_record.enable()
+            employee_record.enable(user=request.user)
             messages.success(request, "La fiche salarié a bien été réactivée.")
             return HttpResponseRedirect(back_url)
         except ValidationError as ex:
