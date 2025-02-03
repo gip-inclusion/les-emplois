@@ -1,7 +1,6 @@
 import datetime
 import functools
 import itertools
-import json
 from datetime import timedelta
 from unittest import mock
 
@@ -348,7 +347,7 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.status == Status.READY
 
     def test_state_sent(self, faker):
-        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=42, archive="{}")
+        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=42, archive={})
 
         assert self.employee_record.status == Status.SENT
         assert self.employee_record.asp_batch_line_number == 42
@@ -357,7 +356,7 @@ class TestEmployeeRecordLifeCycle:
     def test_state_rejected(self, faker):
         self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
 
-        self.employee_record.reject(code="12", label="JSON Invalide", archive="{}")
+        self.employee_record.reject(code="12", label="JSON Invalide", archive={})
         assert self.employee_record.status == Status.REJECTED
         assert self.employee_record.asp_processing_code == "12"
         assert self.employee_record.asp_processing_label == "JSON Invalide"
@@ -370,7 +369,7 @@ class TestEmployeeRecordLifeCycle:
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
             "La ligne de la fiche salarié a été enregistrée avec succès.",
         )
-        self.employee_record.process(code=process_code, label=process_message, archive="{}")
+        self.employee_record.process(code=process_code, label=process_message, archive={})
 
         assert self.employee_record.status == Status.PROCESSED
         assert self.employee_record.asp_processing_code == process_code
@@ -436,7 +435,7 @@ class TestEmployeeRecordLifeCycle:
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
             "La ligne de la fiche salarié a été enregistrée avec succès.",
         )
-        self.employee_record.process(code=process_code, label=process_message, archive="{}")
+        self.employee_record.process(code=process_code, label=process_message, archive={})
         self.employee_record.disable()
         assert self.employee_record.status == Status.DISABLED
 
@@ -461,7 +460,7 @@ class TestEmployeeRecordLifeCycle:
         self.employee_record.wait_for_asp_response(file=faker.unique.asp_batch_filename(), line_number=1, archive=None)
         process_code = EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE
         process_message = "La ligne de la fiche salarié a été enregistrée avec succès."
-        archive_first = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [1]."}'
+        archive_first = {"libelleTraitement": "La ligne de la fiche salarié a été enregistrée avec succès [1]."}
         self.employee_record.process(code=process_code, label=process_message, archive=archive_first)
         self.employee_record.disable()
         assert self.employee_record.status == Status.DISABLED
@@ -475,19 +474,19 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.status == Status.READY
 
         filename_second = faker.unique.asp_batch_filename()
-        archive_second = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [2]."}'
+        archive_second = {"libelleTraitement": "La ligne de la fiche salarié a été enregistrée avec succès [2]."}
         self.employee_record.wait_for_asp_response(file=filename_second, line_number=1, archive=archive_second)
         assert self.employee_record.asp_batch_file == filename_second
-        assert self.employee_record.archived_json == json.loads(archive_second)
+        assert self.employee_record.archived_json == archive_second
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
             "La ligne de la fiche salarié a été enregistrée avec succès.",
         )
-        archive_third = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [3]."}'
+        archive_third = {"libelleTraitement": "La ligne de la fiche salarié a été enregistrée avec succès [3]."}
         self.employee_record.process(code=process_code, label=process_message, archive=archive_third)
         assert self.employee_record.asp_batch_file == filename_second
-        assert self.employee_record.archived_json == json.loads(archive_third)
+        assert self.employee_record.archived_json == archive_third
 
     def test_reactivate_when_the_siae_has_changed(self, faker):
         new_company = CompanyFactory(use_employee_record=True)
@@ -550,7 +549,7 @@ class TestEmployeeRecordLifeCycle:
         employee_record_code_3436.process(
             code=employee_record_code_3436.asp_processing_code,
             label=employee_record_code_3436.asp_processing_label,
-            archive='{"codeTraitement": "3436"}',
+            archive={"codeTraitement": "3436"},
             as_duplicate=True,
         )
         assert employee_record_code_3436.processed_as_duplicate
@@ -625,17 +624,19 @@ class TestEmployeeRecordQueryset:
 
 @pytest.mark.parametrize("factory", [BareEmployeeRecordFactory, BareEmployeeRecordUpdateNotificationFactory])
 @pytest.mark.parametrize(
-    "archive,expected_archive",
+    "archive",
     [
-        ('{"Hello": "World"}', {"Hello": "World"}),
-        ("{}", {}),
-        ("", ""),
-        (None, None),
+        {"Hello": "World"},
+        '{"Hello": "World"}',
+        {},
+        "{}",
+        "",
+        None,
     ],
     ids=repr,
 )
 class TestASPExchangeInformationModel:
-    def test_set_asp_batch_information(self, factory, archive, expected_archive):
+    def test_set_asp_batch_information(self, factory, archive):
         obj = factory()
 
         obj.set_asp_batch_information("RIAE_FS_20230123103950.json", 42, archive)
@@ -644,7 +645,7 @@ class TestASPExchangeInformationModel:
 
         assert obj.asp_batch_file == "RIAE_FS_20230123103950.json"
         assert obj.asp_batch_line_number == 42
-        assert obj.archived_json == expected_archive
+        assert obj.archived_json == archive
 
     @pytest.mark.parametrize(
         "code,expected_code",
@@ -654,7 +655,7 @@ class TestASPExchangeInformationModel:
         ],
         ids=repr,
     )
-    def test_set_asp_processing_information(self, factory, archive, expected_archive, code, expected_code):
+    def test_set_asp_processing_information(self, factory, archive, code, expected_code):
         obj = factory()
 
         obj.set_asp_processing_information(code, "The label", archive)
@@ -663,4 +664,4 @@ class TestASPExchangeInformationModel:
 
         assert obj.asp_processing_code == expected_code
         assert obj.asp_processing_label == "The label"
-        assert obj.archived_json == expected_archive
+        assert obj.archived_json == archive

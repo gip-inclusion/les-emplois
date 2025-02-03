@@ -91,7 +91,7 @@ class TestDisableEmployeeRecords:
         self.employee_record.ready()
         self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
-        self.employee_record.process(code=process_code, label=process_message, archive="{}")
+        self.employee_record.process(code=process_code, label=process_message, archive={})
 
         self.employee_record.refresh_from_db()
         assert self.employee_record.status == Status.PROCESSED

@@ -292,7 +292,7 @@ class TestListEmployeeRecords:
         for err_code, err_message, custom_err_message in tests_specs:
             with subtests.test(err_code):
                 record.status = Status.SENT
-                record.reject(code=err_code, label=err_message, archive="{}")
+                record.reject(code=err_code, label=err_message, archive={})
 
                 response = client.get(self.URL, data={"status": Status.REJECTED})
                 assertContains(response, f"Erreur {err_code}")
