@@ -28,7 +28,7 @@ from itou.utils.auth import check_user
 from itou.utils.emails import redact_email_address
 from itou.utils.pagination import pager
 from itou.utils.session import SessionNamespace
-from itou.utils.urls import get_safe_url
+from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.apply.views.submit_views import ApplicationBaseView
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import (
@@ -278,6 +278,12 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
     def get_exit_url(self, job_seeker, created=False):
         if self.is_gps:
             return reverse("gps:group_list")
+        if self.standalone_creation and self.is_job_seeker_in_user_jobseekers_list(job_seeker) and not created:
+            params = {
+                "job_seeker": job_seeker.public_id,
+                "city": job_seeker.city_slug if self.request.user.can_view_personal_information(job_seeker) else "",
+            }
+            return add_url_params(reverse("search:employers_results"), params)
         if self.standalone_creation:
             return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
@@ -308,6 +314,14 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             "standalone_creation": self.standalone_creation,
             "is_gps": self.is_gps,
         }
+
+    def is_job_seeker_in_user_jobseekers_list(self, job_seeker):
+        if not self.request.user.is_prescriber:
+            return False
+
+        return job_seeker.pk in User.objects.linked_job_seeker_ids(
+            self.request.user, self.request.current_organization
+        )
 
 
 class JobSeekerForSenderBaseView(JobSeekerBaseView):
@@ -431,6 +445,7 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
                 "preview_mode": bool(self.form.data.get("preview")),
                 "job_seeker": job_seeker,
                 "can_view_personal_information": self.sender.can_view_personal_information(job_seeker),
+                "is_job_seeker_in_list": self.is_job_seeker_in_user_jobseekers_list(job_seeker),
             }
         else:
             # Require at least one attempt with an invalid NIR to access the search by email feature.
@@ -465,6 +480,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
         can_add_nir = False
         preview_mode = False
         job_seeker = None
+        is_job_seeker_in_list = False
 
         if self.form.is_valid():
             job_seeker = self.form.get_user()
@@ -489,6 +505,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
             # Ask the sender to confirm the email we found is associated to the correct user
             if self.form.data.get("preview"):
                 preview_mode = True
+                is_job_seeker_in_list = self.is_job_seeker_in_user_jobseekers_list(job_seeker)
 
             # The email we found is correct
             if self.form.data.get("confirm"):
@@ -521,6 +538,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                 "preview_mode": preview_mode,
                 "job_seeker": job_seeker,
                 "can_view_personal_information": job_seeker and self.sender.can_view_personal_information(job_seeker),
+                "is_job_seeker_in_list": is_job_seeker_in_list,
             }
         )
 
