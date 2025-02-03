@@ -106,7 +106,7 @@ def assert_contains_apply_email_modal(response, job_seeker, with_personal_inform
         f"""
         <p>
             En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale
-            {format_nir(nir_to_add)} soit associé à ce candidat .</b>
+            {format_nir(nir_to_add)} soit associé à ce candidat.</b>
         </p>
         """
         if nir_to_add is not None

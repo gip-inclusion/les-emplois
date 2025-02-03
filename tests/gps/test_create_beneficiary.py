@@ -51,7 +51,7 @@ def assert_contains_gps_email_modal(response, job_seeker, nir_to_add=None):
         f"""
         <p>
             En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale
-            {format_nir(nir_to_add)} soit associé à ce bénéficiaire .</b>
+            {format_nir(nir_to_add)} soit associé à ce bénéficiaire.</b>
         </p>
         """
         if nir_to_add is not None

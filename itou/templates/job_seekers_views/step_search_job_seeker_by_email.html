@@ -66,28 +66,26 @@
                             </p>
                             {% if can_add_nir %}
                                 <p>
-                                    En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale {{ nir|format_nir }} soit associé à ce
-                                    {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
-                                .</b>
-                            </p>
-                        {% endif %}
-                    </div>
-                    <div class="modal-footer">
+                                    En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale {{ nir|format_nir }} soit associé à ce {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}.</b>
+                                </p>
+                            {% endif %}
+                        </div>
+                        <div class="modal-footer">
 
-                        {# Reload this page with a new form. #}
-                        {% if is_gps|default:False %}
-                            {% bootstrap_button "Suivre un autre bénéficiaire" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
-                        {% else %}
-                            {% bootstrap_button "Ce n'est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
-                        {% endif %}
-                        {# Go to the next step. #}
-                        {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
+                            {# Reload this page with a new form. #}
+                            {% if is_gps|default:False %}
+                                {% bootstrap_button "Suivre un autre bénéficiaire" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                            {% else %}
+                                {% bootstrap_button "Ce n'est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                            {% endif %}
+                            {# Go to the next step. #}
+                            {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    {% endif %}
-</form>
+        {% endif %}
+    </form>
 {% endblock %}
 
 {% block script %}
