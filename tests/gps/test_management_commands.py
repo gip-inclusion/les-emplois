@@ -124,7 +124,6 @@ class TestSyncGroupsManagementCommand:
         group_2 = FollowUpGroupFactory(beneficiary=beneficiary_2)
         membership_2_1 = FollowUpGroupMembershipFactory(
             follow_up_group=group_2,
-            last_contact_at=None,
             member=follower_1,
             is_referent=True,
             created_in_bulk=False,
