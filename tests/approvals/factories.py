@@ -22,7 +22,7 @@ from itou.approvals.models import (
     ProlongationRequestDenyInformation,
     Suspension,
 )
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
+from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
@@ -56,7 +56,7 @@ class ApprovalFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
             origin_pe_approval=True,
         )
         with_origin_values = factory.Trait(
-            origin_siae_kind=factory.fuzzy.FuzzyChoice(SIAE_WITH_CONVENTION_KINDS),
+            origin_siae_kind=factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds()),
             origin_siae_siret=factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1"),
             origin_sender_kind=SenderKind.EMPLOYER,
             origin_prescriber_organization_kind="",
@@ -101,7 +101,7 @@ class CancelledApprovalFactory(factory.django.DjangoModelFactory):
     user_last_name = factory.Faker("last_name")
     user_birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
 
-    origin_siae_kind = factory.fuzzy.FuzzyChoice(SIAE_WITH_CONVENTION_KINDS)
+    origin_siae_kind = factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds())
     origin_siae_siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     origin_sender_kind = SenderKind.EMPLOYER
     origin_prescriber_organization_kind = ""

@@ -3,7 +3,7 @@ from django.urls import reverse
 from itou.communications import NotificationCategory, registry as notifications_registry
 from itou.communications.dispatch import EmailNotification, EmployerNotification, JobSeekerNotification
 from itou.communications.dispatch.utils import PrescriberNotification
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
+from itou.companies.enums import CompanyKind
 from itou.utils.urls import get_absolute_url
 
 
@@ -59,7 +59,7 @@ class ProlongationRequestDeniedForEmployerNotification(EmployerNotification, Ema
     body_template = "approvals/email/prolongation_request/denied/employer_body.txt"
 
     def is_applicable(self):
-        return self.structure and self.structure.kind in SIAE_WITH_CONVENTION_KINDS
+        return self.structure and self.structure.kind in CompanyKind.siae_kinds()
 
 
 @notifications_registry.register
@@ -90,7 +90,7 @@ class PassAcceptedEmployerNotification(EmployerNotification, EmailNotification):
         return self.context
 
     def is_applicable(self):
-        return self.structure and self.structure.kind in SIAE_WITH_CONVENTION_KINDS
+        return self.structure and self.structure.kind in CompanyKind.siae_kinds()
 
 
 @notifications_registry.register
@@ -101,7 +101,7 @@ class ProlongationRequestGrantedForEmployerNotification(EmployerNotification, Em
     body_template = "approvals/email/prolongation_request/granted/employer_body.txt"
 
     def is_applicable(self):
-        return self.structure and self.structure.kind in SIAE_WITH_CONVENTION_KINDS
+        return self.structure and self.structure.kind in CompanyKind.siae_kinds()
 
 
 @notifications_registry.register

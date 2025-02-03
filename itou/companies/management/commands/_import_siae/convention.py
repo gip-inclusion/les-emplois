@@ -9,7 +9,7 @@ import datetime
 from django.db import transaction
 from django.utils import timezone
 
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, SiaeConvention
 
 
@@ -169,12 +169,12 @@ def check_convention_data_consistency():
             assert siae.kind == convention.kind
 
     asp_siaes_without_convention = Company.objects.filter(
-        kind__in=SIAE_WITH_CONVENTION_KINDS, source=Company.SOURCE_ASP, convention__isnull=True
+        kind__in=CompanyKind.siae_kinds(), source=Company.SOURCE_ASP, convention__isnull=True
     ).count()
     assert asp_siaes_without_convention == 0
 
     user_created_siaes_without_convention = Company.objects.filter(
-        kind__in=SIAE_WITH_CONVENTION_KINDS,
+        kind__in=CompanyKind.siae_kinds(),
         source=Company.SOURCE_USER_CREATED,
         convention__isnull=True,
     ).count()

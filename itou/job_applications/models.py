@@ -13,7 +13,7 @@ from xworkflows import before_transition
 
 from itou.approvals.models import Approval, Suspension
 from itou.approvals.notifications import PassAcceptedEmployerNotification
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType
+from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
@@ -848,7 +848,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             not self.sender_prescriber_organization or not self.sender_prescriber_organization.is_authorized
         ):
             return "Orienteur"
-        elif self.sender_kind == SenderKind.EMPLOYER and self.to_company.kind not in SIAE_WITH_CONVENTION_KINDS:
+        elif self.sender_kind == SenderKind.EMPLOYER and self.to_company.kind not in CompanyKind.siae_kinds():
             # Not an SIAE per se
             return "Employeur"
         else:

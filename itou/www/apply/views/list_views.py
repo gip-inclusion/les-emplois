@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
+from itou.companies.enums import CompanyKind
 from itou.eligibility.models import SelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -329,7 +329,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     # SIAE members have access to personal info
     _add_user_can_view_personal_information(job_applications_page, lambda ja: True)
 
-    iae_company = company.kind in SIAE_WITH_CONVENTION_KINDS
+    iae_company = company.kind in CompanyKind.siae_kinds()
     if iae_company:
         _add_administrative_criteria(job_applications_page)
 
@@ -345,7 +345,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "pending_states_job_applications_count": pending_states_job_applications_count,
         "list_exports_url": reverse("apply:list_for_siae_exports"),
         "back_url": reverse("dashboard:index"),
-        "can_apply": company.kind in SIAE_WITH_CONVENTION_KINDS + [CompanyKind.GEIQ],
+        "can_apply": company.kind in CompanyKind.siae_kinds() + [CompanyKind.GEIQ],
         "show_rdvi_promote_page": (
             request.current_organization.department in settings.RDV_INSERTION_PROMOTE_DEPARTMENTS
         ),

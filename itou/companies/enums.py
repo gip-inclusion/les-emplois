@@ -13,20 +13,20 @@ class CompanyKind(models.TextChoices):
     GEIQ = "GEIQ", "Groupement d'employeurs pour l'insertion et la qualification"
     OPCS = "OPCS", "Organisation porteuse de la clause sociale"
 
+    @classmethod
+    def siae_choices(cls):
+        """Returns a list of CompanyKinds which are SIAEs."""
+        return [(k, v) for k, v in cls.choices if k in cls.siae_kinds()]
 
-# This used to be the ASP_MANAGED_KINDS list in companies.models; but it's clearer to talk about
-# SIAEs that have a convention.
-# Ported older comment: ASP data is used to keep the siae data of these kinds in sync.
-# These kinds and only these kinds thus have convention/AF logic.
-SIAE_WITH_CONVENTION_KINDS = [
-    CompanyKind.AI.value,
-    CompanyKind.ACI.value,
-    CompanyKind.EI.value,
-    CompanyKind.EITI.value,
-    CompanyKind.ETTI.value,
-]
-
-SIAE_WITH_CONVENTION_CHOICES = [(k, v) for k, v in CompanyKind.choices if k in SIAE_WITH_CONVENTION_KINDS]
+    @classmethod
+    def siae_kinds(cls):
+        return [
+            cls.AI.value,
+            cls.ACI.value,
+            cls.EI.value,
+            cls.EITI.value,
+            cls.ETTI.value,
+        ]
 
 
 class ContractNature(models.TextChoices):
@@ -85,7 +85,7 @@ class ContractType(models.TextChoices):
             case CompanyKind.OPCS:
                 choices = [cls.PERMANENT, cls.FIXED_TERM, cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
             case CompanyKind.ACI | CompanyKind.EI | CompanyKind.AI | CompanyKind.ETTI:
-                # SIAE_WITH_CONVENTION_KINDS but without EITI.
+                # SIAEs, without EITI.
                 choices = [cls.FIXED_TERM_I, cls.FIXED_TERM_USAGE, cls.TEMPORARY, cls.PROFESSIONAL_TRAINING, cls.OTHER]
             case _:
                 choices = list(cls)
