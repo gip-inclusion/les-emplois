@@ -38,6 +38,8 @@ from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
 from itou.utils.session import SessionNamespace
+from itou.utils.templatetags.format_filters import format_nir
+from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
@@ -72,6 +74,68 @@ LINK_RESET_MARKUP = (
     ' aria-label="Annuler la saisie de ce formulaire">'
 )
 CONFIRM_RESET_MARKUP = '<a href="%s" class="btn btn-sm btn-danger">Confirmer l\'annulation</a>'
+
+
+def assert_contains_apply_nir_modal(response, job_seeker, with_personal_information=True):
+    assertContains(
+        response,
+        f"""
+        <div class="modal-body">
+            <p>
+                Le numéro {format_nir(job_seeker.jobseeker_profile.nir)} est associé au compte de
+                <b>{mask_unless(job_seeker.get_full_name(), with_personal_information)}</b>.
+            </p>
+            <p>
+                Si cette candidature n'est pas pour
+                <b>{mask_unless(job_seeker.get_full_name(), with_personal_information)}</b>,
+                cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+            Ce n'est pas mon candidat</button>
+            <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Continuer</button>
+        </div>
+        """,
+        html=True,
+    )
+
+
+def assert_contains_apply_email_modal(response, job_seeker, with_personal_information=True, nir_to_add=None):
+    add_nir_text = (
+        f"""
+        <p>
+            En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale
+            {format_nir(nir_to_add)} soit associé à ce candidat .</b>
+        </p>
+        """
+        if nir_to_add is not None
+        else ""
+    )
+    assertContains(
+        response,
+        f"""
+        <div class="modal-body">
+            <p>
+                L'adresse {job_seeker.email} est associée au compte de
+                <b>{mask_unless(job_seeker.get_full_name(), with_personal_information)}</b>.
+            </p>
+            <p>
+                L'identité du candidat est une information clé pour la structure.
+                Si cette candidature n'est pas pour
+                <b>{mask_unless(job_seeker.get_full_name(), with_personal_information)}</b>,
+                cliquez sur « Ce n'est pas mon candidat » afin d'enregistrer ses informations personnelles.
+            </p>
+            {add_nir_text}
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+            Ce n'est pas mon candidat</button>
+            <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Continuer</button>
+        </div>
+        """,
+        html=True,
+    )
 
 
 class TestApply:
@@ -790,6 +854,7 @@ class TestApplyAsAuthorizedPrescriber:
         """Apply as prescriber that has pending authorization."""
 
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        from_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(with_pending_authorization=True)
         user = prescriber_organization.members.first()
@@ -800,6 +865,7 @@ class TestApplyAsAuthorizedPrescriber:
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
         )
+        existing_job_seeker = JobSeekerFactory()
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -821,7 +887,7 @@ class TestApplyAsAuthorizedPrescriber:
         params = {
             "tunnel": "sender",
             "company": company.pk,
-            "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+            "from_url": from_url,
         }
         next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
         assertContains(response, "Statut de prescripteur habilité non vérifié")
@@ -835,13 +901,22 @@ class TestApplyAsAuthorizedPrescriber:
             html=True,
         )
 
-        # Step determine the job seeker with a NIR.
-        # ----------------------------------------------------------------------
-
         response = client.get(next_url)
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
         next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
         assertRedirects(response, next_url)
+
+        # Step determine the job seeker with a NIR. First try: NIR is found
+        # ----------------------------------------------------------------------
+
+        response = client.get(next_url)
+        assertContains(response, LINK_RESET_MARKUP % from_url)
+
+        response = client.post(next_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "preview": 1})
+        assert_contains_apply_nir_modal(response, existing_job_seeker, with_personal_information=False)
+
+        # Step determine the job seeker with a NIR. Second try: NIR is not found
+        # ----------------------------------------------------------------------
 
         response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assert response.status_code == 302
@@ -864,7 +939,16 @@ class TestApplyAsAuthorizedPrescriber:
         assert response.url == next_url
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
-        # Step get job seeker e-mail.
+        # Step get job seeker e-mail. First try: email is found
+        # ----------------------------------------------------------------------
+
+        response = client.post(
+            next_url,
+            data={"email": existing_job_seeker.email, "preview": 1},
+        )
+        assert_contains_apply_email_modal(response, existing_job_seeker, with_personal_information=False)
+
+        # Step get job seeker e-mail. Second try: email is not found
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
@@ -1098,6 +1182,7 @@ class TestApplyAsAuthorizedPrescriber:
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
         )
+        existing_job_seeker = JobSeekerFactory()
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -1118,12 +1203,17 @@ class TestApplyAsAuthorizedPrescriber:
         next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
         assert response.url == next_url
 
-        # Step determine the job seeker with a NIR.
+        # Step determine the job seeker with a NIR. First try: NIR is found
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, LINK_RESET_MARKUP % reset_url_company)
+
+        response = client.post(next_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "preview": 1})
+        assert_contains_apply_nir_modal(response, existing_job_seeker)
+
+        # Step determine the job seeker with a NIR. Second try: NIR is not found
+        # ----------------------------------------------------------------------
 
         response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assert response.status_code == 302
@@ -1134,12 +1224,30 @@ class TestApplyAsAuthorizedPrescriber:
         )
         assert response.url == next_url
 
-        # Step get job seeker e-mail.
+        # Step get job seeker e-mail. First try: email is found
         # ----------------------------------------------------------------------
 
-        response = client.get(next_url)
-        assert response.status_code == 200
-        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
+        response = client.post(
+            next_url,
+            data={"email": existing_job_seeker.email, "preview": 1},
+        )
+        assert_contains_apply_email_modal(response, existing_job_seeker)
+
+        # Step get job seeker e-mail. Second try: email is found, attached to a
+        # user without NIR
+        # ----------------------------------------------------------------------
+        existing_job_seeker_without_nir = JobSeekerFactory(jobseeker_profile__nir="")
+
+        response = client.post(
+            next_url,
+            data={"email": existing_job_seeker_without_nir.email, "preview": 1},
+        )
+        assert_contains_apply_email_modal(
+            response, existing_job_seeker_without_nir, nir_to_add=dummy_job_seeker.jobseeker_profile.nir
+        )
+
+        # Step get job seeker e-mail. Third try: email is not found
+        # ----------------------------------------------------------------------
 
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
         assert response.status_code == 302
@@ -1541,6 +1649,7 @@ class TestApplyAsPrescriber:
             jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
             title="M",
         )
+        existing_job_seeker = JobSeekerFactory()
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -1560,12 +1669,17 @@ class TestApplyAsPrescriber:
         next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
         assert response.url == next_url
 
-        # Step determine the job seeker with a NIR.
+        # Step determine the job seeker with a NIR. First try: NIR is found
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, LINK_RESET_MARKUP % reset_url_company)
+
+        response = client.post(next_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "preview": 1})
+        assert_contains_apply_nir_modal(response, existing_job_seeker, with_personal_information=False)
+
+        # Step determine the job seeker with a NIR. Second try: NIR is not found
+        # ----------------------------------------------------------------------
 
         response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assert response.status_code == 302
@@ -1588,12 +1702,20 @@ class TestApplyAsPrescriber:
 
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
-        # Step get job seeker e-mail.
+        # Step get job seeker e-mail. First try: email is found
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
+
+        response = client.post(
+            next_url,
+            data={"email": existing_job_seeker.email, "preview": 1},
+        )
+        assert_contains_apply_email_modal(response, existing_job_seeker, with_personal_information=False)
+
+        # Step get job seeker e-mail. Second try: email is not found
+        # ----------------------------------------------------------------------
 
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
         assert response.status_code == 302
@@ -2133,6 +2255,8 @@ class TestApplyAsCompany:
             else reverse("companies_views:card", kwargs={"siae_id": company.pk})
         )
 
+        existing_job_seeker = JobSeekerFactory()
+
         # Entry point.
         # ----------------------------------------------------------------------
 
@@ -2152,12 +2276,17 @@ class TestApplyAsCompany:
         next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
         assert response.url == next_url
 
-        # Step determine the job seeker with a NIR.
+        # Step determine the job seeker with a NIR. First try: NIR is found
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, LINK_RESET_MARKUP % reset_url)
+
+        response = client.post(next_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "preview": 1})
+        assert_contains_apply_nir_modal(response, existing_job_seeker)
+
+        # Step determine the job seeker with a NIR. Second try: NIR is not found
+        # ----------------------------------------------------------------------
 
         response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assert response.status_code == 302
@@ -2176,12 +2305,20 @@ class TestApplyAsCompany:
         assert response.url == next_url
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
-        # Step get job seeker e-mail.
+        # Step get job seeker e-mail. First try: email is found
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
+
+        response = client.post(
+            next_url,
+            data={"email": existing_job_seeker.email, "preview": 1},
+        )
+        assert_contains_apply_email_modal(response, existing_job_seeker)
+
+        # Step get job seeker e-mail. Second try: email is not found
+        # ----------------------------------------------------------------------
 
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
         assert response.status_code == 302
@@ -2609,21 +2746,28 @@ class TestDirectHireFullProcess:
             jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
             title="M",
         )
+        existing_job_seeker = JobSeekerFactory()
 
         geispolsheim = create_city_geispolsheim()
 
-        # Step determine the job seeker with a NIR.
-        # ----------------------------------------------------------------------
         # Init session
         response = client.get(reverse("apply:start_hire", kwargs={"company_pk": company.pk}), follow=True)
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
-
         check_nir_url = reverse(
             "job_seekers_views:check_nir_for_hire", kwargs={"session_uuid": job_seeker_session_name}
         )
+
+        # Step determine the job seeker with a NIR. First try: NIR is found
+        # ----------------------------------------------------------------------
+
         response = client.get(check_nir_url)
-        assert response.status_code == 200
         assertContains(response, LINK_RESET_MARKUP % reset_url_dashboard)
+
+        response = client.post(check_nir_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "preview": 1})
+        assert_contains_apply_nir_modal(response, existing_job_seeker)
+
+        # Step determine the job seeker with a NIR. Second try: NIR is not found
+        # ----------------------------------------------------------------------
 
         response = client.post(check_nir_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "preview": 1})
         assert response.status_code == 302
@@ -2634,12 +2778,21 @@ class TestDirectHireFullProcess:
         )
         assert response.url == next_url
 
-        # Step get job seeker e-mail.
+        # Step get job seeker e-mail. First try: email is found
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
+
+        response = client.post(
+            next_url,
+            data={"email": existing_job_seeker.email, "preview": 1},
+        )
+
+        assert_contains_apply_email_modal(response, existing_job_seeker)
+
+        # Step get job seeker e-mail. Second try: email is not found
+        # ----------------------------------------------------------------------
 
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
         assert response.status_code == 302
@@ -2929,18 +3082,24 @@ class TestDirectHireFullProcess:
         user = company.members.first()
         client.force_login(user)
 
-        # Step determine the job seeker with a NIR.
-        # ----------------------------------------------------------------------
         # Init session
         response = client.get(reverse("apply:start_hire", kwargs={"company_pk": company.pk}), follow=True)
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
-
         check_nir_url = reverse(
             "job_seekers_views:check_nir_for_hire", kwargs={"session_uuid": job_seeker_session_name}
         )
+
+        # Step determine the job seeker with a NIR. First: show modal
+        # ----------------------------------------------------------------------
         response = client.get(check_nir_url)
         assert response.status_code == 200
         assertContains(response, LINK_RESET_MARKUP % reset_url_dashboard)
+
+        response = client.post(check_nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "preview": 1})
+        assert_contains_apply_nir_modal(response, job_seeker)
+
+        # Step determine the job seeker with a NIR. Second: confirm
+        # ----------------------------------------------------------------------
 
         response = client.post(check_nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": 1})
         check_infos_url = reverse(

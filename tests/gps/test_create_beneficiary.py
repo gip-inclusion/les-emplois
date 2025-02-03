@@ -11,6 +11,7 @@ from itou.companies.models import Company
 from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.users.models import User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
+from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.urls import add_url_params
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
@@ -19,6 +20,67 @@ from tests.users.factories import (
     JobSeekerFactory,
 )
 from tests.utils.test import KNOWN_SESSION_KEYS
+
+
+def assert_contains_gps_nir_modal(response, job_seeker):
+    assertContains(
+        response,
+        f"""
+        <div class="modal-body">
+            <p>
+                Le numéro {format_nir(job_seeker.jobseeker_profile.nir)} est associé au compte de
+                <b>{job_seeker.get_full_name()}</b>.
+            </p>
+            <p>
+                Si ce n'est pas le bénéficiaire que vous souhaitez suivre,
+                cliquez sur « Suivre un autre bénéficiaire » afin de modifier le numéro de sécurité sociale.
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+            Suivre un autre bénéficiaire</button>
+            <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Continuer</button>
+        </div>
+        """,
+        html=True,
+    )
+
+
+def assert_contains_gps_email_modal(response, job_seeker, nir_to_add=None):
+    add_nir_text = (
+        f"""
+        <p>
+            En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale
+            {format_nir(nir_to_add)} soit associé à ce bénéficiaire .</b>
+        </p>
+        """
+        if nir_to_add is not None
+        else ""
+    )
+    assertContains(
+        response,
+        f"""
+        <div class="modal-body">
+            <p>
+                L'adresse {job_seeker.email} est associée au compte de
+                <b>{job_seeker.get_full_name()}</b>.
+            </p>
+            <p>
+                L'identité du candidat est une information clé pour la structure.
+                Si vous ne souhaitez pas suivre
+                <b>{job_seeker.get_full_name()}</b>,
+                cliquez sur « Suivre un autre bénéficiaire » afin d'enregistrer ses informations personnelles.
+            </p>
+            {add_nir_text}
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+            Suivre un autre bénéficiaire</button>
+            <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Continuer</button>
+        </div>
+        """,
+        html=True,
+    )
 
 
 @pytest.mark.ignore_unknown_variable_template_error("confirmation_needed", "job_seeker")
@@ -272,11 +334,10 @@ def test_existing_user_with_email(client):
     post_data = {"email": job_seeker.email, "preview": "1"}
 
     response = client.post(next_url, data=post_data)
-    assert response.status_code == 200
 
     # Display GPS text in modal
     # ----------------------------------------------------------------------
-    assertContains(response, "Si vous ne souhaitez pas suivre")
+    assert_contains_gps_email_modal(response, job_seeker, nir_to_add=nir)
 
     post_data = {"email": job_seeker.email, "confirm": "1"}
     response = client.post(next_url, data=post_data)
@@ -319,8 +380,7 @@ def test_existing_user_with_nir(client):
     post_data = {"nir": nir, "preview": 1}
     response = client.post(last_url, data=post_data)
 
-    assert response.status_code == 200
-    assertContains(response, "Si ce n'est pas le bénéficiaire que vous souhaitez suivre")
+    assert_contains_gps_nir_modal(response, job_seeker)
 
     post_data = {"nir": nir, "confirm": 1}
     response = client.post(last_url, data=post_data)
