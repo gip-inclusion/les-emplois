@@ -1,9 +1,8 @@
-import contextlib
 import enum
-import json
 
 import xworkflows
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Exists, OuterRef
@@ -78,21 +77,15 @@ class ASPExchangeInformation(models.Model):
         ]
         ordering = ["-created_at"]
 
-    def _set_archived_json(self, archive):
-        if archive is not None:
-            with contextlib.suppress(json.JSONDecodeError):
-                archive = json.loads(archive)
-        self.archived_json = archive
-
     def set_asp_batch_information(self, file, line_number, archive):
         self.asp_batch_file = file
         self.asp_batch_line_number = line_number
-        self._set_archived_json(archive)
+        self.archived_json = archive
 
     def set_asp_processing_information(self, code, label, archive):
         self.asp_processing_code = code
         self.asp_processing_label = label
-        self._set_archived_json(archive)
+        self.archived_json = archive
 
 
 class EmployeeRecordTransition(enum.StrEnum):

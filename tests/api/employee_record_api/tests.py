@@ -111,7 +111,7 @@ class TestEmployeeRecordAPIFetchList:
         result = response.json()
         assert len(result.get("results")) == 0
 
-        self.employee_record.process(code=process_code, label=process_message, archive="{}")
+        self.employee_record.process(code=process_code, label=process_message, archive={})
         response = api_client.get(ENDPOINT_URL, format="json")
         assert response.status_code == 200
 

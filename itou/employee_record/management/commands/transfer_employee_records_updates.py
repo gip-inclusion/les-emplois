@@ -2,7 +2,6 @@ import paramiko
 from django.conf import settings
 from django.db import transaction
 from rest_framework.parsers import JSONParser
-from rest_framework.renderers import JSONRenderer
 from sentry_sdk.crons import monitor
 
 from itou.employee_record.common_management import EmployeeRecordTransferCommand, IgnoreFile
@@ -62,12 +61,11 @@ class Command(EmployeeRecordTransferCommand):
                 self.logger.info("DRY-RUN: Not *really* updating notification statuses")
                 return
 
-            renderer = JSONRenderer()
             for idx, notification in enumerate(notifications, 1):
                 notification.wait_for_asp_response(
                     file=remote_path,
                     line_number=idx,
-                    archive=renderer.render(batch_data["lignesTelechargement"][idx - 1]),
+                    archive=batch_data["lignesTelechargement"][idx - 1],
                 )
 
     def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> None:
@@ -103,15 +101,14 @@ class Command(EmployeeRecordTransferCommand):
                 self.logger.info(f"Skipping, incoherent status for {notification=}")
                 continue
 
-            archived_json = JSONRenderer().render(employee_record)
             if processing_code == EmployeeRecordUpdateNotification.ASP_PROCESSING_SUCCESS_CODE:  # Processed by ASP
                 if not dry_run:
-                    notification.process(code=processing_code, label=processing_label, archive=archived_json)
+                    notification.process(code=processing_code, label=processing_label, archive=employee_record)
                 else:
                     self.logger.info(f"DRY-RUN: Processed {notification}, {processing_code=}, {processing_label=}")
             else:  # Rejected by ASP
                 if not dry_run:
-                    notification.reject(code=processing_code, label=processing_label, archive=archived_json)
+                    notification.reject(code=processing_code, label=processing_label, archive=employee_record)
                 else:
                     self.logger.info(f"DRY-RUN: Rejected {notification}: {processing_code=}, {processing_label=}")
 

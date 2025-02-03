@@ -3,7 +3,6 @@ from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 from rest_framework.parsers import JSONParser
-from rest_framework.renderers import JSONRenderer
 from sentry_sdk.crons import monitor
 
 from itou.approvals.models import Approval
@@ -56,12 +55,11 @@ class Command(EmployeeRecordTransferCommand):
 
             # Now that file is transferred, update employee records status (SENT)
             # and store in which file they have been sent
-            renderer = JSONRenderer()
             for idx, employee_record in enumerate(employee_records, 1):
                 employee_record.wait_for_asp_response(
                     file=remote_path,
                     line_number=idx,
-                    archive=renderer.render(batch_data["lignesTelechargement"][idx - 1]),
+                    archive=batch_data["lignesTelechargement"][idx - 1],
                 )
 
     def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> None:
@@ -98,10 +96,9 @@ class Command(EmployeeRecordTransferCommand):
                 self.logger.info(f"Skipping, incoherent status for {employee_record=}")
                 continue
 
-            archived_json = JSONRenderer().render(raw_employee_record)
             if processing_code == EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE:  # Processed by ASP
                 if not dry_run:
-                    employee_record.process(code=processing_code, label=processing_label, archive=archived_json)
+                    employee_record.process(code=processing_code, label=processing_label, archive=raw_employee_record)
                 else:
                     self.logger.info(f"DRY-RUN: Accepted {employee_record=}, {processing_code=}, {processing_label=}")
             else:  # Rejected by ASP
@@ -110,7 +107,10 @@ class Command(EmployeeRecordTransferCommand):
                     # 3436 processing code are automatically converted as PROCESSED
                     if processing_code == EmployeeRecord.ASP_DUPLICATE_ERROR_CODE:
                         employee_record.process(
-                            code=processing_code, label=processing_label, archive=archived_json, as_duplicate=True
+                            code=processing_code,
+                            label=processing_label,
+                            archive=raw_employee_record,
+                            as_duplicate=True,
                         )
 
                         # If the ASP mark the employee record as duplicate,
@@ -131,7 +131,7 @@ class Command(EmployeeRecordTransferCommand):
 
                         continue
 
-                    employee_record.reject(code=processing_code, label=processing_label, archive=archived_json)
+                    employee_record.reject(code=processing_code, label=processing_label, archive=raw_employee_record)
                 else:
                     self.logger.info(f"DRY-RUN: Rejected {employee_record=}, {processing_code=}, {processing_label=}")
 
