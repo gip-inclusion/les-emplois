@@ -61,6 +61,7 @@ class FollowUpGroupMembershipFactory(factory.django.DjangoModelFactory):
         if o.created_in_bulk
         else timezone.now()
     )
+    last_contact_at = factory.SelfAttribute("created_at")
 
     created_in_bulk = False
     follow_up_group = factory.SubFactory(FollowUpGroupFactory)
