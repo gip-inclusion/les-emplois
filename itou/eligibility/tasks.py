@@ -20,7 +20,7 @@ logger = logging.getLogger("APIParticulierClient")
 def certify_criteria(eligibility_diagnosis):
     job_seeker = eligibility_diagnosis.job_seeker
     if not api_particulier.has_required_info(job_seeker):
-        logger.info("Skipping {job_seeker.pk=}, missing required information.")
+        logger.info("Skipping job seeker %s, missing required information.", job_seeker.pk)
         return
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
     criteria = (
