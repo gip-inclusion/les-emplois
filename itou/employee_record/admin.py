@@ -90,6 +90,22 @@ class ASPExchangeInformationAdminMixin:
         return f"{number} ({start} – {end})"
 
 
+class EmployeeRecordTransitionLogInline(ReadonlyMixin, ItouTabularInline):
+    model = models.EmployeeRecordTransitionLog
+    extra = 0
+    fields = (
+        "transition",
+        "from_state",
+        "to_state",
+        "user",
+        "timestamp",
+        "asp_processing_code",
+        "asp_processing_label",
+        "asp_batch_file",
+    )
+    raw_id_fields = ("user",)
+
+
 @admin.register(models.EmployeeRecord)
 class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
     form = EmployeeRecordAdminForm
@@ -118,7 +134,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
         schedule_approval_update_notification,
     ]
 
-    inlines = (EmployeeRecordUpdateNotificationInline,)
+    inlines = (EmployeeRecordUpdateNotificationInline, EmployeeRecordTransitionLogInline)
 
     list_display = (
         "pk",

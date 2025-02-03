@@ -119,6 +119,7 @@ class EmployeeRecordWorkflow(xwf_models.Workflow):
         (EmployeeRecordTransition.UNARCHIVE_PROCESSED, Status.ARCHIVED, Status.PROCESSED),
         (EmployeeRecordTransition.UNARCHIVE_REJECTED, Status.ARCHIVED, Status.REJECTED),
     )
+    log_model = "employee_record.EmployeeRecordTransitionLog"
 
 
 class EmployeeRecordQuerySet(models.QuerySet):
@@ -461,6 +462,32 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
             raise ValidationError(EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE)
 
         return fs
+
+
+class EmployeeRecordTransitionLog(xwf_models.BaseTransitionLog, ASPExchangeInformation):
+    MODIFIED_OBJECT_FIELD = "employee_record"
+    EXTRA_LOG_ATTRIBUTES = (
+        ("user", "user", None),
+        ("asp_batch_file", "file", None),
+        ("asp_batch_line_number", "line_number", None),
+        ("asp_processing_code", "code", None),
+        ("asp_processing_label", "label", None),
+        ("archived_json", "archive", None),
+    )
+
+    employee_record = models.ForeignKey(EmployeeRecord, related_name="logs", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.RESTRICT,  # For traceability and accountability
+        related_name="+",
+    )
+
+    class Meta(ASPExchangeInformation.Meta):
+        verbose_name = "log des transitions de la fiche salarié"
+        verbose_name_plural = "log des transitions des fiches salarié"
+        ordering = ["-timestamp"]
 
 
 class EmployeeRecordBatch:
