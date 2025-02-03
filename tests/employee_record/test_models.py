@@ -13,7 +13,14 @@ from django.utils import timezone
 from itou.approvals.models import Approval
 from itou.companies.models import Company
 from itou.employee_record.enums import Status
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
+from itou.employee_record.models import (
+    EmployeeRecord,
+    EmployeeRecordBatch,
+    EmployeeRecordTransition,
+    EmployeeRecordTransitionLog,
+    EmployeeRecordWorkflow,
+    validate_asp_batch_filename,
+)
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.mocks.address_format import mock_get_geocoding_data
@@ -35,6 +42,7 @@ from tests.job_applications.factories import (
     JobApplicationWithCompleteJobSeekerProfileFactory,
     JobApplicationWithoutApprovalFactory,
 )
+from tests.users.factories import EmployerFactory
 
 
 class TestEmployeeRecordModel:
@@ -665,3 +673,61 @@ class TestASPExchangeInformationModel:
         assert obj.asp_processing_code == expected_code
         assert obj.asp_processing_label == "The label"
         assert obj.archived_json == archive
+
+
+def test_transition_log(faker):
+    attributes_mapping = {i[1]: i[0] for i in EmployeeRecordTransitionLog.EXTRA_LOG_ATTRIBUTES}
+    tested_transitions = set()
+
+    lifecycle_specs = [
+        {
+            EmployeeRecordTransition.READY: {"user": EmployerFactory()},
+            EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE: {
+                "file": faker.asp_batch_filename(),
+                "line_number": faker.pyint(),
+                "archive": faker.pydict(value_types=[int, str]),
+            },
+            EmployeeRecordTransition.PROCESS: {
+                "code": EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+                "label": faker.sentence(),
+                "archive": faker.pydict(value_types=[int, str]),
+            },
+            EmployeeRecordTransition.DISABLE: {},
+            EmployeeRecordTransition.ENABLE: {"user": EmployerFactory()},
+            EmployeeRecordTransition.ARCHIVE: {},
+            EmployeeRecordTransition.UNARCHIVE_PROCESSED: {},
+        },
+        {
+            EmployeeRecordTransition.READY: {"user": EmployerFactory()},
+            EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE: {
+                "file": faker.asp_batch_filename(),
+                "line_number": faker.pyint(),
+                "archive": faker.pydict(value_types=[int, str]),
+            },
+            EmployeeRecordTransition.REJECT: {
+                "code": faker.numerify("33##"),
+                "label": faker.sentence(),
+                "archive": faker.pydict(value_types=[int, str]),
+            },
+            EmployeeRecordTransition.ARCHIVE: {},
+            EmployeeRecordTransition.UNARCHIVE_REJECTED: {},
+        },
+        {
+            EmployeeRecordTransition.ARCHIVE: {},
+            EmployeeRecordTransition.UNARCHIVE_NEW: {},
+        },
+    ]
+    for specs in lifecycle_specs:
+        employee_record = EmployeeRecordWithProfileFactory(status=Status.NEW, archivable=True)
+        for transition_name, transition_kwargs in specs.items():
+            transition_name = "unarchive" if transition_name.startswith("unarchive_") else transition_name
+            getattr(employee_record, transition_name)(**transition_kwargs)
+
+        assert employee_record.logs.count() == len(specs)
+        for log in employee_record.logs.all():
+            for kwargs_name, kwargs_value in specs[log.transition].items():
+                assert getattr(log, attributes_mapping[kwargs_name]) == kwargs_value
+
+        tested_transitions |= set(specs.keys())
+
+    assert tested_transitions == {t.name for t in EmployeeRecordWorkflow.transitions}
