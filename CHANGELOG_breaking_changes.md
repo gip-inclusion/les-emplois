@@ -4,8 +4,8 @@
 - Mise à jour vers Python 3.13:
     1. Reconstruire le _virtual env_ : `rm -r $VIRTUAL_ENV && make venv`
     2. Mettre à jour ses recettes jetables après avoir `git rebase master`, en
-       retirant la variable `CC_CLEVER_PYTHON_VERSION=3.12` de l’environnement
-       de l’app sur la console CleverCloud.
+       éditant la valeur de la variable `CC_PYTHON_VERSION` en `3.13` dans
+       l’environnement de l’app sur la console CleverCloud.
 
 ## 2025-01-27
 
