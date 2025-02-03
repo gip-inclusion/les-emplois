@@ -1,4 +1,4 @@
-from itou.users.enums import IdentityProvider
+from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, IdentityProvider
 
 
 def test_identity_provider_configures_allowed_user_kinds():
@@ -7,4 +7,4 @@ def test_identity_provider_configures_allowed_user_kinds():
             # not used anymore
             continue
         # will raise a KeyError if an implementation is missing for the IdentityProvider
-        assert len(IdentityProvider.supported_user_kinds[identity_provider]) > 0
+        assert len(IDENTITY_PROVIDER_SUPPORTED_USER_KIND[identity_provider]) > 0

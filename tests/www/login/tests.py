@@ -12,7 +12,7 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.users import enums as users_enums
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, IdentityProvider, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.urls import add_url_params
 from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
@@ -302,7 +302,7 @@ class TestExistingUserLogin:
     )
     def test_login(self, client, snapshot, identity_provider):
         # Renders only the component for the identity provider in-use by this account
-        user_kind = IdentityProvider.supported_user_kinds[identity_provider][0]
+        user_kind = IDENTITY_PROVIDER_SUPPORTED_USER_KIND[identity_provider][0]
         user = UserFactory(kind=user_kind, identity_provider=identity_provider, for_snapshot=True)
         url = f"{reverse('login:existing_user', args=(user.public_id,))}?back_url={reverse('signup:choose_user_kind')}"
         response = client.get(url)
@@ -367,7 +367,7 @@ class TestExistingUserLogin:
         PRO_CONNECT_BASE_URL=None,
     )
     def test_login_disabled_provider(self, client, snapshot, identity_provider):
-        user_kind = IdentityProvider.supported_user_kinds[identity_provider][0]
+        user_kind = IDENTITY_PROVIDER_SUPPORTED_USER_KIND[identity_provider][0]
         user = UserFactory(kind=user_kind, identity_provider=identity_provider, for_snapshot=True)
         response = client.get(reverse("login:existing_user", args=(user.public_id,)))
         assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
