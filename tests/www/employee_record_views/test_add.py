@@ -7,7 +7,7 @@ from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
 def test_wizard(snapshot, client):
@@ -27,7 +27,8 @@ def test_wizard(snapshot, client):
     end_url = reverse("employee_record_views:add", kwargs={"step": "done"})
 
     # Starting the tunnel should redirect to the first step
-    assertRedirects(client.get(start_url), choose_employee_url)
+    with assertSnapshotQueries(snapshot):
+        assertRedirects(client.get(start_url), choose_employee_url)
 
     # Submit data for the "choose-employee" step
     # TODO: Figure out why testing manually is OK ("Étape 1/2") but with client it's not ("Étape 1/1")
