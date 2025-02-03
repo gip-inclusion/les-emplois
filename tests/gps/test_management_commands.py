@@ -1,24 +1,20 @@
-import datetime
 from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
 import pytest
-from django.conf import settings
 from django.core import management
-from django.utils import timezone
-from freezegun import freeze_time
-from pytest_django.asserts import assertQuerySetEqual
 
-from itou.companies.enums import CompanyKind
+from itou.gps.management.commands import sync_follow_up_groups_and_members
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
+from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile
-from tests.companies.factories import CompanyWith4MembershipsFactory
+from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
-from tests.gps.factories import FollowUpGroupFactory
-from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
+from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -28,363 +24,185 @@ from tests.users.factories import (
 )
 
 
-class TestGpsManagementCommand:
+class TestSyncGroupsManagementCommand:
     @pytest.fixture(autouse=True)
     def setup(self, settings):
         # To be able to use assertCountEqual
         settings.GPS_GROUPS_CREATED_BY_EMAIL = "rocking@developer.com"
         ItouStaffFactory(email=settings.GPS_GROUPS_CREATED_BY_EMAIL)
 
-    def test_group_creation(self):
-        should_be_created_groups_counter = 0
-        should_be_created_memberships = 0
-        # A group should be created for every beneficiary with a least one job application not new.
-        job_application = JobApplicationFactory(
-            state=JobApplicationState.NEW,
-        )
-        JobApplicationFactory(
-            state=JobApplicationState.PROCESSING,
-            job_seeker=job_application.job_seeker,
-            eligibility_diagnosis=job_application.eligibility_diagnosis,
-        )
-        should_be_created_groups_counter += 1
-        should_be_created_memberships += 1  # processing job_application sender
-        should_be_created_memberships += 1  # eligibility diagnosis (new job_app sender)
-        assert job_application.job_seeker.eligibility_diagnoses.count() == 1
+    def test_get_uses_contacts(ids):
+        beneficiary = JobSeekerFactory()
 
-        management.call_command("init_follow_up_groups", wet_run=True)
-
-        assert FollowUpGroup.objects.count() == should_be_created_groups_counter
-        assert FollowUpGroupMembership.objects.count() == should_be_created_memberships
-
-        company = CompanyWith4MembershipsFactory()
-
-        job_application_with_approval = JobApplicationFactory(
-            with_approval=True,
-            state=JobApplicationState.PROCESSING,
-            to_company=company,
-            eligibility_diagnosis__author=company.members.first(),
-            approval__eligibility_diagnosis__to_company=company,
-        )
-        # Needed to create the transition log entries
-        user_who_accepted = job_application_with_approval.to_company.members.last()
-        # Don't call accept that now creates a group and membership automatically
-        JobApplicationTransitionLog.objects.create(
-            job_application=job_application_with_approval,
-            to_state=JobApplicationState.ACCEPTED,
-            user=user_who_accepted,
-        )
-        should_be_created_groups_counter += 1
-        should_be_created_memberships += 3  # employer who accepted, employer who made the diagnosis and prescriber
-
-        # No job application linked. A group should not be created.
-        JobSeekerFactory()
-
-        # Only one new job application. A group should not be created.
-        JobApplicationFactory(state=JobApplicationState.NEW)
-
-        # Empty group!
-        # One processing job application sent by a job seeker.
-        # A group should not be created.
-        JobApplicationSentByJobSeekerFactory(state=JobApplicationState.PROCESSING)
-
-        management.call_command("init_follow_up_groups", wet_run=True)
-
-        # We should have created one follow-up group per job_application
-        assert FollowUpGroup.objects.count() == should_be_created_groups_counter
-
-        # We should have crated 4 memberships, one for the first job_application sender
-        # 3 for the second job_application: one for the sender, the other for the user
-        # who accepted the job_application and the third for the author of the diagnosis
-        # assert FollowUpGroupMembership.objects.count() == 4
-        assert FollowUpGroupMembership.objects.count() == should_be_created_memberships
-
-        assertQuerySetEqual(
-            job_application_with_approval.job_seeker.follow_up_group.members.all(),
-            [
-                job_application_with_approval.sender,
-                job_application_with_approval.eligibility_diagnosis.author,
-                user_who_accepted,
-            ],
-            ordered=False,
-        )
-
-        ## Jop Application with GEIQ approval
-        job_application_geiq_diagnosis = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
-            state=JobApplicationState.PROCESSING,
-            with_geiq_eligibility_diagnosis_from_prescriber=True,
-            to_company=company,
-            geiq_eligibility_diagnosis__author=company.members.first(),
-        )
-        should_be_created_groups_counter += 1
-
-        management.call_command("init_follow_up_groups", wet_run=True)
-
-        # One more
-        assert FollowUpGroup.objects.count() == should_be_created_groups_counter
-
-        assertQuerySetEqual(
-            job_application_geiq_diagnosis.job_seeker.follow_up_group.members.all(),
-            [
-                job_application_geiq_diagnosis.sender,
-                job_application_geiq_diagnosis.geiq_eligibility_diagnosis.author,
-            ],
-            ordered=False,
-        )
-
-        ## Job application sent by job seeker.
-        prescriber = PrescriberFactory()
-        job_application_sent_by_job_seeker = JobApplicationSentByJobSeekerFactory(
-            job_seeker__first_name="Dave",
-            state=JobApplicationState.PROCESSING,
-            with_iae_eligibility_diagnosis=True,
-            eligibility_diagnosis__author=prescriber,
-        )
-        should_be_created_groups_counter += 1
-        management.call_command("init_follow_up_groups", wet_run=True)
-        assert FollowUpGroup.objects.count() == should_be_created_groups_counter
-        beneficiary = job_application_sent_by_job_seeker.job_seeker
-        group = FollowUpGroup.objects.get(beneficiary=beneficiary)
-        assert not group.memberships.filter(member=beneficiary).exists()
-
-    def test_job_application_accepted(self):
-        JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
-            state=JobApplicationState.PROCESSING,
-        )
-
-        job_application_accepted = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
-            state=JobApplicationState.PROCESSING,
-        )
-        user = job_application_accepted.to_company.members.first()
-        # Don't call accept that now creates a group and membership automatically
-        JobApplicationTransitionLog.objects.create(
-            job_application=job_application_accepted,
-            to_state=JobApplicationState.ACCEPTED,
-            user=user,
-        )
-
-        assert FollowUpGroup.objects.count() == 0
-        assert FollowUpGroupMembership.objects.count() == 0
-
-        management.call_command("init_follow_up_groups", wet_run=True)
-
-        # We should have created one follow-up group per job_application
-        assert FollowUpGroup.objects.count() == 2
-
-        # We should have crated 3 memberships, one for the first job_application sender
-        # and 2 for the second job_application: one for the sender and the other for the user
-        # who accepted the job_application
-        assert FollowUpGroupMembership.objects.count() == 3
-
-        assertQuerySetEqual(
-            job_application_accepted.job_seeker.follow_up_group.members.all(),
-            [user, job_application_accepted.sender],
-            ordered=False,
-        )
-
-    def test_job_application_sender_job_seeker(self):
-        JobApplicationSentByJobSeekerFactory(state=JobApplicationState.NEW, to_company__kind=CompanyKind.GEIQ)
-
-        assert FollowUpGroup.objects.count() == 0
-        assert FollowUpGroupMembership.objects.count() == 0
-
-        management.call_command("init_follow_up_groups", wet_run=True)
-
-        # We should not create anything
-        assert FollowUpGroup.objects.count() == 0
-        assert FollowUpGroupMembership.objects.count() == 0
-
-    def test_job_application_sender_prescriber(self):
-        # First job_application with a new prescriber and beneficiary
-        first_job_application = JobApplicationFactory(
-            state=JobApplicationState.NEW,
-            to_company__kind=CompanyKind.GEIQ,
-            eligibility_diagnosis=None,
-        )
-
-        # Second job application with the same sender as the first one
-        second_job_application = JobApplicationFactory(
-            state=JobApplicationState.PROCESSING,
-            to_company__kind=CompanyKind.GEIQ,
-            eligibility_diagnosis=None,
-            sender=first_job_application.sender,
-        )
-
-        # We create another random JobApplication
-        JobApplicationFactory(
-            state=JobApplicationState.PROCESSING,
-            to_company__kind=CompanyKind.GEIQ,
-            eligibility_diagnosis=None,
-        )
-
-        # We create a FollowUpGroup for the first_job_applicaton with 4 members, one of the members being
-        # the firt_job_application sender
-        first_beneficiary_group = FollowUpGroupFactory(
-            beneficiary=first_job_application.job_seeker,
-            memberships=4,
-            memberships__member=first_job_application.sender,
-        )
-
-        assert FollowUpGroup.objects.count() == 1
-
-        assertQuerySetEqual(
-            FollowUpGroup.objects.filter(beneficiary=first_job_application.job_seeker)
-            .filter(members=first_job_application.sender)
-            .all(),
-            [first_beneficiary_group],
-            ordered=False,
-        )
-
-        assert FollowUpGroupMembership.objects.count() == 4
-
-        management.call_command("init_follow_up_groups", wet_run=True)
-
-        # As we are already part of the first_beneficiary group, having a job application for it
-        # should not create a new membership, but a membership for the second_job_application should
-        # be created
-        assert FollowUpGroupMembership.objects.count() == 6
-        memberships = FollowUpGroupMembership.objects.filter(member=first_job_application.sender).all()
-
-        assert len(memberships) == 2
-
-        all_groups = FollowUpGroup.objects.all()
-        first_sender_groups = FollowUpGroup.objects.filter(members=first_job_application.sender).all()
-
-        # Groups should not contain any job_seeker
-        assert all([not member.is_job_seeker for group in all_groups for member in group.members.all()])
-
-        # The already created group in fixtures should still be part of the groups after the command call
-        assert first_beneficiary_group in all_groups
-
-        # 2 new groups should have be created
-        assert len(all_groups) == 3
-
-        new_groups = [group for group in all_groups if group.id != first_beneficiary_group.id]
-
-        # One group should have the seconde_job_application job_seeker as beneficiary
-        [new_first_group] = [group for group in new_groups if group.beneficiary == second_job_application.job_seeker]
-
-        # The other one should have totally new beneficiary and members
-        [_] = [
-            group
-            for group in new_groups
-            if group.beneficiary != first_job_application.job_seeker
-            and first_job_application.sender not in group.members.all()
-        ]
-
-        # By default all the new memberships are active
-        assert all([membership.is_active for group in new_groups for membership in group.memberships.all()])
-
-        # By default all the added members are ot referent
-        assert all([not membership.is_referent for group in new_groups for membership in group.memberships.all()])
-
-        # The members of the new group for the first application should only be composed of
-        # the first_job_application sender
-        assertQuerySetEqual(new_first_group.members.all(), [first_job_application.sender])
-
-        # Calling the command twice should be ok
-        management.call_command("init_follow_up_groups", wet_run=True)
-
-        assertQuerySetEqual(
-            FollowUpGroupMembership.objects.filter(member=first_job_application.sender).all(),
-            memberships,
-            ordered=False,
-        )
-
-        assert FollowUpGroupMembership.objects.count() == 6
-        assertQuerySetEqual(
-            FollowUpGroup.objects.filter(members=first_job_application.sender).all(),
-            first_sender_groups,
-            ordered=False,
-        )
-
-    def test_group_create_at_update(self):
-        job_seeker = JobSeekerFactory()
-        prescriber = PrescriberFactory()
+        # employer with multiple contacts
         employer = EmployerFactory()
-        with freeze_time("2022-06-01 00:00:01"):
-            # A sent job application in NEW status (ignored)
-            new_job_app = JobApplicationFactory(
-                job_seeker=job_seeker, sender=prescriber, state=JobApplicationState.NEW, eligibility_diagnosis=None
-            )
-        with freeze_time("2022-06-01 00:00:02"):
-            # >>> Prescriber membership & group creation date
-            prescriber_membership_date = timezone.now()
-            # A first iae diag from the prescriber (this is the date of the prescriber membership)
-            IAEEligibilityDiagnosisFactory(job_seeker=job_seeker, from_prescriber=True, author=prescriber)
-        with freeze_time("2022-06-01 00:00:03"):
-            # Another iae diag from the prescriber
-            IAEEligibilityDiagnosisFactory(job_seeker=job_seeker, from_prescriber=True, author=prescriber)
-        with freeze_time("2022-06-01 00:00:04"):
-            # A geiq diag stil from the prescriber
-            GEIQEligibilityDiagnosisFactory(job_seeker=job_seeker, from_prescriber=True, author=prescriber)
-        with freeze_time("2022-06-01 00:00:05"):
-            # Another sent job application
-            accepted_job_app = JobApplicationFactory(
-                job_seeker=job_seeker, sender=prescriber, state=JobApplicationState.NEW
-            )
-        with freeze_time("2022-06-01 00:00:06"):
-            # the employer process the last job app
-            accepted_job_app.process(user=employer)
-        with freeze_time("2022-06-01 00:00:07"):
-            # >>> Employer membership creation date
-            employer_membership_date = timezone.now()
-            # the employer accepts the last job app
-            # Don't call accept that now creates a group and membership automatically
-            JobApplicationTransitionLog.objects.create(
-                job_application=accepted_job_app,
-                to_state=JobApplicationState.ACCEPTED,
-                user=employer,
-            )
-        with freeze_time("2022-06-01 00:00:08"):
-            # Another iae diag from the employer
-            IAEEligibilityDiagnosisFactory(job_seeker=job_seeker, from_employer=True, author=employer)
-
-        # reset first job app that was rendered obsolete (this instance is still new)
-        new_job_app.save()
-
-        # initialise the groups
-        init_created_at = datetime.datetime.combine(
-            settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(10, 0, 0), tzinfo=datetime.UTC
+        # A job app sent by the employer (we don't check if it's sent to the employer company or another)
+        job_app_1 = JobApplicationFactory(
+            job_seeker=beneficiary,
+            sender=employer,
+            sender_kind=UserKind.EMPLOYER,
+            sender_company=CompanyFactory(),
+            eligibility_diagnosis=None,
         )
-        with freeze_time(init_created_at):
-            management.call_command("init_follow_up_groups", wet_run=True)
+        geiq_diag_1 = GEIQEligibilityDiagnosisFactory(
+            job_seeker=beneficiary,
+            author=employer,
+            from_geiq=True,
+        )
+        iae_diag_1 = IAEEligibilityDiagnosisFactory(
+            job_seeker=beneficiary,
+            author=employer,
+            from_employer=True,
+        )
+        for state in JobApplicationState:
+            JobApplicationTransitionLog.objects.create(user=employer, to_state=state, job_application=job_app_1)
+        job_app_1_log = JobApplicationTransitionLog.objects.get(to_state=JobApplicationState.ACCEPTED)
 
-        assert list(
-            FollowUpGroup.objects.values_list("beneficiary_id", "created_at", "created_in_bulk", "updated_at")
-        ) == [
-            (job_seeker.pk, init_created_at, True, init_created_at),
-        ]
-        assert list(
-            FollowUpGroupMembership.objects.order_by("member_id").values_list(
-                "member_id", "created_at", "created_in_bulk", "updated_at"
-            )
-        ) == [
-            (prescriber.pk, init_created_at, True, init_created_at),
-            (employer.pk, init_created_at, True, init_created_at),
-        ]
+        # this prescriber had multiple "contacts":
+        prescriber = PrescriberFactory()
+        job_app_2 = JobApplicationFactory(
+            job_seeker=beneficiary,
+            sender=prescriber,
+            sent_by_authorized_prescriber_organisation=True,
+            eligibility_diagnosis=None,
+        )
+        geiq_diag_2 = GEIQEligibilityDiagnosisFactory(
+            job_seeker=beneficiary,
+            author=prescriber,
+            from_prescriber=True,
+        )
+        iae_diag_2 = IAEEligibilityDiagnosisFactory(
+            job_seeker=beneficiary,
+            author=prescriber,
+            from_prescriber=True,
+        )
 
-        # Update created_at
-        with freeze_time(timezone.now()):
-            update_script_launched_at = timezone.now()
-            management.call_command("update_follow_up_groups_member_created_at", wet_run=True)
-        assert list(
-            FollowUpGroup.objects.values_list("beneficiary_id", "created_at", "created_in_bulk", "updated_at")
-        ) == [
-            (job_seeker.pk, prescriber_membership_date, True, update_script_launched_at),
-        ]
-        assert list(
-            FollowUpGroupMembership.objects.order_by("member_id").values_list(
-                "member_id", "created_at", "created_in_bulk", "updated_at"
-            )
-        ) == [
-            (prescriber.pk, prescriber_membership_date, True, update_script_launched_at),
-            (employer.pk, employer_membership_date, True, update_script_launched_at),
-        ]
+        # non authorized prescriber sent job application are ignored
+        JobApplicationFactory(
+            job_seeker=beneficiary,
+            eligibility_diagnosis=None,
+        )
 
+        # self sent job application are ignored
+        JobApplicationFactory(
+            job_seeker=beneficiary,
+            sender=beneficiary,
+            eligibility_diagnosis=None,
+        )
+
+        assert sync_follow_up_groups_and_members.get_users_contacts([beneficiary.pk]) == {
+            beneficiary.pk: {
+                employer.pk: sorted(
+                    [
+                        job_app_1.created_at,
+                        geiq_diag_1.created_at,
+                        iae_diag_1.created_at,
+                        job_app_1_log.timestamp,
+                    ]
+                ),
+                prescriber.pk: sorted(
+                    [
+                        job_app_2.created_at,
+                        geiq_diag_2.created_at,
+                        iae_diag_2.created_at,
+                    ]
+                ),
+            },
+        }
+
+    def test_sync_groups(self, settings):
+        batch_group_creator = ItouStaffFactory()
+        settings.GPS_GROUPS_CREATED_BY_EMAIL = batch_group_creator.email
+
+        follower_1 = PrescriberFactory()
+        follower_2 = PrescriberFactory()
+
+        # A beneficiary with no existing group
+        beneficiary_1 = JobSeekerFactory()
+        # Another one with a group but we found new contacts
+        beneficiary_2 = JobSeekerFactory()
+        group_2 = FollowUpGroupFactory(beneficiary=beneficiary_2)
+        membership_2_1 = FollowUpGroupMembershipFactory(
+            follow_up_group=group_2,
+            last_contact_at=None,
+            member=follower_1,
+            is_referent=True,
+            created_in_bulk=False,
+            creator=follower_2,
+        )
+        membership_2_1_created_at = membership_2_1.created_at
+
+        # Simple contacts with only sent job application
+        JobApplicationFactory(
+            sender=follower_1,
+            job_seeker=beneficiary_1,
+            eligibility_diagnosis=None,
+            sent_by_authorized_prescriber_organisation=True,
+        )
+        JobApplicationFactory(
+            sender=follower_1,
+            job_seeker=beneficiary_1,
+            eligibility_diagnosis=None,
+            sent_by_authorized_prescriber_organisation=True,
+        )
+        JobApplicationFactory(
+            sender=follower_1,
+            job_seeker=beneficiary_2,
+            eligibility_diagnosis=None,
+            sent_by_authorized_prescriber_organisation=True,
+        )
+        JobApplicationFactory(
+            sender=follower_1,
+            job_seeker=beneficiary_2,
+            eligibility_diagnosis=None,
+            sent_by_authorized_prescriber_organisation=True,
+        )
+        JobApplicationFactory(
+            sender=follower_2,
+            job_seeker=beneficiary_2,
+            eligibility_diagnosis=None,
+            sent_by_authorized_prescriber_organisation=True,
+        )
+        JobApplicationFactory(
+            sender=follower_2,
+            job_seeker=beneficiary_2,
+            eligibility_diagnosis=None,
+            sent_by_authorized_prescriber_organisation=True,
+        )
+
+        contacts_data = sync_follow_up_groups_and_members.get_users_contacts([beneficiary_1.pk, beneficiary_2.pk])
+        management.call_command("sync_follow_up_groups_and_members", wet_run=True)
+
+        # New group and membership for beneficiary_1
+        group_1 = FollowUpGroup.objects.get(beneficiary=beneficiary_1)
+        assert group_1.created_in_bulk
+        membership_1_1 = FollowUpGroupMembership.objects.get(follow_up_group=group_1)
+        assert membership_1_1.member == follower_1
+        assert not membership_1_1.is_referent
+        assert membership_1_1.created_in_bulk
+        assert membership_1_1.creator == batch_group_creator
+        assert membership_1_1.last_contact_at == contacts_data[beneficiary_1.pk][follower_1.pk][1]
+        assert membership_1_1.created_at == contacts_data[beneficiary_1.pk][follower_1.pk][0]
+
+        # group already existed for beneficiary_2
+        membership_2_1.refresh_from_db()
+        # Update membership for follower_1
+        assert membership_2_1.is_referent  # didn't change
+        assert not membership_2_1.created_in_bulk  # didn't change
+        assert membership_2_1.creator == follower_2  # didin't change
+        assert membership_2_1.created_at == membership_2_1_created_at
+        assert membership_2_1.last_contact_at == contacts_data[beneficiary_2.pk][follower_1.pk][1]
+        # create the one for follower_2
+        membership_2_2 = FollowUpGroupMembership.objects.get(follow_up_group=group_2, member=follower_2)
+        assert membership_2_2.member == follower_2
+        assert not membership_2_2.is_referent
+        assert membership_2_2.created_in_bulk
+        assert membership_2_2.creator == batch_group_creator
+        assert membership_2_2.last_contact_at == contacts_data[beneficiary_2.pk][follower_2.pk][1]
+        assert membership_2_2.created_at == contacts_data[beneficiary_2.pk][follower_2.pk][0]
+
+
+class TestImportAdvisorManagementCommand:
     def test_import_advisor_information(self):
         contacted_profile = JobSeekerProfileFactory(with_contact=True)
         contactless_profile = JobSeekerProfileFactory()
