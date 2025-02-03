@@ -14,7 +14,7 @@ from django_select2.forms import Select2MultipleWidget, Select2Widget
 from itou.approvals.models import Approval
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType, JobDescriptionSource
+from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
 from itou.companies.models import JobDescription
 from itou.eligibility.models import AdministrativeCriteria
 from itou.files.forms import ItouFileField
@@ -374,7 +374,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
                     "hx-target": "#geiq_contract_type_and_options_block",
                 },
             )
-        elif company.kind in SIAE_WITH_CONVENTION_KINDS:
+        elif company.kind in CompanyKind.siae_kinds():
             # Add specific details to help texts for IAE
             self.fields["hiring_start_at"].help_text += (
                 " La date est modifiable jusqu'à la veille de la date saisie. En cas de premier PASS IAE pour "
@@ -842,7 +842,7 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
         self.fields["sender_prescriber_organizations"].choices += self.get_sender_prescriber_organization_choices()
         self.fields["sender_companies"].choices += self.get_sender_companies_choices()
 
-        if company.kind not in SIAE_WITH_CONVENTION_KINDS:
+        if company.kind not in CompanyKind.siae_kinds():
             del self.fields["eligibility_validated"]
             del self.fields["pass_iae_active"]
             del self.fields["pass_iae_suspended"]
