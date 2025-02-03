@@ -1,5 +1,37 @@
 # Journal des modifications
 
+## 2025-02-03
+
+### Ajouté
+
+- [Candidature: Simplification du parcours de refus (expérimentation dans le Rhône)](https://github.com/gip-inclusion/les-emplois/pull/5506)
+- [Candidature: traitement par lot](https://github.com/gip-inclusion/les-emplois/pull/5242)
+- [Tableau de bord: Ajout d'un bandeau pour inviter les candidats autonomes à un webinaire d'information](https://github.com/gip-inclusion/les-emplois/pull/5464)
+- [Tableau de bord: Ajout d'un bandeau promotionnel de GPS pour le Gard](https://github.com/gip-inclusion/les-emplois/pull/5495)
+
+### Modifié
+
+- [Admin: Ajout d'un message warning lors de la selection d'une organisation non habilité pour un diagnostic d'éligibilité.](https://github.com/gip-inclusion/les-emplois/pull/5486)
+- [Admin: Correction du formulaire des diagnostics d'éligibilité.](https://github.com/gip-inclusion/les-emplois/pull/5485)
+- [Admin: Correction du formulaire des diagnostics d'éligibilité](https://github.com/gip-inclusion/les-emplois/pull/5482)
+- [Admin: correction des formulaire d'ajout et de modification de diagnostic via l'admin](https://github.com/gip-inclusion/les-emplois/pull/5439)
+- [Candidature: mettre la vue tableau par défaut pour les employeurs](https://github.com/gip-inclusion/les-emplois/pull/5499)
+- [GPS: Changement de l'ordre d'affichage des membres d'un groupe](https://github.com/gip-inclusion/les-emplois/pull/5467)
+- [GPS: Changement du nom d'une colonne](https://github.com/gip-inclusion/les-emplois/pull/5465)
+- [GPS: Ne pas ajouter les orienteurs aux groupes de suivi automatiquement](https://github.com/gip-inclusion/les-emplois/pull/5509)
+- [GPS: Ne pas masquer les informations de contact de l'utilisateur](https://github.com/gip-inclusion/les-emplois/pull/5483)
+- [GPS: suivre automatiquement les candidats lors de certaines actions](https://github.com/gip-inclusion/les-emplois/pull/5501)
+- [Prescripteur : masquer le nom des candidats dans le filtre de la liste des candidats](https://github.com/gip-inclusion/les-emplois/pull/5480) 🖼
+- [PASS IAE: suppression de la redirection temporaire approvals:redirect_to_employee vers employees:detail](https://github.com/gip-inclusion/les-emplois/pull/5496)
+- [UX/UI: Fix du bouton avec spinner sur GPS](https://github.com/gip-inclusion/les-emplois/pull/5508)
+- [UX/UI: Mise a jour du thème vers la v2.6.1](https://github.com/gip-inclusion/les-emplois/pull/5452)
+- [UX/UI: Modifier l'alignement des badges et supprimer les .text-muted dans la section titre](https://github.com/gip-inclusion/les-emplois/pull/5491) 🖼
+
+### Tech
+
+- [Sécurité: correction des vulnérabilités de redirection ouverte](https://github.com/gip-inclusion/les-emplois/pull/5512)
+- [Tech: Ajout d'une contrainte en base de donnée sur la structure de l'auteur d'un diagnostic d'éligibilité IAE](https://github.com/gip-inclusion/les-emplois/pull/5489)
+
 ## 2025-01-27
 
 ### Ajouté
