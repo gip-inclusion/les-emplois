@@ -375,6 +375,8 @@ class RefuseWizardView(UserPassesTestMixin, TemplateView):
         for previous_step in self.steps:
             if previous_step == step:
                 return None
+            if self.wizard_session.get(previous_step) is self.wizard_session.NOT_SET:
+                return previous_step
             form = self.get_form(previous_step, data=self.wizard_session.get(previous_step, {}))
             if not form.is_valid():
                 return previous_step
