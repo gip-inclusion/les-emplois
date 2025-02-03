@@ -1,4 +1,12 @@
 # Journal des changements techniques majeurs
+## 2025-02-04
+
+- Mise à jour vers Python 3.13:
+    1. Reconstruire le _virtual env_ : `rm -r $VIRTUAL_ENV && make venv`
+    2. Mettre à jour ses recettes jetables après avoir `git rebase master`, en
+       retirant la variable `CC_CLEVER_PYTHON_VERSION=3.12` de l’environnement
+       de l’app sur la console CleverCloud.
+
 ## 2025-01-27
 
 - Utiliser `FORCE_PROCONNECT_LOGIN=False` en local au lieu de `FORCE_IC_LOGIN=False`.
