@@ -9,7 +9,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from itou.asp.models import Commune, EducationLevel
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
 from itou.employee_record.enums import Status
-from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition
 from itou.users.enums import LackOfNIRReason
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK, mock_get_geocoding_data
 from itou.utils.widgets import DuetDatePickerWidget
@@ -739,6 +739,16 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
         assertNotContains(response, "Acteur rencontré : ")
         assertNotContains(response, "Revenu brut mensuel moyen : ")
         assertNotContains(response, "Taux de cotisation : ")
+
+    def test_transition_log(self, client):
+        employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
+
+        assert employee_record.logs.count() == 0
+        client.post(self.url)
+
+        log = employee_record.logs.get()
+        assert log.transition == EmployeeRecordTransition.READY
+        assert log.user == self.user
 
 
 class TestCreateEmployeeRecordStep5ForEITI(TestCreateEmployeeRecordStep5):

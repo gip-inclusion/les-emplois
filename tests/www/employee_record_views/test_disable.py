@@ -4,7 +4,7 @@ from django.utils.html import escape
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.employee_record.enums import Status
-from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.employee_record.factories import EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
@@ -105,3 +105,13 @@ class TestDisableEmployeeRecords:
 
         self.employee_record.refresh_from_db()
         assert self.employee_record.status == Status.DISABLED
+
+    def test_transition_log(self, client):
+        client.force_login(self.user)
+
+        assert self.employee_record.logs.count() == 0
+        client.post(self.url, data={"confirm": "true"}, follow=True)
+
+        log = self.employee_record.logs.get()
+        assert log.transition == EmployeeRecordTransition.DISABLE
+        assert log.user == self.user

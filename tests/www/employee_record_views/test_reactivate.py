@@ -3,6 +3,7 @@ from django.urls import reverse, reverse_lazy
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.employee_record.enums import Status
+from itou.employee_record.models import EmployeeRecordTransition
 from itou.utils.templatetags import format_filters
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.employee_record.factories import EmployeeRecordWithProfileFactory
@@ -18,17 +19,14 @@ class TestReactivateEmployeeRecords:
         self.company = CompanyWithMembershipAndJobsFactory(name="Wanna Corp.", membership__user__first_name="Billy")
         self.user = self.company.members.get(first_name="Billy")
         self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_company=self.company)
-        self.employee_record = EmployeeRecordWithProfileFactory(job_application=self.job_application)
+        self.employee_record = EmployeeRecordWithProfileFactory(
+            status=Status.DISABLED, job_application=self.job_application
+        )
         self.url = reverse("employee_record_views:reactivate", args=(self.employee_record.id,))
 
     def test_reactivate_employee_record(self, client, faker):
-        self.employee_record.ready()
-        self.employee_record.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
-        process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
-        self.employee_record.process(code=process_code, label=process_message, archive={})
-        self.employee_record.disable()
-
         client.force_login(self.user)
+
         response = client.get(f"{self.url}?status=DISABLED")
         assertContains(response, "Confirmer la réactivation")
 
@@ -45,3 +43,13 @@ class TestReactivateEmployeeRecords:
 
         response = client.get(f"{self.NEXT_URL}?status=DISABLED")
         assertNotContains(response, approval_number_formatted)
+
+    def test_transition_log(self, client):
+        client.force_login(self.user)
+
+        assert self.employee_record.logs.count() == 0
+        client.post(self.url, data={"confirm": "true"}, follow=True)
+
+        log = self.employee_record.logs.get()
+        assert log.transition == EmployeeRecordTransition.ENABLE
+        assert log.user == self.user
