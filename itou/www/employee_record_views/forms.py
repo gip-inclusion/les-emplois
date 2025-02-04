@@ -25,7 +25,7 @@ class AddEmployeeRecordChooseEmployeeForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         self.fields["employee"].choices = [(None, "Sélectionnez le salarié")] + sorted(
-            [(user.id, user.get_full_name().title()) for user in employees if user.get_full_name()],
+            [(user.id, user.get_full_name()) for user in employees if user.get_full_name()],
             key=lambda u: u[1],
         )
 

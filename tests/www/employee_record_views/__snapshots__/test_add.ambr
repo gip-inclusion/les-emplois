@@ -672,7 +672,7 @@
                               <div class="form-group form-group-required"><label class="form-label" for="id_choose-employee-employee">Nom du salarié</label><select aria-describedby="id_choose-employee-employee_helptext" class="form-select django-select2" data-allow-clear="false" data-minimum-input-length="0" data-theme="bootstrap-5" id="id_choose-employee-employee" lang="fr" name="choose-employee-employee" required="">
     <option selected="" value="">Sélectionnez le salarié</option>
   
-    <option value="[PK of job seeker]">Jane Doe</option>
+    <option value="[PK of job seeker]">Jane DOE</option>
   
   </select><div class="form-text">Le salarié concerné par le transfert de données vers l'Extranet IAE 2.0 de l'ASP</div>
   </div>
