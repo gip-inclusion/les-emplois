@@ -58,20 +58,12 @@ STEPS = [
 ]
 
 
-def _show_add_choose_approval_form(wizard):
-    cleaned_data = wizard.get_cleaned_data_for_step("choose-employee") or {}
-    return bool(cleaned_data.get("employee"))
-
-
 class AddView(NamedUrlSessionWizardView):
     template_name = "employee_record/add.html"
     form_list = [
         ("choose-employee", AddEmployeeRecordChooseEmployeeForm),
         ("choose-approval", AddEmployeeRecordChooseApprovalForm),
     ]
-    condition_dict = {
-        "choose-approval": _show_add_choose_approval_form,
-    }
 
     def dispatch(self, request, *args, **kwargs):
         self.company = get_current_company_or_404(request)
@@ -104,6 +96,22 @@ class AddView(NamedUrlSessionWizardView):
         Avoid session conflicts when using multiple tabs.
         """
         return f"company_{self.company.pk}_add_employee_record"
+
+    def check_wizard_state(self, *args, **kwargs):
+        step_url = kwargs.get("step", None)
+        if step_url != self.steps.current and step_url != "done":
+            # The user is accessing the wrong step (e.g. he tried to go back to the last step after finishing)
+            return HttpResponseRedirect(reverse("employee_record_views:add", kwargs={"step": self.steps.current}))
+
+    def get(self, *args, **kwargs):
+        if check_response := self.check_wizard_state(*args, **kwargs):
+            return check_response
+        return super().get(*args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        if check_response := self.check_wizard_state(*args, **kwargs):
+            return check_response
+        return super().post(*args, **kwargs)
 
     def done(self, form_list, *args, **kwargs):
         approval = Approval.objects.get(
