@@ -31,10 +31,25 @@ def test_wizard(snapshot, client):
         assertRedirects(client.get(start_url), choose_employee_url)
 
     # Submit data for the "choose-employee" step
-    # TODO: Figure out why testing manually is OK ("Étape 1/2") but with client it's not ("Étape 1/1")
-    # assert str(parse_response_to_soup(client.get(choose_employee_url), selector="#main .s-section")) == snapshot(
-    #     name="choose-employee"
-    # )
+    assert str(
+        parse_response_to_soup(
+            client.get(choose_employee_url),
+            selector="#main .s-section",
+            replace_in_attr=[
+                (
+                    "id",
+                    f"id_company_{company.pk}_add_employee_record-current_step",
+                    "id_company_[PK of Company]_add_employee_record-current_step",
+                ),
+                (
+                    "name",
+                    f"company_{company.pk}_add_employee_record-current_step",
+                    "company_[PK of Company]_add_employee_record-current_step",
+                ),
+                ("value", str(job_application.job_seeker.pk), "[PK of job seeker]"),
+            ],
+        )
+    ) == snapshot(name="choose-employee")
     response = client.post(
         choose_employee_url,
         {
@@ -61,6 +76,12 @@ def test_wizard(snapshot, client):
     )
 
     assertRedirects(response, end_url, fetch_redirect_response=False)
+    # get end_url to clear the wizard data
+    client.get(end_url)
+
+    # Don't crash when going back to last step
+    response = client.get(choose_approval_url)
+    assertRedirects(response, choose_employee_url)
 
 
 def test_done_step_when_the_employee_record_need_to_be_created(client):
