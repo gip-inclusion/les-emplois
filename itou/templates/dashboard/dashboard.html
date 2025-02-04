@@ -139,29 +139,6 @@
         </div>
     {% endif %}
 
-    {% if user.is_job_seeker and not user.has_valid_diagnosis and not user.job_applications.accepted.exists %}
-        <div id="information-session-2025-02-04" class="alert alert-info alert-dismissible-once d-none my-5" role="status">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-            <div class="row">
-                <div class="col-auto pe-0">
-                    <i class="ri-information-line ri-xl text-important" aria-hidden="true"></i>
-                </div>
-                <div class="col">
-                    <p class="mb-2">
-                        <strong>Prochaine session d’information le 4 février 2025 de 14h30 à 15h !</strong>
-                    </p>
-                    <p class="mb-0">
-                        Pour en savoir plus sur ce qu’est l’insertion par l’activité économique et écouter les conseils de notre équipe pour augmenter vos chances de trouver un emploi,
-                        inscrivez-vous à la prochaine session d’information en visio-conférence.
-                    </p>
-                </div>
-                <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                    <a href="https://app.livestorm.co/p/0b9468c0-6b28-4d62-a162-15e764bf79d4/live?s=a92d8a07-5507-412b-a9f3-4e796ceaa7d3" target="_blank" class="btn btn-sm btn-primary">Je m’inscris</a>
-                </div>
-            </div>
-        </div>
-    {% endif %}
-
     {% if can_view_gps_card and request.current_organization.department == "30" %}
         <div id="gps-webinar-2025-02-04" class="alert alert-info alert-dismissible-once d-none my-5" role="status">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
