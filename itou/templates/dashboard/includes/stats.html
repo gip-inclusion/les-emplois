@@ -32,7 +32,7 @@
                             </a>
                         </li>
                     {% endif %}
-                    {% if can_view_stats_siae_orga_etp %}
+                    {% if can_view_stats_siae %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'stats:stats_siae_orga_etp' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -40,8 +40,6 @@
                             </a>
                             {% include "dashboard/includes/stats_new_badge.html" %}
                         </li>
-                    {% endif %}
-                    {% if can_view_stats_siae %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'stats:stats_siae_hiring' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>

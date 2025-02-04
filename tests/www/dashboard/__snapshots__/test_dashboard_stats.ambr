@@ -22,7 +22,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -81,7 +80,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -156,7 +154,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -215,7 +212,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -327,7 +323,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -537,7 +532,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -690,7 +684,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/cd/iae">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -787,7 +780,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/cd/iae">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -864,7 +856,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -956,7 +947,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/cd/iae">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -1041,7 +1031,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -1100,7 +1089,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -1175,7 +1163,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -1234,7 +1221,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -1346,7 +1332,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -1510,7 +1495,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a aria-label="Accéder au guide d'analyse France Travail (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://plateforme-inclusion.notion.site/Guide-d-utilisation-et-d-analyse-des-tableaux-de-bord-France-Travail-dad8530e64af47bd99787a6d4e81f6b9" rel="noopener" target="_blank">
                                   <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
@@ -1594,7 +1578,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -1692,7 +1675,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a aria-label="Accéder au guide d'analyse France Travail (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://plateforme-inclusion.notion.site/Guide-d-utilisation-et-d-analyse-des-tableaux-de-bord-France-Travail-dad8530e64af47bd99787a6d4e81f6b9" rel="noopener" target="_blank">
                                   <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
@@ -1776,7 +1758,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -1912,7 +1893,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -2080,8 +2060,6 @@
                               <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
-                      
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/hiring">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -2168,7 +2146,14 @@
                       
                       
                       
-                      
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/siae/orga_etp">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Suivre les effectifs annuels et mensuels en ETP de ma structure</span>
+                              </a>
+                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
+  
+                          </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/hiring">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -2255,7 +2240,14 @@
                       
                       
                       
-                      
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/siae/orga_etp">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Suivre les effectifs annuels et mensuels en ETP de ma structure</span>
+                              </a>
+                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
+  
+                          </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/hiring">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -2350,8 +2342,6 @@
                               <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
-                      
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/hiring">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -2438,7 +2428,14 @@
                       
                       
                       
-                      
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/siae/orga_etp">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Suivre les effectifs annuels et mensuels en ETP de ma structure</span>
+                              </a>
+                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
+  
+                          </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/hiring">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -2525,7 +2522,14 @@
                       
                       
                       
-                      
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/siae/orga_etp">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Suivre les effectifs annuels et mensuels en ETP de ma structure</span>
+                              </a>
+                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
+  
+                          </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/hiring">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -2761,7 +2765,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/convergence/prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -2834,7 +2837,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/convergence/prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -2890,7 +2892,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -3107,7 +3108,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets/auto_prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -3238,7 +3238,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets/auto_prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -3351,7 +3350,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -3476,7 +3474,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets_log/state">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -3543,7 +3540,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets_log/state">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -3600,7 +3596,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -3815,7 +3810,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dgefp/auto_prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -3941,7 +3935,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dgefp/auto_prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -4054,7 +4047,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -4194,7 +4186,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dihal/state">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -4261,7 +4252,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dihal/state">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -4314,7 +4304,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -4527,7 +4516,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dreets/auto_prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -4649,7 +4637,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dreets/auto_prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -4751,7 +4738,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -4879,7 +4865,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/drihl/state">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -4948,7 +4933,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/drihl/state">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -5002,7 +4986,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -5087,7 +5070,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/iae_network/hiring">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -5156,7 +5138,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/iae_network/hiring">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -5209,7 +5190,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
