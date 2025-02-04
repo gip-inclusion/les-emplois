@@ -138,30 +138,6 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
     {% endif %}
-
-    {% if can_view_gps_card and request.current_organization.department == "30" %}
-        <div id="gps-webinar-2025-02-04" class="alert alert-info alert-dismissible-once d-none my-5" role="status">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-            <div class="row">
-                <div class="col-auto pe-0">
-                    <i class="ri-information-line ri-xl text-important" aria-hidden="true"></i>
-                </div>
-                <div class="col">
-                    <p class="mb-2">
-                        <strong>GPS · L’outil pour travailler ensemble</strong>
-                    </p>
-                    <p class="mb-0">
-                        <strong>Mardi 4 février de 10h à 11h</strong>, venez découvrir GPS,
-                        <a href="https://pages.inclusion.gouv.fr/gps-bienvenue" target="_blank">notre outil de suivi de parcours efficace et minimaliste</a>,
-                        actuellement en test dans le Gard, et faire part de vos retours et idées à l’équipe.
-                    </p>
-                </div>
-                <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                    <a href="https://app.livestorm.co/itou/gps-loutil-pour-travailler-ensemble?s=811c326b-1e2c-48fc-9619-6bdc2dec1a16" target="_blank" class="btn btn-sm btn-primary">Inscription gratuite</a>
-                </div>
-            </div>
-        </div>
-    {% endif %}
 {% endblock %}
 
 {% block title_content %}
