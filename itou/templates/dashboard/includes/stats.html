@@ -86,6 +86,13 @@
                                 <span>Prescriptions des accompagnateurs des publics allocataires du RSA de mon département</span>
                             </a>
                         </li>
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'stats:stats_cd_orga_etp' %}" class="btn-link btn-ico">
+                                <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
+                            </a>
+                            {% include "dashboard/includes/stats_new_badge.html" %}
+                        </li>
                     {% endif %}
                     {% if can_view_stats_cd_aci %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
@@ -93,15 +100,6 @@
                                 <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                 <span>Suivi du cofinancement des ACI de mon département</span>
                             </a>
-                        </li>
-                    {% endif %}
-                    {% if can_view_stats_cd_orga_etp %}
-                        <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_cd_orga_etp' %}" class="btn-link btn-ico">
-                                <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
-                            </a>
-                            {% include "dashboard/includes/stats_new_badge.html" %}
                         </li>
                     {% endif %}
                     {% if can_view_stats_ft %}
@@ -200,21 +198,19 @@
                                 <span>Prescriptions des acteurs AHI de ma région</span>
                             </a>
                         </li>
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'stats:stats_ddets_iae_orga_etp' %}" class="btn-link btn-ico">
+                                <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
+                            </a>
+                            {% include "dashboard/includes/stats_new_badge.html" %}
+                        </li>
                         {% if can_view_stats_ddets_iae_aci %}
                             <li class="d-flex justify-content-between align-items-center mb-3">
                                 <a href="{% url 'stats:stats_ddets_iae_aci' %}" class="btn-link btn-ico">
                                     <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                     <span>Suivi du cofinancement des ACI de mon département</span>
                                 </a>
-                            </li>
-                        {% endif %}
-                        {% if can_view_stats_ddets_iae_orga_etp %}
-                            <li class="d-flex justify-content-between align-items-center mb-3">
-                                <a href="{% url 'stats:stats_ddets_iae_orga_etp' %}" class="btn-link btn-ico">
-                                    <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                    <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
-                                </a>
-                                {% include "dashboard/includes/stats_new_badge.html" %}
                             </li>
                         {% endif %}
                     {% endif %}
@@ -278,8 +274,6 @@
                                 <span>Prescriptions des acteurs AHI de ma région</span>
                             </a>
                         </li>
-                    {% endif %}
-                    {% if can_view_stats_dreets_iae_orga_etp %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'stats:stats_dreets_iae_orga_etp' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>

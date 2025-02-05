@@ -21,14 +21,12 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Traitement et résultats des candidatures orientées par mon organisation</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -87,14 +85,12 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Traitement et résultats des candidatures orientées par mon organisation</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -153,14 +149,12 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Traitement et résultats des candidatures orientées par mon organisation</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -219,14 +213,12 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Traitement et résultats des candidatures orientées par mon organisation</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -330,14 +322,12 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Traitement et résultats des candidatures orientées par mon organisation</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -531,14 +521,12 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Traitement et résultats des candidatures orientées par mon organisation</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -704,16 +692,6 @@
                                   <span>Prescriptions des accompagnateurs des publics allocataires du RSA de mon département</span>
                               </a>
                           </li>
-                      
-                      
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/cd/aci">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivi du cofinancement des ACI de mon département</span>
-                              </a>
-                          </li>
-                      
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/cd/orga_etp">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -723,6 +701,13 @@
   
                           </li>
                       
+                      
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/cd/aci">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Suivi du cofinancement des ACI de mon département</span>
+                              </a>
+                          </li>
                       
                       
                       
@@ -800,8 +785,14 @@
                                   <span>Prescriptions des accompagnateurs des publics allocataires du RSA de mon département</span>
                               </a>
                           </li>
-                      
-                      
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/cd/orga_etp">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
+                              </a>
+                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
+  
+                          </li>
                       
                       
                       
@@ -880,6 +871,14 @@
                                   <span>Prescriptions des accompagnateurs des publics allocataires du RSA de mon département</span>
                               </a>
                           </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/cd/orga_etp">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
+                              </a>
+                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
+  
+                          </li>
                       
                       
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -888,8 +887,6 @@
                                   <span>Suivi du cofinancement des ACI de mon département</span>
                               </a>
                           </li>
-                      
-                      
                       
                       
                       
@@ -967,8 +964,14 @@
                                   <span>Prescriptions des accompagnateurs des publics allocataires du RSA de mon département</span>
                               </a>
                           </li>
-                      
-                      
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/cd/orga_etp">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
+                              </a>
+                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
+  
+                          </li>
                       
                       
                       
@@ -1030,14 +1033,12 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Traitement et résultats des candidatures orientées par mon organisation</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -1096,14 +1097,12 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Traitement et résultats des candidatures orientées par mon organisation</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -1162,14 +1161,12 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Traitement et résultats des candidatures orientées par mon organisation</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -1228,14 +1225,12 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Traitement et résultats des candidatures orientées par mon organisation</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -1339,14 +1334,12 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Traitement et résultats des candidatures orientées par mon organisation</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -1494,7 +1487,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a aria-label="Accéder au guide d'analyse France Travail (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://plateforme-inclusion.notion.site/Guide-d-utilisation-et-d-analyse-des-tableaux-de-bord-France-Travail-dad8530e64af47bd99787a6d4e81f6b9" rel="noopener" target="_blank">
                                   <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
@@ -1525,7 +1517,6 @@
                                   <span>Délai d'entrée en IAE pour mon territoire</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -1584,7 +1575,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a aria-label="Accéder au guide d'analyse France Travail (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://plateforme-inclusion.notion.site/Guide-d-utilisation-et-d-analyse-des-tableaux-de-bord-France-Travail-dad8530e64af47bd99787a6d4e81f6b9" rel="noopener" target="_blank">
                                   <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
@@ -1615,7 +1605,6 @@
                                   <span>Délai d'entrée en IAE pour mon territoire</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -1674,7 +1663,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a aria-label="Accéder au guide d'analyse France Travail (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://plateforme-inclusion.notion.site/Guide-d-utilisation-et-d-analyse-des-tableaux-de-bord-France-Travail-dad8530e64af47bd99787a6d4e81f6b9" rel="noopener" target="_blank">
                                   <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
@@ -1705,7 +1693,6 @@
                                   <span>Délai d'entrée en IAE pour mon territoire</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -1764,7 +1751,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a aria-label="Accéder au guide d'analyse France Travail (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://plateforme-inclusion.notion.site/Guide-d-utilisation-et-d-analyse-des-tableaux-de-bord-France-Travail-dad8530e64af47bd99787a6d4e81f6b9" rel="noopener" target="_blank">
                                   <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
@@ -1795,7 +1781,6 @@
                                   <span>Délai d'entrée en IAE pour mon territoire</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -1900,14 +1885,12 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ph/state/main">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Traitement et résultats des candidatures orientées par mon organisation</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -2099,8 +2082,6 @@
                       
                       
                       
-                      
-                      
                   </ul>
               
           </div>
@@ -2180,8 +2161,6 @@
                               <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
-                      
-                      
                       
                       
                       
@@ -2287,8 +2266,6 @@
                       
                       
                       
-                      
-                      
                   </ul>
               
           </div>
@@ -2368,8 +2345,6 @@
                               <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
-                      
-                      
                       
                       
                       
@@ -2475,8 +2450,6 @@
                       
                       
                       
-                      
-                      
                   </ul>
               
           </div>
@@ -2556,8 +2529,6 @@
                               <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
-                      
-                      
                       
                       
                       
@@ -2763,8 +2734,6 @@
                       
                       
                       
-                      
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/convergence/prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -2835,8 +2804,6 @@
                       
                       
                       
-                      
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/convergence/prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -2892,8 +2859,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
-                      
                       
                       
                       
@@ -3107,7 +3072,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets/auto_prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -3160,6 +3124,14 @@
                                   <span>Prescriptions des acteurs AHI de ma région</span>
                               </a>
                           </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/ddets/orga_etp">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
+                              </a>
+                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
+  
+                          </li>
                           
                               <li class="d-flex justify-content-between align-items-center mb-3">
                                   <a class="btn-link btn-ico" href="/stats/ddets/aci">
@@ -3168,17 +3140,6 @@
                                   </a>
                               </li>
                           
-                          
-                              <li class="d-flex justify-content-between align-items-center mb-3">
-                                  <a class="btn-link btn-ico" href="/stats/ddets/orga_etp">
-                                      <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                      <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
-                                  </a>
-                                  <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
-  
-                              </li>
-                          
-                      
                       
                       
                       
@@ -3237,7 +3198,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets/auto_prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -3290,6 +3250,14 @@
                                   <span>Prescriptions des acteurs AHI de ma région</span>
                               </a>
                           </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/ddets/orga_etp">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
+                              </a>
+                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
+  
+                          </li>
                           
                               <li class="d-flex justify-content-between align-items-center mb-3">
                                   <a class="btn-link btn-ico" href="/stats/ddets/aci">
@@ -3298,8 +3266,6 @@
                                   </a>
                               </li>
                           
-                          
-                      
                       
                       
                       
@@ -3358,7 +3324,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets/auto_prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -3411,9 +3376,15 @@
                                   <span>Prescriptions des acteurs AHI de ma région</span>
                               </a>
                           </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/ddets/orga_etp">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
+                              </a>
+                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
+  
+                          </li>
                           
-                          
-                      
                       
                       
                       
@@ -3473,14 +3444,12 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets_log/state">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Prescriptions des acteurs AHI de ma région</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -3539,14 +3508,12 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets_log/state">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Prescriptions des acteurs AHI de ma région</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -3605,14 +3572,12 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets_log/state">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Prescriptions des acteurs AHI de ma région</span>
                               </a>
                           </li>
-                      
                       
                       
                       
@@ -3808,8 +3773,6 @@
                       
                       
                       
-                      
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dgefp/auto_prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -3933,8 +3896,6 @@
                       
                       
                       
-                      
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dgefp/auto_prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -4047,8 +4008,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
-                      
                       
                       
                       
@@ -4184,8 +4143,6 @@
                       
                       
                       
-                      
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dihal/state">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -4250,8 +4207,6 @@
                       
                       
                       
-                      
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dihal/state">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -4304,8 +4259,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
-                      
                       
                       
                       
@@ -4515,7 +4468,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dreets/auto_prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -4568,8 +4520,6 @@
                                   <span>Prescriptions des acteurs AHI de ma région</span>
                               </a>
                           </li>
-                      
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dreets/orga_etp">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -4636,7 +4586,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dreets/auto_prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -4689,7 +4638,14 @@
                                   <span>Prescriptions des acteurs AHI de ma région</span>
                               </a>
                           </li>
-                      
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/dreets/orga_etp">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Suivre les effectifs annuels et mensuels en ETP des structures de ma région</span>
+                              </a>
+                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
+  
+                          </li>
                       
                       
                       
@@ -4748,7 +4704,6 @@
                       
                       
                       
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dreets/auto_prescription">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -4801,7 +4756,14 @@
                                   <span>Prescriptions des acteurs AHI de ma région</span>
                               </a>
                           </li>
-                      
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/dreets/orga_etp">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Suivre les effectifs annuels et mensuels en ETP des structures de ma région</span>
+                              </a>
+                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
+  
+                          </li>
                       
                       
                       
@@ -4850,8 +4812,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
-                      
                       
                       
                       
@@ -4931,8 +4891,6 @@
                       
                       
                       
-                      
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/drihl/state">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -4986,8 +4944,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
-                      
                       
                       
                       
@@ -5068,8 +5024,6 @@
                       
                       
                       
-                      
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/iae_network/hiring">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -5136,8 +5090,6 @@
                       
                       
                       
-                      
-                      
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/iae_network/hiring">
                                   <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -5190,8 +5142,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
-                      
                       
                       
                       

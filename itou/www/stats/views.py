@@ -357,7 +357,7 @@ def stats_cd_aci(request):
 
 def stats_cd_orga_etp(request):
     get_current_org_or_404(request)
-    if not utils.can_view_stats_cd_orga_etp(request):
+    if not utils.can_view_stats_cd(request):
         raise PermissionDenied
 
     return render_stats_cd(
@@ -621,7 +621,7 @@ def stats_ddets_iae_aci(request):
 
 
 def stats_ddets_iae_orga_etp(request):
-    if not utils.can_view_stats_ddets_iae_orga_etp(request):
+    if not utils.can_view_stats_ddets_iae(request):
         raise PermissionDenied
 
     return render_stats_ddets_iae(
@@ -704,7 +704,7 @@ def stats_dreets_iae_state(request):
 
 
 def stats_dreets_iae_orga_etp(request):
-    if not utils.can_view_stats_dreets_iae_orga_etp(request):
+    if not utils.can_view_stats_dreets_iae(request):
         raise PermissionDenied
 
     return render_stats_dreets_iae(
