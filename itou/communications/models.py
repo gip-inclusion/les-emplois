@@ -213,7 +213,12 @@ class AnnouncementItem(models.Model):
         storage=storages["public"],
         verbose_name="capture d'écran",
         help_text="1200x600 recommandé",
+        height_field="image_height",
+        width_field="image_width",
     )
+    # Denormalized information of image dimensions to avoid the need to access S3
+    image_height = models.PositiveIntegerField(verbose_name="hauteur de l’image", null=True)
+    image_width = models.PositiveIntegerField(verbose_name="largeur de l’image", null=True)
     image_alt_text = models.TextField(
         blank=True,
         verbose_name="description de l'image",
