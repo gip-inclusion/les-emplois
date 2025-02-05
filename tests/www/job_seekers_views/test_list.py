@@ -12,6 +12,28 @@ from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
+def assert_contains_button_apply_for(response, job_seeker, with_city=True, with_intro_js=False):
+    id_intro_js = 'id="introJsBtnPostuler"' if with_intro_js else ""
+    city = f"&city={job_seeker.city_slug}" if with_city else ""
+    assertContains(
+        response,
+        f"""
+            <a class="btn btn-sm btn-link btn-ico-only"
+                aria-label="Postuler pour ce candidat"
+                data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
+                data-matomo-option="postuler-pour-ce-candidat"
+                {id_intro_js}
+                href="{reverse("search:employers_results")}?job_seeker={job_seeker.public_id}{city}">
+                <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip"
+                data-bs-title="Postuler pour ce candidat">
+                </i>
+            </a>
+        """,
+        count=1,
+        html=True,
+    )
+
+
 def test_anonymous_user(client):
     url = reverse("job_seekers_views:list")
     response = client.get(url)
@@ -106,61 +128,16 @@ def test_multiple(client, snapshot):
 
         # Address is in search URL
         for i, application in enumerate([job_app, job_app2, job_app3]):
-            introjs_id = 'id="introJsBtnPostuler"' if i == 0 else ""
-            assertContains(
-                response,
-                f"""
-                <a class="btn btn-sm btn-link btn-ico-only"
-                    aria-label="Postuler pour ce candidat"
-                    data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
-                    data-matomo-option="postuler-pour-ce-candidat"
-                    {introjs_id}
-                    href="{reverse("search:employers_results")}?job_seeker={application.job_seeker.public_id}&city={application.job_seeker.city_slug}">
-                    <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip"
-                    data-bs-title="Postuler pour ce candidat">
-                    </i>
-                </a>
-                """,
-                html=True,
-            )
+            assert_contains_button_apply_for(response, application.job_seeker, with_city=True, with_intro_js=i == 0)
 
         # Job seeker does not have an address, so it is not in the URL
-        assertContains(
-            response,
-            f"""
-                <a class="btn btn-sm btn-link btn-ico-only"
-                    aria-label="Postuler pour ce candidat"
-                    data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
-                    data-matomo-option="postuler-pour-ce-candidat"
-                    href="{reverse("search:employers_results")}?job_seeker={job_app4.job_seeker.public_id}">
-                    <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip"
-                    data-bs-title="Postuler pour ce candidat">
-                    </i>
-                </a>
-                """,
-            html=True,
-        )
+        assert_contains_button_apply_for(response, job_app4.job_seeker, with_city=False)
 
     # Current user cannot view personal information, so the city is not in the URL
     client.force_login(unauthorized_prescriber)
     response = client.get(url)
     parse_response_to_soup(response, selector="tbody")
-    assertContains(
-        response,
-        f"""
-            <a class="btn btn-sm btn-link btn-ico-only"
-                aria-label="Postuler pour ce candidat"
-                data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
-                data-matomo-option="postuler-pour-ce-candidat"
-                id="introJsBtnPostuler"
-                href="{reverse("search:employers_results")}?job_seeker={job_app5.job_seeker.public_id}">
-                <i class="ri-draft-line" aria-hidden="true" data-bs-toggle="tooltip"
-                data-bs-title="Postuler pour ce candidat">
-                </i>
-            </a>
-            """,
-        html=True,
-    )
+    assert_contains_button_apply_for(response, job_app5.job_seeker, with_city=False, with_intro_js=True)
 
 
 def test_htmx_job_seeker_filter(client):
