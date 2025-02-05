@@ -438,7 +438,6 @@ class TestApplyAsJobSeeker:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, LINK_RESET_MARKUP % reset_url_company)
 
         nir = "178122978200508"
@@ -460,7 +459,6 @@ class TestApplyAsJobSeeker:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, LINK_RESET_MARKUP % reset_url_company)
 
         post_data = {"birthdate": "20/12/1978", "phone": "0610203040", "pole_emploi_id": "1234567A"}
@@ -1319,7 +1317,6 @@ class TestApplyAsAuthorizedPrescriber:
         assert response.url == next_url
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         post_data = {
@@ -1344,7 +1341,6 @@ class TestApplyAsAuthorizedPrescriber:
         assert response.url == next_url
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         post_data = {
@@ -1425,7 +1421,6 @@ class TestApplyAsAuthorizedPrescriber:
             return_value=True,
         ):
             response = client.get(next_url)
-            assert response.status_code == 200
             assertContains(response, CONFIRM_RESET_MARKUP % reset_url_job_description)
             assert not EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=company)
             assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
@@ -1525,11 +1520,9 @@ class TestApplyAsAuthorizedPrescriber:
         assert response.status_code == 200
 
         response = client.post(email_url, data={"email": "toto@pole-emploi.fr", "confirm": "1"})
-        assert response.status_code == 200
         assertContains(response, "Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
 
         response = client.post(email_url, data={"email": "titi@francetravail.fr", "confirm": "1"})
-        assert response.status_code == 200
         assertContains(response, "Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
 
     def test_apply_step_eligibility_does_not_show_employer_diagnosis(self, client):
@@ -1764,7 +1757,6 @@ class TestApplyAsPrescriber:
             "lack_of_nir_reason": "",
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 200
         assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE % "")
 
         post_data = {
@@ -1776,7 +1768,6 @@ class TestApplyAsPrescriber:
             "lack_of_nir_reason": "",
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 200
         assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
 
         # Resume to valid data and proceed with "normal" flow.
@@ -1808,7 +1799,6 @@ class TestApplyAsPrescriber:
         assert response.url == next_url
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         post_data = {
@@ -1832,7 +1822,6 @@ class TestApplyAsPrescriber:
         assert response.url == next_url
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         post_data = {
@@ -1905,7 +1894,6 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, LINK_RESET_MARKUP % reset_url_company)
 
         selected_job = company.job_description_through.first()
@@ -2008,7 +1996,6 @@ class TestApplyAsPrescriber:
             "pole_emploi_id": "3454471C",
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 200
         assertContains(
             response,
             (
@@ -2367,7 +2354,6 @@ class TestApplyAsCompany:
             "lack_of_nir_reason": "",
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 200
         assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE % "")
 
         post_data = {
@@ -2379,7 +2365,6 @@ class TestApplyAsCompany:
             "lack_of_nir_reason": "",
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 200
         assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
 
         # Resume to valid data and proceed with "normal" flow.
@@ -2411,7 +2396,6 @@ class TestApplyAsCompany:
         assert response.url == next_url
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
 
         post_data = {
@@ -2436,7 +2420,6 @@ class TestApplyAsCompany:
         assert response.url == next_url
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
 
         post_data = {
@@ -2490,7 +2473,6 @@ class TestApplyAsCompany:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, LINK_RESET_MARKUP % reset_url)
 
         selected_job = company.job_description_through.first()
@@ -2633,7 +2615,6 @@ class TestApplyAsCompany:
             "pole_emploi_id": "3454471C",
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 200
         assertContains(
             response,
             (
@@ -2675,11 +2656,9 @@ class TestApplyAsCompany:
         assert response.status_code == 200
 
         response = client.post(email_url, data={"email": "toto@pole-emploi.fr", "confirm": "1"})
-        assert response.status_code == 200
         assertContains(response, "Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
 
         response = client.post(email_url, data={"email": "titi@francetravail.fr", "confirm": "1"})
-        assert response.status_code == 200
         assertContains(response, "Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
 
 
@@ -2851,7 +2830,6 @@ class TestDirectHireFullProcess:
             "lack_of_nir_reason": "",
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 200
         assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE % "")
 
         post_data = {
@@ -2863,7 +2841,6 @@ class TestDirectHireFullProcess:
             "lack_of_nir_reason": "",
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 200
         assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
 
         # Resume to valid data and proceed with "normal" flow.
@@ -2895,7 +2872,6 @@ class TestDirectHireFullProcess:
         assert response.url == next_url
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
 
         post_data = {
@@ -2921,7 +2897,6 @@ class TestDirectHireFullProcess:
         assert response.url == next_url
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
 
         post_data = {
@@ -2957,7 +2932,6 @@ class TestDirectHireFullProcess:
         assert response.url == next_url
 
         response = client.get(next_url)
-        assert response.status_code == 200
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
 
         response = client.post(next_url)
@@ -3092,7 +3066,6 @@ class TestDirectHireFullProcess:
         # Step determine the job seeker with a NIR. First: show modal
         # ----------------------------------------------------------------------
         response = client.get(check_nir_url)
-        assert response.status_code == 200
         assertContains(response, LINK_RESET_MARKUP % reset_url_dashboard)
 
         response = client.post(check_nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "preview": 1})

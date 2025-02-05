@@ -43,7 +43,6 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("job_seekers_views:list"))
-        assert response.status_code == 200
         next_url = f"{reverse('search:employers_results')}?job_seeker={job_seeker.public_id}"
         assertContains(
             response,
@@ -67,7 +66,6 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
-        assert response.status_code == 200
         next_url = f"{reverse('search:employers_results')}?job_seeker={job_seeker.public_id}"
         assertContains(
             response,
@@ -211,7 +209,6 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("job_seekers_views:list"))
-        assert response.status_code == 200
         next_url = f"{reverse('search:employers_results')}?job_seeker={job_seeker.public_id}"
         assertContains(response, "A… Z…")
         assertContains(
@@ -236,7 +233,6 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
-        assert response.status_code == 200
         next_url = f"{reverse('search:employers_results')}?job_seeker={job_seeker.public_id}"
         assertContains(response, "A… Z…")
         assertContains(
@@ -414,7 +410,6 @@ class TestApplyAsCompany:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
-        assert response.status_code == 200
         next_url = f"{reverse('search:employers_results')}?job_seeker={job_seeker.public_id}"
         assertContains(
             response,
