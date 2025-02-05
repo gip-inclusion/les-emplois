@@ -1,7 +1,7 @@
 from urllib.parse import quote
 
 from django.urls import reverse
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
@@ -109,13 +109,12 @@ class TestApplyAsPrescriber:
             reverse("apply:start", kwargs={"company_pk": guerande_company.pk}) + f"?job_seeker={job_seeker.public_id}"
         )
         response = client.get(apply_company_url)
-        assert response.status_code == 302
 
         next_url = reverse(
             "apply:application_jobs",
             kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step apply to job
         # ----------------------------------------------------------------------
@@ -125,7 +124,6 @@ class TestApplyAsPrescriber:
 
         selected_job = guerande_company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
-        assert response.status_code == 302
 
         assert client.session[f"job_application-{guerande_company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
@@ -133,14 +131,13 @@ class TestApplyAsPrescriber:
             "apply:application_eligibility",
             kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's eligibility
         # ----------------------------------------------------------------------
 
         # job seeker is getting RSA
         response = client.post(next_url, {"level_1_1": True})
-        assert response.status_code == 302
 
         assert EligibilityDiagnosis.objects.has_considered_valid(job_seeker, for_siae=guerande_company)
 
@@ -148,7 +145,7 @@ class TestApplyAsPrescriber:
             "apply:application_resume",
             kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's resume.
         # ----------------------------------------------------------------------
@@ -162,7 +159,6 @@ class TestApplyAsPrescriber:
                 "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             },
         )
-        assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=prescriber, to_company=guerande_company)
         assert job_application.job_seeker == job_seeker
@@ -178,7 +174,7 @@ class TestApplyAsPrescriber:
         next_url = reverse(
             "apply:application_end", kwargs={"company_pk": guerande_company.pk, "application_pk": job_application.pk}
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
     def test_apply_as_prescriber_without_seeing_personal_info(self, client):
         guerande = create_city_guerande()
@@ -276,13 +272,12 @@ class TestApplyAsPrescriber:
             reverse("apply:start", kwargs={"company_pk": guerande_company.pk}) + f"?job_seeker={job_seeker.public_id}"
         )
         response = client.get(apply_company_url)
-        assert response.status_code == 302
 
         next_url = reverse(
             "apply:application_jobs",
             kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step apply to job
         # ----------------------------------------------------------------------
@@ -292,7 +287,6 @@ class TestApplyAsPrescriber:
 
         selected_job = guerande_company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
-        assert response.status_code == 302
 
         assert client.session[f"job_application-{guerande_company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
@@ -300,14 +294,13 @@ class TestApplyAsPrescriber:
             "apply:application_eligibility",
             kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
         # Step application's eligibility
         # ----------------------------------------------------------------------
 
         # job seeker is getting RSA
         response = client.post(next_url, {"level_1_1": True})
-        assert response.status_code == 302
 
         assert EligibilityDiagnosis.objects.has_considered_valid(job_seeker, for_siae=guerande_company)
 
@@ -315,7 +308,7 @@ class TestApplyAsPrescriber:
             "apply:application_resume",
             kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's resume.
         # ----------------------------------------------------------------------
@@ -329,7 +322,6 @@ class TestApplyAsPrescriber:
                 "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             },
         )
-        assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=prescriber, to_company=guerande_company)
         assert job_application.job_seeker == job_seeker
@@ -345,7 +337,7 @@ class TestApplyAsPrescriber:
         next_url = reverse(
             "apply:application_end", kwargs={"company_pk": guerande_company.pk, "application_pk": job_application.pk}
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
     def test_cannot_apply_as_prescriber_with_incorrect_public_id(self, client):
         company = CompanyWithMembershipAndJobsFactory()
@@ -452,13 +444,12 @@ class TestApplyAsCompany:
             reverse("apply:start", kwargs={"company_pk": other_company.pk}) + f"?job_seeker={job_seeker.public_id}"
         )
         response = client.get(apply_company_url)
-        assert response.status_code == 302
 
         next_url = reverse(
             "apply:application_jobs",
             kwargs={"company_pk": other_company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
@@ -468,7 +459,6 @@ class TestApplyAsCompany:
 
         selected_job = other_company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
-        assert response.status_code == 302
 
         assert client.session[f"job_application-{other_company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
@@ -476,7 +466,7 @@ class TestApplyAsCompany:
             "apply:application_eligibility",
             kwargs={"company_pk": other_company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
         # Step application's eligibility
         # ----------------------------------------------------------------------
@@ -486,7 +476,7 @@ class TestApplyAsCompany:
             "apply:application_resume",
             kwargs={"company_pk": other_company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's resume.
         # ----------------------------------------------------------------------
@@ -499,7 +489,6 @@ class TestApplyAsCompany:
                 "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             },
         )
-        assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=employer, to_company=other_company)
         assert job_application.job_seeker == job_seeker
@@ -515,7 +504,7 @@ class TestApplyAsCompany:
         next_url = reverse(
             "apply:application_end", kwargs={"company_pk": other_company.pk, "application_pk": job_application.pk}
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
     def test_cannot_apply_as_company_with_incorrect_public_id(self, client):
         company = CompanyWithMembershipAndJobsFactory()

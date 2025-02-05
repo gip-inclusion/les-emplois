@@ -325,7 +325,6 @@ def test_existing_user_with_email(client):
         },
     }
 
-    assert response.url == next_url
     assert client.session[job_seeker_session_name] == expected_job_seeker_session
     assertRedirects(response, next_url)
 

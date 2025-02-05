@@ -369,11 +369,10 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
     # ----------------------------------------------------------------------
 
     response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
-    assert response.status_code == 302
 
     [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
     next_url = reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name})
-    assert response.url == next_url
+    assertRedirects(response, next_url)
 
     # Step check job seeker NIR.
     # ----------------------------------------------------------------------
@@ -426,13 +425,12 @@ class TestApplyAsJobSeeker:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
-        assert response.status_code == 302
 
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
         next_url = reverse(
             "job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name}
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step check job seeker NIR.
         # ----------------------------------------------------------------------
@@ -444,7 +442,6 @@ class TestApplyAsJobSeeker:
         post_data = {"nir": nir, "confirm": 1}
 
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 302
 
         user = User.objects.get(pk=user.pk)
         assert user.jobseeker_profile.nir == nir
@@ -453,7 +450,7 @@ class TestApplyAsJobSeeker:
             "job_seekers_views:check_job_seeker_info",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step check job seeker info.
         # ----------------------------------------------------------------------
@@ -464,7 +461,6 @@ class TestApplyAsJobSeeker:
         post_data = {"birthdate": "20/12/1978", "phone": "0610203040", "pole_emploi_id": "1234567A"}
 
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 302
 
         user = User.objects.get(pk=user.pk)
         assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
@@ -476,18 +472,17 @@ class TestApplyAsJobSeeker:
             "apply:step_check_prev_applications",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
         # Step check previous job applications.
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assert response.status_code == 302
 
         next_url = reverse(
             "apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id}
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
@@ -500,24 +495,22 @@ class TestApplyAsJobSeeker:
             "companies_views:job_description_card", kwargs={"job_description_id": selected_job.pk}
         )
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
-        assert response.status_code == 302
 
         assert client.session[f"job_application-{company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
         next_url = reverse(
             "apply:application_eligibility", kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id}
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
         # Step application's eligibility.
         # ----------------------------------------------------------------------
         response = client.get(next_url)
-        assert response.status_code == 302
 
         next_url = reverse(
             "apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id}
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's resume.
         # ----------------------------------------------------------------------
@@ -536,7 +529,6 @@ class TestApplyAsJobSeeker:
                     "resume": pdf_file,
                 },
             )
-        assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=user, to_company=company)
         assert job_application.job_seeker == user
@@ -556,7 +548,7 @@ class TestApplyAsJobSeeker:
         next_url = reverse(
             "apply:application_end", kwargs={"company_pk": company.pk, "application_pk": job_application.pk}
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's end.
         # ----------------------------------------------------------------------
@@ -640,27 +632,27 @@ class TestApplyAsJobSeeker:
         next_url = reverse(
             "job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name}
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
         response = client.get(next_url)
 
         next_url = reverse(
             "job_seekers_views:check_job_seeker_info",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
         response = client.get(next_url)
 
         next_url = reverse(
             "apply:step_check_prev_applications",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
         response = client.get(next_url)
 
         next_url = reverse(
             "apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id}
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
         response = client.get(next_url)
 
         assertContains(response, LINK_RESET_MARKUP % reset_url_job_description)
@@ -869,13 +861,12 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
-        assert response.status_code == 302
 
         next_url = reverse(
             "apply:pending_authorization_for_sender",
             kwargs={"company_pk": company.pk},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step show warning message about pending authorization.
         # ----------------------------------------------------------------------
@@ -917,7 +908,6 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
-        assert response.status_code == 302
 
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
@@ -934,7 +924,7 @@ class TestApplyAsAuthorizedPrescriber:
                 "nir": dummy_job_seeker.jobseeker_profile.nir,
             },
         }
-        assert response.url == next_url
+        assertRedirects(response, next_url)
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         # Step get job seeker e-mail. First try: email is found
@@ -953,7 +943,6 @@ class TestApplyAsAuthorizedPrescriber:
         assert response.status_code == 200
 
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
-        assert response.status_code == 302
 
         expected_job_seeker_session |= {
             "user": {
@@ -966,7 +955,7 @@ class TestApplyAsAuthorizedPrescriber:
             "job_seekers_views:create_job_seeker_step_1_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step create a job seeker.
         # ----------------------------------------------------------------------
@@ -997,7 +986,6 @@ class TestApplyAsAuthorizedPrescriber:
             "birth_country": Country.france_id,
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 302
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
@@ -1009,7 +997,7 @@ class TestApplyAsAuthorizedPrescriber:
             "job_seekers_views:create_job_seeker_step_2_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         response = client.get(next_url)
         assert response.status_code == 200
@@ -1026,7 +1014,6 @@ class TestApplyAsAuthorizedPrescriber:
 
         response = client.post(next_url, data=post_data)
 
-        assert response.status_code == 302
         expected_job_seeker_session["user"] |= post_data | {"address_line_2": "", "address_for_autocomplete": None}
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1034,7 +1021,7 @@ class TestApplyAsAuthorizedPrescriber:
             "job_seekers_views:create_job_seeker_step_3_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         response = client.get(next_url)
         assert response.status_code == 200
@@ -1043,7 +1030,6 @@ class TestApplyAsAuthorizedPrescriber:
             "education_level": dummy_job_seeker.jobseeker_profile.education_level,
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 302
         expected_job_seeker_session["profile"] |= post_data | {
             "pole_emploi_id": "",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED.value,
@@ -1069,14 +1055,13 @@ class TestApplyAsAuthorizedPrescriber:
             "job_seekers_views:create_job_seeker_step_end_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         response = client.get(next_url)
         assertContains(response, "Créer le compte candidat")
 
         mock_advisor_list(dummy_job_seeker.jobseeker_profile.nir)
         response = client.post(next_url)
-        assert response.status_code == 302
 
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
@@ -1088,7 +1073,7 @@ class TestApplyAsAuthorizedPrescriber:
             "apply:application_jobs",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
@@ -1098,7 +1083,6 @@ class TestApplyAsAuthorizedPrescriber:
 
         selected_job = company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
-        assert response.status_code == 302
 
         assert client.session[f"job_application-{company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
@@ -1106,18 +1090,17 @@ class TestApplyAsAuthorizedPrescriber:
             "apply:application_eligibility",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
         # Step application's eligibility.
         # ----------------------------------------------------------------------
         response = client.get(next_url)
-        assert response.status_code == 302
 
         next_url = reverse(
             "apply:application_resume",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's resume.
         # ----------------------------------------------------------------------
@@ -1135,7 +1118,6 @@ class TestApplyAsAuthorizedPrescriber:
                     "resume": pdf_file,
                 },
             )
-        assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=user, to_company=company)
         assert job_application.job_seeker == new_job_seeker
@@ -1155,7 +1137,7 @@ class TestApplyAsAuthorizedPrescriber:
         next_url = reverse(
             "apply:application_end", kwargs={"company_pk": company.pk, "application_pk": job_application.pk}
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's end.
         # ----------------------------------------------------------------------
@@ -1186,7 +1168,6 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
-        assert response.status_code == 302
 
         params = {
             "tunnel": "sender",
@@ -1194,12 +1175,12 @@ class TestApplyAsAuthorizedPrescriber:
             "from_url": reset_url_company,
         }
         next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
-        assert response.url == next_url
+        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
         response = client.get(next_url)
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
         next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step determine the job seeker with a NIR. First try: NIR is found
         # ----------------------------------------------------------------------
@@ -1214,13 +1195,12 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
-        assert response.status_code == 302
 
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step get job seeker e-mail. First try: email is found
         # ----------------------------------------------------------------------
@@ -1248,7 +1228,6 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
-        assert response.status_code == 302
 
         expected_job_seeker_session = {
             "config": {
@@ -1270,7 +1249,7 @@ class TestApplyAsAuthorizedPrescriber:
             "job_seekers_views:create_job_seeker_step_1_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step create a job seeker.
         # ----------------------------------------------------------------------
@@ -1301,7 +1280,6 @@ class TestApplyAsAuthorizedPrescriber:
             "birth_country": Country.france_id,
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 302
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
@@ -1314,7 +1292,7 @@ class TestApplyAsAuthorizedPrescriber:
             "job_seekers_views:create_job_seeker_step_2_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         response = client.get(next_url)
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
@@ -1330,7 +1308,6 @@ class TestApplyAsAuthorizedPrescriber:
         }
 
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 302
         expected_job_seeker_session["user"] |= post_data | {"address_for_autocomplete": None, "address_line_2": ""}
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1338,7 +1315,7 @@ class TestApplyAsAuthorizedPrescriber:
             "job_seekers_views:create_job_seeker_step_3_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         response = client.get(next_url)
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
@@ -1347,7 +1324,6 @@ class TestApplyAsAuthorizedPrescriber:
             "education_level": dummy_job_seeker.jobseeker_profile.education_level,
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 302
         expected_job_seeker_session["profile"] |= post_data | {
             "pole_emploi_id": "",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED.value,
@@ -1373,13 +1349,12 @@ class TestApplyAsAuthorizedPrescriber:
             "job_seekers_views:create_job_seeker_step_end_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         response = client.get(next_url)
         assertContains(response, "Créer le compte candidat")
 
         response = client.post(next_url)
-        assert response.status_code == 302
 
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
@@ -1388,7 +1363,7 @@ class TestApplyAsAuthorizedPrescriber:
             "apply:application_jobs",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
@@ -1401,7 +1376,6 @@ class TestApplyAsAuthorizedPrescriber:
             "companies_views:job_description_card", kwargs={"job_description_id": selected_job.pk}
         )
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
-        assert response.status_code == 302
 
         assert client.session[f"job_application-{company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
@@ -1409,7 +1383,7 @@ class TestApplyAsAuthorizedPrescriber:
             "apply:application_eligibility",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's eligibility.
         # ----------------------------------------------------------------------
@@ -1426,7 +1400,6 @@ class TestApplyAsAuthorizedPrescriber:
             assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
 
         response = client.post(next_url, {"level_1_1": True})
-        assert response.status_code == 302
         diag = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=new_job_seeker, for_siae=company)
         assert diag.is_valid is True
         assert diag.expires_at == timezone.localdate() + relativedelta(months=6)
@@ -1435,7 +1408,7 @@ class TestApplyAsAuthorizedPrescriber:
             "apply:application_resume",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's resume.
         # ----------------------------------------------------------------------
@@ -1454,7 +1427,6 @@ class TestApplyAsAuthorizedPrescriber:
                     "resume": pdf_file,
                 },
             )
-        assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=user, to_company=company)
         assert job_application.job_seeker == new_job_seeker
@@ -1474,7 +1446,7 @@ class TestApplyAsAuthorizedPrescriber:
         next_url = reverse(
             "apply:application_end", kwargs={"company_pk": company.pk, "application_pk": job_application.pk}
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's end.
         # ----------------------------------------------------------------------
@@ -1505,13 +1477,12 @@ class TestApplyAsAuthorizedPrescriber:
         assert response.status_code == 200
 
         response = client.post(nir_url, data={"nir": JobSeekerProfileFactory.build().nir, "confirm": 1})
-        assert response.status_code == 302
 
         email_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == email_url
+        assertRedirects(response, email_url)
 
         # Step get job seeker e-mail.
         # ----------------------------------------------------------------------
@@ -1554,7 +1525,6 @@ class TestApplyAsAuthorizedPrescriber:
         client.force_login(user)
 
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
-        assert response.status_code == 302
 
         params = {
             "tunnel": "sender",
@@ -1562,7 +1532,7 @@ class TestApplyAsAuthorizedPrescriber:
             "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
         }
         next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
-        assert response.url == next_url
+        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
         response = client.get(next_url)
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
@@ -1648,19 +1618,18 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
-        assert response.status_code == 302
         params = {
             "tunnel": "sender",
             "company": company.pk,
             "from_url": reset_url_company,
         }
         next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
-        assert response.url == next_url
+        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
         response = client.get(next_url)
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
         next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step determine the job seeker with a NIR. First try: NIR is found
         # ----------------------------------------------------------------------
@@ -1675,13 +1644,12 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
-        assert response.status_code == 302
 
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         expected_job_seeker_session = {
             "config": {
@@ -1711,7 +1679,6 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
-        assert response.status_code == 302
 
         expected_job_seeker_session |= {
             "user": {
@@ -1724,7 +1691,7 @@ class TestApplyAsPrescriber:
             "job_seekers_views:create_job_seeker_step_1_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step create a job seeker.
         # ----------------------------------------------------------------------
@@ -1784,7 +1751,6 @@ class TestApplyAsPrescriber:
             "birth_country": Country.france_id,
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 302
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
@@ -1796,7 +1762,7 @@ class TestApplyAsPrescriber:
             "job_seekers_views:create_job_seeker_step_2_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         response = client.get(next_url)
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
@@ -1811,7 +1777,6 @@ class TestApplyAsPrescriber:
             "fill_mode": "ban_api",
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 302
         expected_job_seeker_session["user"] |= post_data | {"address_line_2": "", "address_for_autocomplete": None}
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1819,7 +1784,7 @@ class TestApplyAsPrescriber:
             "job_seekers_views:create_job_seeker_step_3_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         response = client.get(next_url)
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
@@ -1828,7 +1793,6 @@ class TestApplyAsPrescriber:
             "education_level": dummy_job_seeker.jobseeker_profile.education_level,
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 302
         expected_job_seeker_session["profile"] |= post_data | {
             "pole_emploi_id": "",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED.value,
@@ -1854,7 +1818,7 @@ class TestApplyAsPrescriber:
             "job_seekers_views:create_job_seeker_step_end_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         response = client.get(next_url)
         assertContains(response, "Créer le compte candidat")
@@ -1879,7 +1843,6 @@ class TestApplyAsPrescriber:
         other_job_seeker.delete()
 
         response = client.post(next_url)
-        assert response.status_code == 302
 
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
@@ -1888,7 +1851,7 @@ class TestApplyAsPrescriber:
             "apply:application_jobs",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
@@ -1901,7 +1864,6 @@ class TestApplyAsPrescriber:
             "companies_views:job_description_card", kwargs={"job_description_id": selected_job.pk}
         )
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
-        assert response.status_code == 302
 
         assert client.session[f"job_application-{company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
@@ -1909,18 +1871,17 @@ class TestApplyAsPrescriber:
             "apply:application_eligibility",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
         # Step application's eligibility.
         # ----------------------------------------------------------------------
         response = client.get(next_url)
-        assert response.status_code == 302
 
         next_url = reverse(
             "apply:application_resume",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's resume.
         # ----------------------------------------------------------------------
@@ -1939,7 +1900,6 @@ class TestApplyAsPrescriber:
                     "resume": pdf_file,
                 },
             )
-        assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=user, to_company=company)
         assert job_application.job_seeker == new_job_seeker
@@ -1960,7 +1920,7 @@ class TestApplyAsPrescriber:
         next_url = reverse(
             "apply:application_end", kwargs={"company_pk": company.pk, "application_pk": job_application.pk}
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's end.
         # ----------------------------------------------------------------------
@@ -2075,7 +2035,7 @@ class TestApplyAsPrescriberNirExceptions:
             },
         }
 
-        assert response.url == next_url
+        assertRedirects(response, next_url)
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
         assertRedirects(response, next_url)
 
@@ -2161,7 +2121,7 @@ class TestApplyAsPrescriberNirExceptions:
                 "nir": nir,
             },
         }
-        assert response.url == next_url
+        assertRedirects(response, next_url)
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
         assertRedirects(response, next_url)
 
@@ -2248,7 +2208,6 @@ class TestApplyAsCompany:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
-        assert response.status_code == 302
 
         params = {
             "tunnel": "sender",
@@ -2256,12 +2215,12 @@ class TestApplyAsCompany:
             "from_url": reset_url,
         }
         next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
-        assert response.url == next_url
+        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
         response = client.get(next_url)
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
         next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step determine the job seeker with a NIR. First try: NIR is found
         # ----------------------------------------------------------------------
@@ -2276,7 +2235,6 @@ class TestApplyAsCompany:
         # ----------------------------------------------------------------------
 
         response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
-        assert response.status_code == 302
 
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
@@ -2289,7 +2247,7 @@ class TestApplyAsCompany:
                 "nir": dummy_job_seeker.jobseeker_profile.nir,
             },
         }
-        assert response.url == next_url
+        assertRedirects(response, next_url)
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         # Step get job seeker e-mail. First try: email is found
@@ -2308,7 +2266,6 @@ class TestApplyAsCompany:
         # ----------------------------------------------------------------------
 
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
-        assert response.status_code == 302
 
         expected_job_seeker_session |= {
             "user": {
@@ -2321,7 +2278,7 @@ class TestApplyAsCompany:
             "job_seekers_views:create_job_seeker_step_1_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step create a job seeker.
         # ----------------------------------------------------------------------
@@ -2381,7 +2338,6 @@ class TestApplyAsCompany:
             "birth_country": Country.france_id,
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 302
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
@@ -2393,7 +2349,7 @@ class TestApplyAsCompany:
             "job_seekers_views:create_job_seeker_step_2_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         response = client.get(next_url)
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
@@ -2409,7 +2365,6 @@ class TestApplyAsCompany:
         }
 
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 302
         expected_job_seeker_session["user"] |= post_data | {"address_line_2": "", "address_for_autocomplete": None}
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -2417,7 +2372,7 @@ class TestApplyAsCompany:
             "job_seekers_views:create_job_seeker_step_3_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         response = client.get(next_url)
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
@@ -2426,7 +2381,6 @@ class TestApplyAsCompany:
             "education_level": dummy_job_seeker.jobseeker_profile.education_level,
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 302
         expected_job_seeker_session["profile"] |= post_data | {
             "pole_emploi_id": "",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
@@ -2452,13 +2406,12 @@ class TestApplyAsCompany:
             "job_seekers_views:create_job_seeker_step_end_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         response = client.get(next_url)
         assertContains(response, "Créer le compte candidat")
 
         response = client.post(next_url)
-        assert response.status_code == 302
 
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
@@ -2467,7 +2420,7 @@ class TestApplyAsCompany:
             "apply:application_jobs",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
@@ -2484,7 +2437,6 @@ class TestApplyAsCompany:
             else reverse("companies_views:job_description_card", kwargs={"job_description_id": selected_job.pk})
         )
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
-        assert response.status_code == 302
 
         assert client.session[f"job_application-{company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
@@ -2492,18 +2444,17 @@ class TestApplyAsCompany:
             "apply:application_eligibility",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
         # Step application's eligibility.
         # ----------------------------------------------------------------------
         response = client.get(next_url)
-        assert response.status_code == 302
 
         next_url = reverse(
             "apply:application_resume",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's resume.
         # ----------------------------------------------------------------------
@@ -2522,7 +2473,6 @@ class TestApplyAsCompany:
                     "resume": pdf_file,
                 },
             )
-        assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=user, to_company=company)
         assert job_application.job_seeker == new_job_seeker
@@ -2543,7 +2493,7 @@ class TestApplyAsCompany:
         next_url = reverse(
             "apply:application_end", kwargs={"company_pk": company.pk, "application_pk": job_application.pk}
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step application's end.
         # ----------------------------------------------------------------------
@@ -2641,13 +2591,12 @@ class TestApplyAsCompany:
         assert response.status_code == 200
 
         response = client.post(nir_url, data={"nir": JobSeekerProfileFactory.build().nir, "confirm": 1})
-        assert response.status_code == 302
 
         email_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == email_url
+        assertRedirects(response, email_url)
 
         # Step get job seeker e-mail.
         # ----------------------------------------------------------------------
@@ -2749,13 +2698,12 @@ class TestDirectHireFullProcess:
         # ----------------------------------------------------------------------
 
         response = client.post(check_nir_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "preview": 1})
-        assert response.status_code == 302
 
         next_url = reverse(
             "job_seekers_views:search_by_email_for_hire",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step get job seeker e-mail. First try: email is found
         # ----------------------------------------------------------------------
@@ -2774,7 +2722,6 @@ class TestDirectHireFullProcess:
         # ----------------------------------------------------------------------
 
         response = client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
-        assert response.status_code == 302
 
         expected_job_seeker_session = {
             "config": {
@@ -2796,7 +2743,7 @@ class TestDirectHireFullProcess:
             "job_seekers_views:create_job_seeker_step_1_for_hire",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step create a job seeker.
         # ----------------------------------------------------------------------
@@ -2857,7 +2804,6 @@ class TestDirectHireFullProcess:
             "birth_country": Country.france_id,
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 302
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
@@ -2869,7 +2815,7 @@ class TestDirectHireFullProcess:
             "job_seekers_views:create_job_seeker_step_2_for_hire",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         response = client.get(next_url)
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
@@ -2886,7 +2832,6 @@ class TestDirectHireFullProcess:
 
         response = client.post(next_url, data=post_data)
 
-        assert response.status_code == 302
         expected_job_seeker_session["user"] |= post_data | {"address_line_2": "", "address_for_autocomplete": None}
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -2894,7 +2839,7 @@ class TestDirectHireFullProcess:
             "job_seekers_views:create_job_seeker_step_3_for_hire",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         response = client.get(next_url)
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
@@ -2903,7 +2848,6 @@ class TestDirectHireFullProcess:
             "education_level": dummy_job_seeker.jobseeker_profile.education_level,
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 302
         expected_job_seeker_session["profile"] |= post_data | {
             "pole_emploi_id": "",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED.value,
@@ -2929,13 +2873,12 @@ class TestDirectHireFullProcess:
             "job_seekers_views:create_job_seeker_step_end_for_hire",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         response = client.get(next_url)
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
 
         response = client.post(next_url)
-        assert response.status_code == 302
 
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
@@ -2945,7 +2888,7 @@ class TestDirectHireFullProcess:
             "apply:eligibility_for_hire",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         # Step eligibility diagnosis
         # ----------------------------------------------------------------------
@@ -2969,13 +2912,12 @@ class TestDirectHireFullProcess:
                 f"{criterion3.key}": "on",
             },
         )
-        assert response.status_code == 302
 
         next_url = reverse(
             "apply:hire_confirmation",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
-        assert response.url == next_url
+        assertRedirects(response, next_url)
         diag = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=new_job_seeker, for_siae=company)
         assert diag.expires_at == timezone.localdate() + EligibilityDiagnosis.EMPLOYER_DIAGNOSIS_VALIDITY_TIMEDELTA
 
@@ -4272,7 +4214,6 @@ def test_detect_existing_job_seeker(client):
     # ----------------------------------------------------------------------
 
     response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
-    assert response.status_code == 302
 
     params = {
         "tunnel": "sender",
@@ -4280,7 +4221,7 @@ def test_detect_existing_job_seeker(client):
         "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
     }
     next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
-    assert response.url == next_url
+    assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
     # Step determine the job seeker with a NIR.
     # ----------------------------------------------------------------------
@@ -4294,7 +4235,6 @@ def test_detect_existing_job_seeker(client):
 
     NEW_NIR = "197013625838386"
     response = client.post(next_url, data={"nir": NEW_NIR, "confirm": 1})
-    assert response.status_code == 302
     next_url = reverse(
         "job_seekers_views:search_by_email_for_sender",
         kwargs={"session_uuid": job_seeker_session_name},
@@ -4310,7 +4250,7 @@ def test_detect_existing_job_seeker(client):
             "nir": NEW_NIR,
         },
     }
-    assert response.url == next_url
+    assertRedirects(response, next_url)
     assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
     # Step get job seeker e-mail.
@@ -4320,7 +4260,6 @@ def test_detect_existing_job_seeker(client):
     assert response.status_code == 200
 
     response = client.post(next_url, data={"email": "wrong-email@example.com", "confirm": "1"})
-    assert response.status_code == 302
 
     expected_job_seeker_session |= {
         "user": {
@@ -4333,7 +4272,7 @@ def test_detect_existing_job_seeker(client):
         "job_seekers_views:create_job_seeker_step_1_for_sender",
         kwargs={"session_uuid": job_seeker_session_name},
     )
-    assert response.url == next_url
+    assertRedirects(response, next_url)
 
     # Step to create a job seeker.
     # ----------------------------------------------------------------------
@@ -4396,7 +4335,7 @@ def test_detect_existing_job_seeker(client):
         "job_seekers_views:create_job_seeker_step_2_for_sender",
         kwargs={"session_uuid": job_seeker_session_name},
     )
-    assert response.url == next_url
+    assertRedirects(response, next_url)
 
     # If we chose to cancel & go back, we should find our old wrong email in the page
     response = client.get(check_email_url)
@@ -4968,14 +4907,13 @@ class TestFindJobSeekerForHireView:
         assertContains(response, "Déclarer une embauche")
 
         response = client.post(check_nir_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "preview": 1})
-        assert response.status_code == 302
 
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
         search_by_email_url = reverse(
             "job_seekers_views:search_by_email_for_hire",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assert response.url == search_by_email_url
+        assertRedirects(response, search_by_email_url)
 
         response = client.get(search_by_email_url)
         assertContains(response, "Déclarer une embauche")  # Check page title
