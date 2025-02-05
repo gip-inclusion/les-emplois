@@ -951,7 +951,7 @@ class TestApplyAsAuthorizedPrescriber:
         )
         expected_job_seeker_session = {
             "config": {
-                "tunnel": "sender",
+                "tunnel": "prescription",
                 "from_url": params["from_url"],
                 "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
@@ -1268,7 +1268,7 @@ class TestApplyAsAuthorizedPrescriber:
 
         expected_job_seeker_session = {
             "config": {
-                "tunnel": "sender",
+                "tunnel": "prescription",
                 "from_url": reset_url_company,
                 "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
@@ -1691,7 +1691,7 @@ class TestApplyAsPrescriber:
 
         expected_job_seeker_session = {
             "config": {
-                "tunnel": "sender",
+                "tunnel": "prescription",
                 "from_url": reset_url_company,
                 "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
@@ -2065,7 +2065,7 @@ class TestApplyAsPrescriberNirExceptions:
         )
         expected_job_seeker_session = {
             "config": {
-                "tunnel": "sender",
+                "tunnel": "prescription",
                 "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
                 "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
@@ -2152,7 +2152,7 @@ class TestApplyAsPrescriberNirExceptions:
         )
         expected_job_seeker_session = {
             "config": {
-                "tunnel": "sender",
+                "tunnel": "prescription",
                 "from_url": reverse("companies_views:card", kwargs={"siae_id": siae.pk}),
                 "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
@@ -2281,7 +2281,11 @@ class TestApplyAsCompany:
             kwargs={"session_uuid": job_seeker_session_name},
         )
         expected_job_seeker_session = {
-            "config": {"tunnel": "sender", "from_url": reset_url, "session_kind": JobSeekerSessionKinds.GET_OR_CREATE},
+            "config": {
+                "tunnel": "auto_prescription" if company in user.company_set.all() else "prescription",
+                "from_url": reset_url,
+                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
+            },
             "apply": {"company_pk": company.pk},
             "profile": {
                 "nir": dummy_job_seeker.jobseeker_profile.nir,
@@ -4296,7 +4300,7 @@ def test_detect_existing_job_seeker(client):
     )
     expected_job_seeker_session = {
         "config": {
-            "tunnel": "sender",
+            "tunnel": "prescription",
             "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
         },

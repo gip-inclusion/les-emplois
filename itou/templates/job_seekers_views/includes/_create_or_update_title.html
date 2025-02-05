@@ -1,0 +1,21 @@
+{% load str_filters %}
+
+{% if tunnel == "gps" %}
+    Enregistrer un nouveau bénéficiaire
+{% elif tunnel == "hire" %}
+    {% if job_seeker %}
+        Déclarer l’embauche de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+    {% else %}
+        Déclarer une embauche
+    {% endif %}
+{% elif tunnel == "auto_prescription" %}
+    Enregistrer une candidature
+    {% if job_seeker %}pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}{% endif %}
+{% elif tunnel == "prescription" %}
+    Postuler
+    {% if job_seeker %}pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}{% endif %}
+{% elif tunnel == "standalone" %}
+    Créer un compte candidat
+{% else %}
+    Postuler
+{% endif %}

@@ -3,11 +3,19 @@
 
 {% block progress_title %}
     Coordonnées du
-    {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
+    {% if tunnel|default:"" == "gps" %}
+        bénéficiaire
+    {% else %}
+        candidat
+    {% endif %}
 {% endblock %}
 {% block step_title %}
     Quelles sont les coordonnées du
-    {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
+    {% if tunnel|default:"" == "gps" %}
+        bénéficiaire
+    {% else %}
+        candidat
+    {% endif %}
     ?
 {% endblock %}
 
@@ -15,7 +23,11 @@
     <fieldset>
         <legend class="visually-hidden">
             Coordonnées du
-            {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
+            {% if tunnel|default:"" == "gps" %}
+                bénéficiaire
+            {% else %}
+                candidat
+            {% endif %}
         </legend>
         {% bootstrap_field form.address_for_autocomplete %}
         {% bootstrap_field form.address_line_1 %}

@@ -3,11 +3,19 @@
 
 {% block progress_title %}
     Situation du
-    {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
+    {% if tunnel|default:"" == "gps" %}
+        bénéficiaire
+    {% else %}
+        candidat
+    {% endif %}
 {% endblock %}
 {% block step_title %}
     Quelle est la situation du
-    {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
+    {% if tunnel|default:"" == "gps" %}
+        bénéficiaire
+    {% else %}
+        candidat
+    {% endif %}
     ?
 {% endblock %}
 
@@ -15,7 +23,11 @@
     <fieldset>
         <legend class="visually-hidden">
             Situation du
-            {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
+            {% if tunnel|default:"" == "gps" %}
+                bénéficiaire
+            {% else %}
+                candidat
+            {% endif %}
         </legend>
         {% bootstrap_field form.education_level %}
 

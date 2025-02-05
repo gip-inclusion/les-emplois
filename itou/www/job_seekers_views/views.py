@@ -208,6 +208,12 @@ class GetOrCreateJobSeekerStartView(View):
             except ValueError:
                 raise Http404("Aucune entreprise n'a été trouvée")
 
+        if self.tunnel == "sender":
+            if request.user.is_employer and company == request.current_organization:
+                self.tunnel = "auto_prescription"
+            else:
+                self.tunnel = "prescription"
+
         data = {
             "config": {
                 "tunnel": self.tunnel,
@@ -225,7 +231,7 @@ class GetOrCreateJobSeekerStartView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        if self.tunnel in ("sender", "gps", "standalone"):
+        if self.tunnel in ("prescription", "auto_prescription", "gps", "standalone"):
             view_name = "job_seekers_views:check_nir_for_sender"
         elif self.tunnel == "hire":
             view_name = "job_seekers_views:check_nir_for_hire"
@@ -267,47 +273,26 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
     def __init__(self):
         super().__init__()
         self.company = None
-        self.hire_process = None
-        self.prescription_proces = None
-        self.auto_prescription_process = None
-        self.standalone_creation = None
-        self.is_gps = False
+        self.tunnel = None
 
     def setup(self, request, *args, hire_process=False, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.is_gps = self.job_seeker_session.get("config", {}).get("tunnel") == "gps"
+        self.tunnel = self.job_seeker_session.get("config", {}).get("tunnel", "job_seeker")
         if company_pk := self.job_seeker_session.get("apply", {}).get("company_pk"):
-            if not self.is_gps:
+            if self.tunnel not in ("gps", "standalone"):
                 self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
-        self.standalone_creation = not self.is_gps and self.company is None
         self.hire_process = hire_process
-        self.prescription_process = (
-            not self.hire_process
-            and not self.is_gps
-            and not self.standalone_creation
-            and (
-                request.user.is_prescriber
-                or (request.user.is_employer and self.company != request.current_organization)
-            )
-        )
-        self.auto_prescription_process = (
-            not self.hire_process
-            and not self.is_gps
-            and not self.standalone_creation
-            and request.user.is_employer
-            and self.company == request.current_organization
-        )
 
     def get_exit_url(self, job_seeker, created=False):
-        if self.is_gps:
+        if self.tunnel == "gps":
             return reverse("gps:group_list")
-        if self.standalone_creation and self.is_job_seeker_in_user_jobseekers_list(job_seeker) and not created:
+        if self.tunnel == "standalone" and self.is_job_seeker_in_user_jobseekers_list(job_seeker) and not created:
             params = {
                 "job_seeker": job_seeker.public_id,
                 "city": job_seeker.city_slug if self.request.user.can_view_personal_information(job_seeker) else "",
             }
             return add_url_params(reverse("search:employers_results"), params)
-        if self.standalone_creation:
+        if self.tunnel == "standalone":
             return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
         kwargs = {"company_pk": self.company.pk, "job_seeker_public_id": job_seeker.public_id}
@@ -317,7 +302,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
                 view_name = "apply:geiq_eligibility_for_hire"
             else:
                 view_name = "apply:eligibility_for_hire"
-        elif self.hire_process:
+        elif self.tunnel == "hire":
             # Hiring a job seeker that was found but not created: we check info
             view_name = "job_seekers_views:check_job_seeker_info_for_hire"
         elif created:
@@ -329,14 +314,13 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         return reverse(view_name, kwargs=kwargs)
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {
+        toto = super().get_context_data(**kwargs) | {
             "siae": self.company,
             "hire_process": self.hire_process,
-            "prescription_process": self.prescription_process,
-            "auto_prescription_process": self.auto_prescription_process,
-            "standalone_creation": self.standalone_creation,
-            "is_gps": self.is_gps,
+            "tunnel": self.tunnel,
         }
+        print(f"This is the context: {toto}")
+        return toto
 
     def is_job_seeker_in_user_jobseekers_list(self, job_seeker):
         if not self.request.user.is_prescriber:
@@ -436,12 +420,12 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.form = CheckJobSeekerNirForm(job_seeker=None, data=request.POST or None, is_gps=self.is_gps)
+        self.form = CheckJobSeekerNirForm(job_seeker=None, data=request.POST or None, is_gps=self.tunnel == "gps")
 
     def search_by_email_url(self, session_uuid):
         view_name = (
             "job_seekers_views:search_by_email_for_hire"
-            if self.hire_process
+            if self.tunnel == "hire"
             else "job_seekers_views:search_by_email_for_sender"
         )
         return reverse(view_name, kwargs={"session_uuid": session_uuid})
@@ -494,7 +478,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.form = JobSeekerExistsForm(
-            is_gps=self.is_gps, initial=self.job_seeker_session.get("user", {}), data=request.POST or None
+            is_gps=self.tunnel == "gps", initial=self.job_seeker_session.get("user", {}), data=request.POST or None
         )
 
     def post(self, request, *args, **kwargs):
@@ -517,7 +501,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                 self.job_seeker_session.update({"user": user_infos, "profile": profile_infos})
                 view_name = (
                     "job_seekers_views:create_job_seeker_step_1_for_hire"
-                    if self.hire_process
+                    if self.tunnel == "hire"
                     else "job_seekers_views:create_job_seeker_step_1_for_sender"
                 )
 
@@ -550,7 +534,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                     messages.warning(request, msg)
                     logger.exception("step_job_seeker: error when saving job_seeker=%s nir=%s", job_seeker, nir)
                 else:
-                    if self.is_gps:
+                    if self.tunnel == "gps":
                         gps_utils.add_beneficiary(request, job_seeker)
                     return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
@@ -567,7 +551,9 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
 
     def get_back_url(self):
         view_name = (
-            "job_seekers_views:check_nir_for_hire" if self.hire_process else "job_seekers_views:check_nir_for_sender"
+            "job_seekers_views:check_nir_for_hire"
+            if self.tunnel == "hire"
+            else "job_seekers_views:check_nir_for_sender"
         )
         return reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.name})
 
@@ -589,14 +575,14 @@ class CreateJobSeekerForSenderBaseView(JobSeekerForSenderBaseView):
         self.job_seeker_session = None
 
     def get_back_url(self):
-        view_name = self.previous_hire_url if self.hire_process else self.previous_apply_url
+        view_name = self.previous_hire_url if self.tunnel == "hire" else self.previous_apply_url
         return reverse(
             view_name,
             kwargs={"session_uuid": self.job_seeker_session.name},
         )
 
     def get_next_url(self):
-        view_name = self.next_hire_url if self.hire_process else self.next_apply_url
+        view_name = self.next_hire_url if self.tunnel == "hire" else self.next_apply_url
         return reverse(
             view_name,
             kwargs={"session_uuid": self.job_seeker_session.name},
@@ -809,7 +795,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                     setattr(self.profile, k, v)
                 if request.user.is_prescriber:
                     self.profile.created_by_prescriber_organization = request.current_organization
-                if self.standalone_creation:
+                if self.tunnel == "standalone":
                     messages.success(
                         request,
                         f"Le compte du candidat {self.profile.user.get_full_name()} a "
@@ -834,7 +820,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             self.job_seeker_session.delete()
             url = self.get_exit_url(self.profile.user, created=True)
 
-            if self.is_gps:
+            if self.tunnel == "gps":
                 notify_duplicate = (
                     User.objects.filter(kind=UserKind.JOB_SEEKER, first_name=user.first_name, last_name=user.last_name)
                     .exclude(pk=user.pk)

@@ -8,7 +8,7 @@
 
 {% block title_content %}
     {{ block.super }}
-    {% if auto_prescription_process or hire_process %}
+    {% if tunnel == "auto_prescription" or tunnel == "hire" %}
         {% if siae.is_subject_to_eligibility_rules or siae.kind == CompanyKind.GEIQ %}
             <p>
                 {% if hire_process %}
@@ -94,9 +94,9 @@
                             </p>
                             {# djlint:on #}
                             <p>
-                                {% if is_gps|default:False %}
+                                {% if tunnel == "gps" %}
                                     Si ce n'est pas le bénéficiaire que vous souhaitez suivre, cliquez sur « Suivre un autre bénéficiaire » afin de modifier le numéro de sécurité sociale.
-                                {% elif standalone_creation and not is_job_seeker_in_list %}
+                                {% elif tunnel == "standalone" and not is_job_seeker_in_list %}
                                     Le compte de ce candidat sera ajouté à votre liste une fois que vous aurez postulé pour lui.
                                 {% elif not is_job_seeker_in_list %}
                                     Si cette candidature n'est pas pour <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
@@ -104,7 +104,7 @@
                             </p>
                         </div>
                         <div class="modal-footer">
-                            {% if standalone_creation and is_job_seeker_in_list %}
+                            {% if tunnel == "standalone" and is_job_seeker_in_list %}
                                 {% url "job_seekers_views:details" public_id=job_seeker.public_id as job_seeker_details %}
                                 {% bootstrap_button "Consulter le profil" button_type="link" href=job_seeker_details button_class="btn btn-sm btn-outline-primary" %}
                                 {% bootstrap_button "Postuler" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}

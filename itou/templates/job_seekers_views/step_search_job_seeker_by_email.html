@@ -57,10 +57,10 @@
                             </p>
                             {# djlint:on #}
                             <p>
-                                {% if is_gps|default:False %}
+                                {% if tunnel == "gps" %}
                                     L'identité du candidat est une information clé pour la structure.
                                     Si vous ne souhaitez pas suivre <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Suivre un autre bénéficiaire » afin d'enregistrer ses informations personnelles.
-                                {% elif standalone_creation and not is_job_seeker_in_list %}
+                                {% elif tunnel == "standalone" and not is_job_seeker_in_list %}
                                     Le compte de ce candidat sera ajouté à votre liste une fois que vous aurez postulé pour lui.
                                 {% elif not standalone_creation %}
                                     L'identité du candidat est une information clé pour la structure.
@@ -71,18 +71,18 @@
                             </p>
                             {% if can_add_nir %}
                                 <p>
-                                    En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale {{ nir|format_nir }} soit associé à ce {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}.</b>
+                                    En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale {{ nir|format_nir }} soit associé à ce {{ tunnel == "gps"|yesno:"bénéficiaire,candidat" }}.</b>
                                 </p>
                             {% endif %}
                         </div>
                         <div class="modal-footer">
 
-                            {% if standalone_creation and is_job_seeker_in_list %}
+                            {% if tunnel == "standalone" and is_job_seeker_in_list %}
                                 {% url "job_seekers_views:details" public_id=job_seeker.public_id as job_seeker_details %}
                                 {% bootstrap_button "Consulter le profil" button_type="link" href=job_seeker_details button_class="btn btn-sm btn-outline-primary" %}
                                 {% bootstrap_button "Postuler" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
                             {% else %}
-                                {% if is_gps|default:False %}
+                                {% if tunnel == "gps" %}
                                     {% bootstrap_button "Suivre un autre bénéficiaire" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
                                 {% else %}
                                     {# Reload this page with a new form. #}
