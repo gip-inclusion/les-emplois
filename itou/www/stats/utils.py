@@ -15,7 +15,6 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 
 
-WHITELIST_IAE_ORGA_ETP_REGIONS = ["Bretagne", "Occitanie"]
 STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST = [
     PrescriberOrganizationKind.CAP_EMPLOI,
     PrescriberOrganizationKind.ML,
@@ -100,10 +99,6 @@ def can_view_stats_cd_aci(request):
     )
 
 
-def can_view_stats_cd_orga_etp(request):
-    return can_view_stats_cd(request) and request.current_organization.region in WHITELIST_IAE_ORGA_ETP_REGIONS
-
-
 def can_view_stats_ft(request):
     return (
         request.user.is_prescriber
@@ -158,10 +153,6 @@ def can_view_stats_ddets_iae_aci(request):
     )
 
 
-def can_view_stats_ddets_iae_orga_etp(request):
-    return can_view_stats_ddets_iae(request) and request.current_organization.region in WHITELIST_IAE_ORGA_ETP_REGIONS
-
-
 def can_view_stats_ddets_log(request):
     return (
         request.user.is_labor_inspector
@@ -179,10 +170,6 @@ def can_view_stats_dreets_iae(request):
         and isinstance(request.current_organization, Institution)
         and request.current_organization.kind == InstitutionKind.DREETS_IAE
     )
-
-
-def can_view_stats_dreets_iae_orga_etp(request):
-    return can_view_stats_dreets_iae(request) and request.current_organization.region in WHITELIST_IAE_ORGA_ETP_REGIONS
 
 
 def can_view_stats_dgefp_iae(request):
