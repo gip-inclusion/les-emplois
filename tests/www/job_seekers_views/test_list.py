@@ -158,7 +158,6 @@ def test_multiple(client, snapshot):
     # Current user cannot view personal information, so the city is not in the URL
     client.force_login(unauthorized_prescriber)
     response = client.get(url)
-    parse_response_to_soup(response, selector="tbody")
     assert_contains_button_apply_for(response, job_app5.job_seeker, with_city=False, with_intro_js=True)
 
 
