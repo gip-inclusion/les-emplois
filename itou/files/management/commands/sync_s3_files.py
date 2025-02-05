@@ -15,16 +15,26 @@ class Command(BaseCommand):
         paginator = s3_client().get_paginator("list_objects_v2")
         page_iterator = paginator.paginate(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
         batch = []
+        permanent_files_nb = 0
+        temporary_files_nb = 0
         for page in page_iterator:
             obj_summaries = page["Contents"]
             for obj_summary in obj_summaries:
                 key = obj_summary["Key"]
                 if not key.startswith(f"{TEMPORARY_STORAGE_PREFIX}/"):
                     batch.append(File(key=key, last_modified=obj_summary["LastModified"]))
+                    permanent_files_nb += 1
+                else:
+                    temporary_files_nb += 1
             if len(batch) >= self.BATCH_SIZE:
                 self.insert_or_update_files(batch)
                 batch = []
         self.insert_or_update_files(batch)
+        self.logger.info(
+            "Completed bucket sync: found permanent=%d and temporary=%d files in the bucket",
+            permanent_files_nb,
+            temporary_files_nb,
+        )
 
     @staticmethod
     def insert_or_update_files(files):
