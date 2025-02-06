@@ -89,7 +89,7 @@ class TestPrescriberOrganizationManager:
 
 class TestPrescriberOrganizationModel:
     def test_accept_survey_url(self):
-        org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.PE, department="57")
+        org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.FT, department="57")
         url = org.accept_survey_url
         assert url.startswith(f"{settings.TALLY_URL}/r/")
         assert f"idorganisation={org.pk}" in url
@@ -108,7 +108,7 @@ class TestPrescriberOrganizationModel:
         """
         Test that a SIRET number is required only for non-PE organizations.
         """
-        org = PrescriberOrganizationFactory.build(siret="", kind=PrescriberOrganizationKind.PE)
+        org = PrescriberOrganizationFactory.build(siret="", kind=PrescriberOrganizationKind.FT)
         org.clean_siret()
         with pytest.raises(ValidationError):
             org = PrescriberOrganizationFactory.build(siret="", kind=PrescriberOrganizationKind.CAP_EMPLOI)
@@ -118,7 +118,7 @@ class TestPrescriberOrganizationModel:
         """
         Test that a code SAFIR can only be set for PE agencies.
         """
-        org = PrescriberOrganizationFactory.build(code_safir_pole_emploi="12345", kind=PrescriberOrganizationKind.PE)
+        org = PrescriberOrganizationFactory.build(code_safir_pole_emploi="12345", kind=PrescriberOrganizationKind.FT)
         org.clean_code_safir_pole_emploi()
         with pytest.raises(ValidationError):
             org = PrescriberOrganizationFactory.build(
@@ -348,7 +348,7 @@ class TestPrescriberOrganizationAdmin:
 
         updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
         assert updated_prescriber_organization.is_authorized
-        assert updated_prescriber_organization.kind == PrescriberOrganizationKind.PE
+        assert updated_prescriber_organization.kind == PrescriberOrganizationKind.FT
         assert updated_prescriber_organization.authorization_updated_by is None
         assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
@@ -676,13 +676,13 @@ class TestPrescriberOrganizationAdmin:
         assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.NOT_SET
 
         # can validate it with changed type
-        post_data["kind"] = PrescriberOrganizationKind.PE
+        post_data["kind"] = PrescriberOrganizationKind.FT
         response = client.post(url, data=post_data)
 
         assert response.status_code == 302
         updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
         assert updated_prescriber_organization.is_authorized
-        assert updated_prescriber_organization.kind == PrescriberOrganizationKind.PE
+        assert updated_prescriber_organization.kind == PrescriberOrganizationKind.FT
         assert updated_prescriber_organization.authorization_updated_by == self.user
         assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
@@ -793,7 +793,7 @@ def test_organization_kind_to_PE_typologie_prescripteur(organization_kind):
         PrescriberOrganizationKind.OHPD: "OHPD",
         PrescriberOrganizationKind.ORIENTEUR: "Orienteur",
         PrescriberOrganizationKind.OTHER: "Autre",
-        PrescriberOrganizationKind.PE: "PE",
+        PrescriberOrganizationKind.FT: "PE",
         PrescriberOrganizationKind.PENSION: "Autre",
         PrescriberOrganizationKind.PIJ_BIJ: "PIJ_BIJ",
         PrescriberOrganizationKind.PJJ: "Autre",

@@ -44,7 +44,7 @@ EMPLOIS_TO_LABEL_PRESCRIBER = {
     PrescriberOrganizationKind.CAP_EMPLOI: LabelPrescriberKind.CAP_EMPLOI,
     PrescriberOrganizationKind.ML: LabelPrescriberKind.ML,
     PrescriberOrganizationKind.ODC: LabelPrescriberKind.CT,
-    PrescriberOrganizationKind.PE: LabelPrescriberKind.PE,
+    PrescriberOrganizationKind.FT: LabelPrescriberKind.PE,
     PrescriberOrganizationKind.DEPT: LabelPrescriberKind.CT,
     PrescriberOrganizationKind.ASE: LabelPrescriberKind.CT,
     PrescriberOrganizationKind.PLIE: LabelPrescriberKind.PLIE,

@@ -174,7 +174,7 @@ class TestEditOrganization:
     def test_pe_cannot_edit(self, client, snapshot):
         organization = PrescriberOrganizationWithMembershipFactory(
             authorized=True,
-            kind=PrescriberOrganizationKind.PE,
+            kind=PrescriberOrganizationKind.FT,
             name="Pôle emploi",
             siret="12345678901234",
             phone="0600000000",

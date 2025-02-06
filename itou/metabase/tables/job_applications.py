@@ -64,7 +64,7 @@ def get_ja_sender_organization_safir(ja):
 
 def get_ja_sender_full_name_if_pe_or_spip(ja):
     org = ja.sender_prescriber_organization
-    if org and org.kind in [PrescriberOrganizationKind.PE, PrescriberOrganizationKind.SPIP]:
+    if org and org.kind in [PrescriberOrganizationKind.FT, PrescriberOrganizationKind.SPIP]:
         return f"{ja.sender.last_name.upper()} {ja.sender.first_name}"
     return None
 

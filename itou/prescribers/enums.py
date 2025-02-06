@@ -23,7 +23,7 @@ class PrescriberOrganizationKind(models.TextChoices):
     CSAPA = "CSAPA", "CSAPA - Centre de soins, d'accompagnement et de prévention en addictologie"
     E2C = "E2C", "E2C - École de la deuxième chance"
     EPIDE = "EPIDE", "EPIDE - Établissement pour l'insertion dans l'emploi"
-    PE = "PE", "France Travail"  # Previously pôle emploi
+    FT = "PE", "France Travail"  # Previously pôle emploi
     HUDA = "HUDA", "HUDA - Hébergement d'urgence pour demandeurs d'asile"
     ML = "ML", "Mission locale"
     MSA = "MSA", "MSA - Mutualité Sociale Agricole"

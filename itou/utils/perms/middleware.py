@@ -95,7 +95,7 @@ class ItouCurrentOrganizationMiddleware:
                     .select_related("organization")
                 )
                 if user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX) and not any(
-                    m.organization.kind == PrescriberOrganizationKind.PE for m in active_memberships
+                    m.organization.kind == PrescriberOrganizationKind.FT for m in active_memberships
                 ):
                     logout_warning = LogoutWarning.FT_NO_FT_ORGANIZATION
                 (

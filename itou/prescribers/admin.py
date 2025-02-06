@@ -28,7 +28,7 @@ class TmpMissingSiretFilter(admin.SimpleListFilter):
         value = self.value()
         if value == "yes":
             return (
-                queryset.exclude(kind=PrescriberOrganizationKind.PE.value)
+                queryset.exclude(kind=PrescriberOrganizationKind.FT.value)
                 .exclude(members=None)
                 .filter(siret__isnull=True)
             )
@@ -52,7 +52,7 @@ class TmpCanBeDeletedFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         value = self.value()
         if value == "yes":
-            return queryset.filter(members=None).exclude(kind=PrescriberOrganizationKind.PE.value)
+            return queryset.filter(members=None).exclude(kind=PrescriberOrganizationKind.FT.value)
         return queryset
 
 

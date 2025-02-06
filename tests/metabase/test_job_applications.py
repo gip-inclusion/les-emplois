@@ -53,6 +53,6 @@ def test_ja_sent_by_exotic_prescriber_organization():
     ja = JobApplicationSentByPrescriberOrganizationFactory(
         sender_prescriber_organization__kind=PrescriberOrganizationKind.CHRS
     )
-    assert ja.sender_prescriber_organization.kind != PrescriberOrganizationKind.PE
+    assert ja.sender_prescriber_organization.kind != PrescriberOrganizationKind.FT
     assert TABLE.get(column_name="nom_prénom_conseiller", input=ja) is None
     assert TABLE.get(column_name="safir_org_prescripteur", input=ja) is None

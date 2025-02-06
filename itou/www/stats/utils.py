@@ -103,7 +103,7 @@ def can_view_stats_ft(request):
     return (
         request.user.is_prescriber
         and isinstance(request.current_organization, PrescriberOrganization)
-        and request.current_organization.kind == PrescriberOrganizationKind.PE
+        and request.current_organization.kind == PrescriberOrganizationKind.FT
         and request.current_organization.is_authorized
         and request.current_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
     )

@@ -456,7 +456,7 @@ def prescriber_choose_org(request, siret, template_name="signup/prescriber_choos
         prescriber_kind = form.cleaned_data["kind"]
         authorization_status = None
 
-        if prescriber_kind == PrescriberOrganizationKind.PE.value:
+        if prescriber_kind == PrescriberOrganizationKind.FT.value:
             next_url = reverse("signup:prescriber_pole_emploi_safir_code")
 
         elif prescriber_kind == PrescriberOrganizationKind.OTHER.value:
@@ -581,7 +581,7 @@ def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_
         session_data.update(
             {
                 "authorization_status": None,
-                "kind": PrescriberOrganizationKind.PE.value,
+                "kind": PrescriberOrganizationKind.FT.value,
                 "prescriber_org_data": None,
                 "pole_emploi_org_pk": form.pole_emploi_org.pk,
                 "safir_code": form.cleaned_data["safir_code"],
@@ -614,11 +614,11 @@ def prescriber_check_pe_email(request, template_name="signup/prescriber_check_pe
     pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
 
     # Check session data.
-    if not pole_emploi_org_pk or kind != PrescriberOrganizationKind.PE.value:
+    if not pole_emploi_org_pk or kind != PrescriberOrganizationKind.FT.value:
         raise PermissionDenied
 
     pole_emploi_org = get_object_or_404(
-        PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganizationKind.PE.value
+        PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganizationKind.FT.value
     )
     context = {
         "pole_emploi_org": pole_emploi_org,
@@ -637,11 +637,11 @@ def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_e
     pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
 
     # Check session data.
-    if not pole_emploi_org_pk or kind != PrescriberOrganizationKind.PE.value:
+    if not pole_emploi_org_pk or kind != PrescriberOrganizationKind.FT.value:
         raise PermissionDenied
 
     pole_emploi_org = get_object_or_404(
-        PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganizationKind.PE.value
+        PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganizationKind.FT.value
     )
     params = {
         "user_email": session_data["email"],
@@ -686,7 +686,7 @@ def prescriber_user(request, template_name="signup/prescriber_user.html"):
 
     join_authorized_org = (
         authorization_status == PrescriberAuthorizationStatus.NOT_SET.value
-        and kind not in [None, PrescriberOrganizationKind.PE.value]
+        and kind not in [None, PrescriberOrganizationKind.FT.value]
         and prescriber_org_data is not None
     )
 
@@ -753,7 +753,7 @@ def prescriber_join_org(request):
                 pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
                 # We should not have errors here since we have a PE organization pk from the database.
                 prescriber_org = PrescriberOrganization.objects.get(
-                    pk=pole_emploi_org_pk, kind=PrescriberOrganizationKind.PE.value
+                    pk=pole_emploi_org_pk, kind=PrescriberOrganizationKind.FT.value
                 )
             else:
                 org_attributes = {

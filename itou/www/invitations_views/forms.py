@@ -45,7 +45,7 @@ class PrescriberWithOrgInvitationForm(forms.ModelForm):
         email = self.cleaned_data["email"]
 
         self._invited_user_exists_error(email)
-        if self.organization.kind == PrescriberOrganizationKind.PE:
+        if self.organization.kind == PrescriberOrganizationKind.FT:
             validate_francetravail_email(email)
         return email
 
