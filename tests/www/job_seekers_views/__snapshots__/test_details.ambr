@@ -923,7 +923,7 @@
                   <div class="s-section__col col-12">
                       <div class="tab-content">
                           <div aria-labelledby="job-applications-tab" class="tab-pane fade show active" id="candidatures" role="tabpanel">
-                              <h2>Candidatures envoyées</h2>
+                              <h2>Candidatures envoyées par ma structure</h2>
                               <hr/>
                               
                               
