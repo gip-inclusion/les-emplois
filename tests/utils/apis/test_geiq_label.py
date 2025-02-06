@@ -20,17 +20,17 @@ def test_improperly_configured(settings):
 def test_error_response(respx_mock, label_settings):
     client = geiq_label.get_client()
 
-    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/GeiqFFGeiq?sort=geiq.id&n=100&p=1").respond(400)
+    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/Geiq?sort=geiq.id&n=100&p=1").respond(400)
     with pytest.raises(geiq_label.LabelAPIError):
         client.get_all_geiq()
 
-    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/GeiqFFGeiq?sort=geiq.id&n=100&p=1").respond(
+    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/Geiq?sort=geiq.id&n=100&p=1").respond(
         200, json={"status": "Error"}
     )
     with pytest.raises(geiq_label.LabelAPIError):
         client.get_all_geiq()
 
-    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/GeiqFFGeiq?sort=geiq.id&n=100&p=1").respond(
+    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/Geiq?sort=geiq.id&n=100&p=1").respond(
         200,
         content="These aren't the droids you're looking for",
     )
@@ -39,7 +39,7 @@ def test_error_response(respx_mock, label_settings):
 
 
 def test_get_all_geiq_empty(respx_mock, label_settings):
-    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/GeiqFFGeiq?sort=geiq.id&n=100&p=1").respond(
+    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/Geiq?sort=geiq.id&n=100&p=1").respond(
         200, json={"status": "Success", "result": []}
     )
 
@@ -49,10 +49,10 @@ def test_get_all_geiq_empty(respx_mock, label_settings):
 
 def test_get_all_geiq(respx_mock, label_settings):
     expected_data = [{"id": nb, "nom": f"GEIQ N° {nb}"} for nb in range(1, 102)]
-    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/GeiqFFGeiq?sort=geiq.id&n=100&p=1").respond(
+    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/Geiq?sort=geiq.id&n=100&p=1").respond(
         200, json={"status": "Success", "result": expected_data[:100]}
     )
-    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/GeiqFFGeiq?sort=geiq.id&n=100&p=2").respond(
+    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/Geiq?sort=geiq.id&n=100&p=2").respond(
         200, json={"status": "Success", "result": expected_data[100:]}
     )
 

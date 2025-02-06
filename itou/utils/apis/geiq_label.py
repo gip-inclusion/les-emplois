@@ -17,7 +17,7 @@ class LabelCommand(enum.StrEnum):
     Salarie = "Salarie"
     SalarieContrat = "SalarieContrat"
     SalariePreQualification = "SalariePreQualification"
-    GeiqFFGeiq = "GeiqFFGeiq"
+    Geiq = "Geiq"
     Adherent = "Adherent"
     Prescripteur = "Prescripteur"
     GeiqPrestation = "GeiqPrestation"
@@ -57,7 +57,7 @@ class LabelApiClient:
     def get_all_geiq(self, *, page_size=100):
         data = []
         p = 1
-        while new_values := self._command(LabelCommand.GeiqFFGeiq, sort="geiq.id", n=page_size, p=p):
+        while new_values := self._command(LabelCommand.Geiq, sort="geiq.id", n=page_size, p=p):
             data.extend(new_values)
             if len(new_values) != page_size:
                 break
