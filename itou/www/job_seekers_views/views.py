@@ -807,6 +807,8 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                         extra_tags="toast",
                     )
                 self.profile.save()
+                # TODO(ewen): add tunnel information when we have it in self.tunnel
+                logger.info("user=%s created job_seeker=%s", self.sender.pk, user.pk)
         except ValidationError as e:
             messages.error(request, " ".join(e.messages))
             url = reverse("dashboard:index")
@@ -1137,6 +1139,7 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
             self.profile.save()
             url = self.get_exit_url()
             self.job_seeker_session.delete()
+            logger.info("user=%s updated job_seeker=%s", request.user.pk, self.job_seeker.pk)
         return HttpResponseRedirect(url)
 
     def get_exit_url(self):
