@@ -19,6 +19,8 @@ class LabelCommand(enum.StrEnum):
     SalariePreQualification = "SalariePreQualification"
     Geiq = "Geiq"
     GeiqPrestation = "GeiqPrestation"
+    SynthesePDF = "SynthesePDF"
+    TauxGeiq = "TauxGeiq"
 
 
 class LabelApiClient:
