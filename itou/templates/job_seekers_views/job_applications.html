@@ -39,7 +39,7 @@
                 <div class="s-section__col col-12">
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="candidatures" role="tabpanel" aria-labelledby="job-applications-tab">
-                            <h2>Candidatures envoyées</h2>
+                            <h2>Candidatures envoyées par ma structure</h2>
                             <hr>
                             {% matomo_event "candidat" "clic" "detail-candidature" as matomo_event_attrs %}
                             {% for job_application in sent_job_applications %}
