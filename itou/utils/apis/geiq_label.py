@@ -18,15 +18,7 @@ class LabelCommand(enum.StrEnum):
     SalarieContrat = "SalarieContrat"
     SalariePreQualification = "SalariePreQualification"
     Geiq = "Geiq"
-    Adherent = "Adherent"
-    Prescripteur = "Prescripteur"
     GeiqPrestation = "GeiqPrestation"
-    Accompagnement = "Accompagnement"
-    Preremplissage = "Preremplissage"
-    DecompteHeures = "DecompteHeures"
-    LignesCompte = "LignesCompte"
-    CompteResultat = "CompteResultat"
-    EquipeAdministrative = "EquipeAdministrative"
 
 
 class LabelApiClient:
