@@ -292,9 +292,7 @@ class LaborInspectorInvitation(InvitationAbstract):
         on_delete=models.CASCADE,
         related_name="institution_invitations",
     )
-    institution = models.ForeignKey(
-        "institutions.Institution", on_delete=models.CASCADE, related_name="labor_inspectors_invitations"
-    )
+    institution = models.ForeignKey("institutions.Institution", on_delete=models.CASCADE, related_name="invitations")
 
     class Meta:
         verbose_name = "invitation inspecteurs du travail"
