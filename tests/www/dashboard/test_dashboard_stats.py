@@ -29,7 +29,7 @@ def test_index_stats_for_employer(snapshot, client, kind, department):
     "kind",
     [
         PrescriberOrganizationKind.DEPT,
-        PrescriberOrganizationKind.PE,
+        PrescriberOrganizationKind.FT,
         PrescriberOrganizationKind.CHRS,
         PrescriberOrganizationKind.CHU,
         PrescriberOrganizationKind.OIL,

@@ -44,7 +44,7 @@ def test_list_accredited_organizations(client):
     authorized_but_not_brsa_org = PrescriberOrganizationFactory(
         authorized=True,
         department=organization.department,
-        kind=PrescriberOrganizationKind.PE,
+        kind=PrescriberOrganizationKind.FT,
         is_brsa=False,
     )
 

@@ -41,7 +41,7 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")
-    kind = PrescriberOrganizationKind.PE
+    kind = PrescriberOrganizationKind.FT
     post_code = factory.LazyFunction(create_fake_postcode)
     department = factory.LazyAttribute(lambda o: department_from_postcode(o.post_code))
 
@@ -94,7 +94,7 @@ class PrescriberOrganizationWith2MembershipFactory(PrescriberOrganizationFactory
 class PrescriberPoleEmploiFactory(PrescriberOrganizationFactory):
     code_safir_pole_emploi = factory.fuzzy.FuzzyText(length=5, chars=string.digits)
     is_authorized = True
-    kind = PrescriberOrganizationKind.PE
+    kind = PrescriberOrganizationKind.FT
     authorization_status = PrescriberAuthorizationStatus.VALIDATED
 
 

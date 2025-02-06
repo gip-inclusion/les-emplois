@@ -13,6 +13,7 @@ from itou.common_apps.address.departments import DEPARTMENT_TO_REGION
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.institutions.enums import InstitutionKind
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.apis.metabase import METABASE_DASHBOARDS
 from itou.www.stats import urls as stats_urls
 from itou.www.stats.views import get_params_aci_asp_ids_for_department
@@ -58,7 +59,7 @@ def assert_stats_dashboard_equal(values):
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_ft_")],
 )
 def test_stats_ft_log_visit(client, view_name):
-    prescriber_org = PrescriberOrganizationWithMembershipFactory(kind="PE", authorized=True)
+    prescriber_org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.FT, authorized=True)
     user = prescriber_org.members.get()
     client.force_login(user)
 

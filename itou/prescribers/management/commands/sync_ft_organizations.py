@@ -78,7 +78,7 @@ class Command(BaseCommand):
         data_by_siret = {datum["siret"]: datum for datum in data if datum.get("siret")}
         for organization in PrescriberOrganization.objects.filter(
             Q(code_safir_pole_emploi="") | Q(code_safir_pole_emploi=None),
-            kind=PrescriberOrganizationKind.PE,
+            kind=PrescriberOrganizationKind.FT,
             siret__in=data_by_siret,
         ):
             self.stdout.write(f"Organization={organization.pk} doesn't have a safir code")
@@ -92,7 +92,7 @@ class Command(BaseCommand):
                     self.stdout.write(f"ERR: safir={organization.code_safir_pole_emploi} already used")
 
     def update_information(self, data, *, wet_run=False):
-        qs = PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.PE).exclude(
+        qs = PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.FT).exclude(
             Q(code_safir_pole_emploi="") | Q(code_safir_pole_emploi=None)
         )
         mapping = [
@@ -120,14 +120,14 @@ class Command(BaseCommand):
             # clearing the siret for the current one if it doesn't already exist or if is not the first one we see.
             if (
                 siret
-                and PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.PE, siret=siret)
+                and PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.FT, siret=siret)
                 .exclude(code_safir_pole_emploi=safir)
                 .exists()
             ):
                 siret = None
             if item.kind == DiffItemKind.ADDITION:
                 obj = PrescriberOrganization(
-                    kind=PrescriberOrganizationKind.PE,
+                    kind=PrescriberOrganizationKind.FT,
                     code_safir_pole_emploi=safir,
                     is_authorized=True,
                     authorization_status=PrescriberAuthorizationStatus.VALIDATED,

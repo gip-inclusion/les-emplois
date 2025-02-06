@@ -709,7 +709,7 @@ class TestDashboardView:
         assertNotContains(response, self.SUSPEND_TEXT)
 
         prescriber_org_pe = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
-            authorized=True, kind=PrescriberOrganizationKind.PE
+            authorized=True, kind=PrescriberOrganizationKind.FT
         )
         prescriber_pe = prescriber_org_pe.members.first()
         client.force_login(prescriber_pe)

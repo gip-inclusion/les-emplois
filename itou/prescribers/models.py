@@ -234,14 +234,14 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         """
         A code SAFIR can only be set for PE agencies.
         """
-        if self.kind != PrescriberOrganizationKind.PE and self.code_safir_pole_emploi:
+        if self.kind != PrescriberOrganizationKind.FT and self.code_safir_pole_emploi:
             raise ValidationError({"code_safir_pole_emploi": "Le Code Safir est réservé aux agences France Travail."})
 
     def clean_siret(self):
         """
         SIRET is required for all organizations, except for PE agencies.
         """
-        if self.kind != PrescriberOrganizationKind.PE:
+        if self.kind != PrescriberOrganizationKind.FT:
             if not self.siret:
                 raise ValidationError({"siret": "Le SIRET est obligatoire."})
             if self._meta.model.objects.exclude(pk=self.pk).filter(siret=self.siret, kind=self.kind).exists():
@@ -322,14 +322,14 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         """
         DGFT, as in "Direction Générale France Travail" is a special FT agency which oversees the whole country.
         """
-        return self.kind == PrescriberOrganizationKind.PE and self.code_safir_pole_emploi == DGFT_SAFIR_CODE
+        return self.kind == PrescriberOrganizationKind.FT and self.code_safir_pole_emploi == DGFT_SAFIR_CODE
 
     @property
     def is_drft(self):
         """
         DRFT, as in "Direction Régionale France Travail", are special FT agencies which oversee their whole region.
         """
-        return self.kind == PrescriberOrganizationKind.PE and self.code_safir_pole_emploi in DRFT_SAFIR_CODES
+        return self.kind == PrescriberOrganizationKind.FT and self.code_safir_pole_emploi in DRFT_SAFIR_CODES
 
     @property
     def is_dtft(self):
@@ -338,7 +338,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         their whole department and sometimes more than one department.
         """
         return (
-            self.kind == PrescriberOrganizationKind.PE
+            self.kind == PrescriberOrganizationKind.FT
             and self.code_safir_pole_emploi in DTFT_SAFIR_CODE_TO_DEPARTMENTS
         )
 

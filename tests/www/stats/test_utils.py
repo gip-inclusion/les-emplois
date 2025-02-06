@@ -125,7 +125,7 @@ def test_can_view_stats_cd_aci(settings):
 
 def test_can_view_stats_ft_as_regular_pe_agency():
     regular_pe_agency = PrescriberOrganizationWithMembershipFactory(
-        authorized=True, kind=PrescriberOrganizationKind.PE, department="93"
+        authorized=True, kind=PrescriberOrganizationKind.FT, department="93"
     )
     user = regular_pe_agency.members.get()
     assert not regular_pe_agency.is_dtft
@@ -139,7 +139,7 @@ def test_can_view_stats_ft_as_regular_pe_agency():
 def test_can_view_stats_ft_as_dtft_with_single_department():
     dtft_with_single_department = PrescriberOrganizationWithMembershipFactory(
         authorized=True,
-        kind=PrescriberOrganizationKind.PE,
+        kind=PrescriberOrganizationKind.FT,
         code_safir_pole_emploi="49104",
         department="49",
     )
@@ -155,7 +155,7 @@ def test_can_view_stats_ft_as_dtft_with_single_department():
 def test_can_view_stats_ft_as_dtft_with_multiple_departments():
     dtft_with_multiple_departments = PrescriberOrganizationWithMembershipFactory(
         authorized=True,
-        kind=PrescriberOrganizationKind.PE,
+        kind=PrescriberOrganizationKind.FT,
         code_safir_pole_emploi="72203",
         department="72",
     )
@@ -171,7 +171,7 @@ def test_can_view_stats_ft_as_dtft_with_multiple_departments():
 def test_can_view_stats_ft_as_drft():
     drft = PrescriberOrganizationWithMembershipFactory(
         authorized=True,
-        kind=PrescriberOrganizationKind.PE,
+        kind=PrescriberOrganizationKind.FT,
         department="93",
         code_safir_pole_emploi="75980",
     )
@@ -196,7 +196,7 @@ def test_can_view_stats_ft_as_drft():
 def test_can_view_stats_ft_as_dgft():
     dgft = PrescriberOrganizationWithMembershipFactory(
         authorized=True,
-        kind=PrescriberOrganizationKind.PE,
+        kind=PrescriberOrganizationKind.FT,
         department="93",
         code_safir_pole_emploi="00162",
     )

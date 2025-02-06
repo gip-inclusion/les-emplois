@@ -1980,7 +1980,7 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
             siae_siret=self.siae_siret,
             siae_kind=self.siae_kind,
             sender_kind=job_application_enums.SenderKind.PRESCRIBER,
-            prescriber_kind=prescribers_enums.PrescriberOrganizationKind.PE,
+            prescriber_kind=prescribers_enums.PrescriberOrganizationKind.FT,
             at=now,
         )
 

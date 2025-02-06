@@ -446,7 +446,7 @@ def test_exports_with_organization(client):
 def test_exports_as_pole_emploi_prescriber(client, snapshot):
     job_application = JobApplicationFactory(
         sent_by_authorized_prescriber_organisation=True,
-        sender_prescriber_organization__kind=PrescriberOrganizationKind.PE,
+        sender_prescriber_organization__kind=PrescriberOrganizationKind.FT,
     )
     client.force_login(job_application.sender)
 
