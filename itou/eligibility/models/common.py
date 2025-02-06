@@ -2,6 +2,8 @@ import datetime
 import logging
 
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
 
@@ -211,3 +213,28 @@ class AbstractSelectedAdministrativeCriteria(models.Model):
         abstract = True
 
     objects = SelectedAdministrativeCriteriaQuerySet.as_manager()
+
+
+class UserCertifiedAdministrativeCriteria(AbstractSelectedAdministrativeCriteria):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="certified_administrative_criteria"
+    )
+    administrative_criteria_type = models.ForeignKey(ContentType, null=True, on_delete=models.CASCADE)
+    administrative_criteria_pk = models.PositiveIntegerField(null=True)
+    administrative_criteria = GenericForeignKey("administrative_criteria_type", "administrative_criteria_pk")
+
+    class Meta:
+        verbose_name = "critère administratif certifié de l'utilisateur"
+        verbose_name_plural = "critères administratifs certifiés de l'utilisateur"
+        unique_together = ("user", "administrative_criteria_type", "administrative_criteria_pk")
+
+    @classmethod
+    def get_or_create(cls, **kwargs):
+        if administrative_criteria := kwargs.pop("administrative_criteria", None):
+            kwargs.update(
+                {
+                    "administrative_criteria_type": ContentType.objects.get_for_model(administrative_criteria),
+                    "administrative_criteria_pk": administrative_criteria.pk,
+                }
+            )
+        return cls.objects.get_or_create(**kwargs)
