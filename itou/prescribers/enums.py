@@ -23,7 +23,7 @@ class PrescriberOrganizationKind(models.TextChoices):
     CSAPA = "CSAPA", "CSAPA - Centre de soins, d'accompagnement et de prévention en addictologie"
     E2C = "E2C", "E2C - École de la deuxième chance"
     EPIDE = "EPIDE", "EPIDE - Établissement pour l'insertion dans l'emploi"
-    FT = "PE", "France Travail"  # Previously pôle emploi
+    FT = "FT", "France Travail"
     HUDA = "HUDA", "HUDA - Hébergement d'urgence pour demandeurs d'asile"
     ML = "ML", "Mission locale"
     MSA = "MSA", "MSA - Mutualité Sociale Agricole"
@@ -52,6 +52,8 @@ class PrescriberOrganizationKind(models.TextChoices):
     def to_PE_typologie_prescripteur(self):
         if self in PE_SENSITIVE_PRESCRIBER_KINDS:
             return PrescriberOrganizationKind.OTHER
+        if self == PrescriberOrganizationKind.FT:
+            return "PE"
         return self
 
 

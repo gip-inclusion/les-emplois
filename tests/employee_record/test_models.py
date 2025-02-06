@@ -268,7 +268,7 @@ def test_asp_prescriber_type_for_other_sender(factory, expected):
         ("OIL", "06"),
         ("ODC", "06"),
         ("PENSION", "06"),
-        ("PE", "03"),
+        ("FT", "03"),
         ("RS_FJT", "06"),
         ("PREVENTION", "14"),
         ("DEPT", "05"),

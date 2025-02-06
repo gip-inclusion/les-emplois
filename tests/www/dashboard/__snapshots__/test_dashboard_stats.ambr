@@ -1011,6 +1011,358 @@
                           </div>
   '''
 # ---
+# name: test_index_stats_for_authorized_prescriber[FT-31]
+  '''
+  <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
+                              <h2>Statistiques</h2>
+                              <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
+                                  <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
+                              </div>
+                              <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
+      <div class="c-box p-0 h-100">
+          <div class="p-3 p-lg-4">
+              <span class="h4 mb-0">Données personnalisées</span>
+          </div>
+          <div class="px-3 px-lg-4">
+              
+                  <ul class="list-unstyled mb-lg-5">
+                      
+                      
+                      
+                      
+                      
+                      
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a aria-label="Accéder au guide d'analyse France Travail (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://plateforme-inclusion.notion.site/Guide-d-utilisation-et-d-analyse-des-tableaux-de-bord-France-Travail-dad8530e64af47bd99787a6d4e81f6b9" rel="noopener" target="_blank">
+                                  <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Voir le guide d’analyse France Travail</span>
+                              </a>
+                          </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/pe/state/main">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Traitement et résultat des candidatures orientées par mes agences</span>
+                              </a>
+                          </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/pe/conversion/main">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Taux de transformation de mes agences</span>
+                              </a>
+                          </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/pe/tension">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Fiches de poste en tension de mon territoire</span>
+                              </a>
+                          </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/pe/delay/main">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Délai d'entrée en IAE pour mon territoire</span>
+                              </a>
+                          </li>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                  </ul>
+              
+          </div>
+      </div>
+  </div>
+  <div class="col mb-3 mb-md-5">
+      <div class="c-box p-0 h-100">
+          <div class="p-3 p-lg-4">
+              <span class="h4 mb-0">Données publiques</span>
+          </div>
+          <div class="px-3 px-lg-4">
+              <ul class="list-unstyled mb-lg-5">
+                  <li class="d-flex justify-content-between align-items-center mb-3">
+                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                          <i class="ri-dashboard-line ri-lg fw-normal align-self-start"></i>
+                          <span>Accéder aux tableaux de bord publics</span>
+                          <i class="ri-external-link-line fw-normal ms-2"></i>
+                      </a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </div>
+  </div>
+                          </div>
+  '''
+# ---
+# name: test_index_stats_for_authorized_prescriber[FT-75]
+  '''
+  <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
+                              <h2>Statistiques</h2>
+                              <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
+                                  <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
+                              </div>
+                              <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
+      <div class="c-box p-0 h-100">
+          <div class="p-3 p-lg-4">
+              <span class="h4 mb-0">Données personnalisées</span>
+          </div>
+          <div class="px-3 px-lg-4">
+              
+                  <ul class="list-unstyled mb-lg-5">
+                      
+                      
+                      
+                      
+                      
+                      
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a aria-label="Accéder au guide d'analyse France Travail (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://plateforme-inclusion.notion.site/Guide-d-utilisation-et-d-analyse-des-tableaux-de-bord-France-Travail-dad8530e64af47bd99787a6d4e81f6b9" rel="noopener" target="_blank">
+                                  <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Voir le guide d’analyse France Travail</span>
+                              </a>
+                          </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/pe/state/main">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Traitement et résultat des candidatures orientées par mes agences</span>
+                              </a>
+                          </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/pe/conversion/main">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Taux de transformation de mes agences</span>
+                              </a>
+                          </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/pe/tension">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Fiches de poste en tension de mon territoire</span>
+                              </a>
+                          </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/pe/delay/main">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Délai d'entrée en IAE pour mon territoire</span>
+                              </a>
+                          </li>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                  </ul>
+              
+          </div>
+      </div>
+  </div>
+  <div class="col mb-3 mb-md-5">
+      <div class="c-box p-0 h-100">
+          <div class="p-3 p-lg-4">
+              <span class="h4 mb-0">Données publiques</span>
+          </div>
+          <div class="px-3 px-lg-4">
+              <ul class="list-unstyled mb-lg-5">
+                  <li class="d-flex justify-content-between align-items-center mb-3">
+                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                          <i class="ri-dashboard-line ri-lg fw-normal align-self-start"></i>
+                          <span>Accéder aux tableaux de bord publics</span>
+                          <i class="ri-external-link-line fw-normal ms-2"></i>
+                      </a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </div>
+  </div>
+                          </div>
+  '''
+# ---
+# name: test_index_stats_for_authorized_prescriber[FT-84]
+  '''
+  <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
+                              <h2>Statistiques</h2>
+                              <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
+                                  <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
+                              </div>
+                              <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
+      <div class="c-box p-0 h-100">
+          <div class="p-3 p-lg-4">
+              <span class="h4 mb-0">Données personnalisées</span>
+          </div>
+          <div class="px-3 px-lg-4">
+              
+                  <ul class="list-unstyled mb-lg-5">
+                      
+                      
+                      
+                      
+                      
+                      
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a aria-label="Accéder au guide d'analyse France Travail (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://plateforme-inclusion.notion.site/Guide-d-utilisation-et-d-analyse-des-tableaux-de-bord-France-Travail-dad8530e64af47bd99787a6d4e81f6b9" rel="noopener" target="_blank">
+                                  <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Voir le guide d’analyse France Travail</span>
+                              </a>
+                          </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/pe/state/main">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Traitement et résultat des candidatures orientées par mes agences</span>
+                              </a>
+                          </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/pe/conversion/main">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Taux de transformation de mes agences</span>
+                              </a>
+                          </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/pe/tension">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Fiches de poste en tension de mon territoire</span>
+                              </a>
+                          </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/pe/delay/main">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Délai d'entrée en IAE pour mon territoire</span>
+                              </a>
+                          </li>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                  </ul>
+              
+          </div>
+      </div>
+  </div>
+  <div class="col mb-3 mb-md-5">
+      <div class="c-box p-0 h-100">
+          <div class="p-3 p-lg-4">
+              <span class="h4 mb-0">Données publiques</span>
+          </div>
+          <div class="px-3 px-lg-4">
+              <ul class="list-unstyled mb-lg-5">
+                  <li class="d-flex justify-content-between align-items-center mb-3">
+                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                          <i class="ri-dashboard-line ri-lg fw-normal align-self-start"></i>
+                          <span>Accéder aux tableaux de bord publics</span>
+                          <i class="ri-external-link-line fw-normal ms-2"></i>
+                      </a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </div>
+  </div>
+                          </div>
+  '''
+# ---
+# name: test_index_stats_for_authorized_prescriber[FT-90]
+  '''
+  <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
+                              <h2>Statistiques</h2>
+                              <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
+                                  <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
+                              </div>
+                              <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
+      <div class="c-box p-0 h-100">
+          <div class="p-3 p-lg-4">
+              <span class="h4 mb-0">Données personnalisées</span>
+          </div>
+          <div class="px-3 px-lg-4">
+              
+                  <ul class="list-unstyled mb-lg-5">
+                      
+                      
+                      
+                      
+                      
+                      
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a aria-label="Accéder au guide d'analyse France Travail (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://plateforme-inclusion.notion.site/Guide-d-utilisation-et-d-analyse-des-tableaux-de-bord-France-Travail-dad8530e64af47bd99787a6d4e81f6b9" rel="noopener" target="_blank">
+                                  <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Voir le guide d’analyse France Travail</span>
+                              </a>
+                          </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/pe/state/main">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Traitement et résultat des candidatures orientées par mes agences</span>
+                              </a>
+                          </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/pe/conversion/main">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Taux de transformation de mes agences</span>
+                              </a>
+                          </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/pe/tension">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Fiches de poste en tension de mon territoire</span>
+                              </a>
+                          </li>
+                          <li class="d-flex justify-content-between align-items-center mb-3">
+                              <a class="btn-link btn-ico" href="/stats/pe/delay/main">
+                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                  <span>Délai d'entrée en IAE pour mon territoire</span>
+                              </a>
+                          </li>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                  </ul>
+              
+          </div>
+      </div>
+  </div>
+  <div class="col mb-3 mb-md-5">
+      <div class="c-box p-0 h-100">
+          <div class="p-3 p-lg-4">
+              <span class="h4 mb-0">Données publiques</span>
+          </div>
+          <div class="px-3 px-lg-4">
+              <ul class="list-unstyled mb-lg-5">
+                  <li class="d-flex justify-content-between align-items-center mb-3">
+                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                          <i class="ri-dashboard-line ri-lg fw-normal align-self-start"></i>
+                          <span>Accéder aux tableaux de bord publics</span>
+                          <i class="ri-external-link-line fw-normal ms-2"></i>
+                      </a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </div>
+  </div>
+                          </div>
+  '''
+# ---
 # name: test_index_stats_for_authorized_prescriber[ML-31]
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
@@ -1440,358 +1792,6 @@
                       Faites-nous part de vos besoins éventuels en nous contactant
                       <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">ici</a>.
                   </p>
-              
-          </div>
-      </div>
-  </div>
-  <div class="col mb-3 mb-md-5">
-      <div class="c-box p-0 h-100">
-          <div class="p-3 p-lg-4">
-              <span class="h4 mb-0">Données publiques</span>
-          </div>
-          <div class="px-3 px-lg-4">
-              <ul class="list-unstyled mb-lg-5">
-                  <li class="d-flex justify-content-between align-items-center mb-3">
-                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                          <i class="ri-dashboard-line ri-lg fw-normal align-self-start"></i>
-                          <span>Accéder aux tableaux de bord publics</span>
-                          <i class="ri-external-link-line fw-normal ms-2"></i>
-                      </a>
-                  </li>
-              </ul>
-          </div>
-      </div>
-  </div>
-  </div>
-                          </div>
-  '''
-# ---
-# name: test_index_stats_for_authorized_prescriber[PE-31]
-  '''
-  <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
-                              <h2>Statistiques</h2>
-                              <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
-                                  <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
-                              </div>
-                              <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
-      <div class="c-box p-0 h-100">
-          <div class="p-3 p-lg-4">
-              <span class="h4 mb-0">Données personnalisées</span>
-          </div>
-          <div class="px-3 px-lg-4">
-              
-                  <ul class="list-unstyled mb-lg-5">
-                      
-                      
-                      
-                      
-                      
-                      
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a aria-label="Accéder au guide d'analyse France Travail (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://plateforme-inclusion.notion.site/Guide-d-utilisation-et-d-analyse-des-tableaux-de-bord-France-Travail-dad8530e64af47bd99787a6d4e81f6b9" rel="noopener" target="_blank">
-                                  <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Voir le guide d’analyse France Travail</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/pe/state/main">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Traitement et résultat des candidatures orientées par mes agences</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/pe/conversion/main">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Taux de transformation de mes agences</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/pe/tension">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Fiches de poste en tension de mon territoire</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/pe/delay/main">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Délai d'entrée en IAE pour mon territoire</span>
-                              </a>
-                          </li>
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                  </ul>
-              
-          </div>
-      </div>
-  </div>
-  <div class="col mb-3 mb-md-5">
-      <div class="c-box p-0 h-100">
-          <div class="p-3 p-lg-4">
-              <span class="h4 mb-0">Données publiques</span>
-          </div>
-          <div class="px-3 px-lg-4">
-              <ul class="list-unstyled mb-lg-5">
-                  <li class="d-flex justify-content-between align-items-center mb-3">
-                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                          <i class="ri-dashboard-line ri-lg fw-normal align-self-start"></i>
-                          <span>Accéder aux tableaux de bord publics</span>
-                          <i class="ri-external-link-line fw-normal ms-2"></i>
-                      </a>
-                  </li>
-              </ul>
-          </div>
-      </div>
-  </div>
-  </div>
-                          </div>
-  '''
-# ---
-# name: test_index_stats_for_authorized_prescriber[PE-75]
-  '''
-  <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
-                              <h2>Statistiques</h2>
-                              <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
-                                  <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
-                              </div>
-                              <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
-      <div class="c-box p-0 h-100">
-          <div class="p-3 p-lg-4">
-              <span class="h4 mb-0">Données personnalisées</span>
-          </div>
-          <div class="px-3 px-lg-4">
-              
-                  <ul class="list-unstyled mb-lg-5">
-                      
-                      
-                      
-                      
-                      
-                      
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a aria-label="Accéder au guide d'analyse France Travail (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://plateforme-inclusion.notion.site/Guide-d-utilisation-et-d-analyse-des-tableaux-de-bord-France-Travail-dad8530e64af47bd99787a6d4e81f6b9" rel="noopener" target="_blank">
-                                  <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Voir le guide d’analyse France Travail</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/pe/state/main">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Traitement et résultat des candidatures orientées par mes agences</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/pe/conversion/main">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Taux de transformation de mes agences</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/pe/tension">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Fiches de poste en tension de mon territoire</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/pe/delay/main">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Délai d'entrée en IAE pour mon territoire</span>
-                              </a>
-                          </li>
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                  </ul>
-              
-          </div>
-      </div>
-  </div>
-  <div class="col mb-3 mb-md-5">
-      <div class="c-box p-0 h-100">
-          <div class="p-3 p-lg-4">
-              <span class="h4 mb-0">Données publiques</span>
-          </div>
-          <div class="px-3 px-lg-4">
-              <ul class="list-unstyled mb-lg-5">
-                  <li class="d-flex justify-content-between align-items-center mb-3">
-                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                          <i class="ri-dashboard-line ri-lg fw-normal align-self-start"></i>
-                          <span>Accéder aux tableaux de bord publics</span>
-                          <i class="ri-external-link-line fw-normal ms-2"></i>
-                      </a>
-                  </li>
-              </ul>
-          </div>
-      </div>
-  </div>
-  </div>
-                          </div>
-  '''
-# ---
-# name: test_index_stats_for_authorized_prescriber[PE-84]
-  '''
-  <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
-                              <h2>Statistiques</h2>
-                              <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
-                                  <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
-                              </div>
-                              <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
-      <div class="c-box p-0 h-100">
-          <div class="p-3 p-lg-4">
-              <span class="h4 mb-0">Données personnalisées</span>
-          </div>
-          <div class="px-3 px-lg-4">
-              
-                  <ul class="list-unstyled mb-lg-5">
-                      
-                      
-                      
-                      
-                      
-                      
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a aria-label="Accéder au guide d'analyse France Travail (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://plateforme-inclusion.notion.site/Guide-d-utilisation-et-d-analyse-des-tableaux-de-bord-France-Travail-dad8530e64af47bd99787a6d4e81f6b9" rel="noopener" target="_blank">
-                                  <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Voir le guide d’analyse France Travail</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/pe/state/main">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Traitement et résultat des candidatures orientées par mes agences</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/pe/conversion/main">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Taux de transformation de mes agences</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/pe/tension">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Fiches de poste en tension de mon territoire</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/pe/delay/main">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Délai d'entrée en IAE pour mon territoire</span>
-                              </a>
-                          </li>
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                  </ul>
-              
-          </div>
-      </div>
-  </div>
-  <div class="col mb-3 mb-md-5">
-      <div class="c-box p-0 h-100">
-          <div class="p-3 p-lg-4">
-              <span class="h4 mb-0">Données publiques</span>
-          </div>
-          <div class="px-3 px-lg-4">
-              <ul class="list-unstyled mb-lg-5">
-                  <li class="d-flex justify-content-between align-items-center mb-3">
-                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                          <i class="ri-dashboard-line ri-lg fw-normal align-self-start"></i>
-                          <span>Accéder aux tableaux de bord publics</span>
-                          <i class="ri-external-link-line fw-normal ms-2"></i>
-                      </a>
-                  </li>
-              </ul>
-          </div>
-      </div>
-  </div>
-  </div>
-                          </div>
-  '''
-# ---
-# name: test_index_stats_for_authorized_prescriber[PE-90]
-  '''
-  <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
-                              <h2>Statistiques</h2>
-                              <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
-                                  <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
-                              </div>
-                              <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
-      <div class="c-box p-0 h-100">
-          <div class="p-3 p-lg-4">
-              <span class="h4 mb-0">Données personnalisées</span>
-          </div>
-          <div class="px-3 px-lg-4">
-              
-                  <ul class="list-unstyled mb-lg-5">
-                      
-                      
-                      
-                      
-                      
-                      
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a aria-label="Accéder au guide d'analyse France Travail (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://plateforme-inclusion.notion.site/Guide-d-utilisation-et-d-analyse-des-tableaux-de-bord-France-Travail-dad8530e64af47bd99787a6d4e81f6b9" rel="noopener" target="_blank">
-                                  <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Voir le guide d’analyse France Travail</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/pe/state/main">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Traitement et résultat des candidatures orientées par mes agences</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/pe/conversion/main">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Taux de transformation de mes agences</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/pe/tension">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Fiches de poste en tension de mon territoire</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/pe/delay/main">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Délai d'entrée en IAE pour mon territoire</span>
-                              </a>
-                          </li>
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                  </ul>
               
           </div>
       </div>
