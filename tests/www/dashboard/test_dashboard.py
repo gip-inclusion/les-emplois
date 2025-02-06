@@ -708,11 +708,11 @@ class TestDashboardView:
         response = client.get(reverse("dashboard:index"))
         assertNotContains(response, self.SUSPEND_TEXT)
 
-        prescriber_org_pe = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
+        prescriber_org_ft = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
             authorized=True, kind=PrescriberOrganizationKind.FT
         )
-        prescriber_pe = prescriber_org_pe.members.first()
-        client.force_login(prescriber_pe)
+        prescriber_fr = prescriber_org_ft.members.first()
+        client.force_login(prescriber_fr)
         response = client.get(reverse("dashboard:index"))
         assertContains(response, self.SUSPEND_TEXT)
 

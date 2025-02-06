@@ -123,14 +123,14 @@ def test_can_view_stats_cd_aci(settings):
     assert utils.can_view_stats_dashboard_widget(request)
 
 
-def test_can_view_stats_ft_as_regular_pe_agency():
-    regular_pe_agency = PrescriberOrganizationWithMembershipFactory(
+def test_can_view_stats_ft_as_regular_ft_agency():
+    regular_fr_agency = PrescriberOrganizationWithMembershipFactory(
         authorized=True, kind=PrescriberOrganizationKind.FT, department="93"
     )
-    user = regular_pe_agency.members.get()
-    assert not regular_pe_agency.is_dtft
-    assert not regular_pe_agency.is_drft
-    assert not regular_pe_agency.is_dgft
+    user = regular_fr_agency.members.get()
+    assert not regular_fr_agency.is_dtft
+    assert not regular_fr_agency.is_drft
+    assert not regular_fr_agency.is_dgft
     request = get_request(user)
     assert utils.can_view_stats_ft(request)
     assert utils.get_stats_ft_departments(request) == ["93"]

@@ -1127,7 +1127,7 @@ class TestProConnectPrescribersViewsExceptions:
         assert not user.prescriberorganization_set.exists()
 
     @respx.mock
-    def test_prescriber_signup__pe_organization_wrong_email(self, client, pro_connect):
+    def test_prescriber_signup__ft_organization_wrong_email(self, client, pro_connect):
         """
         A user creates a prescriber account on Itou with Inclusion Connect.
         He wants to join a Pôle emploi organization
