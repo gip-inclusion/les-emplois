@@ -57,7 +57,7 @@ def get_latest_diagnosis_author_sub_kind(job_seeker):
     Build a human readable sub category, e.g.
     - Employeur ACI
     - Employeur ETTI
-    - Prescripteur PE
+    - Prescripteur FT
     - Prescripteur ML
     """
     latest_diagnosis = get_latest_diagnosis(job_seeker)

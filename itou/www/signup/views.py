@@ -748,7 +748,7 @@ def prescriber_join_org(request):
 
     try:
         with transaction.atomic():
-            if session_data["kind"] == "PE":
+            if session_data["kind"] in ["PE", "FT"]:  # FIXME(alaurent) remove PE in a week
                 # Organization creation is not allowed for PE.
                 pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
                 # We should not have errors here since we have a PE organization pk from the database.
