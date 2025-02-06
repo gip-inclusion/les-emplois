@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: TestEditOrganization.test_pe_cannot_edit[Fields are disabled]
+# name: TestEditOrganization.test_ft_cannot_edit[Fields are disabled]
   '''
   <form class="js-prevent-multiple-submit" method="post">
   

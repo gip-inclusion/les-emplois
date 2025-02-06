@@ -102,7 +102,7 @@ class ContractType(models.TextChoices):
         return cls._choices_from_enums_list(choices)
 
 
-def siae_kind_to_pe_type_siae(siae_kind):
+def siae_kind_to_ft_type_siae(siae_kind):
     # Possible values on Pole Emploi's side:
     # « 836 – IAE ITOU ACI »
     # « 837 – IAE ITOU AI »

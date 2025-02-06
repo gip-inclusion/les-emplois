@@ -171,7 +171,7 @@ class TestEditOrganization:
         url = reverse("dashboard:index")
         assert url == response.url
 
-    def test_pe_cannot_edit(self, client, snapshot):
+    def test_ft_cannot_edit(self, client, snapshot):
         organization = PrescriberOrganizationWithMembershipFactory(
             authorized=True,
             kind=PrescriberOrganizationKind.FT,

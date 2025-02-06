@@ -10,7 +10,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.approvals.models import Approval, CancelledApproval
-from itou.companies.enums import CompanyKind, siae_kind_to_pe_type_siae
+from itou.companies.enums import CompanyKind, siae_kind_to_ft_type_siae
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.apis import enums as api_enums
@@ -718,7 +718,7 @@ class TestPoleEmploiApprovalNotifyPoleEmploiIntegration:
             "numSIRETsiae": pe_approval.siae_siret,
             "origineCandidature": "PRES",
             "statutReponsePassIAE": "A",
-            "typeSIAE": siae_kind_to_pe_type_siae(pe_approval.siae_kind),
+            "typeSIAE": siae_kind_to_ft_type_siae(pe_approval.siae_kind),
             "typologiePrescripteur": "PE",
         }
         assert pe_approval.pe_notification_status == "notification_success"

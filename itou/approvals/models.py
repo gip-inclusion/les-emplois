@@ -356,7 +356,7 @@ class PENotificationMixin(models.Model):
                 self,
                 id_national_pe,
                 siae_siret,
-                companies_enums.siae_kind_to_pe_type_siae(siae_kind),
+                companies_enums.siae_kind_to_ft_type_siae(siae_kind),
                 origine_candidature=origine_candidature,
                 typologie_prescripteur=typologie_prescripteur,
             )
@@ -417,7 +417,7 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
                 at,
             )
 
-        type_siae = companies_enums.siae_kind_to_pe_type_siae(self.origin_siae_kind)
+        type_siae = companies_enums.siae_kind_to_ft_type_siae(self.origin_siae_kind)
         if not type_siae:
             self.pe_log_err(
                 "could not find PE type for siae_siret={} siae_kind={}", self.origin_siae_siret, self.origin_siae_kind
@@ -951,7 +951,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             if prescriber_org := job_application.sender_prescriber_organization:
                 prescriber_organization_kind = prescriber_org.kind
 
-        type_siae = companies_enums.siae_kind_to_pe_type_siae(siae_kind)
+        type_siae = companies_enums.siae_kind_to_ft_type_siae(siae_kind)
         if not type_siae:
             self.pe_log_err("could not find PE type for siae_siret={} siae_kind={}", siae_siret, siae_kind)
             return self.pe_save_error(
