@@ -99,7 +99,13 @@ class AddView(NamedUrlSessionWizardView):
 
     def check_wizard_state(self, *args, **kwargs):
         step_url = kwargs.get("step", None)
-        if step_url != self.steps.current and step_url != "done":
+        if step_url is None:
+            # let the wizard redirect at the correct place
+            return
+        if step_url == "done" and self.steps.current == self.steps.last:
+            # it's okay, we can go to "done" step : the wizard will redirect to self.steps.last if needed
+            return
+        if step_url != self.steps.current:
             # The user is accessing the wrong step (e.g. he tried to go back to the last step after finishing)
             return HttpResponseRedirect(reverse("employee_record_views:add", kwargs={"step": self.steps.current}))
 

@@ -59,6 +59,10 @@ def test_wizard(snapshot, client):
     )
     assertRedirects(response, choose_approval_url)
 
+    # Force step 2 even if the user tries to skip it
+    response = client.get(end_url)
+    assertRedirects(response, choose_approval_url)
+
     # Submit data for the "choose-approval" step
     soup = parse_response_to_soup(client.get(choose_approval_url), selector="#main .s-section")
     assert soup.find(id="id_choose-approval-approval").option["value"] == str(approval.pk)
@@ -77,10 +81,13 @@ def test_wizard(snapshot, client):
 
     assertRedirects(response, end_url, fetch_redirect_response=False)
     # get end_url to clear the wizard data
-    client.get(end_url)
+    client.get(end_url, follow=True)
 
     # Don't crash when going back to last step
     response = client.get(choose_approval_url)
+    assertRedirects(response, choose_employee_url)
+
+    response = client.get(end_url)
     assertRedirects(response, choose_employee_url)
 
 
