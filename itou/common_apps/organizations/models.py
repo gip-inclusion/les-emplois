@@ -101,18 +101,19 @@ class OrganizationAbstract(models.Model):
             },
         )
 
-    def add_or_activate_membership(self, user):
+    def add_or_activate_membership(self, user, *, force_admin=None):
         membership_model = self.members.through
         is_only_active_member = not self.memberships.active().exists()
+        should_be_admin = is_only_active_member if force_admin is None else force_admin
         try:
             membership = self.memberships.get(user=user)
         except membership_model.DoesNotExist:
-            membership = self.memberships.create(user=user, is_admin=is_only_active_member)
+            membership = self.memberships.create(user=user, is_admin=should_be_admin)
             action = "Creating"
         else:
             action = "Reactivating"
             membership.is_active = True
-            membership.is_admin = is_only_active_member
+            membership.is_admin = should_be_admin
             membership.save(update_fields=["is_active", "is_admin"])
         self.expire_invitations(user)
         logger.info(
@@ -128,6 +129,7 @@ class OrganizationAbstract(models.Model):
         )
         if membership.is_admin:
             self.add_admin_email(membership.user).send()
+        return membership
 
     def deactivate_membership(self, membership, *, updated_by):
         """

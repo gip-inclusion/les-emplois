@@ -77,7 +77,7 @@ class TestCompanyAdmin:
 
         assert_set_admin_role__removal(membership.user, company, mailoutbox)
 
-    def test_delete_admin(self, admin_client, mailoutbox):
+    def test_delete_admin(self, admin_client, caplog, mailoutbox):
         company = CompanyFactory(with_membership=True)
         membership = company.memberships.first()
         assert membership.is_admin
@@ -114,9 +114,17 @@ class TestCompanyAdmin:
         assertRedirects(response, change_url, fetch_redirect_response=False)
         response = admin_client.get(change_url)
 
-        assert_set_admin_role__removal(membership.user, company, mailoutbox)
+        assert membership.user not in company.active_admin_members
+        [email] = mailoutbox
+        assert f"[DEV] [Désactivation] Vous n'êtes plus membre de {company.display_name}" == email.subject
+        assert "Un administrateur vous a retiré d'une structure" in email.body
+        assert email.to == [membership.user.email]
+        assert (
+            f"User {admin_client.session['_auth_user_id']} deactivated companies.CompanyMembership "
+            f"of organization_id={company.pk} for user_id={membership.user_id} is_admin=True."
+        ) in caplog.messages
 
-    def test_add_admin(self, admin_client, mailoutbox):
+    def test_add_admin(self, admin_client, caplog, mailoutbox):
         company = CompanyFactory(with_membership=True)
         membership = company.memberships.first()
         employer = EmployerFactory()
@@ -157,6 +165,10 @@ class TestCompanyAdmin:
         response = admin_client.get(change_url)
 
         assert_set_admin_role__creation(employer, company, mailoutbox)
+        assert (
+            f"Creating companies.CompanyMembership of organization_id={company.pk} "
+            f"for user_id={employer.pk} is_admin=True."
+        ) in caplog.messages
 
 
 @freeze_time("2024-05-17T11:11:11+02:00")

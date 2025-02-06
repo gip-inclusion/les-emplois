@@ -935,7 +935,7 @@ def test_deactivate_last_admin(admin_client, mailoutbox):
     assert_set_admin_role__removal(membership.user, organization, mailoutbox)
 
 
-def test_delete_admin(admin_client, mailoutbox):
+def test_delete_admin(admin_client, caplog, mailoutbox):
     organization = PrescriberOrganizationWithMembershipFactory()
     membership = organization.memberships.first()
     assert membership.is_admin
@@ -978,10 +978,18 @@ def test_delete_admin(admin_client, mailoutbox):
     assertRedirects(response, change_url, fetch_redirect_response=False)
     response = admin_client.get(change_url)
 
-    assert_set_admin_role__removal(membership.user, organization, mailoutbox)
+    assert membership.user not in organization.active_admin_members
+    [email] = mailoutbox
+    assert f"[DEV] [Désactivation] Vous n'êtes plus membre de {organization.display_name}" == email.subject
+    assert "Un administrateur vous a retiré d'une structure" in email.body
+    assert email.to == [membership.user.email]
+    assert (
+        f"User {admin_client.session['_auth_user_id']} deactivated prescribers.PrescriberMembership "
+        f"of organization_id={organization.pk} for user_id={membership.user_id} is_admin=True."
+    ) in caplog.messages
 
 
-def test_add_admin(admin_client, mailoutbox):
+def test_add_admin(admin_client, caplog, mailoutbox):
     organization = PrescriberOrganizationWithMembershipFactory()
     membership = organization.memberships.first()
     prescriber = PrescriberFactory()
@@ -1028,6 +1036,10 @@ def test_add_admin(admin_client, mailoutbox):
     response = admin_client.get(change_url)
 
     assert_set_admin_role__creation(prescriber, organization, mailoutbox)
+    assert (
+        f"Creating prescribers.PrescriberMembership of organization_id={organization.pk} "
+        f"for user_id={prescriber.pk} is_admin=True."
+    ) in caplog.messages
 
 
 def test_prescriber_kinds_are_alphabetically_sorted():
