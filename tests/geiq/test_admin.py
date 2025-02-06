@@ -36,7 +36,7 @@ def label_settings(settings):
 
 
 def test_sync_assessments_http_error(admin_client, label_settings, respx_mock):
-    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/GeiqFFGeiq?sort=geiq.id&n=100&p=1").respond(400)
+    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/Geiq?sort=geiq.id&n=100&p=1").respond(400)
     campaign = ImplementationAssessmentCampaignFactory()
 
     response = admin_client.post(
