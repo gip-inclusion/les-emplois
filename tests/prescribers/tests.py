@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.db import IntegrityError
 from django.urls import reverse
-from django.utils.timezone import get_current_timezone
+from django.utils import timezone
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.job_applications import models as job_applications_models
@@ -276,7 +276,7 @@ class TestPrescriberOrganizationAdmin:
             siret="83987278500010",
             department="14",
             post_code="14000",
-            authorization_updated_at=datetime.now(tz=get_current_timezone()),
+            authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
@@ -311,7 +311,7 @@ class TestPrescriberOrganizationAdmin:
             siret="83987278500010",
             department="14",
             post_code="14000",
-            authorization_updated_at=datetime.now(tz=get_current_timezone()),
+            authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
         )
         PrescriberOrganizationFactory(
             kind=PrescriberOrganizationKind.OTHER,
@@ -360,7 +360,7 @@ class TestPrescriberOrganizationAdmin:
             siret="83987278500010",
             department="14",
             post_code="14000",
-            authorization_updated_at=datetime.now(tz=get_current_timezone()),
+            authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
             is_authorized=False,
         )
@@ -396,7 +396,7 @@ class TestPrescriberOrganizationAdmin:
             siret="83987278500010",
             department="14",
             post_code="14000",
-            authorization_updated_at=datetime.now(tz=get_current_timezone()),
+            authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
@@ -430,7 +430,7 @@ class TestPrescriberOrganizationAdmin:
             siret="83987278500010",
             department="14",
             post_code="14000",
-            authorization_updated_at=datetime.now(tz=get_current_timezone()),
+            authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
@@ -464,7 +464,7 @@ class TestPrescriberOrganizationAdmin:
             siret="83987278500010",
             department="14",
             post_code="14000",
-            authorization_updated_at=datetime.now(tz=get_current_timezone()),
+            authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
             is_authorized=False,
         )
@@ -500,7 +500,7 @@ class TestPrescriberOrganizationAdmin:
             siret="83987278500010",
             department="14",
             post_code="14000",
-            authorization_updated_at=datetime.now(tz=get_current_timezone()),
+            authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
             authorization_status=PrescriberAuthorizationStatus.REFUSED,
             is_authorized=False,
         )
@@ -536,7 +536,7 @@ class TestPrescriberOrganizationAdmin:
             siret="83987278500010",
             department="14",
             post_code="14000",
-            authorization_updated_at=datetime.now(tz=get_current_timezone()),
+            authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
@@ -598,7 +598,7 @@ class TestPrescriberOrganizationAdmin:
             siret="83987278500010",
             department="14",
             post_code="14000",
-            authorization_updated_at=datetime.now(tz=get_current_timezone()),
+            authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
             kind=PrescriberOrganizationKind.ODC,
             is_authorized=False,
@@ -638,7 +638,7 @@ class TestPrescriberOrganizationAdmin:
             siret="83987278500010",
             department="14",
             post_code="14000",
-            authorization_updated_at=datetime.now(tz=get_current_timezone()),
+            authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
             is_authorized=False,
             kind=PrescriberOrganizationKind.OTHER,
@@ -694,7 +694,7 @@ class TestPrescriberOrganizationAdmin:
             siret="83987278500010",
             department="14",
             post_code="14000",
-            authorization_updated_at=datetime.now(tz=get_current_timezone()),
+            authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
