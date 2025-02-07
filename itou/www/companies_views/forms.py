@@ -52,7 +52,7 @@ class CreateCompanyForm(forms.ModelForm):
 
         self.fields["department"].choices = [("", "---")] + list(DEPARTMENTS.items())
 
-        required_fields = ["address_line_1", "post_code", "city", "department", "phone"]
+        required_fields = ["address_line_1", "post_code", "city", "department"]
         for required_field in required_fields:
             self.fields[required_field].required = True
 
@@ -127,7 +127,7 @@ class EditCompanyForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        required_fields = ["brand", "address_line_1", "post_code", "city", "phone"]
+        required_fields = ["brand", "address_line_1", "post_code", "city"]
         for required_field in required_fields:
             self.fields[required_field].required = True
 
