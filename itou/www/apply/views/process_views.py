@@ -18,7 +18,6 @@ from django.utils import formats, timezone
 from django.views.decorators.http import require_POST
 from django.views.generic.base import TemplateView
 from django_xworkflows import models as xwf_models
-from formtools.wizard.views import NamedUrlSessionWizardView
 
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Company
@@ -34,14 +33,10 @@ from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
     AnswerForm,
-    JobApplicationRefusalJobSeekerAnswerForm,
-    JobApplicationRefusalPrescriberAnswerForm,
-    JobApplicationRefusalReasonForm,
     PriorActionForm,
     TransferJobApplicationForm,
 )
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
-from itou.www.apply.views.batch_views import RefuseViewStep
 from itou.www.apply.views.submit_views import ApplicationEndView, ApplicationJobsView, ApplicationResumeView
 from itou.www.companies_views.views import CompanyCardView, JobDescriptionCardView
 from itou.www.search.views import EmployerSearchView
@@ -388,138 +383,6 @@ def start_refuse_wizard(request, job_application_id):
         next_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application_id}),
         from_detail_view=True,
     )
-
-
-def _show_prescriber_answer_form(wizard):
-    return wizard.job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER
-
-
-class JobApplicationRefuseView(NamedUrlSessionWizardView):
-    template_name = "apply/process_refuse.html"
-    form_list = [
-        (RefuseViewStep.REASON, JobApplicationRefusalReasonForm),
-        (RefuseViewStep.JOB_SEEKER_ANSWER, JobApplicationRefusalJobSeekerAnswerForm),
-        (RefuseViewStep.PRESCRIBER_ANSWER, JobApplicationRefusalPrescriberAnswerForm),
-    ]
-    condition_dict = {
-        RefuseViewStep.PRESCRIBER_ANSWER: _show_prescriber_answer_form,
-    }
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-
-        self.job_application = get_object_or_404(
-            JobApplication.objects.is_active_company_member(request.user).select_related("job_seeker"),
-            pk=kwargs["job_application_id"],
-        )
-
-    def check_wizard_state(self, *args, **kwargs):
-        # Redirect to job application details if the state is not refusable
-        if self.job_application.state not in JobApplicationWorkflow.CAN_BE_REFUSED_STATES:
-            message = "Action déjà effectuée." if self.job_application.state.is_refused else "Action impossible."
-            messages.error(self.request, message, extra_tags="toast")
-            return HttpResponseRedirect(
-                reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-            )
-
-        # Redirect to first step if form data is not retrieved in session (eg. direct url access)
-        if kwargs.get("step") in [
-            RefuseViewStep.JOB_SEEKER_ANSWER,
-            RefuseViewStep.PRESCRIBER_ANSWER,
-        ] and not self.get_cleaned_data_for_step(RefuseViewStep.REASON):
-            return HttpResponseRedirect(self.get_step_url(RefuseViewStep.REASON))
-
-    def get(self, *args, **kwargs):
-        if check_response := self.check_wizard_state(*args, **kwargs):
-            return check_response
-        return super().get(*args, **kwargs)
-
-    def post(self, *args, **kwargs):
-        if check_response := self.check_wizard_state(*args, **kwargs):
-            return check_response
-        return super().post(*args, **kwargs)
-
-    def done(self, form_list, *args, **kwargs):
-        try:
-            # After each successful transition, a save() is performed by django-xworkflows.
-            cleaned_data = self.get_all_cleaned_data()
-            self.job_application.refusal_reason = cleaned_data["refusal_reason"]
-            self.job_application.refusal_reason_shared_with_job_seeker = cleaned_data[
-                "refusal_reason_shared_with_job_seeker"
-            ]
-            self.job_application.answer = cleaned_data["job_seeker_answer"]
-            self.job_application.answer_to_prescriber = cleaned_data.get("prescriber_answer", "")
-            self.job_application.refuse(user=self.request.user)
-            messages.success(
-                self.request,
-                f"La candidature de {self.job_application.job_seeker.get_full_name()} a bien été déclinée.",
-                extra_tags="toast",
-            )
-        except xwf_models.InvalidTransitionError:
-            messages.error(self.request, "Action déjà effectuée.", extra_tags="toast")
-
-        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-        return HttpResponseRedirect(next_url)
-
-    def get_prefix(self, request, *args, **kwargs):
-        """
-        Ensure that each refuse session is bound to a job application.
-        Avoid session conflicts when using multiple tabs.
-        """
-        return f"job_application_{self.job_application.pk}_refuse"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.steps.current != RefuseViewStep.REASON:
-            cleaned_data = self.get_cleaned_data_for_step(RefuseViewStep.REASON)
-            if cleaned_data.get("refusal_reason"):
-                context["refusal_reason_label"] = job_applications_enums.RefusalReason(
-                    cleaned_data["refusal_reason"]
-                ).label
-            else:
-                context["refusal_reason_label"] = "Non renseigné"
-            context["refusal_reason_shared_with_job_seeker"] = cleaned_data["refusal_reason_shared_with_job_seeker"]
-        return context | {
-            "job_applications": [self.job_application],
-            "can_view_personal_information": True,  # SIAE members have access to personal info
-            "matomo_custom_title": "Candidature refusée",
-            "matomo_event_name": f"refuse-application-{self.steps.current}-submit",
-            "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.id}),
-            "RefuseViewStep": RefuseViewStep,
-            "to_prescriber": (
-                "au prescripteur" if self.job_application.is_sent_by_authorized_prescriber else "à l’orienteur"
-            ),
-            "the_prescriber": (
-                "le prescripteur" if self.job_application.is_sent_by_authorized_prescriber else "l’orienteur"
-            ),
-            "with_prescriber": self.job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER,
-            "job_seeker_nb": 1,
-        }
-
-    def get_form_kwargs(self, step=None):
-        return {
-            "job_applications": [self.job_application],
-        }
-
-    def get_form_initial(self, step):
-        initial_data = self.initial_dict.get(step, {})
-        if step == RefuseViewStep.JOB_SEEKER_ANSWER:
-            refusal_reason = self.get_cleaned_data_for_step(RefuseViewStep.REASON).get("refusal_reason")
-            if refusal_reason:
-                initial_data["job_seeker_answer"] = loader.render_to_string(
-                    f"apply/refusal_messages/{refusal_reason}.txt",
-                    context={
-                        "to_company": self.job_application.to_company,
-                    }
-                    if refusal_reason == job_applications_enums.RefusalReason.NON_ELIGIBLE
-                    else {},
-                    request=self.request,
-                )
-
-        return initial_data
-
-    def get_step_url(self, step):
-        return reverse(f"apply:{self.url_name}", kwargs={"job_application_id": self.job_application.pk, "step": step})
 
 
 @check_user(lambda user: user.is_employer)

@@ -54,7 +54,7 @@ def test_unused_templates():
         # Used in itou/siae_evaluations/models.py's Calendar model
         "siae_evaluations/default_calendar_html.html",
     ] + [
-        # Cf JobApplicationRefuseView
+        # Cf RefuseWizardView
         f"apply/refusal_messages/{reason.value}.txt"
         for reason in job_applications_enums.RefusalReason
     ]
