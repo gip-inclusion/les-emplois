@@ -126,6 +126,8 @@ class OrganizationAbstract(models.Model):
                 "is_admin": membership.is_admin,
             },
         )
+        if membership.is_admin:
+            self.add_admin_email(membership.user).send()
 
     def deactivate_membership(self, membership, *, updated_by):
         """
