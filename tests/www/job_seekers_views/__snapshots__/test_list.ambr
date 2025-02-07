@@ -92,7 +92,7 @@
 # ---
 # name: test_multiple.1
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -211,6 +211,30 @@
       }),
       dict({
         'origin': list([
+          'JobSeekerListView.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          
+            (SELECT "users_user"."id" AS "col1"
+             FROM "users_user"
+             WHERE "users_user"."created_by_id" = %s
+             ORDER BY RANDOM() ASC)
+          UNION
+            (SELECT "users_jobseekerprofile"."user_id" AS "col1"
+             FROM "users_jobseekerprofile"
+             WHERE "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s
+             ORDER BY RANDOM() ASC)
+          UNION
+            (SELECT "job_applications_jobapplication"."job_seeker_id" AS "col1"
+             FROM "job_applications_jobapplication"
+             WHERE (("job_applications_jobapplication"."sender_id" = %s
+                     AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
+                    OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
+             ORDER BY "job_applications_jobapplication"."created_at" DESC)
+        ''',
+      }),
+      dict({
+        'origin': list([
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'JobSeekerListView.setup[www/job_seekers_views/views.py]',
         ]),
@@ -249,18 +273,11 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login"
           FROM "users_user"
-          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
-                 AND (EXISTS
-                        (SELECT %s AS "a"
-                         FROM "job_applications_jobapplication" U0
-                         WHERE (((U0."sender_id" = %s
-                                  AND U0."sender_prescriber_organization_id" IS NULL)
-                                 OR U0."sender_prescriber_organization_id" = %s)
-                                AND U0."job_seeker_id" = ("users_user"."id"))
-                         LIMIT 1)
-                      OR "users_user"."created_by_id" = %s
-                      OR "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s))
+                 AND "users_user"."id" IN (%s,
+                                           %s,
+                                           %s,
+                                           %s))
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
         ''',
@@ -293,18 +310,12 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "users_user"
-          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
-                 AND (EXISTS
-                        (SELECT %s AS "a"
-                         FROM "job_applications_jobapplication" U0
-                         WHERE (((U0."sender_id" = %s
-                                  AND U0."sender_prescriber_organization_id" IS NULL)
-                                 OR U0."sender_prescriber_organization_id" = %s)
-                                AND U0."job_seeker_id" = ("users_user"."id"))
-                         LIMIT 1)
-                      OR "users_user"."created_by_id" = %s
-                      OR "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s))
+                 AND "users_user"."kind" = %s
+                 AND "users_user"."id" IN (%s,
+                                           %s,
+                                           %s,
+                                           %s))
         ''',
       }),
       dict({
@@ -409,16 +420,11 @@
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
-                 AND (EXISTS
-                        (SELECT %s AS "a"
-                         FROM "job_applications_jobapplication" U0
-                         WHERE (((U0."sender_id" = %s
-                                  AND U0."sender_prescriber_organization_id" IS NULL)
-                                 OR U0."sender_prescriber_organization_id" = %s)
-                                AND U0."job_seeker_id" = ("users_user"."id"))
-                         LIMIT 1)
-                      OR "users_user"."created_by_id" = %s
-                      OR "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s))
+                 AND "users_user"."kind" = %s
+                 AND "users_user"."id" IN (%s,
+                                           %s,
+                                           %s,
+                                           %s))
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
           LIMIT 4
@@ -616,7 +622,7 @@
 # ---
 # name: test_multiple_with_job_seekers_created_by_organization.1
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -735,6 +741,30 @@
       }),
       dict({
         'origin': list([
+          'JobSeekerListView.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          
+            (SELECT "users_user"."id" AS "col1"
+             FROM "users_user"
+             WHERE "users_user"."created_by_id" = %s
+             ORDER BY RANDOM() ASC)
+          UNION
+            (SELECT "users_jobseekerprofile"."user_id" AS "col1"
+             FROM "users_jobseekerprofile"
+             WHERE "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s
+             ORDER BY RANDOM() ASC)
+          UNION
+            (SELECT "job_applications_jobapplication"."job_seeker_id" AS "col1"
+             FROM "job_applications_jobapplication"
+             WHERE (("job_applications_jobapplication"."sender_id" = %s
+                     AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
+                    OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
+             ORDER BY "job_applications_jobapplication"."created_at" DESC)
+        ''',
+      }),
+      dict({
+        'origin': list([
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'JobSeekerListView.setup[www/job_seekers_views/views.py]',
         ]),
@@ -773,18 +803,11 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login"
           FROM "users_user"
-          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
-                 AND (EXISTS
-                        (SELECT %s AS "a"
-                         FROM "job_applications_jobapplication" U0
-                         WHERE (((U0."sender_id" = %s
-                                  AND U0."sender_prescriber_organization_id" IS NULL)
-                                 OR U0."sender_prescriber_organization_id" = %s)
-                                AND U0."job_seeker_id" = ("users_user"."id"))
-                         LIMIT 1)
-                      OR "users_user"."created_by_id" = %s
-                      OR "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s))
+                 AND "users_user"."id" IN (%s,
+                                           %s,
+                                           %s,
+                                           %s))
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
         ''',
@@ -817,18 +840,12 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "users_user"
-          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
-                 AND (EXISTS
-                        (SELECT %s AS "a"
-                         FROM "job_applications_jobapplication" U0
-                         WHERE (((U0."sender_id" = %s
-                                  AND U0."sender_prescriber_organization_id" IS NULL)
-                                 OR U0."sender_prescriber_organization_id" = %s)
-                                AND U0."job_seeker_id" = ("users_user"."id"))
-                         LIMIT 1)
-                      OR "users_user"."created_by_id" = %s
-                      OR "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s))
+                 AND "users_user"."kind" = %s
+                 AND "users_user"."id" IN (%s,
+                                           %s,
+                                           %s,
+                                           %s))
         ''',
       }),
       dict({
@@ -933,16 +950,11 @@
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
-                 AND (EXISTS
-                        (SELECT %s AS "a"
-                         FROM "job_applications_jobapplication" U0
-                         WHERE (((U0."sender_id" = %s
-                                  AND U0."sender_prescriber_organization_id" IS NULL)
-                                 OR U0."sender_prescriber_organization_id" = %s)
-                                AND U0."job_seeker_id" = ("users_user"."id"))
-                         LIMIT 1)
-                      OR "users_user"."created_by_id" = %s
-                      OR "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s))
+                 AND "users_user"."kind" = %s
+                 AND "users_user"."id" IN (%s,
+                                           %s,
+                                           %s,
+                                           %s))
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
           LIMIT 4
