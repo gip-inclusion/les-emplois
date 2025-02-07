@@ -194,7 +194,7 @@ class TestPoleEmploiAPIClient:
 
     @respx.mock
     def test_appellations(self):
-        respx.get("https://pe.fake/rome/v1/appellation?champs=code,libelle,metier(code)").respond(
+        respx.get("https://pe.fake/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code)").respond(
             200,
             json=pole_emploi_api_mocks.API_APPELLATIONS,
         )

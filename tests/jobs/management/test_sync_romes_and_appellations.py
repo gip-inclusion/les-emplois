@@ -23,7 +23,7 @@ def test_sync_rome_appellation(caplog, respx_mock):
             {"code": "MET01", "libelle": "Edition"},
         ],
     )
-    respx_mock.get("https://pe.fake/rome/v1/appellation?champs=code,libelle,metier(code)").respond(
+    respx_mock.get("https://pe.fake/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code)").respond(
         200,
         json=[
             {"code": "JOB32", "libelle": "Ecriveur de bouquins", "metier": {"code": "MET01"}},
@@ -54,7 +54,10 @@ def test_sync_rome_appellation(caplog, respx_mock):
         "\tREMOVED Métiers du corps (B001)",
         "\tREMOVED Arts de la table (F002)",  # not really removed though by our command, see docstring
         "len=2 ROME entries have been created or updated.",
-        'HTTP Request: GET https://pe.fake/rome/v1/appellation?champs=code,libelle,metier(code) "HTTP/1.1 200 OK"',
+        (
+            "HTTP Request: GET https://pe.fake/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code) "
+            '"HTTP/1.1 200 OK"'
+        ),
         "count=2 label=Appellation had the same key in collection and queryset",
         "\tCHANGED name=Entraîneur sportif changed to value=Entraîneur sportif avéré",
         "\tCHANGED name=Chef cuistot d'élite changed to value=Chef cuistor d'élite",
