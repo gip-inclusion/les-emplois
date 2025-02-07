@@ -140,8 +140,8 @@ class TestPrescriberSignup:
         assert user.prescribermembership_set.get().organization_id == organization.pk
         assert user.company_set.count() == 0
 
-        # No email has been sent to support (validation/refusal of authorisation not needed).
-        assert len(mailoutbox) == 0
+        [email] = mailoutbox
+        assert email.subject == "[DEV] Votre rôle d’administrateur"
 
     @respx.mock
     def test_create_user_prescriber_with_authorized_org_returns_on_other_browser(
@@ -217,9 +217,9 @@ class TestPrescriberSignup:
         assert membership.is_admin
 
         # Check email has been sent to support (validation/refusal of authorisation needed).
-        assert len(mailoutbox) == 1
-        subject = mailoutbox[0].subject
-        assert "Vérification de l'habilitation d'une nouvelle organisation" in subject
+        [authorization_email, administrator_email] = mailoutbox
+        assert "Vérification de l'habilitation d'une nouvelle organisation" in authorization_email.subject
+        assert administrator_email.subject == "[DEV] Votre rôle d’administrateur"
 
     @respx.mock
     def test_create_user_prescriber_with_authorized_org_of_known_kind(self, client, mocker, mailoutbox, pro_connect):
@@ -294,12 +294,13 @@ class TestPrescriberSignup:
         assert membership.is_admin
 
         # Check email has been sent to support (validation/refusal of authorisation needed).
-        [email] = mailoutbox
-        assert "Vérification de l'habilitation d'une nouvelle organisation" in email.subject
-        body_lines = email.body.splitlines()
+        [authorization_email, administrator_email] = mailoutbox
+        assert "Vérification de l'habilitation d'une nouvelle organisation" in authorization_email.subject
+        body_lines = authorization_email.body.splitlines()
         assert "- Nom : CENTRE COMMUNAL D'ACTION SOCIALE" in body_lines
         assert f"- ID : {org.pk}" in body_lines
         assert "- Type sélectionné par l’utilisateur : Cap emploi" in body_lines
+        assert administrator_email.subject == "[DEV] Votre rôle d’administrateur"
 
     @respx.mock
     def test_create_user_prescriber_with_authorized_org_of_unknown_kind(self, client, mocker, mailoutbox, pro_connect):
@@ -391,9 +392,9 @@ class TestPrescriberSignup:
         assert membership.is_admin
 
         # Check email has been sent to support (validation/refusal of authorisation needed).
-        assert len(mailoutbox) == 1
-        subject = mailoutbox[0].subject
-        assert "Vérification de l'habilitation d'une nouvelle organisation" in subject
+        [authorization_email, administrator_email] = mailoutbox
+        assert "Vérification de l'habilitation d'une nouvelle organisation" in authorization_email.subject
+        assert administrator_email.subject == "[DEV] Votre rôle d’administrateur"
 
     @respx.mock
     def test_create_user_prescriber_with_unauthorized_org(self, client, mocker, mailoutbox, pro_connect):
@@ -475,8 +476,8 @@ class TestPrescriberSignup:
         membership = user.prescribermembership_set.get(organization=org)
         assert membership.is_admin
 
-        # No email has been sent to support (validation/refusal of authorisation not needed).
-        assert len(mailoutbox) == 0
+        [email] = mailoutbox
+        assert email.subject == "[DEV] Votre rôle d’administrateur"
 
     def test_create_user_prescriber_with_existing_siren_other_department(self, client):
         """
@@ -604,7 +605,7 @@ class TestPrescriberSignup:
         # Check membership.
         assert 0 == user.prescriberorganization_set.count()
 
-        # No email has been sent to support (validation/refusal of authorisation not needed).
+        # No email has been sent.
         assert len(mailoutbox) == 0
 
     @respx.mock
