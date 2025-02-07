@@ -1539,6 +1539,29 @@ class TestProcessViews:
         assert job_application.state.is_cancelled
         assertMessages(response, [messages.Message(messages.SUCCESS, "L'embauche a bien été annulée.")])
 
+    def test_cancel_clean_back_url(self, client):
+        job_application = JobApplicationFactory(with_approval=True, to_company__subject_to_eligibility=True)
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
+
+        employee_url = reverse("employees:detail", args=(job_application.job_seeker.public_id,))
+        response = client.get(employee_url)
+
+        detail_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        detail_url_with_back_url = f"{detail_url}?back_url={urlencode_filter(employee_url)}"
+        assertContains(response, detail_url_with_back_url)
+
+        client.get(detail_url_with_back_url)
+        assertContains(response, employee_url)
+
+        cancel_url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
+        response = client.post(cancel_url)
+        assertRedirects(response, detail_url)
+
+        response = client.get(detail_url)
+        # employee_url is not available anymore so we cleaned it
+        assertNotContains(response, employee_url)
+
     def test_cannot_cancel(self, client):
         job_application = JobApplicationFactory(
             with_approval=True,
