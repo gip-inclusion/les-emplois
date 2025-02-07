@@ -33,6 +33,8 @@ class LabelApiClient:
 
     def _command(self, command, **params):
         command = LabelCommand(command)
+        if command == LabelCommand.SynthesePDF:
+            raise ValueError("SynthesePDF does not return JSON data")
         try:
             response_data = (
                 self.client.get(
@@ -57,6 +59,31 @@ class LabelApiClient:
                 break
             p += 1
         return data
+
+    def get_taux_geiq(self, *, geiq_id=None, page_size=100):
+        data = []
+        if geiq_id:
+            data.extend(self._command(LabelCommand.TauxGeiq, where=f"geiq,=,{geiq_id}"))
+        else:
+            p = 1
+            while new_values := self._command(LabelCommand.TauxGeiq, sort="geiq.id", n=page_size, p=p):
+                data.extend(new_values)
+                if len(new_values) != page_size:
+                    break
+                p += 1
+        return data
+
+    def get_synthese_pdf(self, *, geiq_id):
+        try:
+            response_data = self.client.get(
+                f"rest/{LabelCommand.SynthesePDF}",
+                params={"id": geiq_id},
+            ).raise_for_status()
+        except httpx.HTTPError as exc:
+            raise LabelAPIError("Error requesting Label API") from exc
+        if response_data.headers["content-type"] != "application/pdf":
+            raise LabelAPIError(f"Unexpected content-type: {response_data.headers.get('content-type')}")
+        return response_data.content
 
     def get_all_contracts(self, geiq_id, *, page_size=100):
         data = []
