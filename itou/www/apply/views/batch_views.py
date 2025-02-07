@@ -360,6 +360,7 @@ class RefuseWizardView(UserPassesTestMixin, TemplateView):
             to_prescriber = "aux prescripteurs/orienteurs"
             the_prescriber = "les prescripteurs/orienteurs"
 
+        # Compatible with formtools wizard.steps object to share stepper_progress implementation
         Steps = namedtuple("Steps", ["current", "step1", "count", "next", "prev"])
         if self.tunnel == RefuseTunnel.BATCH:
             matomo_custom_title = "Candidatures refusées"
@@ -372,16 +373,13 @@ class RefuseWizardView(UserPassesTestMixin, TemplateView):
             "can_view_personal_information": True,  # SIAE members have access to personal info
             "matomo_custom_title": matomo_custom_title,
             "matomo_event_name": matomo_event_name,
-            # Compatibility with current process_refuse.html
-            "wizard": {
-                "steps": Steps(
-                    current=self.step,
-                    step1=self.steps.index(self.step) + 1,
-                    count=len(self.steps),
-                    next=self.next_step,
-                    prev=self.get_step_url(self.get_previous_step()) if self.get_previous_step() is not None else None,
-                ),
-            },
+            "wizard_steps": Steps(
+                current=self.step,
+                step1=self.steps.index(self.step) + 1,
+                count=len(self.steps),
+                next=self.next_step,
+                prev=self.get_step_url(self.get_previous_step()) if self.get_previous_step() is not None else None,
+            ),
             "form": self.form,
             "reset_url": self.reset_url,
             "RefuseViewStep": RefuseViewStep,
