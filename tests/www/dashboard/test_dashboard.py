@@ -586,7 +586,7 @@ class TestDashboardView:
 
     @override_settings(TALLY_URL="https://hello-tally.so")
     @pytest.mark.parametrize(
-        "factory,snapshot_name",
+        "factory,gps_info",
         [
             [partial(JobSeekerFactory, for_snapshot=True), None],
             [
@@ -594,30 +594,27 @@ class TestDashboardView:
                     EmployerFactory,
                     for_snapshot=True,
                     with_company=True,
-                    with_company__company__for_snapshot=True,
                 ),
-                "full",
+                "card",
             ],
-            [partial(PrescriberFactory, for_snapshot=True), "partial"],  # no org
+            [partial(PrescriberFactory, for_snapshot=True), "card"],  # no org
             [
                 partial(
                     PrescriberFactory,
                     for_snapshot=True,
                     membership=True,
                     membership__organization__authorized=False,
-                    membership__organization__for_snapshot=True,
                 ),
-                "partial",
-            ],  # non authorizd org
+                "card",
+            ],  # non authorized org
             [
                 partial(
                     PrescriberFactory,
                     for_snapshot=True,
                     membership=True,
                     membership__organization__authorized=True,
-                    membership__organization__for_snapshot=True,
                 ),
-                "full",
+                "card",
             ],  # authorized_org
             [partial(LaborInspectorFactory, membership=True), None],
         ],
@@ -630,28 +627,16 @@ class TestDashboardView:
             "labor_inspector",
         ],
     )
-    def test_gps_card(self, snapshot, client, factory, snapshot_name):
+    def test_gps_card(self, snapshot, client, factory, gps_info):
+        GPS_CARD_TXT = "gps-card"
         user = factory()
         client.force_login(user)
         response = client.get(reverse("dashboard:index"))
-        if snapshot_name is None:
-            assertNotContains(response, "gps-card")
-        elif snapshot_name == "partial":
-            assert str(parse_response_to_soup(response, "#gps-card")) == snapshot(name=snapshot_name)
+        if gps_info == "card":
+            assert str(parse_response_to_soup(response, "#gps-card")) == snapshot
+            assertContains(response, GPS_CARD_TXT)
         else:
-            assert str(
-                parse_response_to_soup(
-                    response,
-                    "#gps-card",
-                    replace_in_attr=[
-                        (
-                            "href",
-                            f"user_organization_uid={response.wsgi_request.current_organization.uid}",
-                            "user_organization_uid=[UID of org]",
-                        )
-                    ],
-                )
-            ) == snapshot(name=snapshot_name)
+            assertNotContains(response, GPS_CARD_TXT)
 
     def test_dashboard_prescriber_without_organization_message(self, client):
         # An orienter is a prescriber without prescriber organization

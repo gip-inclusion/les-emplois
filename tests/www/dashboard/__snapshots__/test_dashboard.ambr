@@ -498,7 +498,7 @@
     ]),
   })
 # ---
-# name: TestDashboardView.test_gps_card[employer][full]
+# name: TestDashboardView.test_gps_card[employer]
   '''
   <div class="col mb-3 mb-md-5" id="gps-card">
       <div class="c-box p-0 h-100">
@@ -523,7 +523,7 @@
   </div>
   '''
 # ---
-# name: TestDashboardView.test_gps_card[prescriber][full]
+# name: TestDashboardView.test_gps_card[prescriber]
   '''
   <div class="col mb-3 mb-md-5" id="gps-card">
       <div class="c-box p-0 h-100">
@@ -548,7 +548,7 @@
   </div>
   '''
 # ---
-# name: TestDashboardView.test_gps_card[prescriber_no_org][partial]
+# name: TestDashboardView.test_gps_card[prescriber_no_org]
   '''
   <div class="col mb-3 mb-md-5" id="gps-card">
       <div class="c-box p-0 h-100">
@@ -573,7 +573,7 @@
   </div>
   '''
 # ---
-# name: TestDashboardView.test_gps_card[prescriber_non_authorized_org][partial]
+# name: TestDashboardView.test_gps_card[prescriber_non_authorized_org]
   '''
   <div class="col mb-3 mb-md-5" id="gps-card">
       <div class="c-box p-0 h-100">
