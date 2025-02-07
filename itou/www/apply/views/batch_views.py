@@ -381,8 +381,6 @@ class RefuseWizardView(UserPassesTestMixin, TemplateView):
                     next=self.next_step,
                     prev=self.get_step_url(self.get_previous_step()) if self.get_previous_step() is not None else None,
                 ),
-                "form": self.form,
-                "management_form": "",
             },
             "form": self.form,
             "reset_url": self.reset_url,
