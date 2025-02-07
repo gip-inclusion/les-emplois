@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, get_user
 from django.core.management import call_command
 from django.template import Context, Template
 from django.test import override_settings
-from django.urls import reverse
+from django.urls import URLPattern, URLResolver, get_resolver
 
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -89,10 +89,29 @@ class TestButtonsForm:
 
 
 class TestNav:
-    def test_active_view_names(self):
+    @pytest.fixture(scope="class")
+    def named_urls(self):
+        resolver = get_resolver()
+        known_urls = set()
+        for resolver in resolver.url_patterns:
+            if isinstance(resolver, URLResolver):
+                prefix = f"{resolver.namespace}:" if resolver.namespace else ""
+                for urlname in resolver.reverse_dict:
+                    if isinstance(urlname, str):
+                        qualname = f"{prefix}{urlname}"
+                        known_urls.add(qualname)
+            elif isinstance(resolver, URLPattern):
+                if resolver.name:
+                    known_urls.add(resolver.name)
+            else:
+                raise ValueError
+        return frozenset(known_urls)
+
+    def test_active_view_names(self, named_urls):
+        # build all valid view names
         for entry in NAV_ENTRIES.values():
             for view_name in entry.active_view_names:
-                reverse(view_name)
+                assert view_name in named_urls
 
 
 class TestThemeInclusion:
