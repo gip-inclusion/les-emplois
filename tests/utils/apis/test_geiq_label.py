@@ -115,3 +115,81 @@ def test_get_all_prequalifications(respx_mock, label_settings):
 
     client = geiq_label.get_client()
     assert client.get_all_prequalifications(123) == expected_data
+
+
+def test_get_taux_geiq_single(respx_mock, label_settings):
+    expected_data = [
+        [
+            {
+                "geiq_id": 123,
+                "taux_rupture_periode_essai": "",
+                "taux_rupture_hors_periode_essai": "",
+                "taux_sortie_emploi_durable": "50.0",
+                "taux_sortie_emploi": "50.0",
+                "taux_obtention_qualification": "75.0",
+            }
+        ]
+    ]
+    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/TauxGeiq?where=geiq,=,123").respond(
+        200, json={"status": "Success", "result": expected_data}
+    )
+
+    client = geiq_label.get_client()
+    assert client.get_taux_geiq(geiq_id=123) == expected_data
+
+
+def test_get_taux_geiq_batch(respx_mock, label_settings):
+    expected_data = [
+        [
+            {
+                "geiq_id": i,
+                "taux_rupture_periode_essai": "",
+                "taux_rupture_hors_periode_essai": "",
+                "taux_sortie_emploi_durable": str(i % 100),
+                "taux_sortie_emploi": str(2 * i % 100),
+                "taux_obtention_qualification": str(3 * i % 100),
+            }
+            for i in range(102)
+        ]
+    ]
+    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/TauxGeiq?sort=geiq.id&n=100&p=1").respond(
+        200, json={"status": "Success", "result": expected_data[:100]}
+    )
+    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/TauxGeiq?sort=geiq.id&n=100&p=2").respond(
+        200, json={"status": "Success", "result": expected_data[100:]}
+    )
+
+    client = geiq_label.get_client()
+    assert client.get_taux_geiq() == expected_data
+
+
+def test_get_synthese_pdf(respx_mock, label_settings):
+    expected_data = b"some pdf file"
+    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/SynthesePDF?id=123").respond(
+        200,
+        content=expected_data,
+        headers={
+            "content-length": f"{len(expected_data)}",
+            "content-transfer-encoding": "binary",
+            "content-type": "application/pdf",
+        },
+    )
+
+    client = geiq_label.get_client()
+    assert client.get_synthese_pdf(geiq_id=123) == expected_data
+
+
+def test_get_synthese_pdf_invalid_content_type(respx_mock, label_settings):
+    client = geiq_label.get_client()
+
+    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/SynthesePDF?id=123").respond(
+        200,
+        content=b"",
+        headers={
+            "content-length": "0",
+            "content-transfer-encoding": "binary",
+            "content-type": "text/html",
+        },
+    )
+    with pytest.raises(geiq_label.LabelAPIError):
+        assert client.get_synthese_pdf(geiq_id=123)
