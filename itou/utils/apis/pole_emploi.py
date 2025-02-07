@@ -52,9 +52,8 @@ AUTHORIZED_SCOPES = [
     "api_maj-pass-iaev1",
     "api_offresdemploiv2",
     "api_rechercheindividucertifiev1",
-    # TODO: check if those 2 ROME-related scopes are again valid in a few days and uncomment them
-    # "api_romev1",
-    # "nomenclatureRome",
+    "api_rome-metiersv1",
+    "nomenclatureRome",
     "o2dsoffre",
     "passIAE",
     "rechercherIndividuCertifie",
@@ -225,7 +224,10 @@ class PoleEmploiApiClient:
         return data["resultats"]
 
     def appellations(self):
-        return self._request(f"{self.base_url}/rome/v1/appellation?champs=code,libelle,metier(code)", method="GET")
+        return self._request(
+            f"{self.base_url}/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code)",
+            method="GET",
+        )
 
     def agences(self, safir=None):
         agences = self._request(f"{self.base_url}/referentielagences/v1/agences", method="GET")
