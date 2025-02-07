@@ -21,13 +21,13 @@ def test_edit(client, mocker):
 
     post_data = {
         "brand": "NEW FAMOUS COMPANY BRAND NAME",
-        "phone": "",
+        "phone": "0610203050",
         "email": "toto@titi.fr",
         "website": "https://famous-company.com",
         "address_line_1": "1 Rue Jeanne d'Arc",
         "address_line_2": "",
         "post_code": "62000",
-        "city": "Arras",
+        "city": "",
     }
     response = client.post(url, data=post_data)
 
@@ -35,7 +35,7 @@ def test_edit(client, mocker):
     assertContains(response, "Ce champ est obligatoire")
 
     # Go to next step: description
-    post_data["phone"] = "0610203050"
+    post_data["city"] = "Arras"
     response = client.post(url, data=post_data)
     assertRedirects(response, reverse("companies_views:edit_company_step_description"))
 
