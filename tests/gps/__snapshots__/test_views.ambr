@@ -630,7 +630,12 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'is_allowed_to_use_gps_advanced_features[www/gps/views.py]',
+          'IfNode[layout/_header_help_dropdown_content.html]',
+          'IfNode[layout/_header_help_dropdown_content.html]',
+          'IncludeNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[gps/my_groups.html]',
           'my_groups[www/gps/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
