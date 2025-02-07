@@ -53,7 +53,6 @@ def my_groups(request, template_name="gps/my_groups.html"):
         "back_url": reverse("dashboard:index"),
         "filters_form": filters_form,
         "memberships_page": memberships_page,
-        "can_use_gps_advanced_features": is_allowed_to_use_gps_advanced_features(request.user),
     }
 
     context["request_new_beneficiary_form_url"] = (
