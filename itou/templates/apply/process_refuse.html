@@ -48,7 +48,6 @@
                     <div class="c-form mb-3 mb-lg-5">
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
-                            {{ wizard.management_form }}
 
                             {% if wizard.steps.current == RefuseViewStep.REASON %}
                                 <h2 class="mb-3 mb-md-4">Choix du motif de refus</h2>
@@ -140,7 +139,7 @@
                                     </div>
                                 </fieldset>
                             {% else %}
-                                {% bootstrap_form wizard.form alert_error_type="non_fields" %}
+                                {% bootstrap_form form alert_error_type="non_fields" %}
                             {% endif %}
 
                             {% if wizard.steps.prev %}
