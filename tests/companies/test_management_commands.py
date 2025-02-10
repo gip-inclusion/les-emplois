@@ -176,7 +176,7 @@ def test_update_companies_coords(settings, capsys, respx_mock):
         ),
     )
 
-    management.call_command("update_companies_coords", wet_run=True)
+    management.call_command("update_companies_coords", wet_run=True, verbosity=2)
     stdout, stderr = capsys.readouterr()
     assert stderr == ""
     assert stdout.splitlines() == [

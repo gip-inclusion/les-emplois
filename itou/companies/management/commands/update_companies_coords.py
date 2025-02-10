@@ -37,10 +37,10 @@ class Command(BaseCommand):
             dest="wet_run",
         )
 
-    def handle(self, wet_run, **options):
+    def handle(self, wet_run, verbosity, **options):
         companies = Company.objects.all()
 
-        companies_to_save = list(geolocate_qs(companies, is_verbose=True))
+        companies_to_save = list(geolocate_qs(companies, is_verbose=verbosity > 1))
         if wet_run:
             Company.objects.bulk_update(
                 companies_to_save,
