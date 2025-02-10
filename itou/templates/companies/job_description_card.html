@@ -138,15 +138,11 @@
                         </ul>
                         <div class="tab-content">
                             <div id="recrutements-en-cours" class="tab-pane fade active show" aria-labelledby="recrutements-en-cours-tab" role="tabpanel">
-                                {% if other_active_jobs %}
-                                    <ul class="list-group list-group-flush list-group-link">
-                                        {% for other_job in other_active_jobs %}
-                                            {% include "companies/includes/_siae_jobdescription.html" with job=other_job %}
-                                        {% endfor %}
-                                    </ul>
-                                {% else %}
-                                    <p class="mb-0">Pour le moment, il n’y a aucun recrutement en cours dans cette structure.</p>
-                                {% endif %}
+                                <ul class="list-group list-group-flush list-group-link">
+                                    {% for other_job in other_active_jobs %}
+                                        {% include "companies/includes/_siae_jobdescription.html" with job=other_job %}
+                                    {% endfor %}
+                                </ul>
                             </div>
                         </div>
                     </div>
