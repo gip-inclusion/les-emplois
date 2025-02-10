@@ -5,7 +5,7 @@
                           <li class="nav-item" role="presentation">
                               <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
                                   <span>Recrutement en cours</span>
-                                  <span class="badge badge-sm rounded-pill ms-2">0</span>
+                                  
                               </a>
                           </li>
                           
@@ -24,7 +24,7 @@
   <div class="tab-content">
                           <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
                               
-                                  <p class="mb-0">Pour le moment, il n’y a aucun recrutement en cours dans cette structure.</p>
+                                  <p class="mb-0">Cet employeur accepte de recevoir des candidatures spontanées.</p>
                               
                           </div>
                           
@@ -73,7 +73,9 @@
                           <li class="nav-item" role="presentation">
                               <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
                                   <span>Recrutement en cours</span>
-                                  <span class="badge badge-sm rounded-pill ms-2">1</span>
+                                  
+                                      <span class="badge badge-sm rounded-pill ms-2">1</span>
+                                  
                               </a>
                           </li>
                           
@@ -182,7 +184,7 @@
                           <li class="nav-item" role="presentation">
                               <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
                                   <span>Recrutement en cours</span>
-                                  <span class="badge badge-sm rounded-pill ms-2">0</span>
+                                  
                               </a>
                           </li>
                           
@@ -201,7 +203,7 @@
   <div class="tab-content">
                           <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
                               
-                                  <p class="mb-0">Pour le moment, il n’y a aucun recrutement en cours dans cette structure.</p>
+                                  <p class="mb-0">Cet employeur accepte de recevoir des candidatures spontanées.</p>
                               
                           </div>
                           
@@ -396,7 +398,7 @@
                           <li class="nav-item" role="presentation">
                               <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
                                   <span>Recrutement en cours</span>
-                                  <span class="badge badge-sm rounded-pill ms-2">0</span>
+                                  
                               </a>
                           </li>
                           
@@ -404,7 +406,7 @@
                       <div class="tab-content">
                           <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
                               
-                                  <p class="mb-0">Pour le moment, il n’y a aucun recrutement en cours dans cette structure.</p>
+                                  <p class="mb-0">Cet employeur accepte de recevoir des candidatures spontanées.</p>
                               
                           </div>
                           
@@ -426,7 +428,9 @@
                           <li class="nav-item" role="presentation">
                               <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
                                   <span>Recrutement en cours</span>
-                                  <span class="badge badge-sm rounded-pill ms-2">1</span>
+                                  
+                                      <span class="badge badge-sm rounded-pill ms-2">1</span>
+                                  
                               </a>
                           </li>
                           
