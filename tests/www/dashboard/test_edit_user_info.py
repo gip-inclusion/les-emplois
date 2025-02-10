@@ -13,6 +13,7 @@ from itou.cities.models import City
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
+from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users.factories import (
     JobSeekerFactory,
     PrescriberFactory,
@@ -558,6 +559,45 @@ class TestEditUserInfoView:
             count=1,
         )
         assert user.jobseeker_profile.birth_country_id is None
+
+    def test_fields_readonly_with_certified_criteria(self, client):
+        job_seeker = JobSeekerFactory(
+            title=Title.M,
+            born_in_france=True,
+            jobseeker_profile__birthdate=date(1978, 12, 20),
+            jobseeker_profile__nir="178122978200508",
+        )
+        IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis__job_seeker=job_seeker,
+            certified=True,
+        )
+        client.force_login(job_seeker)
+        birthdate = date(1978, 12, 1)
+        response = client.post(
+            reverse("dashboard:edit_user_info"),
+            {
+                "email": "bob@saintclar.net",
+                "title": "M",
+                "first_name": "Bob",
+                "last_name": "Saint Clar",
+                "birthdate": birthdate.isoformat(),
+                "birth_place": Commune.objects.by_insee_code_and_period("64483", birthdate).pk,
+                "phone": "0610203050",
+                "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+                "address_line_1": "10 rue du Gué",
+                "address_line_2": "Sous l'escalier",
+                "post_code": "35400",
+                "city": "Saint-Malo",
+                "lack_of_nir": False,
+                "nir": job_seeker.jobseeker_profile.nir,
+            },
+        )
+        assertRedirects(response, reverse("dashboard:index"))
+        refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
+        for attr in ["title", "first_name", "last_name"]:
+            assert getattr(refreshed_job_seeker, attr) == getattr(job_seeker, attr)
+        for attr in ["birthdate", "birth_place", "birth_country"]:
+            assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
 
     @freeze_time("2023-03-10")
     def test_edit_sso(self, client):
