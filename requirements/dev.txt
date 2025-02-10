@@ -690,8 +690,9 @@ jmespath==1.0.1 \
     #   -r requirements/test.txt
     #   boto3
     #   botocore
-jsbeautifier==1.15.1 \
-    --hash=sha256:ebd733b560704c602d744eafc839db60a1ee9326e30a2a80c4adb8718adc1b24
+jsbeautifier==1.15.2 \
+    --hash=sha256:6aff11af2c6cb9a2ce135f33a5b223cf5ee676ab7ff5da0edac01e23734f5755 \
+    --hash=sha256:d599aed6dcb0d5431190e5ad7335900d5fdc67236082fe6b6d3fb61d568d7417
     # via
     #   -r requirements/test.txt
     #   cssbeautifier
