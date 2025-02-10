@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestHireConfirmation.test_as_company[view queries]
   dict({
-    'num_queries': 24,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -860,6 +860,24 @@
       }),
       dict({
         'origin': list([
+          'User.identity_certified_compat[users/models.py]',
+          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
+          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
+          '_accept[www/apply/views/common.py]',
+          'hire_confirmation[www/apply/views/submit_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_eligibilitydiagnosis"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_eligibilitydiagnosis"."id" = "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id")
+          WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND "eligibility_selectedadministrativecriteria"."certified")
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'AcceptForm.__init__[www/apply/forms.py]',
           '_accept[www/apply/views/common.py]',
           'hire_confirmation[www/apply/views/submit_views.py]',
@@ -1281,7 +1299,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -1513,6 +1531,22 @@
                  AND "prescribers_prescribermembership"."is_active"
                  AND "prescribers_prescriberorganization"."is_authorized"
                  AND "users_user"."is_active")
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.identity_certified_compat[users/models.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_eligibilitydiagnosis"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_eligibilitydiagnosis"."id" = "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id")
+          WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND "eligibility_selectedadministrativecriteria"."certified")
           LIMIT 1
         ''',
       }),
@@ -2322,7 +2356,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_company_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -2588,6 +2622,22 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.identity_certified_compat[users/models.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_eligibilitydiagnosis"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_eligibilitydiagnosis"."id" = "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id")
+          WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND "eligibility_selectedadministrativecriteria"."certified")
+          LIMIT 1
         ''',
       }),
       dict({
@@ -3467,7 +3517,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -3699,6 +3749,22 @@
                  AND "prescribers_prescribermembership"."is_active"
                  AND "prescribers_prescriberorganization"."is_authorized"
                  AND "users_user"."is_active")
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.identity_certified_compat[users/models.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_eligibilitydiagnosis"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_eligibilitydiagnosis"."id" = "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id")
+          WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND "eligibility_selectedadministrativecriteria"."certified")
           LIMIT 1
         ''',
       }),
@@ -4508,7 +4574,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_with_job_seeker_without_nir[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -4774,6 +4840,22 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.identity_certified_compat[users/models.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_eligibilitydiagnosis"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_eligibilitydiagnosis"."id" = "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id")
+          WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND "eligibility_selectedadministrativecriteria"."certified")
+          LIMIT 1
         ''',
       }),
       dict({
@@ -5653,7 +5735,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -5885,6 +5967,22 @@
                  AND "prescribers_prescribermembership"."is_active"
                  AND "prescribers_prescriberorganization"."is_authorized"
                  AND "users_user"."is_active")
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.identity_certified_compat[users/models.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_eligibilitydiagnosis"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_eligibilitydiagnosis"."id" = "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id")
+          WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND "eligibility_selectedadministrativecriteria"."certified")
           LIMIT 1
         ''',
       }),
@@ -6694,7 +6792,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_company_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -6960,6 +7058,22 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.identity_certified_compat[users/models.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_eligibilitydiagnosis"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_eligibilitydiagnosis"."id" = "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id")
+          WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND "eligibility_selectedadministrativecriteria"."certified")
+          LIMIT 1
         ''',
       }),
       dict({
@@ -7839,7 +7953,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -8071,6 +8185,22 @@
                  AND "prescribers_prescribermembership"."is_active"
                  AND "prescribers_prescriberorganization"."is_authorized"
                  AND "users_user"."is_active")
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.identity_certified_compat[users/models.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_eligibilitydiagnosis"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_eligibilitydiagnosis"."id" = "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id")
+          WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND "eligibility_selectedadministrativecriteria"."certified")
           LIMIT 1
         ''',
       }),
@@ -8880,7 +9010,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_with_job_seeker_without_nir[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -9146,6 +9276,22 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.identity_certified_compat[users/models.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_eligibilitydiagnosis"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_eligibilitydiagnosis"."id" = "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id")
+          WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND "eligibility_selectedadministrativecriteria"."certified")
+          LIMIT 1
         ''',
       }),
       dict({

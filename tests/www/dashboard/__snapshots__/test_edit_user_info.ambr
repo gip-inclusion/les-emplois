@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestEditUserInfoView.test_edit_with_nir
   dict({
-    'num_queries': 10,
+    'num_queries': 11,
     'queries': list([
       dict({
         'origin': list([
@@ -117,6 +117,24 @@
           FROM "users_jobseekerprofile"
           WHERE "users_jobseekerprofile"."user_id" = %s
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.identity_certified_compat[users/models.py]',
+          'EditJobSeekerInfoForm.__init__[users/forms.py]',
+          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
+          'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
+          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
+          'edit_user_info[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_eligibilitydiagnosis"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_eligibilitydiagnosis"."id" = "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id")
+          WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND "eligibility_selectedadministrativecriteria"."certified")
+          LIMIT 1
         ''',
       }),
       dict({

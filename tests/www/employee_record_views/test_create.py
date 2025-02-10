@@ -13,10 +13,12 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import SiaeFinancialAnnex
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition
-from itou.users.enums import LackOfNIRReason
+from itou.users.enums import LackOfNIRReason, Title
+from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK, mock_get_geocoding_data
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory, SiaeFinancialAnnexFactory
+from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from tests.users.factories import JobSeekerFactory
@@ -276,6 +278,28 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
             html=True,
             count=1,
         )
+
+    def test_accept_personal_data_readonly_with_certified_criteria(self, client):
+        IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=self.job_seeker, certified=True)
+        client.force_login(self.user)
+        response = client.post(
+            self.url,
+            data={
+                "title": Title.M if self.job_seeker.title == Title.MME else Title.MME,
+                "first_name": "Léon",
+                "last_name": "Munitionette",
+                "birth_place": Commune.objects.by_insee_code_and_period("07141", datetime.date(1990, 1, 1)).pk,
+                "birthdate": "1990-01-01",
+            },
+        )
+        assertRedirects(response, reverse("employee_record_views:create_step_2", args=(self.job_application.pk,)))
+        refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=self.job_seeker.pk)
+        for attr in ["title", "first_name", "last_name"]:
+            assert getattr(refreshed_job_seeker, attr) == getattr(self.job_seeker, attr)
+        for attr in ["birthdate", "birth_place", "birth_country"]:
+            assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(
+                self.job_seeker.jobseeker_profile, attr
+            )
 
     def test_pass_step_1_without_geolocated_address(self, client):
         # Do not mess with job seeker profile and geolocation at step 1
