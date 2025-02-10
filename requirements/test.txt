@@ -305,8 +305,9 @@ cryptography==44.0.0 \
     # via
     #   -r requirements/base.txt
     #   paramiko
-cssbeautifier==1.15.1 \
-    --hash=sha256:9f7064362aedd559c55eeecf6b6bed65e05f33488dcbe39044f0403c26e1c006
+cssbeautifier==1.15.2 \
+    --hash=sha256:02d42ffa6aefaa87f18452b437dbb73f6b98f42e9a84759810dc58f7a6bfc26c \
+    --hash=sha256:6daf7f6012ff2914092d675793a5a7f602ca36a10159d0cf5c119183004306e0
     # via djlint
 django==5.1.5 \
     --hash=sha256:19bbca786df50b9eca23cee79d495facf55c8f5c54c529d9bf1fe7b5ea086af3 \
