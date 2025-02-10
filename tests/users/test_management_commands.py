@@ -705,7 +705,7 @@ def test_update_job_seeker_coords(settings, capsys, respx_mock):
         ),
     )
 
-    call_command("update_job_seeker_coords", wet_run=True)
+    call_command("update_job_seeker_coords", wet_run=True, verbosity=2)
     stdout, stderr = capsys.readouterr()
     assert stderr == ""
     assert stdout.splitlines() == [

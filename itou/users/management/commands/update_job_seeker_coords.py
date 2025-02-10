@@ -38,10 +38,10 @@ class Command(BaseCommand):
             dest="wet_run",
         )
 
-    def handle(self, wet_run, **options):
+    def handle(self, wet_run, verbosity, **options):
         users = User.objects.filter(kind=UserKind.JOB_SEEKER, is_active=True)
 
-        users_to_save = list(geolocate_qs(users, is_verbose=True))
+        users_to_save = list(geolocate_qs(users, is_verbose=verbosity > 1))
         if wet_run:
             User.objects.bulk_update(
                 users_to_save,
