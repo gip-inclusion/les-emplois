@@ -3,16 +3,14 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.text import slugify
 
-from itou.asp.forms import BirthPlaceWithBirthdateModelForm
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.communications import registry as notification_registry
 from itou.communications.models import NotificationRecord, NotificationSettings
 from itou.users.enums import IdentityProvider
-from itou.users.forms import JobSeekerProfileFieldsMixin
+from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
-from itou.utils.widgets import DuetDatePickerWidget
 
 
 class SSOReadonlyMixin:
@@ -33,9 +31,8 @@ class SSOReadonlyMixin:
 class EditJobSeekerInfoForm(
     JobSeekerNIRUpdateMixin,
     SSOReadonlyMixin,
-    JobSeekerProfileFieldsMixin,
+    JobSeekerProfileModelForm,
     JobSeekerAddressForm,
-    BirthPlaceWithBirthdateModelForm,
 ):
     """
     Edit a job seeker profile.
@@ -61,9 +58,7 @@ class EditJobSeekerInfoForm(
         model = User
         fields = [
             "email",
-            "title",
-            "first_name",
-            "last_name",
+            *JobSeekerProfileModelForm.Meta.fields,
             "phone",
         ] + JobSeekerAddressForm.Meta.fields
         help_texts = {
@@ -76,15 +71,6 @@ class EditJobSeekerInfoForm(
         editor = kwargs.get("editor", None)
         super().__init__(*args, **kwargs)
         assert self.instance.is_job_seeker, self.instance
-
-        for required_fieldname in ["title", "birthdate", "first_name", "last_name"]:
-            self.fields[required_fieldname].required = True
-        self.fields["birthdate"].widget = DuetDatePickerWidget(
-            attrs={
-                "min": DuetDatePickerWidget.min_birthdate(),
-                "max": DuetDatePickerWidget.max_birthdate(),
-            }
-        )
 
         # Noboby can edit its own email.
         if self.instance.identity_provider == IdentityProvider.FRANCE_CONNECT:
