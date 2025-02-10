@@ -534,6 +534,7 @@ REST_FRAMEWORK = {
         "anon": "12/minute",
         "user": "120/minute",
     },
+    "EXCEPTION_HANDLER": "itou.api.errors.custom_exception_handler",
 }
 
 SPECTACULAR_SETTINGS = {
