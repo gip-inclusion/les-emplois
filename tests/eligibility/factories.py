@@ -11,6 +11,8 @@ from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models.common import AbstractEligibilityDiagnosisModel
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.eligibility.models.iae import AdministrativeCriteria
+from itou.users.enums import IdentityCertificationAuthorities
+from itou.users.models import IdentityCertification
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
@@ -92,3 +94,20 @@ class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
         if create and extracted:
             admin_criterion = AdministrativeCriteria.objects.filter(kind__in=extracted)
             self.administrative_criteria.add(*admin_criterion)
+
+
+class IAESelectedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.SelectedAdministrativeCriteria
+        skip_postgeneration_save = True
+
+    eligibility_diagnosis = factory.SubFactory(IAEEligibilityDiagnosisFactory, from_employer=True)
+    administrative_criteria = factory.Iterator(models.AdministrativeCriteria.objects.certifiable())
+
+    @factory.post_generation
+    def identity_certification(obj, create, extracted, **kwargs):
+        if obj.certified is not None:
+            IdentityCertification.objects.create(
+                certifier=IdentityCertificationAuthorities.API_PARTICULIER,
+                jobseeker_profile=obj.eligibility_diagnosis.job_seeker.jobseeker_profile,
+            )

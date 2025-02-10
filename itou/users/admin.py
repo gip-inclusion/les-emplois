@@ -454,6 +454,8 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
                 readonly_fields.extend(["first_name", "last_name", "email"])
         if obj:
             readonly_fields.append("kind")  # kind is never editable, but still addable
+            if obj.kind == UserKind.JOB_SEEKER:
+                readonly_fields.extend(obj.jobseeker_profile.readonly_pii_fields())
         return readonly_fields
 
     def get_fieldsets(self, request, obj=None):
@@ -774,15 +776,6 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
 
     list_select_related = ("user",)
 
-    readonly_fields = (
-        "hexa_lane_type",
-        "hexa_post_code",
-        "hexa_commune",
-        "pe_obfuscated_nir",
-        "pe_last_certification_attempt_at",
-        "disabled_notifications",
-        "fields_history_formatted",
-    )
     show_full_result_count = False
 
     fieldsets = (
@@ -878,6 +871,20 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
     @admin.display(description="historique des champs modifiés sur le modèle")
     def fields_history_formatted(self, obj):
         return format_html("<pre><code>{}</code></pre>", pformat(obj.fields_history, width=120))
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = [
+            "hexa_lane_type",
+            "hexa_post_code",
+            "hexa_commune",
+            "pe_obfuscated_nir",
+            "pe_last_certification_attempt_at",
+            "disabled_notifications",
+            "fields_history_formatted",
+        ]
+        if obj:
+            readonly_fields.extend(obj.readonly_pii_fields())
+        return readonly_fields
 
     def get_search_fields(self, request):
         search_fields = []

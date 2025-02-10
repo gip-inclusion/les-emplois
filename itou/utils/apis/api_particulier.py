@@ -38,18 +38,22 @@ def _request(client, endpoint, job_seeker):
     return client.get(endpoint, params=params).raise_for_status().json()
 
 
+USER_REQUIRED_FIELDS = ["first_name", "last_name", "title"]
+JOBSEEKER_PROFILE_REQUIRED_FIELDS = ["birthdate", "birth_country", "birth_place"]
+
+
 def has_required_info(job_seeker):
+    for field in USER_REQUIRED_FIELDS:
+        if not getattr(job_seeker, field):
+            return False
     profile = job_seeker.jobseeker_profile
-    required = [
-        job_seeker.last_name,
-        job_seeker.first_name,
-        job_seeker.title,
-        profile.birthdate,
-        profile.birth_country,
-    ]
-    if profile.is_born_in_france:
-        required.append(profile.birth_place)
-    return all(required)
+    profile_required_fields = JOBSEEKER_PROFILE_REQUIRED_FIELDS.copy()
+    if not profile.is_born_in_france:
+        profile_required_fields.remove("birth_place")
+    for field in profile_required_fields:
+        if not getattr(profile, field):
+            return False
+    return True
 
 
 def certify_criteria(criteria, client, job_seeker):
