@@ -1,0 +1,26 @@
+{% extends 'admin/change_form.html' %}
+
+{% block submit_buttons_top %}
+
+    {{ block.super }}
+
+    {% if perms.employee_record.change_employeerecord and available_transitions %}
+        <div class="submit-row" id="employee-record-transitions">
+            <p>Changer l'état de la fiche salarié :</p>
+            {% for transition in available_transitions %}
+                <input type='submit' class="danger js-with-confirm" name="transition_{{ transition.name }}" value="{{ transition.target.title }}">
+            {% endfor %}
+        </div>
+
+        <script nonce="{{ CSP_NONCE }}">
+            var buttons = document.getElementsByClassName("js-with-confirm");
+            Array.prototype.forEach.call(buttons, function(button) {
+                button.addEventListener("click", function(event) {
+                    if (!confirm("Êtes vous certain de vouloir changer l'état à **" + event.target.value.toUpperCase() + '** ?')) {
+                        event.preventDefault();
+                    }
+                });
+            });
+        </script>
+    {% endif %}
+{% endblock %}

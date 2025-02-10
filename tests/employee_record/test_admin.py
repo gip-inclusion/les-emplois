@@ -1,13 +1,18 @@
 import pytest
 from django.contrib import messages
 from django.contrib.admin import helpers
+from django.contrib.auth.models import Permission
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertMessages, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.approvals.models import Approval
 from itou.employee_record import models
+from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from tests.employee_record import factories
+from tests.employee_record.factories import EmployeeRecordFactory
+from tests.users.factories import ItouStaffFactory
+from tests.utils.test import parse_response_to_soup
 
 
 def test_schedule_approval_update_notification_when_notification_do_not_exists(admin_client):
@@ -104,3 +109,27 @@ def test_employee_record_deletion_with_notification(admin_client):
     response = admin_client.post(delete_url, {"post": "yes"})
     assertRedirects(response, reverse("admin:employee_record_employeerecord_changelist"))
     assert EmployeeRecord.objects.filter(pk=ern.employee_record.pk).count() == 0
+
+
+@pytest.mark.parametrize("status", Status)
+def test_available_transitions(snapshot, client, status):
+    superuser = ItouStaffFactory(is_superuser=True)
+    rw_user = ItouStaffFactory(is_superuser=False)
+    rw_user.user_permissions.add(Permission.objects.get(codename="change_employeerecord"))
+    ro_user = ItouStaffFactory(is_superuser=False)
+    ro_user.user_permissions.add(Permission.objects.get(codename="view_employeerecord"))
+
+    employee_record = EmployeeRecordFactory(status=status)
+    url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.pk])
+
+    for user in [superuser, rw_user]:
+        client.force_login(user)
+        response = client.get(url)
+        if status not in {Status.READY, Status.SENT}:
+            assert str(parse_response_to_soup(response, "#employee-record-transitions")) == snapshot(name="actions")
+        else:
+            assertNotContains(response, '<div class="submit-row" id="employee-record-transitions">')
+
+    client.force_login(ro_user)
+    response = client.get(url)
+    assertNotContains(response, '<div class="submit-row" id="employee-record-transitions">')
