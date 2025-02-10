@@ -5,7 +5,6 @@ Handle multiple user types sign up with django-allauth.
 import logging
 
 from allauth.account.adapter import get_adapter
-from allauth.account.views import SignupView
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
@@ -15,7 +14,9 @@ from django.db import Error, transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
+from django.views.decorators.cache import never_cache
 from django.views.generic import FormView, TemplateView, View
 
 from itou.common_apps.address.models import lat_lon_to_coords
@@ -26,10 +27,11 @@ from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.adapter import UserAdapter
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, MATOMO_ACCOUNT_TYPE, UserKind
 from itou.utils import constants as global_constants
-from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.auth import LoginNotRequiredMixin, sensitive_post_parameters_password
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.tokens import company_signup_token_generator
 from itou.utils.urls import get_safe_url
+from itou.utils.views import NextRedirectMixin, login_with_message
 from itou.www.signup import forms
 from itou.www.signup.errors import JobSeekerSignupConflictModalResolver
 
@@ -116,10 +118,30 @@ def job_seeker_signup_info(request, template_name="signup/job_seeker_signup.html
     return render(request, template_name, context)
 
 
-class JobSeekerCredentialsSignupView(LoginNotRequiredMixin, SignupView):
+# TODO: Finish migrating below view and writing tests
+"""
+class SignupView:
+    def get_initial(self):
+        initial = super().get_initial()
+        email = self.request.GET.get("email")
+        if email:
+            try:
+                validate_email(email)
+            except ValidationError:
+                return initial
+            initial["email"] = email
+        return initial
+"""
+
+
+class JobSeekerCredentialsSignupView(LoginNotRequiredMixin, NextRedirectMixin, FormView):
     form_class = forms.JobSeekerCredentialsSignupForm
     template_name = "signup/job_seeker_signup_credentials.html"
 
+    # TODO: reintroduce or replace rate-limiting from django-allauth
+    # @method_decorator(rate_limit(action="signup"))
+    @sensitive_post_parameters_password
+    @method_decorator(never_cache)
     def dispatch(self, request, *args, **kwargs):
         if global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY not in request.session:
             return HttpResponseRedirect(reverse("signup:job_seeker"))
@@ -127,6 +149,29 @@ class JobSeekerCredentialsSignupView(LoginNotRequiredMixin, SignupView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        form = context["form"]
+        # This session key is set during signup via invitation.
+        # If there is an email in the session, populate this field
+        # TODO: move this to the first stage of signup
+        email = self.request.session.get("account_verified_email")
+        if email:
+            email_keys = ["email"]
+            for email_key in email_keys:
+                form.fields[email_key].initial = email
+
+        login_url = self.passthrough_next_url(reverse("account_login"))
+        signup_url = self.passthrough_next_url(reverse("account_signup"))
+        signup_by_passkey_url = None
+        # TODO: are all of these keys used?
+        context.update(
+            {
+                "login_url": login_url,
+                "signup_url": signup_url,
+                "signup_by_passkey_url": signup_by_passkey_url,
+            }
+        )
+
         context["show_france_connect"] = bool(settings.FRANCE_CONNECT_BASE_URL)
         context["show_peamu"] = bool(settings.PEAMU_AUTH_BASE_URL)
         return context
@@ -136,11 +181,22 @@ class JobSeekerCredentialsSignupView(LoginNotRequiredMixin, SignupView):
         kwargs["prior_cleaned_data"] = self.request.session.get(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY)
         return kwargs
 
+    def try_save(self, form):
+        self.user, resp = form.try_save(self.request)
+        if resp:
+            return resp
+
+        login_with_message(self.user)
+        return HttpResponseRedirect(self.get_success_url())
+
     def form_valid(self, form):
-        response = super().form_valid(form)
+        response = self.try_save(form)
         # Signup successful. Clear session
         self.request.session.pop(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY)
         return response
+
+    def get_success_url(self):
+        return get_adapter(self.request).get_login_redirect_url(self.request)
 
 
 # SIAEs signup.
