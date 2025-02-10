@@ -1,8 +1,10 @@
 from django.core.exceptions import ValidationError
+from django.forms import widgets
 
 from itou.asp.forms import BirthPlaceWithBirthdateModelForm
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
+from itou.utils.apis import api_particulier
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -71,7 +73,10 @@ class JobSeekerProfileFieldsMixin:
 
 class JobSeekerProfileModelForm(JobSeekerProfileFieldsMixin, BirthPlaceWithBirthdateModelForm):
     PROFILE_FIELDS = ["birthdate", "birth_place", "birth_country"]
-    REQUIRED_FIELDS = ["title", "first_name", "last_name", "birthdate"]
+    # The JOBSEEKER_PROFILE_REQUIRED_FIELDS are also required, but the
+    # birth_place is only required when the country is part of the France
+    # group. That is hard to express in a declarative syntax, so KISS.
+    REQUIRED_FIELDS = api_particulier.USER_REQUIRED_FIELDS + ["birthdate"]
 
     class Meta:
         model = User
@@ -92,3 +97,20 @@ class JobSeekerProfileModelForm(JobSeekerProfileFieldsMixin, BirthPlaceWithBirth
                 self.fields[fieldname].required = True
             except KeyError:
                 pass
+
+        if self.instance.pk and self.instance.identity_certified():
+            jobseeker_profile = self.instance.jobseeker_profile
+            for fieldname, field in self.fields.items():
+                if (
+                    fieldname
+                    in api_particulier.USER_REQUIRED_FIELDS + api_particulier.JOBSEEKER_PROFILE_REQUIRED_FIELDS
+                ):
+                    field.disabled = True
+                    if fieldname in ["birth_place", "birth_country"]:
+                        # No need to load a select2, if we’re only going to disable it.
+                        field.widget = widgets.Select()
+                        # Avoid constructing the choices.
+                        modelfield = jobseeker_profile._meta.get_field(fieldname)
+                        accessor = modelfield.attname
+                        value = getattr(jobseeker_profile, accessor)
+                        field.queryset = field.queryset.filter(pk=value)

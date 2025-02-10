@@ -38,7 +38,8 @@ from itou.job_applications.enums import JobApplicationState, QualificationLevel,
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.siae_evaluations.models import Sanctions
-from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
+from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, Title
+from itou.users.models import User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.mocks.api_particulier import rsa_certified_mocker
 from itou.utils.models import InclusiveDateRange
@@ -53,7 +54,11 @@ from tests.approvals.factories import (
 )
 from tests.cities.factories import create_test_cities
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
-from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
+from tests.eligibility.factories import (
+    GEIQEligibilityDiagnosisFactory,
+    IAEEligibilityDiagnosisFactory,
+    IAESelectedAdministrativeCriteriaFactory,
+)
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
@@ -3008,6 +3013,42 @@ class TestProcessAcceptViews:
             html=True,
             count=1,
         )
+
+    @freeze_time("2024-09-11")
+    def test_accept_personal_data_readonly_with_certified_criteria(self, client):
+        job_seeker = JobSeekerFactory(
+            born_in_france=True,
+            with_pole_emploi_id=True,
+            with_ban_api_mocked_address=True,
+        )
+        selected_criteria = IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis__job_seeker=job_seeker,
+            eligibility_diagnosis__author_siae=self.company,
+            certified=True,
+        )
+        job_application = JobApplicationSentByJobSeekerFactory(
+            job_seeker=job_seeker,
+            to_company=self.company,
+            state=JobApplicationState.PROCESSING,
+            eligibility_diagnosis=selected_criteria.eligibility_diagnosis,
+            selected_jobs=[self.company.jobs.first()],
+        )
+        client.force_login(self.company.members.get())
+
+        post_data = {
+            "title": Title.M if job_seeker.title is Title.MME else Title.MME,
+            "first_name": "Léon",
+            "last_name": "Munitionette",
+            "birth_place": Commune.objects.by_insee_code_and_period("07141", datetime.date(1990, 1, 1)).pk,
+            "birthdate": "1990-01-01",
+        }
+        self.accept_job_application(client, job_application, post_data=post_data)
+
+        refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
+        for attr in ["title", "first_name", "last_name"]:
+            assert getattr(refreshed_job_seeker, attr) == getattr(job_seeker, attr)
+        for attr in ["birthdate", "birth_place", "birth_country"]:
+            assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
 
 
 class TestProcessTemplates:
