@@ -48,6 +48,7 @@ from itou.users.enums import (
     UserKind,
 )
 from itou.users.notifications import JobSeekerCreatedByProxyNotification
+from itou.utils.apis import api_particulier
 from itou.utils.db import or_queries
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.triggers import FieldsHistory
@@ -1453,6 +1454,15 @@ class JobSeekerProfile(models.Model):
             return result
 
         return "Adresse HEXA incomplète"
+
+    def readonly_pii_fields(self):
+        blocked_fields = set()
+        for certification in self.identity_certifications.all():
+            match certification.certifier:
+                case IdentityCertificationAuthorities.API_PARTICULIER:
+                    blocked_fields.update(api_particulier.USER_REQUIRED_FIELDS)
+                    blocked_fields.update(api_particulier.JOBSEEKER_PROFILE_REQUIRED_FIELDS)
+        return blocked_fields
 
 
 class IdentityCertificationManager(models.Manager):

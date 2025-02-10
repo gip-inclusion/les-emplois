@@ -7,7 +7,7 @@ from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertMessages, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune, Country, RSAAllocation
 from itou.gps.models import FollowUpGroupMembership
@@ -19,12 +19,14 @@ from itou.utils.urls import add_url_params
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.companies.factories import CompanyFactory
+from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
+from tests.users import constants as users_test_constants
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.test import parse_response_to_soup, session_data_without_known_keys
 from tests.www.apply.test_submit import CONFIRM_RESET_MARKUP, LINK_RESET_MARKUP
@@ -1012,12 +1014,12 @@ class TestUpdateForSender:
         client.get(start_url)
         [job_seeker_session_name] = session_data_without_known_keys(client.session)
 
+        url = reverse("job_seekers_views:update_job_seeker_step_1", kwargs={"session_uuid": job_seeker_session_name})
+        response = client.get(url)
+        assertNotContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True)
         birthdate = datetime.date(1911, 11, 1)
         response = client.post(
-            reverse(
-                "job_seekers_views:update_job_seeker_step_1",
-                kwargs={"session_uuid": job_seeker_session_name},
-            ),
+            url,
             {
                 "title": Title.M,
                 "first_name": "Manuel",
@@ -1135,3 +1137,62 @@ class TestUpdateForSender:
             html=True,
             count=1,
         )
+
+    def test_fields_readonly_with_certified_criteria(self, client):
+        company = CompanyFactory(with_membership=True)
+        user = company.members.get()
+        job_seeker = JobSeekerFactory(
+            created_by=user,
+            title=Title.M,
+            born_in_france=True,
+            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            jobseeker_profile__nir="178122978200508",
+        )
+        IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis__job_seeker=job_seeker,
+            certified=False,
+        )
+
+        client.force_login(user)
+        params = {
+            "job_seeker_public_id": job_seeker.public_id,
+            "from_url": reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+        }
+        response = client.get(reverse("job_seekers_views:update_job_seeker_start"), params)
+        [job_seeker_session_name] = session_data_without_known_keys(client.session)
+        new_birth_date = datetime.date(1978, 12, 1)
+        url = reverse(
+            "job_seekers_views:update_job_seeker_step_1",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        response = client.get(url)
+        assertContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True, count=1)
+        response = client.post(
+            url,
+            {
+                "title": Title.M,
+                "first_name": "Bob",
+                "last_name": "Saint Clair",
+                "birthdate": new_birth_date.isoformat(),
+                "birth_place": Commune.objects.by_insee_code_and_period("64483", new_birth_date).pk,
+                "birth_country": Country.objects.get(code=Country.INSEE_CODE_FRANCE).pk,
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "job_seekers_views:update_job_seeker_step_2",
+                kwargs={"session_uuid": job_seeker_session_name},
+            ),
+        )
+        session_data = client.session[job_seeker_session_name]
+        session_user = session_data["user"]
+        for attr in ["title", "first_name", "last_name"]:
+            assert session_user[attr] == getattr(job_seeker, attr)
+        session_profile = session_data["profile"]
+        assert session_profile["birthdate"] == job_seeker.jobseeker_profile.birthdate
+        assert session_profile["birth_place"] == job_seeker.jobseeker_profile.birth_place_id
+        assert session_profile["birth_country"] == job_seeker.jobseeker_profile.birth_country_id

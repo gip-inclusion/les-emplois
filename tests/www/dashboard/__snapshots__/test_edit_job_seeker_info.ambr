@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestEditJobSeekerInfo.test_edit_by_company_with_nir[view queries]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -258,6 +258,25 @@
       }),
       dict({
         'origin': list([
+          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
+          'EditJobSeekerInfoForm.__init__[users/forms.py]',
+          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
+          'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
+          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
+          'edit_job_seeker_info[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_identitycertification"."id",
+                 "users_identitycertification"."jobseeker_profile_id",
+                 "users_identitycertification"."certifier",
+                 "users_identitycertification"."certified_at"
+          FROM "users_identitycertification"
+          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'User.has_verified_email[users/models.py]',
           'User.can_edit_email[users/models.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
@@ -356,7 +375,7 @@
 # ---
 # name: TestEditJobSeekerInfo.test_edit_by_prescriber[view queries]
   dict({
-    'num_queries': 15,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -599,6 +618,25 @@
           FROM "asp_country"
           WHERE "asp_country"."id" = %s
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
+          'EditJobSeekerInfoForm.__init__[users/forms.py]',
+          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
+          'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
+          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
+          'edit_job_seeker_info[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_identitycertification"."id",
+                 "users_identitycertification"."jobseeker_profile_id",
+                 "users_identitycertification"."certifier",
+                 "users_identitycertification"."certified_at"
+          FROM "users_identitycertification"
+          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

@@ -21,6 +21,7 @@ from itou.openid_connect.pe_connect.models import PoleEmploiConnectState, PoleEm
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users.factories import JobSeekerFactory, UserFactory
 from tests.utils.test import reload_module
 
@@ -191,6 +192,27 @@ class TestPoleEmploiConnect:
                 peamu_user_data.create_or_update_user()
 
             user.delete()
+
+    def test_update_readonly_with_certified_criteria(self, caplog):
+        job_seeker = JobSeekerFactory(
+            username=PEAMU_USERINFO["sub"],
+            identity_provider=IdentityProvider.PE_CONNECT,
+            born_in_france=True,
+        )
+        IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=job_seeker, certified=True)
+        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+        user, created = peamu_user_data.create_or_update_user()
+        assert created is False
+        assert user.last_name == job_seeker.last_name
+        assert user.first_name == job_seeker.first_name
+        assert user.jobseeker_profile.birthdate == job_seeker.jobseeker_profile.birthdate
+        assert user.external_data_source_history[0]["source"] == "PEC"
+        assert user.identity_provider == IdentityProvider.PE_CONNECT
+        assert user.kind == UserKind.JOB_SEEKER
+        assert (
+            f"Not updating fields first_name, last_name on job seeker pk={job_seeker.pk} "
+            "because their identity has been certified." in caplog.messages
+        )
 
     def test_callback_no_code(self, client):
         url = reverse("pe_connect:callback")

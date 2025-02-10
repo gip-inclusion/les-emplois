@@ -14,6 +14,7 @@
 {% block form_content %}
     <fieldset>
         <legend class="visually-hidden">État civil du candidat</legend>
+        {% include "includes/job_seekers/readonly_form.html" with form=form ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
         {% bootstrap_field form.title wrapper_class="form-group form-group-input-w-lg-33" %}
         {% bootstrap_field form.first_name %}
         {% bootstrap_field form.last_name %}

@@ -1,6 +1,7 @@
 import datetime
 import math
 
+import factory
 import pytest
 from allauth.account.models import EmailAddress
 from django.contrib.gis.geos import Point
@@ -10,10 +11,11 @@ from pytest_django.asserts import assertContains, assertFormError, assertNotCont
 
 from itou.asp.models import Commune
 from itou.cities.models import City
-from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
+from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, Title
 from itou.users.models import User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from tests.companies.factories import CompanyFactory
+from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberFactory
 from tests.prescribers import factories as prescribers_factories
 from tests.users.factories import PrescriberFactory
@@ -533,3 +535,47 @@ class TestEditJobSeekerInfo:
         response = client.post(url, data=post_data)
         assertContains(response, "Ce champ est obligatoire.")
         assert response.context["form"].errors["address_for_autocomplete"] == ["Ce champ est obligatoire."]
+
+    def test_fields_readonly_with_certified_criteria(self, client, mocker):
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+        )
+        selected_criteria = IAESelectedAdministrativeCriteriaFactory(
+            # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
+            eligibility_diagnosis__job_seeker__created_by=factory.SelfAttribute("..author"),
+            eligibility_diagnosis__job_seeker__title=Title.M,
+            eligibility_diagnosis__job_seeker__jobseeker_profile__nir="178121111111151",
+            eligibility_diagnosis__job_seeker__born_in_france=True,
+            eligibility_diagnosis__job_seeker__jobseeker_profile__birthdate=datetime.date(1978, 12, 1),
+            certified=True,
+        )
+        job_seeker = selected_criteria.eligibility_diagnosis.job_seeker
+
+        client.force_login(selected_criteria.eligibility_diagnosis.author)
+        new_birthdate = datetime.date(1978, 12, 20)
+        response = client.post(
+            reverse(
+                "dashboard:edit_job_seeker_info",
+                kwargs={"job_seeker_public_id": job_seeker.public_id},
+            ),
+            {
+                "title": "M",
+                "first_name": "Manuel",
+                "last_name": "Calavera",
+                "email": job_seeker.email,
+                "birthdate": new_birthdate.isoformat(),
+                "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+                "birth_place": (
+                    Commune.objects.filter(start_date__lte=new_birthdate, end_date__gte=new_birthdate).first().pk
+                ),
+                **self.address_form_fields,
+            },
+        )
+
+        assertRedirects(response, reverse("dashboard:index"))
+        refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
+        for attr in ["title", "first_name", "last_name"]:
+            assert getattr(refreshed_job_seeker, attr) == getattr(job_seeker, attr)
+        for attr in ["birthdate", "birth_place", "birth_country"]:
+            assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)

@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestEditUserInfoView.test_edit_with_nir
   dict({
-    'num_queries': 10,
+    'num_queries': 11,
     'queries': list([
       dict({
         'origin': list([
@@ -119,6 +119,25 @@
           FROM "users_jobseekerprofile"
           WHERE "users_jobseekerprofile"."user_id" = %s
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
+          'EditJobSeekerInfoForm.__init__[users/forms.py]',
+          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
+          'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
+          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
+          'edit_user_info[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_identitycertification"."id",
+                 "users_identitycertification"."jobseeker_profile_id",
+                 "users_identitycertification"."certifier",
+                 "users_identitycertification"."certified_at"
+          FROM "users_identitycertification"
+          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
