@@ -154,7 +154,9 @@
                         <li class="nav-item" role="presentation">
                             <a id="recrutements-en-cours-tab" class="nav-link active" role="tab" href="#recrutements-en-cours" data-bs-toggle="tab" aria-selected="true" aria-controls="recrutements-en-cours">
                                 <span>Recrutement{{ active_job_descriptions|pluralizefr }} en cours</span>
-                                <span class="badge badge-sm rounded-pill ms-2">{{ active_job_descriptions|length }}</span>
+                                {% if active_job_descriptions %}
+                                    <span class="badge badge-sm rounded-pill ms-2">{{ active_job_descriptions|length }}</span>
+                                {% endif %}
                             </a>
                         </li>
                         {% if other_job_descriptions %}
@@ -175,7 +177,7 @@
                                     {% endfor %}
                                 </ul>
                             {% else %}
-                                <p class="mb-0">Pour le moment, il n’y a aucun recrutement en cours dans cette structure.</p>
+                                <p class="mb-0">Cet employeur accepte de recevoir des candidatures spontanées.</p>
                             {% endif %}
                         </div>
                         {% if other_job_descriptions %}
