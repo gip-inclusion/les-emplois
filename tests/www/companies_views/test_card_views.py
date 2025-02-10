@@ -358,8 +358,8 @@ class TestJobDescriptionCardView:
         assertNotContains(response, OPEN_POSITION_TEXT)
 
         # Check other jobs
-        assert response.context["others_active_jobs"].count() == 3
-        for other_active_job in response.context["others_active_jobs"]:
+        assert response.context["other_active_jobs"].count() == 3
+        for other_active_job in response.context["other_active_jobs"]:
             assertContains(response, other_active_job.display_name, html=True)
 
         response = client.get(add_url_params(url, {"back_url": reverse("companies_views:job_description_list")}))
