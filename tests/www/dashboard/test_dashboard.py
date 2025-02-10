@@ -594,9 +594,19 @@ class TestDashboardView:
                     EmployerFactory,
                     for_snapshot=True,
                     with_company=True,
+                    with_company__company__department="75",
                 ),
                 "card",
             ],
+            [
+                partial(
+                    EmployerFactory,
+                    for_snapshot=True,
+                    with_company=True,
+                    with_company__company__department="30",
+                ),
+                "nav",
+            ],  # in the Gard
             [partial(PrescriberFactory, for_snapshot=True), "card"],  # no org
             [
                 partial(
@@ -604,6 +614,7 @@ class TestDashboardView:
                     for_snapshot=True,
                     membership=True,
                     membership__organization__authorized=False,
+                    membership__organization__department="75",
                 ),
                 "card",
             ],  # non authorized org
@@ -612,18 +623,42 @@ class TestDashboardView:
                     PrescriberFactory,
                     for_snapshot=True,
                     membership=True,
+                    membership__organization__authorized=False,
+                    membership__organization__department="30",
+                ),
+                "nav",
+            ],  # non authorized org in the Gard
+            [
+                partial(
+                    PrescriberFactory,
+                    for_snapshot=True,
+                    membership=True,
                     membership__organization__authorized=True,
+                    membership__organization__department="75",
                 ),
                 "card",
             ],  # authorized_org
+            [
+                partial(
+                    PrescriberFactory,
+                    for_snapshot=True,
+                    membership=True,
+                    membership__organization__authorized=True,
+                    membership__organization__department="30",
+                ),
+                "nav",
+            ],  # authorized_org in the Gard
             [partial(LaborInspectorFactory, membership=True), None],
         ],
         ids=[
             "job_seeker",
             "employer",
+            "employer_gard",
             "prescriber_no_org",
             "prescriber_non_authorized_org",
+            "prescriber_non_authorized_org_gard",
             "prescriber",
+            "prescriber_gard",
             "labor_inspector",
         ],
     )
@@ -637,6 +672,14 @@ class TestDashboardView:
             assertContains(response, GPS_CARD_TXT)
         else:
             assertNotContains(response, GPS_CARD_TXT)
+
+        nav = parse_response_to_soup(response, "#offcanvasNav")
+        [menu] = nav.find_all(class_="nav-tabs")
+        nav_menu = str(menu)
+        if gps_info == "nav":
+            assert "gps" in nav_menu
+        else:
+            assert "gps" not in nav_menu
 
     def test_dashboard_prescriber_without_organization_message(self, client):
         # An orienter is a prescriber without prescriber organization

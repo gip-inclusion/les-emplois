@@ -26,6 +26,10 @@ def is_allowed_to_use_gps_advanced_features(user):
     return user.is_employer or user.is_prescriber_with_authorized_org
 
 
+def in_gard(request):
+    return getattr(request.current_organization, "department", None) == "30"
+
+
 @check_user(is_allowed_to_use_gps)
 def my_groups(request, template_name="gps/my_groups.html"):
     memberships = (

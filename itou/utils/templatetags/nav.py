@@ -4,6 +4,8 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.text import slugify
 
+from itou.www.gps.views import in_gard, is_allowed_to_use_gps
+
 
 register = template.Library()
 
@@ -192,6 +194,17 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="annexes-financieres",
     ),
+    # GPS (for employers and prescribers with an org in department nb 30)
+    "gps": NavItem(
+        label="GPS",
+        icon="ri-compass-line",
+        is_new=True,  # TODO(alaurent) Remove on 2025/04/01
+        target=reverse("gps:my_groups"),
+        active_view_names=["gps:my_groups", "gps:user_details"],
+        matomo_event_category="gps",
+        matomo_event_name="clic",
+        matomo_event_option="tdb_liste_beneficiaires",
+    ),
 }
 
 
@@ -245,6 +258,8 @@ def nav(request):
                     items=[NAV_ENTRIES["labor-inspector-members"]],
                 )
             )
+        if is_allowed_to_use_gps(request.user) and in_gard(request):
+            menu_items.append(NAV_ENTRIES["gps"])
         menu_items.append(
             NavGroup(
                 label="Rechercher",
