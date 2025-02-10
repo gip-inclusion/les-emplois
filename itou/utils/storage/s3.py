@@ -1,7 +1,7 @@
 import boto3
 from botocore.client import Config
 from django.conf import settings
-from storages.backends.s3boto3 import S3Boto3Storage
+from storages.backends.s3 import S3Storage
 
 
 TEMPORARY_STORAGE_PREFIX = "temporary_storage"
@@ -28,7 +28,7 @@ def pilotage_s3_client():
     )
 
 
-class PublicStorage(S3Boto3Storage):
+class PublicStorage(S3Storage):
     # Not using the S3StaticStorage backend to ensure the listdir() operation remains forbidden.
     # Don’t sign URLs, objects are public.
     querystring_auth = False
