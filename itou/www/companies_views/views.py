@@ -141,7 +141,7 @@ class JobDescriptionCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Temp
         )
 
         # select_related on company, location useful for _list_siae_actives_jobs_row.html template
-        others_active_jobs = (
+        other_active_jobs = (
             JobDescription.objects.select_related("appellation", "company", "location")
             .filter(is_active=True, company=company)
             .exclude(id=self.job_description.pk)
@@ -159,7 +159,7 @@ class JobDescriptionCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Temp
             "job": self.job_description,
             "siae": company,
             "can_update_job_description": can_update_job_description,
-            "others_active_jobs": others_active_jobs,
+            "other_active_jobs": other_active_jobs,
             "back_url": back_url,
             "matomo_custom_title": "Détails de la fiche de poste",
             "code_insee": code_insee,
@@ -460,24 +460,24 @@ class CompanyCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, TemplateVie
 
     def get_context_data(self, **kwargs):
         back_url = get_safe_url(self.request, "back_url")
-        jobs_descriptions = JobDescription.objects.filter(company=self.company).select_related(
+        job_descriptions = JobDescription.objects.filter(company=self.company).select_related(
             "appellation", "location"
         )
-        active_jobs_descriptions = []
+        active_job_descriptions = []
         if self.company.block_job_applications:
-            other_jobs_descriptions = jobs_descriptions
+            other_job_descriptions = job_descriptions
         else:
-            other_jobs_descriptions = []
-            for job_desc in jobs_descriptions:
+            other_job_descriptions = []
+            for job_desc in job_descriptions:
                 if job_desc.is_active:
-                    active_jobs_descriptions.append(job_desc)
+                    active_job_descriptions.append(job_desc)
                 else:
-                    other_jobs_descriptions.append(job_desc)
+                    other_job_descriptions.append(job_desc)
 
         return super().get_context_data(**kwargs) | {
             "siae": self.company,
-            "active_jobs_descriptions": active_jobs_descriptions,
-            "other_jobs_descriptions": other_jobs_descriptions,
+            "active_job_descriptions": active_job_descriptions,
+            "other_job_descriptions": other_job_descriptions,
             "matomo_custom_title": "Fiche de la structure d'insertion",
             "code_insee": self.company.insee_city.code_insee if self.company.insee_city else None,
             "siae_card_absolute_url": get_absolute_url(

@@ -76,7 +76,7 @@
                         </div>
                     {% endif %}
                 {% endif %}
-                {% if others_active_jobs and not siae.block_job_applications %}
+                {% if other_active_jobs and not siae.block_job_applications %}
                     <div class="form-group col-12 col-lg-auto">
                         <a href="#recrutements" class="btn btn-lg btn-outline-white btn-block btn-ico">
                             <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
@@ -122,7 +122,7 @@
         </div>
     </section>
 
-    {% if others_active_jobs and not siae.block_job_applications %}
+    {% if other_active_jobs and not siae.block_job_applications %}
         <section id="recrutements" class="s-tabs-01 mt-0 pt-0">
             <div class="s-tabs-01__container container">
                 <div class="s-tabs-01__row row">
@@ -131,16 +131,16 @@
                         <ul class="s-tabs-01__nav nav nav-tabs" role="tablist" data-it-sliding-tabs="true" aria-labelledby="recrutements-title">
                             <li class="nav-item" role="presentation">
                                 <a id="recrutements-en-cours-tab" class="nav-link active" role="tab" href="#recrutements-en-cours" data-bs-toggle="tab" aria-selected="true" aria-controls="recrutements-en-cours">
-                                    <span>Recrutement{{ others_active_jobs|pluralizefr }} en cours dans cette structure</span>
-                                    <span class="badge badge-sm rounded-pill ms-2">{{ others_active_jobs|length }}</span>
+                                    <span>Recrutement{{ other_active_jobs|pluralizefr }} en cours dans cette structure</span>
+                                    <span class="badge badge-sm rounded-pill ms-2">{{ other_active_jobs|length }}</span>
                                 </a>
                             </li>
                         </ul>
                         <div class="tab-content">
                             <div id="recrutements-en-cours" class="tab-pane fade active show" aria-labelledby="recrutements-en-cours-tab" role="tabpanel">
-                                {% if others_active_jobs %}
+                                {% if other_active_jobs %}
                                     <ul class="list-group list-group-flush list-group-link">
-                                        {% for other_job in others_active_jobs %}
+                                        {% for other_job in other_active_jobs %}
                                             {% include "companies/includes/_siae_jobdescription.html" with job=other_job %}
                                         {% endfor %}
                                     </ul>

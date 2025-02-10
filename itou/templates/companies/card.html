@@ -51,7 +51,7 @@
                     </div>
                 {% endif %}
             {% endif %}
-            {% if active_jobs_descriptions or other_jobs_descriptions %}
+            {% if active_job_descriptions or other_job_descriptions %}
                 <div class="form-group col-12 col-lg-auto">
                     <a href="#metiers" class="btn btn-lg btn-outline-white btn-block btn-ico">
                         <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
@@ -153,24 +153,24 @@
                     <ul class="s-tabs-01__nav nav nav-tabs" role="tablist" data-it-sliding-tabs="true" aria-labelledby="metiers-title">
                         <li class="nav-item" role="presentation">
                             <a id="recrutements-en-cours-tab" class="nav-link active" role="tab" href="#recrutements-en-cours" data-bs-toggle="tab" aria-selected="true" aria-controls="recrutements-en-cours">
-                                <span>Recrutement{{ active_jobs_descriptions|pluralizefr }} en cours</span>
-                                <span class="badge badge-sm rounded-pill ms-2">{{ active_jobs_descriptions|length }}</span>
+                                <span>Recrutement{{ active_job_descriptions|pluralizefr }} en cours</span>
+                                <span class="badge badge-sm rounded-pill ms-2">{{ active_job_descriptions|length }}</span>
                             </a>
                         </li>
-                        {% if other_jobs_descriptions %}
+                        {% if other_job_descriptions %}
                             <li class="nav-item" role="presentation">
                                 <a id="autres-metiers-tab" class="nav-link" role="tab" href="#autres-metiers" data-bs-toggle="tab" aria-selected="false" aria-controls="autres-metiers">
-                                    <span>{{ other_jobs_descriptions|pluralizefr:"Autre métier exercé,Autres métiers exercés" }}</span>
-                                    <span class="badge badge-sm rounded-pill ms-2">{{ other_jobs_descriptions|length }}</span>
+                                    <span>{{ other_job_descriptions|pluralizefr:"Autre métier exercé,Autres métiers exercés" }}</span>
+                                    <span class="badge badge-sm rounded-pill ms-2">{{ other_job_descriptions|length }}</span>
                                 </a>
                             </li>
                         {% endif %}
                     </ul>
                     <div class="tab-content">
                         <div id="recrutements-en-cours" class="tab-pane fade active show" aria-labelledby="recrutements-en-cours-tab" role="tabpanel">
-                            {% if active_jobs_descriptions %}
+                            {% if active_job_descriptions %}
                                 <ul class="list-group list-group-flush list-group-link">
-                                    {% for job in active_jobs_descriptions %}
+                                    {% for job in active_job_descriptions %}
                                         {% include "companies/includes/_siae_jobdescription.html" %}
                                     {% endfor %}
                                 </ul>
@@ -178,10 +178,10 @@
                                 <p class="mb-0">Pour le moment, il n’y a aucun recrutement en cours dans cette structure.</p>
                             {% endif %}
                         </div>
-                        {% if other_jobs_descriptions %}
+                        {% if other_job_descriptions %}
                             <div id="autres-metiers" class="tab-pane fade" aria-labelledby="autres-metiers-tab" role="tabpanel">
                                 <ul class="list-group list-group-flush list-group-link">
-                                    {% for job in other_jobs_descriptions %}
+                                    {% for job in other_job_descriptions %}
                                         {% include "companies/includes/_siae_jobdescription.html" %}
                                     {% endfor %}
                                 </ul>
