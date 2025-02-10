@@ -3,11 +3,18 @@ from functools import wraps
 from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
+from django.views.decorators.debug import sensitive_post_parameters
 
 from itou.openid_connect.france_connect.constants import FRANCE_CONNECT_SESSION_STATE, FRANCE_CONNECT_SESSION_TOKEN
 from itou.openid_connect.pe_connect.constants import PE_CONNECT_SESSION_TOKEN
 from itou.openid_connect.pro_connect.constants import PRO_CONNECT_SESSION_KEY
+
+
+sensitive_post_parameters_password = method_decorator(
+    sensitive_post_parameters("oldpassword", "password", "password1", "password2")
+)
 
 
 def check_user(test_func, err_msg=""):

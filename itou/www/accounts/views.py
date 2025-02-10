@@ -5,14 +5,12 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
-from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import FormView, TemplateView
 
 from itou.emails.models import EmailConfirmation
 from itou.users.notifications import PasswordChangedNotification, PasswordResetSuccessNotification
-from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.auth import LoginNotRequiredMixin, sensitive_post_parameters_password
 from itou.utils.requests import get_client_ip, get_http_user_agent
 from itou.utils.views import NextRedirectMixin, logout_with_message
 from itou.www.accounts import forms
@@ -23,11 +21,14 @@ INTERNAL_RESET_SESSION_KEY = "_password_reset_key"
 
 # TODO: migrate rate_limit functionality from allauth, or replace it.
 # @method_decorator(rate_limit(action="change_password"), name="dispatch")
-@method_decorator(sensitive_post_parameters("oldpassword", "password", "password1", "password2"), name="dispatch")
 class PasswordChangeView(NextRedirectMixin, FormView):
     template_name = "account/password_change.html"
     form_class = forms.ChangePasswordForm
     success_url = reverse_lazy("dashboard:index")
+
+    @sensitive_post_parameters_password
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
