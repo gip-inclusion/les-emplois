@@ -16,6 +16,7 @@ class NavItem:
         label,
         target,
         active_view_names,
+        is_new=False,
         matomo_event_category=None,
         matomo_event_name=None,
         matomo_event_option=None,
@@ -24,6 +25,7 @@ class NavItem:
         self.label = label
         self.target = target
         self.active_view_names = active_view_names
+        self.is_new = is_new
         self.matomo_event_category = matomo_event_category
         self.matomo_event_name = matomo_event_name
         self.matomo_event_option = matomo_event_option

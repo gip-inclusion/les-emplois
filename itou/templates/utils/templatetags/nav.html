@@ -20,7 +20,11 @@
                                 <a href="{{ menu_item.target }}"
                                    {% if menu_item.active %}class="active"{% endif %}
                                    {% if menu_item.matomo_event_category %}{% matomo_event menu_item.matomo_event_category menu_item.matomo_event_name menu_item.matomo_event_option %}{% endif %}>
-                                {{ menu_item.label }}</a>
+                                    {{ menu_item.label }}
+                                    {% if menu_item.is_new %}
+                                        <span class="badge badge-sm rounded-pill bg-important text-white ms-3">nouveau</span>
+                                    {% endif %}
+                                </a>
                             </li>
                         {% endfor %}
                     </ul>
@@ -33,6 +37,9 @@
                    {% if menu_group_or_item.matomo_event_category %}{% matomo_event menu_group_or_item.matomo_event_category menu_group_or_item.matomo_event_name menu_group_or_item.matomo_event_option %}{% endif %}>
                     <i class="{{ menu_group_or_item.icon }} fw-medium" aria-hidden="true"></i>
                     <span>{{ menu_group_or_item.label }}</span>
+                    {% if menu_group_or_item.is_new %}
+                        <span class="badge badge-sm rounded-pill bg-important text-white ms-3">nouveau</span>
+                    {% endif %}
                 </a>
             </li>
         {% endif %}

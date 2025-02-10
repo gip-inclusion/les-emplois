@@ -33,6 +33,7 @@
                   <a class="nav-link active" href="/dashboard/">
                       <i aria-hidden="true" class="ri-home-line fw-medium"></i>
                       <span>Accueil</span>
+                      
                   </a>
               </li>
           
@@ -42,6 +43,7 @@
                   <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Candidatures</span>
+                      
                   </a>
               </li>
           
@@ -51,6 +53,7 @@
                   <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats" href="/job-seekers/list">
                       <i aria-hidden="true" class="ri-user-line fw-medium"></i>
                       <span>Candidats</span>
+                      
                   </a>
               </li>
           
@@ -66,7 +69,9 @@
                           
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="collaborateurs" href="/prescribers/colleagues">
-                                  Collaborateurs</a>
+                                      Collaborateurs
+                                      
+                                  </a>
                               </li>
                           
                       </ul>
@@ -85,12 +90,16 @@
                           
                               <li>
                                   <a href="/search/employers/results">
-                                  Un emploi inclusif</a>
+                                      Un emploi inclusif
+                                      
+                                  </a>
                               </li>
                           
                               <li>
                                   <a href="/search/prescribers/results">
-                                  Un prescripteur habilité</a>
+                                      Un prescripteur habilité
+                                      
+                                  </a>
                               </li>
                           
                       </ul>
@@ -283,6 +292,7 @@
                   <a class="nav-link active" href="/dashboard/">
                       <i aria-hidden="true" class="ri-home-line fw-medium"></i>
                       <span>Accueil</span>
+                      
                   </a>
               </li>
           
@@ -292,6 +302,7 @@
                   <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/siae/list">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Candidatures</span>
+                      
                   </a>
               </li>
           
@@ -307,12 +318,16 @@
                           
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="salaries-pass-iae" href="/approvals/list">
-                                  Salariés et PASS IAE</a>
+                                      Salariés et PASS IAE
+                                      
+                                  </a>
                               </li>
                           
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="fiches-salaries-asp" href="/employee_record/list">
-                                  Fiches salarié ASP</a>
+                                      Fiches salarié ASP
+                                      
+                                  </a>
                               </li>
                           
                       </ul>
@@ -331,22 +346,30 @@
                           
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="structure-presentation" href="/company/overview">
-                                  Présentation</a>
+                                      Présentation
+                                      
+                                  </a>
                               </li>
                           
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="metiers-recrutement" href="/company/job_description_list">
-                                  Métiers et recrutements</a>
+                                      Métiers et recrutements
+                                      
+                                  </a>
                               </li>
                           
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="collaborateurs" href="/company/colleagues">
-                                  Collaborateurs</a>
+                                      Collaborateurs
+                                      
+                                  </a>
                               </li>
                           
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="annexes-financieres" href="/company/show_financial_annexes">
-                                  Annexes financières</a>
+                                      Annexes financières
+                                      
+                                  </a>
                               </li>
                           
                       </ul>
@@ -365,12 +388,16 @@
                           
                               <li>
                                   <a href="/search/employers/results">
-                                  Un emploi inclusif</a>
+                                      Un emploi inclusif
+                                      
+                                  </a>
                               </li>
                           
                               <li>
                                   <a href="/search/prescribers/results">
-                                  Un prescripteur habilité</a>
+                                      Un prescripteur habilité
+                                      
+                                  </a>
                               </li>
                           
                       </ul>
@@ -573,6 +600,7 @@
                   <a class="nav-link active" href="/dashboard/">
                       <i aria-hidden="true" class="ri-home-line fw-medium"></i>
                       <span>Accueil</span>
+                      
                   </a>
               </li>
           
@@ -582,6 +610,7 @@
                   <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="mes-candidatures" href="/apply/job_seeker/list">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Mes candidatures</span>
+                      
                   </a>
               </li>
           
@@ -597,12 +626,16 @@
                           
                               <li>
                                   <a href="/search/employers/results">
-                                  Un emploi inclusif</a>
+                                      Un emploi inclusif
+                                      
+                                  </a>
                               </li>
                           
                               <li>
                                   <a href="/search/prescribers/results">
-                                  Un prescripteur habilité</a>
+                                      Un prescripteur habilité
+                                      
+                                  </a>
                               </li>
                           
                       </ul>
@@ -805,6 +838,7 @@
                   <a class="nav-link active" href="/dashboard/">
                       <i aria-hidden="true" class="ri-home-line fw-medium"></i>
                       <span>Accueil</span>
+                      
                   </a>
               </li>
           
@@ -820,7 +854,9 @@
                           
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="annexes-financieres" href="/institutions/colleagues">
-                                  Collaborateurs</a>
+                                      Collaborateurs
+                                      
+                                  </a>
                               </li>
                           
                       </ul>
@@ -839,12 +875,16 @@
                           
                               <li>
                                   <a href="/search/employers/results">
-                                  Un emploi inclusif</a>
+                                      Un emploi inclusif
+                                      
+                                  </a>
                               </li>
                           
                               <li>
                                   <a href="/search/prescribers/results">
-                                  Un prescripteur habilité</a>
+                                      Un prescripteur habilité
+                                      
+                                  </a>
                               </li>
                           
                       </ul>
@@ -1039,6 +1079,7 @@
                   <a class="nav-link active" href="/dashboard/">
                       <i aria-hidden="true" class="ri-home-line fw-medium"></i>
                       <span>Accueil</span>
+                      
                   </a>
               </li>
           
@@ -1048,6 +1089,7 @@
                   <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Candidatures</span>
+                      
                   </a>
               </li>
           
@@ -1057,6 +1099,7 @@
                   <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats" href="/job-seekers/list">
                       <i aria-hidden="true" class="ri-user-line fw-medium"></i>
                       <span>Candidats</span>
+                      
                   </a>
               </li>
           
@@ -1072,7 +1115,9 @@
                           
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="collaborateurs" href="/prescribers/colleagues">
-                                  Collaborateurs</a>
+                                      Collaborateurs
+                                      
+                                  </a>
                               </li>
                           
                       </ul>
@@ -1091,12 +1136,16 @@
                           
                               <li>
                                   <a href="/search/employers/results">
-                                  Un emploi inclusif</a>
+                                      Un emploi inclusif
+                                      
+                                  </a>
                               </li>
                           
                               <li>
                                   <a href="/search/prescribers/results">
-                                  Un prescripteur habilité</a>
+                                      Un prescripteur habilité
+                                      
+                                  </a>
                               </li>
                           
                       </ul>
@@ -1285,6 +1334,7 @@
                   <a class="nav-link active" href="/dashboard/">
                       <i aria-hidden="true" class="ri-home-line fw-medium"></i>
                       <span>Accueil</span>
+                      
                   </a>
               </li>
           
@@ -1294,6 +1344,7 @@
                   <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Candidatures</span>
+                      
                   </a>
               </li>
           
@@ -1303,6 +1354,7 @@
                   <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats" href="/job-seekers/list">
                       <i aria-hidden="true" class="ri-user-line fw-medium"></i>
                       <span>Candidats</span>
+                      
                   </a>
               </li>
           
@@ -1318,12 +1370,16 @@
                           
                               <li>
                                   <a href="/search/employers/results">
-                                  Un emploi inclusif</a>
+                                      Un emploi inclusif
+                                      
+                                  </a>
                               </li>
                           
                               <li>
                                   <a href="/search/prescribers/results">
-                                  Un prescripteur habilité</a>
+                                      Un prescripteur habilité
+                                      
+                                  </a>
                               </li>
                           
                       </ul>
