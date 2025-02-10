@@ -1,5 +1,6 @@
 import logging
 
+from django.db import connection, transaction
 from django_datadog_logger.formatters import datadog
 
 from itou.utils.command import get_current_command_info
@@ -42,3 +43,15 @@ class ItouDataDogJSONFormatter(datadog.DataDogJSONFormatter):
             log_entry_dict["command.run_uid"] = command_info.run_uid
             log_entry_dict["command.name"] = command_info.name
         return log_entry_dict
+
+
+class TransactionalStreamHandler(logging.StreamHandler):
+    def emit(self, record):
+        if connection.in_atomic_block:
+
+            def emit_log():
+                super(TransactionalStreamHandler, self).emit(record)
+
+            transaction.on_commit(emit_log)
+        else:
+            super().emit(record)

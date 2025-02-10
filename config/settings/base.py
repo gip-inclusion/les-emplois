@@ -287,6 +287,7 @@ LOGGING = {
     },
     "handlers": {
         "console": {"class": "logging.StreamHandler", "formatter": "json"},
+        "transactional": {"class": "itou.utils.logging.TransactionalStreamHandler", "formatter": "json"},
         "null": {"class": "logging.NullHandler"},
     },
     "loggers": {
@@ -302,6 +303,7 @@ LOGGING = {
             "propagate": False,
         },
         "itou": {
+            "handlers": ["transactional"],
             "level": os.getenv("ITOU_LOG_LEVEL", "INFO"),
         },
         # Logger for DRF API application
