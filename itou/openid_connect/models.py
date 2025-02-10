@@ -9,7 +9,11 @@ from django.utils import crypto, timezone
 from django.utils.html import format_html
 
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP, OIDC_STATE_EXPIRATION
-from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, IdentityProvider, UserKind
+from itou.users.enums import (
+    IDENTITY_PROVIDER_SUPPORTED_USER_KIND,
+    IdentityProvider,
+    UserKind,
+)
 from itou.users.models import User
 from itou.utils.constants import ITOU_HELP_CENTER_URL
 
@@ -190,17 +194,34 @@ class OIDConnectUserData:
 
         self.check_valid_kind(user, user_data_dict, is_login)
 
+        readonly_pii_fields = user.jobseeker_profile.readonly_pii_fields() if is_jobseeker else set()
+        readonly_pii_fields_changed = []
         if not created:
             for key, value in user_data_dict.items():
                 # Don't update kind on login, it allows prescribers to log through employer form
                 # which happens a lot...
                 if is_login and key == "kind":
                     continue
-                setattr(user, key, value)
+                if key in readonly_pii_fields:
+                    if getattr(user, key) != value:
+                        readonly_pii_fields_changed.append(key)
+                else:
+                    setattr(user, key, value)
         if jobseeker_data_dict:
             for key, value in jobseeker_data_dict.items():
-                setattr(user.jobseeker_profile, key, value)
+                if key in readonly_pii_fields:
+                    if getattr(user.jobseeker_profile, key) != value:
+                        readonly_pii_fields_changed.append(key)
+                else:
+                    setattr(user.jobseeker_profile, key, value)
             user.jobseeker_profile.save(update_fields=jobseeker_data_dict)
+        if readonly_pii_fields_changed:
+            logger.warning(
+                "Not updating fields %s on job seeker pk=%d because their identity has been certified.",
+                ", ".join(sorted(readonly_pii_fields_changed)),
+                user.pk,
+            )
+
         for key, value in user_data_dict.items():
             user.update_external_data_source_history_field(provider=self.identity_provider, field=key, value=value)
         user.save()

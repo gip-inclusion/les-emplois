@@ -1,0 +1,8 @@
+{% if form.readonly_pii_fields %}
+    <p class="mb-4">
+        Certains champs ne sont plus modifiables car ils sont certifiés par un
+        système d’information de l’État. Si toutefois vous observez une erreur,
+        merci de
+        <a href="{{ ITOU_HELP_CENTER_URL }}/requests/new" target="_blank" rel="noopener" class="has-external-link" aria-label="contactez l’assistance (ouverture dans un nouvel onglet)">contacter l’assistance</a>.
+    </p>
+{% endif %}

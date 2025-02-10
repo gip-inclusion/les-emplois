@@ -16,6 +16,7 @@ from itou.openid_connect.france_connect.models import FranceConnectState, France
 from itou.openid_connect.models import EmailInUseException, InvalidKindException, MultipleSubSameEmailException
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
+from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users.factories import JobSeekerFactory, UserFactory
 from tests.utils.test import reload_module
 
@@ -227,6 +228,31 @@ class TestFranceConnect:
                 fc_user_data.create_or_update_user()
 
             user.delete()
+
+    def test_update_readonly_with_certified_criteria(self, caplog):
+        job_seeker = JobSeekerFactory(
+            username=FC_USERINFO["sub"],
+            identity_provider=IdentityProvider.FRANCE_CONNECT,
+            born_in_france=True,
+        )
+        IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=job_seeker, certified=True)
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
+        user, created = fc_user_data.create_or_update_user()
+        assert created is False
+        assert user.last_name == job_seeker.last_name
+        assert user.first_name == job_seeker.first_name
+        assert user.phone == FC_USERINFO["phone_number"]
+        assert user.jobseeker_profile.birthdate == job_seeker.jobseeker_profile.birthdate
+        assert user.address_line_1 == FC_USERINFO["address"]["street_address"]
+        assert user.post_code == FC_USERINFO["address"]["postal_code"]
+        assert user.city == FC_USERINFO["address"]["locality"]
+        assert user.external_data_source_history[0]["source"] == "FC"
+        assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
+        assert user.kind == UserKind.JOB_SEEKER
+        assert (
+            f"Not updating fields birthdate, first_name, last_name on job seeker pk={job_seeker.pk} "
+            "because their identity has been certified." in caplog.messages
+        )
 
     def test_callback_no_code(self, client):
         url = reverse("france_connect:callback")
