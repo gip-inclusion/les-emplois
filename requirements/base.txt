@@ -303,8 +303,8 @@ django==5.1.5 \
     #   django-xworkflows
     #   djangorestframework
     #   drf-spectacular
-django-allauth==65.3.1 \
-    --hash=sha256:e02e951b71a2753a746459f2efa114c7c72bf2cef6887dbe8607a577c0350587
+django-allauth==65.4.1 \
+    --hash=sha256:60b32aef7dbbcc213319aa4fd8f570e985266ea1162ae6ef7a26a24efca85c8c
     # via -r requirements/base.in
 django-anymail==12.0 \
     --hash=sha256:65789c1b0f42915aa0450a4f173f77572d4c552979b748ddd8125af41972ad30 \
@@ -1240,13 +1240,6 @@ tqdm==4.67.1 \
     --hash=sha256:26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2 \
     --hash=sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2
     # via -r requirements/base.in
-typing-extensions==4.12.2 \
-    --hash=sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d \
-    --hash=sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8
-    # via
-    #   anyio
-    #   psycopg
-    #   referencing
 tzdata==2025.1 \
     --hash=sha256:24894909e88cdb28bd1636c6887801df64cb485bd593f2fd83ef29075a81d694 \
     --hash=sha256:7e127113816800496f027041c570f50bcd464a020098a3b6b199517772303639
