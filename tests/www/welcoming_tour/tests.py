@@ -1,26 +1,18 @@
 import respx
-from allauth.account.adapter import get_adapter
-from allauth.account.models import EmailConfirmationHMAC
 from django.urls import reverse
 from pytest_django.asserts import assertTemplateUsed
 
+from itou.emails.models import EmailAddress
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER
-from itou.users.models import User
 from itou.utils import constants as global_constants
 from tests.companies.factories import CompanyFactory
 from tests.openid_connect.test import sso_parametrize
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 
 
-def get_confirm_email_url(request, email):
-    user = User.objects.get(email=email)
-    user_email = user.emailaddress_set.first()
-    return get_adapter().get_email_confirmation_url(request, EmailConfirmationHMAC(user_email))
-
-
 def verify_email(client, email, request):
     # User verifies its email clicking on the email he received
-    confirm_email_url = get_confirm_email_url(request, email)
+    confirm_email_url = EmailAddress.objects.get(email=email).get_confirmation_url()
     response = client.get(confirm_email_url, follow=True)
     assert response.status_code == 200
     return response
