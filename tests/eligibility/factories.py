@@ -97,3 +97,12 @@ class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
         if create and extracted:
             admin_criterion = AdministrativeCriteria.objects.filter(kind__in=extracted)
             self.administrative_criteria.add(*admin_criterion)
+
+
+class IAESelectedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.SelectedAdministrativeCriteria
+
+    eligibility_diagnosis = factory.SubFactory(IAEEligibilityDiagnosisFactory, from_employer=True)
+    administrative_criteria = factory.Iterator(models.AdministrativeCriteria.objects.certifiable())
+    certified = False
