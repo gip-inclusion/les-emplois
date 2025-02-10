@@ -93,7 +93,6 @@ def test_get_fields_to_transfer_for_job_seekers():
         "reviewed_geiq_assessment_set",  # ImplementationAssessment.reviewed_by
         "company_invitations",  # EmployerInvitation.sender
         "companymembership",  # CompanyMembership.user
-        "socialaccount",  # allauth.socialaccount.models.SocialAccount.user
         "submitted_geiq_assessment_set",  # ImplementationAssessment.submitted_by
         "suspension",  # Suspension.updated_by
         "updated_institutionmembership_set",  # InstitutionMembership.updated_by

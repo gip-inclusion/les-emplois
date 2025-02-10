@@ -5,9 +5,6 @@
 {% comment %}
     Hijacking this template is the simplest, most elegant and less intrusive way
     to manage the case when a PEAMU user has not verified their email yet.
-    Otherwise we would have to overload the method
-    allauth.socialaccount.helpers.complete_social_login
-    and this would result in yet more ugly duplicated code from the dependency.
 
     Unverified PEAMU users are redirected to this template by django-allauth
     most likely because the email data is missing and django-allauth thus

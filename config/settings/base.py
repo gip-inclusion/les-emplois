@@ -66,7 +66,6 @@ INSTALLED_APPS = [
     "itou.allauth_adapters",
     "allauth",
     "allauth.account",
-    "allauth.socialaccount",
     # ITOU apps.
     "itou.utils",
     "itou.cities",
