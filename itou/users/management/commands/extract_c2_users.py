@@ -82,6 +82,7 @@ class Command(BaseCommand):
             "DateRattachement": membership.created_at.date(),
             "Département": DEPARTMENTS[org.department] if org.department else None,
             "Région": org.region,
+            "Organisation": org.display_name,
         }
 
         if isinstance(org, Company):
