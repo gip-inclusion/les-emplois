@@ -179,10 +179,6 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
 
     URL_NAME = "employee_record_views:create"
 
-    @pytest.fixture(autouse=True)
-    def setup_method(self):
-        self.job_seeker = JobSeekerFactory.build(with_address=True, born_in_france=True)
-
     def test_title(self, client):
         # Job seeker / employee must have a title
 
