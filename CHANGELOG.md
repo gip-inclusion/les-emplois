@@ -1,5 +1,34 @@
 # Journal des modifications
 
+## 2025-02-10
+
+### Ajouté
+
+- [Prescripteur: Permettre la création de compte candidat sans candidater](https://github.com/gip-inclusion/les-emplois/pull/5462)
+
+### Modifié
+
+- [Admin: Permettre de modifier la date de dernier contact d'un member de groups GPS dans l'admin](https://github.com/gip-inclusion/les-emplois/pull/5551)
+- [Admin: Permettre de modifier la date de début de suivi d'un membre de groupe GPS](https://github.com/gip-inclusion/les-emplois/pull/5517)
+- [Candidature: Le message de mise en attente par lot est maintenant optionnel](https://github.com/gip-inclusion/les-emplois/pull/5514)
+- [GPS: Créer et mettre à jour les groupes de suivi](https://github.com/gip-inclusion/les-emplois/pull/5515)
+- [GPS: Rendre la date de dernier contact obligatoire](https://github.com/gip-inclusion/les-emplois/pull/5516)
+- [Pilotage: Publication nationale des deux tableaux de bord ETP](https://github.com/gip-inclusion/les-emplois/pull/5546)
+- [UX/UI: Remplacer PE par FT pour les agences France Travail](https://github.com/gip-inclusion/les-emplois/pull/5545)
+- [UX/UI: Correction UI du spinner sur les switch](https://github.com/gip-inclusion/les-emplois/pull/5552) 🖼
+
+### Supprimé
+
+- [Tableau de bord: Retrait du bandeau pour inviter les candidats autonomes à un webinaire d'information](https://github.com/gip-inclusion/les-emplois/pull/5542)
+- [Tableau de bord: Retrait du bandeau promotionnel de GPS pour le Gard](https://github.com/gip-inclusion/les-emplois/pull/5543)
+
+### Tech
+
+- [Performance: Amélioration de la page nouveautés](https://github.com/gip-inclusion/les-emplois/pull/5554)
+- [Sécurité: IDOR sécurisation des urls de consultation des PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/5431)
+- [Technique: Ajout d'une option pour alerter sur des fichiers ayant disparu de notre bucket](https://github.com/gip-inclusion/les-emplois/pull/5548)
+- [Technique: Amélioration du code de création de fiches salariées](https://github.com/gip-inclusion/les-emplois/pull/5541)
+
 ## 2025-02-03
 
 ### Ajouté
