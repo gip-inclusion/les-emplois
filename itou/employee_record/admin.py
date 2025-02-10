@@ -1,7 +1,9 @@
 import itertools
 
+import xworkflows
 from django import forms
 from django.contrib import admin, messages
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
@@ -161,6 +163,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
 
     readonly_fields = (
         "pk",
+        "status",
         "created_at",
         "updated_at",
         "processed_at",
@@ -234,6 +237,8 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
         ),
     )
 
+    change_form_template = "admin/employee_records/employeerecord_change_form.html"
+
     @admin.display(description="numéro d'agrément")
     def approval_number_link(self, obj):
         if approval_number := obj.approval_number:
@@ -268,6 +273,35 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
         # EmployeeRecordUpdateNotification() are readonly, but we don't want to block EmployeeRecord() deletion
         perms_needed.discard(EmployeeRecordUpdateNotification._meta.verbose_name)
         return deleted_objects, model_count, perms_needed, protected
+
+    def response_change(self, request, obj):
+        for transition in obj.status.transitions():
+            if f"transition_{transition.name}" in request.POST:
+                try:
+                    getattr(obj, transition.name)(user=request.user)
+                except xworkflows.AbortTransition as e:
+                    self.message_user(request, e, messages.ERROR)
+                return HttpResponseRedirect(request.get_full_path())
+
+        return super().response_change(request, obj)
+
+    def render_change_form(self, request, context, *, obj=None, **kwargs):
+        if obj:
+            system_transitions = {
+                models.EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE,
+                models.EmployeeRecordTransition.REJECT,
+                models.EmployeeRecordTransition.PROCESS,
+            }
+            context.update(
+                {
+                    "available_transitions": [
+                        transition
+                        for transition in obj.status.transitions()
+                        if getattr(obj, transition.name).is_available() and transition.name not in system_transitions
+                    ]
+                }
+            )
+        return super().render_change_form(request, context, **kwargs)
 
 
 @admin.register(models.EmployeeRecordUpdateNotification)

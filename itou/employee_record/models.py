@@ -349,7 +349,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         return not self.job_application.approval.is_valid() and not self.job_application.approval.can_be_prolonged
 
     @xwf_models.transition()
-    def archive(self):
+    def archive(self, *, user=None):
         # Remove proof of processing after delay
         self.archived_json = None
 
