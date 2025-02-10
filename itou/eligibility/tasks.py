@@ -22,6 +22,9 @@ def certify_criteria(eligibility_diagnosis):
     if not api_particulier.has_required_info(job_seeker):
         logger.info("Skipping {job_seeker.pk=}, missing required information.")
         return
+    if not eligibility_diagnosis.criteria_can_be_certified():
+        logger.info("Eligibility diagnosis not from an employer. This should not happen.")
+        return
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
     criteria = (
         SelectedAdministrativeCriteria.objects.filter(
