@@ -18,11 +18,4 @@ class Migration(migrations.Migration):
                 verbose_name="utilisée",
             ),
         ),
-        # Prevent pre-existing email confirmation links from being used for login.
-        migrations.RunSQL(
-            """
-            UPDATE emails_emailconfirmation
-            SET used = true;
-            """
-        ),
     ]
