@@ -5,6 +5,11 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from itou.utils.urls import get_safe_url
 
 
+# TODO: review how often the following params are actually passed in POST, if ever
+# If they're not used, delete the usages and these functions
+# LogoutView : self.redirect_field_name
+
+
 def add_query_params(url, params):
     parsed_url = urlparse(url)
     query_params = parse_qs(parsed_url.query)
