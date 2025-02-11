@@ -3,7 +3,7 @@ from datetime import timedelta
 import pytest
 from django.utils import timezone
 
-from itou.asp.models import AllocationDuration, EducationLevel, EITIContributions, SiaeMeasure
+from itou.asp.models import AllocationDuration, Commune, EducationLevel, EITIContributions, SiaeMeasure
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.employee_record.enums import NotificationStatus, Status
@@ -15,7 +15,6 @@ from itou.employee_record.serializers import (
     _AddressSerializer,
     _PersonSerializer,
 )
-from tests.asp.factories import CommuneFactory
 from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
 from tests.users.factories import JobSeekerFactory
 
@@ -97,7 +96,7 @@ class TestEmployeeRecordAddressSerializer:
         assert good_lane_name == data["adrLibelleVoie"]
 
     def test_with_empty_fields(self):
-        commune = CommuneFactory()
+        commune = Commune.objects.order_by("?").first()
         serializer = _AddressSerializer(JobSeekerFactory(jobseeker_profile__hexa_commune=commune))
 
         assert serializer.data == {
