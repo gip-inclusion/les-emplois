@@ -32,7 +32,7 @@ class TestCompanyAdmin:
         response = parse_response_to_soup(response, selector=".field-approvals_list")
         assert str(response) == snapshot(name="approvals list")
 
-    def test_deactivate_last_admin(self, admin_client, mailoutbox):
+    def test_remove_last_admin_status(self, admin_client, mailoutbox):
         company = CompanyFactory(with_membership=True)
         membership = company.memberships.first()
         assert membership.is_admin
@@ -50,14 +50,15 @@ class TestCompanyAdmin:
                 "name": company.name,
                 "phone": company.phone,
                 "email": company.email,
-                "companymembership_set-TOTAL_FORMS": "2",
+                "companymembership_set-TOTAL_FORMS": "1",
                 "companymembership_set-INITIAL_FORMS": "1",
                 "companymembership_set-MIN_NUM_FORMS": "0",
                 "companymembership_set-MAX_NUM_FORMS": "1000",
                 "companymembership_set-0-id": membership.pk,
                 "companymembership_set-0-company": company.pk,
                 "companymembership_set-0-user": membership.user.pk,
-                # companymembership_pet-0-is_admin is absent
+                "companymembership_set-0-is_active": "on",
+                # companymembership_set-0-is_admin is absent
                 "job_description_through-TOTAL_FORMS": "0",
                 "job_description_through-INITIAL_FORMS": "0",
                 "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
@@ -77,7 +78,7 @@ class TestCompanyAdmin:
 
         assert_set_admin_role__removal(membership.user, company, mailoutbox)
 
-    def test_delete_admin(self, admin_client, caplog, mailoutbox):
+    def test_deactivate_admin(self, admin_client, caplog, mailoutbox):
         company = CompanyFactory(with_membership=True)
         membership = company.memberships.first()
         assert membership.is_admin
@@ -95,7 +96,7 @@ class TestCompanyAdmin:
                 "name": company.name,
                 "phone": company.phone,
                 "email": company.email,
-                "companymembership_set-TOTAL_FORMS": "2",
+                "companymembership_set-TOTAL_FORMS": "1",
                 "companymembership_set-INITIAL_FORMS": "1",
                 "companymembership_set-MIN_NUM_FORMS": "0",
                 "companymembership_set-MAX_NUM_FORMS": "1000",
@@ -103,7 +104,7 @@ class TestCompanyAdmin:
                 "companymembership_set-0-company": company.pk,
                 "companymembership_set-0-user": membership.user.pk,
                 "companymembership_set-0-is_admin": "on",
-                "companymembership_set-0-DELETE": "on",
+                # companymembership_set-0-is_active is absent
                 "job_description_through-TOTAL_FORMS": "0",
                 "job_description_through-INITIAL_FORMS": "0",
                 "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
@@ -151,9 +152,11 @@ class TestCompanyAdmin:
                 "companymembership_set-0-company": company.pk,
                 "companymembership_set-0-user": membership.user.pk,
                 "companymembership_set-0-is_admin": "on",
+                "companymembership_set-0-is_active": "on",
                 "companymembership_set-1-company": company.pk,
                 "companymembership_set-1-user": employer.pk,
                 "companymembership_set-1-is_admin": "on",
+                "companymembership_set-1-is_active": "on",
                 "job_description_through-TOTAL_FORMS": "0",
                 "job_description_through-INITIAL_FORMS": "0",
                 "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
