@@ -242,7 +242,7 @@ def stats_siae_etp(request):
             mb.ASP_SIAE_FILTER_KEY_FLAVOR3: [
                 str(membership.company.convention.asp_id)
                 for membership in request.user.active_or_in_grace_period_company_memberships()
-                if membership.is_admin
+                if membership.is_admin and membership.company.convention is not None
             ]
         },
     )
@@ -266,7 +266,9 @@ def stats_siae_orga_etp(request):
         request=request,
         context=context,
         params={
-            mb.ASP_SIAE_FILTER_KEY_FLAVOR3: [org.convention.asp_id for org in request.organizations],
+            mb.ASP_SIAE_FILTER_KEY_FLAVOR3: [
+                org.convention.asp_id for org in request.organizations if org.convention is not None
+            ],
         },
     )
 
