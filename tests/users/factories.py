@@ -8,7 +8,7 @@ from allauth.account import models as allauth_models
 from django.contrib.auth.hashers import make_password
 from django.utils.text import slugify
 
-from itou.asp.models import AllocationDuration, EducationLevel, EITIContributions, LaneType
+from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, EITIContributions, LaneType
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.communications.models import NotificationRecord, NotificationSettings
@@ -19,7 +19,7 @@ from itou.utils.mocks.address_format import (
     get_random_geocoding_api_result,
 )
 from itou.utils.validators import validate_nir
-from tests.asp.factories import CommuneFactory, CountryFranceFactory
+from tests.asp.factories import CommuneFactory
 from tests.cities.factories import create_city_in_zrr, create_city_partially_in_zrr
 from tests.geo.factories import QPVFactory, ZRRFactory
 
@@ -158,16 +158,16 @@ class JobSeekerFactory(UserFactory):
     jobseeker_profile = factory.RelatedFactory("tests.users.factories.JobSeekerProfileFactory", "user")
 
     class Params:
-        # Reminder : ASP models are "read-only", they must not be saved.
-        # These traits must not be used with a `CREATE` strategy,
-        # or they will try to create new Country or Commune objects in DB.
-        # Use `BUILD` strategy or `build()` method when creating these traits.
-        # They are currently only used to test employee records, which is
-        # the only part relying on ASP reference files / models.
-        with_birth_place = factory.Trait(jobseeker_profile__birth_place=factory.SubFactory(CommuneFactory))
         born_in_france = factory.Trait(
-            with_birth_place=True,
-            jobseeker_profile__birth_country=factory.SubFactory(CountryFranceFactory),
+            jobseeker_profile__birth_place=factory.LazyAttribute(
+                lambda instance: Commune.objects.order_by("?")
+                .filter(
+                    start_date__lte=instance.birthdate,
+                    end_date__gte=instance.birthdate,
+                )
+                .first(),
+            ),
+            jobseeker_profile__birth_country=factory.LazyAttribute(lambda _: Country.objects.get(name="FRANCE")),
         )
         with_pole_emploi_id = factory.Trait(
             jobseeker_profile__pole_emploi_id=factory.fuzzy.FuzzyText(length=8, chars=string.digits),

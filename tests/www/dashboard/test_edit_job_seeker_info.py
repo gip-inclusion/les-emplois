@@ -283,7 +283,7 @@ class TestEditJobSeekerInfo:
     def test_edit_by_prescriber(self, client, snapshot):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
-            job_seeker__with_birth_place=True,
+            job_seeker__born_in_france=True,
         )
         user = job_application.sender
 
