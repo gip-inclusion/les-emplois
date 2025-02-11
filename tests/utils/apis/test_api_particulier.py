@@ -1,7 +1,6 @@
 from django.conf import settings
 
 from itou.eligibility.tasks import certify_criteria
-from itou.users.models import User
 from itou.utils.apis import api_particulier
 from itou.utils.mocks.api_particulier import rsa_data_provider_error, rsa_not_found_mocker
 from tests.asp.factories import CommuneFactory, CountryFranceFactory, CountryOutsideEuropeFactory
@@ -15,9 +14,6 @@ RSA_ENDPOINT = f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active"
 def test_build_params_from(snapshot):
     birth_place = CommuneFactory(code="07141")
     job_seeker = JobSeekerFactory(born_in_france=True, for_snapshot=True, jobseeker_profile__birth_place=birth_place)
-    job_seeker = User.objects.select_related(
-        "jobseeker_profile", "jobseeker_profile__birth_place", "jobseeker_profile__birth_country"
-    ).get(pk=job_seeker.pk)
     assert api_particulier._build_params_from(job_seeker) == snapshot(name="api_particulier_build_params")
     assert api_particulier.has_required_info(job_seeker) is True
 
