@@ -59,6 +59,12 @@ class Command(BaseCommand):
                         < get_availability_date_for_kind(job_application.to_company.kind).date()
                     ):
                         info = "Date de début du contrat avant l'interopérabilité"
+                    elif (
+                        JobApplication.objects.eligible_as_employee_record(job_application.to_company)
+                        .filter(pk=job_application.pk)
+                        .exists()
+                    ):
+                        info = "En attente de création"
                     else:
                         info = "-"
             except EmployeeRecord.MultipleObjectsReturned:
