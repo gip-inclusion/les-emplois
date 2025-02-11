@@ -51,7 +51,7 @@ from tests.approvals.factories import (
     ApprovalFactory,
     SuspensionFactory,
 )
-from tests.asp.factories import CommuneFactory, CountryEuropeFactory, CountryFranceFactory
+from tests.asp.factories import CommuneFactory
 from tests.cities.factories import create_test_cities
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
@@ -1942,7 +1942,7 @@ class TestProcessAcceptViews:
         # JobSeekerPersonalDataForm
         personal_data_default_fields = {
             "birthdate": job_seeker.jobseeker_profile.birthdate,
-            "birth_country": extra_post_data.setdefault("birth_country", CountryFranceFactory().pk),
+            "birth_country": extra_post_data.setdefault("birth_country", Country.france_id),
             "birth_place": extra_post_data.setdefault("birth_place", CommuneFactory().pk),
             "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
         }
@@ -2665,7 +2665,7 @@ class TestProcessAcceptViews:
             ],
         }
 
-        birth_country = CountryFranceFactory()
+        birth_country = Country.objects.get(name="FRANCE")
         birth_place = Commune.objects.by_insee_code_and_period(
             "07141", job_application.job_seeker.jobseeker_profile.birthdate
         )
@@ -2734,7 +2734,7 @@ class TestProcessAcceptViews:
         )
 
         # Then set it.
-        birth_country = CountryFranceFactory()
+        birth_country = Country.objects.get(name="FRANCE")
         birth_place = Commune.objects.by_insee_code_and_period(
             "07141", job_application.job_seeker.jobseeker_profile.birthdate
         )
@@ -2890,7 +2890,7 @@ class TestProcessAcceptViews:
         )
         client.force_login(job_application.to_company.members.get())
         post_data = self._accept_view_post_data(job_application=job_application)
-        post_data["birth_country"] = CountryEuropeFactory().pk
+        post_data["birth_country"] = Country.objects.order_by("?").exclude(group=Country.Group.FRANCE).first().pk
         response = client.post(
             reverse("apply:accept", kwargs={"job_application_id": job_application.pk}),
             headers={"hx-request": "true"},

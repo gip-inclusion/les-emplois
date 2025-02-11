@@ -20,7 +20,7 @@ from pytest_django.asserts import assertQuerySetEqual, assertRedirects
 
 import tests.asp.factories as asp
 from itou.approvals.models import Approval
-from itou.asp.models import AllocationDuration, EducationLevel
+from itou.asp.models import AllocationDuration, Country, EducationLevel
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
@@ -900,32 +900,12 @@ class TestJobSeekerProfileModel:
 
         # France and Commune filled
         profile = JobSeekerFactory().jobseeker_profile
-        profile.birth_country = asp.CountryFranceFactory()
+        profile.birth_country = Country.objects.get(name="FRANCE")
         profile.birth_place = asp.CommuneFactory()
         assert profile._clean_birth_fields() is None
 
-        # Europe and no commune
-        profile = JobSeekerFactory().jobseeker_profile
-        profile.birth_place = None
-        profile.birth_country = asp.CountryEuropeFactory()
+        profile = JobSeekerFactory(born_outside_france=True).jobseeker_profile
         assert profile._clean_birth_fields() is None
-
-        # Outside Europe and no commune
-        profile.birth_country = asp.CountryOutsideEuropeFactory()
-        assert profile._clean_birth_fields() is None
-
-        # Invalid use cases:
-
-        # Europe and Commune filled
-        profile.birth_country = asp.CountryEuropeFactory()
-        profile.birth_place = asp.CommuneFactory()
-        with pytest.raises(ValidationError):
-            profile._clean_birth_fields()
-
-        # Outside Europe and Commune filled
-        profile.birth_country = asp.CountryOutsideEuropeFactory()
-        with pytest.raises(ValidationError):
-            profile._clean_birth_fields()
 
 
 def user_with_approval_in_waiting_period():

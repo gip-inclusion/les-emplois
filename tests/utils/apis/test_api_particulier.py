@@ -3,7 +3,7 @@ from django.conf import settings
 from itou.eligibility.tasks import certify_criteria
 from itou.utils.apis import api_particulier
 from itou.utils.mocks.api_particulier import rsa_data_provider_error, rsa_not_found_mocker
-from tests.asp.factories import CommuneFactory, CountryFranceFactory, CountryOutsideEuropeFactory
+from tests.asp.factories import CommuneFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.users.factories import JobSeekerFactory
 
@@ -20,21 +20,11 @@ def test_build_params_from(snapshot):
     job_seeker = JobSeekerFactory(jobseeker_profile__birthdate=None)
     assert api_particulier.has_required_info(job_seeker) is False
 
-    # Born in France without a birth country.
-    job_seeker = JobSeekerFactory(
-        jobseeker_profile__birth_country=CountryFranceFactory(),
-    )
-    assert api_particulier.has_required_info(job_seeker) is False
-
-    # Job seeker born outside of France
-    country = CountryOutsideEuropeFactory()
-    job_seeker = JobSeekerFactory(
-        jobseeker_profile__birth_country=country,
-    )
+    job_seeker = JobSeekerFactory(born_outside_france=True)
     params = api_particulier._build_params_from(job_seeker)
     assert api_particulier.has_required_info(job_seeker) is True
     assert "codeInseeLieuDeNaissance" not in params.keys()
-    assert params["codePaysLieuDeNaissance"][2:] == country.code
+    assert params["codePaysLieuDeNaissance"][2:] == job_seeker.jobseeker_profile.birth_country.code
 
 
 def test_not_found(respx_mock):

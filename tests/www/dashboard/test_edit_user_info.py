@@ -13,7 +13,6 @@ from itou.cities.models import City
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
-from tests.asp.factories import CountryEuropeFactory, CountryOutsideEuropeFactory
 from tests.users.factories import (
     JobSeekerFactory,
     PrescriberFactory,
@@ -466,10 +465,10 @@ class TestEditUserInfoView:
         assert user.jobseeker_profile.nir == ""
 
     def test_only_birth_country(self, client):
-        user = JobSeekerFactory(jobseeker_profile__nir="178122978200508")
+        user = JobSeekerFactory(jobseeker_profile__nir="178122978200508", born_outside_france=True)
+        birth_country = user.jobseeker_profile.birth_country
         client.force_login(user)
         birthdate = date(1978, 12, 20)
-        birth_country = CountryOutsideEuropeFactory()
         post_data = {
             "email": "bob@saintclar.net",
             "title": "M",
@@ -530,7 +529,7 @@ class TestEditUserInfoView:
         client.force_login(user)
         birthdate = date(1978, 12, 20)
         birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
-        birth_country = CountryEuropeFactory()
+        birth_country = Country.objects.order_by("?").exclude(group=Country.Group.FRANCE).first()
         post_data = {
             "email": "bob@saintclar.net",
             "title": "M",
