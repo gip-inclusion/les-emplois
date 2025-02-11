@@ -79,6 +79,9 @@ class JobApplicationInline(ItouStackedInline):
                 )
             )
 
+        if JobApplication.objects.eligible_as_employee_record(siae=obj.to_company).filter(pk=obj.pk).exists():
+            return "En attente de création"
+
         already_exists = None
         if obj.approval:
             already_exists = (

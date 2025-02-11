@@ -14,6 +14,7 @@ from freezegun import freeze_time
 
 from itou.approvals.models import Approval, CancelledApproval
 from itou.companies.enums import CompanyKind, ContractType
+from itou.companies.models import Company
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -537,6 +538,81 @@ class TestJobApplicationQuerySet:
         assert hasattr(qs, f"eligibility_diagnosis_criterion_{level1_criterion.pk}")
         assert hasattr(qs, f"eligibility_diagnosis_criterion_{level2_criterion.pk}")
         assert hasattr(qs, f"eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
+
+    def test_eligible_as_employee_record(self):
+        # A valid job application:
+        job_app = JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            with_approval=True,
+        )
+        assert job_app == JobApplication.objects.eligible_as_employee_record(job_app.to_company).get()
+
+        # Test all disabling criterias
+        # ----------------------------
+        def assert_job_app_not_in_queryset(ja):
+            assert ja not in JobApplication.objects.eligible_as_employee_record(ja.to_company)
+
+        # Status is not accepted
+        job_app_not_accepted = JobApplicationFactory(
+            state=JobApplicationState.PROCESSING,
+            with_approval=True,
+        )
+        assert_job_app_not_in_queryset(job_app_not_accepted)
+
+        # without an approval
+        job_app_without_approval = JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+        )
+        assert_job_app_not_in_queryset(job_app_without_approval)
+
+        # `create_employee_record` is False.
+        job_app_blocked_creation = JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            with_approval=True,
+            create_employee_record=False,
+        )
+        assert_job_app_not_in_queryset(job_app_blocked_creation)
+
+        # Already has an employee record
+        job_app_with_employee_record = JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            with_approval=True,
+        )
+        employee_record = EmployeeRecordFactory(
+            job_application=job_app_with_employee_record,
+            asp_id=job_app_with_employee_record.to_company.convention.asp_id,
+            approval_number=job_app_with_employee_record.approval.number,
+            status=Status.NEW,
+        )
+        assert_job_app_not_in_queryset(job_app_with_employee_record)
+        # Even if it's disabled
+        employee_record.disable()
+        assert employee_record.status == Status.DISABLED
+        assert_job_app_not_in_queryset(job_app_with_employee_record)
+
+        # There's already an employee record for the same SIAE and the same approval (job_app)
+        job_app_on_same_siae = JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            to_company=job_app_with_employee_record.to_company,
+            approval=job_app_with_employee_record.approval,
+        )
+        assert_job_app_not_in_queryset(job_app_on_same_siae)
+
+        # There's already an employee record for a SIAE of the same convention and the same approval
+        job_app_on_same_convention = JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            to_company__convention=job_app_with_employee_record.to_company.convention,
+            to_company__source=Company.SOURCE_USER_CREATED,
+            approval=job_app_with_employee_record.approval,
+        )
+        assert_job_app_not_in_queryset(job_app_on_same_convention)
+
+        job_app_with_future_hiring_start_at = JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            with_approval=True,
+            hiring_start_at=timezone.localdate() + datetime.timedelta(days=1),
+        )
+        assert_job_app_not_in_queryset(job_app_with_future_hiring_start_at)
 
     def test_with_accepted_at_for_created_from_pe_approval(self):
         JobApplicationFactory(

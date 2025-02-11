@@ -1150,7 +1150,7 @@ class TestCustomApprovalAdminViews:
                 if not job_application.to_company.can_use_employee_record:
                     assert msg == "La SIAE ne peut pas utiliser la gestion des fiches salarié"
                 else:
-                    assert msg == "-"
+                    assert msg == "En attente de création"
 
         # When an employee record already exists for the candidate
         employee_record = EmployeeRecordFactory(status=Status.READY)

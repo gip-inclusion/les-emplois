@@ -17,6 +17,7 @@ from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, Contra
 from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
+from itou.employee_record.models import EmployeeRecord
 from itou.gps.models import FollowUpGroup
 from itou.job_applications import notifications as job_application_notifications
 from itou.job_applications.enums import (
@@ -326,6 +327,38 @@ class JobApplicationQuerySet(models.QuerySet):
             .annotate(c=Count("id"))
             .values("month", "c")
             .order_by("-month")
+        )
+
+    # Employee record querysets
+    def eligible_as_employee_record(self, siae):
+        """
+        Get a list of job applications potentially "updatable" as an employee record.
+        For display concerns (list of employees for a given SIAE).
+        """
+        if not siae.can_use_employee_record:
+            return self.none()
+
+        # Return the approvals already used by any SIAE of the convention
+        approvals_to_exclude = EmployeeRecord.objects.for_asp_company(siae).values("approval_number")
+
+        return (
+            self.accepted()  # Must be accepted
+            .filter(
+                # Must be linked to an approval
+                approval__isnull=False,
+                # Only for that SIAE
+                to_company=siae,
+                # Admin control: can prevent creation of employee record
+                create_employee_record=True,
+                # There must be **NO** employee record linked in this part
+                employee_record__isnull=True,
+                # The hiring should have started
+                # don't send a record before it started, it creates too much work for the support
+                hiring_start_at__lte=timezone.localdate(),
+            )
+            .exclude(approval__number__in=approvals_to_exclude)
+            # show the most recent hiring first (and the one with null at the end)
+            .order_by(F("hiring_start_at").desc(nulls_last=True))
         )
 
     def inconsistent_approval_user(self):
