@@ -38,6 +38,7 @@ class DataInclusionApiClient:
                     "code_insee": code_insee,
                     "sources": settings.API_DATA_INCLUSION_SOURCES,
                     "thematiques": API_THEMATIQUES,
+                    "score_qualite_minimum": settings.API_DATA_INCLUSION_SCORE_QUALITE_MINIMUM,
                 },
             ).raise_for_status()
         except httpx.HTTPError as exc:
