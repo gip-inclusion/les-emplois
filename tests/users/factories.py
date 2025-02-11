@@ -152,14 +152,6 @@ class LaborInspectorFactory(UserFactory):
             InstitutionMembershipFactory(user=self, **kwargs)
 
 
-# `JobSeeker` and `JobSeekerProfile` factories are mainly used for employee record testing
-
-# In order to use these factories, you must load these fixtures:
-# - `test_asp_INSEE_communes_factory.json`
-# - `test_asp_INSEE_countries_factory.json`
-# in your Django unit tests (set `fixtures` field).
-
-
 class JobSeekerFactory(UserFactory):
     title = random.choice(Title.values)
     kind = UserKind.JOB_SEEKER
