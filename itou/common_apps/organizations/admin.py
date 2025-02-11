@@ -19,6 +19,18 @@ class MembersInlineFormSet(BaseInlineFormSet):
                     form.cleaned_data["is_admin"],
                     updated_by=self.acting_user,
                 )
+            if "is_active" in form.changed_data:
+                if form.cleaned_data["is_active"]:
+                    self.instance.add_or_activate_membership(
+                        form.cleaned_data["user"],
+                        force_admin=form.cleaned_data["is_admin"],
+                    )
+                else:
+                    # This will also remove admin role, do we call set_admin_role before to send the email ?
+                    self.instance.deactivate_membership(
+                        membership,
+                        updated_by=self.acting_user,
+                    )
         else:
             membership = self.instance.add_or_activate_membership(
                 form.cleaned_data["user"],
@@ -36,18 +48,17 @@ class MembersInlineFormSet(BaseInlineFormSet):
             return self._handle_save(form)
         return super().save_existing(form, obj, commit=commit)
 
-    def delete_existing(self, obj, commit=True):
-        if commit:
-            self.instance.deactivate_membership(obj, updated_by=self.acting_user)
-
 
 class MembersInline(ItouTabularInline):
     # Remember to specify the model in child class. Example:
     # model = models.Company.members.through
-    extra = 1
+    extra = 0
     raw_id_fields = ("user",)
-    readonly_fields = ("is_active", "created_at", "updated_at", "updated_by", "joined_at")
+    readonly_fields = ("created_at", "updated_at", "updated_by", "joined_at")
     formset = MembersInlineFormSet
+
+    def has_delete_permission(self, *args, **kwargs):
+        return False
 
 
 class HasMembersFilter(admin.SimpleListFilter):

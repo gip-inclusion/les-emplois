@@ -130,7 +130,7 @@ class TestInstitutionModel:
             institution.add_or_activate_membership(wrong_kind_user)
 
 
-def test_deactivate_last_admin(admin_client, mailoutbox):
+def test_remove_last_admin_status(admin_client, mailoutbox):
     institution = InstitutionWithMembershipFactory(department="")
     membership = institution.memberships.first()
     assert membership.is_admin
@@ -150,13 +150,14 @@ def test_deactivate_last_admin(admin_client, mailoutbox):
             "city": institution.city,
             "department": institution.department,
             "coords": "",
-            "institutionmembership_set-TOTAL_FORMS": "2",
+            "institutionmembership_set-TOTAL_FORMS": "1",
             "institutionmembership_set-INITIAL_FORMS": "1",
             "institutionmembership_set-MIN_NUM_FORMS": "0",
             "institutionmembership_set-MAX_NUM_FORMS": "1000",
             "institutionmembership_set-0-id": membership.pk,
             "institutionmembership_set-0-institution": institution.pk,
             "institutionmembership_set-0-user": membership.user.pk,
+            "institutionmembership_set-0-is_active": "on",
             # institutionmembership_set-0-is_admin is absent
             "_continue": "Enregistrer+et+continuer+les+modifications",
         },
@@ -174,7 +175,7 @@ def test_deactivate_last_admin(admin_client, mailoutbox):
     assert_set_admin_role__removal(membership.user, institution, mailoutbox)
 
 
-def test_delete_admin(admin_client, caplog, mailoutbox):
+def test_deactivate_admin(admin_client, caplog, mailoutbox):
     institution = InstitutionWithMembershipFactory(department="")
     membership = institution.memberships.first()
     assert membership.is_admin
@@ -194,7 +195,7 @@ def test_delete_admin(admin_client, caplog, mailoutbox):
             "city": institution.city,
             "department": institution.department,
             "coords": "",
-            "institutionmembership_set-TOTAL_FORMS": "2",
+            "institutionmembership_set-TOTAL_FORMS": "1",
             "institutionmembership_set-INITIAL_FORMS": "1",
             "institutionmembership_set-MIN_NUM_FORMS": "0",
             "institutionmembership_set-MAX_NUM_FORMS": "1000",
@@ -202,7 +203,7 @@ def test_delete_admin(admin_client, caplog, mailoutbox):
             "institutionmembership_set-0-institution": institution.pk,
             "institutionmembership_set-0-user": membership.user.pk,
             "institutionmembership_set-0-is_admin": "on",
-            "institutionmembership_set-0-DELETE": "on",
+            # institutionmembership_set-0-is_active is absent
             "_continue": "Enregistrer+et+continuer+les+modifications",
         },
     )
@@ -249,9 +250,11 @@ def test_add_admin(admin_client, caplog, mailoutbox):
             "institutionmembership_set-0-institution": institution.pk,
             "institutionmembership_set-0-user": membership.user.pk,
             "institutionmembership_set-0-is_admin": "on",
+            "institutionmembership_set-0-is_active": "on",
             "institutionmembership_set-1-institution": institution.pk,
             "institutionmembership_set-1-user": labor_inspector.pk,
             "institutionmembership_set-1-is_admin": "on",
+            "institutionmembership_set-1-is_active": "on",
             "_continue": "Enregistrer+et+continuer+les+modifications",
         },
     )

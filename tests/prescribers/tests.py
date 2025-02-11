@@ -311,7 +311,7 @@ class TestPrescriberOrganizationAdmin:
     REFUSE_BUTTON_LABEL = "Refuser l'habilitation"
     ACCEPT_AFTER_REFUSAL_BUTTON_LABEL = "Annuler le refus et valider l'habilitation"
     FORMSETS_PAYLOAD = {
-        "prescribermembership_set-TOTAL_FORMS": 1,
+        "prescribermembership_set-TOTAL_FORMS": 0,
         "prescribermembership_set-INITIAL_FORMS": 0,
         "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
         "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
@@ -883,7 +883,7 @@ def test_prevent_validated_authorization_if_other_constraint():
         )
 
 
-def test_deactivate_last_admin(admin_client, mailoutbox):
+def test_remove_last_admin_status(admin_client, mailoutbox):
     organization = PrescriberOrganizationWithMembershipFactory()
     membership = organization.memberships.first()
     assert membership.is_admin
@@ -909,13 +909,14 @@ def test_deactivate_last_admin(admin_client, mailoutbox):
             "city": organization.city,
             "department": organization.department,
             "coords": "",
-            "prescribermembership_set-TOTAL_FORMS": "2",
+            "prescribermembership_set-TOTAL_FORMS": "1",
             "prescribermembership_set-INITIAL_FORMS": "1",
             "prescribermembership_set-MIN_NUM_FORMS": "0",
             "prescribermembership_set-MAX_NUM_FORMS": "1000",
             "prescribermembership_set-0-id": membership.pk,
             "prescribermembership_set-0-organization": organization.pk,
             "prescribermembership_set-0-user": membership.user.pk,
+            "prescribermembership_set-0-is_active": "on",
             # prescribermembership_set-0-is_admin is absent
             "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
             "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
@@ -935,7 +936,7 @@ def test_deactivate_last_admin(admin_client, mailoutbox):
     assert_set_admin_role__removal(membership.user, organization, mailoutbox)
 
 
-def test_delete_admin(admin_client, caplog, mailoutbox):
+def test_deactivate_admin(admin_client, caplog, mailoutbox):
     organization = PrescriberOrganizationWithMembershipFactory()
     membership = organization.memberships.first()
     assert membership.is_admin
@@ -961,7 +962,7 @@ def test_delete_admin(admin_client, caplog, mailoutbox):
             "city": organization.city,
             "department": organization.department,
             "coords": "",
-            "prescribermembership_set-TOTAL_FORMS": "2",
+            "prescribermembership_set-TOTAL_FORMS": "1",
             "prescribermembership_set-INITIAL_FORMS": "1",
             "prescribermembership_set-MIN_NUM_FORMS": "0",
             "prescribermembership_set-MAX_NUM_FORMS": "1000",
@@ -969,7 +970,7 @@ def test_delete_admin(admin_client, caplog, mailoutbox):
             "prescribermembership_set-0-organization": organization.pk,
             "prescribermembership_set-0-user": membership.user.pk,
             "prescribermembership_set-0-is_admin": "on",
-            "prescribermembership_set-0-DELETE": "on",
+            # prescribermembership_set-0-is_active is absent
             "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
             "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
             "_continue": "Enregistrer+et+continuer+les+modifications",
@@ -1024,9 +1025,11 @@ def test_add_admin(admin_client, caplog, mailoutbox):
             "prescribermembership_set-0-organization": organization.pk,
             "prescribermembership_set-0-user": membership.user.pk,
             "prescribermembership_set-0-is_admin": "on",
+            "prescribermembership_set-0-is_active": "on",
             "prescribermembership_set-1-organization": organization.pk,
             "prescribermembership_set-1-user": prescriber.pk,
             "prescribermembership_set-1-is_admin": "on",
+            "prescribermembership_set-1-is_active": "on",
             "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
             "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
             "_continue": "Enregistrer+et+continuer+les+modifications",
