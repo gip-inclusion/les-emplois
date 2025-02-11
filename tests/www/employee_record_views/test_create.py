@@ -6,14 +6,13 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from itou.asp.models import Commune, EducationLevel
+from itou.asp.models import Commune, Country, EducationLevel
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.users.enums import LackOfNIRReason
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK, mock_get_geocoding_data
 from itou.utils.widgets import DuetDatePickerWidget
-from tests.asp.factories import CountryFranceFactory, CountryOutsideEuropeFactory
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
@@ -207,7 +206,7 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         data = _get_user_form_data(self.job_seeker)
 
         # France as birth country without commune
-        data["birth_country"] = CountryFranceFactory().pk
+        data["birth_country"] = Country.objects.get(name="FRANCE").pk
         data.pop("birth_place")
         response = client.post(self.url, data=data)
 
@@ -234,10 +233,9 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         client.force_login(self.user)
         client.get(self.url)
 
-        # Set a country different from France
         data = _get_user_form_data(self.job_seeker)
         data.pop("birth_place")
-        data["birth_country"] = CountryOutsideEuropeFactory().pk
+        data["birth_country"] = Country.objects.order_by("?").exclude(group=Country.Group.FRANCE).first().pk
 
         target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
         response = client.post(self.url, data=data)
@@ -264,7 +262,7 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         client.force_login(self.user)
         client.get(self.url)
         data = _get_user_form_data(self.job_seeker)
-        data["birth_country"] = CountryOutsideEuropeFactory().pk
+        data["birth_country"] = Country.objects.order_by("?").exclude(group=Country.Group.FRANCE).first().pk
         response = client.post(self.url, data=data)
         assertContains(
             response,

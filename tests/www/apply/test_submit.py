@@ -44,7 +44,6 @@ from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from tests.asp.factories import CommuneFactory, CountryFranceFactory
 from tests.cities.factories import create_city_geispolsheim, create_city_in_zrr, create_test_cities
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWithMembershipAndJobsFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
@@ -2798,6 +2797,8 @@ class TestDirectHireFullProcess:
         # Resume to valid data and proceed with "normal" flow.
         # ----------------------------------------------------------------------
 
+        birth_place_id = Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id
+        birth_country_id = Country.france_id
         post_data = {
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
@@ -2805,8 +2806,8 @@ class TestDirectHireFullProcess:
             "birthdate": birthdate,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
-            "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-            "birth_country": Country.france_id,
+            "birth_place": birth_place_id,
+            "birth_country": birth_country_id,
         }
         response = client.post(next_url, data=post_data)
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
@@ -2928,10 +2929,6 @@ class TestDirectHireFullProcess:
 
         # Hire confirmation
         # ----------------------------------------------------------------------
-        # FIXME(cms): create a Trait instead.
-        birth_country = CountryFranceFactory()
-        birth_place = CommuneFactory()
-
         response = client.get(next_url)
         assertTemplateNotUsed(response, "approvals/includes/box.html")
         assertContains(response, "Valider l’embauche")
@@ -2959,8 +2956,8 @@ class TestDirectHireFullProcess:
             "address_for_autocomplete": "0",
             # BRSA criterion certification.
             "birthdate": birthdate,
-            "birth_place": birth_place.pk,
-            "birth_country": birth_country.pk,
+            "birth_place": birth_place_id,
+            "birth_country": birth_country_id,
         }
         response = client.post(
             next_url,

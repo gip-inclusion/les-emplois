@@ -3,7 +3,6 @@ import pytest
 from django.urls import reverse_lazy
 from pytest_django.asserts import assertNumQueries
 
-from tests.asp.factories import CommuneFactory, CountryFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -141,8 +140,16 @@ class TestApplicantsAPI:
         # First company: 2 applicants, 3 job applications.
         company_1 = CompanyFactory(with_membership=True)
         employer = company_1.members.first()
-        bob = JobApplicationFactory(job_seeker__first_name="Bob", to_company=company_1).job_seeker
-        dylan = JobApplicationFactory(job_seeker__first_name="Dylan", to_company=company_1).job_seeker
+        bob = JobApplicationFactory(
+            job_seeker__first_name="Bob",
+            job_seeker__born_in_france=True,
+            to_company=company_1,
+        ).job_seeker
+        dylan = JobApplicationFactory(
+            job_seeker__first_name="Dylan",
+            job_seeker__born_in_france=True,
+            to_company=company_1,
+        ).job_seeker
         JobApplicationFactory(to_company_id=company_1.pk, job_seeker_id=dylan.pk)
 
         # Second company: 1 applicant, 1 job application.
@@ -157,14 +164,6 @@ class TestApplicantsAPI:
         # for an applicant in the 2 others companies
         company_3 = CompanyFactory()
         JobApplicationFactory(to_company_id=company_3.pk, job_seeker_id=dylan.pk)
-
-        # Add birth data
-        bob.jobseeker_profile.birth_place = CommuneFactory()
-        bob.jobseeker_profile.birth_country = CountryFactory()
-        bob.jobseeker_profile.save()
-        dylan.jobseeker_profile.birth_place = CommuneFactory()
-        dylan.jobseeker_profile.birth_country = CountryFactory()
-        dylan.jobseeker_profile.save()
 
         num_queries = (
             BASE_NUM_QUERIES
@@ -218,7 +217,7 @@ class TestApplicantsAPI:
 
     def test_applicant_data(self, api_client):
         company = CompanyFactory(with_membership=True)
-        job_seeker1 = JobApplicationFactory(to_company=company).job_seeker
+        job_seeker1 = JobApplicationFactory(to_company=company, job_seeker__born_in_france=True).job_seeker
         # Will not refactor ASP factories:
         # - too long,
         # - not the point
@@ -229,18 +228,12 @@ class TestApplicantsAPI:
         job_seeker1.post_code = "37000"
         job_seeker1.city = "TOURS"
         job_seeker1.save()
-        job_seeker1.jobseeker_profile.birth_place = CommuneFactory()
-        job_seeker1.jobseeker_profile.birth_country = CountryFactory()
-        job_seeker1.jobseeker_profile.save()
-        job_seeker2 = JobApplicationFactory(to_company=company).job_seeker
+        job_seeker2 = JobApplicationFactory(to_company=company, job_seeker__born_in_france=True).job_seeker
         job_seeker2.address_line_1 = "2nd address test"
         job_seeker2.address_line_2 = "2nd address 2"
         job_seeker2.post_code = "59000"
         job_seeker2.city = "LILLE"
         job_seeker2.save()
-        job_seeker2.jobseeker_profile.birth_place = CommuneFactory()
-        job_seeker2.jobseeker_profile.birth_country = CountryFactory()
-        job_seeker2.jobseeker_profile.save()
         user = company.members.first()
 
         api_client.force_authenticate(user)

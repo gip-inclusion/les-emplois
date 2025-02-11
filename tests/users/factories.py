@@ -169,6 +169,11 @@ class JobSeekerFactory(UserFactory):
             ),
             jobseeker_profile__birth_country=factory.LazyAttribute(lambda _: Country.objects.get(name="FRANCE")),
         )
+        born_outside_france = factory.Trait(
+            jobseeker_profile__birth_country=factory.LazyAttribute(
+                lambda _: Country.objects.order_by("?").exclude(group=Country.Group.FRANCE).first()
+            ),
+        )
         with_pole_emploi_id = factory.Trait(
             jobseeker_profile__pole_emploi_id=factory.fuzzy.FuzzyText(length=8, chars=string.digits),
             jobseeker_profile__pole_emploi_since=AllocationDuration.MORE_THAN_24_MONTHS,

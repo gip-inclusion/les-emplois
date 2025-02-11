@@ -17,7 +17,6 @@ from itou.utils import constants as global_constants
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 from itou.www.signup.forms import JobSeekerSituationForm
-from tests.asp.factories import CountryEuropeFactory, CountryFranceFactory
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, JobSeekerFactory
@@ -309,7 +308,7 @@ class TestJobSeekerSignup:
         assert response.status_code == 200
 
         job_seeker_data = JobSeekerFactory.build(for_snapshot=True)
-        birth_country = CountryFranceFactory()
+        birth_country = Country.objects.get(name="FRANCE")
         geispolsheim = create_city_geispolsheim()
         birthdate = job_seeker_data.jobseeker_profile.birthdate
         post_data = {
@@ -352,7 +351,7 @@ class TestJobSeekerSignup:
         geispolsheim = create_city_geispolsheim()
         birthdate = job_seeker_data.jobseeker_profile.birthdate
         birth_place = Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate)
-        birth_country = CountryFranceFactory()
+        birth_country = Country.objects.get(name="FRANCE")
         response = client.post(
             reverse("signup:job_seeker"),
             {
@@ -401,7 +400,7 @@ class TestJobSeekerSignup:
                 "email": "leon@w3.blizz",
                 "birthdate": "1911-11-02",
                 "birth_place": Commune.objects.exclude(code=geispolsheim.code_insee).first().pk,
-                "birth_country": CountryEuropeFactory().pk,
+                "birth_country": Country.objects.order_by("?").exclude(group=Country.Group.FRANCE).first().pk,
                 # Actual payload.
                 "password1": DEFAULT_PASSWORD,
                 "password2": DEFAULT_PASSWORD,
@@ -466,7 +465,7 @@ class TestJobSeekerSignup:
                 "email": job_seeker_data.email,
                 "birthdate": birthdate,
                 "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).pk,
-                "birth_country": CountryEuropeFactory().pk,
+                "birth_country": Country.objects.order_by("?").exclude(group=Country.Group.FRANCE).first().pk,
             },
         )
         assertContains(
