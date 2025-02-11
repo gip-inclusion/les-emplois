@@ -19,7 +19,7 @@ from itou.utils.mocks.address_format import (
     get_random_geocoding_api_result,
 )
 from itou.utils.validators import validate_nir
-from tests.asp.factories import CommuneFactory, CountryFactory, CountryFranceFactory
+from tests.asp.factories import CommuneFactory, CountryFranceFactory
 from tests.cities.factories import create_city_in_zrr, create_city_partially_in_zrr
 from tests.geo.factories import QPVFactory, ZRRFactory
 
@@ -165,7 +165,6 @@ class JobSeekerFactory(UserFactory):
         # They are currently only used to test employee records, which is
         # the only part relying on ASP reference files / models.
         with_birth_place = factory.Trait(jobseeker_profile__birth_place=factory.SubFactory(CommuneFactory))
-        with_birth_country = factory.Trait(jobseeker_profile__birth_country=factory.SubFactory(CountryFactory))
         born_in_france = factory.Trait(
             with_birth_place=True,
             jobseeker_profile__birth_country=factory.SubFactory(CountryFranceFactory),
