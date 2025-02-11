@@ -51,7 +51,6 @@ from tests.approvals.factories import (
     ApprovalFactory,
     SuspensionFactory,
 )
-from tests.asp.factories import CommuneFactory
 from tests.cities.factories import create_test_cities
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
@@ -1940,10 +1939,18 @@ class TestProcessAcceptViews:
             "geocoding_score": 0.9714,
         }
         # JobSeekerPersonalDataForm
+        birth_place = (
+            Commune.objects.filter(
+                start_date__lte=job_seeker.jobseeker_profile.birthdate,
+                end_date__gte=job_seeker.jobseeker_profile.birthdate,
+            )
+            .first()
+            .pk
+        )
         personal_data_default_fields = {
             "birthdate": job_seeker.jobseeker_profile.birthdate,
             "birth_country": extra_post_data.setdefault("birth_country", Country.france_id),
-            "birth_place": extra_post_data.setdefault("birth_place", CommuneFactory().pk),
+            "birth_place": extra_post_data.setdefault("birth_place", birth_place),
             "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
         }
         # AcceptForm

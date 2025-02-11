@@ -3,13 +3,13 @@ import datetime
 from django.template import Context
 from freezegun import freeze_time
 
+from itou.asp.models import Commune
 from tests.approvals.factories import (
     ApprovalFactory,
     PoleEmploiApprovalFactory,
     ProlongationRequestFactory,
     SuspensionFactory,
 )
-from tests.asp.factories import CommuneFactory
 from tests.cities.factories import create_city_geispolsheim
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.utils.test import load_template
@@ -97,7 +97,7 @@ def test_expired_approval_in_waiting_period_with_valid_diagnosis(snapshot):
             }
         )
     ) == snapshot(name="without city")
-    approval.user.jobseeker_profile.hexa_commune = CommuneFactory(code="67152")
+    approval.user.jobseeker_profile.hexa_commune = Commune.objects.by_insee_code("67152")
     approval.user.jobseeker_profile.save(update_fields=("hexa_commune",))
     approval.user.jobseeker_profile.hexa_commune.city = create_city_geispolsheim()
     approval.user.jobseeker_profile.hexa_commune.save(update_fields=("city",))
@@ -127,7 +127,7 @@ def test_expired_approval_in_waiting_period_without_diagnosis(snapshot):
             }
         )
     ) == snapshot(name="without_city")
-    approval.user.jobseeker_profile.hexa_commune = CommuneFactory(code="67152")
+    approval.user.jobseeker_profile.hexa_commune = Commune.objects.by_insee_code("67152")
     approval.user.jobseeker_profile.save(update_fields=("hexa_commune",))
     approval.user.jobseeker_profile.hexa_commune.city = create_city_geispolsheim()
     approval.user.jobseeker_profile.hexa_commune.save(update_fields=("city",))

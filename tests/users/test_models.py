@@ -18,9 +18,8 @@ from django.urls import reverse
 from django.utils import timezone
 from pytest_django.asserts import assertQuerySetEqual, assertRedirects
 
-import tests.asp.factories as asp
 from itou.approvals.models import Approval
-from itou.asp.models import AllocationDuration, Country, EducationLevel
+from itou.asp.models import AllocationDuration, Commune, EducationLevel
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
@@ -790,7 +789,7 @@ class TestJobSeekerProfileModel:
             self.profile._clean_job_seeker_hexa_address()
 
         # address should be complete now
-        self.profile.hexa_commune = asp.CommuneFactory()
+        self.profile.hexa_commune = Commune.objects.order_by("?").first()
         self.profile._clean_job_seeker_hexa_address()
 
     @mock.patch(
@@ -899,9 +898,7 @@ class TestJobSeekerProfileModel:
         assert profile._clean_birth_fields() is None
 
         # France and Commune filled
-        profile = JobSeekerFactory().jobseeker_profile
-        profile.birth_country = Country.objects.get(name="FRANCE")
-        profile.birth_place = asp.CommuneFactory()
+        profile = JobSeekerFactory(born_in_france=True).jobseeker_profile
         assert profile._clean_birth_fields() is None
 
         profile = JobSeekerFactory(born_outside_france=True).jobseeker_profile

@@ -19,7 +19,6 @@ from itou.utils.mocks.address_format import (
     get_random_geocoding_api_result,
 )
 from itou.utils.validators import validate_nir
-from tests.asp.factories import CommuneFactory
 from tests.cities.factories import create_city_in_zrr, create_city_partially_in_zrr
 from tests.geo.factories import QPVFactory, ZRRFactory
 
@@ -321,7 +320,7 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
             hexa_lane_type=factory.fuzzy.FuzzyChoice(LaneType.values),
             hexa_lane_name=factory.Faker("street_address", locale="fr_FR"),
             hexa_post_code=factory.Faker("postalcode"),
-            hexa_commune=factory.SubFactory(CommuneFactory),
+            hexa_commune=factory.LazyAttribute(lambda _: Commune.objects.order_by("?").first()),
         )
         with_required_eiti_fields = factory.Trait(
             actor_met_for_business_creation=factory.Faker("word", locale="en_GB"),  # To match validator
