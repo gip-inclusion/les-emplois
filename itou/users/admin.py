@@ -86,7 +86,6 @@ class DisabledNotificationsMixin:
 class CompanyMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
     model = CompanyMembership
     extra = 0
-    raw_id_fields = ("company",)
     readonly_fields = (
         "company_siret_link",
         "joined_at",
@@ -98,15 +97,15 @@ class CompanyMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
         "updated_by",
     )
     fields = readonly_fields
-    can_delete = True
+    can_delete = False
     show_change_link = True
     fk_name = "user"
 
     def has_change_permission(self, request, obj=None):
-        return True
+        return False
 
     def has_add_permission(self, request, obj=None):
-        return True
+        return False
 
     @admin.display(description="Entreprise")
     def company_siret_link(self, obj):
@@ -116,7 +115,6 @@ class CompanyMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
 class PrescriberMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
     model = PrescriberMembership
     extra = 0
-    raw_id_fields = ("organization",)
     readonly_fields = (
         "organization_id_link",
         "joined_at",
@@ -128,14 +126,14 @@ class PrescriberMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
         "updated_by",
     )
     fields = readonly_fields
-    can_delete = True
+    can_delete = False
     fk_name = "user"
 
     def has_change_permission(self, request, obj=None):
-        return True
+        return False
 
     def has_add_permission(self, request, obj=None):
-        return True
+        return False
 
     def organization_id_link(self, obj):
         return get_structure_view_link(obj.organization)
@@ -144,11 +142,6 @@ class PrescriberMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
 class InstitutionMembershipInline(ItouTabularInline):
     model = InstitutionMembership
     extra = 0
-    raw_id_fields = (
-        "institution",
-        "user",
-        "updated_by",
-    )
     readonly_fields = (
         "institution_id_link",
         "joined_at",
@@ -159,14 +152,14 @@ class InstitutionMembershipInline(ItouTabularInline):
         "updated_by",
     )
     fields = readonly_fields
-    can_delete = True
+    can_delete = False
     fk_name = "user"
 
     def has_change_permission(self, request, obj=None):
-        return True
+        return False
 
     def has_add_permission(self, request, obj=None):
-        return True
+        return False
 
     def institution_id_link(self, obj):
         return get_structure_view_link(obj.institution)
