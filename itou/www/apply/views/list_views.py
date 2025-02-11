@@ -3,7 +3,8 @@ from collections import defaultdict
 
 from django.conf import settings
 from django.db import models
-from django.db.models import Count, Exists, F, OuterRef, Q, Subquery
+from django.db.models import Count, Exists, F, OuterRef, Q, Subquery, Value
+from django.db.models.functions import Concat, Lower
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -57,6 +58,26 @@ class JobApplicationsDisplayKind(enum.StrEnum):
 
     def is_table(self):
         return self is self.TABLE
+
+
+class JobApplicationOrder(enum.StrEnum):
+    JOB_SEEKER_FULL_NAME_ASC = "job_seeker_full_name"
+    JOB_SEEKER_FULL_NAME_DESC = "-job_seeker_full_name"
+    CREATED_AT_ASC = "created_at"
+    CREATED_AT_DESC = "-created_at"
+
+    @property
+    def opposite(self):
+        if self.value.startswith("-"):
+            return self.__class__(self.value[1:])
+        else:
+            return self.__class__(f"-{self.value}")
+
+    # Make the Enum work in Django's templates
+    # See :
+    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
+    # - https://github.com/django/django/pull/12304
+    do_not_call_in_templates = enum.nonmember(True)
 
 
 def _add_user_can_view_personal_information(job_applications, can_view):
@@ -117,6 +138,11 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     except ValueError:
         display_kind = JobApplicationsDisplayKind.LIST
 
+    try:
+        order = JobApplicationOrder(request.GET.get("order"))
+    except ValueError:
+        order = JobApplicationOrder.CREATED_AT_DESC
+
     if display_kind == JobApplicationsDisplayKind.LIST:
         job_applications = job_applications.annotate(
             next_appointment_start_at=Subquery(
@@ -146,6 +172,10 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
         job_applications = filters_form.filter(job_applications)
         filters_counter = filters_form.get_qs_filters_counter()
 
+    job_applications = job_applications.annotate(
+        job_seeker_full_name=Concat(Lower("job_seeker__first_name"), Value(" "), Lower("job_seeker__last_name"))
+    ).order_by(str(order))
+
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=20)
     _add_pending_for_weeks(job_applications_page)
 
@@ -155,6 +185,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     context = {
         "job_applications_page": job_applications_page,
         "display_kind": display_kind,
+        "order": order,
         "job_applications_list_kind": JobApplicationsListKind.SENT_FOR_ME,
         "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,
@@ -199,6 +230,15 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         filters_counter = filters_form.get_qs_filters_counter()
         title = annotate_title(title, filters_form.cleaned_data["archived"])
 
+    try:
+        order = JobApplicationOrder(request.GET.get("order"))
+    except ValueError:
+        order = JobApplicationOrder.CREATED_AT_DESC
+
+    job_applications = job_applications.annotate(
+        job_seeker_full_name=Concat(Lower("job_seeker__first_name"), Value(" "), Lower("job_seeker__last_name"))
+    ).order_by(str(order))
+
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=20)
     _add_pending_for_weeks(job_applications_page)
     _add_user_can_view_personal_information(job_applications_page, request.user.can_view_personal_information)
@@ -213,6 +253,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         "title": title,
         "job_applications_page": job_applications_page,
         "display_kind": display_kind,
+        "order": order,
         "job_applications_list_kind": JobApplicationsListKind.SENT,
         "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,
