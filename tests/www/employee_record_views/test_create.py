@@ -13,7 +13,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.users.enums import LackOfNIRReason
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK, mock_get_geocoding_data
 from itou.utils.widgets import DuetDatePickerWidget
-from tests.asp.factories import CommuneFactory, CountryFranceFactory, CountryOutsideEuropeFactory
+from tests.asp.factories import CountryFranceFactory, CountryOutsideEuropeFactory
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
@@ -601,15 +601,6 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
             job_seeker=self.job_seeker,
             approval=self.job_application.approval,
         )
-        # Get a test commune from fixtures
-        commune = CommuneFactory()
-
-        dup_job_application.job_seeker.jobseeker_profile.education_level = "00"
-        dup_job_application.job_seeker.jobseeker_profile.commune = commune
-        dup_job_application.job_seeker.birth_place = commune
-
-        dup_job_application.job_seeker.birth_country = CountryFranceFactory()
-        dup_job_application.save()
 
         employee_record = EmployeeRecord.from_job_application(dup_job_application)
         employee_record.save()
