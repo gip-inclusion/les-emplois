@@ -6,7 +6,7 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from itou.asp.models import Commune
+from itou.asp.models import Commune, EducationLevel
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -588,6 +588,8 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
         assert "03" == self.job_seeker.jobseeker_profile.ass_allocation_since
 
     def test_fail_step_3(self, client):
+        self.job_seeker.jobseeker_profile.education_level = EducationLevel.NON_CERTIFYING_QUALICATIONS
+        self.job_seeker.jobseeker_profile.save(update_fields=["education_level"])
         # If anything goes wrong during employee record creation,
         # catch error / exceptions and display a message
         self.pass_step_2(client)
