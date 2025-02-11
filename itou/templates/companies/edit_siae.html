@@ -59,10 +59,10 @@
                             <hr>
                             {% bootstrap_field form.address_line_1 %}
                             {% bootstrap_field form.address_line_2 %}
-                            <div class="form-row">
-                                {% bootstrap_field form.post_code wrapper_class='form-group col-md-3' %}
-                                {% bootstrap_field form.city wrapper_class='form-group col-md-9' %}
-                            </div>
+
+                            {% bootstrap_field form.post_code %}
+                            {% bootstrap_field form.city %}
+
                             <hr>
                             {% bootstrap_field form.phone %}
                             {% bootstrap_field form.email %}
