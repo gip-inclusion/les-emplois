@@ -31,6 +31,7 @@ def test_data_inclusion_client(settings, respx_mock):
     assert parse_qs(str(api_mock.calls[0].request.url.params)) == {
         "code_insee": ["fake-insee-code"],
         "sources": ["dora,toto"],
+        "score_qualite_minimum": ["0.6"],
         "thematiques": [
             "acces-aux-droits-et-citoyennete",
             "accompagnement-social-et-professionnel-personnalise",
