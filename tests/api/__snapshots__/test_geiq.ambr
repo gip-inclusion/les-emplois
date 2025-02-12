@@ -878,7 +878,7 @@
         'prenom': 'Jane',
         'prequalifications': list([
         ]),
-        'prescripteur_origine': 'PE',
+        'prescripteur_origine': 'FT',
         'siret_employeur': '11832575966666',
         'type_contrat': 'CAPP',
         'type_qualification': 'CCN',
