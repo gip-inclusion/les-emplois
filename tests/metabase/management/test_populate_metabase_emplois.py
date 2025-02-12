@@ -6,19 +6,22 @@ from django.core import management
 from django.db import connection, transaction
 from django.utils import timezone
 from freezegun import freeze_time
+from psycopg.types.range import Range
 from pytest_django.asserts import assertNumQueries
 
 from itou.approvals.enums import Origin
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import JobDescription
-from itou.eligibility.models import AdministrativeCriteria
+from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.eligibility.models import AdministrativeCriteria, SelectedAdministrativeCriteria
 from itou.geo.utils import coords_to_geometry
 from itou.job_applications.enums import JobApplicationState
 from itou.metabase.tables import gps
 from itou.metabase.tables.utils import hash_content
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils.db import dictfetchall
+from itou.utils.types import InclusiveDateRange
 from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
 from tests.approvals.factories import (
     ApprovalFactory,
@@ -177,7 +180,7 @@ def test_populate_job_seekers():
 
     # Third user
     #  - multiple eligibility diagnosis
-    #  - last eligibility diagnosis from an employer
+    #  - last eligibility diagnosis with a certified criteria from an employer
     #  - not an AI
     #  - outside QPV but missing geocoding score
     user_3 = JobSeekerFactory(
@@ -193,8 +196,20 @@ def test_populate_job_seekers():
         eligibility_diagnosis__author_kind=UserKind.EMPLOYER,
         eligibility_diagnosis__author_prescriber_organization=None,
         eligibility_diagnosis__author_siae=CompanyFactory(),
+        eligibility_diagnosis__certifiable=True,
+        eligibility_diagnosis__criteria_kinds=[AdministrativeCriteriaKind.RSA],
         to_company__kind="ETTI",
     )
+    user_3_selected_criteria = SelectedAdministrativeCriteria.objects.get(
+        eligibility_diagnosis=job_application_3.eligibility_diagnosis
+    )
+    user_3_selected_criteria.certified = True
+    user_3_selected_criteria.certified_at = timezone.now()
+    user_3_selected_criteria.certification_period = InclusiveDateRange(
+        datetime.date(2025, 3, 13),
+        datetime.date(2025, 6, 13),
+    )
+    user_3_selected_criteria.save()
     # Older accepted job_application with no eligibility diagnosis
     # Allow to check get_hiring_company()
     JobApplicationFactory(
@@ -219,6 +234,7 @@ def test_populate_job_seekers():
     num_queries += 1  # Select last pk for current chunck
     num_queries += 1  # Select job seekers chunck (with annotations)
     num_queries += 1  # Prefetch EligibilityDiagnosis with anotations, author_prescriber_organization and author_siae
+    num_queries += 1  # Prefetch EligibilityDiagnosis's selected administrative criteria
     num_queries += 1  # Prefetch JobApplications with Siaes
     num_queries += 1  # Get QPV users
     num_queries += 1  # Select AI stock approvals pks
@@ -268,8 +284,14 @@ def test_populate_job_seekers():
             "total_critères_niveau_1": None,
             "total_critères_niveau_2": None,
             "critère_n1_bénéficiaire_du_rsa": None,
+            "critère_n1_bénéficiaire_du_rsa_certifié": None,
+            "critère_n1_bénéficiaire_du_rsa_date_certification": None,
+            "critère_n1_bénéficiaire_du_rsa_période_certification": None,
             "critère_n1_allocataire_ass": None,
             "critère_n1_allocataire_aah": None,
+            "critère_n1_allocataire_aah_certifié": None,
+            "critère_n1_allocataire_aah_date_certification": None,
+            "critère_n1_allocataire_aah_période_certification": None,
             "critère_n1_detld_plus_de_24_mois": None,
             "critère_n2_niveau_d_étude_3_cap_bep_ou_infra": None,
             "critère_n2_senior_plus_de_50_ans": None,
@@ -278,6 +300,9 @@ def test_populate_job_seekers():
             "critère_n2_deld_12_à_24_mois": None,
             "critère_n2_travailleur_handicapé": None,
             "critère_n2_parent_isolé": None,
+            "critère_n2_parent_isolé_certifié": None,
+            "critère_n2_parent_isolé_date_certification": None,
+            "critère_n2_parent_isolé_période_certification": None,
             "critère_n2_personne_sans_hébergement_ou_hébergée_ou_ayant_u": None,
             "critère_n2_réfugié_statutaire_bénéficiaire_d_une_protectio": None,
             "critère_n2_résident_zrr": None,
@@ -322,8 +347,14 @@ def test_populate_job_seekers():
             "total_critères_niveau_1": 4,
             "total_critères_niveau_2": 14,
             "critère_n1_bénéficiaire_du_rsa": 1,
+            "critère_n1_bénéficiaire_du_rsa_certifié": None,
+            "critère_n1_bénéficiaire_du_rsa_date_certification": None,
+            "critère_n1_bénéficiaire_du_rsa_période_certification": None,
             "critère_n1_allocataire_ass": 1,
             "critère_n1_allocataire_aah": 1,
+            "critère_n1_allocataire_aah_certifié": None,
+            "critère_n1_allocataire_aah_date_certification": None,
+            "critère_n1_allocataire_aah_période_certification": None,
             "critère_n1_detld_plus_de_24_mois": 1,
             "critère_n2_niveau_d_étude_3_cap_bep_ou_infra": 1,
             "critère_n2_senior_plus_de_50_ans": 1,
@@ -332,6 +363,9 @@ def test_populate_job_seekers():
             "critère_n2_deld_12_à_24_mois": 1,
             "critère_n2_travailleur_handicapé": 1,
             "critère_n2_parent_isolé": 1,
+            "critère_n2_parent_isolé_certifié": None,
+            "critère_n2_parent_isolé_date_certification": None,
+            "critère_n2_parent_isolé_période_certification": None,
             "critère_n2_personne_sans_hébergement_ou_hébergée_ou_ayant_u": 1,
             "critère_n2_réfugié_statutaire_bénéficiaire_d_une_protectio": 1,
             "critère_n2_résident_zrr": 1,
@@ -373,11 +407,19 @@ def test_populate_job_seekers():
             "sous_type_auteur_diagnostic": "Employeur EI",
             "nom_auteur_diagnostic": job_application_3.eligibility_diagnosis.author_siae.display_name,
             "type_structure_dernière_embauche": "ETTI",
-            "total_critères_niveau_1": 0,
+            "total_critères_niveau_1": 1,
             "total_critères_niveau_2": 0,
-            "critère_n1_bénéficiaire_du_rsa": 0,
+            "critère_n1_bénéficiaire_du_rsa": 1,
+            "critère_n1_bénéficiaire_du_rsa_certifié": 1,
+            "critère_n1_bénéficiaire_du_rsa_date_certification": user_3_selected_criteria.certified_at,
+            "critère_n1_bénéficiaire_du_rsa_période_certification": Range(
+                datetime.date(2025, 3, 13), datetime.date(2025, 6, 14), "[)"
+            ),
             "critère_n1_allocataire_ass": 0,
             "critère_n1_allocataire_aah": 0,
+            "critère_n1_allocataire_aah_certifié": None,
+            "critère_n1_allocataire_aah_date_certification": None,
+            "critère_n1_allocataire_aah_période_certification": None,
             "critère_n1_detld_plus_de_24_mois": 0,
             "critère_n2_niveau_d_étude_3_cap_bep_ou_infra": 0,
             "critère_n2_senior_plus_de_50_ans": 0,
@@ -386,6 +428,9 @@ def test_populate_job_seekers():
             "critère_n2_deld_12_à_24_mois": 0,
             "critère_n2_travailleur_handicapé": 0,
             "critère_n2_parent_isolé": 0,
+            "critère_n2_parent_isolé_certifié": None,
+            "critère_n2_parent_isolé_date_certification": None,
+            "critère_n2_parent_isolé_période_certification": None,
             "critère_n2_personne_sans_hébergement_ou_hébergée_ou_ayant_u": 0,
             "critère_n2_réfugié_statutaire_bénéficiaire_d_une_protectio": 0,
             "critère_n2_résident_zrr": 0,
