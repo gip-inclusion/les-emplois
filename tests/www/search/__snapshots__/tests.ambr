@@ -16,6 +16,7 @@
         'sql': '''
           SELECT "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -155,6 +156,7 @@
                  "companies_company"."fields_history",
                  "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -293,6 +295,7 @@
         'sql': '''
           SELECT "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -330,6 +333,7 @@
         'sql': '''
           SELECT "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -469,6 +473,7 @@
                  "companies_company"."fields_history",
                  "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -607,6 +612,7 @@
         'sql': '''
           SELECT "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -644,6 +650,7 @@
         'sql': '''
           SELECT "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -793,6 +800,7 @@
         'sql': '''
           SELECT "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -968,6 +976,7 @@
                  "companies_company"."fields_history",
                  "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -1033,6 +1042,7 @@
         'sql': '''
           SELECT "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -1181,6 +1191,7 @@
         'sql': '''
           SELECT "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -1355,6 +1366,7 @@
                  "companies_company"."fields_history",
                  "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -1421,6 +1433,7 @@
         'sql': '''
           SELECT "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -1569,6 +1582,7 @@
         'sql': '''
           SELECT "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -1743,6 +1757,7 @@
                  "companies_company"."fields_history",
                  "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -1808,6 +1823,7 @@
         'sql': '''
           SELECT "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -1956,6 +1972,7 @@
         'sql': '''
           SELECT "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
@@ -2130,6 +2147,7 @@
                  "companies_company"."fields_history",
                  "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",

@@ -886,6 +886,7 @@
                  "jobs_appellation"."full_text",
                  "cities_city"."id",
                  "cities_city"."name",
+                 "cities_city"."normalized_name",
                  "cities_city"."slug",
                  "cities_city"."department",
                  "cities_city"."post_codes",
