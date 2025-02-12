@@ -34,7 +34,7 @@ class LabelPrescriberKind(models.TextChoices):
     GP = "GP", "Groupement d'employeurs"
     ML = "ML", "Missions locales"
     OF = "OF", "Organisme de formation"
-    PE = "PE", "Pôle Emploi"
+    FT = "FT", "France Travail Emploi"
     PLIE = "PLIE", "PLIE"
     PS = "PS", "Parrainage de salariés"
     SIAE_CONS = "SIAE_CONS", "SIAE et consors"
@@ -44,7 +44,7 @@ EMPLOIS_TO_LABEL_PRESCRIBER = {
     PrescriberOrganizationKind.CAP_EMPLOI: LabelPrescriberKind.CAP_EMPLOI,
     PrescriberOrganizationKind.ML: LabelPrescriberKind.ML,
     PrescriberOrganizationKind.ODC: LabelPrescriberKind.CT,
-    PrescriberOrganizationKind.FT: LabelPrescriberKind.PE,
+    PrescriberOrganizationKind.FT: LabelPrescriberKind.FT,
     PrescriberOrganizationKind.DEPT: LabelPrescriberKind.CT,
     PrescriberOrganizationKind.ASE: LabelPrescriberKind.CT,
     PrescriberOrganizationKind.PLIE: LabelPrescriberKind.PLIE,
