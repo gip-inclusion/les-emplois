@@ -51,7 +51,7 @@ def certify_criteria(eligibility_diagnosis):
                         # https://particulier.api.gouv.fr/developpeurs#respecter-la-volumétrie
                         raise RetryTask(delay=int(exc.response.headers["Retry-After"])) from exc
                     case 503:
-                        # TODO: Use the error code instead the message when switching to API v3.
+                        # TODO: Use the error code instead of the message when switching to API v3.
                         if criterion.data_returned_by_api["message"] == (
                             "Erreur de fournisseur de donnée : "
                             "Trop de requêtes effectuées, veuillez réessayer plus tard."
