@@ -1021,8 +1021,8 @@ def test_list_for_siae_select_applications_htmx(client):
     # Check reset selection button
     reset_button = simulated_page.find(id="selected-nb-display").find("button")
     assert reset_button.find("span").contents == ["annuler la sélection"]
-    assert reset_button["data-setter-checked"] == "false"
-    assert simulated_page.select(reset_button["data-setter-target"])
+    assert reset_button["data-emplois-setter-checked"] == "false"
+    assert simulated_page.select(reset_button["data-emplois-setter-target"])
     # Check batch action box display
     assert simulated_page.find(id="batch-action-box").find("h2")
 

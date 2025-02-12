@@ -161,13 +161,13 @@ htmx.onLoad((target) => {
   /**
    * JS to set an input value from a button
    **/
-  querySelectorAllIncludingTarget(target, "button[data-setter-target]").forEach((button) => {
+  querySelectorAllIncludingTarget(target, "button[data-emplois-setter-target]").forEach((button) => {
     button.addEventListener("click", function() {
-      const inputElement = document.querySelector(this.getAttribute("data-setter-target"))
-      if (this.hasAttribute("data-setter-value")) {
-        inputElement.value = this.getAttribute("data-setter-value")
-      } else if (this.hasAttribute("data-setter-checked")) {
-        inputElement.checked = this.getAttribute("data-setter-checked") === 'true'
+      const inputElement = document.querySelector(this.getAttribute("data-emplois-setter-target"))
+      if (this.hasAttribute("data-emplois-setter-value")) {
+        inputElement.value = this.getAttribute("data-emplois-setter-value")
+      } else if (this.hasAttribute("data-emplois-setter-checked")) {
+        inputElement.checked = this.getAttribute("data-emplois-setter-checked") === 'true'
         inputElement.indeterminate = false
       }
       inputElement.dispatchEvent(new Event("change", { bubbles: true }));
