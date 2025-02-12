@@ -38,6 +38,7 @@ class SiaeSearchForm(forms.Form):
             attrs={
                 "class": "form-control",
                 "data-ajax--url": format_lazy("{}?slug=", reverse_lazy("autocomplete:cities")),
+                "data-ajax--delay": 250,
                 "data-minimum-input-length": 1,
                 "data-placeholder": "Rechercher un emploi inclusif autour de…",
             }

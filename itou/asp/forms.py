@@ -23,6 +23,7 @@ class BirthPlaceModelForm(forms.ModelForm):
             attrs={
                 "data-ajax--url": reverse_lazy("autocomplete:communes"),
                 "data-ajax--cache": "true",
+                "data-ajax--delay": 250,
                 "data-ajax--type": "GET",
                 "data-minimum-input-length": 1,
                 "data-placeholder": "Nom de la commune",
