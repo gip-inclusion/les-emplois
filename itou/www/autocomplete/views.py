@@ -30,7 +30,7 @@ def autocomplete_name(qs, term, extra_ordering_by):
     # such as search terms “La Chapelle du” not finding La Chapelle-du-Châtelard.
 
     return (
-        qs.filter(Q(name__unaccent__icontains=term_spaced) | Q(name__unaccent__icontains=term_hyphenated))
+        qs.filter(normalized_name__contains=term_spaced)
         .annotate(
             spaced_index=NullIf(StrIndex(Lower("name__unaccent"), Value(term_spaced)), 0),
             hyphenated_index=NullIf(StrIndex(Lower("name__unaccent"), Value(term_hyphenated)), 0),
