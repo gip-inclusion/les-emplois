@@ -16,12 +16,12 @@
                 {% endif %}
                 {% if job.is_overwhelmed %}
                     <div class="order-1 order-md-2">
-                        <span class="badge badge-sm rounded-pill bg-accent-03 text-primary ms-0 ms-lg-2 mt-1 mt-lg-0"><i class="ri-group-line"></i>{{ job.OVERWHELMED_THRESHOLD }}+ candidatures</span>
+                        <span class="badge badge-sm rounded-pill bg-accent-03 text-primary ms-0 ms-lg-2 mt-1 mt-lg-0"><i class="ri-group-line" aria-hidden="true"></i>{{ job.OVERWHELMED_THRESHOLD }}+ candidatures</span>
                     </div>
                 {% endif %}
             </div>
             <span class="fs-sm mt-1 d-flex align-items-center">
-                <i class="ri-map-pin-2-line ri-sm me-1"></i>
+                <i class="ri-map-pin-2-line ri-sm me-1" aria-hidden="true"></i>
                 {% if job.location %}
                     {{ job.location }}
                 {% else %}

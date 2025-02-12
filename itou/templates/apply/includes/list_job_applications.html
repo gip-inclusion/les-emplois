@@ -37,17 +37,17 @@
             </p>
             {% if job_applications_list_kind is JobApplicationsListKind.SENT %}
                 <a href="{% url 'search:employers_results' %}" class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center">
-                    <i class="ri-user-follow-line ri-lg fw-normal"></i>
+                    <i class="ri-user-follow-line ri-lg fw-normal" aria-hidden="true"></i>
                     <span>Postuler pour un candidat</span>
                 </a>
             {% elif job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
                 <a href="{% url 'companies_views:job_description_list' %}" class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center">
-                    <i class="ri-briefcase-line ri-lg fw-normal"></i>
+                    <i class="ri-briefcase-line ri-lg fw-normal" aria-hidden="true"></i>
                     <span>Gérer les métiers et recrutements</span>
                 </a>
             {% elif job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %}
                 <a href="{% url 'search:employers_home' %}" class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center">
-                    <i class="ri-briefcase-line ri-lg fw-normal"></i>
+                    <i class="ri-briefcase-line ri-lg fw-normal" aria-hidden="true"></i>
                     <span>Rechercher un emploi inclusif</span>
                 </a>
             {% endif %}

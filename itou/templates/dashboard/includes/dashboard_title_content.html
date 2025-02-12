@@ -52,7 +52,7 @@
                     </button>
                 {% else %}
                     <a href="{% url 'apply:start_hire' company_pk=request.current_organization.pk %}" class="btn btn-lg btn-primary btn-ico" {% matomo_event "employeurs" "clic" "declarer-embauche" %}>
-                        <i class="ri-user-follow-line fw-medium"></i>
+                        <i class="ri-user-follow-line fw-medium" aria-hidden="true"></i>
                         <span>Déclarer une embauche</span>
                     </a>
                 {% endif %}

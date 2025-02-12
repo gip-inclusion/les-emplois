@@ -1,8 +1,8 @@
 {% if review_state == "ACCEPTED" %}
-    <strong class="text-success"><i class="ri-check-line"></i> Validé</strong>
+    <strong class="text-success"><i class="ri-check-line" aria-hidden="true"></i> Validé</strong>
     <br>
 {% elif review_state == "REFUSED" or review_state == "REFUSED_2" %}
-    <strong class="text-danger"><i class="ri-close-line"></i> Refusé</strong>
+    <strong class="text-danger"><i class="ri-close-line" aria-hidden="true"></i> Refusé</strong>
     <br>
 {% endif %}
 <strong class="fs-sm">{{ criteria.name }}</strong>

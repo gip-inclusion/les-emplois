@@ -509,7 +509,7 @@
               <ul class="list-unstyled">
                   <li class="d-flex justify-content-between align-items-center mb-3">
                       <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups">
-                          <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
+                          <i aria-hidden="true" class="ri-article-line ri-lg fw-normal align-self-start"></i>
                           <span>Visualiser les bénéficiaires</span>
                       </a>
                   </li>
@@ -534,7 +534,7 @@
               <ul class="list-unstyled">
                   <li class="d-flex justify-content-between align-items-center mb-3">
                       <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups">
-                          <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
+                          <i aria-hidden="true" class="ri-article-line ri-lg fw-normal align-self-start"></i>
                           <span>Visualiser les bénéficiaires</span>
                       </a>
                   </li>
@@ -559,7 +559,7 @@
               <ul class="list-unstyled">
                   <li class="d-flex justify-content-between align-items-center mb-3">
                       <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups">
-                          <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
+                          <i aria-hidden="true" class="ri-article-line ri-lg fw-normal align-self-start"></i>
                           <span>Visualiser les bénéficiaires</span>
                       </a>
                   </li>
@@ -584,7 +584,7 @@
               <ul class="list-unstyled">
                   <li class="d-flex justify-content-between align-items-center mb-3">
                       <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups">
-                          <i class="ri-article-line ri-lg fw-normal align-self-start"></i>
+                          <i aria-hidden="true" class="ri-article-line ri-lg fw-normal align-self-start"></i>
                           <span>Visualiser les bénéficiaires</span>
                       </a>
                   </li>

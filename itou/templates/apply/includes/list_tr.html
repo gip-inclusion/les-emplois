@@ -75,10 +75,10 @@
         {% elif job_application.sender_kind == SenderKind.JOB_SEEKER %}
             <i class="ri-user-line me-1" aria-hidden="true"></i>Le candidat lui-même
         {% elif job_application.sender_kind == SenderKind.EMPLOYER %}
-            <i class="ri-community-line"></i>
+            <i class="ri-community-line" aria-hidden="true"></i>
             {{ job_application.sender_company.display_name }}
         {% elif job_application.sender_kind == SenderKind.PRESCRIBER %}
-            <i class="ri-home-smile-2-line"></i>
+            <i class="ri-home-smile-2-line" aria-hidden="true"></i>
             {% if job_application.sender_prescriber_organization %}
                 {{ job_application.sender_prescriber_organization.display_name }}
             {% else %}

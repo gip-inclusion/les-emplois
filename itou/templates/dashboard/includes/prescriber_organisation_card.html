@@ -15,7 +15,7 @@
                     {% if request.is_current_organization_admin %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'prescribers_views:edit_organization' %}" class="btn-link btn-ico">
-                                <i class="ri-pencil-line ri-lg ri-lg fw-normal"></i>
+                                <i class="ri-pencil-line ri-lg ri-lg fw-normal" aria-hidden="true"></i>
                                 <span>Modifier cette organisation</span>
                             </a>
                         </li>
@@ -23,7 +23,7 @@
                     {% if card_url %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{{ card_url }}?back_url={{ request.get_full_path|urlencode }}" class="btn-link btn-ico">
-                                <i class="ri-eye-line ri-lg ri-lg fw-normal"></i>
+                                <i class="ri-eye-line ri-lg ri-lg fw-normal" aria-hidden="true"></i>
                                 <span>Voir la fiche publique</span>
                             </a>
                         </li>
@@ -31,14 +31,14 @@
                 {% endwith %}
                 <li class="d-flex justify-content-between align-items-center mb-3">
                     <a href="{% url 'prescribers_views:members' %}" class="btn-link btn-ico">
-                        <i class="ri-team-line ri-lg ri-lg fw-normal"></i>
+                        <i class="ri-team-line ri-lg ri-lg fw-normal" aria-hidden="true"></i>
                         <span>Gérer les collaborateurs</span>
                     </a>
                 </li>
                 {% if request.current_organization.kind == PrescriberOrganizationKind.DEPT and request.is_current_organization_admin %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'prescribers_views:list_accredited_organizations' %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link btn-ico">
-                            <i class="ri-list-unordered ri-lg ri-lg fw-normal"></i>
+                            <i class="ri-list-unordered ri-lg ri-lg fw-normal" aria-hidden="true"></i>
                             <span>Voir la liste des organisations conventionnées</span>
                         </a>
                     </li>

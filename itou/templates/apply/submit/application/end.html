@@ -39,12 +39,12 @@
                                     <h2 class="mb-0 flex-grow-1">{{ job_application.job_seeker.get_full_name }}</h2>
                                     {% if request.user.is_job_seeker %}
                                         <a class="btn btn-outline-primary btn-ico btn-sm" href="{% url 'dashboard:edit_user_info' %}">
-                                            <i class="ri-pencil-line"></i>
+                                            <i class="ri-pencil-line" aria-hidden="true"></i>
                                             <span>Modifier</span>
                                         </a>
                                     {% elif can_edit_personal_information %}
                                         <span class="btn btn-outline-primary btn-ico btn-sm" data-swap-element="#informations">
-                                            <i class="ri-pencil-line"></i>
+                                            <i class="ri-pencil-line" aria-hidden="true"></i>
                                             <span>Modifier</span>
                                         </span>
                                     {% endif %}

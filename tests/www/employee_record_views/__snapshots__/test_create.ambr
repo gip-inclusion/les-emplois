@@ -21,7 +21,7 @@
                           </ul>
                           
                               <p class="mb-0">
-                                  <i class="ri-error-warning-line ri-lg me-1"></i><strong>Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié.</strong>
+                                  <i aria-hidden="true" class="ri-error-warning-line ri-lg me-1"></i><strong>Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié.</strong>
                               </p>
                           
                       </div>

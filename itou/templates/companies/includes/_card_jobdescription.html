@@ -45,11 +45,11 @@
                         {% endif %}
                         <ul class="c-box--results__list-contact flex-md-grow-1 mt-1">
                             <li class="d-block d-md-inline-flex">
-                                <i class="ri-navigation-line fw-normal me-1"></i>
+                                <i class="ri-navigation-line fw-normal me-1" aria-hidden="true"></i>
                                 à <strong class="text-info mx-md-1">{{ job_description.distance | floatformat:"-1" }}&nbsp;km</strong> de votre lieu de recherche
                             </li>
                             <li class="d-block d-md-inline-flex">
-                                <i class="ri-map-pin-2-line fw-normal me-1"></i>
+                                <i class="ri-map-pin-2-line fw-normal me-1" aria-hidden="true"></i>
                                 <address class="d-inline m-0">
                                     {% if job_description.location %}
                                         {{ job_description.location }}

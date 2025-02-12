@@ -30,7 +30,7 @@
         <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
             <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
                 <li>
-                    <i class="ri-navigation-line fw-normal me-1"></i>
+                    <i class="ri-navigation-line fw-normal me-1" aria-hidden="true"></i>
                     à <strong class="text-info mx-1">{{ siae.distance|floatformat:"-1"|default:"12" }}&nbsp;km</strong> de votre lieu de recherche
                     {% comment %}
                     The "default" distance of 12 kms above seems a little weird.
@@ -41,7 +41,7 @@
                     {% endcomment %}
                 </li>
                 <li>
-                    <i class="ri-map-pin-2-line fw-normal me-1"></i>
+                    <i class="ri-map-pin-2-line fw-normal me-1" aria-hidden="true"></i>
                     <address class="m-0">{{ siae.address_on_one_line }}</address>
                 </li>
             </ul>
