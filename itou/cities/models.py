@@ -2,8 +2,11 @@ from django.contrib.gis.db import models as gis_models
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
+from django.db.models import Value
+from django.db.models.functions import Lower, Replace
 
 from itou.common_apps.address.departments import DEPARTMENTS, REGIONS
+from itou.utils.models import SlylyImmutableUnaccent
 
 
 class EditionModeChoices(models.TextChoices):
@@ -17,6 +20,12 @@ class City(models.Model):
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
     name = models.CharField(verbose_name="ville", max_length=255, db_index=True)
+    normalized_name = models.GeneratedField(
+        expression=Replace(Lower(SlylyImmutableUnaccent("name")), Value("-"), Value(" ")),
+        output_field=models.CharField(),
+        verbose_name="nom normalisé pour faciliter la recherche",
+        db_persist=True,
+    )
     slug = models.SlugField(verbose_name="slug", max_length=255, unique=True)
     department = models.CharField(verbose_name="département", choices=DEPARTMENT_CHOICES, max_length=3, db_index=True)
 
@@ -45,7 +54,7 @@ class City(models.Model):
             # https://docs.djangoproject.com/en/dev/ref/contrib/postgres/search/#trigram-similarity
             # https://docs.djangoproject.com/en/dev/ref/contrib/postgres/indexes/#ginindex
             # https://www.postgresql.org/docs/11/pgtrgm.html#id-1.11.7.40.7
-            GinIndex(fields=["name"], name="cities_city_name_gin_trgm", opclasses=["gin_trgm_ops"])
+            GinIndex(fields=["normalized_name"], name="%(class)s_normalized_name_gin", opclasses=["gin_trgm_ops"])
         ]
 
     def __str__(self):
