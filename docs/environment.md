@@ -75,11 +75,6 @@ ProConnect, elles sont préfixées par `PRO_CONNECT_`.
 
 Identifiants Mailjet de l’applicatif, utilisé lors de l’envoi d’emails.
 
-#### `API_MAILJET_KEY_PRINCIPAL` & `API_MAILJET_SECRET_PRINCIPAL`
-
-Identifiants Mailjet du compte principal, utilisé pour alimenter les listes de
-diffusion pour les campagnes Mailjet.
-
 ### `MATOMO_BASE_URL`
 
 Connexion à l’instance Matomo du GIP de l’inclusion. Le site par défaut dans
