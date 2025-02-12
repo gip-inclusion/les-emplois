@@ -50,6 +50,17 @@ class Upper(Transform):
     function = "UPPER"
 
 
+class SlylyImmutableUnaccent(Transform):
+    """
+    unaccent function falsely declared as immutable to be usable in index & generated fields
+    It is not immutable.
+    """
+
+    bilateral = True
+    lookup_name = "slyly_immutable_unaccent"
+    function = "SLYLY_IMMUTABLE_UNACCENT"
+
+
 class AbstractSupportRemark(models.Model):
     class Meta:
         verbose_name = "commentaire du support"
