@@ -583,6 +583,7 @@
                  "asp_commune"."end_date",
                  "asp_commune"."code",
                  "asp_commune"."name",
+                 "asp_commune"."normalized_name",
                  "asp_commune"."created_at",
                  "asp_commune"."city_id"
           FROM "asp_commune"
@@ -641,6 +642,7 @@
                  "asp_commune"."end_date",
                  "asp_commune"."code",
                  "asp_commune"."name",
+                 "asp_commune"."normalized_name",
                  "asp_commune"."created_at",
                  "asp_commune"."city_id"
           FROM "asp_commune"
