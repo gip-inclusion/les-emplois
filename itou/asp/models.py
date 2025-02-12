@@ -4,12 +4,13 @@ from django.contrib.postgres.constraints import ExclusionConstraint
 from django.contrib.postgres.fields import RangeBoundary, RangeOperators
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Value
+from django.db.models.functions import Lower, Replace
 from django.utils import timezone
 from django.utils.functional import cached_property, classproperty
 from unidecode import unidecode
 
-from itou.utils.models import DateRange
+from itou.utils.models import DateRange, SlylyImmutableUnaccent
 
 
 class LaneType(models.TextChoices):
@@ -392,6 +393,13 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     code = models.CharField(max_length=5, verbose_name="code commune INSEE", db_index=True)
     name = models.CharField(max_length=50, verbose_name="nom de la commune")
 
+    normalized_name = models.GeneratedField(
+        expression=Replace(Lower(SlylyImmutableUnaccent("name")), Value("-"), Value(" ")),
+        output_field=models.CharField(),
+        verbose_name="nom normalisé pour faciliter la recherche",
+        db_persist=True,
+    )
+
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
 
     # A corresponding INSEE City is associated in order to also get the current display name and post codes.
@@ -407,7 +415,9 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
 
     class Meta(AbstractPeriod.Meta):
         verbose_name = "commune"
-        indexes = [GinIndex(fields=["name"], name="aps_communes_name_gin_trgm", opclasses=["gin_trgm_ops"])]
+        indexes = [
+            GinIndex(fields=["normalized_name"], name="%(class)s_normalized_name_gin", opclasses=["gin_trgm_ops"])
+        ]
 
     @cached_property
     def department_code(self):
