@@ -1,3 +1,5 @@
+from urllib.parse import parse_qs
+
 import httpx
 import pytest
 
@@ -6,7 +8,6 @@ from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusion
 
 def test_data_inclusion_client(settings, respx_mock):
     client = DataInclusionApiClient("https://fake.api.gouv.fr/", "fake-token")
-    settings.API_DATA_INCLUSION_SOURCES = "dora,toto"
     api_mock = respx_mock.get("https://fake.api.gouv.fr/search/services")
     api_mock.respond(
         200,
@@ -26,11 +27,9 @@ def test_data_inclusion_client(settings, respx_mock):
         {"id": "svc3"},
         {"id": "svc4"},
     ]
-    from urllib.parse import parse_qs
 
     assert parse_qs(str(api_mock.calls[0].request.url.params)) == {
         "code_insee": ["fake-insee-code"],
-        "sources": ["dora,toto"],
         "score_qualite_minimum": ["0.6"],
         "thematiques": [
             "acces-aux-droits-et-citoyennete",
@@ -42,6 +41,11 @@ def test_data_inclusion_client(settings, respx_mock):
         ],
     }
     assert api_mock.calls[0].request.headers["authorization"] == "Bearer fake-token"
+
+    # check setting sources
+    settings.API_DATA_INCLUSION_SOURCES = "dora,toto"
+    client.search_services("fake-insee-code")
+    assert parse_qs(str(api_mock.calls[1].request.url.params))["sources"] == ["dora", "toto"]
 
     # check exceptions
     api_mock.respond(200, json={"something": "else"})

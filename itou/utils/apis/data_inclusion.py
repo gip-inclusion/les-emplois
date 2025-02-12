@@ -31,15 +31,17 @@ class DataInclusionApiClient:
         )
 
     def search_services(self, code_insee: str) -> list[dict]:
+        params = {
+            "code_insee": code_insee,
+            "thematiques": API_THEMATIQUES,
+            "score_qualite_minimum": settings.API_DATA_INCLUSION_SCORE_QUALITE_MINIMUM,
+        }
+        if settings.API_DATA_INCLUSION_SOURCES:
+            params["sources"] = settings.API_DATA_INCLUSION_SOURCES.split(",")
         try:
             response = self.client.get(
                 "/search/services",
-                params={
-                    "code_insee": code_insee,
-                    "sources": settings.API_DATA_INCLUSION_SOURCES,
-                    "thematiques": API_THEMATIQUES,
-                    "score_qualite_minimum": settings.API_DATA_INCLUSION_SCORE_QUALITE_MINIMUM,
-                },
+                params=params,
             ).raise_for_status()
         except httpx.HTTPError as exc:
             logger.info("data.inclusion request error code_insee=%s error=%s", code_insee, exc)
