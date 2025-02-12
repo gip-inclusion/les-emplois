@@ -12,12 +12,12 @@
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             {% if active_campaign.evaluations_asked_at %}
                                 <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_list' active_campaign.pk %}" class="btn-link btn-ico">
-                                    <i class="ri-list-check-3 ri-lg fw-normal"></i>
+                                    <i class="ri-list-check-3 ri-lg fw-normal" aria-hidden="true"></i>
                                     <span>Campagne en cours</span>
                                 </a>
                             {% else %}
                                 <a href="{% url 'siae_evaluations_views:samples_selection' %}" class="btn-link btn-ico">
-                                    <i class="ri-list-check-3 ri-lg fw-normal"></i>
+                                    <i class="ri-list-check-3 ri-lg fw-normal" aria-hidden="true"></i>
                                     <span>Campagne en cours</span>
                                 </a>
                             {% endif %}
@@ -26,7 +26,7 @@
                             <li class="d-flex justify-content-between align-items-center mb-3">
                                 <a href="{% url 'siae_evaluations_views:campaign_calendar' active_campaign.pk %}" class="btn-link btn-ico">
                                     {% comment %} TODO(cms): change icon {% endcomment %}
-                                    <i class="ri-calendar-line ri-lg fw-normal"></i>
+                                    <i class="ri-calendar-line ri-lg fw-normal" aria-hidden="true"></i>
                                     <span>Calendrier</span>
                                 </a>
                             </li>
@@ -38,15 +38,15 @@
             {% if closed_campaigns %}
                 <hr class="mb-0">
                 <button class="btn btn-link btn-ico p-0" type="button" data-bs-toggle="collapse" data-bs-target="#closed_campaigns" aria-expanded="false" aria-controls="closed_campaigns">
-                    <i class="ri-history-line ri-lg fw-normal"></i>
+                    <i class="ri-history-line ri-lg fw-normal" aria-hidden="true"></i>
                     <span>Historique</span>
-                    <i class="ri-arrow-drop-down-line ri-lg fw-normal"></i>
+                    <i class="ri-arrow-drop-down-line ri-lg fw-normal" aria-hidden="true"></i>
                 </button>
                 <ul class="collapse" id="closed_campaigns">
                     {% for closed_campaign in closed_campaigns %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_list' closed_campaign.pk %}" class="btn-link btn-ico">
-                                <i class="ri-file-copy-2-line ri-lg fw-normal"></i>
+                                <i class="ri-file-copy-2-line ri-lg fw-normal" aria-hidden="true"></i>
                                 <span>{{ closed_campaign.name }}</span>
                             </a>
                         </li>
@@ -57,7 +57,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <a href="https://www.legifrance.gouv.fr/download/pdf/circ?id=45319" class="btn-link btn-ico" rel="noopener" target="_blank">
                     <span>Contexte législatif</span>
-                    <i class="ri-external-link-line fw-normal"></i>
+                    <i class="ri-external-link-line fw-normal" aria-hidden="true"></i>
                 </a>
             </div>
         </div>

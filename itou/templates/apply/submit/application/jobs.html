@@ -19,12 +19,12 @@
                                 </label>
                                 {% if job_description.is_overwhelmed %}
                                     <div class="order-1 order-md-2">
-                                        <span class="badge badge-sm rounded-pill bg-accent-03 text-primary ms-0 ms-lg-2 mt-1 mt-lg-0"><i class="ri-group-line"></i>{{ job_description.OVERWHELMED_THRESHOLD }}+ candidatures</span>
+                                        <span class="badge badge-sm rounded-pill bg-accent-03 text-primary ms-0 ms-lg-2 mt-1 mt-lg-0"><i class="ri-group-line" aria-hidden="true"></i>{{ job_description.OVERWHELMED_THRESHOLD }}+ candidatures</span>
                                     </div>
                                 {% endif %}
                             </div>
                             <span class="fs-sm mt-1 d-flex align-items-center">
-                                <i class="ri-map-pin-2-line ri-sm me-1"></i>{{ job_description.display_location }}
+                                <i class="ri-map-pin-2-line ri-sm me-1" aria-hidden="true"></i>{{ job_description.display_location }}
                             </span>
                         </div>
                         <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">

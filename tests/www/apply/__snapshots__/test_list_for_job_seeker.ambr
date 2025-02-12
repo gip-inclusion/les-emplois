@@ -382,7 +382,7 @@
       </td>
       <td>
           
-              <i class="ri-home-smile-2-line"></i>
+              <i aria-hidden="true" class="ri-home-smile-2-line"></i>
               
                   Pres. Org.
               
@@ -432,7 +432,7 @@
       </td>
       <td>
           
-              <i class="ri-community-line"></i>
+              <i aria-hidden="true" class="ri-community-line"></i>
               Acme inc.
           
       </td>
@@ -533,7 +533,7 @@
               </p>
               
                   <a class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center" href="/search/employers">
-                      <i class="ri-briefcase-line ri-lg fw-normal"></i>
+                      <i aria-hidden="true" class="ri-briefcase-line ri-lg fw-normal"></i>
                       <span>Rechercher un emploi inclusif</span>
                   </a>
               

@@ -91,7 +91,7 @@
                                                     {% matomo_event "candidature" "clic" "batch-transfer-applications-open-modal" %}
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#transfer_confirmation_modal_{{ siae.pk }}">
-                                                <i class="ri-community-line"></i>
+                                                <i class="ri-community-line" aria-hidden="true"></i>
                                                 <span>{{ siae.kind }}</span>
                                                 <strong>{{ siae.display_name }}</strong>
                                             </button>

@@ -5,18 +5,18 @@
 <ul class="list-unstyled mb-5">
     {% if job.display_contract_type %}
         <li class="d-flex align-items-center mb-2">
-            <i class="ri-file-list-3-line me-1"></i>
+            <i class="ri-file-list-3-line me-1" aria-hidden="true"></i>
             {{ job.display_contract_type }}
         </li>
     {% endif %}
     {% if job.hours_per_week %}
         <li class="d-flex align-items-center mb-2">
-            <i class="ri-time-line me-1"></i>
+            <i class="ri-time-line me-1" aria-hidden="true"></i>
             {{ job.hours_per_week }}h / semaine
         </li>
     {% endif %}
     <li class="d-flex align-items-center mb-2">
-        <i class="ri-map-pin-line me-1"></i>
+        <i class="ri-map-pin-line me-1" aria-hidden="true"></i>
         {{ job.display_location }}
     </li>
 </ul>

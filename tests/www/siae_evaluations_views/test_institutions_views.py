@@ -1907,7 +1907,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
             f"""
             <a target="_blank" href="/siae_evaluation/evaluated_siae_detail/{evaluated_siae.pk}/">
              Revoir les 5 auto-prescriptions
-             <i class="ri-external-link-line">
+             <i class="ri-external-link-line" aria-hidden="true">
              </i>
             </a>""",
             html=True,
@@ -2066,7 +2066,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotify
             f"""
             <a target="_blank" href="/siae_evaluation/evaluated_siae_detail/{evaluated_siae.pk}/">
              Revoir l’auto-prescription
-             <i class="ri-external-link-line">
+             <i class="ri-external-link-line" aria-hidden="true">
              </i>
             </a>""",
             html=True,
@@ -3545,7 +3545,9 @@ class TestInstitutionEvaluatedJobApplicationView:
         assertNotContains(response, accepte_url)
         assertContains(response, reinit_url)
         assertContains(
-            response, '<strong class="text-success"><i class="ri-check-line"></i> Validé</strong>', html=True
+            response,
+            '<strong class="text-success"><i class="ri-check-line" aria-hidden="true"></i> Validé</strong>',
+            html=True,
         )
 
         # refused
@@ -3557,7 +3559,9 @@ class TestInstitutionEvaluatedJobApplicationView:
         assertNotContains(response, accepte_url)
         assertContains(response, reinit_url)
         assertContains(
-            response, '<strong class="text-danger"><i class="ri-close-line"></i> Refusé</strong>', html=True
+            response,
+            '<strong class="text-danger"><i class="ri-close-line" aria-hidden="true"></i> Refusé</strong>',
+            html=True,
         )
 
         # reinited

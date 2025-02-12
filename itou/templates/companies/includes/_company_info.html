@@ -8,7 +8,7 @@
          aria-expanded="{{ show|default:False|yesno:'true,false' }}"
          aria-controls="collapseBoxStructure"
          tabindex="0">
-        <i class="ri-community-line"></i>
+        <i class="ri-community-line" aria-hidden="true"></i>
         <div>
             <button type="button" data-bs-toggle="tooltip" data-bs-title="{{ company.get_kind_display }}">
                 {{ company.kind }}
@@ -20,7 +20,7 @@
         <hr class="my-4">
         <ul class="c-box--structure__list-contact">
             <li>
-                <i class="ri-map-pin-2-line fw-normal me-2"></i>
+                <i class="ri-map-pin-2-line fw-normal me-2" aria-hidden="true"></i>
                 <address class="m-0">{{ company.address_on_one_line }}</address>
                 {% include 'includes/copy_to_clipboard.html' with content=company.address_on_one_line css_classes="btn-link fw-medium ms-1" only_icon=True %}
             </li>

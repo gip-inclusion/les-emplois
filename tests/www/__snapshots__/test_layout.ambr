@@ -110,7 +110,7 @@
                       <ul class="list-unstyled">
       <li class="dropdown-item">
           <div class="d-flex align-items-center">
-              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <span class="flex-shrink-0"><i aria-hidden="true" class="ri-user-line ri-2x"></i></span>
               <div class="flex-grow-1 ms-2 lh-sm w-75">
                   
                       <span>John DOE</span>
@@ -211,7 +211,7 @@
                                       <ul class="list-unstyled">
       <li class="dropdown-item">
           <div class="d-flex align-items-center">
-              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <span class="flex-shrink-0"><i aria-hidden="true" class="ri-user-line ri-2x"></i></span>
               <div class="flex-grow-1 ms-2 lh-sm">
                   
                       <span>John DOE</span>
@@ -390,7 +390,7 @@
                       <ul class="list-unstyled">
       <li class="dropdown-item">
           <div class="d-flex align-items-center">
-              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <span class="flex-shrink-0"><i aria-hidden="true" class="ri-user-line ri-2x"></i></span>
               <div class="flex-grow-1 ms-2 lh-sm w-75">
                   
                       <span>John DOE</span>
@@ -496,7 +496,7 @@
                                       <ul class="list-unstyled">
       <li class="dropdown-item">
           <div class="d-flex align-items-center">
-              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <span class="flex-shrink-0"><i aria-hidden="true" class="ri-user-line ri-2x"></i></span>
               <div class="flex-grow-1 ms-2 lh-sm">
                   
                       <span>John DOE</span>
@@ -622,7 +622,7 @@
                       <ul class="list-unstyled">
       <li class="dropdown-item">
           <div class="d-flex align-items-center">
-              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <span class="flex-shrink-0"><i aria-hidden="true" class="ri-user-line ri-2x"></i></span>
               <div class="flex-grow-1 ms-2 lh-sm w-75">
                   
                       <span>John DOE</span>
@@ -726,7 +726,7 @@
                                       <ul class="list-unstyled">
       <li class="dropdown-item">
           <div class="d-flex align-items-center">
-              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <span class="flex-shrink-0"><i aria-hidden="true" class="ri-user-line ri-2x"></i></span>
               <div class="flex-grow-1 ms-2 lh-sm">
                   
                       <span>John DOE</span>
@@ -864,7 +864,7 @@
                       <ul class="list-unstyled">
       <li class="dropdown-item">
           <div class="d-flex align-items-center">
-              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <span class="flex-shrink-0"><i aria-hidden="true" class="ri-user-line ri-2x"></i></span>
               <div class="flex-grow-1 ms-2 lh-sm w-75">
                   
                       <span>John DOE</span>
@@ -963,7 +963,7 @@
                                       <ul class="list-unstyled">
       <li class="dropdown-item">
           <div class="d-flex align-items-center">
-              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <span class="flex-shrink-0"><i aria-hidden="true" class="ri-user-line ri-2x"></i></span>
               <div class="flex-grow-1 ms-2 lh-sm">
                   
                       <span>John DOE</span>
@@ -1116,7 +1116,7 @@
                       <ul class="list-unstyled">
       <li class="dropdown-item">
           <div class="d-flex align-items-center">
-              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <span class="flex-shrink-0"><i aria-hidden="true" class="ri-user-line ri-2x"></i></span>
               <div class="flex-grow-1 ms-2 lh-sm w-75">
                   
                       <span>John DOE</span>
@@ -1213,7 +1213,7 @@
                                       <ul class="list-unstyled">
       <li class="dropdown-item">
           <div class="d-flex align-items-center">
-              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <span class="flex-shrink-0"><i aria-hidden="true" class="ri-user-line ri-2x"></i></span>
               <div class="flex-grow-1 ms-2 lh-sm">
                   
                       <span>John DOE</span>
@@ -1343,7 +1343,7 @@
                       <ul class="list-unstyled">
       <li class="dropdown-item">
           <div class="d-flex align-items-center">
-              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <span class="flex-shrink-0"><i aria-hidden="true" class="ri-user-line ri-2x"></i></span>
               <div class="flex-grow-1 ms-2 lh-sm w-75">
                   
                       <span>John DOE</span>
@@ -1440,7 +1440,7 @@
                                       <ul class="list-unstyled">
       <li class="dropdown-item">
           <div class="d-flex align-items-center">
-              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <span class="flex-shrink-0"><i aria-hidden="true" class="ri-user-line ri-2x"></i></span>
               <div class="flex-grow-1 ms-2 lh-sm">
                   
                       <span>John DOE</span>

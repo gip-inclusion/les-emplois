@@ -1468,7 +1468,7 @@
                               </p>
                               <p>
                                   <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
-                                      <i class="ri-download-line ri-lg fw-normal"></i>
+                                      <i aria-hidden="true" class="ri-download-line ri-lg fw-normal"></i>
                                       <span>Télécharger le bilan</span>
                                   </a>
                               </p>
@@ -1479,7 +1479,7 @@
                                   L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
                               </p>
                               <p>
-                                  <i class="ri-mail-line"></i>
+                                  <i aria-hidden="true" class="ri-mail-line"></i>
                                   <a class="btn-link me-3" href="mailto:email@example.com">email@example.com</a>
                                   <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1488,7 +1488,7 @@
   
                               </p>
                               <p>
-                                  <i class="ri-phone-line"></i>
+                                  <i aria-hidden="true" class="ri-phone-line"></i>
                                   <a class="btn-link" href="tel:+33123456789">+33123456789</a>
                               </p>
                           
@@ -1586,7 +1586,7 @@
                               </p>
                               <p>
                                   <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
-                                      <i class="ri-download-line ri-lg fw-normal"></i>
+                                      <i aria-hidden="true" class="ri-download-line ri-lg fw-normal"></i>
                                       <span>Télécharger le bilan</span>
                                   </a>
                               </p>
@@ -1597,7 +1597,7 @@
                                   L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
                               </p>
                               <p>
-                                  <i class="ri-mail-line"></i>
+                                  <i aria-hidden="true" class="ri-mail-line"></i>
                                   <a class="btn-link me-3" href="mailto:email@example.com">email@example.com</a>
                                   <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1606,7 +1606,7 @@
   
                               </p>
                               <p>
-                                  <i class="ri-phone-line"></i>
+                                  <i aria-hidden="true" class="ri-phone-line"></i>
                                   <a class="btn-link" href="tel:+33123456789">+33123456789</a>
                               </p>
                           
@@ -1675,7 +1675,7 @@
   
   <div class="c-box c-box--structure">
       <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line"></i>
           <div>
               <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
                   EI
@@ -1687,7 +1687,7 @@
           <hr class="my-4"/>
           <ul class="c-box--structure__list-contact">
               <li>
-                  <i class="ri-map-pin-2-line fw-normal me-2"></i>
+                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
                   <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
                   <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1698,7 +1698,7 @@
               
                   
       <li>
-      <i class="ri-mail-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1712,7 +1712,7 @@
   
       
   <li>
-      <i class="ri-phone-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1840,7 +1840,7 @@
                               </p>
                               <p>
                                   <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
-                                      <i class="ri-download-line ri-lg fw-normal"></i>
+                                      <i aria-hidden="true" class="ri-download-line ri-lg fw-normal"></i>
                                       <span>Télécharger le bilan</span>
                                   </a>
                               </p>
@@ -1851,7 +1851,7 @@
                                   L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
                               </p>
                               <p>
-                                  <i class="ri-mail-line"></i>
+                                  <i aria-hidden="true" class="ri-mail-line"></i>
                                   <a class="btn-link me-3" href="mailto:email@example.com">email@example.com</a>
                                   <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1860,7 +1860,7 @@
   
                               </p>
                               <p>
-                                  <i class="ri-phone-line"></i>
+                                  <i aria-hidden="true" class="ri-phone-line"></i>
                                   <a class="btn-link" href="tel:+33123456789">+33123456789</a>
                               </p>
                           
@@ -1929,7 +1929,7 @@
   
   <div class="c-box c-box--structure">
       <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line"></i>
           <div>
               <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
                   EI
@@ -1941,7 +1941,7 @@
           <hr class="my-4"/>
           <ul class="c-box--structure__list-contact">
               <li>
-                  <i class="ri-map-pin-2-line fw-normal me-2"></i>
+                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
                   <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
                   <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1952,7 +1952,7 @@
               
                   
       <li>
-      <i class="ri-mail-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1966,7 +1966,7 @@
   
       
   <li>
-      <i class="ri-phone-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2052,14 +2052,14 @@
                       <form action="/approvals/prolongation/request/666/grant" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center">
-                              <i class="ri-check-line"></i>
+                              <i aria-hidden="true" class="ri-check-line"></i>
                               <span>Accepter</span>
                           </button>
                       </form>
                   </div>
                   <div class="form-group col-12 col-lg-auto">
                       <a class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center" href="/approvals/prolongation/request/666/deny?reset=1">
-                          <i class="ri-close-line"></i>
+                          <i aria-hidden="true" class="ri-close-line"></i>
                           <span>Refuser</span>
                       </a>
                   </div>
@@ -2107,7 +2107,7 @@
                               </p>
                               <p>
                                   <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
-                                      <i class="ri-download-line ri-lg fw-normal"></i>
+                                      <i aria-hidden="true" class="ri-download-line ri-lg fw-normal"></i>
                                       <span>Télécharger le bilan</span>
                                   </a>
                               </p>
@@ -2118,7 +2118,7 @@
                                   L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
                               </p>
                               <p>
-                                  <i class="ri-mail-line"></i>
+                                  <i aria-hidden="true" class="ri-mail-line"></i>
                                   <a class="btn-link me-3" href="mailto:email@example.com">email@example.com</a>
                                   <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2127,7 +2127,7 @@
   
                               </p>
                               <p>
-                                  <i class="ri-phone-line"></i>
+                                  <i aria-hidden="true" class="ri-phone-line"></i>
                                   <a class="btn-link" href="tel:+33123456789">+33123456789</a>
                               </p>
                           
@@ -2206,7 +2206,7 @@
   
   <div class="c-box c-box--structure">
       <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line"></i>
           <div>
               <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
                   EI
@@ -2218,7 +2218,7 @@
           <hr class="my-4"/>
           <ul class="c-box--structure__list-contact">
               <li>
-                  <i class="ri-map-pin-2-line fw-normal me-2"></i>
+                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
                   <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
                   <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2229,7 +2229,7 @@
               
                   
       <li>
-      <i class="ri-mail-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2243,7 +2243,7 @@
   
       
   <li>
-      <i class="ri-phone-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>

@@ -8,11 +8,7 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import (
-    assertContains,
-    assertNotContains,
-    assertRedirects,
-)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import Status
@@ -214,7 +210,7 @@ class TestDashboardView:
                    data-matomo-category="employeurs"
                    data-matomo-action="clic"
                    data-matomo-option="voir-liste-candidatures-À traiter">
-                    <i class="ri-notification-4-line ri-lg fw-normal"></i>
+                    <i class="ri-notification-4-line ri-lg fw-normal" aria-hidden="true"></i>
                     <span>À traiter</span>
                 </a>
                 <span class="badge rounded-pill badge-xs bg-info-lighter text-info">1</span>
@@ -234,7 +230,7 @@ class TestDashboardView:
                    data-matomo-category="employeurs"
                    data-matomo-action="clic"
                    data-matomo-option="voir-liste-candidatures-En attente">
-                    <i class="ri-time-line ri-lg fw-normal"></i>
+                    <i class="ri-time-line ri-lg fw-normal" aria-hidden="true"></i>
                     <span>En attente</span>
                 </a>
                 <span class="badge rounded-pill badge-xs bg-info-lighter text-info">1</span>
@@ -475,7 +471,7 @@ class TestDashboardView:
             f"""
             <a href="/siae_evaluation/evaluated_siae_sanction/{evaluated_siae_with_final_decision.pk}/"
              class="btn-link btn-ico">
-                <i class="ri-file-copy-2-line ri-lg fw-normal"></i>
+                <i class="ri-file-copy-2-line ri-lg fw-normal" aria-hidden="true"></i>
                 <span>Final decision reached</span>
             </a>
             """,
@@ -487,7 +483,7 @@ class TestDashboardView:
             f"""
             <a href="/siae_evaluation/evaluated_siae_sanction/{evaluated_siae_campaign_closed.pk}/"
              class="btn-link btn-ico">
-                <i class="ri-file-copy-2-line ri-lg fw-normal"></i>
+                <i class="ri-file-copy-2-line ri-lg fw-normal" aria-hidden="true"></i>
                 <span>{just_closed_name}</span>
             </a>
             """,

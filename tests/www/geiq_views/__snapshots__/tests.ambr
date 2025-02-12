@@ -466,7 +466,7 @@
                                           <tr>
                                               <td>
                                                   
-      <span class="badge badge-xs rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
+      <span class="badge badge-xs rounded-pill text-nowrap bg-success"><i aria-hidden="true" class="ri-check-line"></i>Validé</span>
   
   
                                               </td>
@@ -486,7 +486,7 @@
                                           <tr>
                                               <td>
                                                   
-      <span class="badge badge-xs rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
+      <span class="badge badge-xs rounded-pill text-nowrap bg-success"><i aria-hidden="true" class="ri-check-line"></i>Validé</span>
   
   
                                               </td>
@@ -506,7 +506,7 @@
                                           <tr>
                                               <td>
                                                   
-      <span class="badge badge-xs rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
+      <span class="badge badge-xs rounded-pill text-nowrap bg-success"><i aria-hidden="true" class="ri-check-line"></i>Validé</span>
   
   
                                               </td>
@@ -526,7 +526,7 @@
                                           <tr>
                                               <td>
                                                   
-      <span class="badge badge-xs rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
+      <span class="badge badge-xs rounded-pill text-nowrap bg-success"><i aria-hidden="true" class="ri-check-line"></i>Validé</span>
   
   
                                               </td>
@@ -546,7 +546,7 @@
                                           <tr>
                                               <td>
                                                   
-      <span class="badge badge-xs rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
+      <span class="badge badge-xs rounded-pill text-nowrap bg-success"><i aria-hidden="true" class="ri-check-line"></i>Validé</span>
   
   
                                               </td>
@@ -567,7 +567,7 @@
                                           <tr>
                                               <td>
                                                   
-      <span class="badge badge-xs rounded-pill text-nowrap bg-info"><i class="ri-loader-2-line"></i>À valider</span>
+      <span class="badge badge-xs rounded-pill text-nowrap bg-info"><i aria-hidden="true" class="ri-loader-2-line"></i>À valider</span>
   
   
                                               </td>
@@ -587,7 +587,7 @@
                                           <tr>
                                               <td>
                                                   
-      <span class="badge badge-xs rounded-pill text-nowrap bg-warning"><i class="ri-close-line"></i>En attente</span>
+      <span class="badge badge-xs rounded-pill text-nowrap bg-warning"><i aria-hidden="true" class="ri-close-line"></i>En attente</span>
   
   
                                               </td>
@@ -693,7 +693,7 @@
   
   <div class="c-box c-box--structure mb-3 mb-md-4">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line"></i>
           <div>
               <button data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip" type="button">
                   GEIQ
@@ -705,7 +705,7 @@
           <hr class="my-4"/>
           <ul class="c-box--structure__list-contact">
               <li>
-                  <i class="ri-map-pin-2-line fw-normal me-2"></i>
+                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
                   <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
                   <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -716,7 +716,7 @@
               
                   
       <li>
-      <i class="ri-mail-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -730,7 +730,7 @@
   
       
   <li>
-      <i class="ri-phone-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -821,7 +821,7 @@
           <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
               <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
                   <span>En savoir plus</span>
-                  <i class="ri-external-link-line ri-lg"></i>
+                  <i aria-hidden="true" class="ri-external-link-line ri-lg"></i>
               </a>
           </div>
       </div>
@@ -974,7 +974,7 @@
           <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
               <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
                   <span>En savoir plus</span>
-                  <i class="ri-external-link-line ri-lg"></i>
+                  <i aria-hidden="true" class="ri-external-link-line ri-lg"></i>
               </a>
           </div>
       </div>
@@ -1049,7 +1049,7 @@
   
   <div class="c-box c-box--structure mb-3 mb-md-4">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line"></i>
           <div>
               <button data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip" type="button">
                   GEIQ
@@ -1061,7 +1061,7 @@
           <hr class="my-4"/>
           <ul class="c-box--structure__list-contact">
               <li>
-                  <i class="ri-map-pin-2-line fw-normal me-2"></i>
+                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
                   <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
                   <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1072,7 +1072,7 @@
               
                   
       <li>
-      <i class="ri-mail-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1086,7 +1086,7 @@
   
       
   <li>
-      <i class="ri-phone-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1177,7 +1177,7 @@
           <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
               <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
                   <span>En savoir plus</span>
-                  <i class="ri-external-link-line ri-lg"></i>
+                  <i aria-hidden="true" class="ri-external-link-line ri-lg"></i>
               </a>
           </div>
       </div>
@@ -1328,7 +1328,7 @@
           <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
               <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
                   <span>En savoir plus</span>
-                  <i class="ri-external-link-line ri-lg"></i>
+                  <i aria-hidden="true" class="ri-external-link-line ri-lg"></i>
               </a>
           </div>
       </div>
@@ -1403,7 +1403,7 @@
   
   <div class="c-box c-box--structure mb-3 mb-md-4">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line"></i>
           <div>
               <button data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip" type="button">
                   GEIQ
@@ -1415,7 +1415,7 @@
           <hr class="my-4"/>
           <ul class="c-box--structure__list-contact">
               <li>
-                  <i class="ri-map-pin-2-line fw-normal me-2"></i>
+                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
                   <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
                   <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1426,7 +1426,7 @@
               
                   
       <li>
-      <i class="ri-mail-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1440,7 +1440,7 @@
   
       
   <li>
-      <i class="ri-phone-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1531,7 +1531,7 @@
           <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
               <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
                   <span>En savoir plus</span>
-                  <i class="ri-external-link-line ri-lg"></i>
+                  <i aria-hidden="true" class="ri-external-link-line ri-lg"></i>
               </a>
           </div>
       </div>
@@ -1684,7 +1684,7 @@
           <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
               <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
                   <span>En savoir plus</span>
-                  <i class="ri-external-link-line ri-lg"></i>
+                  <i aria-hidden="true" class="ri-external-link-line ri-lg"></i>
               </a>
           </div>
       </div>
@@ -1759,7 +1759,7 @@
   
   <div class="c-box c-box--structure mb-3 mb-md-4">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line"></i>
           <div>
               <button data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip" type="button">
                   GEIQ
@@ -1771,7 +1771,7 @@
           <hr class="my-4"/>
           <ul class="c-box--structure__list-contact">
               <li>
-                  <i class="ri-map-pin-2-line fw-normal me-2"></i>
+                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
                   <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
                   <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1782,7 +1782,7 @@
               
                   
       <li>
-      <i class="ri-mail-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1796,7 +1796,7 @@
   
       
   <li>
-      <i class="ri-phone-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -1887,7 +1887,7 @@
           <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
               <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
                   <span>En savoir plus</span>
-                  <i class="ri-external-link-line ri-lg"></i>
+                  <i aria-hidden="true" class="ri-external-link-line ri-lg"></i>
               </a>
           </div>
       </div>
@@ -2040,7 +2040,7 @@
           <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
               <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
                   <span>En savoir plus</span>
-                  <i class="ri-external-link-line ri-lg"></i>
+                  <i aria-hidden="true" class="ri-external-link-line ri-lg"></i>
               </a>
           </div>
       </div>
@@ -2115,7 +2115,7 @@
   
   <div class="c-box c-box--structure mb-3 mb-md-4">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line"></i>
           <div>
               <button data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip" type="button">
                   GEIQ
@@ -2127,7 +2127,7 @@
           <hr class="my-4"/>
           <ul class="c-box--structure__list-contact">
               <li>
-                  <i class="ri-map-pin-2-line fw-normal me-2"></i>
+                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
                   <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
                   <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2138,7 +2138,7 @@
               
                   
       <li>
-      <i class="ri-mail-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2152,7 +2152,7 @@
   
       
   <li>
-      <i class="ri-phone-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2243,7 +2243,7 @@
           <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
               <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
                   <span>En savoir plus</span>
-                  <i class="ri-external-link-line ri-lg"></i>
+                  <i aria-hidden="true" class="ri-external-link-line ri-lg"></i>
               </a>
           </div>
       </div>
@@ -2394,7 +2394,7 @@
           <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
               <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
                   <span>En savoir plus</span>
-                  <i class="ri-external-link-line ri-lg"></i>
+                  <i aria-hidden="true" class="ri-external-link-line ri-lg"></i>
               </a>
           </div>
       </div>
@@ -2465,7 +2465,7 @@
   
   <div class="c-box c-box--structure mb-3 mb-md-4">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line"></i>
           <div>
               <button data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip" type="button">
                   GEIQ
@@ -2477,7 +2477,7 @@
           <hr class="my-4"/>
           <ul class="c-box--structure__list-contact">
               <li>
-                  <i class="ri-map-pin-2-line fw-normal me-2"></i>
+                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
                   <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
                   <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2488,7 +2488,7 @@
               
                   
       <li>
-      <i class="ri-mail-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2502,7 +2502,7 @@
   
       
   <li>
-      <i class="ri-phone-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2591,7 +2591,7 @@
           <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
               <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
                   <span>En savoir plus</span>
-                  <i class="ri-external-link-line ri-lg"></i>
+                  <i aria-hidden="true" class="ri-external-link-line ri-lg"></i>
               </a>
           </div>
       </div>
@@ -2738,7 +2738,7 @@
           <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
               <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
                   <span>En savoir plus</span>
-                  <i class="ri-external-link-line ri-lg"></i>
+                  <i aria-hidden="true" class="ri-external-link-line ri-lg"></i>
               </a>
           </div>
       </div>
@@ -2794,7 +2794,7 @@
   
   <div class="c-box c-box--structure mb-3 mb-md-4">
       <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line"></i>
           <div>
               <button data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip" type="button">
                   GEIQ
@@ -2806,7 +2806,7 @@
           <hr class="my-4"/>
           <ul class="c-box--structure__list-contact">
               <li>
-                  <i class="ri-map-pin-2-line fw-normal me-2"></i>
+                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
                   <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
                   <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2817,7 +2817,7 @@
               
                   
       <li>
-      <i class="ri-mail-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2831,7 +2831,7 @@
   
       
   <li>
-      <i class="ri-phone-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2920,7 +2920,7 @@
           <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
               <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
                   <span>En savoir plus</span>
-                  <i class="ri-external-link-line ri-lg"></i>
+                  <i aria-hidden="true" class="ri-external-link-line ri-lg"></i>
               </a>
           </div>
       </div>
@@ -2961,13 +2961,13 @@
   
       <div class="file-dropzone-selector">
           <p aria-hidden="true" class="mb-1 text-nuance-06">
-              <i class="ri-upload-cloud-2-line ri-2x"></i>
+              <i aria-hidden="true" class="ri-upload-cloud-2-line ri-2x"></i>
           </p>
           <p class="mb-2">
               Glissez votre fichier ici ou <strong>rechercher</strong> dans vos fichiers
           </p>
           <label class="btn btn-link btn-sm btn-ico mb-2 stretched-link" for="id_activity_report_file">
-              <i class="ri-folder-line ri-xl"></i>
+              <i aria-hidden="true" class="ri-folder-line ri-xl"></i>
               <span>Rechercher dans vos fichiers</span>
           </label>
           <p class="small text-nuance-06 mb-0">
@@ -2985,7 +2985,7 @@
               <strong class="file-dropzone-filename"></strong>
           </div>
           <button class="btn btn-sm btn-ico btn-secondary file-dropzone-clear" type="button">
-              <i class="ri-delete-bin-line ri-xl"></i>
+              <i aria-hidden="true" class="ri-delete-bin-line ri-xl"></i>
               <span>Supprimer</span>
           </button>
       </div>
@@ -3112,7 +3112,7 @@
           <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
               <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
                   <span>En savoir plus</span>
-                  <i class="ri-external-link-line ri-lg"></i>
+                  <i aria-hidden="true" class="ri-external-link-line ri-lg"></i>
               </a>
           </div>
       </div>

@@ -39,7 +39,7 @@
             {% if can_view_personal_information and not request.user.is_job_seeker %}
                 <a class="btn-link ms-3" href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker=job_seeker.public_id from_url=request.get_full_path|urlencode %}">Vérifier le profil</a>
             {% endif %}
-            {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning"></i>{% endif %}
+            {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>{% endif %}
         </p>
     {% endif %}
 {% endblock %}

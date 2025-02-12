@@ -976,7 +976,7 @@
           
               <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
                   <div class="dropdown-item disabled">
-                      <i class="ri-home-smile-line"></i>
+                      <i aria-hidden="true" class="ri-home-smile-line"></i>
                       <strong>Une autre structure</strong>
                   </div>
               </div>
@@ -995,7 +995,7 @@
           
           
               <a class="dropdown-item" href="/apply/[PK of JobApplication]/siae/external-transfer/1">
-                  <i class="ri-home-smile-line"></i>
+                  <i aria-hidden="true" class="ri-home-smile-line"></i>
                   <strong>Une autre structure</strong>
               </a>
           

@@ -8,7 +8,7 @@
             {% for siae in request.organizations %}
                 {% if siae != request.current_organization %}
                     <a class="dropdown-item dropdown-item__summary" data-bs-toggle="modal" data-bs-target="#transfer_confirmation_modal_{{ siae.pk }}">
-                        <i class="ri-community-line"></i>
+                        <i class="ri-community-line" aria-hidden="true"></i>
                         <span>{{ siae.kind }}</span>
                         <strong>{{ siae.display_name }}</strong>
                     </a>
@@ -18,13 +18,13 @@
         {% endif %}
         {% if job_application.state.is_refused %}
             <a class="dropdown-item" href="{% url 'apply:job_application_external_transfer_step_1' job_application_id=job_application.id %}">
-                <i class="ri-home-smile-line"></i>
+                <i class="ri-home-smile-line" aria-hidden="true"></i>
                 <strong>Une autre structure</strong>
             </a>
         {% else %}
             <div data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" role="button" tabindex="0">
                 <div class="dropdown-item disabled">
-                    <i class="ri-home-smile-line"></i>
+                    <i class="ri-home-smile-line" aria-hidden="true"></i>
                     <strong>Une autre structure</strong>
                 </div>
             </div>

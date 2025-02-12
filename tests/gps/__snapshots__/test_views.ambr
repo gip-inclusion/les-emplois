@@ -191,7 +191,7 @@
                                       
                                           <div>
                                               <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
-                                                  <i class="ri-map-pin-user-line"></i>
+                                                  <i aria-hidden="true" class="ri-map-pin-user-line"></i>
                                                   Référent⸱e
                                               </span>
                                           </div>

@@ -1,7 +1,7 @@
 <ul class="list-unstyled">
     <li class="dropdown-item">
         <div class="d-flex align-items-center">
-            <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+            <span class="flex-shrink-0"><i class="ri-user-line ri-2x" aria-hidden="true"></i></span>
             <div class="flex-grow-1 ms-2 lh-sm{% if mobile %} w-75{% endif %}">
                 {% if user.get_full_name %}
                     <span>{{ user.get_full_name }}</span>

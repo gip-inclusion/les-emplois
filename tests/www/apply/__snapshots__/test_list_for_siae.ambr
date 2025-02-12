@@ -2634,7 +2634,7 @@
                                       
                                           
                                               <button class="dropdown-item dropdown-item__summary" data-bs-target="#transfer_confirmation_modal_2222" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-open-modal" type="button">
-                                                  <i class="ri-community-line"></i>
+                                                  <i aria-hidden="true" class="ri-community-line"></i>
                                                   <span>EI</span>
                                                   <strong>Acme inc.</strong>
                                               </button>
@@ -2644,7 +2644,7 @@
                                       
                                           
                                               <button class="dropdown-item dropdown-item__summary" data-bs-target="#transfer_confirmation_modal_3333" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-open-modal" type="button">
-                                                  <i class="ri-community-line"></i>
+                                                  <i aria-hidden="true" class="ri-community-line"></i>
                                                   <span>EITI</span>
                                                   <strong>Superbe snapshot</strong>
                                               </button>
@@ -2684,7 +2684,7 @@
   
   <div class="c-box c-box--structure mb-3 mb-lg-5">
       <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line"></i>
           <div>
               <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
                   EI
@@ -2696,7 +2696,7 @@
           <hr class="my-4"/>
           <ul class="c-box--structure__list-contact">
               <li>
-                  <i class="ri-map-pin-2-line fw-normal me-2"></i>
+                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
                   <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
                   <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2707,7 +2707,7 @@
               
                   
       <li>
-      <i class="ri-mail-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2721,7 +2721,7 @@
   
       
   <li>
-      <i class="ri-phone-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2790,7 +2790,7 @@
   
   <div class="c-box c-box--structure mb-3 mb-lg-5">
       <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line"></i>
           <div>
               <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
                   EI
@@ -2802,7 +2802,7 @@
           <hr class="my-4"/>
           <ul class="c-box--structure__list-contact">
               <li>
-                  <i class="ri-map-pin-2-line fw-normal me-2"></i>
+                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
                   <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
                   <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2813,7 +2813,7 @@
               
                   
       <li>
-      <i class="ri-mail-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -2827,7 +2827,7 @@
   
       
   <li>
-      <i class="ri-phone-line fw-normal me-2"></i>
+      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
       <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
@@ -3219,7 +3219,7 @@
       </td>
       <td>
           
-              <i class="ri-home-smile-2-line"></i>
+              <i aria-hidden="true" class="ri-home-smile-2-line"></i>
               
                   Pres. Org.
               
@@ -3438,7 +3438,7 @@
               </p>
               
                   <a class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center" href="/company/job_description_list">
-                      <i class="ri-briefcase-line ri-lg fw-normal"></i>
+                      <i aria-hidden="true" class="ri-briefcase-line ri-lg fw-normal"></i>
                       <span>Gérer les métiers et recrutements</span>
                   </a>
               
