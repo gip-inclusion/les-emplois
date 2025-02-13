@@ -314,7 +314,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
 
     def get_exit_url(self, job_seeker_public_id, created=False):
         if self.is_gps:
-            return reverse("gps:groups_list")
+            return reverse("gps:group_list")
         if self.standalone_creation:
             return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker_public_id})
 

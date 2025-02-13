@@ -104,7 +104,7 @@ def test_create_job_seeker(_mock, client):
 
     params = {
         "tunnel": "gps",
-        "from_url": reverse("gps:groups_list"),
+        "from_url": reverse("gps:group_list"),
     }
     create_beneficiary_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
 
@@ -131,7 +131,7 @@ def test_create_job_seeker(_mock, client):
     expected_job_seeker_session = {
         "config": {
             "tunnel": "gps",
-            "from_url": reverse("gps:groups_list"),
+            "from_url": reverse("gps:group_list"),
             "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
         },
         "profile": {
@@ -270,7 +270,7 @@ def test_create_job_seeker(_mock, client):
     assertContains(response, "Créer et suivre le bénéficiaire")
 
     response = client.post(next_url)
-    assertRedirects(response, reverse("gps:groups_list"))
+    assertRedirects(response, reverse("gps:group_list"))
     created_job_seeker = User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("follow_up_group").get()
     assert created_job_seeker.email == dummy_job_seeker.email
     assert created_job_seeker.jobseeker_profile.created_by_prescriber_organization == prescriber_organization
@@ -290,7 +290,7 @@ def test_existing_user_with_email(client):
     client.force_login(user)
 
     # Follow all redirections…
-    params = {"tunnel": "gps", "from_url": reverse("gps:groups_list")}
+    params = {"tunnel": "gps", "from_url": reverse("gps:group_list")}
     create_beneficiary_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
     response = client.get(create_beneficiary_url, follow=True)
     [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
@@ -315,7 +315,7 @@ def test_existing_user_with_email(client):
     expected_job_seeker_session = {
         "config": {
             "tunnel": "gps",
-            "from_url": reverse("gps:groups_list"),
+            "from_url": reverse("gps:group_list"),
             "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
         },
         "profile": {
@@ -338,7 +338,7 @@ def test_existing_user_with_email(client):
 
     post_data = {"email": job_seeker.email, "confirm": "1"}
     response = client.post(next_url, data=post_data)
-    assertRedirects(response, reverse("gps:groups_list"))
+    assertRedirects(response, reverse("gps:group_list"))
 
     # Make sure the job seeker follow-up group was created
     # ----------------------------------------------------------------------
@@ -359,7 +359,7 @@ def test_existing_user_with_nir(client):
     client.force_login(user)
 
     # Follow all redirections…
-    params = {"tunnel": "gps", "from_url": reverse("gps:groups_list")}
+    params = {"tunnel": "gps", "from_url": reverse("gps:group_list")}
     create_beneficiary_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
     response = client.get(create_beneficiary_url, follow=True)
     [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
@@ -381,7 +381,7 @@ def test_existing_user_with_nir(client):
     post_data = {"nir": nir, "confirm": 1}
     response = client.post(last_url, data=post_data)
 
-    assertRedirects(response, reverse("gps:groups_list"))
+    assertRedirects(response, reverse("gps:group_list"))
 
     # Make sure the job seeker follow-up group was created
     # ----------------------------------------------------------------------
