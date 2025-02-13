@@ -85,7 +85,7 @@ def leave_group(request, group_id):
         membership.is_active = False
         membership.save()
 
-    return HttpResponseRedirect(reverse("gps:my_groups"))
+    return HttpResponseRedirect(reverse("gps:groups_list"))
 
 
 @check_user(is_allowed_to_use_gps)
@@ -145,7 +145,7 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
 
         org_department = getattr(self.request.current_organization, "department", None)
         matomo_option = org_department if org_department in self.get_live_department_codes() else None
-        back_url = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("gps:my_groups"))
+        back_url = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("gps:groups_list"))
 
         membership = next(m for m in gps_memberships if m.member == self.request.user)
 
