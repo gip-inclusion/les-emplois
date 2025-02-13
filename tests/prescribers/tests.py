@@ -1045,6 +1045,19 @@ def test_add_admin(admin_client, caplog, mailoutbox):
     ) in caplog.messages
 
 
+def test_admin_more_than_100_memberships(admin_client, mocker):
+    organization = PrescriberOrganizationWith2MembershipFactory()
+
+    change_url = reverse("admin:prescribers_prescriberorganization_change", args=[organization.pk])
+    response = admin_client.get(change_url)
+    membership_form_field_id = '"id_prescribermembership_set-0-user"'
+    assertContains(response, membership_form_field_id)
+
+    mocker.patch("itou.prescribers.admin.PrescriberOrganizationMembersInline.MEMBERSHIP_RO_LIMIT", 1)
+    response = admin_client.get(change_url)
+    assertNotContains(response, membership_form_field_id)
+
+
 def test_prescriber_kinds_are_alphabetically_sorted():
     assert PrescriberOrganizationKind.choices == sorted(
         PrescriberOrganizationKind.choices,
