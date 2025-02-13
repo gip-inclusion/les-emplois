@@ -1,3 +1,4 @@
+import functools
 import string
 
 import factory.fuzzy
@@ -98,6 +99,9 @@ class CompanyFactory(factory.django.DjangoModelFactory):
             with_geocoding=True,
             brand=factory.Faker("company", locale="fr_FR"),
             description=factory.Faker("paragraph", locale="fr_FR"),
+        )
+        not_in_territorial_experimentation = factory.Trait(
+            post_code=factory.LazyFunction(functools.partial(create_fake_postcode, ignore=["30"]))
         )
         for_snapshot = factory.Trait(
             name="ACME Inc.",
