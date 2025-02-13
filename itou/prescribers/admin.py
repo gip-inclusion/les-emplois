@@ -71,6 +71,13 @@ class AuthorizationValidationRequired(admin.SimpleListFilter):
 
 class PrescriberOrganizationMembersInline(MembersInline):
     model = PrescriberOrganization.members.through
+    MEMBERSHIP_RO_LIMIT = 200
+
+    def has_change_permission(self, request, obj=None):
+        # A few organizations have more than 250 members, which causes the form
+        # to have more than 1000 fields (the limit set in DATA_UPLOAD_MAX_NUMBER_FIELDS)
+        # we believe that with 200+ members, there's no need to ask the support team to manually add a member
+        return not bool(obj and obj.prescribermembership_set.count() > self.MEMBERSHIP_RO_LIMIT)
 
 
 @admin.register(PrescriberOrganization)
