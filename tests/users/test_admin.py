@@ -1,5 +1,6 @@
 import pytest
 from django.urls import reverse
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.users import admin
 from itou.users.models import JobSeekerProfile, User
@@ -7,6 +8,15 @@ from tests.companies.factories import CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import JobSeekerFactory
+
+
+def test_search(admin_client):
+    user = JobSeekerFactory()
+    other_user = JobSeekerFactory()
+
+    response = admin_client.get(reverse("admin:users_user_changelist") + f"?q={user.public_id}")
+    assertContains(response, user.email)
+    assertNotContains(response, other_user.email)
 
 
 def test_filter():
