@@ -98,7 +98,15 @@ class JobApplicationSearchView(LoginNotRequiredMixin, mixins.ListModelMixin, gen
                     JobApplicationTransitionLog.objects.all().order_by("-timestamp").values("timestamp")[:1],
                 ),
                 F("updated_at"),
-            )
+            ),
+            employer_email=Coalesce(
+                Subquery(
+                    JobApplicationTransitionLog.objects.exclude(user__isnull=True)
+                    .order_by("-timestamp")
+                    .values("user__email")[:1],
+                ),
+                F("to_company__email"),
+            ),
         )
         .select_related(
             "job_seeker__jobseeker_profile",

@@ -189,7 +189,7 @@ class TestJobApplicationSearchApi:
         assert first_application["entreprise_nom"] == self.job_application.to_company.display_name
         assert first_application["entreprise_siret"] == self.job_application.to_company.siret
         assert first_application["entreprise_adresse"] == self.job_application.to_company.address_on_one_line
-        assert first_application["entreprise_email"] == self.job_application.to_company.email
+        assert first_application["entreprise_employeur_email"] == self.job_application.to_company.email
         assert first_application["orientation_emetteur_type"] == self.job_application.sender_kind
         assert (
             first_application["orientation_emetteur_sous_type"]
@@ -234,6 +234,7 @@ class TestJobApplicationSearchApi:
     def test_siret_siren(self, company_source, expected_len):
         self.job_application.to_company.source = company_source
         self.job_application.last_modification_at = self.job_application.updated_at  # Annotated attribute
+        self.job_application.employer_email = self.job_application.to_company.email  # Annotated attribute
         assert (
             len(JobApplicationSearchResponseSerializer(self.job_application).data["entreprise_siret"]) == expected_len
         )

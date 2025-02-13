@@ -119,9 +119,9 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
         source="to_company.address_on_one_line",
         label="Adresse postale de l’entreprise",
     )
-    entreprise_email = serializers.CharField(
-        source="to_company.email",
-        label="Adresse e-mail de l’entreprise",
+    entreprise_employeur_email = serializers.CharField(
+        source="employer_email",
+        label="Adresse e-mail de l’employeur",
     )
     orientation_emetteur_type = serializers.ChoiceField(
         source="sender_kind",
@@ -214,7 +214,7 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
             "entreprise_nom",
             "entreprise_siret",
             "entreprise_adresse",
-            "entreprise_email",
+            "entreprise_employeur_email",
             "orientation_emetteur_type",
             "orientation_emetteur_sous_type",
             "orientation_emetteur_nom",
