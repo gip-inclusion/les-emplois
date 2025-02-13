@@ -13,7 +13,10 @@
 
 {% block title_content %}
     <div class="d-flex flex-column flex-md-row gap-3 mb-3 mb-md-5 justify-content-md-between align-items-md-center">
-        <h1 class="m-0">Mes bénéficiaires</h1>
+        <div>
+            <h1 class="m-0">GPS</h1>
+            <p>Guide de partage et de suivi</p>
+        </div>
         <div class="d-flex flex-column flex-md-row gap-md-3" role="group" aria-label="Actions sur les groupes de suivi">
             <a href='{% tally_form_url form_id="w5kLqM" user_public_id=user.public_id user_first_name=user.first_name user_last_name=user.last_name %}&{% if request.current_organization %}&user_organization_uid={{ request.current_organization.uid }}&user_organization_name={{ request.current_organization.display_name }}{% endif %}'
                rel="noopener"
