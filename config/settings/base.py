@@ -709,6 +709,7 @@ DORA_BASE_URL = os.getenv("DORA_BASE_URL", "https://dora.inclusion.beta.gouv.fr"
 # ------------------------------------------------------------------------------
 GPS_GROUPS_CREATED_BY_EMAIL = os.getenv("GPS_GROUPS_CREATED_BY_EMAIL", None)
 GPS_GROUPS_CREATED_AT_DATE = datetime.date(2024, 6, 12)
+GPS_NAV_ENTRY_DEPARTMENTS = ["30"]
 GRIST_API_KEY = os.getenv("GRIST_API_KEY")
 
 # Datadog
