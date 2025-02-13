@@ -24,7 +24,11 @@
                  AND "users_jobseekerprofile"."birthdate" = %s
                  AND "users_jobseekerprofile"."nir" = %s
                  AND "users_user"."last_name" %% %s
-                 AND "job_applications_jobapplication"."updated_at" >= %s)
+                 AND COALESCE(
+                                (SELECT U0."timestamp"
+                                 FROM "job_applications_jobapplicationtransitionlog" U0
+                                 ORDER BY U0."timestamp" DESC
+                                 LIMIT 1), "job_applications_jobapplication"."updated_at") >= %s)
         ''',
       }),
       dict({
@@ -79,6 +83,11 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 COALESCE(
+                            (SELECT U0."timestamp"
+                             FROM "job_applications_jobapplicationtransitionlog" U0
+                             ORDER BY U0."timestamp" DESC
+                             LIMIT 1), "job_applications_jobapplication"."updated_at") AS "last_modification_at",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -316,8 +325,12 @@
                  AND "users_jobseekerprofile"."birthdate" = %s
                  AND "users_jobseekerprofile"."nir" = %s
                  AND "users_user"."last_name" %% %s
-                 AND "job_applications_jobapplication"."updated_at" >= %s)
-          ORDER BY "job_applications_jobapplication"."updated_at" DESC
+                 AND COALESCE(
+                                (SELECT U0."timestamp"
+                                 FROM "job_applications_jobapplicationtransitionlog" U0
+                                 ORDER BY U0."timestamp" DESC
+                                 LIMIT 1), "job_applications_jobapplication"."updated_at") >= %s)
+          ORDER BY 47 DESC
           LIMIT 3
         ''',
       }),

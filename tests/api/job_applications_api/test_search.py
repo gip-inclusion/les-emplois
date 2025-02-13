@@ -233,6 +233,7 @@ class TestJobApplicationSearchApi:
     )
     def test_siret_siren(self, company_source, expected_len):
         self.job_application.to_company.source = company_source
+        self.job_application.last_modification_at = self.job_application.updated_at  # Annotated attribute
         assert (
             len(JobApplicationSearchResponseSerializer(self.job_application).data["entreprise_siret"]) == expected_len
         )

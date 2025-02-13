@@ -1,5 +1,6 @@
 from dateutil.relativedelta import relativedelta
-from django.db.models import Prefetch
+from django.db.models import F, Prefetch, Subquery
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view, inline_serializer
@@ -14,7 +15,7 @@ from itou.api.job_application_api.serializers import (
 )
 from itou.api.job_application_api.throttling import JobApplicationSearchThrottle
 from itou.companies.models import JobDescription
-from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.utils.auth import LoginNotRequiredMixin
 
 
@@ -91,7 +92,15 @@ class JobApplicationSearchView(LoginNotRequiredMixin, mixins.ListModelMixin, gen
     serializer_class = JobApplicationSearchResponseSerializer
     throttle_classes = [JobApplicationSearchThrottle]
     queryset = (
-        JobApplication.objects.select_related(
+        JobApplication.objects.annotate(
+            last_modification_at=Coalesce(
+                Subquery(
+                    JobApplicationTransitionLog.objects.all().order_by("-timestamp").values("timestamp")[:1],
+                ),
+                F("updated_at"),
+            )
+        )
+        .select_related(
             "job_seeker__jobseeker_profile",
             "to_company",
             "approval",
@@ -110,7 +119,7 @@ class JobApplicationSearchView(LoginNotRequiredMixin, mixins.ListModelMixin, gen
                 queryset=JobDescription.objects.select_related("appellation__rome", "location", "company"),
             ),
         )
-        .order_by("-updated_at")
+        .order_by("-last_modification_at")
     )
 
     def post(self, request, *args, **kwargs):
@@ -126,5 +135,5 @@ class JobApplicationSearchView(LoginNotRequiredMixin, mixins.ListModelMixin, gen
             job_seeker__jobseeker_profile__birthdate=validated_data["date_naissance"],
             job_seeker__last_name__trigram_similar=validated_data["nom"],
             job_seeker__first_name__trigram_similar=validated_data["prenom"],
-            updated_at__gte=three_months_ago,
+            last_modification_at__gte=three_months_ago,
         )

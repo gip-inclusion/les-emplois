@@ -44,6 +44,11 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
             "Idéal pour déterminer si une entrée doit être mise à jour sur une base externe."
         ),
     )
+    dernier_changement_le = serializers.DateTimeField(
+        source="last_modification_at",
+        label="Horodatage du dernier changement de la candidature (ISO 8601)",
+        help_text="Correspond à l’horodatage le plus récent lors duquel la candidature a changé d’état.",
+    )
     statut = serializers.ChoiceField(
         source="state",
         choices=JobApplicationState.choices,
@@ -184,6 +189,7 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
         fields = (
             "cree_le",
             "mis_a_jour_le",
+            "dernier_changement_le",
             "statut",
             "candidat_nom",
             "candidat_prenom",
