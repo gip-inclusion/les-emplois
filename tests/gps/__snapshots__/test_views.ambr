@@ -558,7 +558,7 @@
         'origin': list([
           'MembershipsFiltersForm._get_beneficiary_choices[www/gps/forms.py]',
           'MembershipsFiltersForm.__init__[www/gps/forms.py]',
-          'my_groups[www/gps/views.py]',
+          'group_list[www/gps/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
@@ -612,7 +612,7 @@
         'origin': list([
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
-          'my_groups[www/gps/views.py]',
+          'group_list[www/gps/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
@@ -635,8 +635,8 @@
           'IncludeNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[gps/my_groups.html]',
-          'my_groups[www/gps/views.py]',
+          'ExtendsNode[gps/group_list.html]',
+          'group_list[www/gps/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
@@ -654,10 +654,10 @@
       dict({
         'origin': list([
           'IfNode[gps/includes/memberships_results.html]',
-          'IncludeNode[gps/my_groups.html]',
+          'IncludeNode[gps/group_list.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[gps/my_groups.html]',
-          'my_groups[www/gps/views.py]',
+          'ExtendsNode[gps/group_list.html]',
+          'group_list[www/gps/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
@@ -762,10 +762,10 @@
       dict({
         'origin': list([
           'IfNode[gps/includes/memberships_results.html]',
-          'IncludeNode[gps/my_groups.html]',
+          'IncludeNode[gps/group_list.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[gps/my_groups.html]',
-          'my_groups[www/gps/views.py]',
+          'ExtendsNode[gps/group_list.html]',
+          'group_list[www/gps/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
@@ -812,10 +812,10 @@
           'IfNode[gps/includes/memberships_results.html]',
           'ForNode[gps/includes/memberships_results.html]',
           'IfNode[gps/includes/memberships_results.html]',
-          'IncludeNode[gps/my_groups.html]',
+          'IncludeNode[gps/group_list.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[gps/my_groups.html]',
-          'my_groups[www/gps/views.py]',
+          'ExtendsNode[gps/group_list.html]',
+          'group_list[www/gps/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''

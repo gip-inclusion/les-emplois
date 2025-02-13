@@ -31,7 +31,7 @@ def in_gard(request):
 
 
 @check_user(is_allowed_to_use_gps)
-def my_groups(request, template_name="gps/my_groups.html"):
+def group_list(request, template_name="gps/group_list.html"):
     memberships = (
         FollowUpGroupMembership.objects.filter(member=request.user)
         .filter(is_active=True)
@@ -85,7 +85,7 @@ def leave_group(request, group_id):
         membership.is_active = False
         membership.save()
 
-    return HttpResponseRedirect(reverse("gps:groups_list"))
+    return HttpResponseRedirect(reverse("gps:group_list"))
 
 
 @check_user(is_allowed_to_use_gps)
@@ -145,7 +145,7 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
 
         org_department = getattr(self.request.current_organization, "department", None)
         matomo_option = org_department if org_department in self.get_live_department_codes() else None
-        back_url = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("gps:groups_list"))
+        back_url = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("gps:group_list"))
 
         membership = next(m for m in gps_memberships if m.member == self.request.user)
 

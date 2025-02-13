@@ -24,7 +24,7 @@ def test_job_seeker_cannot_use_gps(client):
     group = FollowUpGroupFactory(beneficiary=job_seeker)
 
     for route, kwargs in [
-        ("gps:groups_list", {}),
+        ("gps:group_list", {}),
         ("gps:leave_group", {"group_id": group.pk}),
         ("gps:toggle_referent", {"group_id": group.pk}),
     ]:
@@ -62,7 +62,7 @@ def test_job_seeker_cannot_use_gps(client):
 )
 def test_gps_access(client, factory, access):
     client.force_login(factory())
-    response = client.get(reverse("gps:groups_list"))
+    response = client.get(reverse("gps:group_list"))
     FEATURE_INVITE = "<span>Inviter un partenaire</span>"
     FEATURE_ADD = "<span>Ajouter un bénéficiaire</span>"
     if access is None:
@@ -89,7 +89,7 @@ def test_my_groups(snapshot, client):
     FollowUpGroup.objects.follow_beneficiary(group.beneficiary, user)
 
     with assertSnapshotQueries(snapshot):
-        response = client.get(reverse("gps:groups_list"))
+        response = client.get(reverse("gps:group_list"))
     groups = parse_response_to_soup(
         response,
         selector="#follow-up-groups-section",
@@ -102,7 +102,7 @@ def test_my_groups(snapshot, client):
     # Test `is_referent` display.
     group = FollowUpGroupFactory(memberships=1, beneficiary__first_name="Janis", beneficiary__last_name="Joplin")
     FollowUpGroup.objects.follow_beneficiary(group.beneficiary, user, is_referent=True)
-    response = client.get(reverse("gps:groups_list"))
+    response = client.get(reverse("gps:group_list"))
     assertContains(response, "vous êtes référent")
 
 
@@ -110,7 +110,7 @@ def test_my_groups_as_non_authorized_precriber(client):
     user = PrescriberFactory()
     client.force_login(user)
 
-    response = client.get(reverse("gps:groups_list"))
+    response = client.get(reverse("gps:group_list"))
     assertContains(response, "Demander l'ajout d'un bénéficiaire")
     assertContains(response, "https://formulaires.gps.inclusion.gouv.fr/ajouter-usager?")
 
@@ -339,7 +339,7 @@ def test_remove_members_from_group(client):
     prescriber = PrescriberFactory(membership__organization__authorized=True)
     beneficiary = JobSeekerFactory()
     my_group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=4, memberships__member=prescriber)
-    my_groups_url = reverse("gps:groups_list")
+    my_groups_url = reverse("gps:group_list")
     user_details_url = reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id})
 
     client.force_login(prescriber)
@@ -373,7 +373,7 @@ def test_groups_pagination_and_name_filter(client):
     created_groups = FollowUpGroupFactory.create_batch(51, memberships=1, memberships__member=prescriber)
 
     client.force_login(prescriber)
-    my_groups_url = reverse("gps:groups_list")
+    my_groups_url = reverse("gps:group_list")
     response = client.get(my_groups_url)
     assert len(response.context["memberships_page"].object_list) == 50
     assert f"{my_groups_url}?page=2" in response.content.decode()
