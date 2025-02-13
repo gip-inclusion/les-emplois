@@ -21,7 +21,7 @@ from itou.users.models import User
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
-from itou.utils.urls import add_url_params, get_safe_url
+from itou.utils.urls import get_safe_url
 from itou.www.employee_record_views.enums import EmployeeRecordOrder
 from itou.www.employee_record_views.forms import (
     AddEmployeeRecordChooseApprovalForm,
@@ -77,7 +77,14 @@ class AddView(NamedUrlSessionWizardView):
     def get_form_kwargs(self, step=None):
         hiring_of_the_company = JobApplication.objects.accepted().filter(to_company=self.company)
         if step == "choose-employee":
-            return {"employees": hiring_of_the_company.get_unique_fk_objects("job_seeker")}
+            employees = []
+            # Add job seekers in order, whithout duplicates
+            for job_app in hiring_of_the_company.eligible_as_employee_record(self.company).select_related(
+                "job_seeker"
+            ):
+                if job_app.job_seeker not in employees:
+                    employees.append(job_app.job_seeker)
+            return {"employees": employees}
         elif step == "choose-approval":
             employee = User.objects.get(
                 pk=self.get_cleaned_data_for_step("choose-employee")["employee"], kind=UserKind.JOB_SEEKER
@@ -125,35 +132,15 @@ class AddView(NamedUrlSessionWizardView):
         approval = Approval.objects.get(
             pk=self.get_all_cleaned_data()["approval"], user=self.get_all_cleaned_data()["employee"]
         )
-        try:
-            employee_record = EmployeeRecord.objects.for_company(self.company).get(approval_number=approval.number)
-        except EmployeeRecord.DoesNotExist:  # Send to the creation tunnel with the last accepted job application
-            job_application = (
-                JobApplication.objects.filter(to_company=self.company, approval=approval)
-                .accepted()
-                .with_accepted_at()
-                .latest("accepted_at")
-            )
-            return HttpResponseRedirect(
-                reverse("employee_record_views:create", kwargs={"job_application_id": job_application.pk})
-            )
-        else:
-            if employee_record.status == Status.NEW:  # Should be filled, send to the creation tunnel
-                return HttpResponseRedirect(
-                    reverse(
-                        "employee_record_views:create",
-                        kwargs={"job_application_id": employee_record.job_application.pk},
-                    )
-                    + "?back_url="
-                    + reverse("employee_record_views:add", kwargs={"step": "choose-employee"})
-                )
-            else:  # An employee record exists, show the summary
-                return HttpResponseRedirect(
-                    add_url_params(
-                        reverse("employee_record_views:summary", kwargs={"employee_record_id": employee_record.pk}),
-                        {"back_url": reverse("employee_record_views:list")},
-                    )
-                )
+        job_application = (
+            JobApplication.objects.filter(to_company=self.company, approval=approval)
+            .accepted()
+            .with_accepted_at()
+            .latest("accepted_at")
+        )
+        return HttpResponseRedirect(
+            reverse("employee_record_views:create", kwargs={"job_application_id": job_application.pk})
+        )
 
 
 @require_safe

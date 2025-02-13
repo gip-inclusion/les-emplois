@@ -31,30 +31,23 @@
                             {% csrf_token %}
                             {{ wizard.management_form }}
 
-                            <p>
-                                Dans le menu déroulant ci-dessous, vous trouverez la liste de vos salariés.
-                                Cette liste se base sur les embauches que vous avez déclarées sur le site des emplois de l’inclusion.
-                            </p>
-                            {% bootstrap_form form alert_error_type="non_fields" %}
-
-                            {% if not wizard.steps.next %}
+                            {% if wizard.steps.current == "choose-employee" %}
                                 <p>
-                                    Après avoir sélectionné le PASS IAE concerné et cliqué sur <i>"Confirmer"</i>, 2 cas de figure sont possibles :
+                                    Dans le menu déroulant ci-dessous, vous trouverez la liste de vos salariés qui n'ont pas encore de fiche salarié.
+                                    <br>
+                                    Cette liste se base sur les embauches que vous avez déclarées sur le site des Emplois de l’inclusion et qui ont déjà démarée.
                                 </p>
-                                <ul>
-                                    <li>
-                                        <p class="m-0">
-                                            <b>Une fiche salarié existe déjà pour ce salarié et ce PASS IAE :</b> dans ce cas vous serez automatiquement redirigé sur la page de détail de cette fiche salarié.
-                                        </p>
-                                        <p>
-                                            Si la fiche salarié est déjà intégrée et que vous avez besoin de la renvoyer dans l’Extranet IAE 2.0 de l’ASP, vous devez la <b>désactiver</b> puis la <b>réactiver</b>.
-                                        </p>
-                                    </li>
-                                    <li>
-                                        <b>Aucune fiche salarié n’existe pour ce salarié et ce PASS IAE :</b> dans ce cas vous serez redirigé vers le formulaire de création et d’envoi de la fiche salarié.
-                                    </li>
-                                </ul>
+                                <div class="c-info mb-3">
+                                    <span class="c-info__summary">Si vous avez besoin de renvoyer une fiche salarié déjà intégrée à l'Extranet IAE 2.0 de l'ASP, vous devez d’abord la désactiver, puis la réactiver.</span>
+                                </div>
+                            {% else %}
+                                <p>
+                                    Dans le menu déroulant ci-dessous, vous trouverez les PASS IAE du salarié selectionné à l'étape précédente.
+                                    <br>
+                                    Seuls les PASS n'ayant pas encore de fiche salarié sont affichés.
+                                </p>
                             {% endif %}
+                            {% bootstrap_form form alert_error_type="non_fields" %}
 
                             {% url "employee_record_views:list" as reset_url %}
                             {% if wizard.steps.prev %}
