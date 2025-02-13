@@ -36,7 +36,7 @@ from itou.www.dashboard.forms import (
     EditUserInfoForm,
     EditUserNotificationForm,
 )
-from itou.www.gps.views import in_gard, is_allowed_to_use_gps
+from itou.www.gps.views import is_allowed_to_use_gps, show_gps_as_a_nav_entry
 from itou.www.search.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
 
@@ -112,7 +112,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_create_siae_antenna": False,
         "can_show_financial_annexes": False,
         "can_show_employee_records": False,
-        "can_view_gps_card": is_allowed_to_use_gps(request.user) and not in_gard(request),
+        "can_view_gps_card": is_allowed_to_use_gps(request.user) and not show_gps_as_a_nav_entry(request),
         "can_view_stats_dashboard_widget": stats_utils.can_view_stats_dashboard_widget(request),
         "num_rejected_employee_records": 0,
         "pending_prolongation_requests": None,
