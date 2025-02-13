@@ -169,6 +169,11 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
     orientation_candidat_message = serializers.CharField(
         source="message",
         label="Message de candidature",
+        help_text=(
+            "Le message est potentiellement rédigé sur plusieurs lignes.\n\n"
+            "Des marqueurs de sauts de ligne tels que `\\n` ou `\\r\\n` peuvent être inclus dans le message.\n\n"
+            "**Il conviendra de les échapper ou de les convertir au besoin.**"
+        ),
     )
     orientation_candidat_cv = serializers.CharField(
         source="resume_link",
