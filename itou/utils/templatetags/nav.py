@@ -4,7 +4,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.text import slugify
 
-from itou.www.gps.views import in_gard, is_allowed_to_use_gps
+from itou.www.gps.views import in_departments_open_to_gps, is_allowed_to_use_gps
 
 
 register = template.Library()
@@ -258,7 +258,7 @@ def nav(request):
                     items=[NAV_ENTRIES["labor-inspector-members"]],
                 )
             )
-        if is_allowed_to_use_gps(request.user) and in_gard(request):
+        if is_allowed_to_use_gps(request.user) and in_departments_open_to_gps(request):
             menu_items.append(NAV_ENTRIES["gps"])
         menu_items.append(
             NavGroup(
