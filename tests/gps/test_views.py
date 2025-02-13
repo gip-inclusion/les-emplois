@@ -40,7 +40,7 @@ def test_job_seeker_cannot_use_gps(client):
         [partial(JobSeekerFactory, for_snapshot=True), None],
         [partial(EmployerFactory, with_company=True), "full"],
         [PrescriberFactory, "partial"],  # no org
-        [PrescriberFactory, "partial"],  # non authorizd org
+        [PrescriberFactory, "partial"],  # non authorized org
         [
             partial(
                 PrescriberFactory,
