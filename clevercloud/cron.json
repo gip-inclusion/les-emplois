@@ -29,7 +29,7 @@
   "5 23 * * * $ROOT/clevercloud/run_management_command.sh archive_employee_records --wet-run",
   "20 23 * * * $ROOT/clevercloud/run_management_command.sh archive_job_applications",
 
-  "0 9-12 * * 1 $ROOT/clevercloud/run_management_command.sh upload_data_to_pilotage asp_riae_shared_bucket/",
+  "0 9-12 * * 1 $ROOT/clevercloud/run_management_command.sh upload_data_to_pilotage asp_riae_shared_bucket/ --wet-run",
   "0 0 * * 1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
   "0 2 * * 1 $ROOT/clevercloud/crons/populate_metabase_matomo.sh",
   "0 12 * * 1 $ROOT/clevercloud/run_management_command.sh import_ea_eatt --from-asp --wet-run",
