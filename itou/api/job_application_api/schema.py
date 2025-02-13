@@ -23,6 +23,7 @@ job_application_search_response_valid_example = OpenApiExample(
         "results": [
             {
                 "cree_le": "2025-02-06T14:48:06.595973+01:00",
+                "mis_a_jour_le": "2025-02-06T17:15:22.654892+01:00",
                 "statut": "obsolete",
                 "candidat_nom": "Durand",
                 "candidat_prenom": "Nathalie",
@@ -54,6 +55,7 @@ job_application_search_response_valid_example = OpenApiExample(
             },
             {
                 "cree_le": "2025-02-06T10:52:25.678156+01:00",
+                "mis_a_jour_le": "2025-02-06T17:25:33.458745+01:00",
                 "statut": "accepted",
                 "candidat_nom": "Durand",
                 "candidat_prenom": "Nathalie",

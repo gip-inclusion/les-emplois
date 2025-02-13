@@ -34,6 +34,16 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
         source="created_at",
         label="Horodatage de création de la candidature (ISO 8601)",
     )
+    mis_a_jour_le = serializers.DateTimeField(
+        source="updated_at",
+        label="Horodatage de dernière mise à jour de la candidature (ISO 8601)",
+        help_text=(
+            "**Non destiné à l’affichage.**\n\n"
+            "Correspond à l’horodatage le plus récent lors duquel la candidature a été modifiée.\n\n"
+            "Ces modifications peuvent être des traitements automatisés.\n\n"
+            "Idéal pour déterminer si une entrée doit être mise à jour sur une base externe."
+        ),
+    )
     statut = serializers.ChoiceField(
         source="state",
         choices=JobApplicationState.choices,
@@ -173,6 +183,7 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
         model = JobApplication
         fields = (
             "cree_le",
+            "mis_a_jour_le",
             "statut",
             "candidat_nom",
             "candidat_prenom",
