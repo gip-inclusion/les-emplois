@@ -1045,7 +1045,7 @@ def test_add_admin(admin_client, caplog, mailoutbox):
     ) in caplog.messages
 
 
-def test_admin_more_than_100_memberships(admin_client, mocker):
+def test_admin_too_many_memberships(admin_client, mocker):
     organization = PrescriberOrganizationWith2MembershipFactory()
 
     change_url = reverse("admin:prescribers_prescriberorganization_change", args=[organization.pk])
