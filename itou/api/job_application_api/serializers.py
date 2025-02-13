@@ -59,6 +59,10 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
         choices=JobApplicationState.choices,
         label="État de la candidature",
     )
+    candidat_nir = serializers.CharField(
+        source="job_seeker.jobseeker_profile.nir",
+        label="Numéro de sécurité sociale du candidat",
+    )
     candidat_nom = serializers.CharField(
         source="job_seeker.last_name",
         label="Nom de famille du candidat",
@@ -67,9 +71,9 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
         source="job_seeker.first_name",
         label="Prénom du candidat",
     )
-    candidat_nir = serializers.CharField(
-        source="job_seeker.jobseeker_profile.nir",
-        label="Numéro de sécurité sociale du candidat",
+    candidat_date_naissance = serializers.DateField(
+        source="job_seeker.jobseeker_profile.birthdate",
+        label="Date de naissance du candidat (ISO 8601)",
     )
     candidat_email = serializers.CharField(
         source="job_seeker.email",
@@ -198,9 +202,10 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
             "mis_a_jour_le",
             "dernier_changement_le",
             "statut",
+            "candidat_nir",
             "candidat_nom",
             "candidat_prenom",
-            "candidat_nir",
+            "candidat_date_naissance",
             "candidat_email",
             "candidat_telephone",
             "candidat_pass_iae_statut",
