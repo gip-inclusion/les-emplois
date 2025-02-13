@@ -371,96 +371,112 @@
       }),
       dict({
         'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
           'AddView.get_form_kwargs[www/employee_record_views/views.py]',
           'AddView.get[www/employee_record_views/views.py]',
           'AddView.dispatch[www/employee_record_views/views.py]',
         ]),
         'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."job_seeker_id") "job_applications_jobapplication"."id",
-                             "job_applications_jobapplication"."job_seeker_id",
-                             "job_applications_jobapplication"."eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."create_employee_record",
-                             "job_applications_jobapplication"."resume_link",
-                             "job_applications_jobapplication"."sender_id",
-                             "job_applications_jobapplication"."sender_kind",
-                             "job_applications_jobapplication"."sender_company_id",
-                             "job_applications_jobapplication"."sender_prescriber_organization_id",
-                             "job_applications_jobapplication"."to_company_id",
-                             "job_applications_jobapplication"."state",
-                             "job_applications_jobapplication"."archived_at",
-                             "job_applications_jobapplication"."archived_by_id",
-                             "job_applications_jobapplication"."hired_job_id",
-                             "job_applications_jobapplication"."message",
-                             "job_applications_jobapplication"."answer",
-                             "job_applications_jobapplication"."answer_to_prescriber",
-                             "job_applications_jobapplication"."refusal_reason",
-                             "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
-                             "job_applications_jobapplication"."hiring_start_at",
-                             "job_applications_jobapplication"."hiring_end_at",
-                             "job_applications_jobapplication"."hiring_without_approval",
-                             "job_applications_jobapplication"."origin",
-                             "job_applications_jobapplication"."approval_id",
-                             "job_applications_jobapplication"."approval_delivery_mode",
-                             "job_applications_jobapplication"."approval_number_sent_by_email",
-                             "job_applications_jobapplication"."approval_number_sent_at",
-                             "job_applications_jobapplication"."approval_manually_delivered_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_at",
-                             "job_applications_jobapplication"."transferred_at",
-                             "job_applications_jobapplication"."transferred_by_id",
-                             "job_applications_jobapplication"."transferred_from_id",
-                             "job_applications_jobapplication"."created_at",
-                             "job_applications_jobapplication"."updated_at",
-                             "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
-                             "job_applications_jobapplication"."contract_type",
-                             "job_applications_jobapplication"."nb_hours_per_week",
-                             "job_applications_jobapplication"."contract_type_details",
-                             "job_applications_jobapplication"."qualification_type",
-                             "job_applications_jobapplication"."qualification_level",
-                             "job_applications_jobapplication"."planned_training_hours",
-                             "job_applications_jobapplication"."inverted_vae_contract",
-                             "job_applications_jobapplication"."diagoriente_invite_sent_at",
-                             "users_user"."id",
-                             "users_user"."password",
-                             "users_user"."last_login",
-                             "users_user"."is_superuser",
-                             "users_user"."username",
-                             "users_user"."first_name",
-                             "users_user"."last_name",
-                             "users_user"."is_staff",
-                             "users_user"."is_active",
-                             "users_user"."date_joined",
-                             "users_user"."address_line_1",
-                             "users_user"."address_line_2",
-                             "users_user"."post_code",
-                             "users_user"."city",
-                             "users_user"."department",
-                             "users_user"."coords",
-                             "users_user"."geocoding_score",
-                             "users_user"."geocoding_updated_at",
-                             "users_user"."ban_api_resolved_address",
-                             "users_user"."insee_city_id",
-                             "users_user"."title",
-                             "users_user"."full_name_search_vector",
-                             "users_user"."email",
-                             "users_user"."phone",
-                             "users_user"."kind",
-                             "users_user"."identity_provider",
-                             "users_user"."has_completed_welcoming_tour",
-                             "users_user"."created_by_id",
-                             "users_user"."external_data_source_history",
-                             "users_user"."last_checked_at",
-                             "users_user"."public_id",
-                             "users_user"."address_filled_at",
-                             "users_user"."first_login"
+          SELECT "job_applications_jobapplication"."id",
+                 "job_applications_jobapplication"."job_seeker_id",
+                 "job_applications_jobapplication"."eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."create_employee_record",
+                 "job_applications_jobapplication"."resume_link",
+                 "job_applications_jobapplication"."sender_id",
+                 "job_applications_jobapplication"."sender_kind",
+                 "job_applications_jobapplication"."sender_company_id",
+                 "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."to_company_id",
+                 "job_applications_jobapplication"."state",
+                 "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."archived_by_id",
+                 "job_applications_jobapplication"."hired_job_id",
+                 "job_applications_jobapplication"."message",
+                 "job_applications_jobapplication"."answer",
+                 "job_applications_jobapplication"."answer_to_prescriber",
+                 "job_applications_jobapplication"."refusal_reason",
+                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
+                 "job_applications_jobapplication"."hiring_start_at",
+                 "job_applications_jobapplication"."hiring_end_at",
+                 "job_applications_jobapplication"."hiring_without_approval",
+                 "job_applications_jobapplication"."origin",
+                 "job_applications_jobapplication"."approval_id",
+                 "job_applications_jobapplication"."approval_delivery_mode",
+                 "job_applications_jobapplication"."approval_number_sent_by_email",
+                 "job_applications_jobapplication"."approval_number_sent_at",
+                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_at",
+                 "job_applications_jobapplication"."transferred_at",
+                 "job_applications_jobapplication"."transferred_by_id",
+                 "job_applications_jobapplication"."transferred_from_id",
+                 "job_applications_jobapplication"."created_at",
+                 "job_applications_jobapplication"."updated_at",
+                 "job_applications_jobapplication"."processed_at",
+                 "job_applications_jobapplication"."prehiring_guidance_days",
+                 "job_applications_jobapplication"."contract_type",
+                 "job_applications_jobapplication"."nb_hours_per_week",
+                 "job_applications_jobapplication"."contract_type_details",
+                 "job_applications_jobapplication"."qualification_type",
+                 "job_applications_jobapplication"."qualification_level",
+                 "job_applications_jobapplication"."planned_training_hours",
+                 "job_applications_jobapplication"."inverted_vae_contract",
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
           FROM "job_applications_jobapplication"
+          INNER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
+          LEFT OUTER JOIN "employee_record_employeerecord" ON ("job_applications_jobapplication"."id" = "employee_record_employeerecord"."job_application_id")
           INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
           WHERE ("job_applications_jobapplication"."state" = %s
-                 AND "job_applications_jobapplication"."to_company_id" = %s)
-          ORDER BY "job_applications_jobapplication"."job_seeker_id" ASC
+                 AND "job_applications_jobapplication"."to_company_id" = %s
+                 AND "job_applications_jobapplication"."state" = %s
+                 AND "job_applications_jobapplication"."approval_id" IS NOT NULL
+                 AND "job_applications_jobapplication"."create_employee_record"
+                 AND "employee_record_employeerecord"."id" IS NULL
+                 AND "job_applications_jobapplication"."hiring_start_at" <= %s
+                 AND "job_applications_jobapplication"."to_company_id" = %s
+                 AND NOT ("approvals_approval"."number" IN
+                            (SELECT V0."approval_number"
+                             FROM "employee_record_employeerecord" V0
+                             INNER JOIN "job_applications_jobapplication" V1 ON (V0."job_application_id" = V1."id")
+                             WHERE V1."to_company_id" IN
+                                 (SELECT U0."id"
+                                  FROM "companies_company" U0
+                                  WHERE (NOT (U0."siret" = %s)
+                                         AND U0."convention_id" = %s)))))
+          ORDER BY "job_applications_jobapplication"."hiring_start_at" DESC NULLS LAST
         ''',
       }),
       dict({
@@ -545,34 +561,18 @@
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                               <input id="id_company_[PK of Company]_add_employee_record-current_step" name="company_[PK of Company]_add_employee_record-current_step" type="hidden" value="choose-approval"/>
   
-                              <p>
-                                  Dans le menu déroulant ci-dessous, vous trouverez la liste de vos salariés.
-                                  Cette liste se base sur les embauches que vous avez déclarées sur le site des emplois de l’inclusion.
-                              </p>
+                              
+                                  <p>
+                                      Dans le menu déroulant ci-dessous, vous trouverez les PASS IAE du salarié selectionné à l'étape précédente.
+                                      <br/>
+                                      Seuls les PASS n'ayant pas encore de fiche salarié sont affichés.
+                                  </p>
+                              
                               <div class="form-group form-group-required"><label class="form-label" for="id_choose-approval-approval">PASS IAE de Jane DOE</label><select aria-describedby="id_choose-approval-approval_helptext" class="form-select" id="id_choose-approval-approval" name="choose-approval-approval">
     <option value="[PK of Approval]">999999999999 — Du 01/01/2000 au 01/01/3000</option>
   
   </select><div class="form-text">Le PASS IAE concerné par le transfert de données vers l'Extranet IAE 2.0 de l'ASP</div>
   </div>
-  
-                              
-                                  <p>
-                                      Après avoir sélectionné le PASS IAE concerné et cliqué sur <i>"Confirmer"</i>, 2 cas de figure sont possibles :
-                                  </p>
-                                  <ul>
-                                      <li>
-                                          <p class="m-0">
-                                              <b>Une fiche salarié existe déjà pour ce salarié et ce PASS IAE :</b> dans ce cas vous serez automatiquement redirigé sur la page de détail de cette fiche salarié.
-                                          </p>
-                                          <p>
-                                              Si la fiche salarié est déjà intégrée et que vous avez besoin de la renvoyer dans l’Extranet IAE 2.0 de l’ASP, vous devez la <b>désactiver</b> puis la <b>réactiver</b>.
-                                          </p>
-                                      </li>
-                                      <li>
-                                          <b>Aucune fiche salarié n’existe pour ce salarié et ce PASS IAE :</b> dans ce cas vous serez redirigé vers le formulaire de création et d’envoi de la fiche salarié.
-                                      </li>
-                                  </ul>
-                              
   
                               
                               
@@ -665,10 +665,16 @@
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                               <input id="id_company_[PK of Company]_add_employee_record-current_step" name="company_[PK of Company]_add_employee_record-current_step" type="hidden" value="choose-employee"/>
   
-                              <p>
-                                  Dans le menu déroulant ci-dessous, vous trouverez la liste de vos salariés.
-                                  Cette liste se base sur les embauches que vous avez déclarées sur le site des emplois de l’inclusion.
-                              </p>
+                              
+                                  <p>
+                                      Dans le menu déroulant ci-dessous, vous trouverez la liste de vos salariés qui n'ont pas encore de fiche salarié.
+                                      <br/>
+                                      Cette liste se base sur les embauches que vous avez déclarées sur le site des Emplois de l’inclusion et qui ont déjà démarée.
+                                  </p>
+                                  <div class="c-info mb-3">
+                                      <span class="c-info__summary">Si vous avez besoin de renvoyer une fiche salarié déjà intégrée à l'Extranet IAE 2.0 de l'ASP, vous devez d’abord la désactiver, puis la réactiver.</span>
+                                  </div>
+                              
                               <div class="form-group form-group-required"><label class="form-label" for="id_choose-employee-employee">Nom du salarié</label><select aria-describedby="id_choose-employee-employee_helptext" class="form-select django-select2" data-allow-clear="false" data-minimum-input-length="0" data-theme="bootstrap-5" id="id_choose-employee-employee" lang="fr" name="choose-employee-employee" required="">
     <option selected="" value="">Sélectionnez le salarié</option>
   
@@ -676,8 +682,6 @@
   
   </select><div class="form-text">Le salarié concerné par le transfert de données vers l'Extranet IAE 2.0 de l'ASP</div>
   </div>
-  
-                              
   
                               
                               
