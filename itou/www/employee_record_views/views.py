@@ -1,9 +1,11 @@
+from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Count
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.views.decorators.http import require_safe
 from formtools.wizard.views import NamedUrlSessionWizardView
 
@@ -214,6 +216,14 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     if job_seeker_id := filters_form.cleaned_data.get("job_seeker"):
         data = data.filter(job_application__job_seeker=job_seeker_id)
 
+    num_recently_missing_employee_records = len(
+        set(
+            JobApplication.objects.eligible_as_employee_record(siae)
+            .filter(hiring_start_at__gte=timezone.localdate() - relativedelta(months=4))
+            .values_list("job_seeker_id", flat=True)
+        )
+    )
+
     context = {
         "form": form,
         "filters_form": filters_form,
@@ -224,6 +234,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         "matomo_custom_title": "Fiches salarié ASP",
         "back_url": reverse("dashboard:index"),
         "num_rejected_employee_records": employee_record_badges.get(Status.REJECTED, 0),
+        "num_recently_missing_employee_records": num_recently_missing_employee_records,
     }
 
     return render(request, "employee_record/includes/list_results.html" if request.htmx else template_name, context)

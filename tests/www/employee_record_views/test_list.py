@@ -14,6 +14,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
+from itou.job_applications.models import JobApplication
 from itou.users.enums import LackOfNIRReason
 from itou.utils.templatetags import format_filters
 from itou.www.employee_record_views.enums import EmployeeRecordOrder
@@ -21,6 +22,7 @@ from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJo
 from tests.employee_record import factories as employee_record_factories
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import (
+    JobApplicationFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
@@ -539,6 +541,44 @@ class TestListEmployeeRecords:
         )
         new_jobseeker_opt.decompose()
         assertSoupEqual(simulated_page, fresh_page)
+
+    def test_missing_employee_records_alert(self, client, snapshot):
+        client.force_login(self.user)
+
+        job_application_1 = JobApplicationFactory(to_company=self.company, with_approval=True)
+        # Another one with the same job seeker to ensure we don't have duplicates
+        JobApplicationFactory(
+            to_company=self.company,
+            job_seeker=job_application_1.job_seeker,
+            with_approval=True,
+            approval=job_application_1.approval,
+        )
+        # Hiring is older, the job seeker will be after job_application_1's one
+        job_application_3 = JobApplicationFactory(
+            to_company=self.company,
+            with_approval=True,
+            hiring_start_at=job_application_1.hiring_start_at - relativedelta(days=1),
+        )
+
+        # the 3 we created here + the one from setup_method
+        assert JobApplication.objects.filter(to_company=self.company).count() == 4
+        assert JobApplication.objects.eligible_as_employee_record(self.company).count() == 3
+        assert set(
+            JobApplication.objects.eligible_as_employee_record(self.company).values_list("job_seeker_id", flat=True)
+        ) == {job_application_1.job_seeker_id, job_application_3.job_seeker_id}
+
+        response = client.get(self.URL, follow=True)
+        assert str(parse_response_to_soup(response, selector="#id_missing_employee_records_alert")) == snapshot(
+            name="plural"
+        )
+
+        # Remove one of the employee from the "missing record" count
+        EmployeeRecordFactory(job_application=job_application_1, status=Status.NEW)
+
+        response = client.get(self.URL, follow=True)
+        assert str(parse_response_to_soup(response, selector="#id_missing_employee_records_alert")) == snapshot(
+            name="singular"
+        )
 
 
 def test_an_active_siae_without_convention_can_not_access_the_view(client):

@@ -30,9 +30,55 @@
       </div>
   '''
 # ---
+# name: TestListEmployeeRecords.test_missing_employee_records_alert[plural]
+  '''
+  <div class="alert alert-info" id="id_missing_employee_records_alert" role="status">
+                                  <div class="row align-items-center">
+                                      <div class="col-auto pe-0">
+                                          <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
+                                      </div>
+                                      <div class="col">
+                                          
+                                              <p class="mb-0">
+                                                  2 nouveaux salariés, embauchés il y a moins de 4 mois, n’ont pas encore de fiches salarié.
+                                              </p>
+                                          
+                                      </div>
+                                      <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                                          <a class="btn btn-primary btn-ico" href="/employee_record/add/">
+                                              <i aria-hidden="true" class="ri-user-add-line ri-lg"></i>
+                                              <span>Créer une fiche salarié</span>
+                                          </a>
+                                      </div>
+                                  </div>
+                              </div>
+  '''
+# ---
+# name: TestListEmployeeRecords.test_missing_employee_records_alert[singular]
+  '''
+  <div class="alert alert-info" id="id_missing_employee_records_alert" role="status">
+                                  <div class="row align-items-center">
+                                      <div class="col-auto pe-0">
+                                          <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
+                                      </div>
+                                      <div class="col">
+                                          
+                                              <p class="mb-0">1 nouveau salarié, embauché il y a moins de 4 mois, n’a pas encore de fiche salarié.</p>
+                                          
+                                      </div>
+                                      <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                                          <a class="btn btn-primary btn-ico" href="/employee_record/add/">
+                                              <i aria-hidden="true" class="ri-user-add-line ri-lg"></i>
+                                              <span>Créer une fiche salarié</span>
+                                          </a>
+                                      </div>
+                                  </div>
+                              </div>
+  '''
+# ---
 # name: TestListEmployeeRecords.test_new_employee_records_sorted[employee records]
   dict({
-    'num_queries': 11,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -261,6 +307,34 @@
           INNER JOIN "job_applications_jobapplication" ON ("employee_record_employeerecord"."job_application_id" = "job_applications_jobapplication"."id")
           WHERE "job_applications_jobapplication"."to_company_id" = %s
           GROUP BY "employee_record_employeerecord"."status"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'list_employee_records[www/employee_record_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."job_seeker_id"
+          FROM "job_applications_jobapplication"
+          INNER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
+          LEFT OUTER JOIN "employee_record_employeerecord" ON ("job_applications_jobapplication"."id" = "employee_record_employeerecord"."job_application_id")
+          WHERE ("job_applications_jobapplication"."state" = %s
+                 AND "job_applications_jobapplication"."approval_id" IS NOT NULL
+                 AND "job_applications_jobapplication"."create_employee_record"
+                 AND "employee_record_employeerecord"."id" IS NULL
+                 AND "job_applications_jobapplication"."hiring_start_at" <= %s
+                 AND "job_applications_jobapplication"."to_company_id" = %s
+                 AND NOT ("approvals_approval"."number" IN
+                            (SELECT V0."approval_number"
+                             FROM "employee_record_employeerecord" V0
+                             INNER JOIN "job_applications_jobapplication" V1 ON (V0."job_application_id" = V1."id")
+                             WHERE V1."to_company_id" IN
+                                 (SELECT U0."id"
+                                  FROM "companies_company" U0
+                                  WHERE (NOT (U0."siret" = %s)
+                                         AND U0."convention_id" = %s))))
+                 AND "job_applications_jobapplication"."hiring_start_at" >= %s)
+          ORDER BY "job_applications_jobapplication"."hiring_start_at" DESC NULLS LAST
         ''',
       }),
       dict({
