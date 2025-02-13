@@ -54,7 +54,6 @@ def my_groups(request, template_name="gps/my_groups.html"):
     memberships_page = pager(memberships, request.GET.get("page"), items_per_page=50)
 
     context = {
-        "back_url": reverse("dashboard:index"),
         "filters_form": filters_form,
         "memberships_page": memberships_page,
     }
