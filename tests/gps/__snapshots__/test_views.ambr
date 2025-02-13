@@ -902,7 +902,7 @@
                   <thead>
                       <tr>
                           <th scope="col">Prénom Nom</th>
-                          <th scope="col">Membre depuis</th>
+                          <th scope="col">Accompagné depuis</th>
                           <th aria-label="Référent ou référente" scope="col">Référent⸱e</th>
                           <th aria-label="Nombre d’intervenants" scope="col">Nbr d’intervenants</th>
                       </tr>
