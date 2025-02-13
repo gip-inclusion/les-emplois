@@ -83,9 +83,13 @@ METABASE_DASHBOARDS = {
     },
     "stats_cd_aci": {
         "dashboard_id": 327,
+        "tally_popup_form_id": "3E0WLX",
+        "tally_embed_form_id": "w4jrLk",
     },
     "stats_cd_orga_etp": {
         "dashboard_id": 485,
+        "tally_popup_form_id": "3N0oLB",
+        "tally_embed_form_id": "mOoDva",
     },
     #
     # Prescriber stats - FT.
@@ -173,9 +177,13 @@ METABASE_DASHBOARDS = {
     },
     "stats_ddets_iae_aci": {
         "dashboard_id": 327,
+        "tally_popup_form_id": "3E0WLX",
+        "tally_embed_form_id": "w4jrLk",
     },
     "stats_ddets_iae_orga_etp": {
         "dashboard_id": 485,
+        "tally_popup_form_id": "3N0oLB",
+        "tally_embed_form_id": "mOoDva",
     },
     #
     # Institution stats - DDETS LOG - department level.
@@ -205,9 +213,13 @@ METABASE_DASHBOARDS = {
     },
     "stats_dreets_iae_follow_prolongation": {
         "dashboard_id": 357,
+        "tally_popup_form_id": "nG0lDp",
+        "tally_embed_form_id": "mO0GY7",
     },
     "stats_dreets_iae_tension": {
         "dashboard_id": 389,
+        "tally_popup_form_id": "nrEPLl",
+        "tally_embed_form_id": "3jxPWx",
     },
     "stats_dreets_iae_iae": {
         "dashboard_id": 117,
@@ -224,6 +236,8 @@ METABASE_DASHBOARDS = {
     },
     "stats_dreets_iae_orga_etp": {
         "dashboard_id": 485,
+        "tally_popup_form_id": "3N0oLB",
+        "tally_embed_form_id": "mOoDva",
     },
     #
     # Institution stats - DRIHL - region level - IDF only.
@@ -248,15 +262,23 @@ METABASE_DASHBOARDS = {
     },
     "stats_dgefp_iae_follow_prolongation": {
         "dashboard_id": 357,
+        "tally_popup_form_id": "nG0lDp",
+        "tally_embed_form_id": "mO0GY7",
     },
     "stats_dgefp_iae_tension": {
         "dashboard_id": 389,
+        "tally_popup_form_id": "nrEPLl",
+        "tally_embed_form_id": "3jxPWx",
     },
     "stats_dgefp_iae_hiring": {
         "dashboard_id": 160,
+        "tally_popup_form_id": "mVLBXv",
+        "tally_embed_form_id": "nPpXpQ",
     },
     "stats_dgefp_iae_state": {
         "dashboard_id": 310,
+        "tally_popup_form_id": "w2az2j",
+        "tally_embed_form_id": "3Nlvzl",
     },
     "stats_dgefp_iae_iae": {
         "dashboard_id": 117,
@@ -274,6 +296,8 @@ METABASE_DASHBOARDS = {
     },
     "stats_dgefp_iae_orga_etp": {
         "dashboard_id": 485,
+        "tally_popup_form_id": "3N0oLB",
+        "tally_embed_form_id": "mOoDva",
     },
     #
     # Institution stats - DIHAL - nation level.
@@ -288,15 +312,21 @@ METABASE_DASHBOARDS = {
     #
     "stats_iae_network_hiring": {
         "dashboard_id": 301,
+        "tally_popup_form_id": "m6p8aY",
+        "tally_embed_form_id": "wvdGol",
     },
     #
     # Institution stats - Convergence France - nation level.
     #
     "stats_convergence_prescription": {
         "dashboard_id": 446,
+        "tally_popup_form_id": "31pAq1",
+        "tally_embed_form_id": "3ydPWX",
     },
     "stats_convergence_job_application": {
         "dashboard_id": 469,
+        "tally_popup_form_id": "3X2xKL",
+        "tally_embed_form_id": "mV4LkM",
     },
     "stats_staff_service_indicators": {
         "dashboard_id": 438,
