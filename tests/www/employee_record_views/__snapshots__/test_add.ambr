@@ -669,7 +669,7 @@
                                   <p>
                                       Dans le menu déroulant ci-dessous, vous trouverez la liste de vos salariés qui n'ont pas encore de fiche salarié.
                                       <br/>
-                                      Cette liste se base sur les embauches que vous avez déclarées sur le site des Emplois de l’inclusion et qui ont déjà démarée.
+                                      Seules les embauches déjà commencées sont visibles. Celles dont le contrat débute plus tard seront accessibles ultérieurement.
                                   </p>
                                   <div class="c-info mb-3">
                                       <span class="c-info__summary">Si vous avez besoin de renvoyer une fiche salarié déjà intégrée à l'Extranet IAE 2.0 de l'ASP, vous devez d’abord la désactiver, puis la réactiver.</span>
