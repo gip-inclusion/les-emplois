@@ -1,3 +1,5 @@
+import uuid
+
 from allauth.account.admin import EmailAddressAdmin
 from allauth.account.models import EmailAddress
 from django.contrib import admin, messages
@@ -562,6 +564,11 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
                 pass
             else:
                 search_fields.append("jobseeker_profile__asp_uid__exact")
+        try:
+            uuid.UUID(search_term)
+            search_fields.append("public_id__exact")
+        except ValueError:
+            pass
         if search_term.isdecimal():
             search_fields.append("pk__exact")
             search_fields.append("jobseeker_profile__nir__exact")
