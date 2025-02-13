@@ -4,7 +4,9 @@ import pytest
 from django.urls import reverse_lazy
 
 from itou.api.auth import ServiceAccount
+from itou.api.job_application_api.serializers import JobApplicationSearchResponseSerializer
 from itou.api.models import DepartmentToken
+from itou.companies.models import Company
 from tests.api.utils import _str_with_tz
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import (
@@ -218,3 +220,19 @@ class TestJobApplicationSearchApi:
             "titre": hired_job.appellation.rome.name,
             "ville": hired_job.location.name if hired_job.location else hired_job.company.city,
         }
+
+    @pytest.mark.parametrize(
+        "company_source,expected_len",
+        [
+            (Company.SOURCE_ASP, 14),
+            (Company.SOURCE_GEIQ, 14),
+            (Company.SOURCE_EA_EATT, 14),
+            (Company.SOURCE_USER_CREATED, 9),
+            (Company.SOURCE_STAFF_CREATED, 14),
+        ],
+    )
+    def test_siret_siren(self, company_source, expected_len):
+        self.job_application.to_company.source = company_source
+        assert (
+            len(JobApplicationSearchResponseSerializer(self.job_application).data["entreprise_siret"]) == expected_len
+        )

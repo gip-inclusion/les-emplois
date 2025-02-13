@@ -89,9 +89,12 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
         source="to_company.display_name",
         label="Nom de l’entreprise",
     )
-    entreprise_siret = serializers.CharField(
-        source="to_company.siret",
+    entreprise_siret = serializers.SerializerMethodField(
         label="SIRET de l’entreprise",
+        help_text=(
+            "Le SIREN de l’organisation mère est susceptible d’être retourné pour des structures "
+            "dont le SIRET est inconnu."
+        ),
     )
     entreprise_adresse = serializers.CharField(
         source="to_company.address_on_one_line",
@@ -200,6 +203,11 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
             "contrat_poste_retenu",
         )
         read_only_fields = fields
+
+    def get_entreprise_siret(self, obj) -> str:
+        if obj.to_company.source == obj.to_company.SOURCE_USER_CREATED:
+            return obj.to_company.siret[:9]
+        return obj.to_company.siret
 
     def _get_sender_org(self, obj):
         if obj.sender_kind == SenderKind.PRESCRIBER and obj.sender_prescriber_organization:
