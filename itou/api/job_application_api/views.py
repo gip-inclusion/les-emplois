@@ -111,13 +111,12 @@ class JobApplicationSearchView(LoginNotRequiredMixin, mixins.ListModelMixin, gen
         .select_related(
             "job_seeker__jobseeker_profile",
             "to_company",
-            "approval",
             "sender",
             "sender_prescriber_organization",
             "sender_company",
         )
         .prefetch_related(
-            "approval__suspension_set",
+            "job_seeker__approvals__suspension_set",
             Prefetch(
                 "selected_jobs",
                 queryset=JobDescription.objects.select_related("appellation__rome", "location", "company"),

@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from itou.approvals.enums import ApprovalStatus
@@ -78,24 +79,19 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
         source="job_seeker.phone",
         label="Téléphone du candidat",
     )
-    candidat_pass_iae_statut = serializers.ChoiceField(
-        source="approval.state",
+    candidat_pass_iae_statut = serializers.SerializerMethodField(
         allow_null=True,
-        choices=ApprovalStatus.choices,
         label="Statut du PASS IAE",
     )
-    candidat_pass_iae_numero = serializers.CharField(
-        source="approval.number",
+    candidat_pass_iae_numero = serializers.SerializerMethodField(
         allow_null=True,
         label="Numéro de PASS IAE",
     )
-    candidat_pass_iae_date_debut = serializers.CharField(
-        source="approval.start_at",
+    candidat_pass_iae_date_debut = serializers.SerializerMethodField(
         allow_null=True,
         label="Date de début du PASS IAE (ISO 8601)",
     )
-    candidat_pass_iae_date_fin = serializers.CharField(
-        source="approval.end_at",
+    candidat_pass_iae_date_fin = serializers.SerializerMethodField(
         allow_null=True,
         label="Date de début du PASS IAE (ISO 8601)",
     )
@@ -149,13 +145,14 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
         allow_null=True,
         label="Prénom de l’émetteur",
     )
+    orientation_emetteur_email = serializers.CharField(
+        source="sender.email",
+        allow_null=True,
+        label="Adresse e-mail de l’émetteur",
+    )
     orientation_emetteur_organisme = serializers.SerializerMethodField(
         allow_null=True,
         label="Nom de la structure de l’émetteur",
-    )
-    orientation_emetteur_organisme_email = serializers.SerializerMethodField(
-        allow_null=True,
-        label="Adresse e-mail de la structure de l’émetteur",
     )
     orientation_emetteur_organisme_telephone = serializers.SerializerMethodField(
         allow_null=True,
@@ -219,8 +216,8 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
             "orientation_emetteur_sous_type",
             "orientation_emetteur_nom",
             "orientation_emetteur_prenom",
+            "orientation_emetteur_email",
             "orientation_emetteur_organisme",
-            "orientation_emetteur_organisme_email",
             "orientation_emetteur_organisme_telephone",
             "orientation_postes_recherches",
             "orientation_candidat_message",
@@ -230,6 +227,25 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
             "contrat_poste_retenu",
         )
         read_only_fields = fields
+
+    @extend_schema_field(serializers.ChoiceField(choices=ApprovalStatus.choices))
+    def get_candidat_pass_iae_statut(self, obj) -> str | None:
+        if obj.job_seeker.latest_approval:
+            return obj.job_seeker.latest_approval.state
+
+    def get_candidat_pass_iae_numero(self, obj) -> str | None:
+        if obj.job_seeker.latest_approval:
+            return obj.job_seeker.latest_approval.number
+
+    @extend_schema_field(serializers.DateField)
+    def get_candidat_pass_iae_date_debut(self, obj):
+        if obj.job_seeker.latest_approval:
+            return obj.job_seeker.latest_approval.start_at
+
+    @extend_schema_field(serializers.DateField)
+    def get_candidat_pass_iae_date_fin(self, obj):
+        if obj.job_seeker.latest_approval:
+            return obj.job_seeker.latest_approval.end_at
 
     def get_entreprise_siret(self, obj) -> str:
         if obj.to_company.source == obj.to_company.SOURCE_USER_CREATED:
@@ -249,10 +265,6 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
     def get_orientation_emetteur_organisme(self, obj) -> str | None:
         if sender_org := self._get_sender_org(obj):
             return sender_org.name
-
-    def get_orientation_emetteur_organisme_email(self, obj) -> str | None:
-        if sender_org := self._get_sender_org(obj):
-            return sender_org.email
 
     def get_orientation_emetteur_organisme_telephone(self, obj) -> str | None:
         if sender_org := self._get_sender_org(obj):

@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestJobApplicationSearchApi.test_performances
   dict({
-    'num_queries': 7,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -301,8 +301,34 @@
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
-                 "companies_company"."fields_history",
-                 "approvals_approval"."id",
+                 "companies_company"."fields_history"
+          FROM "job_applications_jobapplication"
+          INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
+          INNER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+          LEFT OUTER JOIN "users_user" T5 ON ("job_applications_jobapplication"."sender_id" = T5."id")
+          LEFT OUTER JOIN "companies_company" T6 ON ("job_applications_jobapplication"."sender_company_id" = T6."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("users_user"."first_name" %% %s
+                 AND "users_jobseekerprofile"."birthdate" = %s
+                 AND "users_jobseekerprofile"."nir" = %s
+                 AND "users_user"."last_name" %% %s
+                 AND COALESCE(
+                                (SELECT U0."timestamp"
+                                 FROM "job_applications_jobapplicationtransitionlog" U0
+                                 ORDER BY U0."timestamp" DESC
+                                 LIMIT 1), "job_applications_jobapplication"."updated_at") >= %s)
+          ORDER BY 47 DESC
+          LIMIT 3
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplicationSearchView.list[<site-packages>/rest_framework/mixins.py]',
+          'JobApplicationSearchView.post[api/job_application_api/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
                  "approvals_approval"."start_at",
                  "approvals_approval"."end_at",
                  "approvals_approval"."created_at",
@@ -321,25 +347,9 @@
                  "approvals_approval"."origin_sender_kind",
                  "approvals_approval"."origin_prescriber_organization_kind",
                  "approvals_approval"."public_id"
-          FROM "job_applications_jobapplication"
-          INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
-          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
-          INNER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
-          LEFT OUTER JOIN "users_user" T5 ON ("job_applications_jobapplication"."sender_id" = T5."id")
-          LEFT OUTER JOIN "companies_company" T6 ON ("job_applications_jobapplication"."sender_company_id" = T6."id")
-          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
-          LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
-          WHERE ("users_user"."first_name" %% %s
-                 AND "users_jobseekerprofile"."birthdate" = %s
-                 AND "users_jobseekerprofile"."nir" = %s
-                 AND "users_user"."last_name" %% %s
-                 AND COALESCE(
-                                (SELECT U0."timestamp"
-                                 FROM "job_applications_jobapplicationtransitionlog" U0
-                                 ORDER BY U0."timestamp" DESC
-                                 LIMIT 1), "job_applications_jobapplication"."updated_at") >= %s)
-          ORDER BY 47 DESC
-          LIMIT 3
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."user_id" IN (%s)
+          ORDER BY "approvals_approval"."created_at" DESC
         ''',
       }),
       dict({

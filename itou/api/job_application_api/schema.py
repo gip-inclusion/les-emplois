@@ -45,8 +45,8 @@ job_application_search_response_valid_example = OpenApiExample(
                 "orientation_emetteur_sous_type": None,
                 "orientation_emetteur_nom": "Durand",
                 "orientation_emetteur_prenom": "Nathalie",
+                "orientation_emetteur_email": None,
                 "orientation_emetteur_organisme": None,
-                "orientation_emetteur_organisme_email": None,
                 "orientation_emetteur_organisme_telephone": None,
                 "orientation_postes_recherches": [],
                 "orientation_candidat_message": "Message à l’employeur",
@@ -79,8 +79,8 @@ job_application_search_response_valid_example = OpenApiExample(
                 "orientation_emetteur_sous_type": None,
                 "orientation_emetteur_nom": "Dufour",
                 "orientation_emetteur_prenom": "André",
+                "orientation_emetteur_email": "",
                 "orientation_emetteur_organisme": "POLE EMPLOI - PARIS",
-                "orientation_emetteur_organisme_email": "",
                 "orientation_emetteur_organisme_telephone": "+33 1 23 45 67 89",
                 "orientation_postes_recherches": [
                     {

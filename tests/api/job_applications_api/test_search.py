@@ -197,13 +197,10 @@ class TestJobApplicationSearchApi:
         )
         assert first_application["orientation_emetteur_nom"] == self.job_application.sender.last_name
         assert first_application["orientation_emetteur_prenom"] == self.job_application.sender.first_name
+        assert first_application["orientation_emetteur_email"] == self.job_application.sender.email
         assert (
             first_application["orientation_emetteur_organisme"]
             == self.job_application.sender_prescriber_organization.name
-        )
-        assert (
-            first_application["orientation_emetteur_organisme_email"]
-            == self.job_application.sender_prescriber_organization.email
         )
         assert (
             first_application["orientation_emetteur_organisme_telephone"]
