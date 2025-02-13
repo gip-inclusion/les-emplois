@@ -22,6 +22,7 @@ job_application_search_response_valid_example = OpenApiExample(
         "previous": None,
         "results": [
             {
+                "identifiant_unique": "e1b89c73-b064-4351-8e2d-b6e1a1359c27",
                 "cree_le": "2025-02-06T14:48:06.595973+01:00",
                 "mis_a_jour_le": "2025-02-06T17:15:22.654892+01:00",
                 "dernier_changement_le": "2025-02-06T17:15:22.654892+01:00",
@@ -55,6 +56,7 @@ job_application_search_response_valid_example = OpenApiExample(
                 "contrat_poste_retenu": None,
             },
             {
+                "identifiant_unique": "2a30f968-02c9-48c6-ac3f-d8611fdcc46b",
                 "cree_le": "2025-02-06T10:52:25.678156+01:00",
                 "mis_a_jour_le": "2025-02-06T17:25:33.458745+01:00",
                 "dernier_changement_le": "2025-02-06T10:52:25.678156+01:00",

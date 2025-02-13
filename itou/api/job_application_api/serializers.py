@@ -30,6 +30,10 @@ class JobDescriptionSerializer(serializers.ModelSerializer):
 
 
 class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
+    identifiant_unique = serializers.UUIDField(
+        source="pk",
+        label="Identifiant unique de la candidature",
+    )
     cree_le = serializers.DateTimeField(
         source="created_at",
         label="Horodatage de création de la candidature (ISO 8601)",
@@ -187,6 +191,7 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobApplication
         fields = (
+            "identifiant_unique",
             "cree_le",
             "mis_a_jour_le",
             "dernier_changement_le",
