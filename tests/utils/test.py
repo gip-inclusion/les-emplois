@@ -166,8 +166,9 @@ def assert_previous_step(response, url, back_to_list=False):
     assertContains(response, previous_step)
 
 
-def create_fake_postcode():
-    department = random.choice(list(DEPARTMENTS))
+def create_fake_postcode(ignore=None):
+    departments_to_choose_from = set(DEPARTMENTS) - set(ignore or [])
+    department = random.choice(list(departments_to_choose_from))
     if department == "2A":
         department = random.choice(["200", "201", "207"])
     elif department == "2B":
