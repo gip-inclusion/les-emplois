@@ -8,6 +8,7 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.companies import models
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType
 from itou.jobs.models import Appellation
+from tests.cities.factories import create_city_vannes
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory
 from tests.utils.test import create_fake_postcode
@@ -207,6 +208,17 @@ class CompanyAfterGracePeriodFactory(CompanyFactory):
 class JobDescriptionFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.JobDescription
+
+    class Params:
+        for_snapshot = factory.Trait(
+            appellation=factory.LazyAttribute(lambda obj: Appellation.objects.order_by("pk").first()),
+            description="Une description statique",
+            contract_type=ContractType.PERMANENT,
+            location=factory.LazyAttribute(lambda obj: create_city_vannes()),
+            profile_description="Un profil statique",
+            market_context_description="Un contexte de marché stable",
+            company__for_snapshot=True,
+        )
 
     appellation = factory.LazyAttribute(lambda obj: Appellation.objects.order_by("?").first())
     company = factory.SubFactory(CompanyFactory)
