@@ -4,8 +4,8 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, IntegerField, Max, OuterRef, Subquery
-from django.db.models.functions import Coalesce
+from django.db.models import Count, DateTimeField, IntegerField, Max, OuterRef, Subquery, Value
+from django.db.models.functions import Coalesce, Concat, Lower
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -30,7 +30,7 @@ from itou.utils.pagination import pager
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.apply.views.submit_views import ApplicationBaseView
-from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
+from itou.www.job_seekers_views.enums import JobSeekerOrder, JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import (
     CheckJobSeekerInfoForm,
     CheckJobSeekerNirForm,
@@ -142,9 +142,9 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
     )
     queryset = (
         User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids)
-        .order_by("first_name", "last_name")
         .prefetch_related("approvals")
         .annotate(
+            full_name=Concat(Lower("first_name"), Value(" "), Lower("last_name")),
             job_applications_nb=Coalesce(subquery_count, 0),
             last_updated_at=subquery_last_update,
             valid_eligibility_diagnosis=subquery_diagnosis,
@@ -154,6 +154,12 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
     if form.is_valid() and (job_seeker_pk := form.cleaned_data["job_seeker"]):
         queryset = queryset.filter(pk=job_seeker_pk)
 
+    try:
+        order = JobSeekerOrder(request.GET.get("order"))
+    except ValueError:
+        order = JobSeekerOrder.FULL_NAME_ASC
+    queryset = queryset.order_by(str(order))
+
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=10)
     for job_seeker in page_obj:
         job_seeker.user_can_view_personal_information = request.user.can_view_personal_information(job_seeker)
@@ -161,6 +167,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
     context = {
         "back_url": get_safe_url(request, "back_url"),
         "filters_form": form,
+        "order": order,
         "page_obj": page_obj,
     }
 

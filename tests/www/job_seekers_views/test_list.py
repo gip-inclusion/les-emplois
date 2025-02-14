@@ -477,3 +477,85 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
         (c_d_job_seeker.pk, "C… D…"),
         (created_job_seeker.pk, "Zorro MARTIN"),
     ]
+
+
+def test_job_seekers_order(client, subtests):
+    prescriber = PrescriberFactory()
+    c_d_job_seeker = JobApplicationFactory(
+        sender=prescriber,
+        job_seeker__created_by=prescriber,
+        job_seeker__first_name="Charles",
+        job_seeker__last_name="Deux candidatures",
+    ).job_seeker
+    JobApplicationFactory(sender=prescriber, job_seeker=c_d_job_seeker)
+    created_job_seeker = JobSeekerFactory(
+        created_by=prescriber,
+        first_name="Zorro",
+        last_name="Martin",
+    )
+    a_b_job_seeker = JobApplicationFactory(
+        sender=prescriber, job_seeker__first_name="Alice", job_seeker__last_name="Berger"
+    ).job_seeker
+
+    client.force_login(prescriber)
+    url = reverse("job_seekers_views:list")
+
+    expected_order = {
+        "full_name": [a_b_job_seeker, c_d_job_seeker, created_job_seeker],
+        "job_applications_nb": [created_job_seeker, a_b_job_seeker, c_d_job_seeker],
+        "last_updated_at": [c_d_job_seeker, a_b_job_seeker, created_job_seeker],
+    }
+
+    with subtests.test(order="<missing_value>"):
+        response = client.get(url)
+        assert response.context["page_obj"].object_list == expected_order["full_name"]
+
+    with subtests.test(order="<invalid_value>"):
+        response = client.get(url, {"order": "invalid_value"})
+        assert response.context["page_obj"].object_list == expected_order["full_name"]
+
+    for order, job_seekers in expected_order.items():
+        with subtests.test(order=order):
+            response = client.get(url, {"order": order})
+            assert response.context["page_obj"].object_list == job_seekers
+
+            response = client.get(url, {"order": f"-{order}"})
+            assert response.context["page_obj"].object_list == list(reversed(job_seekers))
+
+
+def test_htmx_order(client):
+    url = reverse("job_seekers_views:list")
+
+    job_app = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+    prescriber = job_app.sender
+    other_app = JobApplicationFactory(sender=prescriber)
+    client.force_login(prescriber)
+    response = client.get(url)
+
+    assertContains(response, "2 résultats")
+    assertContains(response, reverse("job_seekers_views:details", kwargs={"public_id": job_app.job_seeker.public_id}))
+    assertContains(
+        response, reverse("job_seekers_views:details", kwargs={"public_id": other_app.job_seeker.public_id})
+    )
+    simulated_page = parse_response_to_soup(response)
+
+    ORDER_ID = "id_order"
+    LAST_UPDATED_AT_ASC = "last_updated_at"
+
+    [sort_by_last_updated_at_button] = simulated_page.find_all(
+        "button", {"data-emplois-setter-value": LAST_UPDATED_AT_ASC}
+    )
+    assert sort_by_last_updated_at_button["data-emplois-setter-target"] == f"#{ORDER_ID}"
+    [order_input] = simulated_page.find_all(id=ORDER_ID)
+    # Simulate click on button
+    order_input["value"] = LAST_UPDATED_AT_ASC
+    response = client.get(url, {"order": LAST_UPDATED_AT_ASC}, headers={"HX-Request": "true"})
+    update_page_with_htmx(simulated_page, f"form[hx-get='{url}']", response)
+    response = client.get(url, {"order": LAST_UPDATED_AT_ASC})
+    assertContains(response, "2 résultats")
+    assertContains(response, reverse("job_seekers_views:details", kwargs={"public_id": job_app.job_seeker.public_id}))
+    assertContains(
+        response, reverse("job_seekers_views:details", kwargs={"public_id": other_app.job_seeker.public_id})
+    )
+    fresh_page = parse_response_to_soup(response)
+    assertSoupEqual(simulated_page, fresh_page)
