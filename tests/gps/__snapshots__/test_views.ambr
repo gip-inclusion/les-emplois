@@ -435,7 +435,7 @@
                           </div>
   '''
 # ---
-# name: test_my_groups
+# name: test_group_list
   dict({
     'num_queries': 14,
     'queries': list([
@@ -897,7 +897,7 @@
     ]),
   })
 # ---
-# name: test_my_groups[test_my_groups__group_card]
+# name: test_group_list[test_my_groups__group_card]
   '''
   <div aria-labelledby="results" class="mt-3 mt-md-4" id="follow-up-groups-section">
       
