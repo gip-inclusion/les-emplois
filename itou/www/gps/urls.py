@@ -1,5 +1,4 @@
-from django.urls import path, reverse_lazy
-from django.views.generic import RedirectView
+from django.urls import path
 
 from itou.www.gps import views
 
@@ -8,7 +7,6 @@ from itou.www.gps import views
 app_name = "gps"
 
 urlpatterns = [
-    path("groups", RedirectView.as_view(url=reverse_lazy("gps:groups_list"))),  # FIXME remove in a few days
     path("groups/list", views.my_groups, name="groups_list"),
     path("groups/<int:group_id>/leave", views.leave_group, name="leave_group"),
     path("groups/<int:group_id>/toggle_referent", views.toggle_referent, name="toggle_referent"),
