@@ -73,7 +73,7 @@ def test_gps_access(client, factory, access):
 
 
 @freezegun.freeze_time("2024-06-21", tick=True)
-def test_my_groups(snapshot, client):
+def test_group_list(snapshot, client):
     user = PrescriberFactory(membership__organization__authorized=True, membership__organization__for_snapshot=True)
     client.force_login(user)
 
