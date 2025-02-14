@@ -112,28 +112,34 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     job_applications = request.user.job_applications
     job_applications = job_applications.with_list_related_data()
 
-    job_applications = job_applications.annotate(
-        next_appointment_start_at=Subquery(
-            Participation.objects.filter(
-                appointment__company=OuterRef("to_company"),
-                job_seeker=OuterRef("job_seeker"),
-                status=Participation.Status.UNKNOWN,
-                appointment__start_at__gt=timezone.now(),
-            )
-            .order_by("appointment__start_at")
-            .values("appointment__start_at")[:1],
-            output_field=models.DateTimeField(),
-        ),
-        other_appointments_count=Count(
-            "job_seeker__rdvi_participations",
-            filter=Q(
-                job_seeker__rdvi_participations__appointment__company=F("to_company"),
-                job_seeker__rdvi_participations__status=Participation.Status.UNKNOWN,
-                job_seeker__rdvi_participations__appointment__start_at__gt=timezone.now(),
+    try:
+        display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
+    except ValueError:
+        display_kind = JobApplicationsDisplayKind.LIST
+
+    if display_kind == JobApplicationsDisplayKind.LIST:
+        job_applications = job_applications.annotate(
+            next_appointment_start_at=Subquery(
+                Participation.objects.filter(
+                    appointment__company=OuterRef("to_company"),
+                    job_seeker=OuterRef("job_seeker"),
+                    status=Participation.Status.UNKNOWN,
+                    appointment__start_at__gt=timezone.now(),
+                )
+                .order_by("appointment__start_at")
+                .values("appointment__start_at")[:1],
+                output_field=models.DateTimeField(),
             ),
+            other_appointments_count=Count(
+                "job_seeker__rdvi_participations",
+                filter=Q(
+                    job_seeker__rdvi_participations__appointment__company=F("to_company"),
+                    job_seeker__rdvi_participations__status=Participation.Status.UNKNOWN,
+                    job_seeker__rdvi_participations__appointment__start_at__gt=timezone.now(),
+                ),
+            )
+            - 1,  # Exclude the next appointment
         )
-        - 1,  # Exclude the next appointment
-    )
 
     filters_counter = 0
     if filters_form.is_valid():
@@ -145,11 +151,6 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
 
     # The candidate has obviously access to its personal info
     _add_user_can_view_personal_information(job_applications_page, lambda ja: True)
-
-    try:
-        display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
-    except ValueError:
-        display_kind = JobApplicationsDisplayKind.LIST
 
     context = {
         "job_applications_page": job_applications_page,
@@ -286,35 +287,41 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         filters_counter = filters_form.get_qs_filters_counter()
         title = annotate_title(title, filters_form.cleaned_data["archived"])
 
-    job_applications = job_applications.annotate(
-        has_pending_rdv_insertion_invitation_request=Exists(
-            InvitationRequest.objects.filter(
-                job_seeker=OuterRef("job_seeker"),
-                company=OuterRef("to_company"),
-                created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
-            )
-        ),
-        next_appointment_start_at=Subquery(
-            Participation.objects.filter(
-                appointment__company=OuterRef("to_company"),
-                job_seeker=OuterRef("job_seeker"),
-                status=Participation.Status.UNKNOWN,
-                appointment__start_at__gt=timezone.now(),
-            )
-            .order_by("appointment__start_at")
-            .values("appointment__start_at")[:1],
-            output_field=models.DateTimeField(),
-        ),
-        other_appointments_count=Count(
-            "job_seeker__rdvi_participations",
-            filter=Q(
-                job_seeker__rdvi_participations__appointment__company=request.current_organization,
-                job_seeker__rdvi_participations__status=Participation.Status.UNKNOWN,
-                job_seeker__rdvi_participations__appointment__start_at__gt=timezone.now(),
+    try:
+        display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
+    except ValueError:
+        display_kind = JobApplicationsDisplayKind.TABLE
+
+    if display_kind == JobApplicationsDisplayKind.LIST:
+        job_applications = job_applications.annotate(
+            has_pending_rdv_insertion_invitation_request=Exists(
+                InvitationRequest.objects.filter(
+                    job_seeker=OuterRef("job_seeker"),
+                    company=OuterRef("to_company"),
+                    created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
+                )
             ),
+            next_appointment_start_at=Subquery(
+                Participation.objects.filter(
+                    appointment__company=OuterRef("to_company"),
+                    job_seeker=OuterRef("job_seeker"),
+                    status=Participation.Status.UNKNOWN,
+                    appointment__start_at__gt=timezone.now(),
+                )
+                .order_by("appointment__start_at")
+                .values("appointment__start_at")[:1],
+                output_field=models.DateTimeField(),
+            ),
+            other_appointments_count=Count(
+                "job_seeker__rdvi_participations",
+                filter=Q(
+                    job_seeker__rdvi_participations__appointment__company=request.current_organization,
+                    job_seeker__rdvi_participations__status=Participation.Status.UNKNOWN,
+                    job_seeker__rdvi_participations__appointment__start_at__gt=timezone.now(),
+                ),
+            )
+            - 1,  # Exclude the next appointment
         )
-        - 1,  # Exclude the next appointment
-    )
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=20)
     _add_pending_for_weeks(job_applications_page)
@@ -325,11 +332,6 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     iae_company = company.kind in SIAE_WITH_CONVENTION_KINDS
     if iae_company:
         _add_administrative_criteria(job_applications_page)
-
-    try:
-        display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
-    except ValueError:
-        display_kind = JobApplicationsDisplayKind.TABLE
 
     context = {
         "title": title,
