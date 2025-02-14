@@ -13,14 +13,16 @@
         </div>
     {% else %}
         <div class="table-responsive mt-3 mt-md-4">
-            <table class="table table-hover">
-                <caption class="visually-hidden">Liste des candidats</caption>
+            <table class="table table-hover table-sortable">
+                <caption class="visually-hidden">
+                    Liste des candidats (les colonnes disposant d’un bouton dans leur entête peuvent être triées en cliquant sur le bouton)
+                </caption>
                 <thead>
                     <tr>
-                        <th scope="col">Prénom NOM</th>
+                        {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.FULL_NAME_ASC name="Prénom NOM" only %}
                         <th scope="col">Statut du PASS IAE</th>
-                        <th scope="col">Nombre de candidatures</th>
-                        <th scope="col">Dernière mise à jour de candidature</th>
+                        {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.JOB_APPLICATIONS_NB_ASC name="Nombre de candidatures" only %}
+                        {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.LAST_UPDATED_AT_ASC name="Dernière mise à jour de candidature" only %}
                         <th scope="col" class="text-end w-50px"></th>
                     </tr>
                 </thead>
