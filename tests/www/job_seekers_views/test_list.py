@@ -144,7 +144,7 @@ def test_multiple(client, snapshot):
     client.force_login(prescriber)
     with assertSnapshotQueries(snapshot(name="job seekers list SQL")):
         response = client.get(url)
-        assert str(parse_response_to_soup(response, selector="tbody")) == snapshot(name="job seekers list tbody")
+        assert str(parse_response_to_soup(response, selector="table")) == snapshot(name="job seekers list table")
 
         # Address is in search URL
         for i, application in enumerate([job_app, job_app2, job_app3]):

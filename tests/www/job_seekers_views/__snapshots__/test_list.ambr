@@ -463,9 +463,20 @@
     ]),
   })
 # ---
-# name: test_multiple[job seekers list tbody]
+# name: test_multiple[job seekers list table]
   '''
-  <tbody>
+  <table class="table table-hover">
+                  <caption class="visually-hidden">Liste des candidats</caption>
+                  <thead>
+                      <tr>
+                          <th scope="col">Prénom NOM</th>
+                          <th scope="col">Statut du PASS IAE</th>
+                          <th scope="col">Nombre de candidatures</th>
+                          <th scope="col">Dernière mise à jour de candidature</th>
+                          <th class="text-end w-50px" scope="col"></th>
+                      </tr>
+                  </thead>
+                  <tbody>
                       
                           <tr>
                               <td>
@@ -584,6 +595,7 @@
                           </tr>
                       
                   </tbody>
+              </table>
   '''
 # ---
 # name: test_multiple_with_job_seekers_created_by_organization.1
