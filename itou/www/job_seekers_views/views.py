@@ -639,7 +639,6 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        context["confirmation_needed"] = False
         if self.form.is_valid():
             existing_job_seeker = User.objects.filter(
                 kind=UserKind.JOB_SEEKER,
@@ -668,6 +667,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
+            "confirmation_needed": False,
             "form": self.form,
             "matomo_form_name": "apply-create-job-seeker-identity",
             "progress": "20",

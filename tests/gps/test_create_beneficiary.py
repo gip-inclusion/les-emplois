@@ -83,7 +83,7 @@ def assert_contains_gps_email_modal(response, job_seeker, nir_to_add=None):
     )
 
 
-@pytest.mark.ignore_unknown_variable_template_error("confirmation_needed", "job_seeker")
+@pytest.mark.ignore_unknown_variable_template_error("job_seeker")
 @override_settings(API_BAN_BASE_URL="http://ban-api")
 @mock.patch(
     "itou.utils.apis.geocoding.get_geocoding_data",
