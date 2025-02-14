@@ -311,6 +311,10 @@ LOGGING = {
         # Huey; async tasks
         "huey": {
             "level": os.getenv("HUEY_LOG_LEVEL", "WARNING"),
+            # Define a null handler to prevent huey from adding a StreamHandler:
+            # https://github.com/coleifer/huey/blob/2.5.2/huey/contrib/djhuey/management/commands/run_huey.py#L87-L88
+            # We'll still get the logs since they will propagate to root handlers
+            "handlers": ["null"],
         },
     },
 }
