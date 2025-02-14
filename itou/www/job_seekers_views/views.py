@@ -30,7 +30,7 @@ from itou.utils.pagination import pager
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import get_safe_url
 from itou.www.apply.views.submit_views import ApplicationBaseView
-from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
+from itou.www.job_seekers_views.enums import JobSeekerOrder, JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import (
     CheckJobSeekerInfoForm,
     CheckJobSeekerNirForm,
@@ -134,7 +134,6 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
         request.GET,
         request_user=request.user,
     )
-
     user_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization).filter(
         job_seeker=OuterRef("pk")
     )
@@ -156,7 +155,6 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
     )
     queryset = (
         User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids)
-        .order_by("first_name", "last_name")
         .prefetch_related("approvals")
         .annotate(
             job_applications_nb=Coalesce(subquery_count, 0),
@@ -164,9 +162,15 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
             valid_eligibility_diagnosis=subquery_diagnosis,
         )
     )
-
     if form.is_valid() and (job_seeker_pk := form.cleaned_data["job_seeker"]):
         queryset = queryset.filter(pk=job_seeker_pk)
+    order = JobSeekerOrder(form.cleaned_data.get("order") or JobSeekerOrder.FULL_NAME_ASC)
+
+    order_args = {
+        JobSeekerOrder.FULL_NAME_ASC: ("first_name", "last_name"),
+        JobSeekerOrder.FULL_NAME_DESC: ("-first_name", "-last_name"),
+    }.get(order, (str(order),))
+    queryset = queryset.order_by(*order_args)
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=10)
     for job_seeker in page_obj:
@@ -175,6 +179,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
     context = {
         "back_url": get_safe_url(request, "back_url"),
         "filters_form": form,
+        "order": order,
         "page_obj": page_obj,
     }
 
