@@ -1,6 +1,5 @@
 from unittest import mock
 
-import pytest
 from django.test import override_settings
 from django.urls import resolve, reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateNotUsed
@@ -83,7 +82,6 @@ def assert_contains_gps_email_modal(response, job_seeker, nir_to_add=None):
     )
 
 
-@pytest.mark.ignore_unknown_variable_template_error("job_seeker")
 @override_settings(API_BAN_BASE_URL="http://ban-api")
 @mock.patch(
     "itou.utils.apis.geocoding.get_geocoding_data",
@@ -279,7 +277,6 @@ def test_create_job_seeker(_mock, client):
     assert list(created_job_seeker.follow_up_group.members.all()) == [user]
 
 
-@pytest.mark.ignore_unknown_variable_template_error("job_seeker")
 def test_existing_user_with_email(client):
     """
     A user with the same email already exists, create the group with this user
@@ -350,7 +347,6 @@ def test_existing_user_with_email(client):
     assert user in job_seeker.follow_up_group.members.all()
 
 
-@pytest.mark.ignore_unknown_variable_template_error("job_seeker")
 def test_existing_user_with_nir(client):
     """
     An user with the same NIR already exists, create the group with this user

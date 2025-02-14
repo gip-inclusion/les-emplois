@@ -23,8 +23,6 @@ from tests.utils.test import (
 
 
 class TestCompanyAdmin:
-    # Variable is not defined for the add view, comes from django-import-export.
-    @pytest.mark.ignore_unknown_variable_template_error("show_change_form_export")
     def test_display_for_new_company(self, admin_client, snapshot):
         """Does not search approvals with company IS NULL"""
         with assertSnapshotQueries(snapshot(name="SQL queries")):
