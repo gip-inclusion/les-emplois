@@ -531,7 +531,7 @@ class TestStandaloneCreateAsPrescriber:
             ),
         )
 
-    @pytest.mark.ignore_unknown_variable_template_error("confirmation_needed", "job_seeker")
+    @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
     def test_standalone_creation_as_prescriber(self, client):
         from_url = reverse("job_seekers_views:list")
         user = PrescriberOrganizationWithMembershipFactory().members.first()
