@@ -20,7 +20,7 @@ from tests.job_applications.factories import (
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
 def test_list_for_job_seeker(client):
@@ -30,6 +30,21 @@ def test_list_for_job_seeker(client):
     client.force_login(job_seeker)
 
     response = client.get(reverse("apply:list_for_job_seeker"))
+    assert len(response.context["job_applications_page"].object_list) == 3
+
+
+def test_list_for_job_seeker_queries(client, snapshot):
+    job_seeker = JobApplicationSentByJobSeekerFactory().job_seeker
+    JobApplicationSentByCompanyFactory(job_seeker=job_seeker)
+    JobApplicationSentByPrescriberFactory(job_seeker=job_seeker)
+    client.force_login(job_seeker)
+
+    with assertSnapshotQueries(snapshot(name="SQL queries in list mode")):
+        response = client.get(reverse("apply:list_for_job_seeker"), {"display": JobApplicationsDisplayKind.LIST})
+    assert len(response.context["job_applications_page"].object_list) == 3
+
+    with assertSnapshotQueries(snapshot(name="SQL queries in table mode")):
+        response = client.get(reverse("apply:list_for_job_seeker"), {"display": JobApplicationsDisplayKind.TABLE})
     assert len(response.context["job_applications_page"].object_list) == 3
 
 
