@@ -73,6 +73,20 @@ def test_get(client):
     assertContains(response, job_application.job_seeker.get_full_name())
 
 
+def test_queries(client, snapshot):
+    prescriber = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True).sender
+    JobApplicationFactory(sender=prescriber)
+    client.force_login(prescriber)
+
+    with assertSnapshotQueries(snapshot(name="SQL queries in list mode")):
+        response = client.get(reverse("apply:list_prescriptions"), {"display": JobApplicationsDisplayKind.LIST})
+    assert len(response.context["job_applications_page"].object_list) == 2
+
+    with assertSnapshotQueries(snapshot(name="SQL queries in table mode")):
+        response = client.get(reverse("apply:list_prescriptions"), {"display": JobApplicationsDisplayKind.TABLE})
+    assert len(response.context["job_applications_page"].object_list) == 2
+
+
 def test_as_unauthorized_prescriber(client, snapshot):
     prescriber = PrescriberFactory()
     JobApplicationFactory(

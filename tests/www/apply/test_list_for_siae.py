@@ -59,7 +59,7 @@ class TestProcessListSiae:
         JobApplicationFactory()
 
         client.force_login(employer)
-        with assertSnapshotQueries(snapshot(name="view queries")):
+        with assertSnapshotQueries(snapshot(name="SQL queries in list mode")):
             response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.LIST})
 
         total_applications = len(response.context["job_applications_page"].object_list)
@@ -123,6 +123,10 @@ class TestProcessListSiae:
         assertNotContains(
             response, reverse("job_seekers_views:details", kwargs={"public_id": job_app.job_seeker.public_id})
         )
+
+        with assertSnapshotQueries(snapshot(name="SQL queries in table mode")):
+            response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.TABLE})
+        assert len(response.context["job_applications_page"].object_list) == 3
 
     def test_list_for_siae_show_criteria(self, client):
         company = CompanyFactory(with_membership=True)
