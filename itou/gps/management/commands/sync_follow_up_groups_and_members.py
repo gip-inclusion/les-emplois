@@ -128,6 +128,7 @@ class Command(BaseCommand):
                                         follow_up_group=group,
                                         created_in_bulk=True,
                                         created_at=timestamps[0],
+                                        started_at=timestamps[0],
                                         last_contact_at=timestamps[-1],
                                     )
                                 )
@@ -145,6 +146,7 @@ class Command(BaseCommand):
                                     follow_up_group=group,
                                     created_in_bulk=True,
                                     created_at=timestamps[0],
+                                    started_at=timestamps[0],
                                     last_contact_at=timestamps[-1],
                                 )
                             )

@@ -38,6 +38,7 @@ def test_follow_beneficiary():
         assert membership.is_active is True
         assert membership.is_referent is True
         assert membership.created_at == created_at
+        assert membership.started_at == created_at
         assert membership.last_contact_at == created_at
         assert membership.creator == prescriber
 
@@ -52,6 +53,7 @@ def test_follow_beneficiary():
         assert membership.is_active is True
         assert membership.is_referent is True
         assert membership.created_at == created_at
+        assert membership.started_at == created_at
         assert membership.last_contact_at == updated_at
 
         membership.is_active = False
