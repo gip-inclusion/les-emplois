@@ -46,7 +46,7 @@ def group_list(request, current, template_name="gps/group_list.html"):
         .prefetch_related(
             Prefetch(
                 "follow_up_group__memberships",
-                queryset=FollowUpGroupMembership.objects.filter(is_referent=True)[:1],
+                queryset=FollowUpGroupMembership.objects.filter(is_referent=True).select_related("member")[:1],
                 to_attr="referent",
             ),
         )

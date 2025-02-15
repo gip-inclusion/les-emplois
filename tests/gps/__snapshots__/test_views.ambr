@@ -437,7 +437,7 @@
 # ---
 # name: test_group_list
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -782,7 +782,40 @@
                  "col8",
                  "col9",
                  "col10",
-                 "col11"
+                 "col11",
+                 "col12",
+                 "col13",
+                 "col14",
+                 "col15",
+                 "col16",
+                 "col17",
+                 "col18",
+                 "col19",
+                 "col20",
+                 "col21",
+                 "col22",
+                 "col23",
+                 "col24",
+                 "col25",
+                 "col26",
+                 "col27",
+                 "col28",
+                 "col29",
+                 "col30",
+                 "col31",
+                 "col32",
+                 "col33",
+                 "col34",
+                 "col35",
+                 "col36",
+                 "col37",
+                 "col38",
+                 "col39",
+                 "col40",
+                 "col41",
+                 "col42",
+                 "col43",
+                 "col44"
           FROM
             (SELECT *
              FROM
@@ -799,8 +832,42 @@
                        "gps_followupgroupmembership"."creator_id" AS "col11",
                        ROW_NUMBER() OVER (PARTITION BY "gps_followupgroupmembership"."follow_up_group_id"
                                           ORDER BY RANDOM() ASC) AS "qual0",
-                       RANDOM() AS "qual1"
+                       RANDOM() AS "qual1",
+                       "users_user"."id" AS "col12",
+                       "users_user"."password" AS "col13",
+                       "users_user"."last_login" AS "col14",
+                       "users_user"."is_superuser" AS "col15",
+                       "users_user"."username" AS "col16",
+                       "users_user"."first_name" AS "col17",
+                       "users_user"."last_name" AS "col18",
+                       "users_user"."is_staff" AS "col19",
+                       "users_user"."is_active" AS "col20",
+                       "users_user"."date_joined" AS "col21",
+                       "users_user"."address_line_1" AS "col22",
+                       "users_user"."address_line_2" AS "col23",
+                       "users_user"."post_code" AS "col24",
+                       "users_user"."city" AS "col25",
+                       "users_user"."department" AS "col26",
+                       "users_user"."coords" AS "col27",
+                       "users_user"."geocoding_score" AS "col28",
+                       "users_user"."geocoding_updated_at" AS "col29",
+                       "users_user"."ban_api_resolved_address" AS "col30",
+                       "users_user"."insee_city_id" AS "col31",
+                       "users_user"."title" AS "col32",
+                       "users_user"."full_name_search_vector" AS "col33",
+                       "users_user"."email" AS "col34",
+                       "users_user"."phone" AS "col35",
+                       "users_user"."kind" AS "col36",
+                       "users_user"."identity_provider" AS "col37",
+                       "users_user"."has_completed_welcoming_tour" AS "col38",
+                       "users_user"."created_by_id" AS "col39",
+                       "users_user"."external_data_source_history" AS "col40",
+                       "users_user"."last_checked_at" AS "col41",
+                       "users_user"."public_id" AS "col42",
+                       "users_user"."address_filled_at" AS "col43",
+                       "users_user"."first_login" AS "col44"
                 FROM "gps_followupgroupmembership"
+                INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
                 WHERE ("gps_followupgroupmembership"."is_referent"
                        AND "gps_followupgroupmembership"."follow_up_group_id" IN (%s,
                                                                                   %s,
@@ -809,57 +876,6 @@
              WHERE ("qual0" > %s
                     AND "qual0" <= %s)) "qualify_mask"
           ORDER BY "qual1" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'VariableNode[gps/includes/memberships_results.html]',
-          'IfNode[gps/includes/memberships_results.html]',
-          'ForNode[gps/includes/memberships_results.html]',
-          'IfNode[gps/includes/memberships_results.html]',
-          'IncludeNode[gps/group_list.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[gps/group_list.html]',
-          'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "users_user"."id",
-                 "users_user"."password",
-                 "users_user"."last_login",
-                 "users_user"."is_superuser",
-                 "users_user"."username",
-                 "users_user"."first_name",
-                 "users_user"."last_name",
-                 "users_user"."is_staff",
-                 "users_user"."is_active",
-                 "users_user"."date_joined",
-                 "users_user"."address_line_1",
-                 "users_user"."address_line_2",
-                 "users_user"."post_code",
-                 "users_user"."city",
-                 "users_user"."department",
-                 "users_user"."coords",
-                 "users_user"."geocoding_score",
-                 "users_user"."geocoding_updated_at",
-                 "users_user"."ban_api_resolved_address",
-                 "users_user"."insee_city_id",
-                 "users_user"."title",
-                 "users_user"."full_name_search_vector",
-                 "users_user"."email",
-                 "users_user"."phone",
-                 "users_user"."kind",
-                 "users_user"."identity_provider",
-                 "users_user"."has_completed_welcoming_tour",
-                 "users_user"."created_by_id",
-                 "users_user"."external_data_source_history",
-                 "users_user"."last_checked_at",
-                 "users_user"."public_id",
-                 "users_user"."address_filled_at",
-                 "users_user"."first_login"
-          FROM "users_user"
-          WHERE "users_user"."id" = %s
-          LIMIT 21
         ''',
       }),
       dict({
@@ -1328,7 +1344,40 @@
                  "col8",
                  "col9",
                  "col10",
-                 "col11"
+                 "col11",
+                 "col12",
+                 "col13",
+                 "col14",
+                 "col15",
+                 "col16",
+                 "col17",
+                 "col18",
+                 "col19",
+                 "col20",
+                 "col21",
+                 "col22",
+                 "col23",
+                 "col24",
+                 "col25",
+                 "col26",
+                 "col27",
+                 "col28",
+                 "col29",
+                 "col30",
+                 "col31",
+                 "col32",
+                 "col33",
+                 "col34",
+                 "col35",
+                 "col36",
+                 "col37",
+                 "col38",
+                 "col39",
+                 "col40",
+                 "col41",
+                 "col42",
+                 "col43",
+                 "col44"
           FROM
             (SELECT *
              FROM
@@ -1345,8 +1394,42 @@
                        "gps_followupgroupmembership"."creator_id" AS "col11",
                        ROW_NUMBER() OVER (PARTITION BY "gps_followupgroupmembership"."follow_up_group_id"
                                           ORDER BY RANDOM() ASC) AS "qual0",
-                       RANDOM() AS "qual1"
+                       RANDOM() AS "qual1",
+                       "users_user"."id" AS "col12",
+                       "users_user"."password" AS "col13",
+                       "users_user"."last_login" AS "col14",
+                       "users_user"."is_superuser" AS "col15",
+                       "users_user"."username" AS "col16",
+                       "users_user"."first_name" AS "col17",
+                       "users_user"."last_name" AS "col18",
+                       "users_user"."is_staff" AS "col19",
+                       "users_user"."is_active" AS "col20",
+                       "users_user"."date_joined" AS "col21",
+                       "users_user"."address_line_1" AS "col22",
+                       "users_user"."address_line_2" AS "col23",
+                       "users_user"."post_code" AS "col24",
+                       "users_user"."city" AS "col25",
+                       "users_user"."department" AS "col26",
+                       "users_user"."coords" AS "col27",
+                       "users_user"."geocoding_score" AS "col28",
+                       "users_user"."geocoding_updated_at" AS "col29",
+                       "users_user"."ban_api_resolved_address" AS "col30",
+                       "users_user"."insee_city_id" AS "col31",
+                       "users_user"."title" AS "col32",
+                       "users_user"."full_name_search_vector" AS "col33",
+                       "users_user"."email" AS "col34",
+                       "users_user"."phone" AS "col35",
+                       "users_user"."kind" AS "col36",
+                       "users_user"."identity_provider" AS "col37",
+                       "users_user"."has_completed_welcoming_tour" AS "col38",
+                       "users_user"."created_by_id" AS "col39",
+                       "users_user"."external_data_source_history" AS "col40",
+                       "users_user"."last_checked_at" AS "col41",
+                       "users_user"."public_id" AS "col42",
+                       "users_user"."address_filled_at" AS "col43",
+                       "users_user"."first_login" AS "col44"
                 FROM "gps_followupgroupmembership"
+                INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
                 WHERE ("gps_followupgroupmembership"."is_referent"
                        AND "gps_followupgroupmembership"."follow_up_group_id" IN (%s))
                 ORDER BY RANDOM() ASC) "qualify"
