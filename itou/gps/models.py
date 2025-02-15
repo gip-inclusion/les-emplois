@@ -30,6 +30,7 @@ class FollowUpGroupManager(models.Manager):
             create_args = update_args | {
                 "creator": user,
                 "created_at": now,
+                "started_at": now,
             }
 
             FollowUpGroupMembership.objects.update_or_create(
@@ -111,7 +112,7 @@ class FollowUpGroupMembership(models.Model):
     created_in_bulk = models.BooleanField(verbose_name="créé massivement", default=False, db_index=True)
 
     last_contact_at = models.DateTimeField(verbose_name="date de dernier contact", default=timezone.now)
-
+    started_at = models.DateTimeField(verbose_name="date de début de suivi", null=True)
     # Keep track of when the membership was ended
     ended_at = models.DateTimeField(verbose_name="date de désactivation", null=True)
 
