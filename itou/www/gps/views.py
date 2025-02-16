@@ -34,7 +34,7 @@ def in_gard(request):
 def group_list(request, template_name="gps/group_list.html"):
     memberships = (
         FollowUpGroupMembership.objects.filter(member=request.user)
-        .filter(is_active=True)
+        .filter(is_active=True, ended_at=None)
         .annotate(nb_members=Count("follow_up_group__members"))
         .order_by("-created_at")
         .select_related("follow_up_group", "follow_up_group__beneficiary", "member")
