@@ -602,6 +602,7 @@
                INNER JOIN "gps_followupgroup" U2 ON (U0."follow_up_group_id" = U2."id")
                LEFT OUTER JOIN "gps_followupgroupmembership" U3 ON (U2."id" = U3."follow_up_group_id")
                WHERE (U0."member_id" = %s
+                      AND U0."ended_at" IS NULL
                       AND U0."is_active")
                GROUP BY U0."id",
                         U2."beneficiary_id")
@@ -623,6 +624,7 @@
              INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
              LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
              WHERE ("gps_followupgroupmembership"."member_id" = %s
+                    AND "gps_followupgroupmembership"."ended_at" IS NULL
                     AND "gps_followupgroupmembership"."is_active")
              GROUP BY 1) subquery
         ''',
@@ -750,6 +752,7 @@
           LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
           INNER JOIN "users_user" T6 ON ("gps_followupgroup"."beneficiary_id" = T6."id")
           WHERE ("gps_followupgroupmembership"."member_id" = %s
+                 AND "gps_followupgroupmembership"."ended_at" IS NULL
                  AND "gps_followupgroupmembership"."is_active")
           GROUP BY "gps_followupgroupmembership"."id",
                    "gps_followupgroup"."id",

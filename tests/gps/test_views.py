@@ -104,6 +104,15 @@ def test_my_groups(snapshot, client):
         member=user,
     ).follow_up_group
 
+    # old group
+    FollowUpGroupMembershipFactory(
+        follow_up_group__beneficiary__first_name="Jean",
+        follow_up_group__beneficiary__last_name="Bon",
+        is_referent=False,
+        ended_at=timezone.now(),
+        member=user,
+    )
+
     with assertSnapshotQueries(snapshot):
         response = client.get(reverse("gps:group_list"))
     groups = parse_response_to_soup(
@@ -115,6 +124,8 @@ def test_my_groups(snapshot, client):
         ],
     )
     assert str(groups) == snapshot(name="test_my_groups__group_card")
+
+    assertContains(response, f'<a class="nav-link active" href="{reverse("gps:group_list")}">')
 
     # Test `is_referent` display.
     group_1 = FollowUpGroupFactory(memberships=1, beneficiary__first_name="Janis", beneficiary__last_name="Joplin")

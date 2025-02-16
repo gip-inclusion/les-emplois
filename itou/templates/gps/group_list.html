@@ -9,7 +9,7 @@
 
 
 {% block title_content %}
-    <div class="d-flex flex-column flex-md-row gap-3 mb-3 mb-md-5 justify-content-md-between align-items-md-center">
+    <div class="d-flex flex-column flex-md-row gap-3 mb-3 mb-md-3 justify-content-md-between align-items-md-center">
         <div>
             <h1 class="m-0">GPS</h1>
             <p>Guide de partage et de suivi</p>
@@ -31,6 +31,11 @@
             </a>
         </div>
     </div>
+    <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'gps:group_list' %}">En cours d’accompagnement</a>
+        </li>
+    </ul>
 {% endblock %}
 
 
