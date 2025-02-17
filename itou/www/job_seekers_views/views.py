@@ -4,8 +4,8 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, IntegerField, Max, OuterRef, Q, Subquery
-from django.db.models.functions import Coalesce
+from django.db.models import Count, DateTimeField, IntegerField, Max, OuterRef, Q, Subquery, Value
+from django.db.models.functions import Coalesce, Concat, Lower
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -157,6 +157,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
         User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids)
         .prefetch_related("approvals")
         .annotate(
+            full_name=Concat(Lower("first_name"), Value(" "), Lower("last_name")),
             job_applications_nb=Coalesce(subquery_count, 0),
             last_updated_at=subquery_last_update,
             valid_eligibility_diagnosis=subquery_diagnosis,
@@ -166,11 +167,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
         queryset = queryset.filter(pk=job_seeker_pk)
     order = JobSeekerOrder(form.cleaned_data.get("order") or JobSeekerOrder.FULL_NAME_ASC)
 
-    order_args = {
-        JobSeekerOrder.FULL_NAME_ASC: ("first_name", "last_name"),
-        JobSeekerOrder.FULL_NAME_DESC: ("-first_name", "-last_name"),
-    }.get(order, (str(order),))
-    queryset = queryset.order_by(*order_args)
+    queryset = queryset.order_by(str(order))
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=10)
     for job_seeker in page_obj:

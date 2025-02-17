@@ -361,6 +361,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
                              FROM "job_applications_jobapplication" U0
@@ -391,8 +392,7 @@
                                            %s,
                                            %s,
                                            %s))
-          ORDER BY "users_user"."first_name" ASC,
-                   "users_user"."last_name" ASC
+          ORDER BY 34 ASC
           LIMIT 4
         ''',
       }),
@@ -887,6 +887,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
                              FROM "job_applications_jobapplication" U0
@@ -917,8 +918,7 @@
                                            %s,
                                            %s,
                                            %s))
-          ORDER BY "users_user"."first_name" ASC,
-                   "users_user"."last_name" ASC
+          ORDER BY 34 ASC
           LIMIT 4
         ''',
       }),
