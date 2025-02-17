@@ -131,7 +131,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
 
     form = FilterForm(
         User.objects.filter(kind=UserKind.JOB_SEEKER).filter(pk__in=job_seekers_ids),
-        request.GET or None,
+        request.GET,
         request_user=request.user,
     )
 
