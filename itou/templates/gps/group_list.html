@@ -62,7 +62,7 @@
                         </p>
                         <form class="flex-column flex-md-row mt-3 mt-md-0"
                               hx-get="{{ request.path }}"
-                              hx-trigger="change delay:.5s, duetChange delay:.5s, change from:#id_beneficiary"
+                              hx-trigger="change delay:.5s"
                               hx-indicator="#follow-up-groups-section"
                               hx-target="#follow-up-groups-section"
                               hx-include="#id_beneficiary"
@@ -76,4 +76,10 @@
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src='{% static "js/htmx_compat.js" %}'></script>
+    <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
 {% endblock %}
