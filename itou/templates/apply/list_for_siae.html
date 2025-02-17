@@ -28,6 +28,10 @@
     {% include "apply/includes/siae_actions.html" with batch_mode=False %}
 {% endblock %}
 
+{% block title_messages %}
+    {% include "includes/mon_recap_banner.html" with request=request only %}
+{% endblock title_messages %}
+
 {% block content %}
     {% include "apply/includes/job_applications_filters/offcanvas.html" %}
     <section class="s-section">

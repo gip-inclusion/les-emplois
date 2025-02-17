@@ -1,0 +1,21 @@
+{% if request.current_organization.department == "59" or request.current_organization.department == "69" or request.current_organization.department == "93" %}
+    <div id="mon-recap-banner" class="alert alert-important alert-dismissible-once d-none" role="status">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        <div class="row">
+            <div class="col-auto pe-0">
+                <i class="ri-information-line ri-xl text-important" aria-hidden="true"></i>
+            </div>
+            <div class="col">
+                <p class="mb-2">
+                    <strong>Le saviez-vous ?</strong>
+                </p>
+                <p class="mb-0">
+                    Commandez gratuitement des carnets Mon Récap à distribuer aux personnes que vous accompagnez, pour les aider dans leur parcours et faciliter leur démarche.
+                </p>
+            </div>
+            <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                <a class="btn btn-sm btn-primary has-external-link" target="_blank" rel="noopener" href="https://tally.so/r/mRMDWl?reseau=0&source=sitelesemplois">Je commande</a>
+            </div>
+        </div>
+    </div>
+{% endif %}
