@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, IntegerField, Max, OuterRef, Q, Subquery
+from django.db.models import Count, DateTimeField, IntegerField, Max, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
@@ -113,21 +113,7 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
 @require_safe
 @check_user(lambda user: user.is_prescriber)
 def list_job_seekers(request, template_name="job_seekers_views/list.html"):
-    job_seekers_created_by_user = User.objects.filter(created_by=request.user).values_list("id", flat=True)
-    if request.current_organization:
-        job_seekers_created_by_orga = JobSeekerProfile.objects.filter(
-            created_by_prescriber_organization=request.current_organization,
-        ).values_list("user_id", flat=True)
-        job_seekers_applications = JobApplication.objects.filter(
-            (Q(sender=request.user) & Q(sender_prescriber_organization__isnull=True))
-            | Q(sender_prescriber_organization=request.current_organization),
-        ).values_list("job_seeker_id", flat=True)
-    else:
-        job_seekers_created_by_orga = User.objects.none()
-        job_seekers_applications = JobApplication.objects.filter(sender=request.user).values_list(
-            "job_seeker_id", flat=True
-        )
-    job_seekers_ids = list(job_seekers_created_by_user.union(job_seekers_created_by_orga, job_seekers_applications))
+    job_seekers_ids = list(User.objects.linked_job_seeker_ids(request.user, request.current_organization))
 
     form = FilterForm(
         User.objects.filter(kind=UserKind.JOB_SEEKER).filter(pk__in=job_seekers_ids),

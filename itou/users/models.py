@@ -5,6 +5,7 @@ from collections import Counter
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str
 from citext import CIEmailField
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.postgres.indexes import GinIndex, OpClass
@@ -133,6 +134,31 @@ class ItouUserManager(UserManager):
             del result[pe_id]
 
         return result
+
+    def linked_job_seeker_ids(self, user, organization=None):
+        """
+        Ids of job seekers that appear in the user's job seekers list view:
+        - job seekers created by the current user
+        - job seekers created by the current organization
+        - job seekers for whom the current user applied
+        """
+        job_seekers_created_by_user = self.filter(created_by=user).values_list("id", flat=True)
+
+        job_application_model = apps.get_model("job_applications", "JobApplication")
+        if organization:
+            job_seekers_created_by_orga = JobSeekerProfile.objects.filter(
+                created_by_prescriber_organization=organization,
+            ).values_list("user_id", flat=True)
+            job_seekers_applications = job_application_model.objects.filter(
+                (Q(sender=user) & Q(sender_prescriber_organization__isnull=True))
+                | Q(sender_prescriber_organization=organization),
+            ).values_list("job_seeker_id", flat=True)
+        else:
+            job_seekers_created_by_orga = User.objects.none()
+            job_seekers_applications = job_application_model.objects.filter(sender=user).values_list(
+                "job_seeker_id", flat=True
+            )
+        return job_seekers_created_by_user.union(job_seekers_created_by_orga, job_seekers_applications)
 
 
 class User(AbstractUser, AddressMixin):
