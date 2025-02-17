@@ -37,7 +37,7 @@
             <div class="s-section__row row">
                 <div class="col-12">
                     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                        {% include "job_seekers_views/includes/list_counter.html" with paginator=paginator request=request only %}
+                        {% include "job_seekers_views/includes/list_counter.html" with paginator=page_obj.paginator request=request only %}
                         <div class="flex-column flex-md-row mt-3 mt-md-0">
                             <form hx-get="{% url 'job_seekers_views:list' %}" hx-trigger="change delay:.5s" hx-indicator="#job-seekers-section" hx-target="#job-seekers-section" hx-swap="outerHTML" hx-push-url="true">
                                 {% bootstrap_field filters_form.job_seeker wrapper_class="w-lg-400px" show_label=False %}
