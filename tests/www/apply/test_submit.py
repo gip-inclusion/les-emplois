@@ -1576,7 +1576,6 @@ class TestApplyAsPrescriber:
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
 
-    @pytest.mark.ignore_unknown_variable_template_error
     def test_apply_as_prescriber_with_suspension_sanction(self, client):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
         Sanctions.objects.create(
