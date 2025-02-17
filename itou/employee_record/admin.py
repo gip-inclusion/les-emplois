@@ -97,15 +97,29 @@ class EmployeeRecordTransitionLogInline(ReadonlyMixin, ItouTabularInline):
     extra = 0
     fields = (
         "transition",
-        "from_state",
-        "to_state",
+        "from_state_display",
+        "to_state_display",
         "user",
         "timestamp",
-        "asp_processing_code",
-        "asp_processing_label",
+        "asp_processing_display",
         "asp_batch_file",
     )
+    readonly_fields = fields
     raw_id_fields = ("user",)
+
+    @admin.display(description="statut initial")
+    def from_state_display(self, obj):
+        return obj.get_modified_object().status.workflow.states[obj.from_state].title
+
+    @admin.display(description="statut final")
+    def to_state_display(self, obj):
+        return obj.get_modified_object().status.workflow.states[obj.to_state].title
+
+    @admin.display(description="traitement ASP")
+    def asp_processing_display(self, obj):
+        if obj.asp_processing_code or self.asp_processing_label:
+            return f"{obj.asp_processing_code}/{obj.asp_processing_label}"
+        return self.get_empty_value_display()
 
 
 @admin.register(models.EmployeeRecord)
