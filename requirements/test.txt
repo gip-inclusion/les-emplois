@@ -311,9 +311,9 @@ cssbeautifier==1.15.2 \
     --hash=sha256:02d42ffa6aefaa87f18452b437dbb73f6b98f42e9a84759810dc58f7a6bfc26c \
     --hash=sha256:6daf7f6012ff2914092d675793a5a7f602ca36a10159d0cf5c119183004306e0
     # via djlint
-django==5.1.5 \
-    --hash=sha256:19bbca786df50b9eca23cee79d495facf55c8f5c54c529d9bf1fe7b5ea086af3 \
-    --hash=sha256:c46eb936111fffe6ec4bc9930035524a8be98ec2f74d8a0ff351226a3e52f459
+django==5.1.6 \
+    --hash=sha256:1e39eafdd1b185e761d9fab7a9f0b9fa00af1b37b25ad980a8aa0dac13535690 \
+    --hash=sha256:8d203400bc2952fbfb287c2bbda630297d654920c72a73cc82a9ad7926feaad5
     # via
     #   -r requirements/base.txt
     #   django-allauth
