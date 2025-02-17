@@ -29,7 +29,9 @@
                                     {{ membership.follow_up_group.beneficiary.get_full_name }}
                                 </a>
                             </td>
-                            <td>{{ membership.created_at|date:"d/m/Y" }}</td>
+                            <td>
+                                {{ membership.created_at|date:"F Y" }} – <strong>{{ membership.human_readable_followed_for }}</strong>
+                            </td>
                             <td>
                                 {% if membership.is_referent %}
                                     <span class="badge badge-xs rounded-pill bg-accent-03-lighter text-primary">vous êtes référent</span>
