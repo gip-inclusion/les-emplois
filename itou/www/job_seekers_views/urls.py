@@ -16,7 +16,7 @@ urlpatterns = [
         views.JobSeekerDetailView.as_view(template_name="job_seekers_views/job_applications.html"),
         name="job_applications",
     ),
-    path("list", views.JobSeekerListView.as_view(), name="list"),
+    path("list", views.list_job_seekers, name="list"),
     path(
         "start",
         views.GetOrCreateJobSeekerStartView.as_view(),

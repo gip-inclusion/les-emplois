@@ -211,7 +211,8 @@
       }),
       dict({
         'origin': list([
-          'JobSeekerListView.setup[www/job_seekers_views/views.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           
@@ -236,7 +237,8 @@
       dict({
         'origin': list([
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
-          'JobSeekerListView.setup[www/job_seekers_views/views.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -288,7 +290,8 @@
           'User.can_edit_personal_information[users/models.py]',
           'User.can_view_personal_information[users/models.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
-          'JobSeekerListView.setup[www/job_seekers_views/views.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -305,13 +308,14 @@
       dict({
         'origin': list([
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
-          'JobSeekerListView.get_context_data[www/job_seekers_views/views.py]',
+          'pager[utils/pagination.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
-                 AND "users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
                                            %s,
@@ -320,7 +324,8 @@
       }),
       dict({
         'origin': list([
-          'JobSeekerListView.get_context_data[www/job_seekers_views/views.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -420,7 +425,6 @@
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
-                 AND "users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
                                            %s,
@@ -432,7 +436,8 @@
       }),
       dict({
         'origin': list([
-          'JobSeekerListView.get_context_data[www/job_seekers_views/views.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -741,7 +746,8 @@
       }),
       dict({
         'origin': list([
-          'JobSeekerListView.setup[www/job_seekers_views/views.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           
@@ -766,7 +772,8 @@
       dict({
         'origin': list([
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
-          'JobSeekerListView.setup[www/job_seekers_views/views.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -818,7 +825,8 @@
           'User.can_edit_personal_information[users/models.py]',
           'User.can_view_personal_information[users/models.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
-          'JobSeekerListView.setup[www/job_seekers_views/views.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -835,13 +843,14 @@
       dict({
         'origin': list([
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
-          'JobSeekerListView.get_context_data[www/job_seekers_views/views.py]',
+          'pager[utils/pagination.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
-                 AND "users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
                                            %s,
@@ -850,7 +859,8 @@
       }),
       dict({
         'origin': list([
-          'JobSeekerListView.get_context_data[www/job_seekers_views/views.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -950,7 +960,6 @@
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
-                 AND "users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
                                            %s,
@@ -962,7 +971,8 @@
       }),
       dict({
         'origin': list([
-          'JobSeekerListView.get_context_data[www/job_seekers_views/views.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",

@@ -8,11 +8,11 @@ from django.db.models import Count, DateTimeField, IntegerField, Max, OuterRef, 
 from django.db.models.functions import Coalesce
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
-from django.views.generic import DetailView, ListView, TemplateView, View
+from django.views.generic import DetailView, TemplateView, View
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
@@ -23,8 +23,9 @@ from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError
+from itou.utils.auth import check_user
 from itou.utils.emails import redact_email_address
-from itou.utils.pagination import ItouPaginator
+from itou.utils.pagination import pager
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import get_safe_url
 from itou.www.apply.views.submit_views import ApplicationBaseView
@@ -108,100 +109,75 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
         }
 
 
-class JobSeekerListView(UserPassesTestMixin, ListView):
-    model = User
+@check_user(lambda user: user.is_prescriber)
+def list_job_seekers(request, template_name="job_seekers_views/list.html"):
+    job_seekers_created_by_user = User.objects.filter(created_by=request.user).values_list("id", flat=True)
+    if request.current_organization:
+        job_seekers_created_by_orga = JobSeekerProfile.objects.filter(
+            created_by_prescriber_organization=request.current_organization,
+        ).values_list("user_id", flat=True)
+        job_seekers_applications = JobApplication.objects.filter(
+            (Q(sender=request.user) & Q(sender_prescriber_organization__isnull=True))
+            | Q(sender_prescriber_organization=request.current_organization),
+        ).values_list("job_seeker_id", flat=True)
+    else:
+        job_seekers_created_by_orga = User.objects.none()
+        job_seekers_applications = JobApplication.objects.filter(sender=request.user).values_list(
+            "job_seeker_id", flat=True
+        )
+    job_seekers_ids = list(job_seekers_created_by_user.union(job_seekers_created_by_orga, job_seekers_applications))
+
+    form = FilterForm(
+        User.objects.filter(kind=UserKind.JOB_SEEKER).filter(pk__in=job_seekers_ids),
+        request.GET or None,
+        request_user=request.user,
+    )
+
+    user_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization).filter(
+        job_seeker=OuterRef("pk")
+    )
+    subquery_count = Subquery(
+        user_applications.values("job_seeker").annotate(count=Count("pk")).values("count"),
+        output_field=IntegerField(),
+    )
+    subquery_last_update = Subquery(
+        user_applications.values("job_seeker").annotate(last_update=Max("updated_at")).values("last_update"),
+        output_field=DateTimeField(),
+    )
+    subquery_diagnosis = Subquery(
+        (
+            EligibilityDiagnosis.objects.valid()
+            .for_job_seeker_and_siae(job_seeker=OuterRef("pk"), siae=None)
+            .values("id")[:1]
+        ),
+        output_field=IntegerField(),
+    )
     queryset = (
-        User.objects.filter(kind=UserKind.JOB_SEEKER)
+        User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids)
         .order_by("first_name", "last_name")
         .prefetch_related("approvals")
         .select_related("jobseeker_profile")
-    )
-    paginate_by = 10
-    paginator_class = ItouPaginator
-
-    def __init__(self):
-        super().__init__()
-        self.form = None
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        if self.test_func():
-            job_seekers_created_by_user = User.objects.filter(created_by=request.user).values_list("id", flat=True)
-
-            if request.current_organization:
-                job_seekers_created_by_orga = JobSeekerProfile.objects.filter(
-                    created_by_prescriber_organization=request.current_organization,
-                ).values_list("user_id", flat=True)
-                job_seekers_applications = JobApplication.objects.filter(
-                    (Q(sender=request.user) & Q(sender_prescriber_organization__isnull=True))
-                    | Q(sender_prescriber_organization=request.current_organization),
-                ).values_list("job_seeker_id", flat=True)
-            else:
-                job_seekers_created_by_orga = User.objects.none()
-                job_seekers_applications = JobApplication.objects.filter(sender=request.user).values_list(
-                    "job_seeker_id", flat=True
-                )
-            self.job_seekers_ids = list(
-                job_seekers_created_by_user.union(job_seekers_created_by_orga, job_seekers_applications)
-            )
-            self.form = FilterForm(
-                User.objects.filter(kind=UserKind.JOB_SEEKER).filter(pk__in=self.job_seekers_ids),
-                self.request.GET or None,
-                request_user=request.user,
-            )
-
-    def test_func(self):
-        return self.request.user.is_prescriber
-
-    def get_template_names(self):
-        return ["job_seekers_views/includes/list_results.html" if self.request.htmx else "job_seekers_views/list.html"]
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["back_url"] = get_safe_url(self.request, "back_url")
-        context["filters_form"] = self.form
-        page_obj = context["page_obj"]
-        if page_obj is not None:
-            for job_seeker in page_obj:
-                job_seeker.user_can_view_personal_information = self.request.user.can_view_personal_information(
-                    job_seeker
-                )
-        return context
-
-    def _get_user_job_applications(self):
-        return JobApplication.objects.prescriptions_of(self.request.user, self.request.current_organization).filter(
-            job_seeker=OuterRef("pk")
-        )
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        user_applications = self._get_user_job_applications()
-        subquery_count = Subquery(
-            user_applications.values("job_seeker").annotate(count=Count("pk")).values("count"),
-            output_field=IntegerField(),
-        )
-        subquery_last_update = Subquery(
-            user_applications.values("job_seeker").annotate(last_update=Max("updated_at")).values("last_update"),
-            output_field=DateTimeField(),
-        )
-        subquery_diagnosis = Subquery(
-            (
-                EligibilityDiagnosis.objects.valid()
-                .for_job_seeker_and_siae(job_seeker=OuterRef("pk"), siae=None)
-                .values("id")[:1]
-            ),
-            output_field=IntegerField(),
-        )
-        query = queryset.filter(kind=UserKind.JOB_SEEKER, pk__in=self.job_seekers_ids).annotate(
+        .annotate(
             job_applications_nb=Coalesce(subquery_count, 0),
             last_updated_at=subquery_last_update,
             valid_eligibility_diagnosis=subquery_diagnosis,
         )
+    )
 
-        if self.form.is_valid() and (job_seeker_pk := self.form.cleaned_data["job_seeker"]):
-            query = query.filter(pk=job_seeker_pk)
+    if form.is_valid() and (job_seeker_pk := form.cleaned_data["job_seeker"]):
+        queryset = queryset.filter(pk=job_seeker_pk)
 
-        return query
+    page_obj = pager(queryset, request.GET.get("page"), items_per_page=10)
+    for job_seeker in page_obj:
+        job_seeker.user_can_view_personal_information = request.user.can_view_personal_information(job_seeker)
+
+    context = {
+        "back_url": get_safe_url(request, "back_url"),
+        "filters_form": form,
+        "page_obj": page_obj,
+    }
+
+    return render(request, "job_seekers_views/includes/list_results.html" if request.htmx else template_name, context)
 
 
 class GetOrCreateJobSeekerStartView(View):

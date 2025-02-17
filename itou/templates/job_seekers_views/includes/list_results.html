@@ -62,5 +62,5 @@
 </section>
 
 {% if request.htmx %}
-    {% include "job_seekers_views/includes/list_counter.html" with paginator=paginator request=request only %}
+    {% include "job_seekers_views/includes/list_counter.html" with paginator=page_obj.paginator request=request only %}
 {% endif %}
