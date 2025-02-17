@@ -114,7 +114,7 @@ class FollowUpGroupMembership(models.Model):
     last_contact_at = models.DateTimeField(verbose_name="date de dernier contact", default=timezone.now)
     started_at = models.DateTimeField(verbose_name="date de début de suivi", null=True)
     # Keep track of when the membership was ended
-    ended_at = models.DateTimeField(verbose_name="date de désactivation", null=True)
+    ended_at = models.DateTimeField(verbose_name="date de fin de suivi", null=True, blank=True)
 
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
