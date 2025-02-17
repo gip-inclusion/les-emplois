@@ -1,5 +1,36 @@
 # Journal des modifications
 
+## 2025-02-17
+
+### Ajouté
+
+- [Candidature : préparation à la certification AAH](https://github.com/gip-inclusion/les-emplois/pull/5481)
+- [Fiches salarié : Historique des transitions](https://github.com/gip-inclusion/les-emplois/pull/5527) 🖼
+
+### Modifié
+
+- [A11Y: Ajout des attibuts aria sur tous les %3Ci%3E remixicon](https://github.com/gip-inclusion/les-emplois/pull/5601)
+- [A11Y: Amélioration de l'accessibilité des tooltip](https://github.com/gip-inclusion/les-emplois/pull/5380) 🖼
+- [Admin: Amélioration de la gestion des appartenances aux organisations](https://github.com/gip-inclusion/les-emplois/pull/5595)
+- [Admin: Permettre de chercher par public_id](https://github.com/gip-inclusion/les-emplois/pull/5606)
+- [Admin: Permettre de réactiver un membre d'une organisation depuis l'admin](https://github.com/gip-inclusion/les-emplois/pull/5589)
+- [API: Remplacer PE par FT dans l'api GEIQ](https://github.com/gip-inclusion/les-emplois/pull/5604)
+- [Employeur: Rendre le numéro de téléphone optionel dans le formulaire de création d'entreprise](https://github.com/gip-inclusion/les-emplois/pull/5558)
+- [Fiches salarié: Faciliter la saisie des nouvelles fiches salariés](https://github.com/gip-inclusion/les-emplois/pull/5469)
+- [GPS: Ajouter une section au menu de gauche pour les pros du Gard](https://github.com/gip-inclusion/les-emplois/pull/5567)
+- [GPS: Correction des liens retour](https://github.com/gip-inclusion/les-emplois/pull/5607)
+- [RGPD: Ne pas mettre les adresses géolocalisées par les management commands dans la sortie standard](https://github.com/gip-inclusion/les-emplois/pull/5583)
+- [Stabilité: Correction d'une redirection cassée après avoir annulé une embauche](https://github.com/gip-inclusion/les-emplois/pull/5560)
+- [UX/UI: Supprimer le lien vers le webinaire dans introjsSwitchView](https://github.com/gip-inclusion/les-emplois/pull/5571)
+- [UX/UI: Un seul champ de saisie par ligne](https://github.com/gip-inclusion/les-emplois/pull/5593)
+
+### Tech
+
+- [API: amélioration de notre réponse d'erreur](https://github.com/gip-inclusion/les-emplois/pull/5587)
+- [MàJ vers Python 3.13](https://github.com/gip-inclusion/les-emplois/pull/5540)
+- [Performances: stockage d'un nom normalisé pour les villes & communes pour permettre l'utilisation de l'index](https://github.com/gip-inclusion/les-emplois/pull/5599)
+- [Tech: mise à jour de notre code pour rester compatible avec l'API ROME de FranceTravail](https://github.com/gip-inclusion/les-emplois/pull/5565)
+
 ## 2025-02-10
 
 ### Ajouté
