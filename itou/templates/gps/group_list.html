@@ -33,7 +33,10 @@
     </div>
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
         <li class="nav-item">
-            <a class="nav-link active" href="{% url 'gps:group_list' %}">En cours d’accompagnement</a>
+            <a class="nav-link{% if active_memberships %} active{% endif %}" href="{% url 'gps:group_list' %}">En cours d’accompagnement</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link{% if not active_memberships %} active{% endif %}" href="{% url 'gps:old_group_list' %}">Historique</a>
         </li>
     </ul>
 {% endblock %}
@@ -50,7 +53,11 @@
                     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
                         <p class="mb-0 flex-grow-1" id="results">
                             {% with memberships_page.paginator.count as counter %}
-                                {{ counter }} {{ counter|pluralizefr:"bénéficiaire accompagné,bénéficiaires accompagnés" }}
+                                {% if active_memberships %}
+                                    {{ counter }} {{ counter|pluralizefr:"bénéficiaire accompagné,bénéficiaires accompagnés" }}
+                                {% else %}
+                                    {{ counter }} {{ counter|pluralizefr:"bénéficiaire précédemment accompagné,bénéficiaires précédemment accompagnés" }}
+                                {% endif %}
                             {% endwith %}
                         </p>
                         <form class="flex-column flex-md-row mt-3 mt-md-0"

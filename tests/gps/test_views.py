@@ -134,6 +134,41 @@ def test_group_list(snapshot, client):
     assertContains(response, "vous êtes référent")
 
 
+@freezegun.freeze_time("2024-06-21", tick=True)
+def test_old_group_list(snapshot, client):
+    user = PrescriberFactory(membership__organization__authorized=True, membership__organization__for_snapshot=True)
+    client.force_login(user)
+
+    # old group
+    membership = FollowUpGroupMembershipFactory(
+        follow_up_group__beneficiary__first_name="Jean",
+        follow_up_group__beneficiary__last_name="Bon",
+        is_referent=False,
+        ended_at=timezone.now(),
+        member=user,
+    )
+
+    # active group
+    FollowUpGroupMembershipFactory(member=user)
+
+    with assertSnapshotQueries(snapshot):
+        response = client.get(reverse("gps:old_group_list"))
+    groups = parse_response_to_soup(
+        response,
+        selector="#follow-up-groups-section",
+        replace_in_attr=[
+            (
+                "href",
+                f"/gps/details/{membership.follow_up_group.beneficiary.public_id}",
+                "/gps/details/[Public ID of beneficiary]",
+            )
+        ],
+    )
+    assert str(groups) == snapshot(name="test_my_groups__group_card")
+
+    assertContains(response, f'<a class="nav-link active" href="{reverse("gps:old_group_list")}">')
+
+
 def test_my_groups_as_non_authorized_precriber(client):
     user = PrescriberFactory()
     client.force_login(user)

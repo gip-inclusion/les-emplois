@@ -13,7 +13,12 @@
                 <thead>
                     <tr>
                         <th scope="col">Prénom Nom</th>
-                        <th scope="col">Accompagné depuis</th>
+                        {% if active_memberships %}
+                            <th scope="col">Accompagné depuis</th>
+                        {% else %}
+                            <th scope="col">Début d’accompagnement</th>
+                            <th scope="col">Fin d’accompagnement</th>
+                        {% endif %}
                         <th scope="col" aria-label="Référent ou référente">Référent⸱e</th>
                         <th scope="col" aria-label="Nombre d’intervenants">Nbr d’intervenants</th>
                     </tr>
@@ -29,9 +34,14 @@
                                     {{ membership.follow_up_group.beneficiary.get_full_name }}
                                 </a>
                             </td>
-                            <td>
-                                {{ membership.created_at|date:"F Y" }} – <strong>{{ membership.human_readable_followed_for }}</strong>
-                            </td>
+                            {% if active_memberships %}
+                                <td>
+                                    {{ membership.created_at|date:"F Y" }} – <strong>{{ membership.human_readable_followed_for }}</strong>
+                                </td>
+                            {% else %}
+                                <td>{{ membership.created_at|date:"F Y" }}</td>
+                                <td>{{ membership.ended_at|date:"F Y" }}</td>
+                            {% endif %}
                             <td>
                                 {% if membership.is_referent %}
                                     <span class="badge badge-xs rounded-pill bg-accent-03-lighter text-primary">vous êtes référent</span>
