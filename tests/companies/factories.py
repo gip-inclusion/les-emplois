@@ -1,6 +1,8 @@
+import functools
 import string
 
 import factory.fuzzy
+from django.conf import settings
 from django.utils import timezone
 
 from itou.cities.models import City
@@ -97,6 +99,11 @@ class CompanyFactory(factory.django.DjangoModelFactory):
             with_geocoding=True,
             brand=factory.Faker("company", locale="fr_FR"),
             description=factory.Faker("paragraph", locale="fr_FR"),
+        )
+        not_in_territorial_experimentations = factory.Trait(
+            post_code=factory.LazyFunction(
+                functools.partial(create_fake_postcode, ignore=settings.GPS_OPEN_DEPARTMENTS)
+            )
         )
         for_snapshot = factory.Trait(
             name="ACME Inc.",
