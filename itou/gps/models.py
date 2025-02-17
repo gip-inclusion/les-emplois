@@ -152,7 +152,7 @@ class FollowUpGroupMembership(models.Model):
     @property
     def human_readable_followed_for(self):
         now = timezone.now()
-        d = self.created_at
+        d = self.started_at
         # Get years and months (from django.utils.timesince.timesince)
         total_months = (now.year - d.year) * 12 + (now.month - d.month)
         if d.day > now.day or (d.day == now.day and d.time() > now.time()):

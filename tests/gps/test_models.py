@@ -118,23 +118,23 @@ def test_manager_organizations_names(UserFactory, MembershipFactory, relation_na
 def test_human_readable_followed_for():
     membership = FollowUpGroupMembershipFactory()
 
-    membership.created_at = datetime.datetime(2025, 2, 1)
+    membership.started_at = datetime.datetime(2025, 2, 1)
     assert membership.human_readable_followed_for == "moins d’un mois"
 
-    membership.created_at = datetime.datetime(2025, 1, 14)
+    membership.started_at = datetime.datetime(2025, 1, 14)
     assert membership.human_readable_followed_for == "moins d’un mois"
 
-    membership.created_at = datetime.datetime(2025, 1, 13, 17, 0, 0)
+    membership.started_at = datetime.datetime(2025, 1, 13, 17, 0, 0)
     assert membership.human_readable_followed_for == "moins d’un mois"
 
-    membership.created_at = datetime.datetime(2025, 1, 13, 16, 0, 0)
+    membership.started_at = datetime.datetime(2025, 1, 13, 16, 0, 0)
     assert membership.human_readable_followed_for == "1 mois"
 
-    membership.created_at = datetime.datetime(2024, 2, 14)
+    membership.started_at = datetime.datetime(2024, 2, 14)
     assert membership.human_readable_followed_for == "11 mois"
 
-    membership.created_at = datetime.datetime(2024, 2, 13)
+    membership.started_at = datetime.datetime(2024, 2, 13)
     assert membership.human_readable_followed_for == "1 an"
 
-    membership.created_at = datetime.datetime(2024, 1, 13)
+    membership.started_at = datetime.datetime(2024, 1, 13)
     assert membership.human_readable_followed_for == "1 an, 1 mois"

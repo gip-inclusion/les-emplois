@@ -36,10 +36,10 @@
                             </td>
                             {% if active_memberships %}
                                 <td>
-                                    {{ membership.created_at|date:"F Y" }} – <strong>{{ membership.human_readable_followed_for }}</strong>
+                                    {{ membership.started_at|date:"F Y" }} – <strong>{{ membership.human_readable_followed_for }}</strong>
                                 </td>
                             {% else %}
-                                <td>{{ membership.created_at|date:"F Y" }}</td>
+                                <td>{{ membership.started_at|date:"F Y" }}</td>
                                 <td>{{ membership.ended_at|date:"F Y" }}</td>
                             {% endif %}
                             <td>

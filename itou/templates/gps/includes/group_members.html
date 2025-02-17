@@ -21,7 +21,7 @@
                                 <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
                                     <p class="fs-sm mb-0 flex-grow-1">
                                         <i class="ri-calendar-line fw-normal me-1" aria-hidden="true"></i>
-                                        Membre du groupe de suivi depuis le {{ membership.created_at|date:"d/m/Y" }}
+                                        Membre du groupe de suivi depuis le {{ membership.started_at|date:"d/m/Y" }}
                                     </p>
                                     {% if membership.is_referent %}
                                         <div>
