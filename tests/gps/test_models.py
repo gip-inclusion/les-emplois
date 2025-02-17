@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 from django.utils import timezone
 from freezegun import freeze_time
@@ -5,7 +7,7 @@ from pytest_django.asserts import assertNumQueries
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from tests.companies.factories import CompanyMembershipFactory
-from tests.gps.factories import FollowUpGroupFactory
+from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -108,3 +110,29 @@ def test_manager_organizations_names(UserFactory, MembershipFactory, relation_na
 
     group_membership = FollowUpGroupMembership.objects.with_members_organizations_names().get(member_id=user.pk)
     assert not group_membership.organization_name
+
+
+@freeze_time("2025-02-13T16:44:42")
+def test_human_readable_followed_for():
+    membership = FollowUpGroupMembershipFactory()
+
+    membership.created_at = datetime.datetime(2025, 2, 1)
+    assert membership.human_readable_followed_for == "moins d’un mois"
+
+    membership.created_at = datetime.datetime(2025, 1, 14)
+    assert membership.human_readable_followed_for == "moins d’un mois"
+
+    membership.created_at = datetime.datetime(2025, 1, 13, 17, 0, 0)
+    assert membership.human_readable_followed_for == "moins d’un mois"
+
+    membership.created_at = datetime.datetime(2025, 1, 13, 16, 0, 0)
+    assert membership.human_readable_followed_for == "1 mois"
+
+    membership.created_at = datetime.datetime(2024, 2, 14)
+    assert membership.human_readable_followed_for == "11 mois"
+
+    membership.created_at = datetime.datetime(2024, 2, 13)
+    assert membership.human_readable_followed_for == "1 an"
+
+    membership.created_at = datetime.datetime(2024, 1, 13)
+    assert membership.human_readable_followed_for == "1 an, 1 mois"

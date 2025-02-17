@@ -3,6 +3,7 @@ from django.db import models, transaction
 from django.utils import timezone
 
 from itou.users.models import JobSeekerProfile, User
+from itou.utils.templatetags.str_filters import pluralizefr
 
 
 class BulkCreatedAtQuerysetProxy:
@@ -146,6 +147,26 @@ class FollowUpGroupMembership(models.Model):
     @property
     def organization_name(self):
         return next((name for name in (*self.prescriber_org_names, *self.companies_names) if name), None)
+
+    @property
+    def human_readable_followed_for(self):
+        now = timezone.now()
+        d = self.created_at
+        # Get years and months (from django.utils.timesince.timesince)
+        total_months = (now.year - d.year) * 12 + (now.month - d.month)
+        if d.day > now.day or (d.day == now.day and d.time() > now.time()):
+            total_months -= 1
+
+        if total_months == 0:
+            return "moins d’un mois"
+
+        years, months = divmod(total_months, 12)
+        res = []
+        if years:
+            res.append(f"{years} an{pluralizefr(years)}")
+        if months:
+            res.append(f"{months} mois")
+        return ", ".join(res)
 
 
 class FranceTravailContact(models.Model):
