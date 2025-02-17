@@ -1,4 +1,3 @@
-import pytest
 from django.contrib import messages
 from django.contrib.admin import helpers
 from django.contrib.auth.models import Permission
@@ -237,7 +236,6 @@ class TestTransferCompanyData:
         response = client.get(transfer_url_2)
         assert response.status_code == 403
 
-    @pytest.mark.ignore_unknown_variable_template_error("has_view_permission", "subtitle")
     @freeze_time("2023-08-31 12:34:56")
     def test_transfer_data(self, admin_client, snapshot):
         job_application = JobApplicationFactory(with_approval=True)
@@ -287,7 +285,6 @@ class TestTransferCompanyData:
         assert "Transfert du 2023-08-31 12:34:56 effectué par" in remark
         assert "Candidatures reçues" in remark
 
-    @pytest.mark.ignore_unknown_variable_template_error("has_view_permission", "subtitle")
     @freeze_time("2023-08-31 12:34:56")
     def test_transfer_data_is_searchable_and_disable_from_company(self, admin_client, snapshot):
         job_application = JobApplicationFactory(with_approval=True)
