@@ -79,14 +79,30 @@ def test_my_groups(snapshot, client):
 
     # Nominal case
     # Groups created latelly should come first.
-    group = FollowUpGroupFactory(for_snapshot=True)
+    group_1 = FollowUpGroupFactory(for_snapshot=True)
     FollowUpGroupMembershipFactory(
-        follow_up_group=group,
+        follow_up_group=group_1,
         is_referent=True,
         member__first_name="John",
         member__last_name="Doe",
     )
-    FollowUpGroup.objects.follow_beneficiary(group.beneficiary, user)
+    FollowUpGroup.objects.follow_beneficiary(group_1.beneficiary, user)
+
+    # We are referent
+    group_2 = FollowUpGroupMembershipFactory(
+        follow_up_group__beneficiary__first_name="François",
+        follow_up_group__beneficiary__last_name="Le Français",
+        is_referent=True,
+        member=user,
+    ).follow_up_group
+
+    # No referent
+    group_3 = FollowUpGroupMembershipFactory(
+        follow_up_group__beneficiary__first_name="Jean",
+        follow_up_group__beneficiary__last_name="Bon",
+        is_referent=False,
+        member=user,
+    ).follow_up_group
 
     with assertSnapshotQueries(snapshot):
         response = client.get(reverse("gps:group_list"))
@@ -94,14 +110,15 @@ def test_my_groups(snapshot, client):
         response,
         selector="#follow-up-groups-section",
         replace_in_attr=[
-            ("data-bs-confirm-url", f"/gps/groups/{group.pk}", "/gps/groups/[PK of Group]"),
+            ("href", f"/gps/details/{group.beneficiary.public_id}", "/gps/details/[Public ID of beneficiary]")
+            for group in [group_1, group_2, group_3]
         ],
     )
     assert str(groups) == snapshot(name="test_my_groups__group_card")
 
     # Test `is_referent` display.
-    group = FollowUpGroupFactory(memberships=1, beneficiary__first_name="Janis", beneficiary__last_name="Joplin")
-    FollowUpGroup.objects.follow_beneficiary(group.beneficiary, user, is_referent=True)
+    group_1 = FollowUpGroupFactory(memberships=1, beneficiary__first_name="Janis", beneficiary__last_name="Joplin")
+    FollowUpGroup.objects.follow_beneficiary(group_1.beneficiary, user, is_referent=True)
     response = client.get(reverse("gps:group_list"))
     assertContains(response, "vous êtes référent")
 

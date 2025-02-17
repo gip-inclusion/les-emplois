@@ -756,7 +756,7 @@
                    T6."id",
                    "users_user"."id"
           ORDER BY "gps_followupgroupmembership"."created_at" DESC
-          LIMIT 1
+          LIMIT 3
         ''',
       }),
       dict({
@@ -799,7 +799,9 @@
                        RANDOM() AS "qual1"
                 FROM "gps_followupgroupmembership"
                 WHERE ("gps_followupgroupmembership"."is_referent"
-                       AND "gps_followupgroupmembership"."follow_up_group_id" IN (%s))
+                       AND "gps_followupgroupmembership"."follow_up_group_id" IN (%s,
+                                                                                  %s,
+                                                                                  %s))
                 ORDER BY RANDOM() ASC) "qualify"
              WHERE ("qual0" > %s
                     AND "qual0" <= %s)) "qualify_mask"
@@ -911,7 +913,39 @@
                       
                           <tr>
                               <td>
-                                  <a aria-label="Consulter la fiche de Jane DOE" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/gps/groups/list">
+                                  <a aria-label="Consulter la fiche de Jean BON" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/details/[Public ID of beneficiary]?back_url=/gps/groups/list">
+                                      Jean BON
+                                  </a>
+                              </td>
+                              <td>
+                                  juin 2024 – <strong>moins d’un mois</strong>
+                              </td>
+                              <td>
+                                  
+                              </td>
+                              <td>1</td>
+                          </tr>
+                      
+                          <tr>
+                              <td>
+                                  <a aria-label="Consulter la fiche de François LE FRANÇAIS" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/details/[Public ID of beneficiary]?back_url=/gps/groups/list">
+                                      François LE FRANÇAIS
+                                  </a>
+                              </td>
+                              <td>
+                                  juin 2024 – <strong>moins d’un mois</strong>
+                              </td>
+                              <td>
+                                  
+                                      <span class="badge badge-xs rounded-pill bg-accent-03-lighter text-primary">vous êtes référent</span>
+                                  
+                              </td>
+                              <td>1</td>
+                          </tr>
+                      
+                          <tr>
+                              <td>
+                                  <a aria-label="Consulter la fiche de Jane DOE" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/details/[Public ID of beneficiary]?back_url=/gps/groups/list">
                                       Jane DOE
                                   </a>
                               </td>
