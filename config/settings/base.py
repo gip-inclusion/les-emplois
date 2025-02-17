@@ -333,7 +333,7 @@ AUTHENTICATION_BACKENDS = (
 # https://django-allauth.readthedocs.io/en/latest/advanced.html#custom-redirects
 ACCOUNT_ADAPTER = "itou.users.adapter.UserAdapter"
 
-ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_SUBJECT_PREFIX = ""
