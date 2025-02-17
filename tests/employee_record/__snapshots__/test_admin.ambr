@@ -55,3 +55,43 @@
           </div>
   '''
 # ---
+# name: test_available_transitions_for_unarchive[0000]
+  '''
+  <div class="submit-row" id="employee-record-transitions">
+              <p>Changer l'état de la fiche salarié :</p>
+              
+                  <input class="danger js-with-confirm" name="transition_unarchive_processed" type="submit" value="Intégrée"/>
+              
+          </div>
+  '''
+# ---
+# name: test_available_transitions_for_unarchive[32##]
+  '''
+  <div class="submit-row" id="employee-record-transitions">
+              <p>Changer l'état de la fiche salarié :</p>
+              
+                  <input class="danger js-with-confirm" name="transition_unarchive_rejected" type="submit" value="En erreur"/>
+              
+          </div>
+  '''
+# ---
+# name: test_available_transitions_for_unarchive[3436]
+  '''
+  <div class="submit-row" id="employee-record-transitions">
+              <p>Changer l'état de la fiche salarié :</p>
+              
+                  <input class="danger js-with-confirm" name="transition_unarchive_processed" type="submit" value="Intégrée"/>
+              
+          </div>
+  '''
+# ---
+# name: test_available_transitions_for_unarchive[]
+  '''
+  <div class="submit-row" id="employee-record-transitions">
+              <p>Changer l'état de la fiche salarié :</p>
+              
+                  <input class="danger js-with-confirm" name="transition_unarchive_new" type="submit" value="Nouvelle"/>
+              
+          </div>
+  '''
+# ---
