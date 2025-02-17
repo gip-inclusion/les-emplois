@@ -63,6 +63,8 @@ def test_create_follow_up_membership(admin_client):
         "last_contact_at_1": "12:34:57",
         "started_at_0": "01/01/2025",
         "started_at_1": "12:34:58",
+        "ended_at_0": "",
+        "ended_at_1": "",
     }
     response = admin_client.post(url, data=post_data)
     assert response.status_code == 302
@@ -86,6 +88,8 @@ def test_create_follow_up_membership(admin_client):
             "last_contact_at_1": "12:34:59",
             "started_at_0": "01/01/2025",
             "started_at_1": "12:35:00",
+            "ended_at_0": "",
+            "ended_at_1": "",
         },
     )
     assert response.status_code == 302

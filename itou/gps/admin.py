@@ -52,7 +52,6 @@ class FollowUpGroupMembershipAdmin(ItouModelAdmin):
         "updated_at",
     )
     readonly_fields = (
-        "ended_at",
         "creator",
         "created_in_bulk",
         "updated_at",
