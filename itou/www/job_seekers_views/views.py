@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
+from django.views.decorators.http import require_safe
 from django.views.generic import DetailView, TemplateView, View
 
 from itou.companies.enums import CompanyKind
@@ -109,6 +110,7 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
         }
 
 
+@require_safe
 @check_user(lambda user: user.is_prescriber)
 def list_job_seekers(request, template_name="job_seekers_views/list.html"):
     job_seekers_created_by_user = User.objects.filter(created_by=request.user).values_list("id", flat=True)
