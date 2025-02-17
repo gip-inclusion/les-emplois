@@ -359,11 +359,15 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
 
     @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_PROCESSED)
     def check_unarchive_processed(self):
-        return self.asp_processing_code in ["0000", "3436"]
+        return self.asp_processing_code in ["0000", self.ASP_DUPLICATE_ERROR_CODE]
 
     @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_REJECTED)
     def check_unarchive_rejected(self):
-        return self.asp_processing_code and self.asp_processing_code[:2] in ["32", "33", "34"]
+        return (
+            self.asp_processing_code
+            and self.asp_processing_code[:2] in ["32", "33", "34"]
+            and self.asp_processing_code != self.ASP_DUPLICATE_ERROR_CODE
+        )
 
     def unarchive(self):
         for transition_name in [
