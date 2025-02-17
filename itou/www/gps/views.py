@@ -31,11 +31,16 @@ def in_gard(request):
 
 
 @check_user(is_allowed_to_use_gps)
-def group_list(request, template_name="gps/group_list.html"):
+def group_list(request, current, template_name="gps/group_list.html"):
+    qs = FollowUpGroupMembership.objects.filter(member=request.user)
+
+    if current:
+        qs = qs.filter(is_active=True, ended_at=None)
+    else:
+        qs = qs.exclude(ended_at=None)
+
     memberships = (
-        FollowUpGroupMembership.objects.filter(member=request.user)
-        .filter(is_active=True, ended_at=None)
-        .annotate(nb_members=Count("follow_up_group__members"))
+        qs.annotate(nb_members=Count("follow_up_group__members"))
         .order_by("-created_at")
         .select_related("follow_up_group", "follow_up_group__beneficiary", "member")
         .prefetch_related(
@@ -56,6 +61,7 @@ def group_list(request, template_name="gps/group_list.html"):
     context = {
         "filters_form": filters_form,
         "memberships_page": memberships_page,
+        "active_memberships": current,
     }
 
     context["request_new_beneficiary_form_url"] = (

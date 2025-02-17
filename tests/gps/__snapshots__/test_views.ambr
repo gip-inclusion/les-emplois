@@ -907,7 +907,9 @@
                   <thead>
                       <tr>
                           <th scope="col">Prénom Nom</th>
-                          <th scope="col">Accompagné depuis</th>
+                          
+                              <th scope="col">Accompagné depuis</th>
+                          
                           <th aria-label="Référent ou référente" scope="col">Référent⸱e</th>
                           <th aria-label="Nombre d’intervenants" scope="col">Nbr d’intervenants</th>
                       </tr>
@@ -920,9 +922,11 @@
                                       Jean BON
                                   </a>
                               </td>
-                              <td>
-                                  juin 2024 – <strong>moins d’un mois</strong>
-                              </td>
+                              
+                                  <td>
+                                      juin 2024 – <strong>moins d’un mois</strong>
+                                  </td>
+                              
                               <td>
                                   
                               </td>
@@ -935,9 +939,11 @@
                                       François LE FRANÇAIS
                                   </a>
                               </td>
-                              <td>
-                                  juin 2024 – <strong>moins d’un mois</strong>
-                              </td>
+                              
+                                  <td>
+                                      juin 2024 – <strong>moins d’un mois</strong>
+                                  </td>
+                              
                               <td>
                                   
                                       <span class="badge badge-xs rounded-pill bg-accent-03-lighter text-primary">vous êtes référent</span>
@@ -952,15 +958,472 @@
                                       Jane DOE
                                   </a>
                               </td>
-                              <td>
-                                  juin 2024 – <strong>moins d’un mois</strong>
-                              </td>
+                              
+                                  <td>
+                                      juin 2024 – <strong>moins d’un mois</strong>
+                                  </td>
+                              
                               <td>
                                   
                                       John DOE
                                   
                               </td>
                               <td>2</td>
+                          </tr>
+                      
+                  </tbody>
+              </table>
+          </div>
+  
+          
+  
+  
+  
+  
+      
+  </div>
+  '''
+# ---
+# name: test_old_group_list
+  dict({
+    'num_queries': 13,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."is_head_office",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."is_authorized",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."user_id" = %s
+                 AND "prescribers_prescribermembership"."is_active")
+          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'MembershipsFiltersForm._get_beneficiary_choices[www/gps/forms.py]',
+          'MembershipsFiltersForm.__init__[www/gps/forms.py]',
+          'group_list[www/gps/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "users_user"
+          WHERE "users_user"."id" IN
+              (SELECT U2."beneficiary_id"
+               FROM "gps_followupgroupmembership" U0
+               INNER JOIN "gps_followupgroup" U2 ON (U0."follow_up_group_id" = U2."id")
+               LEFT OUTER JOIN "gps_followupgroupmembership" U3 ON (U2."id" = U3."follow_up_group_id")
+               WHERE (U0."member_id" = %s
+                      AND NOT (U0."ended_at" IS NULL))
+               GROUP BY U0."id",
+                        U2."beneficiary_id")
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
+          'pager[utils/pagination.py]',
+          'group_list[www/gps/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*)
+          FROM
+            (SELECT "gps_followupgroupmembership"."id" AS "col1"
+             FROM "gps_followupgroupmembership"
+             INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
+             LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
+             WHERE ("gps_followupgroupmembership"."member_id" = %s
+                    AND NOT ("gps_followupgroupmembership"."ended_at" IS NULL))
+             GROUP BY 1) subquery
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.is_prescriber_with_authorized_org[users/models.py]',
+          'IfNode[layout/_header_help_dropdown_content.html]',
+          'IfNode[layout/_header_help_dropdown_content.html]',
+          'IncludeNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[gps/group_list.html]',
+          'group_list[www/gps/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."user_id" = %s
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescriberorganization"."is_authorized"
+                 AND "users_user"."is_active")
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'IfNode[gps/includes/memberships_results.html]',
+          'IncludeNode[gps/group_list.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[gps/group_list.html]',
+          'group_list[www/gps/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "gps_followupgroupmembership"."id",
+                 "gps_followupgroupmembership"."is_referent",
+                 "gps_followupgroupmembership"."is_active",
+                 "gps_followupgroupmembership"."created_at",
+                 "gps_followupgroupmembership"."created_in_bulk",
+                 "gps_followupgroupmembership"."last_contact_at",
+                 "gps_followupgroupmembership"."ended_at",
+                 "gps_followupgroupmembership"."updated_at",
+                 "gps_followupgroupmembership"."follow_up_group_id",
+                 "gps_followupgroupmembership"."member_id",
+                 "gps_followupgroupmembership"."creator_id",
+                 COUNT(T4."member_id") AS "nb_members",
+                 "gps_followupgroup"."id",
+                 "gps_followupgroup"."created_at",
+                 "gps_followupgroup"."created_in_bulk",
+                 "gps_followupgroup"."updated_at",
+                 "gps_followupgroup"."beneficiary_id",
+                 T6."id",
+                 T6."password",
+                 T6."last_login",
+                 T6."is_superuser",
+                 T6."username",
+                 T6."first_name",
+                 T6."last_name",
+                 T6."is_staff",
+                 T6."is_active",
+                 T6."date_joined",
+                 T6."address_line_1",
+                 T6."address_line_2",
+                 T6."post_code",
+                 T6."city",
+                 T6."department",
+                 T6."coords",
+                 T6."geocoding_score",
+                 T6."geocoding_updated_at",
+                 T6."ban_api_resolved_address",
+                 T6."insee_city_id",
+                 T6."title",
+                 T6."full_name_search_vector",
+                 T6."email",
+                 T6."phone",
+                 T6."kind",
+                 T6."identity_provider",
+                 T6."has_completed_welcoming_tour",
+                 T6."created_by_id",
+                 T6."external_data_source_history",
+                 T6."last_checked_at",
+                 T6."public_id",
+                 T6."address_filled_at",
+                 T6."first_login",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login"
+          FROM "gps_followupgroupmembership"
+          INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
+          INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
+          LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
+          INNER JOIN "users_user" T6 ON ("gps_followupgroup"."beneficiary_id" = T6."id")
+          WHERE ("gps_followupgroupmembership"."member_id" = %s
+                 AND NOT ("gps_followupgroupmembership"."ended_at" IS NULL))
+          GROUP BY "gps_followupgroupmembership"."id",
+                   "gps_followupgroup"."id",
+                   T6."id",
+                   "users_user"."id"
+          ORDER BY "gps_followupgroupmembership"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'IfNode[gps/includes/memberships_results.html]',
+          'IncludeNode[gps/group_list.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[gps/group_list.html]',
+          'group_list[www/gps/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "col1",
+                 "col2",
+                 "col3",
+                 "col4",
+                 "col5",
+                 "col6",
+                 "col7",
+                 "col8",
+                 "col9",
+                 "col10",
+                 "col11"
+          FROM
+            (SELECT *
+             FROM
+               (SELECT "gps_followupgroupmembership"."id" AS "col1",
+                       "gps_followupgroupmembership"."is_referent" AS "col2",
+                       "gps_followupgroupmembership"."is_active" AS "col3",
+                       "gps_followupgroupmembership"."created_at" AS "col4",
+                       "gps_followupgroupmembership"."created_in_bulk" AS "col5",
+                       "gps_followupgroupmembership"."last_contact_at" AS "col6",
+                       "gps_followupgroupmembership"."ended_at" AS "col7",
+                       "gps_followupgroupmembership"."updated_at" AS "col8",
+                       "gps_followupgroupmembership"."follow_up_group_id" AS "col9",
+                       "gps_followupgroupmembership"."member_id" AS "col10",
+                       "gps_followupgroupmembership"."creator_id" AS "col11",
+                       ROW_NUMBER() OVER (PARTITION BY "gps_followupgroupmembership"."follow_up_group_id"
+                                          ORDER BY RANDOM() ASC) AS "qual0",
+                       RANDOM() AS "qual1"
+                FROM "gps_followupgroupmembership"
+                WHERE ("gps_followupgroupmembership"."is_referent"
+                       AND "gps_followupgroupmembership"."follow_up_group_id" IN (%s))
+                ORDER BY RANDOM() ASC) "qualify"
+             WHERE ("qual0" > %s
+                    AND "qual0" <= %s)) "qualify_mask"
+          ORDER BY "qual1" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          UPDATE "django_session"
+          SET "session_data" = %s,
+              "expire_date" = %s
+          WHERE "django_session"."session_key" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: test_old_group_list[test_my_groups__group_card]
+  '''
+  <div aria-labelledby="results" class="mt-3 mt-md-4" id="follow-up-groups-section">
+      
+          <div class="table-responsive">
+              <table class="table table-hover">
+                  <caption class="visually-hidden">Liste des bénéficiaires</caption>
+                  <thead>
+                      <tr>
+                          <th scope="col">Prénom Nom</th>
+                          
+                              <th scope="col">Début d’accompagnement</th>
+                              <th scope="col">Fin d’accompagnement</th>
+                          
+                          <th aria-label="Référent ou référente" scope="col">Référent⸱e</th>
+                          <th aria-label="Nombre d’intervenants" scope="col">Nbr d’intervenants</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      
+                          <tr>
+                              <td>
+                                  <a aria-label="Consulter la fiche de Jean BON" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/details/[Public ID of beneficiary]?back_url=/gps/groups/old/list">
+                                      Jean BON
+                                  </a>
+                              </td>
+                              
+                                  <td>juin 2024</td>
+                                  <td>juin 2024</td>
+                              
+                              <td>
+                                  
+                              </td>
+                              <td>1</td>
                           </tr>
                       
                   </tbody>
