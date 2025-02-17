@@ -56,17 +56,19 @@
 
         {% include "apply/includes/certification_info_box.html" with diagnosis=eligibility_diagnosis %}
 
-        <p>
-            <i>
-                {% if is_sent_by_authorized_prescriber %}
-                    Ce diagnostic est valide du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au
-                    {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
-                {% else %}
-                    Ce diagnostic expire le
-                    {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
-                {% endif %}
-            </i>
-        </p>
+        {% if not job_seeker.has_valid_approval %}
+            <p>
+                <i>
+                    {% if is_sent_by_authorized_prescriber %}
+                        Ce diagnostic est valide du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au
+                        {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}.
+                    {% else %}
+                        Ce diagnostic expire le
+                        {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}.
+                    {% endif %}
+                </i>
+            </p>
+        {% endif %}
 
     {% elif job_seeker.latest_pe_approval and job_seeker.latest_pe_approval.is_valid %}
         <hr class="my-4">
