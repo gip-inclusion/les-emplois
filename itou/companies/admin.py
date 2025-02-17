@@ -410,6 +410,8 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
             "to_company": to_company,
             "transfer_data": transfer_data,
             "title": title,
+            "subtitle": None,
+            "has_view_permission": self.has_view_permission(request),
         }
 
         return TemplateResponse(

@@ -1024,7 +1024,6 @@ class TestAutomaticApprovalAdminViews:
 
 
 class TestCustomApprovalAdminViews:
-    @pytest.mark.ignore_unknown_variable_template_error("has_view_permission", "subtitle")
     def test_manually_add_approval(self, client, mailoutbox):
         # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
         # with a manual verification.

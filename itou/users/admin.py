@@ -718,6 +718,8 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
             "nothing_to_transfer": not fields_choices,
             "transfer_data": sorted(transfer_data.values(), key=lambda data: data["title"]),
             "title": title,
+            "subtitle": None,
+            "has_view_permission": self.has_view_permission(request),
         }
 
         return TemplateResponse(

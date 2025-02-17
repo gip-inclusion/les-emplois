@@ -95,6 +95,8 @@ def manually_add_approval(
         "media": model_admin.media,
         "opts": opts,
         "title": "Ajout manuel d'un numéro d'agrément",
+        "subtitle": None,
+        "has_view_permission": model_admin.has_view_permission(request),
         **admin_site.each_context(request),
     }
     return render(request, template_name, context)
@@ -151,6 +153,8 @@ def manually_refuse_approval(
         "media": model_admin.media,
         "opts": opts,
         "title": "Confirmer le refus manuel d'un numéro d'agrément",
+        "subtitle": None,
+        "has_view_permission": model_admin.has_view_permission(request),
         **admin_site.each_context(request),
     }
     return render(request, template_name, context)
