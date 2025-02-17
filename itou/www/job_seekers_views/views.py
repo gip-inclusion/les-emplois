@@ -158,7 +158,6 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
         User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids)
         .order_by("first_name", "last_name")
         .prefetch_related("approvals")
-        .select_related("jobseeker_profile")
         .annotate(
             job_applications_nb=Coalesce(subquery_count, 0),
             last_updated_at=subquery_last_update,
