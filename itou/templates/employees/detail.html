@@ -41,7 +41,7 @@
                         {% include "approvals/includes/box.html" with approval=approval link_from_current_url=request.get_full_path extra_class='mb-3 mb-md-4' only %}
                     {% endif %}
                     {% if link_immersion_facile %}
-                        {# Immersion Facilitée proposal on expiring passes #}
+                        {# Immersion Facilitée proposal on all passes #}
                         <div class="c-box p-0 mb-4" id="immersion-facile-opportunity-alert">
                             <div class="c-box__header--immersion-facile p-3 p-lg-4">
                                 <span class="h4 m-0">Trouver une immersion</span>
@@ -51,11 +51,14 @@
                                     {% if approval_expired %}
                                         Le pass de ce candidat est expiré.
                                         <br />
-                                    {% else %}
+                                        <strong>Immersion Facilitée</strong> vous aide à lui trouver une immersion professionnelle sur son territoire.
+                                    {% elif approval_expires_soon %}
                                         Le pass IAE de ce candidat arrive bientôt à expiration.
                                         <br />
+                                        <strong>Immersion Facilitée</strong> vous aide à lui trouver une immersion professionnelle sur son territoire.
+                                    {% else %}
+                                        <strong>Immersion Facilitée</strong> vous aide à trouver une immersion professionnelle pour ce candidat sur son territoire.
                                     {% endif %}
-                                    <strong>Immersion Facilitée</strong> vous aide à lui trouver une immersion professionnelle sur son territoire.
                                 </p>
                                 <a href="{{ link_immersion_facile }}" class="btn-link has-external-link" rel="noopener" target="_blank" aria-label="Rechercher une immersion (ouverture dans un nouvel onglet)">
                                     Rechercher une immersion

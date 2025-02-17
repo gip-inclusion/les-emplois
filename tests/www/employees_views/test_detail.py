@@ -196,7 +196,7 @@ class TestEmployeeDetailView:
         response = client.get(url)
         assert response.context["link_immersion_facile"] == immersion_search_url(approval.user)
         alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
-        assert str(alert) == snapshot(name="alerte à l'opportunité immersion facile")
+        assert str(alert) == snapshot(name="alerte à l'opportunité immersion facile PASS expirant bientôt")
 
         approval.end_at = today - datetime.timedelta(days=1)
         approval.save()
@@ -208,5 +208,6 @@ class TestEmployeeDetailView:
         approval.end_at = today + datetime.timedelta(days=90)
         approval.save()
         response = client.get(url)
-        assert response.status_code == 200
-        assert response.context["link_immersion_facile"] is None
+        assert response.context["link_immersion_facile"] == immersion_search_url(approval.user)
+        alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
+        assert str(alert) == snapshot(name="alerte à l'opportunité immersion facile PASS expirant dans longtemps")
