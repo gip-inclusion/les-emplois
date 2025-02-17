@@ -31,6 +31,10 @@
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
+{% block title_messages %}
+    {% include "includes/mon_recap_banner.html" with request=request only %}
+{% endblock title_messages %}
+
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
