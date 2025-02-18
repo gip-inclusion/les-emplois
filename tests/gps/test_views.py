@@ -109,7 +109,7 @@ def test_group_list(snapshot, client):
         follow_up_group__beneficiary__first_name="Jean",
         follow_up_group__beneficiary__last_name="Bon",
         is_referent=False,
-        ended_at=timezone.now(),
+        ended_at=timezone.localdate(),
         member=user,
     )
 
@@ -144,7 +144,7 @@ def test_old_group_list(snapshot, client):
         follow_up_group__beneficiary__first_name="Jean",
         follow_up_group__beneficiary__last_name="Bon",
         is_referent=False,
-        ended_at=timezone.now(),
+        ended_at=timezone.localdate(),
         member=user,
     )
 

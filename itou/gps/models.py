@@ -30,7 +30,7 @@ class FollowUpGroupManager(models.Manager):
             create_args = update_args | {
                 "creator": user,
                 "created_at": now,
-                "started_at": now,
+                "started_at": timezone.localdate(),
             }
 
             FollowUpGroupMembership.objects.update_or_create(
@@ -112,9 +112,10 @@ class FollowUpGroupMembership(models.Model):
     created_in_bulk = models.BooleanField(verbose_name="créé massivement", default=False, db_index=True)
 
     last_contact_at = models.DateTimeField(verbose_name="date de dernier contact", default=timezone.now)
-    started_at = models.DateTimeField(verbose_name="date de début de suivi")
-    # Keep track of when the membership was ended
-    ended_at = models.DateTimeField(verbose_name="date de fin de suivi", null=True, blank=True)
+
+    # date used by user to tell when they were following the user
+    started_at = models.DateField(verbose_name="date de début de suivi")
+    ended_at = models.DateField(verbose_name="date de fin de suivi", null=True, blank=True)
 
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
@@ -155,7 +156,7 @@ class FollowUpGroupMembership(models.Model):
         d = self.started_at
         # Get years and months (from django.utils.timesince.timesince)
         total_months = (now.year - d.year) * 12 + (now.month - d.month)
-        if d.day > now.day or (d.day == now.day and d.time() > now.time()):
+        if d.day > now.day:
             total_months -= 1
 
         if total_months == 0:
