@@ -478,6 +478,11 @@ def test_administrativecriteria_level_annex_consistency():
             True,
             id="employer_certified_criteria",
         ),
+        pytest.param(
+            {"from_geiq": True, "criteria_kinds": [AdministrativeCriteriaKind.AAH]},
+            True,
+            id="employer_certified_criteria",
+        ),
     ],
 )
 def test_criteria_can_be_certified(factory_params, expected):

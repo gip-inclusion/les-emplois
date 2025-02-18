@@ -54,6 +54,7 @@ def has_required_info(job_seeker):
 
 def certify_criteria(criteria, client, job_seeker):
     endpoint_mapping = {
+        AdministrativeCriteriaKind.AAH: "/v2/allocation-adulte-handicape",
         AdministrativeCriteriaKind.RSA: "/v2/revenu-solidarite-active",
     }
     response = _request(client, endpoint_mapping[criteria], job_seeker)
