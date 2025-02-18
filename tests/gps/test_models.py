@@ -32,13 +32,14 @@ def test_follow_beneficiary():
 
     with freeze_time() as frozen_time:
         created_at = timezone.now()
+        started_at = timezone.localdate()
         FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber, is_referent=True)
         group = FollowUpGroup.objects.get()
         membership = group.memberships.get()
         assert membership.is_active is True
         assert membership.is_referent is True
         assert membership.created_at == created_at
-        assert membership.started_at == created_at
+        assert membership.started_at == started_at
         assert membership.last_contact_at == created_at
         assert membership.creator == prescriber
 
@@ -53,7 +54,7 @@ def test_follow_beneficiary():
         assert membership.is_active is True
         assert membership.is_referent is True
         assert membership.created_at == created_at
-        assert membership.started_at == created_at
+        assert membership.started_at == started_at
         assert membership.last_contact_at == updated_at
 
         membership.is_active = False
@@ -118,23 +119,20 @@ def test_manager_organizations_names(UserFactory, MembershipFactory, relation_na
 def test_human_readable_followed_for():
     membership = FollowUpGroupMembershipFactory()
 
-    membership.started_at = datetime.datetime(2025, 2, 1)
+    membership.started_at = datetime.date(2025, 2, 1)
     assert membership.human_readable_followed_for == "moins d’un mois"
 
-    membership.started_at = datetime.datetime(2025, 1, 14)
+    membership.started_at = datetime.date(2025, 1, 14)
     assert membership.human_readable_followed_for == "moins d’un mois"
 
-    membership.started_at = datetime.datetime(2025, 1, 13, 17, 0, 0)
-    assert membership.human_readable_followed_for == "moins d’un mois"
-
-    membership.started_at = datetime.datetime(2025, 1, 13, 16, 0, 0)
+    membership.started_at = datetime.date(2025, 1, 13)
     assert membership.human_readable_followed_for == "1 mois"
 
-    membership.started_at = datetime.datetime(2024, 2, 14)
+    membership.started_at = datetime.date(2024, 2, 14)
     assert membership.human_readable_followed_for == "11 mois"
 
-    membership.started_at = datetime.datetime(2024, 2, 13)
+    membership.started_at = datetime.date(2024, 2, 13)
     assert membership.human_readable_followed_for == "1 an"
 
-    membership.started_at = datetime.datetime(2024, 1, 13)
+    membership.started_at = datetime.date(2024, 1, 13)
     assert membership.human_readable_followed_for == "1 an, 1 mois"

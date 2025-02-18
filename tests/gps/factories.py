@@ -67,7 +67,7 @@ class FollowUpGroupMembershipFactory(factory.django.DjangoModelFactory):
     follow_up_group = factory.SubFactory(FollowUpGroupFactory)
     member = factory.SubFactory(PrescriberFactory)
     creator = factory.SubFactory(PrescriberFactory)
-    started_at = factory.SelfAttribute("created_at")
+    started_at = factory.LazyAttribute(lambda o: o.created_at.date())
 
 
 class FranceTravailContactFactory(factory.django.DjangoModelFactory):

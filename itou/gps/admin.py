@@ -74,7 +74,7 @@ class FollowUpGroupMembershipAdmin(ItouModelAdmin):
 
         else:
             if not form.cleaned_data["is_active"] and form.initial["is_active"]:
-                obj.ended_at = timezone.now()
+                obj.ended_at = timezone.localdate()
 
         super().save_model(request, obj, form, change)
 
