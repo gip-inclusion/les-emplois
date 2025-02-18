@@ -23,6 +23,7 @@ from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import Origin
 from itou.approvals.utils import get_user_last_accepted_siae_job_application, last_hire_was_made_by_siae
 from itou.companies import enums as companies_enums
+from itou.employee_record.enums import Status
 from itou.files.models import File
 from itou.job_applications import enums as job_application_enums
 from itou.prescribers import enums as prescribers_enums
@@ -582,7 +583,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 operation=pgtrigger.UpdateOf("start_at", "end_at"),
                 condition=pgtrigger.Q(old__end_at__df=pgtrigger.F("new__end_at"))
                 | pgtrigger.Q(old__start_at__df=pgtrigger.F("new__start_at")),
-                func="""
+                func=f"""
                     -- If there is an "UPDATE" action on 'approvals_approval' table (Approval model object):
                     -- create an `EmployeeRecordUpdateNotification` object for each PROCESSED `EmployeeRecord`
                     -- linked to this approval
@@ -592,16 +593,16 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                         FOR current_employee_record_id IN
                             SELECT id FROM employee_record_employeerecord
                             WHERE approval_number = NEW.number
-                            AND status = 'PROCESSED'
+                            AND status = '{Status.PROCESSED.value}'
                             LOOP
                                 -- Create `EmployeeRecordUpdateNotification` object
                                 -- with the correct type and status
                                 INSERT INTO employee_record_employeerecordupdatenotification
                                     (employee_record_id, created_at, updated_at, status)
-                                SELECT current_employee_record_id, NOW(), NOW(), 'NEW'
+                                SELECT current_employee_record_id, NOW(), NOW(), '{Status.NEW.value}'
                                 -- Update it if already created (UPSERT)
                                 -- On partial indexes conflict, the where clause of the index must be added here
-                                ON conflict(employee_record_id) WHERE status = 'NEW'
+                                ON conflict(employee_record_id) WHERE status = '{Status.NEW.value}'
                                 DO
                                 -- Not exactly the same syntax as a standard update op
                                 UPDATE SET updated_at = NOW();
