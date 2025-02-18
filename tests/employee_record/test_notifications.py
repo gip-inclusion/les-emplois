@@ -1,158 +1,92 @@
+import random
 from datetime import timedelta
 
 import pytest
 from django.utils import timezone
-from pytest_django.asserts import assertQuerySetEqual
 
 from itou.employee_record.enums import NotificationStatus, Status
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
+from itou.employee_record.models import EmployeeRecordUpdateNotification
 from tests.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 
 
-class TestEmployeeRecordUpdateNotification:
-    @pytest.mark.parametrize("status", [Status.PROCESSED, Status.SENT, Status.DISABLED])
-    def test_update_approval_start_date(self, status):
-        # If a modification occurs on the `start_date` field of an approval linked to a processed employee record
-        # then exactly *one* 'NEW' notification objects must be created.
-        # A normal case
-        employee_record = EmployeeRecordFactory(status=status)
-        approval = employee_record.job_application.approval
-        today = timezone.localdate()
+@pytest.mark.parametrize("status", [Status.PROCESSED, Status.SENT, Status.DISABLED])
+@pytest.mark.parametrize("field", ["start_at", "end_at"])
+def test_update_approval_monitored_field(field, status):
+    # If one or more modifications occurs on a monitored field of an approval
+    # linked to an employee record with a wanted status,
+    # then exactly *one* 'NEW' notification objects must be created.
+    employee_record = EmployeeRecordFactory(status=status)
+    approval = employee_record.job_application.approval
 
-        approval.start_at = today + timedelta(days=1)
-        approval.save()
+    setattr(approval, field, timezone.localdate() + timedelta(days=1))
+    approval.save()
+    assert employee_record.update_notifications.filter(status=NotificationStatus.NEW).count() == 1
 
-        assert 1 == EmployeeRecord.objects.count()
-        assert today + timedelta(days=1) == approval.start_at
-        assert 1 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
+    setattr(approval, field, timezone.localdate() + timedelta(days=2))
+    approval.save()
+    assert employee_record.update_notifications.filter(status=NotificationStatus.NEW).count() == 1
 
-    @pytest.mark.parametrize("status", [Status.PROCESSED, Status.SENT, Status.DISABLED])
-    def test_update_approval_end_date(self, status):
-        # If a modification occurs on the `end_date` field of an approval linked to a processed employee record
-        # then exactly *one* 'NEW' notification objects must be created.
-        # Another normal case
-        employee_record = EmployeeRecordFactory(status=status)
-        approval = employee_record.job_application.approval
-        today = timezone.localdate()
 
-        approval.end_at = today + timedelta(days=2)
-        approval.save()
+@pytest.mark.parametrize("status", [Status.PROCESSED, Status.SENT, Status.DISABLED])
+def test_update_approval_non_monitored_field(status):
+    # If a modification occurs on an approval linked to an employee record with a wanted status,
+    # and the target fields are not monitored,
+    # then there is no creation of an EmployeeRecordUpdateNotification object.
+    employee_record = EmployeeRecordFactory(status=status)
+    approval = employee_record.job_application.approval
 
-        assert 1 == EmployeeRecord.objects.count()
-        assert today + timedelta(days=2) == approval.end_at
-        assert 1 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
+    approval.created_at = timezone.localtime()
+    approval.save()
+    assert not employee_record.update_notifications.exists()
 
-    @pytest.mark.parametrize("status", [Status.PROCESSED, Status.SENT, Status.DISABLED])
-    def test_update_approval_twice(self, status):
-        # If SEVERAL modifications occurs on a monitored field of an approval linked to a processed employee record
-        # then exactly *one* 'NEW' notification objects must be created,
-        # (which is the last one)
-        employee_record = EmployeeRecordFactory(status=status)
-        approval = employee_record.job_application.approval
-        today = timezone.localdate()
 
-        approval.start_at = today + timedelta(days=1)
-        approval.save()
+@pytest.mark.parametrize("field", ["start_at", "end_at"])
+def test_update_approval_monitored_field_without_employee_record(field):
+    # If a modification occurs on an approval NOT linked to an employee record,
+    # then no notification object must be created.
+    approval = ApprovalFactory()
 
-        assert 1 == EmployeeRecord.objects.count()
-        assert today + timedelta(days=1) == approval.start_at
-        assert 1 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
+    setattr(approval, field, timezone.localdate() + timedelta(days=2))
+    approval.save()
+    assert not EmployeeRecordUpdateNotification.objects.exists()
 
-        approval.start_at = today
-        approval.save()
 
-        assert today == approval.start_at
-        assert 1 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
+@pytest.mark.parametrize("status", set(Status) - {Status.PROCESSED, Status.SENT, Status.DISABLED})
+@pytest.mark.parametrize("field", ["start_at", "end_at"])
+def test_update_approval_monitored_field_with_unwanted_status_employee_record(field, status):
+    # If a modification occurs on an approval linked to an employee record NOT in a wanted state,
+    # then no notification object must be created.
+    employee_record = EmployeeRecordFactory(status=status)
+    approval = employee_record.job_application.approval
 
-    @pytest.mark.parametrize("status", [Status.PROCESSED, Status.SENT, Status.DISABLED])
-    def test_update_non_monitored_fields(self, status):
-        # If a modification occurs on an approval linked to any or no employee record,
-        # And the target fields are not monitored
-        # Then there is no creation of an EmployeeRecordUpdateNotification object.
-        employee_record = EmployeeRecordFactory(status=status)
-        approval = employee_record.job_application.approval
+    setattr(approval, field, timezone.localdate() + timedelta(days=2))
+    approval.save()
+    assert not EmployeeRecordUpdateNotification.objects.exists()
 
-        approval.created_at = timezone.localtime()
-        approval.save()
 
-        assert 1 == EmployeeRecord.objects.count()
-        assert 0 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
+def test_update_approval_monitored_field_with_multiple_employee_records():
+    # If a modification occurs on an approval linked to *N* employee records in a wanted status,
+    # then *N* 'NEW' notification objects must be created.
+    an_employee_record = EmployeeRecordFactory(status=random.choice([Status.PROCESSED, Status.SENT, Status.DISABLED]))
+    approval = an_employee_record.job_application.approval
+    another_employee_record = EmployeeRecordFactory(
+        status=random.choice([Status.PROCESSED, Status.SENT, Status.DISABLED]),
+        job_application__approval=approval,
+    )
 
-    def test_update_on_approval_without_linked_employee_record(self):
-        # If a date modification occurs on an approval NOT linked to any employee record,
-        # then no notification object must be created.
-        approval = ApprovalFactory()
-        today = timezone.localdate()
+    setattr(approval, random.choice(["start_at", "end_at"]), timezone.localdate() + timedelta(days=2))
+    approval.save()
+    assert an_employee_record.update_notifications.filter(status=NotificationStatus.NEW).count() == 1
+    assert another_employee_record.update_notifications.filter(status=NotificationStatus.NEW).count() == 1
 
-        approval.end_at = today + timedelta(days=2)
-        approval.save()
 
-        assert 0 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
+@pytest.mark.parametrize("status", [Status.PROCESSED, Status.SENT, Status.DISABLED])
+@pytest.mark.parametrize("factory", [ProlongationFactory, SuspensionFactory])
+def test_update_with_approval_extension(factory, status):
+    # Creation of a suspension or prolongation on an approval linked to an employee record
+    # must also create a new employee record update notification.
+    employee_record = EmployeeRecordFactory(status=status)
+    factory(approval=employee_record.job_application.approval)
 
-    @pytest.mark.parametrize("status", set(Status) - {Status.PROCESSED, Status.SENT, Status.DISABLED})
-    def test_update_on_non_processed_employee_record(self, status):
-        # If a date modification occurs on an approval linked to an employee record NOT in processed state,
-        # then no notification object must be created.
-        employee_record = EmployeeRecordFactory(status=status)
-        approval = employee_record.job_application.approval
-        today = timezone.localtime()
-
-        approval.created_at = today + timedelta(days=2)
-        approval.save()
-
-        assert 0 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
-
-    def test_update_on_multiple_employee_records(self):
-        # If a date modification occurs on an approval linked to *N* processed employee record,
-        # then *N* 'NEW' notification objects must be created.
-        employee_record_1 = EmployeeRecordFactory(status=Status.PROCESSED)
-        employee_record_2 = EmployeeRecordFactory(status=Status.PROCESSED)
-        approval = employee_record_1.job_application.approval
-
-        employee_record_2.job_application.approval = approval
-        # Trigger join is made on `approval_number`,
-        # and factory boy does not magically update this field.
-        employee_record_2.approval_number = approval.number
-        employee_record_2.save()
-
-        approval.end_at = timezone.localdate() + timedelta(days=2)
-        approval.save()
-
-        assertQuerySetEqual(
-            EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW),
-            [employee_record_1.pk, employee_record_2.pk],
-            transform=lambda notif: notif.employee_record_id,
-            ordered=False,
-        )
-
-    @pytest.mark.parametrize("status", [Status.PROCESSED, Status.SENT, Status.DISABLED])
-    def test_update_with_suspension(self, status):
-        # Creation of a suspension on an approval linked to an employee record
-        # must also create a new employee record update notification.
-        employee_record = EmployeeRecordFactory(status=status)
-        approval = employee_record.job_application.approval
-        start_at = timezone.localdate()
-
-        SuspensionFactory(
-            approval=approval,
-            start_at=start_at,
-        )
-
-        assert 1 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
-        assert employee_record.pk == EmployeeRecordUpdateNotification.objects.earliest("created_at").employee_record.pk
-
-    @pytest.mark.parametrize("status", [Status.PROCESSED, Status.SENT, Status.DISABLED])
-    def test_update_with_prolongation(self, status):
-        # Creation of a prolongation on an approval linked to an employee record
-        # must also create a new employee record update notification.
-        employee_record = EmployeeRecordFactory(status=status)
-        approval = employee_record.job_application.approval
-
-        ProlongationFactory(
-            approval=approval,
-            start_at=approval.end_at,
-        )
-
-        assert 1 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
-        assert employee_record.pk == EmployeeRecordUpdateNotification.objects.earliest("created_at").employee_record.pk
+    assert employee_record.update_notifications.filter(status=NotificationStatus.NEW).count() == 1
