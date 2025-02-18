@@ -39,6 +39,7 @@ from itou.www.job_seekers_views.forms import (
     CreateOrUpdateJobSeekerStep3Form,
     FilterForm,
     JobSeekerExistsForm,
+    OrderForm,
 )
 
 
@@ -129,11 +130,12 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
         )
     job_seekers_ids = list(job_seekers_created_by_user.union(job_seekers_created_by_orga, job_seekers_applications))
 
-    form = FilterForm(
+    filter_form = FilterForm(
         User.objects.filter(kind=UserKind.JOB_SEEKER).filter(pk__in=job_seekers_ids),
         request.GET,
         request_user=request.user,
     )
+    order_form = OrderForm(data=request.GET)
     user_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization).filter(
         job_seeker=OuterRef("pk")
     )
@@ -163,9 +165,12 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
             valid_eligibility_diagnosis=subquery_diagnosis,
         )
     )
-    if form.is_valid() and (job_seeker_pk := form.cleaned_data["job_seeker"]):
+    if filter_form.is_valid() and (job_seeker_pk := filter_form.cleaned_data["job_seeker"]):
         queryset = queryset.filter(pk=job_seeker_pk)
-    order = JobSeekerOrder(form.cleaned_data.get("order") or JobSeekerOrder.FULL_NAME_ASC)
+    if order_form.is_valid() and (order_val := order_form.cleaned_data.get("order")):
+        order = JobSeekerOrder(order_val)
+    else:
+        order = JobSeekerOrder.FULL_NAME_ASC
 
     queryset = queryset.order_by(str(order))
 
@@ -175,7 +180,8 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
 
     context = {
         "back_url": get_safe_url(request, "back_url"),
-        "filters_form": form,
+        "filters_form": filter_form,
+        "order_form": order_form,
         "order": order,
         "page_obj": page_obj,
     }

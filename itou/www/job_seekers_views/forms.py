@@ -28,12 +28,6 @@ class FilterForm(forms.Form):
         ),
     )
 
-    order = forms.ChoiceField(
-        choices=[(item.value, item.name) for item in JobSeekerOrder],
-        required=False,
-        widget=forms.HiddenInput(),
-    )
-
     def __init__(self, job_seeker_qs, data, *args, request_user, **kwargs):
         super().__init__(data, *args, **kwargs)
         self.fields["job_seeker"].choices = [
@@ -46,6 +40,14 @@ class FilterForm(forms.Form):
             for job_seeker in job_seeker_qs.order_by("first_name", "last_name")
             if job_seeker.get_full_name()
         ]
+
+
+class OrderForm(forms.Form):
+    order = forms.ChoiceField(
+        choices=[(item.value, item.name) for item in JobSeekerOrder],
+        required=False,
+        widget=forms.HiddenInput(),
+    )
 
 
 class CheckJobSeekerNirForm(forms.Form):
