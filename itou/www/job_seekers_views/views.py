@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, IntegerField, Max, OuterRef, Q, Subquery
+from django.db.models import Count, DateTimeField, IntegerField, Max, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
@@ -28,7 +28,7 @@ from itou.utils.auth import check_user
 from itou.utils.emails import redact_email_address
 from itou.utils.pagination import pager
 from itou.utils.session import SessionNamespace
-from itou.utils.urls import get_safe_url
+from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.apply.views.submit_views import ApplicationBaseView
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import (
@@ -113,21 +113,7 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
 @require_safe
 @check_user(lambda user: user.is_prescriber)
 def list_job_seekers(request, template_name="job_seekers_views/list.html"):
-    job_seekers_created_by_user = User.objects.filter(created_by=request.user).values_list("id", flat=True)
-    if request.current_organization:
-        job_seekers_created_by_orga = JobSeekerProfile.objects.filter(
-            created_by_prescriber_organization=request.current_organization,
-        ).values_list("user_id", flat=True)
-        job_seekers_applications = JobApplication.objects.filter(
-            (Q(sender=request.user) & Q(sender_prescriber_organization__isnull=True))
-            | Q(sender_prescriber_organization=request.current_organization),
-        ).values_list("job_seeker_id", flat=True)
-    else:
-        job_seekers_created_by_orga = User.objects.none()
-        job_seekers_applications = JobApplication.objects.filter(sender=request.user).values_list(
-            "job_seeker_id", flat=True
-        )
-    job_seekers_ids = list(job_seekers_created_by_user.union(job_seekers_created_by_orga, job_seekers_applications))
+    job_seekers_ids = list(User.objects.linked_job_seeker_ids(request.user, request.current_organization))
 
     form = FilterForm(
         User.objects.filter(kind=UserKind.JOB_SEEKER).filter(pk__in=job_seekers_ids),
@@ -289,13 +275,19 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             and self.company == request.current_organization
         )
 
-    def get_exit_url(self, job_seeker_public_id, created=False):
+    def get_exit_url(self, job_seeker, created=False):
         if self.is_gps:
             return reverse("gps:group_list")
+        if self.standalone_creation and self.is_job_seeker_in_user_jobseekers_list(job_seeker) and not created:
+            params = {
+                "job_seeker": job_seeker.public_id,
+                "city": job_seeker.city_slug if self.request.user.can_view_personal_information(job_seeker) else "",
+            }
+            return add_url_params(reverse("search:employers_results"), params)
         if self.standalone_creation:
-            return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker_public_id})
+            return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
-        kwargs = {"company_pk": self.company.pk, "job_seeker_public_id": job_seeker_public_id}
+        kwargs = {"company_pk": self.company.pk, "job_seeker_public_id": job_seeker.public_id}
         if created and self.hire_process:
             # The job seeker was just created, we don't need to check info if we are hiring
             if self.company.kind == CompanyKind.GEIQ:
@@ -322,6 +314,14 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             "standalone_creation": self.standalone_creation,
             "is_gps": self.is_gps,
         }
+
+    def is_job_seeker_in_user_jobseekers_list(self, job_seeker):
+        if not self.request.user.is_prescriber:
+            return False
+
+        return job_seeker.pk in User.objects.linked_job_seeker_ids(
+            self.request.user, self.request.current_organization
+        )
 
 
 class JobSeekerForSenderBaseView(JobSeekerBaseView):
@@ -438,13 +438,14 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
             if self.form.data.get("confirm"):
                 if self.is_gps:
                     FollowUpGroup.objects.follow_beneficiary(job_seeker, request.user, is_referent=True)
-                return HttpResponseRedirect(self.get_exit_url(job_seeker.public_id))
+                return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
             context = {
                 # Ask the sender to confirm the NIR we found is associated to the correct user
                 "preview_mode": bool(self.form.data.get("preview")),
                 "job_seeker": job_seeker,
                 "can_view_personal_information": self.sender.can_view_personal_information(job_seeker),
+                "is_job_seeker_in_list": self.is_job_seeker_in_user_jobseekers_list(job_seeker),
             }
         else:
             # Require at least one attempt with an invalid NIR to access the search by email feature.
@@ -479,6 +480,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
         can_add_nir = False
         preview_mode = False
         job_seeker = None
+        is_job_seeker_in_list = False
 
         if self.form.is_valid():
             job_seeker = self.form.get_user()
@@ -503,11 +505,12 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
             # Ask the sender to confirm the email we found is associated to the correct user
             if self.form.data.get("preview"):
                 preview_mode = True
+                is_job_seeker_in_list = self.is_job_seeker_in_user_jobseekers_list(job_seeker)
 
             # The email we found is correct
             if self.form.data.get("confirm"):
                 if not can_add_nir:
-                    return HttpResponseRedirect(self.get_exit_url(job_seeker.public_id))
+                    return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
                 try:
                     job_seeker.jobseeker_profile.nir = nir
@@ -526,7 +529,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                 else:
                     if self.is_gps:
                         FollowUpGroup.objects.follow_beneficiary(job_seeker, request.user, is_referent=True)
-                    return HttpResponseRedirect(self.get_exit_url(job_seeker.public_id))
+                    return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
         return self.render_to_response(
             self.get_context_data(**kwargs)
@@ -535,6 +538,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                 "preview_mode": preview_mode,
                 "job_seeker": job_seeker,
                 "can_view_personal_information": job_seeker and self.sender.can_view_personal_information(job_seeker),
+                "is_job_seeker_in_list": is_job_seeker_in_list,
             }
         )
 
@@ -805,7 +809,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 user.save()
 
             self.job_seeker_session.delete()
-            url = self.get_exit_url(self.profile.user.public_id, created=True)
+            url = self.get_exit_url(self.profile.user, created=True)
 
             if self.is_gps:
                 FollowUpGroup.objects.follow_beneficiary(user, request.user, is_referent=True)

@@ -5,6 +5,8 @@ import pytest
 from django.contrib import messages
 from django.template.defaultfilters import urlencode
 from django.urls import reverse
+from django.utils import timezone
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
 from itou.asp.models import Commune, Country, RSAAllocation
@@ -12,15 +14,18 @@ from itou.users.enums import LackOfPoleEmploiId, Title
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.session import SessionNamespace
-from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.urls import add_url_params
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionMembershipFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.prescribers.factories import (
+    PrescriberOrganizationWith2MembershipFactory,
+    PrescriberOrganizationWithMembershipFactory,
+)
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
-from tests.utils.test import KNOWN_SESSION_KEYS
+from tests.utils.test import KNOWN_SESSION_KEYS, parse_response_to_soup
 from tests.www.apply.test_submit import CONFIRM_RESET_MARKUP, LINK_RESET_MARKUP
 
 
@@ -425,19 +430,64 @@ class TestStandaloneCreateAsPrescriber:
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
 
-    def test_standalone_creation_as_prescriber_existing_nir(self, client):
+    @freeze_time("2024-08-30")
+    @pytest.mark.parametrize("case", ["not_in_list", "in_list_user", "in_list_organization", "in_list_application"])
+    def test_standalone_creation_as_prescriber_existing_nir(self, client, snapshot, case):
         from_url = reverse("job_seekers_views:list")
-        user = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        prescriber_organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
+        other_organization = PrescriberOrganizationWithMembershipFactory()
+        user = prescriber_organization.members.first()
+        other_user = prescriber_organization.members.last()
+        other_user_in_other_organization = other_organization.members.first()
         client.force_login(user)
 
-        existing_job_seeker = JobSeekerFactory(
-            jobseeker_profile__with_hexa_address=True,
-            jobseeker_profile__with_education_level=True,
-            with_ban_geoloc_address=True,
-            jobseeker_profile__nir="178122978200508",
-            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
-            title="M",
-        )
+        existing_job_seeker = JobSeekerFactory(for_snapshot=True)
+
+        match case:
+            case "in_list_user":
+                # Job seeker in user's list even if it was for another orga
+                existing_job_seeker.created_by = user
+                existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = other_organization
+                next_url = add_url_params(
+                    reverse(
+                        "search:employers_results",
+                    ),
+                    {"job_seeker": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                )
+            case "in_list_organization":
+                existing_job_seeker.created_by = other_user
+                existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = prescriber_organization
+                next_url = add_url_params(
+                    reverse(
+                        "search:employers_results",
+                    ),
+                    {"job_seeker": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                )
+            case "in_list_application":
+                existing_job_seeker.created_by = other_user_in_other_organization
+                existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = None
+                next_url = add_url_params(
+                    reverse(
+                        "search:employers_results",
+                    ),
+                    {"job_seeker": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                )
+                JobApplicationFactory(
+                    job_seeker=existing_job_seeker,
+                    sender=user,
+                    sender_prescriber_organization=None,
+                    updated_at=timezone.now() - datetime.timedelta(days=1),
+                )
+            case _:
+                # Not in list
+                existing_job_seeker.created_by = other_user_in_other_organization
+                existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = other_organization
+                next_url = reverse(
+                    "job_seekers_views:details",
+                    kwargs={"public_id": existing_job_seeker.public_id},
+                )
+        existing_job_seeker.save()
+        existing_job_seeker.jobseeker_profile.save()
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -446,50 +496,78 @@ class TestStandaloneCreateAsPrescriber:
         start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
         client.get(start_url)
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
-        next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
+        check_nir_url = reverse(
+            "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}
+        )
 
         # Step determine the job seeker with a NIR.
         # ----------------------------------------------------------------------
 
-        response = client.post(next_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "preview": 1})
-        assertContains(
-            response,
-            f"""
-            <div class="modal-body">
-                <p>
-                    Le numéro {format_nir(existing_job_seeker.jobseeker_profile.nir)} est associé au compte
-                    de <b>{existing_job_seeker.get_full_name()}</b>.
-                </p>
-                <p>
-                    Le compte de ce candidat sera ajouté à votre liste une fois que vous aurez postulé pour lui.
-                </p>
-            </div>
-           """,
-            html=True,
-        )
-        response = client.post(next_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "confirm": 1})
+        response = client.post(check_nir_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "preview": 1})
+        modal = parse_response_to_soup(response, selector="#nir-confirmation-modal")
+        assert str(modal) == snapshot()
 
-        assertRedirects(
-            response,
-            reverse(
-                "job_seekers_views:details",
-                kwargs={"public_id": existing_job_seeker.public_id},
-            ),
-        )
+        response = client.post(check_nir_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "confirm": 1})
+        assertRedirects(response, next_url)
 
-    def test_standalone_creation_as_prescriber_existing_email(self, client):
+    @freeze_time("2024-08-30")
+    @pytest.mark.parametrize("case", ["not_in_list", "in_list_user", "in_list_organization", "in_list_application"])
+    def test_standalone_creation_as_prescriber_existing_email(self, client, snapshot, case):
         from_url = reverse("job_seekers_views:list")
-        user = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        prescriber_organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
+        other_organization = PrescriberOrganizationWithMembershipFactory()
+        user = prescriber_organization.members.first()
+        other_user = prescriber_organization.members.last()
+        other_user_in_other_organization = other_organization.members.first()
         client.force_login(user)
 
-        existing_job_seeker = JobSeekerFactory(
-            jobseeker_profile__with_hexa_address=True,
-            jobseeker_profile__with_education_level=True,
-            with_ban_geoloc_address=True,
-            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
-            email="someemail@inclusion.gouv.fr",
-            title="M",
-        )
+        existing_job_seeker = JobSeekerFactory(for_snapshot=True)
+
+        match case:
+            case "in_list_user":
+                # Job seeker in user's list even if it was for another orga
+                existing_job_seeker.created_by = user
+                existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = other_organization
+                next_url = add_url_params(
+                    reverse(
+                        "search:employers_results",
+                    ),
+                    {"job_seeker": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                )
+            case "in_list_organization":
+                existing_job_seeker.created_by = other_user
+                existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = prescriber_organization
+                next_url = add_url_params(
+                    reverse(
+                        "search:employers_results",
+                    ),
+                    {"job_seeker": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                )
+            case "in_list_application":
+                existing_job_seeker.created_by = other_user_in_other_organization
+                existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = None
+                next_url = add_url_params(
+                    reverse(
+                        "search:employers_results",
+                    ),
+                    {"job_seeker": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                )
+                JobApplicationFactory(
+                    job_seeker=existing_job_seeker,
+                    sender=user,
+                    sender_prescriber_organization=None,
+                    updated_at=timezone.now() - datetime.timedelta(days=1),
+                )
+            case _:
+                # Not in list
+                existing_job_seeker.created_by = other_user_in_other_organization
+                existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = other_organization
+                next_url = reverse(
+                    "job_seekers_views:details",
+                    kwargs={"public_id": existing_job_seeker.public_id},
+                )
+        existing_job_seeker.save()
+        existing_job_seeker.jobseeker_profile.save()
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -498,38 +576,19 @@ class TestStandaloneCreateAsPrescriber:
         start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
         client.get(start_url)
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
-        next_url = reverse(
+        search_by_email_url = reverse(
             "job_seekers_views:search_by_email_for_sender", kwargs={"session_uuid": job_seeker_session_name}
         )
 
         # Step determine the job seeker with an email (skipping the NIR)
         # ----------------------------------------------------------------------
 
-        response = client.post(next_url, data={"email": existing_job_seeker.email, "preview": 1})
-        assertContains(
-            response,
-            f"""
-            <div class="modal-body">
-                <p>
-                    L'adresse {existing_job_seeker.email} est associée au compte de
-                    <b>{existing_job_seeker.get_full_name()}</b>.
-                </p>
-                <p>
-                    Le compte de ce candidat sera ajouté à votre liste une fois que vous aurez postulé pour lui.
-                </p>
-            </div>
-           """,
-            html=True,
-        )
-        response = client.post(next_url, data={"email": existing_job_seeker.email, "confirm": 1})
+        response = client.post(search_by_email_url, data={"email": existing_job_seeker.email, "preview": 1})
+        modal = parse_response_to_soup(response, selector="#email-confirmation-modal")
+        assert str(modal) == snapshot()
 
-        assertRedirects(
-            response,
-            reverse(
-                "job_seekers_views:details",
-                kwargs={"public_id": existing_job_seeker.public_id},
-            ),
-        )
+        response = client.post(search_by_email_url, data={"email": existing_job_seeker.email, "confirm": 1})
+        assertRedirects(response, next_url)
 
     def test_standalone_creation_as_prescriber(self, client):
         from_url = reverse("job_seekers_views:list")

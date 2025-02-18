@@ -51,16 +51,18 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                         </div>
                         <div class="modal-body">
+                            {# djlint:off #}
                             <p>
-                                L'adresse {{ form.email.value }} est associée au compte de <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>.
+                                L'adresse {{ form.email.value }} est associée au compte de <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>{% if standalone_creation and is_job_seeker_in_list %} figurant dans votre liste de candidats{% endif %}.
                             </p>
+                            {# djlint:on #}
                             <p>
                                 {% if is_gps|default:False %}
                                     L'identité du candidat est une information clé pour la structure.
                                     Si vous ne souhaitez pas suivre <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Suivre un autre bénéficiaire » afin d'enregistrer ses informations personnelles.
-                                {% elif standalone_creation|default:False %}
+                                {% elif standalone_creation and not is_job_seeker_in_list %}
                                     Le compte de ce candidat sera ajouté à votre liste une fois que vous aurez postulé pour lui.
-                                {% else %}
+                                {% elif not standalone_creation %}
                                     L'identité du candidat est une information clé pour la structure.
                                     Si cette candidature n'est pas pour <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
                                     « Ce n'est pas mon candidat » afin d'enregistrer ses informations
@@ -75,14 +77,20 @@
                         </div>
                         <div class="modal-footer">
 
-                            {# Reload this page with a new form. #}
-                            {% if is_gps|default:False %}
-                                {% bootstrap_button "Suivre un autre bénéficiaire" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                            {% if standalone_creation and is_job_seeker_in_list %}
+                                {% url "job_seekers_views:details" public_id=job_seeker.public_id as job_seeker_details %}
+                                {% bootstrap_button "Consulter le profil" button_type="link" href=job_seeker_details button_class="btn btn-sm btn-outline-primary" %}
+                                {% bootstrap_button "Postuler" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
                             {% else %}
-                                {% bootstrap_button "Ce n'est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                                {% if is_gps|default:False %}
+                                    {% bootstrap_button "Suivre un autre bénéficiaire" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                                {% else %}
+                                    {# Reload this page with a new form. #}
+                                    {% bootstrap_button "Ce n'est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                                {% endif %}
+                                {# Go to the next step. #}
+                                {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
                             {% endif %}
-                            {# Go to the next step. #}
-                            {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
                         </div>
                     </div>
                 </div>
