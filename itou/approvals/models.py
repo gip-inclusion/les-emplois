@@ -593,7 +593,9 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                         FOR current_employee_record_id IN
                             SELECT id FROM employee_record_employeerecord
                             WHERE approval_number = NEW.number
-                            AND status = '{Status.PROCESSED.value}'
+                            AND status IN (
+                                '{Status.PROCESSED.value}', '{Status.SENT.value}', '{Status.DISABLED.value}'
+                            )
                             LOOP
                                 -- Create `EmployeeRecordUpdateNotification` object
                                 -- with the correct type and status
