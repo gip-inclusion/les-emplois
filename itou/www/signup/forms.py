@@ -259,7 +259,12 @@ class CompanySearchBySirenForm(forms.Form):
         min_length=9,
         max_length=9,
         validators=[validate_siren],
-        help_text="Le numéro SIREN contient 9 chiffres.",
+        help_text="Le numéro SIREN contient <b>9 chiffres</b>.",
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "",
+            }
+        ),
     )
 
 
