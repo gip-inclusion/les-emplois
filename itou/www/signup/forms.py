@@ -283,8 +283,9 @@ class CheckAlreadyExistsForm(forms.Form):
         # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
         min_length=14,
         help_text=mark_safe(
+            "Le numéro SIRET contient <b>14 chiffres</b>. "
             "Retrouvez facilement votre numéro SIRET à partir du nom de votre organisation sur le site "
-            '<a href="https://sirene.fr/" rel="noopener" target="_blank">sirene.fr</a>'
+            '<a href="https://sirene.fr/" rel="noopener" target="_blank" class="has-external-link">sirene.fr</a>'
         ),
     )
     department = forms.ChoiceField(
@@ -295,7 +296,7 @@ class CheckAlreadyExistsForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.org_data = None
-        self.fields["siret"].widget.attrs["placeholder"] = "Numéro à 14 chiffres"
+        self.fields["siret"].widget.attrs["placeholder"] = ""
 
     def clean_siret(self):
         siret = self.cleaned_data["siret"].replace(" ", "")
@@ -321,7 +322,7 @@ class PrescriberRequestInvitationForm(FullnameFormMixin):
         widget=forms.TextInput(
             attrs={
                 "type": "email",
-                "placeholder": "jeandupont@exemple.com",
+                "placeholder": "",
                 "autocomplete": "off",
             }
         ),
