@@ -105,6 +105,7 @@ class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, B
     birthdate = forms.DateField(
         label="Date de naissance",
         required=True,
+        help_text="Au format JJ/MM/AAAA, par exemple 20/12/1978",
         validators=[validate_birthdate],
         widget=DuetDatePickerWidget(
             {
@@ -119,13 +120,23 @@ class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, B
         max_length=21,  # 15 + 6 white spaces
         strip=True,
         validators=[validate_nir],
+        help_text="Par exemple 2 69 05 49 588 157 80",
         widget=forms.TextInput(
             attrs={
-                "placeholder": "2 69 05 49 588 157 80",
+                "placeholder": "",
             }
         ),
     )
-    title = forms.ChoiceField(required=True, label="Civilité", choices=BLANK_CHOICE_DASH + Title.choices)
+    title = forms.ChoiceField(
+        required=True,
+        label="Civilité",
+        choices=BLANK_CHOICE_DASH + Title.choices,
+        widget=forms.Select(
+            attrs={
+                "autocomplete": "honorific-prefix",
+            }
+        ),
+    )
 
     _nir_submitted = None
     _email_submitted = None
@@ -136,14 +147,17 @@ class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, B
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["email"].widget.attrs["placeholder"] = "adresse@email.fr"
-        self.fields["first_name"].widget.attrs["placeholder"] = "Dominique"
-        self.fields["last_name"].widget.attrs["placeholder"] = "Durand"
+        self.fields["email"].widget.attrs["placeholder"] = ""
+        self.fields["first_name"].widget.attrs["placeholder"] = ""
+        self.fields["first_name"].widget.attrs["autocomplete"] = "given-name"
+        self.fields["last_name"].widget.attrs["placeholder"] = ""
+        self.fields["last_name"].widget.attrs["autocomplete"] = "family-name"
         self.fields["last_name"].label = "Nom de famille"
         self.fields["birth_place"].help_text = (
             "La commune de naissance est obligatoire lorsque vous êtes né en France. "
             "Elle ne doit pas être renseignée si vous êtes né à l'étranger."
         )
+        self.fields["email"].widget.attrs["autocomplete"] = "email"
 
     def clean_email(self):
         email = super().clean_email()
@@ -185,7 +199,12 @@ class JobSeekerSignupWithOptionalNirForm(JobSeekerSignupForm):
 class JobSeekerCredentialsSignupForm(SignupForm):
     first_name = forms.CharField(disabled=True, required=False, label="Prénom")
     last_name = forms.CharField(disabled=True, required=False, label="Nom")
-    birthdate = forms.DateField(disabled=True, required=False, label="Date de naissance")
+    birthdate = forms.DateField(
+        disabled=True,
+        required=False,
+        label="Date de naissance",
+        help_text="Au format JJ/MM/AAAA, par exemple 20/12/1978",
+    )
     nir = forms.CharField(disabled=True, required=False, label="Numéro de sécurité sociale")
     email = forms.EmailField(disabled=True, required=False, label="Adresse e-mail")
 
@@ -212,7 +231,7 @@ class JobSeekerCredentialsSignupForm(SignupForm):
         self.fields.update(birth_location_fields)
 
         for password_field in [self.fields["password1"], self.fields["password2"]]:
-            password_field.widget.attrs["placeholder"] = "**********"
+            password_field.widget.attrs["placeholder"] = ""
         self.fields["password1"].help_text = (
             f"Le mot de passe doit contenir au moins {settings.PASSWORD_MIN_LENGTH} caractères et 3 des 4 types "
             "suivants : majuscules, minuscules, chiffres, caractères spéciaux."
