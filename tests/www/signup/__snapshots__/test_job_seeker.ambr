@@ -3,12 +3,12 @@
   '''
   <form action="" class="js-format-nir" data-matomo-name="signup-job-seeker-identity" method="post" role="form">
   
-          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
   
-          
-          
+              
+              
   
-          <div class="form-group form-group-required"><label class="form-label" for="id_title">Civilité</label><select class="form-select" id="id_title" name="title" required="">
+              <div class="form-group form-group-input-w-lg-33 form-group-required"><label class="form-label" for="id_title">Civilité</label><select class="form-select" id="id_title" name="title" required="">
     <option selected="" value="">---------</option>
   
     <option value="M">Monsieur</option>
@@ -16,15 +16,16 @@
     <option value="MME">Madame</option>
   
   </select></div>
-          <div class="form-group form-group-required"><label class="form-label" for="id_first_name">Prénom</label><input class="form-control" id="id_first_name" maxlength="150" name="first_name" placeholder="Dominique" required="" type="text"/></div>
-          <div class="form-group form-group-required"><label class="form-label" for="id_last_name">Nom de famille</label><input class="form-control" id="id_last_name" maxlength="150" name="last_name" placeholder="Durand" required="" type="text"/></div>
-          <div class="form-group form-group-required"><label class="form-label" for="id_birthdate">Date de naissance</label><duet-date-picker class="" identifier="id_birthdate" max="2008-10-23" min="1900-01-01" name="birthdate" placeholder="Date de naissance" required=""></duet-date-picker></div>
-          <div class="form-group"><label class="form-label" for="id_birth_place">Commune de naissance</label><select aria-describedby="id_birth_place_helptext" class="form-select django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/autocomplete/communes" data-allow-clear="true" data-disable-target="#id_birth_country" data-minimum-input-length="1" data-placeholder="Nom de la commune" data-select2-link-with-birthdate="id_birthdate" data-target-value="91" data-theme="bootstrap-5" id="id_birth_place" lang="fr" name="birth_place">
+              <div class="form-group form-group-required"><label class="form-label" for="id_first_name">Prénom</label><input class="form-control" id="id_first_name" maxlength="150" name="first_name" required="" type="text"/></div>
+              <div class="form-group form-group-required"><label class="form-label" for="id_last_name">Nom de famille</label><input class="form-control" id="id_last_name" maxlength="150" name="last_name" required="" type="text"/></div>
+              <div class="form-group form-group-input-w-lg-33 form-group-required"><label class="form-label" for="id_birthdate">Date de naissance</label><duet-date-picker aria-describedby="id_birthdate_helptext" class="" identifier="id_birthdate" max="2008-10-23" min="1900-01-01" name="birthdate" required=""></duet-date-picker><div class="form-text" id="id_birthdate_helptext">Au format JJ/MM/AAAA, par exemple 20/12/1978</div>
+  </div>
+              <div class="form-group"><label class="form-label" for="id_birth_place">Commune de naissance</label><select aria-describedby="id_birth_place_helptext" class="form-select django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/autocomplete/communes" data-allow-clear="true" data-disable-target="#id_birth_country" data-minimum-input-length="1" data-placeholder="Nom de la commune" data-select2-link-with-birthdate="id_birthdate" data-target-value="91" data-theme="bootstrap-5" id="id_birth_place" lang="fr" name="birth_place">
     <option value=""></option>
   
   </select><div class="form-text" id="id_birth_place_helptext">La commune de naissance est obligatoire lorsque vous êtes né en France. Elle ne doit pas être renseignée si vous êtes né à l'étranger.</div>
   </div>
-          <div class="form-group"><label class="form-label" for="id_birth_country">Pays de naissance</label><select class="form-select" id="id_birth_country" name="birth_country">
+              <div class="form-group"><label class="form-label" for="id_birth_country">Pays de naissance</label><select class="form-select" id="id_birth_country" name="birth_country">
     <option selected="" value="">---------</option>
   
     <option value="152">AFGHANISTAN</option>
@@ -49,18 +50,18 @@
   
   </select></div>
   
-          <div class="form-group mb-1 form-group-required">
-              <label class="form-label" for="id_email">Adresse e-mail</label>
-              <div class="form-text mt-0 mb-2">
-                  Si vous avez un compte <strong>France Travail</strong> ou <strong>FranceConnect</strong> et que vous souhaitez vous connecter avec ce compte,
-                  merci de renseigner dans ce champ l’adresse e-mail qui y est associée.
-              </div>
-              <div class="form-group mb-0 form-group-required"><label class="visually-hidden" for="id_email">E-mail</label><input autocomplete="email" class="form-control" id="id_email" maxlength="320" name="email" placeholder="adresse@email.fr" required="" type="email"/></div>
-              <div class="form-text mb-3">
-                  <div class="text-end mt-1">
-                      <a class="fs-sm text-secondary" data-bs-target="#no-email-modal" data-bs-toggle="modal" href="#">Pas d'adresse e-mail ?</a>
+              <div class="form-group mb-1 form-group-required">
+                  <label class="form-label" for="id_email">Adresse e-mail</label>
+                  <div class="form-text mt-n2 mb-2">
+                      Si vous avez un compte <strong>France Travail</strong> ou <strong>FranceConnect</strong> et que vous souhaitez vous connecter avec ce compte,
+                      merci de renseigner dans ce champ l’adresse e-mail qui y est associée.
                   </div>
-                  
+                  <div class="form-group form-group-input-w-lg-66 form-group-required"><label class="visually-hidden" for="id_email">E-mail</label><input autocomplete="email" class="form-control" id="id_email" maxlength="320" name="email" placeholder="" required="" type="email"/></div>
+                  <div class="mt-n2 mb-3">
+                      <button class="btn-link fs-sm" data-bs-target="#no-email-modal" data-bs-toggle="modal" type="button">
+                          Pas d'adresse e-mail ?
+                      </button>
+                      
   
   
   
@@ -77,7 +78,7 @@
                       <div class="d-none d-md-inline-flex col-md-3">
                           <img alt="" class="img-fluid" src="/static/img/no_email.svg"/>
                       </div>
-                      <div class="col-12 col-md-auto">
+                      <div class="col-12 col-md-9">
                           <p>Nous vous conseillons de créer une adresse e-mail avec le service de laposte.net.</p>
                           <p>Une fois l'adresse e-mail créée, vous pourrez l'utiliser ici.</p>
                       </div>
@@ -90,19 +91,20 @@
       </div>
   </div>
   
+                  </div>
               </div>
-          </div>
   
-          <div class="form-group mt-1 form-group-required"><label class="form-label" for="id_nir">Numéro de sécurité sociale</label><input class="form-control" id="id_nir" maxlength="21" name="nir" placeholder="2 69 05 49 588 157 80" required="" type="text"/></div>
+              <div class="form-group form-group-required"><label class="form-label" for="id_nir">Numéro de sécurité sociale</label><input aria-describedby="id_nir_helptext" class="form-control" id="id_nir" maxlength="21" name="nir" required="" type="text"/><div class="form-text" id="id_nir_helptext">Par exemple 2 69 05 49 588 157 80</div>
+  </div>
   
-          
+              
   
-          <p class="mt-5 text-primary">
-              Vous n'avez pas de numéro de sécurité sociale ?
-              <a aria-label="Article concernant le numéro de sécurité sociale (ouverture dans un nouvel onglet)" class="has-external-link" href="https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale" rel="noopener" target="_blank">ameli.fr</a>, le site de l'assurance maladie vous explique comment l'obtenir.
-          </p>
+              <p>
+                  Vous n'avez pas de numéro de sécurité sociale ?
+                  <a aria-label="Article concernant le numéro de sécurité sociale (ouverture dans un nouvel onglet)" class="has-external-link" href="https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale" rel="noopener" target="_blank">ameli.fr</a>, le site de l'assurance maladie vous explique comment l'obtenir.
+              </p>
   
-          
+              
   
   <div class="row">
       <div class="col-12">
@@ -132,11 +134,7 @@
   
   
   
-          <p class="mt-3 mt-lg-4 text-end">
-      Vous avez déjà un compte ? <a href="/login/job_seeker">Connexion</a>
-  </p>
-  
-      </form>
+          </form>
   '''
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_birth_fields_conflict_redefine_nir
@@ -166,11 +164,9 @@
 # name: TestJobSeekerSignup.test_job_seeker_signup_weak_password
   '''
   <form action="" class="js-prevent-multiple-submit" data-matomo-name="signup-job-seeker-credentials" method="post" role="form">
-          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
   
-          <p class="h4">Utilisez votre adresse e-mail</p>
-  
-          
+              
   <div class="alert alert-danger" role="alert">
       
           Ce mot de passe est trop court. Il doit contenir au minimum 14 caractères.
@@ -182,35 +178,35 @@
   </div>
   
   
-          
+              
   
-          <div class="form-group"><label class="form-label" for="id_last_name">Nom</label><input class="form-control" disabled="" id="id_last_name" name="last_name" placeholder="Nom" type="text" value="Doe"/></div>
-          <div class="form-group"><label class="form-label" for="id_first_name">Prénom</label><input class="form-control" disabled="" id="id_first_name" name="first_name" placeholder="Prénom" type="text" value="Jane"/></div>
-          <div class="form-group"><label class="form-label" for="id_birthdate">Date de naissance</label><input class="form-control" disabled="" id="id_birthdate" name="birthdate" placeholder="Date de naissance" type="text" value="01/01/1990"/></div>
-          <div class="form-group"><label class="form-label" for="id_birth_place">Commune de naissance</label><select class="form-select" disabled="" id="id_birth_place" name="birth_place">
+              <div class="form-group"><label class="form-label" for="id_last_name">Nom</label><input class="form-control" disabled="" id="id_last_name" name="last_name" type="text" value="Doe"/></div>
+              <div class="form-group"><label class="form-label" for="id_first_name">Prénom</label><input class="form-control" disabled="" id="id_first_name" name="first_name" type="text" value="Jane"/></div>
+              <div class="form-group form-group-input-w-lg-33"><label class="form-label" for="id_birthdate">Date de naissance</label><input aria-describedby="id_birthdate_helptext" class="form-control" disabled="" id="id_birthdate" name="birthdate" type="text" value="01/01/1990"/><div class="form-text" id="id_birthdate_helptext">Au format JJ/MM/AAAA, par exemple 20/12/1978</div>
+  </div>
+              <div class="form-group"><label class="form-label" for="id_birth_place">Commune de naissance</label><select class="form-select" disabled="" id="id_birth_place" name="birth_place">
     <option value="">---------</option>
   
     <option selected="" value="57089">GEISPOLSHEIM</option>
   
   </select></div>
-          <div class="form-group"><label class="form-label" for="id_birth_country">Pays de naissance</label><select class="form-select" disabled="" id="id_birth_country" name="birth_country">
+              <div class="form-group"><label class="form-label" for="id_birth_country">Pays de naissance</label><select class="form-select" disabled="" id="id_birth_country" name="birth_country">
     <option value="">---------</option>
   
     <option selected="" value="91">FRANCE</option>
   
   </select></div>
-          <div class="form-group"><label class="form-label" for="id_nir">Numéro de sécurité sociale</label><input class="form-control" disabled="" id="id_nir" name="nir" placeholder="Numéro de sécurité sociale" type="text" value="290010101010125"/></div>
-          <div class="form-group"><label class="form-label" for="id_email">Adresse e-mail</label><input class="form-control" disabled="" id="id_email" maxlength="320" name="email" placeholder="Adresse e-mail" type="email" value="jane.doe@test.local"/></div>
+              <div class="form-group"><label class="form-label" for="id_nir">Numéro de sécurité sociale</label><input class="form-control" disabled="" id="id_nir" name="nir" type="text" value="290010101010125"/></div>
+              <div class="form-group form-group-input-w-lg-66"><label class="form-label" for="id_email">Adresse e-mail</label><input class="form-control" disabled="" id="id_email" maxlength="320" name="email" type="email" value="jane.doe@test.local"/></div>
   
-          <p class="text-secondary fs-sm">
-              Ces informations sont incorrectes ? <a class="btn-link" href="/signup/job_seeker">Retourner au formulaire</a>
-          </p>
+              <p class="text-secondary fs-sm">
+                  Ces informations sont incorrectes ? <a class="btn-link" href="/signup/job_seeker">Retourner au formulaire</a>
+              </p>
   
-          <hr/>
+              <hr/>
   
-  
-          <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_password1">Mot de passe</label><div class="input-group">
-      <input aria-describedby="id_password1_helptext" aria-invalid="true" autocomplete="new-password" class="form-control is-invalid" id="id_password1" name="password1" placeholder="**********" required="" type="password"/>
+              <div class="form-group form-group-input-w-lg-66 is-invalid form-group-required"><label class="form-label" for="id_password1">Mot de passe</label><div class="input-group">
+      <input aria-describedby="id_password1_helptext" aria-invalid="true" autocomplete="new-password" class="form-control is-invalid" id="id_password1" name="password1" placeholder="" required="" type="password"/>
   
       <div class="input-group-text p-0">
           <button class="btn btn-sm btn-link btn-ico" data-it-password="toggle" type="button">
@@ -225,8 +221,8 @@
   
   <div class="form-text" id="id_password1_helptext">Le mot de passe doit contenir au moins 14 caractères et 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.</div>
   </div>
-          <div class="form-group mb-0 form-group-required"><label class="form-label" for="id_password2">Mot de passe (confirmation)</label><div class="input-group">
-      <input autocomplete="new-password" class="form-control" id="id_password2" name="password2" placeholder="**********" required="" type="password"/>
+              <div class="form-group form-group-input-w-lg-66 mb-0 form-group-required"><label class="form-label" for="id_password2">Mot de passe (confirmation)</label><div class="input-group">
+      <input autocomplete="new-password" class="form-control" id="id_password2" name="password2" placeholder="" required="" type="password"/>
   
       <div class="input-group-text p-0">
           <button class="btn btn-sm btn-link btn-ico" data-it-password="toggle" type="button">
@@ -235,11 +231,11 @@
           </button>
       </div>
   </div></div>
-          <div class="form-text mb-0">
-              Vous pouvez modifier ces informations après vous être inscrit, à partir de votre tableau de bord.
-          </div>
+              <div class="form-text mb-0">
+                  Vous pouvez modifier ces informations après vous être inscrit, à partir de votre tableau de bord.
+              </div>
   
-          
+              
   
   
   <p class="mt-3 mb-0 text-primary">
@@ -285,11 +281,7 @@
   
   
   
-          <p class="mt-3 mt-lg-4 text-end">
-      Vous avez déjà un compte ? <a href="/login/job_seeker">Connexion</a>
-  </p>
-  
-      </form>
+          </form>
   '''
 # ---
 # name: TestJobSeekerSignup.test_job_seeker_signup_with_conflicting_email_not_verified

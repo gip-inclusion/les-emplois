@@ -5,15 +5,18 @@
 {% load buttons_form %}
 
 {% block job_seeker_signup_content %}
-    <form method="post" action="" role="form" class="js-prevent-multiple-submit">
-        {% csrf_token %}
+    <div class="c-form">
+        <form method="post" action="" role="form" class="js-prevent-multiple-submit">
+            {% csrf_token %}
+            <fieldset>
+                <legend class="fs-base form-label">Sélectionnez votre situation</legend>
+                {% redirection_input_field value=redirect_field_value %}
 
-        {% redirection_input_field value=redirect_field_value %}
+                {% bootstrap_form form alert_error_type="all" %}
 
-        {% bootstrap_form form alert_error_type="all" %}
-
-        {% itou_buttons_form primary_label="Continuer" %}
-
+                {% itou_buttons_form primary_label="Continuer" %}
+            </fieldset>
+        </form>
         {% include "signup/includes/login_reminder.html" only %}
-    </form>
+    </div>
 {% endblock %}

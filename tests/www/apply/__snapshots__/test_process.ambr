@@ -4565,7 +4565,7 @@
   '''
   
   <div id="geiq_contract_type_and_options_block">
-      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" placeholder="Nombre de jours d’accompagnement avant contrat" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
+      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
       <div class="invalid-feedback">Ce champ est obligatoire.</div>
   
   <div id="id_prehiring_guidance_days_helptext" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
@@ -4582,7 +4582,7 @@
   </select></div>
       <div class="form-group"><div class="form-check"><input type="checkbox" name="inverted_vae_contract" class="form-check-input" disabled id="id_inverted_vae_contract"><label class="form-check-label" for="id_inverted_vae_contract">Contrat associé à une VAE inversée</label></div></div>
       
-      <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" placeholder="Nombre d&#x27;heures par semaine" required id="id_nb_hours_per_week"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" required id="id_nb_hours_per_week"></div>
   </div>
   
   '''
@@ -4591,7 +4591,7 @@
   '''
   
   <div id="geiq_contract_type_and_options_block">
-      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" placeholder="Nombre de jours d’accompagnement avant contrat" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
+      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
       <div class="invalid-feedback">Ce champ est obligatoire.</div>
   
   <div id="id_prehiring_guidance_days_helptext" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
@@ -4608,11 +4608,11 @@
   </select></div>
       <div class="form-group"><div class="form-check"><input type="checkbox" name="inverted_vae_contract" class="form-check-input" disabled id="id_inverted_vae_contract"><label class="form-check-label" for="id_inverted_vae_contract">Contrat associé à une VAE inversée</label></div></div>
       
-          <div id="contractTypeDetails"><div class="form-group"><label class="form-label" for="id_contract_type_details">Précisions sur le type de contrat</label><textarea name="contract_type_details" cols="40" rows="2" class="form-control" placeholder="Précisions sur le type de contrat" aria-describedby="id_contract_type_details_helptext" id="id_contract_type_details">
+          <div id="contractTypeDetails"><div class="form-group"><label class="form-label" for="id_contract_type_details">Précisions sur le type de contrat</label><textarea name="contract_type_details" cols="40" rows="2" class="form-control" aria-describedby="id_contract_type_details_helptext" id="id_contract_type_details">
   </textarea><div id="id_contract_type_details_helptext" class="form-text">Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions</div>
   </div></div>
       
-      <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" placeholder="Nombre d&#x27;heures par semaine" required id="id_nb_hours_per_week"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" required id="id_nb_hours_per_week"></div>
   </div>
   
   '''
@@ -4621,7 +4621,7 @@
   '''
   
   <div id="geiq_contract_type_and_options_block">
-      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" placeholder="Nombre de jours d’accompagnement avant contrat" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
+      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
       <div class="invalid-feedback">Ce champ est obligatoire.</div>
   
   <div id="id_prehiring_guidance_days_helptext" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
@@ -4638,7 +4638,7 @@
   </select></div>
       <div class="form-group"><div class="form-check"><input type="checkbox" name="inverted_vae_contract" class="form-check-input" id="id_inverted_vae_contract"><label class="form-check-label" for="id_inverted_vae_contract">Contrat associé à une VAE inversée</label></div></div>
       
-      <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" placeholder="Nombre d&#x27;heures par semaine" required id="id_nb_hours_per_week"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" required id="id_nb_hours_per_week"></div>
   </div>
   
   '''
@@ -4647,7 +4647,7 @@
   '''
   
   <div id="geiq_contract_type_and_options_block">
-      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" placeholder="Nombre de jours d’accompagnement avant contrat" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
+      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
       <div class="invalid-feedback">Ce champ est obligatoire.</div>
   
   <div id="id_prehiring_guidance_days_helptext" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
@@ -4664,7 +4664,7 @@
   </select></div>
       <div class="form-group"><div class="form-check"><input type="checkbox" name="inverted_vae_contract" class="form-check-input" disabled id="id_inverted_vae_contract"><label class="form-check-label" for="id_inverted_vae_contract">Contrat associé à une VAE inversée</label></div></div>
       
-      <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" placeholder="Nombre d&#x27;heures par semaine" required id="id_nb_hours_per_week"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" required id="id_nb_hours_per_week"></div>
   </div>
   
   '''
@@ -4673,7 +4673,7 @@
   '''
   
   <div id="geiq_contract_type_and_options_block">
-      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" placeholder="Nombre de jours d’accompagnement avant contrat" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
+      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
       <div class="invalid-feedback">Ce champ est obligatoire.</div>
   
   <div id="id_prehiring_guidance_days_helptext" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
@@ -4690,11 +4690,11 @@
   </select></div>
       <div class="form-group"><div class="form-check"><input type="checkbox" name="inverted_vae_contract" class="form-check-input" disabled id="id_inverted_vae_contract"><label class="form-check-label" for="id_inverted_vae_contract">Contrat associé à une VAE inversée</label></div></div>
       
-          <div id="contractTypeDetails"><div class="form-group"><label class="form-label" for="id_contract_type_details">Précisions sur le type de contrat</label><textarea name="contract_type_details" cols="40" rows="2" class="form-control" placeholder="Précisions sur le type de contrat" aria-describedby="id_contract_type_details_helptext" id="id_contract_type_details">
+          <div id="contractTypeDetails"><div class="form-group"><label class="form-label" for="id_contract_type_details">Précisions sur le type de contrat</label><textarea name="contract_type_details" cols="40" rows="2" class="form-control" aria-describedby="id_contract_type_details_helptext" id="id_contract_type_details">
   </textarea><div id="id_contract_type_details_helptext" class="form-text">Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions</div>
   </div></div>
       
-      <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" placeholder="Nombre d&#x27;heures par semaine" required id="id_nb_hours_per_week"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" required id="id_nb_hours_per_week"></div>
   </div>
   
   '''
@@ -4703,7 +4703,7 @@
   '''
   
   <div id="geiq_contract_type_and_options_block">
-      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" placeholder="Nombre de jours d’accompagnement avant contrat" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
+      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
       <div class="invalid-feedback">Ce champ est obligatoire.</div>
   
   <div id="id_prehiring_guidance_days_helptext" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
@@ -4720,7 +4720,7 @@
   </select></div>
       <div class="form-group"><div class="form-check"><input type="checkbox" name="inverted_vae_contract" class="form-check-input" id="id_inverted_vae_contract"><label class="form-check-label" for="id_inverted_vae_contract">Contrat associé à une VAE inversée</label></div></div>
       
-      <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" placeholder="Nombre d&#x27;heures par semaine" required id="id_nb_hours_per_week"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" required id="id_nb_hours_per_week"></div>
   </div>
   
   '''
@@ -4751,7 +4751,7 @@
     <option value="NOT_RELEVANT">Non concerné</option>
   
   </select></div>
-      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" placeholder="Nombre d&#x27;heures de formation prévues" required id="id_planned_training_hours"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" required id="id_planned_training_hours"></div>
   </div>
   
   '''
@@ -4782,7 +4782,7 @@
     <option value="NOT_RELEVANT">Non concerné</option>
   
   </select></div>
-      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" placeholder="Nombre d&#x27;heures de formation prévues" required id="id_planned_training_hours"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" required id="id_planned_training_hours"></div>
   </div>
   
   '''
@@ -4811,7 +4811,7 @@
     <option value="LEVEL_5">Niveau 5 ou + (Bac+2 ou +)</option>
   
   </select></div>
-      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" placeholder="Nombre d&#x27;heures de formation prévues" required id="id_planned_training_hours"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" required id="id_planned_training_hours"></div>
   </div>
   
   '''
@@ -4842,7 +4842,7 @@
     <option value="NOT_RELEVANT">Non concerné</option>
   
   </select></div>
-      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" placeholder="Nombre d&#x27;heures de formation prévues" required id="id_planned_training_hours"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" required id="id_planned_training_hours"></div>
   </div>
   
   '''
@@ -4873,7 +4873,7 @@
     <option value="NOT_RELEVANT">Non concerné</option>
   
   </select></div>
-      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" placeholder="Nombre d&#x27;heures de formation prévues" required id="id_planned_training_hours"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" required id="id_planned_training_hours"></div>
   </div>
   
   '''
@@ -4902,7 +4902,7 @@
     <option value="LEVEL_5">Niveau 5 ou + (Bac+2 ou +)</option>
   
   </select></div>
-      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" placeholder="Nombre d&#x27;heures de formation prévues" required id="id_planned_training_hours"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" required id="id_planned_training_hours"></div>
   </div>
   
   '''
