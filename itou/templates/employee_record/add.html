@@ -27,6 +27,11 @@
                         </p>
                     </div>
                     <div class="c-form mb-3 mb-lg-5">
+                        {% if wizard.steps.current == "choose-employee" %}
+                            <h2>Rechercher un salarié</h2>
+                        {% else %}
+                            <h2>Rechercher un PASS IAE</h2>
+                        {% endif %}
                         <form method="post">
                             {% csrf_token %}
                             {{ wizard.management_form }}
@@ -35,11 +40,8 @@
                                 <p>
                                     Dans le menu déroulant ci-dessous, vous trouverez la liste de vos salariés qui n'ont pas encore de fiche salarié.
                                     <br>
-                                    Seules les embauches déjà commencées sont visibles. Celles dont le contrat débute plus tard seront accessibles ultérieurement.
+                                    Seules les embauches déjà commencées sont visibles. Celles dont le contrat débute plus tard seront accessibles à compter de la date d'embauche.
                                 </p>
-                                <div class="c-info mb-3">
-                                    <span class="c-info__summary">Si vous avez besoin de renvoyer une fiche salarié déjà intégrée à l'Extranet IAE 2.0 de l'ASP, vous devez d’abord la désactiver, puis la réactiver.</span>
-                                </div>
                             {% else %}
                                 <p>
                                     Dans le menu déroulant ci-dessous, vous trouverez les PASS IAE du salarié selectionné à l'étape précédente.
@@ -49,9 +51,28 @@
                             {% endif %}
                             {% bootstrap_form form alert_error_type="non_fields" %}
 
+                            {% if wizard.steps.current == "choose-employee" %}
+                                <div class="c-info">
+                                    <span class="c-info__summary">
+                                        <strong>Vous ne trouvez pas votre salarié ?</strong>
+                                    </span>
+                                    <p class="c-info__detail mb-0">
+                                        <a href="{% url 'employee_record_views:missing_employee' %}">Cliquez-ici</a> pour faire une recherche avancée parmi l’ensemble des candidats ou salariés de votre structure.
+                                    </p>
+                                </div>
+                            {% else %}
+                                <div class="c-info">
+                                    <span class="c-info__summary">
+                                        <strong>Vous ne trouvez pas le PASS souhaité ?</strong>
+                                    </span>
+                                    <p class="c-info__detail mb-0">
+                                        <a href="{% url 'employee_record_views:missing_employee' %}">Cliquez-ici</a> pour faire une recherche avancée parmi l’ensemble des candidats ou salariés de votre structure.
+                                    </p>
+                                </div>
+                            {% endif %}
+                            <hr>
                             {% url "employee_record_views:list" as reset_url %}
                             {% if wizard.steps.prev %}
-                                {% url 'employee_record_views:add' as secondary_url %}
                                 {% itou_buttons_form primary_label=wizard.steps.next|yesno:"Suivant,Confirmer" reset_url=reset_url secondary_name="wizard_goto_step" secondary_value=wizard.steps.prev matomo_category="fiches-salarié" matomo_action="submit" matomo_name="création" %}
                             {% else %}
                                 {% itou_buttons_form primary_label=wizard.steps.next|yesno:"Suivant,Confirmer" reset_url=reset_url %}
