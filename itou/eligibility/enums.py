@@ -63,4 +63,4 @@ class AdministrativeCriteriaKind(models.TextChoices):
     SANS_TRAVAIL_12 = "SANS_TRAVAIL_12", "Personne éloignée du marché du travail (> 1 an)"
 
 
-CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS = frozenset([AdministrativeCriteriaKind.RSA])
+CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS = frozenset([AdministrativeCriteriaKind.RSA, AdministrativeCriteriaKind.AAH])
