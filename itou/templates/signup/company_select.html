@@ -6,7 +6,7 @@
 
 {% block title_content %}
     <h1 class="mb-0">Inscription</h1>
-    <p>Employeur solidaire</p>
+    <p>Employeur inclusif</p>
 {% endblock %}
 
 {% block content %}
@@ -53,33 +53,28 @@
                                     </li>
                                     <li>Si non, faire une demande d’enregistrement de l’annexe financière dans l’ASP auprès de votre DDETS.</li>
                                 </ul>
-                                En cas de nécessité, contacter l’<a href="{{ ITOU_HELP_CENTER_URL }}/requests/new" target="_blank" rel="noopener" aria-label="lien de contact pour votre DDETS (ouverture dans un nouvel onglet)">Aide & Assistance</a>.
-                                <i class="ri-external-link-line ri-xl" aria-hidden="true"></i>
+                                En cas de nécessité, contacter l’<a href="{{ ITOU_HELP_CENTER_URL }}/requests/new" class="has-external-link" target="_blank" rel="noopener" aria-label="lien de contact pour votre DDETS (ouverture dans un nouvel onglet)">Aide & Assistance</a>.
                             </p>
 
                             <p>
                                 <strong>Une Entreprise Adaptée & GEIQ</strong> :
                                 <br>
-                                Complétez <a href="{% tally_form_url "wA799W" %}" target="_blank" rel="noopener" aria-label="lien pour une Entreprise Adaptée ou un GEIQ (ouverture dans un nouvel onglet)">ce formulaire de demande d'inscription</a>.
-                                <i class="ri-external-link-line ri-xl" aria-hidden="true"></i>
+                                Complétez <a href="{% tally_form_url "wA799W" %}" class="has-external-link" target="_blank" rel="noopener" aria-label="lien pour une Entreprise Adaptée ou un GEIQ (ouverture dans un nouvel onglet)">ce formulaire de demande d'inscription</a>.
                             </p>
 
                             <p class="mb-0">
                                 <strong>Si votre organisation est porteuse de la clause sociale</strong> :
                                 <br>
                                 Complétez <a href="{% url "signup:facilitator_search" %}" rel="noopener" aria-label="lien pour une organisation porteuse de la clause sociale">ce formulaire de demande d'inscription</a>.
-                                <i class="ri-external-link-line ri-xl" aria-hidden="true"></i>
                             </p>
                         </div>
                     {% endif %}
 
 
                     {% if companies_without_members and company_select_form %}
-                        <div class="mt-3 mt-md-4">
-
-                            <h3>{{ companies_without_members|pluralizefr:"Entreprise disponible,Entreprises disponibles" }}</h3>
-
-                            <p class="text-muted">Les données sont fournies par la DGEFP et les extranets IAE 2.0 et EA 2 de l’ASP.</p>
+                        <div class="c-form mt-3 mt-md-5">
+                            <h3 class="mb-1">{{ companies_without_members|pluralizefr:"Entreprise disponible,Entreprises disponibles" }}</h3>
+                            <p>Les données sont fournies par la DGEFP et les extranets IAE 2.0 et EA 2 de l’ASP.</p>
 
                             <form method="post" class="js-prevent-multiple-submit">
 
@@ -94,68 +89,70 @@
                             The best solution I've yet found to display more info to the user than just a
                             label is to manually render the inputs.
                                 {% endcomment %}
-                                {% for siae in companies_without_members %}
-                                    <p>
-                                        <label for="id_{{ company_select_form.siaes.html_name }}_{{ forloop.counter0 }}" class="align-top">
-                                            <input type="radio" name="{{ company_select_form.siaes.html_name }}" value="{{ siae.pk }}" id="id_{{ company_select_form.siaes.html_name }}_{{ forloop.counter0 }}" required>
-                                            <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
-                                            <br>
-                                            {{ siae.display_name }}
-                                            <br>
-                                            {{ siae.address_line_1 }},
-                                            {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
-                                            {{ siae.post_code }} {{ siae.city }}
-                                        </label>
-                                    </p>
-                                    <hr />
-                                {% endfor %}
+                                <ul class="list-group list-group-flush">
+                                    {% for siae in companies_without_members %}
+                                        <li class="list-group-item list-group-item-action">
+                                            <input class="form-check-input me-1" type="radio" name="{{ company_select_form.siaes.html_name }}" value="{{ siae.pk }}" id="id_{{ company_select_form.siaes.html_name }}_{{ forloop.counter0 }}" required>
+                                            <label class="form-check-label" for="id_{{ company_select_form.siaes.html_name }}_{{ forloop.counter0 }}">
+                                                <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
+                                                <br>
+                                                {{ siae.display_name }}
+                                                <br>
+                                                {{ siae.address_line_1 }},
+                                                {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
+                                                {{ siae.post_code }} {{ siae.city }}
+                                            </label>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
 
-                                <p>
-                                    En cliquant sur "Envoyer ma demande de validation", un e-mail contenant un lien de confirmation sera envoyé au correspondant enregistré dans nos bases :
-                                    <br>
-                                    - Pour les SIAE et les EA, il s’agit du correspondant enregistré dans l’extranet IAE 2.0 ou EA 2 de l’ASP,
-                                    <br>
-                                    - Pour les GEIQ, il s’agit du correspondant enregistré dans la liste des GEIQ transmises par la FFGEIQ.
-                                </p>
+                                <hr>
+                                <div class="alert alert-info" role="status">
+                                    <p>
+                                        En cliquant sur "Envoyer ma demande de validation", un e-mail contenant un lien de confirmation sera envoyé au correspondant enregistré dans nos bases :
+                                    </p>
+                                    <ul>
+                                        <li>Pour les SIAE et les EA, il s’agit du correspondant enregistré dans l’extranet IAE 2.0 ou EA 2 de l’ASP,</li>
+                                        <li>Pour les GEIQ, il s’agit du correspondant enregistré dans la liste des GEIQ transmises par la FFGEIQ.</li>
+                                    </ul>
+                                </div>
+
                                 {% itou_buttons_form primary_label="Envoyer ma demande de validation" %}
                             </form>
-
                         </div>
                     {% endif %}
 
 
                     {% if companies_with_members %}
-                        <div class="mt-3 mt-md-4">
-
-                            <h3>{{ companies_with_members|pluralizefr:"Entreprise déjà inscrite,Entreprises déjà inscrites" }}</h3>
-
-                            <p class="text-muted">
+                        <div class="c-form mt-3 mt-md-5">
+                            <h3 class="mb-1">{{ companies_with_members|pluralizefr:"Entreprise déjà inscrite,Entreprises déjà inscrites" }}</h3>
+                            <p>
                                 Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre {{ companies_with_members|pluralizefr:"cette structure,ces structures" }}.
                             </p>
 
-                            {% for siae in companies_with_members %}
-                                <div>
-                                    <p>
-                                        <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
-                                    </p>
-                                    <p>
-                                        {{ siae.display_name }}
-                                        <br>
-                                        {{ siae.address_line_1 }},
-                                        {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
-                                        {{ siae.post_code }} {{ siae.city }}
-                                    </p>
-                                    <p>
-                                        {# note: memberships.first does not work, it does not take the prefetch into account. #}
-                                        {% with siae.memberships.all.0.user as admin %}
-                                            {# For security, display only the first char of the last name. #}
-                                            Pour obtenir une invitation, <b>veuillez contacter {{ admin.first_name|title }} {{ admin.last_name|slice:1|upper }}</b>.
-                                        {% endwith %}
-                                    </p>
-                                </div>
-                                <hr />
-                            {% endfor %}
-
+                            <ul class="list-group list-group-flush">
+                                {% for siae in companies_with_members %}
+                                    <li class="list-group-item">
+                                        <p class="mb-0">
+                                            <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
+                                        </p>
+                                        <p>
+                                            {{ siae.display_name }}
+                                            <br>
+                                            {{ siae.address_line_1 }},
+                                            {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
+                                            {{ siae.post_code }} {{ siae.city }}
+                                        </p>
+                                        <p class="mb-0">
+                                            {# note: memberships.first does not work, it does not take the prefetch into account. #}
+                                            {% with siae.memberships.all.0.user as admin %}
+                                                {# For security, display only the first char of the last name. #}
+                                                Pour obtenir une invitation, <b>veuillez contacter {{ admin.first_name|title }} {{ admin.last_name|slice:1|upper }}</b>.
+                                            {% endwith %}
+                                        </p>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     {% endif %}
 
@@ -163,7 +160,7 @@
                     {% if companies_without_members or companies_with_members %}
                         <div class="mt-3 mt-md-4 text-end">
                             <p>
-                                En cas de problème, <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">contactez-nous</a>.
+                                En cas de problème, <a href="{{ ITOU_HELP_CENTER_URL }}"  class="has-external-link" target="_blank" rel="noopener" aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">contactez-nous</a>.
                             </p>
                         </div>
                     {% endif %}
