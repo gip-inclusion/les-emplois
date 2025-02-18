@@ -14,6 +14,7 @@ from itou.utils.emails import redact_email_address
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.validators import validate_nir
 from itou.utils.widgets import DuetDatePickerWidget
+from itou.www.job_seekers_views.enums import JobSeekerOrder
 
 
 class FilterForm(forms.Form):
@@ -39,6 +40,14 @@ class FilterForm(forms.Form):
             for job_seeker in job_seeker_qs.order_by("first_name", "last_name")
             if job_seeker.get_full_name()
         ]
+
+
+class OrderForm(forms.Form):
+    order = forms.ChoiceField(
+        choices=[(item.value, item.name) for item in JobSeekerOrder],
+        required=False,
+        widget=forms.HiddenInput(),
+    )
 
 
 class CheckJobSeekerNirForm(forms.Form):
