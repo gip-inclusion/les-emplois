@@ -105,6 +105,7 @@ class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, B
     birthdate = forms.DateField(
         label="Date de naissance",
         required=True,
+        help_text="Au format JJ/MM/AAAA, par exemple 20/12/1978",
         validators=[validate_birthdate],
         widget=DuetDatePickerWidget(
             {
@@ -119,11 +120,7 @@ class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, B
         max_length=21,  # 15 + 6 white spaces
         strip=True,
         validators=[validate_nir],
-        widget=forms.TextInput(
-            attrs={
-                "placeholder": "2 69 05 49 588 157 80",
-            }
-        ),
+        help_text="Par exemple 2 69 05 49 588 157 80",
     )
     title = forms.ChoiceField(required=True, label="Civilité", choices=BLANK_CHOICE_DASH + Title.choices)
 
@@ -136,9 +133,7 @@ class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, B
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["email"].widget.attrs["placeholder"] = "adresse@email.fr"
-        self.fields["first_name"].widget.attrs["placeholder"] = "Dominique"
-        self.fields["last_name"].widget.attrs["placeholder"] = "Durand"
+        self.fields["email"].widget.attrs["placeholder"] = ""
         self.fields["last_name"].label = "Nom de famille"
         self.fields["birth_place"].help_text = (
             "La commune de naissance est obligatoire lorsque vous êtes né en France. "
@@ -185,7 +180,12 @@ class JobSeekerSignupWithOptionalNirForm(JobSeekerSignupForm):
 class JobSeekerCredentialsSignupForm(SignupForm):
     first_name = forms.CharField(disabled=True, required=False, label="Prénom")
     last_name = forms.CharField(disabled=True, required=False, label="Nom")
-    birthdate = forms.DateField(disabled=True, required=False, label="Date de naissance")
+    birthdate = forms.DateField(
+        disabled=True,
+        required=False,
+        label="Date de naissance",
+        help_text="Au format JJ/MM/AAAA, par exemple 20/12/1978",
+    )
     nir = forms.CharField(disabled=True, required=False, label="Numéro de sécurité sociale")
     email = forms.EmailField(disabled=True, required=False, label="Adresse e-mail")
 
@@ -212,7 +212,8 @@ class JobSeekerCredentialsSignupForm(SignupForm):
         self.fields.update(birth_location_fields)
 
         for password_field in [self.fields["password1"], self.fields["password2"]]:
-            password_field.widget.attrs["placeholder"] = "**********"
+            password_field.widget.attrs["placeholder"] = ""
+
         self.fields["password1"].help_text = (
             f"Le mot de passe doit contenir au moins {settings.PASSWORD_MIN_LENGTH} caractères et 3 des 4 types "
             "suivants : majuscules, minuscules, chiffres, caractères spéciaux."
@@ -248,7 +249,7 @@ class CompanySearchBySirenForm(forms.Form):
         min_length=9,
         max_length=9,
         validators=[validate_siren],
-        help_text="Le numéro SIREN contient 9 chiffres.",
+        help_text="Le numéro SIREN contient <b>9 chiffres</b>.",
     )
 
 
@@ -267,8 +268,9 @@ class CheckAlreadyExistsForm(forms.Form):
         # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
         min_length=14,
         help_text=mark_safe(
+            "Le numéro SIRET contient <b>14 chiffres</b>. "
             "Retrouvez facilement votre numéro SIRET à partir du nom de votre organisation sur le site "
-            '<a href="https://sirene.fr/" rel="noopener" target="_blank">sirene.fr</a>'
+            '<a href="https://sirene.fr/" rel="noopener" target="_blank" class="has-external-link">sirene.fr</a>'
         ),
     )
     department = forms.ChoiceField(
@@ -279,7 +281,6 @@ class CheckAlreadyExistsForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.org_data = None
-        self.fields["siret"].widget.attrs["placeholder"] = "Numéro à 14 chiffres"
 
     def clean_siret(self):
         siret = self.cleaned_data["siret"].replace(" ", "")
@@ -305,7 +306,6 @@ class PrescriberRequestInvitationForm(FullnameFormMixin):
         widget=forms.TextInput(
             attrs={
                 "type": "email",
-                "placeholder": "jeandupont@exemple.com",
                 "autocomplete": "off",
             }
         ),

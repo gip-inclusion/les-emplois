@@ -763,7 +763,7 @@
                           <h2>Mon intervention</h2>
                           <div class="c-box mb-4">
                               <h2>Période de l’accompagnement</h2>
-                              <div class="form-group form-group-required"><label class="form-label" for="id_started_at">Date de début</label><duet-date-picker class="" identifier="id_started_at" max="2024-06-21" name="started_at" placeholder="Date de début" required="" value="2024-06-21"></duet-date-picker></div>
+                              <div class="form-group form-group-required"><label class="form-label" for="id_started_at">Date de début</label><duet-date-picker class="" identifier="id_started_at" max="2024-06-21" name="started_at" required="" value="2024-06-21"></duet-date-picker></div>
                               <div class="form-group form-group-required"><label class="form-label">Date de fin</label><div class="" data-disable-target="duet-date-picker[identifier=id_ended_at]" id="id_is_ongoing" required="">
       
           
@@ -783,7 +783,7 @@
           
       
   </div></div>
-                              <div class="form-group"><label class="visually-hidden" for="id_ended_at">Date de fin</label><duet-date-picker class="" identifier="id_ended_at" max="2024-06-21" name="ended_at" placeholder="Date de fin"></duet-date-picker></div>
+                              <div class="form-group"><label class="visually-hidden" for="id_ended_at">Date de fin</label><duet-date-picker class="" identifier="id_ended_at" max="2024-06-21" name="ended_at"></duet-date-picker></div>
                               <small class="d-inline-block mb-3">* champs obligatoires</small>
                           </div>
                           <div class="c-box mb-4">
