@@ -1,10 +1,9 @@
 import django.db.transaction as transaction
-from django.db.models import F, Max
-from django.db.models.functions import Greatest
+import xworkflows
 from django.utils import timezone
 
-from itou.employee_record.enums import NotificationStatus, Status
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
+from itou.employee_record.enums import Status
+from itou.employee_record.models import EmployeeRecord
 from itou.utils.command import BaseCommand
 
 
@@ -48,22 +47,11 @@ class Command(BaseCommand):
     @transaction.atomic()
     def _check_missed_notifications(self, dry_run):
         self.stdout.write("* Checking missing employee records notifications:")
-        prolongation_cutoff = timezone.now()
         employee_record_with_missing_notification = (
-            EmployeeRecord.objects.annotate(
-                last_employee_record_snapshot=Greatest(
-                    # We take `updated_at` and not `created_at` to mimic how the trigger would have behaved if the
-                    # employee record was never ARCHIVED. For exemple, if the ER was DISABLED before ARCHIVED then no
-                    # notification would have been sent, the trigger ask for a PROCESSED, if a prolongation was
-                    # submitted between those two events.
-                    F("updated_at"),
-                    Max(F("update_notifications__created_at")),
-                ),
-            )
+            EmployeeRecord.objects.missed_notifications()
             .filter(
                 status=Status.ARCHIVED,
-                job_application__approval__end_at__gte=prolongation_cutoff,  # Take approvals that can still be used
-                last_employee_record_snapshot__lt=F("job_application__approval__updated_at"),
+                job_application__approval__end_at__gte=timezone.now(),  # Take approvals that can still be used
             )
             .order_by(
                 "-job_application__approval__updated_at",
@@ -76,21 +64,18 @@ class Command(BaseCommand):
             "found %d missed employee records notifications", len(employee_record_with_missing_notification)
         )
 
-        total_created = 0
+        unarchive_count = 0
         if not dry_run:
             for employee_record in employee_record_with_missing_notification[: self.MAX_MISSED_NOTIFICATIONS_CREATED]:
-                _, created = EmployeeRecordUpdateNotification.objects.update_or_create(
-                    employee_record=employee_record,
-                    status=NotificationStatus.NEW,
-                    defaults={"updated_at": timezone.now},
-                )
-                total_created += int(created)
-                # Unarchive the employee record so next time we don't miss the notification
-                if employee_record.status == Status.ARCHIVED:
+                try:
                     employee_record.unarchive()
-            self.logger.info(
-                "%d/%d notifications created", total_created, len(employee_record_with_missing_notification)
-            )
+                except xworkflows.AbortTransition:
+                    self.logger.exception("Failed to unarchive employee_record=%s", employee_record)
+                else:
+                    unarchive_count += 1
+        self.logger.info(
+            "%d/%d employee records were unarchived", unarchive_count, len(employee_record_with_missing_notification)
+        )
 
     def handle(self, *, dry_run, **options):
         self.logger.info("Checking employee records coherence before transferring to ASP")
