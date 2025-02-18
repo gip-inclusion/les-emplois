@@ -63,7 +63,7 @@ class TestCertifyCriteria:
     # It would be useless to test them all.
     def test_retry_task_rate_limits(self, factory, respx_mock):
         with freeze_time("2024-09-12T00:00:00Z"):
-            eligibility_diagnosis = factory(criteria_kinds=[AdministrativeCriteriaKind.RSA], certifiable=True)
+            eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
             respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").mock(
                 return_value=httpx.Response(429, headers={"Retry-After": "1"}, json={}),
             )
