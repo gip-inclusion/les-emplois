@@ -21,6 +21,7 @@ from itou.eligibility.models.common import (
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.utils.mocks.api_particulier import (
+    aah_certified_mocker,
     rsa_certified_mocker,
     rsa_not_certified_mocker,
     rsa_not_found_mocker,
@@ -441,6 +442,7 @@ class TestEligibilityDiagnosisModel:
     @pytest.mark.parametrize(
         "factory_params,expected",
         [
+            # Criteria selected by prescribers are never certified, whatever the kind.
             pytest.param(
                 {"from_prescriber": True, "criteria_kinds": [AdministrativeCriteriaKind.RSA]},
                 False,
@@ -458,6 +460,11 @@ class TestEligibilityDiagnosisModel:
             ),
             pytest.param(
                 {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.RSA]},
+                True,
+                id="employer_certified_criteria",
+            ),
+            pytest.param(
+                {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.AAH]},
                 True,
                 id="employer_certified_criteria",
             ),
@@ -533,14 +540,15 @@ class TestAdministrativeCriteriaModel:
     ],
 )
 def test_certifiable(AdministrativeCriteriaClass):
-    certifiable_kinds = [
-        AdministrativeCriteriaKind.RSA,
-    ]
     for criterion in AdministrativeCriteriaClass.objects.all():
         assert AdministrativeCriteriaKind(criterion.kind)
 
-    certifiable_criteria = AdministrativeCriteriaClass.objects.filter(kind__in=certifiable_kinds)
-    not_certifiable_criteria = AdministrativeCriteriaClass.objects.exclude(kind__in=certifiable_kinds).all()
+    certifiable_criteria = AdministrativeCriteriaClass.objects.filter(
+        kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS
+    )
+    not_certifiable_criteria = AdministrativeCriteriaClass.objects.exclude(
+        kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS
+    ).all()
 
     for criterion in certifiable_criteria:
         assert criterion in AdministrativeCriteriaClass.objects.certifiable()
@@ -558,6 +566,7 @@ def test_certifiable(AdministrativeCriteriaClass):
     "CRITERIA_KIND,api_returned_payload",
     [
         pytest.param(AdministrativeCriteriaKind.RSA, rsa_certified_mocker(), id="rsa"),
+        pytest.param(AdministrativeCriteriaKind.AAH, aah_certified_mocker(), id="aah"),
     ],
 )
 @freeze_time("2024-09-12")
