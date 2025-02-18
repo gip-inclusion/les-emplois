@@ -30,10 +30,7 @@
                                     {% if membership.ended_at %}
                                         {% include "gps/includes/badge_ended_membership.html" %}
                                     {% elif membership.is_referent %}
-                                        <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
-                                            <i class="ri-map-pin-user-line" aria-hidden="true"></i>
-                                            Référent⸱e
-                                        </span>
+                                        {% include "gps/includes/badge_is_referent_membership.html" %}
                                     {% endif %}
                                 </div>
                                 <div class="c-box--results__summary">
