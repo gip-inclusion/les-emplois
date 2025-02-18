@@ -16,6 +16,7 @@ urlpatterns = [
         views.AddView.as_view(url_name="employee_record_views:add"),
         name="add",
     ),
+    path("missing", views.missing_employee, name="missing_employee"),
     path("list", views.list_employee_records, name="list"),
     path("create/<uuid:job_application_id>", views.create, name="create"),
     path("create_step_2/<uuid:job_application_id>", views.create_step_2, name="create_step_2"),

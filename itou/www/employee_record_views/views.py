@@ -18,15 +18,17 @@ from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import User
+from itou.utils.auth import check_user
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
 from itou.utils.urls import get_safe_url
-from itou.www.employee_record_views.enums import EmployeeRecordOrder
+from itou.www.employee_record_views.enums import EmployeeRecordOrder, MissingEmployeeCase
 from itou.www.employee_record_views.forms import (
     AddEmployeeRecordChooseApprovalForm,
     AddEmployeeRecordChooseEmployeeForm,
     EmployeeRecordFilterForm,
+    FindEmployeeOrJobSeekerForm,
     NewEmployeeRecordStep2Form,
     NewEmployeeRecordStep3ForEITIForm,
     NewEmployeeRecordStep3Form,
@@ -141,6 +143,73 @@ class AddView(NamedUrlSessionWizardView):
         return HttpResponseRedirect(
             reverse("employee_record_views:create", kwargs={"job_application_id": job_application.pk})
         )
+
+
+@check_user(lambda user: user.is_employer)
+def missing_employee(request, template_name="employee_record/missing_employee.html"):
+    siae = get_current_company_or_404(request)
+    back_url = reverse("employee_record_views:add")
+
+    all_job_seekers = sorted(
+        JobApplication.objects.filter(to_company=siae).get_unique_fk_objects("job_seeker"),
+        key=lambda u: u.get_full_name(),
+    )
+    form = FindEmployeeOrJobSeekerForm(employees=all_job_seekers, data=request.POST or None)
+
+    employee_or_job_seeker = None
+    approvals_data = []
+    case = None
+
+    if request.method == "POST" and form.is_valid():
+        employee_or_job_seeker_pk = form.cleaned_data["employee"]
+        employee_or_job_seeker = get_object_or_404(
+            User.objects.filter(kind=UserKind.JOB_SEEKER, pk=employee_or_job_seeker_pk)
+        )
+        back_url = reverse("employee_record_views:missing_employee")
+
+        hiring_of_the_company = (
+            JobApplication.objects.filter(to_company=siae, job_seeker=employee_or_job_seeker)
+            .accepted()
+            .with_accepted_at()
+            .select_related("approval")
+            .order_by("accepted_at")
+        )
+
+        # Keep only the last accepted job application for each approval
+        approval_to_job_app_mapping = {ja.approval: ja for ja in hiring_of_the_company if ja.approval}
+
+        for approval, job_application in approval_to_job_app_mapping.items():
+            if job_application.hiring_start_at > timezone.localdate():
+                employee_record = None
+                approval_case = MissingEmployeeCase.FUTURE_HIRING
+            else:
+                employee_record = (
+                    EmployeeRecord.objects.for_asp_company(siae).filter(approval_number=approval.number).first()
+                )
+                if employee_record is None:
+                    approval_case = MissingEmployeeCase.NO_EMPLOYEE_RECORD
+                elif employee_record.job_application.to_company == siae:
+                    approval_case = MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_SAME_COMPANY
+                else:
+                    approval_case = MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_OTHER_COMPANY
+            approvals_data.append([approval, job_application, approval_case, employee_record])
+
+        approvals_data = sorted(approvals_data, key=lambda a: a[0].start_at)
+
+        if not hiring_of_the_company.exists():
+            case = MissingEmployeeCase.NO_HIRING
+        elif not approvals_data:
+            case = MissingEmployeeCase.NO_APPROVAL
+
+    context = {
+        "back_url": back_url,
+        "form": form,
+        "employee_or_job_seeker": employee_or_job_seeker,
+        "approvals_data": approvals_data,
+        "case": case,
+        "MissingEmployeeCase": MissingEmployeeCase,
+    }
+    return render(request, template_name, context)
 
 
 @require_safe
