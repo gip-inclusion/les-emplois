@@ -29,6 +29,13 @@ class AddEmployeeRecordChooseEmployeeForm(forms.Form):
         ]
 
 
+class FindEmployeeOrJobSeekerForm(AddEmployeeRecordChooseEmployeeForm):
+    def __init__(self, employees, *args, **kwargs):
+        super().__init__(employees=employees, *args, **kwargs)
+
+        self.fields["employee"].help_text = ""
+
+
 class AddEmployeeRecordChooseApprovalForm(forms.Form):
     approval = forms.ChoiceField(
         label="PASS IAE",

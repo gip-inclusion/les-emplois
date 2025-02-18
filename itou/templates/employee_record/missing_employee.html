@@ -1,0 +1,90 @@
+{% extends "layout/base.html" %}
+{% load django_bootstrap5 %}
+{% load format_filters %}
+{% load str_filters %}
+{% load theme_inclusion %}
+{% load matomo %}
+{% load buttons_form %}
+
+{% block title %}Rechercher un salarié {{ block.super }}{% endblock %}
+
+{% block title_prevstep %}
+    {% include "layout/previous_step.html" with back_url=back_url|default:None only %}
+{% endblock %}
+
+{% block title_content %}<h1>Rechercher un salarié - {{ request.current_organization.display_name }}</h1>{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-md-9">
+                    <div class="c-form mb-3 mb-lg-5">
+                        {% if employee_or_job_seeker %}
+                            <h2>{{ employee_or_job_seeker.get_full_name }}</h2>
+
+                            {% if case == MissingEmployeeCase.NO_HIRING %}
+                                <p>
+                                    Vous n’avez pas déclaré d’embauche pour ce candidat. Pour créer une fiche salarié vous devez accepter la candidature.
+                                    <br>
+                                    Vous pouvez trouver la liste des candidatures de ce candidat en <a href="{% url 'apply:list_for_siae' %}?job_seeker={{ employee_or_job_seeker.pk }}&archived=all">cliquant ici</a>.
+                                </p>
+                            {% elif case == MissingEmployeeCase.NO_APPROVAL %}
+                                <p>
+                                    Ce salarié a été embauché mais sans PASS IAE car vous aviez cliqué sur l’option “Embaucher sans aide au poste”,
+                                    par conséquent la création de fiche salarié est impossible.
+                                </p>
+                                <p>
+                                    Si vous souhaitez créer une fiche salarié, vous devez préalablement déclarer une embauche afin de récupérer un PASS IAE.
+                                </p>
+                            {% else %}
+                                <p>Ce salarié a {{ approvals_data|length }} PASS IAE disponible{{ approvals_data|length|pluralizefr }}</p>
+
+                                {% for approval, job_application, approval_case, employee_record in approvals_data %}
+                                    <hr>
+                                    <p>
+                                        <strong>{{ approval.number }}</strong> du {{ approval.start_at|date:'d/m/Y' }} au {{ approval.end_at|date:'d/m/Y' }}
+                                    </p>
+                                    {% if approval_case == MissingEmployeeCase.FUTURE_HIRING %}
+                                        <p>
+                                            La création de fiche salarié sera possible à compter de la date d’embauche : {{ job_application.hiring_start_at|date:'d/m/Y' }}.
+                                        </p>
+                                    {% elif approval_case == MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_OTHER_COMPANY %}
+                                        <p>
+                                            Une fiche salarié existe déjà pour ce PASS IAE dans une autre structure avec la même convention : {{ employee_record.job_application.to_company.display_name }}
+                                        </p>
+                                        <p>
+                                            Si vous souhaitez visualiser cette fiche salarié, vous devez vous connecter au tableau de bord de cette structure. En cas de difficultés vous pouvez
+                                            <a href="{{ ITOU_HELP_CENTER_URL }}/requests/new" target="_blank" rel="noopener" class="has-external-link">
+                                                nous contacter
+                                            </a>.
+                                        </p>
+                                    {% elif approval_case == MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_SAME_COMPANY %}
+                                        <p>
+                                            Une fiche salarié existe déjà pour ce PASS IAE : <a href="{% url 'employee_record_views:summary' employee_record.pk %}">Voir la fiche salarié</a>.
+                                        </p>
+                                    {% else %}
+                                        <a href="{% url 'employee_record_views:create' job_application_id=job_application.pk %}">Créer la fiche salarié</a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% else %}
+                            <h2>Rechercher parmi tous les salariés</h2>
+                            <form method="post">
+                                {% csrf_token %}
+
+                                <p>
+                                    Dans le menu déroulant ci-dessous, vous trouverez la liste de vos salariés et candidats pour lesquels il y a au moins une candidature au sein de votre structure.
+                                </p>
+                                {% bootstrap_form form alert_error_type="non_fields" %}
+
+                                {% url "employee_record_views:list" as reset_url %}
+                                {% itou_buttons_form primary_label="Rechercher" reset_url=reset_url %}
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

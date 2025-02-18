@@ -557,6 +557,9 @@
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
+                          
+                              <h2>Rechercher un PASS IAE</h2>
+                          
                           <form method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                               <input id="id_company_[PK of Company]_add_employee_record-current_step" name="company_[PK of Company]_add_employee_record-current_step" type="hidden" value="choose-approval"/>
@@ -575,8 +578,18 @@
   </div>
   
                               
+                                  <div class="c-info">
+                                      <span class="c-info__summary">
+                                          <strong>Vous ne trouvez pas le PASS souhaité ?</strong>
+                                      </span>
+                                      <p class="c-info__detail mb-0">
+                                          <a href="/employee_record/missing">Cliquez-ici</a> pour faire une recherche avancée parmi l’ensemble des candidats ou salariés de votre structure.
+                                      </p>
+                                  </div>
                               
-                                  
+                              <hr/>
+                              
+                              
                                   
   
   <div class="row">
@@ -661,6 +674,9 @@
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
+                          
+                              <h2>Rechercher un salarié</h2>
+                          
                           <form method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                               <input id="id_company_[PK of Company]_add_employee_record-current_step" name="company_[PK of Company]_add_employee_record-current_step" type="hidden" value="choose-employee"/>
@@ -669,11 +685,8 @@
                                   <p>
                                       Dans le menu déroulant ci-dessous, vous trouverez la liste de vos salariés qui n'ont pas encore de fiche salarié.
                                       <br/>
-                                      Seules les embauches déjà commencées sont visibles. Celles dont le contrat débute plus tard seront accessibles ultérieurement.
+                                      Seules les embauches déjà commencées sont visibles. Celles dont le contrat débute plus tard seront accessibles à compter de la date d'embauche.
                                   </p>
-                                  <div class="c-info mb-3">
-                                      <span class="c-info__summary">Si vous avez besoin de renvoyer une fiche salarié déjà intégrée à l'Extranet IAE 2.0 de l'ASP, vous devez d’abord la désactiver, puis la réactiver.</span>
-                                  </div>
                               
                               <div class="form-group form-group-required"><label class="form-label" for="id_choose-employee-employee">Nom du salarié</label><select aria-describedby="id_choose-employee-employee_helptext" class="form-select django-select2" data-allow-clear="false" data-minimum-input-length="0" data-theme="bootstrap-5" id="id_choose-employee-employee" lang="fr" name="choose-employee-employee" required="">
     <option selected="" value="">Sélectionnez le salarié</option>
@@ -683,6 +696,17 @@
   </select><div class="form-text">Le salarié concerné par le transfert de données vers l'Extranet IAE 2.0 de l'ASP</div>
   </div>
   
+                              
+                                  <div class="c-info">
+                                      <span class="c-info__summary">
+                                          <strong>Vous ne trouvez pas votre salarié ?</strong>
+                                      </span>
+                                      <p class="c-info__detail mb-0">
+                                          <a href="/employee_record/missing">Cliquez-ici</a> pour faire une recherche avancée parmi l’ensemble des candidats ou salariés de votre structure.
+                                      </p>
+                                  </div>
+                              
+                              <hr/>
                               
                               
                                   
