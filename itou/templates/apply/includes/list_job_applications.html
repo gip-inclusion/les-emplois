@@ -57,7 +57,7 @@
             <div class="table-responsive mt-3 mt-md-4">
                 {% if job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
                     <form hx-get="{% url 'apply:list_for_siae_actions' %}?list_url={{ request.get_full_path|urlencode }}"
-                          hx-trigger="change from:#id_order, change delay:.5"
+                          hx-trigger="change delay:.5"
                           hx-swap="none"
                           hx-indicator=".selection-indicator"
                           data-emplois-elements-visibility-on-selection-controller="selected-application">

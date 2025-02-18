@@ -364,6 +364,15 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
             - 1,  # Exclude the next appointment
         )
 
+    try:
+        order = JobApplicationOrder(request.GET.get("order"))
+    except ValueError:
+        order = JobApplicationOrder.CREATED_AT_DESC
+
+    job_applications = job_applications.annotate(
+        job_seeker_full_name=Concat(Lower("job_seeker__first_name"), Value(" "), Lower("job_seeker__last_name"))
+    ).order_by(str(order))
+
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=20)
     _add_pending_for_weeks(job_applications_page)
 
@@ -379,6 +388,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "siae": company,
         "job_applications_page": job_applications_page,
         "display_kind": display_kind,
+        "order": order,
         "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
         "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,
