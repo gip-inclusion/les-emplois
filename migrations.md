@@ -34,11 +34,6 @@ car on ne peut pas avoir des `{% include %}` et des `{% block %}`, mais devrait
 éviter des problèmes de `z-index` lorsque le *markup* de la modale est dans un
 élément avec `z-index` différent.
 
-## Extraction du parcours de recherche/création/modification de compte candidat
-Historiquement, la création de compte candidat par un prescripteur ou un employeur était rattachée au processus de candidature.
-Nous voulons à présent déconnecter les deux processus.
-Trois applications sont impactées : `job_seekers_views`, `apply` et `gps`.
-
 ## Préfixer les attributs utilisé par notre JS par data-emplois-
 
 Beaucoup de notre code JS n'utilise pas encore le préfixe `data-emplois-`.
