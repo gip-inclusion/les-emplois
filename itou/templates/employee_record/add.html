@@ -51,25 +51,18 @@
                             {% endif %}
                             {% bootstrap_form form alert_error_type="non_fields" %}
 
-                            {% if wizard.steps.current == "choose-employee" %}
-                                <div class="c-info">
-                                    <span class="c-info__summary">
+                            <div class="c-info">
+                                <span class="c-info__summary">
+                                    {% if wizard.steps.current == "choose-employee" %}
                                         <strong>Vous ne trouvez pas votre salarié ?</strong>
-                                    </span>
-                                    <p class="c-info__detail mb-0">
-                                        <a href="{% url 'employee_record_views:missing_employee' %}">Cliquez-ici</a> pour faire une recherche avancée parmi l’ensemble des candidats ou salariés de votre structure.
-                                    </p>
-                                </div>
-                            {% else %}
-                                <div class="c-info">
-                                    <span class="c-info__summary">
+                                    {% else %}
                                         <strong>Vous ne trouvez pas le PASS souhaité ?</strong>
-                                    </span>
-                                    <p class="c-info__detail mb-0">
-                                        <a href="{% url 'employee_record_views:missing_employee' %}">Cliquez-ici</a> pour faire une recherche avancée parmi l’ensemble des candidats ou salariés de votre structure.
-                                    </p>
-                                </div>
-                            {% endif %}
+                                    {% endif %}
+                                </span>
+                                <p class="c-info__detail mb-0">
+                                    <a href="{% url 'employee_record_views:missing_employee' %}">Cliquez-ici</a> pour faire une recherche avancée parmi l’ensemble des candidats ou salariés de votre structure.
+                                </p>
+                            </div>
                             <hr>
                             {% url "employee_record_views:list" as reset_url %}
                             {% if wizard.steps.prev %}
