@@ -3,7 +3,7 @@
   list([
     'found 1 missed employee records notifications',
     '[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.unarchive_new (ARCHIVED -> NEW)',
-    '1/1 notifications created',
+    '1/1 employee records were unarchived',
   ])
 # ---
 # name: test_missed_notifications_limit
@@ -11,6 +11,6 @@
     'found 3 missed employee records notifications',
     '[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.unarchive_new (ARCHIVED -> NEW)',
     '[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.unarchive_new (ARCHIVED -> NEW)',
-    '2/3 notifications created',
+    '2/3 employee records were unarchived',
   ])
 # ---

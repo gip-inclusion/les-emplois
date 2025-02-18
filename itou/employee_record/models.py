@@ -5,7 +5,8 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Exists, OuterRef
+from django.db.models import Exists, F, Max, OuterRef
+from django.db.models.functions import Greatest
 from django.db.models.manager import Manager
 from django.db.models.query import Q, QuerySet
 from django.utils import timezone
@@ -163,6 +164,20 @@ class EmployeeRecordQuerySet(models.QuerySet):
                 created_at__lt=timezone.now() - relativedelta(months=6),  # 6-months grace period if recently created
                 updated_at__lt=timezone.now() - relativedelta(months=1),  # 1-month grace period if recently updated
             )
+        )
+
+    def missed_notifications(self):
+        return self.annotate(
+            last_employee_record_snapshot=Greatest(
+                # We take `updated_at` and not `created_at` to mimic how the trigger would have behaved if the
+                # employee record was never ARCHIVED. For exemple, if the ER was DISABLED before ARCHIVED then no
+                # notification would have been sent, the trigger ask for a PROCESSED, if a prolongation was
+                # submitted between those two events.
+                F("updated_at"),
+                Max(F("update_notifications__created_at")),
+            ),
+        ).filter(
+            last_employee_record_snapshot__lt=F("job_application__approval__updated_at"),
         )
 
 
@@ -377,6 +392,12 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         ]:
             transition = getattr(self, transition_name)
             if transition.is_available():
+                if EmployeeRecord.objects.missed_notifications().filter(pk=self.pk).exists():
+                    EmployeeRecordUpdateNotification.objects.update_or_create(
+                        employee_record=self,
+                        status=NotificationStatus.NEW,
+                        defaults={"updated_at": timezone.now},
+                    )
                 return transition()
 
         if self.status != Status.ARCHIVED:
