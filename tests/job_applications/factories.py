@@ -96,6 +96,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         )
         for_snapshot = factory.Trait(
             pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+            message="Message de candidature",
             to_company__for_snapshot=True,
             sender__for_snapshot=True,
             job_seeker__for_snapshot=True,

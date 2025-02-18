@@ -537,6 +537,7 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": "12/minute",
         "user": "120/minute",
+        "job-applications-search": "120/minute",
     },
     "EXCEPTION_HANDLER": "itou.api.errors.custom_exception_handler",
 }

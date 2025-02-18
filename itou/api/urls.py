@@ -8,6 +8,7 @@ from itou.api.c4_api.views import C4CompanyView
 from itou.api.data_inclusion_api.views import DataInclusionStructureView
 from itou.api.employee_record_api.viewsets import EmployeeRecordUpdateNotificationViewSet, EmployeeRecordViewSet
 from itou.api.geiq.views import GeiqJobApplicationListView
+from itou.api.job_application_api.views import JobApplicationSearchView
 from itou.api.redoc_views import ItouSpectacularRedocView
 from itou.api.siae_api.viewsets import SiaeViewSet
 from itou.api.token_auth.views import ObtainAuthToken
@@ -53,5 +54,6 @@ urlpatterns += router.urls
 urlpatterns += [
     path("structures/", DataInclusionStructureView.as_view(), name="structures-list"),
     path("candidats/", ApplicantsView.as_view(), name="applicants-list"),
+    path("candidatures/recherche/", JobApplicationSearchView.as_view(), name="job-applications-search"),
     path("marche/", C4CompanyView.as_view(), name="marche-company-list"),
 ]
