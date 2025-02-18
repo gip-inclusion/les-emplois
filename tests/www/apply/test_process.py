@@ -2210,11 +2210,13 @@ class TestProcessAcceptViews:
 
     def test_accept_hiring_date_after_approval(self, client, mocker):
         # jobseeker has a PASS IAE, but it ends before the start date of the job
+        approval = ApprovalFactory(end_at=(timezone.localdate() + datetime.timedelta(days=1)))
+        self.job_seeker.approvals.add(approval)
         job_application = self.create_job_application(
             job_seeker=self.job_seeker,
             to_company=self.company,
             sent_by_authorized_prescriber_organisation=True,
-            approval=ApprovalFactory(end_at=(timezone.now() + datetime.timedelta(days=1))),
+            approval=approval,
             hiring_start_at=timezone.localdate() + datetime.timedelta(days=2),
         )
 
@@ -3977,7 +3979,11 @@ def test_reload_qualification_fields(qualification_type, client, snapshot):
     company = CompanyFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    url = reverse("apply:reload_qualification_fields", kwargs={"company_pk": company.pk})
+    job_seeker = JobSeekerFactory(for_snapshot=True)
+    url = reverse(
+        "apply:reload_qualification_fields",
+        kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+    )
     response = client.post(
         url,
         data={
@@ -4000,22 +4006,31 @@ def test_reload_qualification_fields_404(client):
     company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    url = reverse("apply:reload_qualification_fields", kwargs={"company_pk": 0})
-    response = client.post(
-        url,
-        data={
-            "guidance_days": "0",
-            "contract_type": ContractType.APPRENTICESHIP,
-            "contract_type_details": "",
-            "nb_hours_per_week": "",
-            "hiring_start_at": "",
-            "qualification_type": job_applications_enums.QualificationType.CQP,
-            "qualification_level": "",
-            "planned_training_hours": "0",
-            "hiring_end_at": "",
-            "answer": "",
-        },
+    job_seeker = JobSeekerFactory(for_snapshot=True)
+    url = reverse(
+        "apply:reload_qualification_fields", kwargs={"company_pk": 0, "job_seeker_public_id": job_seeker.public_id}
     )
+    data = {
+        "guidance_days": "0",
+        "contract_type": ContractType.APPRENTICESHIP,
+        "contract_type_details": "",
+        "nb_hours_per_week": "",
+        "hiring_start_at": "",
+        "qualification_type": job_applications_enums.QualificationType.CQP,
+        "qualification_level": "",
+        "planned_training_hours": "0",
+        "hiring_end_at": "",
+        "answer": "",
+    }
+    response = client.post(url, data=data)
+    assert response.status_code == 404
+
+    # Can also 404 on job seeker
+    url = reverse(
+        "apply:reload_qualification_fields",
+        kwargs={"company_pk": company.pk, "job_seeker_public_id": "304aa171-5128-4d59-aae6-8ef77ef9ff72"},
+    )
+    response = client.post(url, data=data)
     assert response.status_code == 404
 
 
@@ -4026,7 +4041,11 @@ def test_reload_contract_type_and_options(contract_type, client, snapshot):
     company = CompanyFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    url = reverse("apply:reload_contract_type_and_options", kwargs={"company_pk": company.pk})
+    job_seeker = JobSeekerFactory(for_snapshot=True)
+    url = reverse(
+        "apply:reload_contract_type_and_options",
+        kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+    )
     response = client.post(
         url,
         data={
@@ -4049,28 +4068,40 @@ def test_reload_contract_type_and_options_404(client):
     company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    url = reverse("apply:reload_contract_type_and_options", kwargs={"company_pk": 0})
-    response = client.post(
-        url,
-        data={
-            "guidance_days": "0",
-            "contract_type": ContractType.APPRENTICESHIP,
-            "contract_type_details": "",
-            "nb_hours_per_week": "",
-            "hiring_start_at": "",
-            "qualification_type": "CQP",
-            "qualification_level": "",
-            "planned_training_hours": "0",
-            "hiring_end_at": "",
-            "answer": "",
-        },
+    job_seeker = JobSeekerFactory(for_snapshot=True)
+    url = reverse(
+        "apply:reload_contract_type_and_options",
+        kwargs={"company_pk": 0, "job_seeker_public_id": job_seeker.public_id},
     )
+    data = {
+        "guidance_days": "0",
+        "contract_type": ContractType.APPRENTICESHIP,
+        "contract_type_details": "",
+        "nb_hours_per_week": "",
+        "hiring_start_at": "",
+        "qualification_type": "CQP",
+        "qualification_level": "",
+        "planned_training_hours": "0",
+        "hiring_end_at": "",
+        "answer": "",
+    }
+    response = client.post(url, data=data)
+    assert response.status_code == 404
+
+    # Can also 404 on job seeker
+    url = reverse(
+        "apply:reload_contract_type_and_options",
+        kwargs={"company_pk": company.pk, "job_seeker_public_id": "304aa171-5128-4d59-aae6-8ef77ef9ff72"},
+    )
+    response = client.post(url, data=data)
     assert response.status_code == 404
 
 
 def test_htmx_reload_contract_type_and_options(client):
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.GEIQ, state=job_applications_enums.JobApplicationState.PROCESSING
+        to_company__kind=CompanyKind.GEIQ,
+        state=job_applications_enums.JobApplicationState.PROCESSING,
+        job_seeker__for_snapshot=True,
     )
     employer = job_application.to_company.members.first()
     client.force_login(employer)
@@ -4093,7 +4124,11 @@ def test_htmx_reload_contract_type_and_options(client):
 
     # Update form soup with htmx call
     reload_url = reverse(
-        "apply:reload_contract_type_and_options", kwargs={"company_pk": job_application.to_company.pk}
+        "apply:reload_contract_type_and_options",
+        kwargs={
+            "company_pk": job_application.to_company.pk,
+            "job_seeker_public_id": job_application.job_seeker.public_id,
+        },
     )
     data["contract_type"] = ContractType.PERMANENT
     htmx_response = client.post(

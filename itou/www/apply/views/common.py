@@ -64,7 +64,9 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
             )
             forms.append(form_birth_place)
 
-    form_accept = AcceptForm(instance=job_application, company=company, data=request.POST or None)
+    form_accept = AcceptForm(
+        instance=job_application, company=company, job_seeker=job_seeker, data=request.POST or None
+    )
     forms.append(form_accept)
 
     context = {
@@ -108,8 +110,7 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
                     form_birth_place.save()
                     if settings.API_PARTICULIER_TOKEN:
                         valid_diagnosis.certify_criteria()
-                # After each successful transition, a save() is performed by django-xworkflows,
-                # so use `commit=False` to avoid a double save.
+                # Instance will be committed by the transition, performed by django-xworkflows.
                 job_application = form_accept.save(commit=False)
                 if creating:
                     job_application.job_seeker = job_seeker
