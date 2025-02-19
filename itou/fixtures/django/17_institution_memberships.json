@@ -6,7 +6,6 @@
       "is_active": true,
       "is_admin": true,
       "joined_at": "2021-07-13T15:34:12.923Z",
-      "updated_at": "2021-07-13T15:34:17.790Z",
       "updated_by": null,
       "user": 24
     },
@@ -20,7 +19,6 @@
       "is_active": true,
       "is_admin": true,
       "joined_at": "2023-06-02T09:35:44.547Z",
-      "updated_at": "2023-06-02T09:35:44.547Z",
       "updated_by": null,
       "user": 27
     },
@@ -34,7 +32,6 @@
       "is_active": true,
       "is_admin": false,
       "joined_at": "2024-06-10T09:49:43.391Z",
-      "updated_at": "2024-06-10T09:49:43.418Z",
       "updated_by": null,
       "user": 24
     },
@@ -48,7 +45,6 @@
       "is_active": true,
       "is_admin": false,
       "joined_at": "2024-06-10T09:49:57.908Z",
-      "updated_at": "2024-06-10T09:49:57.938Z",
       "updated_by": null,
       "user": 27
     },
@@ -62,7 +58,6 @@
       "is_active": true,
       "is_admin": false,
       "joined_at": "2024-06-10T09:49:57.908Z",
-      "updated_at": "2024-06-10T09:49:57.938Z",
       "updated_by": null,
       "user": 29
     },

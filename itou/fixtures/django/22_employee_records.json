@@ -15,8 +15,7 @@
       "processed_as_duplicate": false,
       "processed_at": null,
       "siret": "99999999999991",
-      "status": "SENT",
-      "updated_at": "2024-01-10T13:12:47.080Z"
+      "status": "SENT"
     },
     "model": "employee_record.employeerecord",
     "pk": 1
@@ -37,8 +36,7 @@
       "processed_as_duplicate": false,
       "processed_at": null,
       "siret": "99999999999992",
-      "status": "PROCESSED",
-      "updated_at": "2024-01-10T13:12:47.080Z"
+      "status": "PROCESSED"
     },
     "model": "employee_record.employeerecord",
     "pk": 2
@@ -59,8 +57,7 @@
       "processed_as_duplicate": false,
       "processed_at": null,
       "siret": "99999999999993",
-      "status": "SENT",
-      "updated_at": "2024-01-10T13:12:47.080Z"
+      "status": "SENT"
     },
     "model": "employee_record.employeerecord",
     "pk": 3
@@ -81,8 +78,7 @@
       "processed_as_duplicate": false,
       "processed_at": null,
       "siret": "99999999999994",
-      "status": "REJECTED",
-      "updated_at": "2024-01-10T13:12:47.080Z"
+      "status": "REJECTED"
     },
     "model": "employee_record.employeerecord",
     "pk": 4

@@ -10,6 +10,8 @@
       "approval_manually_refused_by": null,
       "approval_number_sent_at": null,
       "approval_number_sent_by_email": false,
+      "archived_at": null,
+      "archived_by": null,
       "contract_type": "",
       "contract_type_details": "",
       "create_employee_record": true,
@@ -43,8 +45,7 @@
       "to_company": 3852,
       "transferred_at": null,
       "transferred_by": null,
-      "transferred_from": null,
-      "updated_at": "2024-06-17T08:46:15.289Z"
+      "transferred_from": null
     },
     "model": "job_applications.jobapplication",
     "pk": "4edf8044-b892-4167-b872-f2ef5ac9e05f"
@@ -95,8 +96,7 @@
       "to_company": 3855,
       "transferred_at": null,
       "transferred_by": null,
-      "transferred_from": null,
-      "updated_at": "2024-10-10T08:22:06.279Z"
+      "transferred_from": null
     },
     "model": "job_applications.jobapplication",
     "pk": "4fd07a20-a8f5-4d19-9b7c-84de3f76dc2a"
@@ -138,9 +138,7 @@
       "refusal_reason": "",
       "refusal_reason_shared_with_job_seeker": false,
       "resume_link": "",
-      "selected_jobs": [
-        4
-      ],
+      "selected_jobs": [],
       "sender": 4,
       "sender_company": 2653,
       "sender_kind": "employer",
@@ -149,8 +147,7 @@
       "to_company": 3851,
       "transferred_at": null,
       "transferred_by": null,
-      "transferred_from": null,
-      "updated_at": "2024-10-04T05:57:12.474Z"
+      "transferred_from": null
     },
     "model": "job_applications.jobapplication",
     "pk": "5e074295-bc38-4ce5-b684-f674b2be1a74"
@@ -166,6 +163,8 @@
       "approval_manually_refused_by": null,
       "approval_number_sent_at": "2021-05-12T09:43:56.386Z",
       "approval_number_sent_by_email": true,
+      "archived_at": null,
+      "archived_by": null,
       "contract_type": "",
       "contract_type_details": "",
       "create_employee_record": true,
@@ -199,8 +198,7 @@
       "to_company": 3850,
       "transferred_at": null,
       "transferred_by": null,
-      "transferred_from": null,
-      "updated_at": "2024-06-17T08:46:15.289Z"
+      "transferred_from": null
     },
     "model": "job_applications.jobapplication",
     "pk": "5f844eff-2dbb-450e-8f8b-6ec99f216c31"
@@ -216,6 +214,8 @@
       "approval_manually_refused_by": null,
       "approval_number_sent_at": "2021-05-12T09:44:40.545Z",
       "approval_number_sent_by_email": true,
+      "archived_at": null,
+      "archived_by": null,
       "contract_type": "",
       "contract_type_details": "",
       "create_employee_record": true,
@@ -249,8 +249,7 @@
       "to_company": 3850,
       "transferred_at": null,
       "transferred_by": null,
-      "transferred_from": null,
-      "updated_at": "2024-06-17T08:46:15.289Z"
+      "transferred_from": null
     },
     "model": "job_applications.jobapplication",
     "pk": "61883223-4a9b-45d6-afa6-25ab6fccaaab"
@@ -266,6 +265,8 @@
       "approval_manually_refused_by": null,
       "approval_number_sent_at": "2021-05-12T09:45:17.884Z",
       "approval_number_sent_by_email": true,
+      "archived_at": null,
+      "archived_by": null,
       "contract_type": "",
       "contract_type_details": "",
       "create_employee_record": true,
@@ -299,8 +300,7 @@
       "to_company": 3850,
       "transferred_at": null,
       "transferred_by": null,
-      "transferred_from": null,
-      "updated_at": "2024-06-17T08:46:15.290Z"
+      "transferred_from": null
     },
     "model": "job_applications.jobapplication",
     "pk": "6e09f9d5-aa9b-42db-89c3-63db5a9d323b"
@@ -316,6 +316,8 @@
       "approval_manually_refused_by": null,
       "approval_number_sent_at": null,
       "approval_number_sent_by_email": false,
+      "archived_at": null,
+      "archived_by": null,
       "contract_type": "",
       "contract_type_details": "",
       "create_employee_record": true,
@@ -349,8 +351,7 @@
       "to_company": 857,
       "transferred_at": null,
       "transferred_by": null,
-      "transferred_from": null,
-      "updated_at": "2024-06-17T08:46:15.290Z"
+      "transferred_from": null
     },
     "model": "job_applications.jobapplication",
     "pk": "76a64dcd-eacb-42b2-a396-0ce8077da37a"
@@ -366,6 +367,8 @@
       "approval_manually_refused_by": null,
       "approval_number_sent_at": null,
       "approval_number_sent_by_email": false,
+      "archived_at": null,
+      "archived_by": null,
       "contract_type": "",
       "contract_type_details": "",
       "create_employee_record": true,
@@ -399,8 +402,7 @@
       "to_company": 2653,
       "transferred_at": null,
       "transferred_by": null,
-      "transferred_from": null,
-      "updated_at": "2024-06-17T08:46:15.290Z"
+      "transferred_from": null
     },
     "model": "job_applications.jobapplication",
     "pk": "86821a94-d876-4f70-9bbb-18cafdd045b8"
@@ -416,6 +418,8 @@
       "approval_manually_refused_by": null,
       "approval_number_sent_at": null,
       "approval_number_sent_by_email": false,
+      "archived_at": null,
+      "archived_by": null,
       "contract_type": "",
       "contract_type_details": "",
       "create_employee_record": true,
@@ -449,8 +453,7 @@
       "to_company": 2653,
       "transferred_at": null,
       "transferred_by": null,
-      "transferred_from": null,
-      "updated_at": "2024-06-17T08:46:15.290Z"
+      "transferred_from": null
     },
     "model": "job_applications.jobapplication",
     "pk": "995f96b7-b52d-4abf-9f96-4897f282eee0"
@@ -466,6 +469,8 @@
       "approval_manually_refused_by": null,
       "approval_number_sent_at": null,
       "approval_number_sent_by_email": false,
+      "archived_at": null,
+      "archived_by": null,
       "contract_type": "",
       "contract_type_details": "",
       "create_employee_record": true,
@@ -499,8 +504,7 @@
       "to_company": 3851,
       "transferred_at": null,
       "transferred_by": null,
-      "transferred_from": null,
-      "updated_at": "2024-06-17T08:46:15.290Z"
+      "transferred_from": null
     },
     "model": "job_applications.jobapplication",
     "pk": "b1a63482-6cb4-4935-ad7b-a0a9cefd9231"
@@ -516,6 +520,8 @@
       "approval_manually_refused_by": null,
       "approval_number_sent_at": "2021-05-12T09:45:57.425Z",
       "approval_number_sent_by_email": true,
+      "archived_at": null,
+      "archived_by": null,
       "contract_type": "",
       "contract_type_details": "",
       "create_employee_record": true,
@@ -549,8 +555,7 @@
       "to_company": 3850,
       "transferred_at": null,
       "transferred_by": null,
-      "transferred_from": null,
-      "updated_at": "2024-06-17T08:46:15.291Z"
+      "transferred_from": null
     },
     "model": "job_applications.jobapplication",
     "pk": "bca602f3-9249-46cf-b949-4d5a9324a5a5"
@@ -566,6 +571,8 @@
       "approval_manually_refused_by": null,
       "approval_number_sent_at": "2021-05-11T16:19:27.927Z",
       "approval_number_sent_by_email": true,
+      "archived_at": null,
+      "archived_by": null,
       "contract_type": "",
       "contract_type_details": "",
       "create_employee_record": true,
@@ -599,8 +606,7 @@
       "to_company": 3850,
       "transferred_at": null,
       "transferred_by": null,
-      "transferred_from": null,
-      "updated_at": "2024-06-17T08:46:15.291Z"
+      "transferred_from": null
     },
     "model": "job_applications.jobapplication",
     "pk": "fe868b07-4df9-4696-aaee-2409e83c4b84"

@@ -22,8 +22,7 @@
       "source_id": null,
       "source_kind": null,
       "source_url": null,
-      "ui_rank": 32767,
-      "updated_at": "2024-01-10T13:12:47.092Z"
+      "ui_rank": 32767
     },
     "model": "companies.jobdescription",
     "pk": 1
@@ -51,8 +50,7 @@
       "source_id": null,
       "source_kind": null,
       "source_url": null,
-      "ui_rank": 32767,
-      "updated_at": "2024-01-10T13:12:47.092Z"
+      "ui_rank": 32767
     },
     "model": "companies.jobdescription",
     "pk": 2
@@ -80,8 +78,7 @@
       "source_id": null,
       "source_kind": null,
       "source_url": null,
-      "ui_rank": 32767,
-      "updated_at": "2024-01-10T13:12:47.092Z"
+      "ui_rank": 32767
     },
     "model": "companies.jobdescription",
     "pk": 3
@@ -109,8 +106,7 @@
       "source_id": null,
       "source_kind": null,
       "source_url": null,
-      "ui_rank": 32767,
-      "updated_at": "2024-01-10T13:12:47.092Z"
+      "ui_rank": 32767
     },
     "model": "companies.jobdescription",
     "pk": 4
@@ -138,8 +134,7 @@
       "source_id": null,
       "source_kind": null,
       "source_url": null,
-      "ui_rank": 32767,
-      "updated_at": "2024-01-10T13:12:47.092Z"
+      "ui_rank": 32767
     },
     "model": "companies.jobdescription",
     "pk": 5
@@ -167,8 +162,7 @@
       "source_id": null,
       "source_kind": null,
       "source_url": null,
-      "ui_rank": 32767,
-      "updated_at": "2024-01-10T13:12:47.092Z"
+      "ui_rank": 32767
     },
     "model": "companies.jobdescription",
     "pk": 6
@@ -196,8 +190,7 @@
       "source_id": null,
       "source_kind": null,
       "source_url": null,
-      "ui_rank": 32767,
-      "updated_at": "2024-01-10T13:12:47.092Z"
+      "ui_rank": 32767
     },
     "model": "companies.jobdescription",
     "pk": 7
@@ -225,8 +218,7 @@
       "source_id": null,
       "source_kind": null,
       "source_url": null,
-      "ui_rank": 32767,
-      "updated_at": "2024-01-10T13:12:47.092Z"
+      "ui_rank": 32767
     },
     "model": "companies.jobdescription",
     "pk": 8
@@ -254,8 +246,7 @@
       "source_id": null,
       "source_kind": null,
       "source_url": null,
-      "ui_rank": 32767,
-      "updated_at": "2024-01-10T13:12:47.092Z"
+      "ui_rank": 32767
     },
     "model": "companies.jobdescription",
     "pk": 9
@@ -283,8 +274,7 @@
       "source_id": null,
       "source_kind": null,
       "source_url": null,
-      "ui_rank": 32767,
-      "updated_at": "2024-01-10T13:12:47.092Z"
+      "ui_rank": 32767
     },
     "model": "companies.jobdescription",
     "pk": 10
@@ -312,8 +302,7 @@
       "source_id": null,
       "source_kind": null,
       "source_url": null,
-      "ui_rank": 32767,
-      "updated_at": "2024-01-10T13:12:47.092Z"
+      "ui_rank": 32767
     },
     "model": "companies.jobdescription",
     "pk": 11
@@ -341,8 +330,7 @@
       "source_id": null,
       "source_kind": null,
       "source_url": null,
-      "ui_rank": 32767,
-      "updated_at": "2024-01-10T13:12:47.092Z"
+      "ui_rank": 32767
     },
     "model": "companies.jobdescription",
     "pk": 12
