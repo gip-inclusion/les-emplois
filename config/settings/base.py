@@ -753,3 +753,8 @@ PILOTAGE_SHOW_STATS_WEBINAR = os.getenv("PILOTAGE_SHOW_STATS_WEBINAR", True) in 
 
 # Github
 API_GITHUB_BASE_URL = "https://api.github.com"
+
+
+SERIALIZATION_MODULES = {
+    "json-no-auto-fields": "itou.utils.json_no_auto_fields_serializer",
+}
