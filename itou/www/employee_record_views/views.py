@@ -150,6 +150,9 @@ def missing_employee(request, template_name="employee_record/missing_employee.ht
     siae = get_current_company_or_404(request)
     back_url = reverse("employee_record_views:add")
 
+    if not siae.can_use_employee_record:
+        raise PermissionDenied
+
     all_job_seekers = sorted(
         JobApplication.objects.filter(to_company=siae).get_unique_fk_objects("job_seeker"),
         key=lambda u: u.get_full_name(),
@@ -161,9 +164,8 @@ def missing_employee(request, template_name="employee_record/missing_employee.ht
     case = None
 
     if request.method == "POST" and form.is_valid():
-        employee_or_job_seeker_pk = form.cleaned_data["employee"]
         employee_or_job_seeker = get_object_or_404(
-            User.objects.filter(kind=UserKind.JOB_SEEKER, pk=employee_or_job_seeker_pk)
+            User.objects.filter(kind=UserKind.JOB_SEEKER, pk=form.cleaned_data["employee"])
         )
         back_url = reverse("employee_record_views:missing_employee")
 
@@ -172,29 +174,29 @@ def missing_employee(request, template_name="employee_record/missing_employee.ht
             .accepted()
             .with_accepted_at()
             .select_related("approval")
-            .order_by("accepted_at")
+            .order_by("-accepted_at")
         )
 
-        # Keep only the last accepted job application for each approval
+        # Keep only the oldest accepted job application for each approval
         approval_to_job_app_mapping = {ja.approval: ja for ja in hiring_of_the_company if ja.approval}
 
         for approval, job_application in approval_to_job_app_mapping.items():
-            if job_application.hiring_start_at > timezone.localdate():
-                employee_record = None
-                approval_case = MissingEmployeeCase.FUTURE_HIRING
-            else:
-                employee_record = (
-                    EmployeeRecord.objects.for_asp_company(siae).filter(approval_number=approval.number).first()
-                )
-                if employee_record is None:
-                    approval_case = MissingEmployeeCase.NO_EMPLOYEE_RECORD
-                elif employee_record.job_application.to_company == siae:
+            employee_record = (
+                EmployeeRecord.objects.for_asp_company(siae).filter(approval_number=approval.number).first()
+            )
+            if employee_record:
+                if employee_record.job_application.to_company == siae:
                     approval_case = MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_SAME_COMPANY
                 else:
                     approval_case = MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_OTHER_COMPANY
+            else:
+                if job_application.hiring_start_at > timezone.localdate():
+                    approval_case = MissingEmployeeCase.FUTURE_HIRING
+                else:
+                    approval_case = MissingEmployeeCase.NO_EMPLOYEE_RECORD
             approvals_data.append([approval, job_application, approval_case, employee_record])
 
-        approvals_data = sorted(approvals_data, key=lambda a: a[0].start_at)
+        approvals_data = sorted(approvals_data, key=lambda a: a[0].end_at, reverse=True)
 
         if not hiring_of_the_company.exists():
             case = MissingEmployeeCase.NO_HIRING

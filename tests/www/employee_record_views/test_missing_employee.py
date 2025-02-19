@@ -1,6 +1,7 @@
-from datetime import date
+import datetime
 
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.job_applications.enums import JobApplicationState
@@ -58,12 +59,24 @@ def test_missing_employee(client, snapshot):
         job_seeker=job_seeker,
         state=JobApplicationState.ACCEPTED,
         approval=approval,
-        hiring_start_at=date(2025, 2, 15),
+        hiring_start_at=datetime.date(2025, 2, 15),
     )
     response = client.post(url, data={"employee": job_seeker.pk})
     assert str(parse_response_to_soup(response, selector=".s-section")) == snapshot(
         name=MissingEmployeeCase.FUTURE_HIRING
     )
+
+    # But if there also was a previous accepted job application it works
+    job_application = JobApplicationFactory(
+        to_company=siae,
+        job_seeker=job_seeker,
+        state=JobApplicationState.ACCEPTED,
+        approval=approval,
+        hiring_start_at=datetime.date(2025, 1, 1),
+        created_at=timezone.now() - datetime.timedelta(days=1),  # fallback for accepted_at
+    )
+    response = client.post(url, data={"employee": job_seeker.pk})
+    assert response.context["approvals_data"][0][2] == MissingEmployeeCase.NO_EMPLOYEE_RECORD
 
     # hired and already has an employee record
     job_seeker = JobSeekerFactory(first_name="Damien", last_name="Danone")
@@ -73,7 +86,7 @@ def test_missing_employee(client, snapshot):
         job_seeker=job_seeker,
         state=JobApplicationState.ACCEPTED,
         approval=approval,
-        hiring_start_at=date(2025, 2, 14),
+        hiring_start_at=datetime.date(2025, 2, 14),
     )
     employee_record = EmployeeRecordFactory(job_application=job_application)
     response = client.post(url, data={"employee": job_seeker.pk})
@@ -99,15 +112,15 @@ def test_missing_employee(client, snapshot):
         job_seeker=job_seeker,
         state=JobApplicationState.ACCEPTED,
         approval=approval,
-        hiring_start_at=date(2025, 2, 14),
+        hiring_start_at=datetime.date(2025, 2, 14),
     )
-    other_siae = CompanyFactory(subject_to_eligibility=True, convention=siae.convention, brand="Monster & Cie")
+    other_siae = CompanyFactory(convention=siae.convention, for_snapshot=True)
     job_application = JobApplicationFactory(
         to_company=other_siae,
         job_seeker=job_seeker,
         state=JobApplicationState.ACCEPTED,
         approval=approval,
-        hiring_start_at=date(2025, 2, 14),
+        hiring_start_at=datetime.date(2025, 2, 14),
     )
     employee_record = EmployeeRecordFactory(job_application=job_application)
     response = client.post(url, data={"employee": job_seeker.pk})
@@ -123,7 +136,7 @@ def test_missing_employee(client, snapshot):
         job_seeker=job_seeker,
         state=JobApplicationState.ACCEPTED,
         approval=approval,
-        hiring_start_at=date(2025, 2, 14),
+        hiring_start_at=datetime.date(2025, 2, 14),
     )
     response = client.post(url, data={"employee": job_seeker.pk})
     assert str(
