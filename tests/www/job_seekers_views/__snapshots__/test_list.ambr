@@ -490,7 +490,7 @@
                                   
                                       
                                   
-                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=11111111-1111-1111-1111-111111111111&amp;city=brest-29" id="introJsBtnPostuler">
+                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=11111111-1111-1111-1111-111111111111&amp;city=brest-29">
                                       <i aria-label="Postuler pour ce candidat" class="ri-draft-line"></i>
                                   </a>
                               </td>
@@ -987,7 +987,7 @@
                                   
                                       
                                   
-                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=11111111-1111-1111-1111-111111111111&amp;city=brest-29" id="introJsBtnPostuler">
+                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=11111111-1111-1111-1111-111111111111&amp;city=brest-29">
                                       <i aria-label="Postuler pour ce candidat" class="ri-draft-line"></i>
                                   </a>
                               </td>

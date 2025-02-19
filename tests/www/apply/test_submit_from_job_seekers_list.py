@@ -52,7 +52,6 @@ class TestApplyAsPrescriber:
                 data-bs-title="Postuler pour ce candidat"
                 data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="postuler-pour-ce-candidat"
-                id="introJsBtnPostuler"
                 href="{next_url}">
                 <i class="ri-draft-line" aria-label="Postuler pour ce candidat">
                 </i>
@@ -214,7 +213,6 @@ class TestApplyAsPrescriber:
                 data-bs-title="Postuler pour ce candidat"
                 data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="postuler-pour-ce-candidat"
-                id="introJsBtnPostuler"
                 href="{next_url}">
                 <i class="ri-draft-line" aria-label="Postuler pour ce candidat">
                 </i>
