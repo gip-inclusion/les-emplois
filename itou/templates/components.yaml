@@ -1,0 +1,4 @@
+components:
+  c_title: "components/c-title.html"
+  c_badge: "components/c-badge.html"
+  c_info: "components/c-info.html"

@@ -3,7 +3,32 @@
 {% block title %}Déclaration d'accessibilité {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1>Déclaration d'accessibilité</h1>
+
+{% comment %}
+TEST Slippers
+ - test avec un .c-title multi-children (fragment) optionnels
+ - test avec un badge
+ - test avec un composant dans un composant (badge dans c-title)
+ - test avec un c-info ayant la possibilitée d'avoir un collapse ou non
+{% endcomment %}
+<p>TEST SLIPPERS 👇</p>
+
+{% fragment as c_title__main %}
+    <h1>Déclaration d'accessibilité {% #c_badge extra_class="bg-danger" %}Ze badge{% /c_badge %}</h1>
+{% endfragment %}
+
+{% fragment as c_title__cta %}
+    <a href="" class="btn btn-lg btn-outline-primary btn-ico">
+        <i class="ri-user-unfollow-line fw-medium" aria-hidden="true"></i>
+        <span>Ne plus suivre</span>
+    </a>
+    <a href="" class="btn btn-lg btn-ico btn-primary">
+        <i class="ri-user-add-line" aria-hidden="true"></i>
+        <span>Ajouter un bénéficiaire</span>
+    </a>
+{% endfragment %}
+
+{% fragment as c_title__secondary %}
     <h2 class="h3">
         <strong>Le GIP Plateforme de l’inclusion</strong> s’engage à rendre ses sites internet et applications accessibles conformément à l’article 47 de la loi n°2005-102 du 11 février 2005.
     </h2>
@@ -13,6 +38,21 @@
     <p>
         Cette déclaration d'accessibilité s'applique au site web <b>Les emplois de l'inclusion</b>.
     </p>
+{% endfragment %}
+
+{% c_title role="group" aria-label="Actions sur les groupes de suivi" c_title__main=c_title__main c_title__cta=c_title__cta c_title__secondary=c_title__secondary %}
+
+{% c_info c_info__summary="Vous devrez contacter l’employeur pour en savoir plus" %}
+
+{% #c_info collapsible collapsibleID="collapseInfoExample" c_info__summary="Vous devrez contacter l’employeur pour en savoir plus" %}
+    <p>
+        L’employeur a refusé la candidature avec le motif “Autre”.
+        <br>
+        Si les détails apportés dans le message de réponse ne vous ont pas permis d’en savoir plus, vous pouvez contacter l’employeur.
+    </p>
+{% /c_info %}
+
+
 {% endblock %}
 
 {% block content %}
@@ -33,9 +73,7 @@
 
                     <h2 class="h2 mt-3 mt-lg-5">Contenus non accessibles</h2>
                     <ul>
-                        <li>
-                            De nombreuses anomalies vont pénaliser les utilisateurs en situation de handicap, naviguant ou non à l'aide de technologies d'assistance
-                        </li>
+                        <li>De nombreuses anomalies vont pénaliser les utilisateurs en situation de handicap, naviguant ou non à l'aide de technologies d'assistance</li>
                         <li>
                             Les non-conformités les plus bloquantes pour les utilisateurs concernent :
                             <ul>
@@ -44,9 +82,7 @@
                                 <li>Champ sans étiquette</li>
                                 <li>Rôle manquant sur quelque région</li>
                                 <li>La page n'est pas bien structurée</li>
-                                <li>
-                                    des contenus avec une structuration (titres et intertitres, paragraphes, listes) incorrecte, ou insuffisante pour une navigation efficace avec un lecteur d'écran
-                                </li>
+                                <li>des contenus avec une structuration (titres et intertitres, paragraphes, listes) incorrecte, ou insuffisante pour une navigation efficace avec un lecteur d'écran</li>
                                 <li>de nombreux textes et éléments d'interface avec des contrastes insuffisants</li>
                                 <li>utilisation de mots en anglais</li>
                                 <li>titre de la page n'est pas à jour par rapport aux contenus</li>
@@ -66,9 +102,7 @@
                     </ul>
 
                     <h3 class="h3">Environnement de test</h3>
-                    <p>
-                        Les vérifications de restitution de contenus ont été réalisées sur la base de la combinaison four-nie par la base de référence du RGAA 4.1, avec les versions suivantes :
-                    </p>
+                    <p>Les vérifications de restitution de contenus ont été réalisées sur la base de la combinaison four-nie par la base de référence du RGAA 4.1, avec les versions suivantes :</p>
                     <ul>
                         <li>Agent utilisateur : Firefox</li>
                         <li>Technologie d'assistance : NVDA</li>
@@ -92,15 +126,11 @@
                         <li>Mes candidatures &gt; Export des candidatures</li>
                         <li>Ma structure &gt; Publier/gérer les fiches de postes</li>
                         <li>Candidature : Mes candidatures &gt; Prolonger/Suspendre un agrément &gt; Rechercher un agrément Pôle emploi</li>
-                        <li>
-                            Connexion en tant que "Prescripteur habilité" &gt; Mes candidature &gt; Postuler pour un candidat &gt; saisir "paris"
-                        </li>
+                        <li>Connexion en tant que "Prescripteur habilité" &gt; Mes candidature &gt; Postuler pour un candidat &gt; saisir "paris"</li>
                     </ul>
 
                     <h2 class="h2 mt-3 mt-lg-5">Amélioration et contact</h2>
-                    <p>
-                        Si vous n'arrivez pas à accéder à un contenu ou à un service, vous pouvez nous contacter pour être orienté vers une alternative accessible ou obtenir le contenu sous une autre forme.
-                    </p>
+                    <p>Si vous n'arrivez pas à accéder à un contenu ou à un service, vous pouvez nous contacter pour être orienté vers une alternative accessible ou obtenir le contenu sous une autre forme.</p>
                     <ul>
                         <li>
                             Adresse e-mail : <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">{{ ITOU_EMAIL_CONTACT }}</a>
@@ -116,9 +146,7 @@
                     <p>Nous essayons de répondre dans les 2 jours ouvrés.</p>
 
                     <h2 class="h2 mt-3 mt-lg-5">Voie de recours</h2>
-                    <p>
-                        Cette procédure est à utiliser dans le cas suivant : vous avez signalé au responsable du site internet un défaut d'accessibilité qui vous empêche d'accéder à un contenu ou à un des services du portail et vous n'avez pas obtenu de réponse satisfaisante.
-                    </p>
+                    <p>Cette procédure est à utiliser dans le cas suivant : vous avez signalé au responsable du site internet un défaut d'accessibilité qui vous empêche d'accéder à un contenu ou à un des services du portail et vous n'avez pas obtenu de réponse satisfaisante.</p>
                     <p>Vous pouvez :</p>
                     <ul>
                         <li>Écrire un message au Défenseur des droits</li>
