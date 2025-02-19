@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "hijack",
     "hijack.contrib.admin",
     "pgtrigger",
+    "slippers",
     # Register adapters before to load allauth apps.
     "itou.allauth_adapters",
     "allauth",
@@ -174,7 +175,8 @@ TEMPLATES = [
                 "itou.utils.context_processors.expose_enums",
                 "itou.utils.context_processors.matomo",
                 "itou.utils.context_processors.active_announcement_campaign",
-            ]
+            ],
+            "builtins": ["slippers.templatetags.slippers"],
         },
     }
 ]

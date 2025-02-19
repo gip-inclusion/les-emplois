@@ -335,6 +335,7 @@ django==5.1.6 \
     #   django-xworkflows
     #   djangorestframework
     #   drf-spectacular
+    #   slippers
 django-allauth==65.4.1 \
     --hash=sha256:60b32aef7dbbcc213319aa4fd8f570e985266ea1162ae6ef7a26a24efca85c8c
     # via -r requirements/base.txt
@@ -1256,6 +1257,7 @@ pyyaml==6.0.2 \
     #   -r requirements/base.txt
     #   djlint
     #   drf-spectacular
+    #   slippers
 pyzipper==0.3.6 \
     --hash=sha256:0adca90a00c36a93fbe49bfa8c5add452bfe4ef85a1b8e3638739dd1c7b26bfc \
     --hash=sha256:6d097f465bfa47796b1494e12ea65d1478107d38e13bc56f6e58eedc4f6c1a87
@@ -1538,6 +1540,10 @@ six==1.17.0 \
     #   html5lib
     #   jsbeautifier
     #   python-dateutil
+slippers==0.6.2 \
+    --hash=sha256:4cb555b8822ba0d404e5405723f5d723994022c29046008ee917081031bc0cf1 \
+    --hash=sha256:739e05f85354becbf0a65daab831eea62557d89e7512042209ab629af4378bca
+    # via -r requirements/base.txt
 sniffio==1.3.1 \
     --hash=sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2 \
     --hash=sha256:f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc
@@ -1575,12 +1581,23 @@ tqdm==4.67.1 \
     # via
     #   -r requirements/base.txt
     #   djlint
+typeguard==2.13.3 \
+    --hash=sha256:00edaa8da3a133674796cf5ea87d9f4b4c367d77476e185e80251cc13dfbb8c4 \
+    --hash=sha256:5e3e3be01e887e7eafae5af63d1f36c849aaa94e3a0112097312aabfa16284f1
+    # via
+    #   -r requirements/base.txt
+    #   slippers
 typing-extensions==4.12.2 \
     --hash=sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d \
     --hash=sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8
     # via
+    #   -r requirements/base.txt
+    #   anyio
     #   beautifulsoup4
     #   faker
+    #   psycopg
+    #   referencing
+    #   slippers
 tzdata==2025.1 \
     --hash=sha256:24894909e88cdb28bd1636c6887801df64cb485bd593f2fd83ef29075a81d694 \
     --hash=sha256:7e127113816800496f027041c570f50bcd464a020098a3b6b199517772303639
