@@ -18,13 +18,195 @@ from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
+class TestGroupLists:
+    @pytest.mark.parametrize(
+        "factory,access",
+        [
+            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(EmployerFactory, with_company=True), True],
+            [PrescriberFactory, True],  # we don't need authorized organizations as of today
+            [partial(LaborInspectorFactory, membership=True), False],
+        ],
+        ids=[
+            "job_seeker",
+            "employer",
+            "prescriber",
+            "labor_inspector",
+        ],
+    )
+    def test_permissions(self, client, factory, access):
+        client.force_login(factory())
+        for route in ["gps:group_list", "gps:old_group_list"]:
+            response = client.get(reverse(route))
+            if access:
+                assert response.status_code == 200
+            else:
+                assert response.status_code == 403
+
+    @freezegun.freeze_time("2024-06-21", tick=True)
+    def test_group_list(self, snapshot, client):
+        user = PrescriberFactory(
+            membership__organization__authorized=True, membership__organization__for_snapshot=True
+        )
+        client.force_login(user)
+
+        # Nominal case
+        # Groups created latelly should come first.
+        group_1 = FollowUpGroupFactory(for_snapshot=True)
+        FollowUpGroupMembershipFactory(
+            follow_up_group=group_1,
+            is_referent=True,
+            member__first_name="John",
+            member__last_name="Doe",
+        )
+        FollowUpGroup.objects.follow_beneficiary(group_1.beneficiary, user)
+
+        # We are referent
+        group_2 = FollowUpGroupMembershipFactory(
+            follow_up_group__beneficiary__first_name="François",
+            follow_up_group__beneficiary__last_name="Le Français",
+            is_referent=True,
+            member=user,
+        ).follow_up_group
+
+        # No referent
+        group_3 = FollowUpGroupMembershipFactory(
+            follow_up_group__beneficiary__first_name="Jean",
+            follow_up_group__beneficiary__last_name="Bon",
+            is_referent=False,
+            member=user,
+        ).follow_up_group
+
+        # old membership
+        FollowUpGroupMembershipFactory(ended_at=timezone.localdate(), member=user)
+
+        # inactive membership
+        FollowUpGroupMembershipFactory(is_active=False, member=user)
+
+        with assertSnapshotQueries(snapshot):
+            response = client.get(reverse("gps:group_list"))
+        groups = parse_response_to_soup(
+            response,
+            selector="#follow-up-groups-section",
+            replace_in_attr=[
+                ("href", f"/gps/details/{group.beneficiary.public_id}", "/gps/details/[Public ID of beneficiary]")
+                for group in [group_1, group_2, group_3]
+            ],
+        )
+        assert str(groups) == snapshot(name="test_my_groups__group_card")
+
+        assertContains(response, f'<a class="nav-link active" href="{reverse("gps:group_list")}">')
+
+        # Test `is_referent` display.
+        group_1 = FollowUpGroupFactory(memberships=1, beneficiary__first_name="Janis", beneficiary__last_name="Joplin")
+        FollowUpGroup.objects.follow_beneficiary(group_1.beneficiary, user, is_referent=True)
+        response = client.get(reverse("gps:group_list"))
+        assertContains(response, "vous êtes référent")
+
+    @freezegun.freeze_time("2024-06-21", tick=True)
+    def test_old_group_list(self, snapshot, client):
+        user = PrescriberFactory(
+            membership__organization__authorized=True, membership__organization__for_snapshot=True
+        )
+        client.force_login(user)
+
+        # old membership
+        membership = FollowUpGroupMembershipFactory(
+            follow_up_group__beneficiary__first_name="Jean",
+            follow_up_group__beneficiary__last_name="Bon",
+            is_referent=False,
+            ended_at=timezone.localdate(),
+            member=user,
+        )
+
+        # ongoing membership
+        FollowUpGroupMembershipFactory(member=user)
+
+        # inactive membership
+        FollowUpGroupMembershipFactory(is_active=False, member=user)
+
+        with assertSnapshotQueries(snapshot):
+            response = client.get(reverse("gps:old_group_list"))
+        groups = parse_response_to_soup(
+            response,
+            selector="#follow-up-groups-section",
+            replace_in_attr=[
+                (
+                    "href",
+                    f"/gps/details/{membership.follow_up_group.beneficiary.public_id}",
+                    "/gps/details/[Public ID of beneficiary]",
+                )
+            ],
+        )
+        assert str(groups) == snapshot(name="test_my_groups__group_card")
+
+        assertContains(response, f'<a class="nav-link active" href="{reverse("gps:old_group_list")}">')
+
+    def test_groups_pagination_and_name_filter(self, client):
+        prescriber = PrescriberFactory(membership__organization__authorized=True)
+        created_groups = FollowUpGroupFactory.create_batch(51, memberships=1, memberships__member=prescriber)
+
+        client.force_login(prescriber)
+        my_groups_url = reverse("gps:group_list")
+        response = client.get(my_groups_url)
+        assert len(response.context["memberships_page"].object_list) == 50
+        assert f"{my_groups_url}?page=2" in response.content.decode()
+
+        # Filter by beneficiary name.
+        beneficiary = created_groups[0].beneficiary
+        response = client.get(my_groups_url, {"beneficiary": beneficiary.pk})
+        memberships_page = response.context["memberships_page"]
+        assert len(memberships_page.object_list) == 1
+        assert memberships_page[0].follow_up_group.beneficiary == beneficiary
+        # Assert 11 names are displayed in the dropdown.
+        form = response.context["filters_form"]
+        assert len(form.fields["beneficiary"].choices) == 51
+
+        # Inactive memberships should not be displayed in the dropdown.
+        membership = created_groups[0].memberships.first()
+        membership.is_active = False
+        membership.save()
+        response = client.get(my_groups_url)
+        form = response.context["filters_form"]
+        assert len(form.fields["beneficiary"].choices) == 50
+
+        # Filtering by another beneficiary should not be allowed.
+        beneficiary = FollowUpGroupFactory().beneficiary
+        response = client.get(my_groups_url, {"beneficiary": beneficiary.pk})
+        memberships_page = response.context["memberships_page"]
+        assert len(memberships_page.object_list) == 50
+
+        # HTMX
+        beneficiary = created_groups[-1].beneficiary
+        response = client.get(my_groups_url, {"beneficiary": beneficiary.pk})
+        page = parse_response_to_soup(response, selector="#main")
+        [results] = page.select("#follow-up-groups-section")
+
+        response = client.get(
+            my_groups_url,
+            {"beneficiary": beneficiary.pk},
+            headers={"HX-Request": "true"},
+        )
+        update_page_with_htmx(page, f"form[hx-get='{my_groups_url}']", response)
+
+        response = client.get(
+            my_groups_url,
+            {"beneficiary": beneficiary.pk},
+        )
+        fresh_results = parse_response_to_soup(response, selector="#follow-up-groups-section")
+        assertSoupEqual(results, fresh_results)
+
+
+# tests that will soon be removed or re-written
+# -------------------------------------------------------------------------------------------
+
+
 def test_job_seeker_cannot_use_gps(client):
     job_seeker = JobSeekerFactory()
     client.force_login(job_seeker)
     group = FollowUpGroupFactory(beneficiary=job_seeker)
 
     for route, kwargs in [
-        ("gps:group_list", {}),
         ("gps:leave_group", {"group_id": group.pk}),
         ("gps:toggle_referent", {"group_id": group.pk}),
     ]:
@@ -32,150 +214,6 @@ def test_job_seeker_cannot_use_gps(client):
         assert response.status_code == 403
     response = client.get(reverse("gps:user_details", kwargs={"public_id": job_seeker.public_id}))
     assert response.status_code == 403
-
-
-@pytest.mark.parametrize(
-    "factory,access",
-    [
-        [partial(JobSeekerFactory, for_snapshot=True), None],
-        [partial(EmployerFactory, with_company=True), "full"],
-        [PrescriberFactory, "partial"],  # no org
-        [PrescriberFactory, "partial"],  # non authorized org
-        [
-            partial(
-                PrescriberFactory,
-                membership=True,
-                membership__organization__authorized=True,
-            ),
-            "full",
-        ],  # authorized_org
-        [partial(LaborInspectorFactory, membership=True), None],
-    ],
-    ids=[
-        "job_seeker",
-        "employer",
-        "prescriber_no_org",
-        "prescriber_non_authorized_org",
-        "prescriber",
-        "labor_inspector",
-    ],
-)
-def test_gps_access(client, factory, access):
-    client.force_login(factory())
-    response = client.get(reverse("gps:group_list"))
-    FEATURE_INVITE = "<span>Inviter un partenaire</span>"
-    FEATURE_ADD = "<span>Ajouter un bénéficiaire</span>"
-    if access is None:
-        assert response.status_code == 403
-    else:
-        assertContains(response, FEATURE_INVITE)
-        assertNotContains(response, FEATURE_ADD)
-
-
-@freezegun.freeze_time("2024-06-21", tick=True)
-def test_group_list(snapshot, client):
-    user = PrescriberFactory(membership__organization__authorized=True, membership__organization__for_snapshot=True)
-    client.force_login(user)
-
-    # Nominal case
-    # Groups created latelly should come first.
-    group_1 = FollowUpGroupFactory(for_snapshot=True)
-    FollowUpGroupMembershipFactory(
-        follow_up_group=group_1,
-        is_referent=True,
-        member__first_name="John",
-        member__last_name="Doe",
-    )
-    FollowUpGroup.objects.follow_beneficiary(group_1.beneficiary, user)
-
-    # We are referent
-    group_2 = FollowUpGroupMembershipFactory(
-        follow_up_group__beneficiary__first_name="François",
-        follow_up_group__beneficiary__last_name="Le Français",
-        is_referent=True,
-        member=user,
-    ).follow_up_group
-
-    # No referent
-    group_3 = FollowUpGroupMembershipFactory(
-        follow_up_group__beneficiary__first_name="Jean",
-        follow_up_group__beneficiary__last_name="Bon",
-        is_referent=False,
-        member=user,
-    ).follow_up_group
-
-    # old membership
-    FollowUpGroupMembershipFactory(ended_at=timezone.localdate(), member=user)
-
-    # inactive membership
-    FollowUpGroupMembershipFactory(is_active=False, member=user)
-
-    with assertSnapshotQueries(snapshot):
-        response = client.get(reverse("gps:group_list"))
-    groups = parse_response_to_soup(
-        response,
-        selector="#follow-up-groups-section",
-        replace_in_attr=[
-            ("href", f"/gps/details/{group.beneficiary.public_id}", "/gps/details/[Public ID of beneficiary]")
-            for group in [group_1, group_2, group_3]
-        ],
-    )
-    assert str(groups) == snapshot(name="test_my_groups__group_card")
-
-    assertContains(response, f'<a class="nav-link active" href="{reverse("gps:group_list")}">')
-
-    # Test `is_referent` display.
-    group_1 = FollowUpGroupFactory(memberships=1, beneficiary__first_name="Janis", beneficiary__last_name="Joplin")
-    FollowUpGroup.objects.follow_beneficiary(group_1.beneficiary, user, is_referent=True)
-    response = client.get(reverse("gps:group_list"))
-    assertContains(response, "vous êtes référent")
-
-
-@freezegun.freeze_time("2024-06-21", tick=True)
-def test_old_group_list(snapshot, client):
-    user = PrescriberFactory(membership__organization__authorized=True, membership__organization__for_snapshot=True)
-    client.force_login(user)
-
-    # old membership
-    membership = FollowUpGroupMembershipFactory(
-        follow_up_group__beneficiary__first_name="Jean",
-        follow_up_group__beneficiary__last_name="Bon",
-        is_referent=False,
-        ended_at=timezone.localdate(),
-        member=user,
-    )
-
-    # ongoing membership
-    FollowUpGroupMembershipFactory(member=user)
-
-    # inactive membership
-    FollowUpGroupMembershipFactory(is_active=False, member=user)
-
-    with assertSnapshotQueries(snapshot):
-        response = client.get(reverse("gps:old_group_list"))
-    groups = parse_response_to_soup(
-        response,
-        selector="#follow-up-groups-section",
-        replace_in_attr=[
-            (
-                "href",
-                f"/gps/details/{membership.follow_up_group.beneficiary.public_id}",
-                "/gps/details/[Public ID of beneficiary]",
-            )
-        ],
-    )
-    assert str(groups) == snapshot(name="test_my_groups__group_card")
-
-    assertContains(response, f'<a class="nav-link active" href="{reverse("gps:old_group_list")}">')
-
-
-def test_my_groups_as_non_authorized_precriber(client):
-    user = PrescriberFactory()
-    client.force_login(user)
-
-    response = client.get(reverse("gps:group_list"))
-    assertContains(response, "Demander l'ajout d'un bénéficiaire")
-    assertContains(response, "https://formulaires.gps.inclusion.gouv.fr/ajouter-usager?")
 
 
 def test_leave_group(client):
@@ -396,61 +434,6 @@ def test_display_participant_contact_info_not_allowed(client):
     assert response.status_code == 404
     response = client.post(display_email_url)
     assert response.status_code == 404
-
-
-def test_groups_pagination_and_name_filter(client):
-    prescriber = PrescriberFactory(membership__organization__authorized=True)
-    created_groups = FollowUpGroupFactory.create_batch(51, memberships=1, memberships__member=prescriber)
-
-    client.force_login(prescriber)
-    my_groups_url = reverse("gps:group_list")
-    response = client.get(my_groups_url)
-    assert len(response.context["memberships_page"].object_list) == 50
-    assert f"{my_groups_url}?page=2" in response.content.decode()
-
-    # Filter by beneficiary name.
-    beneficiary = created_groups[0].beneficiary
-    response = client.get(my_groups_url, {"beneficiary": beneficiary.pk})
-    memberships_page = response.context["memberships_page"]
-    assert len(memberships_page.object_list) == 1
-    assert memberships_page[0].follow_up_group.beneficiary == beneficiary
-    # Assert 11 names are displayed in the dropdown.
-    form = response.context["filters_form"]
-    assert len(form.fields["beneficiary"].choices) == 51
-
-    # Inactive memberships should not be displayed in the dropdown.
-    membership = created_groups[0].memberships.first()
-    membership.is_active = False
-    membership.save()
-    response = client.get(my_groups_url)
-    form = response.context["filters_form"]
-    assert len(form.fields["beneficiary"].choices) == 50
-
-    # Filtering by another beneficiary should not be allowed.
-    beneficiary = FollowUpGroupFactory().beneficiary
-    response = client.get(my_groups_url, {"beneficiary": beneficiary.pk})
-    memberships_page = response.context["memberships_page"]
-    assert len(memberships_page.object_list) == 50
-
-    # HTMX
-    beneficiary = created_groups[-1].beneficiary
-    response = client.get(my_groups_url, {"beneficiary": beneficiary.pk})
-    page = parse_response_to_soup(response, selector="#main")
-    [results] = page.select("#follow-up-groups-section")
-
-    response = client.get(
-        my_groups_url,
-        {"beneficiary": beneficiary.pk},
-        headers={"HX-Request": "true"},
-    )
-    update_page_with_htmx(page, f"form[hx-get='{my_groups_url}']", response)
-
-    response = client.get(
-        my_groups_url,
-        {"beneficiary": beneficiary.pk},
-    )
-    fresh_results = parse_response_to_soup(response, selector="#follow-up-groups-section")
-    assertSoupEqual(results, fresh_results)
 
 
 def test_contact_information_display(client, snapshot):

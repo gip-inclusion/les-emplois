@@ -1,441 +1,5 @@
 # serializer version: 1
-# name: test_beneficiary_details
-  '''
-  <main class="s-main" id="main" role="main">
-              <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
-  </div>
-  
-              <section class="s-title-02">
-                  <div class="s-title-02__container container">
-                      <div class="s-title-02__row row">
-                          <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-      <div class="c-prevstep">
-          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/gps/groups/list">
-              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
-              <span>
-                  Retour
-                  à la liste
-              </span>
-          </a>
-      </div>
-  
-  
-  
-                              
-      <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
-          <h1 class="m-0">Jane DOE</h1>
-          <div aria-label="Actions sur le bénéficiaire" class="d-flex flex-column flex-md-row gap-3" role="group">
-              
-              <a aria-label="Ne plus suivre Jane DOE" class="btn btn-lg btn-outline-primary btn-ico" data-bs-body="Vous pourrez toujours suivre ce bénéficiaire de nouveau plus tard." data-bs-confirm-text="Ne plus suivre" data-bs-confirm-url="/gps/groups/[PK of group]/leave" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de ne plus vouloir suivre Jane DOE ?" data-bs-toggle="modal" href="/gps/details/7614fc4b-aef9-4694-ab17-12324300180a">
-                  <i aria-hidden="true" class="ri-user-unfollow-line fw-medium"></i>
-                  <span>Ne plus suivre</span>
-              </a>
-  
-              
-                  
-                  <a aria-label="Ne plus être référent de Jane DOE" class="btn btn-lg btn-primary btn-ico" data-bs-body="Vous pourrez toujours devenir référent de ce bénéficiaire plus tard." data-bs-confirm-text="Ne plus être référent" data-bs-confirm-url="/gps/groups/[PK of group]/toggle_referent" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de ne plus vouloir être référent de Jane DOE ?" data-bs-toggle="modal" href="/gps/details/7614fc4b-aef9-4694-ab17-12324300180a">
-                      <i aria-hidden="true" class="ri-map-pin-user-line fw-medium"></i>
-                      <span>Ne plus être référent</span>
-                  </a>
-              
-  
-              
-          </div>
-      </div>
-  
-                              
-                                  
-  
-  
-                              
-                              
-                          </div>
-                      </div>
-                  </div>
-              </section>
-  
-              
-      <section class="s-section">
-          <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12" id="beneficiary_details_container">
-                      
-                      <div class="c-box">
-                          <h2>Données administratives</h2>
-                          <hr/>
-                          <div class="row">
-                              <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                  <ul class="list-data">
-                                      <li>
-                                          <small>Prénom</small>
-                                          <strong>Jane</strong>
-                                      </li>
-                                      <li>
-                                          <small>Nom</small>
-                                          <strong>DOE</strong>
-                                      </li>
-                                      <li>
-                                          <small>Date de naissance</small>
-                                          
-                                              <strong>01/01/1990</strong>
-                                          
-                                      </li>
-                                      <li>
-                                          <small>Adresse e-mail</small>
-                                          <strong>jane.doe@test.local</strong>
-                                          
-                                          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-                                      </li>
-                                      <li>
-                                          <small>Téléphone</small>
-                                          
-                                              <strong>06 12 34 56 78</strong>
-                                              
-                                              <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-                                          
-                                      </li>
-                                      <li>
-                                          <small>Adresse</small>
-                                          
-                                              <address>12 rue Georges Bizet, 35000 Rennes</address>
-                                          
-                                      </li>
-                                  </ul>
-                              </div>
-                              <div class="col-12 col-md-6">
-                                  <ul class="list-data">
-                                      <li>
-                                          <small>Niveau de formation</small>
-                                          
-                                              <strong>Formation de niveau BAC</strong>
-                                          
-                                      </li>
-                                      
-                                      
-                                      
-                                      
-                                      
-                                      
-                                      
-                                      
-                                      <li>
-                                          <small>Identifiant France Travail (ex Pôle emploi)</small>
-  
-                                          
-                                              <i class="text-disabled">Non renseigné</i>
-                                          
-                                      </li>
-                                      <li>
-                                          <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
-                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-ailleurs" type="button">
-                                                  <span>Voir les coordonnées du
-                                                      <br class="d-none d-md-inline"/>
-                                                  conseiller emploi France Travail</span>
-                                              </button>
-                                              <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
-                                                  
-                                                      <p class="mb-0">
-                                                          La fonctionnalité est en test dans deux départements et sera bientôt disponible pour votre territoire.
-                                                      </p>
-                                                  
-                                              </div>
-                                          </div>
-                                      </li>
-                                  </ul>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </section>
-  
-      
-  
-  
-  
-  <section class="s-section">
-      <div class="s-section__container container">
-          <div class="row">
-              <div class="col-12" id="gps_intervenants">
-                  <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
-                      <h2 class="mb-0">Intervenants</h2>
-                      <a class="btn btn-ico btn-primary" href="https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?user_name=Pierre+DUPONT&amp;user_id=[PK of user]&amp;user_email=pierre.dupont%40test.local&amp;user_organization_name=Les+Olivades&amp;user_organization_id=[PK of organization]&amp;user_type=prescriber&amp;beneficiary_name=Jane+DOE&amp;beneficiary_id=[PK of beneficiary]&amp;beneficiary_email=jane.doe%40test.local&amp;success_url=http%3A%2F%2Ftestserver%2Fgps%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a" id="request-new-participant-link">
-                          <i aria-hidden="true" class="ri-user-add-line"></i>
-                          <span>Ajouter un intervenant existant</span>
-                      </a>
-                  </div>
-                  <form>
-                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                      
-                          <div class="c-box c-box--results has-links-inside my-md-4" id="card-[PK of prescriber]">
-                              <div class="c-box--results__header">
-                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                                      <p class="fs-sm mb-0 flex-grow-1">
-                                          <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
-                                          Membre du groupe de suivi depuis le 21/06/2024
-                                      </p>
-                                      
-                                          <div>
-                                              <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
-                                                  <i aria-hidden="true" class="ri-map-pin-user-line"></i>
-                                                  Référent⸱e
-                                              </span>
-                                          </div>
-                                      
-                                  </div>
-                                  <div class="c-box--results__summary">
-                                      
-                                          <i aria-hidden="true" class="ri-home-smile-line"></i>
-                                      
-                                      <div>
-                                          <h3>Pierre DUPONT</h3>
-                                          <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                                              Prescripteur
-                                              pour Les Olivades
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                              <hr class="m-0"/>
-                              <div class="c-box--results__body">
-                                  <ul class="list-data list-data__two-column-md">
-                                      <li>
-                                          <small>Adresse e-mail</small>
-                                          
-                                              <strong>pierre.dupont@test.local</strong>
-  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dupont@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  
-                                          
-                                      </li>
-                                      <li>
-                                          <small>Téléphone</small>
-                                          
-                                              
-                                                  <strong>0612345678</strong>
-  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  
-                                              
-                                          
-                                      </li>
-                                  </ul>
-                              </div>
-                          </div>
-                      
-                          <div class="c-box c-box--results has-links-inside my-md-4" id="card-[PK of participant]">
-                              <div class="c-box--results__header">
-                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                                      <p class="fs-sm mb-0 flex-grow-1">
-                                          <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
-                                          Membre du groupe de suivi depuis le 21/06/2024
-                                      </p>
-                                      
-                                  </div>
-                                  <div class="c-box--results__summary">
-                                      
-                                          <i aria-hidden="true" class="ri-user-line"></i>
-                                      
-                                      <div>
-                                          <h3>François LE FRANÇAIS</h3>
-                                          <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                                              Prescripteur
-                                              
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                              <hr class="m-0"/>
-                              <div class="c-box--results__body">
-                                  <ul class="list-data list-data__two-column-md">
-                                      <li>
-                                          <small>Adresse e-mail</small>
-                                          
-                                              <button class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_email" hx-post="/gps/display/[PK of group]/[Public ID of participant]/email" hx-swap="outerHTML" id="email-[PK of participant]">
-                                                  <div class="stable-text">
-                                                      <i aria-hidden="true" class="ri-mail-line fw-medium"></i>
-                                                      <span>Afficher l'email</span>
-                                                  </div>
-                                                  <div class="loading-text">
-                                                      <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
-                                                      <span>Affichage en cours</span>
-                                                  </div>
-                                              </button>
-                                          
-                                      </li>
-                                      <li>
-                                          <small>Téléphone</small>
-                                          
-                                              
-                                                  <button class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_phone" hx-post="/gps/display/[PK of group]/[Public ID of participant]/phone" hx-swap="outerHTML" id="phone-[PK of participant]">
-                                                      <div class="stable-text">
-                                                          <i aria-hidden="true" class="ri-phone-line fw-medium"></i>
-                                                          <span>Afficher le téléphone</span>
-                                                      </div>
-                                                      <div class="loading-text">
-                                                          <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
-                                                          <span>Affichage en cours</span>
-                                                      </div>
-                                                  </button>
-                                              
-                                          
-                                      </li>
-                                  </ul>
-                              </div>
-                          </div>
-                      
-                  </form>
-              </div>
-          </div>
-      </div>
-  </section>
-  
-  
-          </main>
-  '''
-# ---
-# name: test_contact_information_display[info_displayed]
-  '''
-  <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
-                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-30" type="button">
-                                                  <span>Voir les coordonnées du
-                                                      <br class="d-none d-md-inline"/>
-                                                  conseiller emploi France Travail</span>
-                                              </button>
-                                              <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
-                                                  
-                                                      <ul class="list-unstyled">
-                                                          <li>
-                                                              <i aria-hidden="true" class="ri-user-line fw-normal me-1"></i>Test MacTest
-                                                          </li>
-                                                          <li>
-                                                              <i aria-hidden="true" class="ri-mail-line fw-normal me-1"></i>
-                                                              <a aria-label="Contacter Test MacTest par e-mail" class="text-break text-decoration-none" href="mailto:test.mactest@francetravail.fr">test.mactest@francetravail.fr</a>
-                                                              <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="test.mactest@francetravail.fr" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-                                                          </li>
-                                                      </ul>
-                                                  
-                                              </div>
-                                          </div>
-  '''
-# ---
-# name: test_contact_information_display[info_not_available]
-  '''
-  <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
-                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-30" type="button">
-                                                  <span>Voir les coordonnées du
-                                                      <br class="d-none d-md-inline"/>
-                                                  conseiller emploi France Travail</span>
-                                              </button>
-                                              <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
-                                                  
-                                                      <p class="mb-0">Le conseiller emploi France Travail de ce bénéficiaire n’est pas connu.</p>
-                                                  
-                                              </div>
-                                          </div>
-  '''
-# ---
-# name: test_contact_information_display_not_live[preview_displayed]
-  '''
-  <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
-                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-ailleurs" type="button">
-                                                  <span>Voir les coordonnées du
-                                                      <br class="d-none d-md-inline"/>
-                                                  conseiller emploi France Travail</span>
-                                              </button>
-                                              <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
-                                                  
-                                                      <p class="mb-0">
-                                                          La fonctionnalité est en test dans deux départements et sera bientôt disponible pour votre territoire.
-                                                      </p>
-                                                  
-                                              </div>
-                                          </div>
-  '''
-# ---
-# name: test_display_participant_contact_info
-  '''
-  <div class="c-box c-box--results has-links-inside my-md-4" id="card'[Public ID of target_participant]">
-                              <div class="c-box--results__header">
-                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-                                      <p class="fs-sm mb-0 flex-grow-1">
-                                          <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
-                                          Membre du groupe de suivi depuis le 20/01/2025
-                                      </p>
-                                      
-                                  </div>
-                                  <div class="c-box--results__summary">
-                                      
-                                          <i aria-hidden="true" class="ri-user-line"></i>
-                                      
-                                      <div>
-                                          <h3>Jean DUPONT</h3>
-                                          <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                                              Prescripteur
-                                              
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                              <hr class="m-0"/>
-                              <div class="c-box--results__body">
-                                  <ul class="list-data list-data__two-column-md">
-                                      <li>
-                                          <small>Adresse e-mail</small>
-                                          
-                                              <strong>jean@dupont.fr</strong>
-  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jean@dupont.fr">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  
-                                          
-                                      </li>
-                                      <li>
-                                          <small>Téléphone</small>
-                                          
-                                              
-                                                  <strong>0123456789</strong>
-  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0123456789">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  
-                                              
-                                          
-                                      </li>
-                                  </ul>
-                              </div>
-                          </div>
-  '''
-# ---
-# name: test_group_list
+# name: TestGroupLists.test_group_list
   dict({
     'num_queries': 13,
     'queries': list([
@@ -916,7 +480,7 @@
     ]),
   })
 # ---
-# name: test_group_list[test_my_groups__group_card]
+# name: TestGroupLists.test_group_list[test_my_groups__group_card]
   '''
   <div aria-labelledby="results" class="mt-3 mt-md-4" id="follow-up-groups-section">
       
@@ -1003,7 +567,7 @@
   </div>
   '''
 # ---
-# name: test_old_group_list
+# name: TestGroupLists.test_old_group_list
   dict({
     'num_queries': 13,
     'queries': list([
@@ -1482,7 +1046,7 @@
     ]),
   })
 # ---
-# name: test_old_group_list[test_my_groups__group_card]
+# name: TestGroupLists.test_old_group_list[test_my_groups__group_card]
   '''
   <div aria-labelledby="results" class="mt-3 mt-md-4" id="follow-up-groups-section">
       
@@ -1529,5 +1093,441 @@
   
       
   </div>
+  '''
+# ---
+# name: test_beneficiary_details
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/gps/groups/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
+          <h1 class="m-0">Jane DOE</h1>
+          <div aria-label="Actions sur le bénéficiaire" class="d-flex flex-column flex-md-row gap-3" role="group">
+              
+              <a aria-label="Ne plus suivre Jane DOE" class="btn btn-lg btn-outline-primary btn-ico" data-bs-body="Vous pourrez toujours suivre ce bénéficiaire de nouveau plus tard." data-bs-confirm-text="Ne plus suivre" data-bs-confirm-url="/gps/groups/[PK of group]/leave" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de ne plus vouloir suivre Jane DOE ?" data-bs-toggle="modal" href="/gps/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                  <i aria-hidden="true" class="ri-user-unfollow-line fw-medium"></i>
+                  <span>Ne plus suivre</span>
+              </a>
+  
+              
+                  
+                  <a aria-label="Ne plus être référent de Jane DOE" class="btn btn-lg btn-primary btn-ico" data-bs-body="Vous pourrez toujours devenir référent de ce bénéficiaire plus tard." data-bs-confirm-text="Ne plus être référent" data-bs-confirm-url="/gps/groups/[PK of group]/toggle_referent" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de ne plus vouloir être référent de Jane DOE ?" data-bs-toggle="modal" href="/gps/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                      <i aria-hidden="true" class="ri-map-pin-user-line fw-medium"></i>
+                      <span>Ne plus être référent</span>
+                  </a>
+              
+  
+              
+          </div>
+      </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12" id="beneficiary_details_container">
+                      
+                      <div class="c-box">
+                          <h2>Données administratives</h2>
+                          <hr/>
+                          <div class="row">
+                              <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                  <ul class="list-data">
+                                      <li>
+                                          <small>Prénom</small>
+                                          <strong>Jane</strong>
+                                      </li>
+                                      <li>
+                                          <small>Nom</small>
+                                          <strong>DOE</strong>
+                                      </li>
+                                      <li>
+                                          <small>Date de naissance</small>
+                                          
+                                              <strong>01/01/1990</strong>
+                                          
+                                      </li>
+                                      <li>
+                                          <small>Adresse e-mail</small>
+                                          <strong>jane.doe@test.local</strong>
+                                          
+                                          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+                                      </li>
+                                      <li>
+                                          <small>Téléphone</small>
+                                          
+                                              <strong>06 12 34 56 78</strong>
+                                              
+                                              <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+                                          
+                                      </li>
+                                      <li>
+                                          <small>Adresse</small>
+                                          
+                                              <address>12 rue Georges Bizet, 35000 Rennes</address>
+                                          
+                                      </li>
+                                  </ul>
+                              </div>
+                              <div class="col-12 col-md-6">
+                                  <ul class="list-data">
+                                      <li>
+                                          <small>Niveau de formation</small>
+                                          
+                                              <strong>Formation de niveau BAC</strong>
+                                          
+                                      </li>
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      <li>
+                                          <small>Identifiant France Travail (ex Pôle emploi)</small>
+  
+                                          
+                                              <i class="text-disabled">Non renseigné</i>
+                                          
+                                      </li>
+                                      <li>
+                                          <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
+                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-ailleurs" type="button">
+                                                  <span>Voir les coordonnées du
+                                                      <br class="d-none d-md-inline"/>
+                                                  conseiller emploi France Travail</span>
+                                              </button>
+                                              <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
+                                                  
+                                                      <p class="mb-0">
+                                                          La fonctionnalité est en test dans deux départements et sera bientôt disponible pour votre territoire.
+                                                      </p>
+                                                  
+                                              </div>
+                                          </div>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+      
+  
+  
+  
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12" id="gps_intervenants">
+                  <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
+                      <h2 class="mb-0">Intervenants</h2>
+                      <a class="btn btn-ico btn-primary" href="https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?user_name=Pierre+DUPONT&amp;user_id=[PK of user]&amp;user_email=pierre.dupont%40test.local&amp;user_organization_name=Les+Olivades&amp;user_organization_id=[PK of organization]&amp;user_type=prescriber&amp;beneficiary_name=Jane+DOE&amp;beneficiary_id=[PK of beneficiary]&amp;beneficiary_email=jane.doe%40test.local&amp;success_url=http%3A%2F%2Ftestserver%2Fgps%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a" id="request-new-participant-link">
+                          <i aria-hidden="true" class="ri-user-add-line"></i>
+                          <span>Ajouter un intervenant existant</span>
+                      </a>
+                  </div>
+                  <form>
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      
+                          <div class="c-box c-box--results has-links-inside my-md-4" id="card-[PK of prescriber]">
+                              <div class="c-box--results__header">
+                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+                                      <p class="fs-sm mb-0 flex-grow-1">
+                                          <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
+                                          Membre du groupe de suivi depuis le 21/06/2024
+                                      </p>
+                                      
+                                          <div>
+                                              <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
+                                                  <i aria-hidden="true" class="ri-map-pin-user-line"></i>
+                                                  Référent⸱e
+                                              </span>
+                                          </div>
+                                      
+                                  </div>
+                                  <div class="c-box--results__summary">
+                                      
+                                          <i aria-hidden="true" class="ri-home-smile-line"></i>
+                                      
+                                      <div>
+                                          <h3>Pierre DUPONT</h3>
+                                          <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                                              Prescripteur
+                                              pour Les Olivades
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <hr class="m-0"/>
+                              <div class="c-box--results__body">
+                                  <ul class="list-data list-data__two-column-md">
+                                      <li>
+                                          <small>Adresse e-mail</small>
+                                          
+                                              <strong>pierre.dupont@test.local</strong>
+  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dupont@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  
+                                          
+                                      </li>
+                                      <li>
+                                          <small>Téléphone</small>
+                                          
+                                              
+                                                  <strong>0612345678</strong>
+  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  
+                                              
+                                          
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      
+                          <div class="c-box c-box--results has-links-inside my-md-4" id="card-[PK of participant]">
+                              <div class="c-box--results__header">
+                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+                                      <p class="fs-sm mb-0 flex-grow-1">
+                                          <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
+                                          Membre du groupe de suivi depuis le 21/06/2024
+                                      </p>
+                                      
+                                  </div>
+                                  <div class="c-box--results__summary">
+                                      
+                                          <i aria-hidden="true" class="ri-user-line"></i>
+                                      
+                                      <div>
+                                          <h3>François LE FRANÇAIS</h3>
+                                          <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                                              Prescripteur
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <hr class="m-0"/>
+                              <div class="c-box--results__body">
+                                  <ul class="list-data list-data__two-column-md">
+                                      <li>
+                                          <small>Adresse e-mail</small>
+                                          
+                                              <button class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_email" hx-post="/gps/display/[PK of group]/[Public ID of participant]/email" hx-swap="outerHTML" id="email-[PK of participant]">
+                                                  <div class="stable-text">
+                                                      <i aria-hidden="true" class="ri-mail-line fw-medium"></i>
+                                                      <span>Afficher l'email</span>
+                                                  </div>
+                                                  <div class="loading-text">
+                                                      <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+                                                      <span>Affichage en cours</span>
+                                                  </div>
+                                              </button>
+                                          
+                                      </li>
+                                      <li>
+                                          <small>Téléphone</small>
+                                          
+                                              
+                                                  <button class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_phone" hx-post="/gps/display/[PK of group]/[Public ID of participant]/phone" hx-swap="outerHTML" id="phone-[PK of participant]">
+                                                      <div class="stable-text">
+                                                          <i aria-hidden="true" class="ri-phone-line fw-medium"></i>
+                                                          <span>Afficher le téléphone</span>
+                                                      </div>
+                                                      <div class="loading-text">
+                                                          <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+                                                          <span>Affichage en cours</span>
+                                                      </div>
+                                                  </button>
+                                              
+                                          
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      
+                  </form>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  
+          </main>
+  '''
+# ---
+# name: test_contact_information_display[info_displayed]
+  '''
+  <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
+                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-30" type="button">
+                                                  <span>Voir les coordonnées du
+                                                      <br class="d-none d-md-inline"/>
+                                                  conseiller emploi France Travail</span>
+                                              </button>
+                                              <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
+                                                  
+                                                      <ul class="list-unstyled">
+                                                          <li>
+                                                              <i aria-hidden="true" class="ri-user-line fw-normal me-1"></i>Test MacTest
+                                                          </li>
+                                                          <li>
+                                                              <i aria-hidden="true" class="ri-mail-line fw-normal me-1"></i>
+                                                              <a aria-label="Contacter Test MacTest par e-mail" class="text-break text-decoration-none" href="mailto:test.mactest@francetravail.fr">test.mactest@francetravail.fr</a>
+                                                              <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="test.mactest@francetravail.fr" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+                                                          </li>
+                                                      </ul>
+                                                  
+                                              </div>
+                                          </div>
+  '''
+# ---
+# name: test_contact_information_display[info_not_available]
+  '''
+  <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
+                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-30" type="button">
+                                                  <span>Voir les coordonnées du
+                                                      <br class="d-none d-md-inline"/>
+                                                  conseiller emploi France Travail</span>
+                                              </button>
+                                              <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
+                                                  
+                                                      <p class="mb-0">Le conseiller emploi France Travail de ce bénéficiaire n’est pas connu.</p>
+                                                  
+                                              </div>
+                                          </div>
+  '''
+# ---
+# name: test_contact_information_display_not_live[preview_displayed]
+  '''
+  <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
+                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-ailleurs" type="button">
+                                                  <span>Voir les coordonnées du
+                                                      <br class="d-none d-md-inline"/>
+                                                  conseiller emploi France Travail</span>
+                                              </button>
+                                              <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
+                                                  
+                                                      <p class="mb-0">
+                                                          La fonctionnalité est en test dans deux départements et sera bientôt disponible pour votre territoire.
+                                                      </p>
+                                                  
+                                              </div>
+                                          </div>
+  '''
+# ---
+# name: test_display_participant_contact_info
+  '''
+  <div class="c-box c-box--results has-links-inside my-md-4" id="card'[Public ID of target_participant]">
+                              <div class="c-box--results__header">
+                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+                                      <p class="fs-sm mb-0 flex-grow-1">
+                                          <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
+                                          Membre du groupe de suivi depuis le 20/01/2025
+                                      </p>
+                                      
+                                  </div>
+                                  <div class="c-box--results__summary">
+                                      
+                                          <i aria-hidden="true" class="ri-user-line"></i>
+                                      
+                                      <div>
+                                          <h3>Jean DUPONT</h3>
+                                          <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                                              Prescripteur
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <hr class="m-0"/>
+                              <div class="c-box--results__body">
+                                  <ul class="list-data list-data__two-column-md">
+                                      <li>
+                                          <small>Adresse e-mail</small>
+                                          
+                                              <strong>jean@dupont.fr</strong>
+  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jean@dupont.fr">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  
+                                          
+                                      </li>
+                                      <li>
+                                          <small>Téléphone</small>
+                                          
+                                              
+                                                  <strong>0123456789</strong>
+  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0123456789">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  
+                                              
+                                          
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
   '''
 # ---
