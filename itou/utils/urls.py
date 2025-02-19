@@ -21,19 +21,17 @@ def get_safe_url(request, param_name=None, fallback_url=None, url=None):
             # As a quick fix, we build a new URL without the port.
 
             url_info = urlsplit(url)
-            url_without_port = SplitResult(
+            url_to_check = SplitResult(
                 scheme=url_info.scheme,
                 netloc=url_info.hostname,
                 path=url_info.path,
                 query=url_info.query,
                 fragment=url_info.fragment,
             ).geturl()
-            if url_has_allowed_host_and_scheme(url_without_port, allowed_hosts, require_https):
-                return url
-
         else:
-            if url_has_allowed_host_and_scheme(url, allowed_hosts, require_https):
-                return url
+            url_to_check = url
+        if url_has_allowed_host_and_scheme(url_to_check, allowed_hosts, require_https):
+            return url
 
     return fallback_url
 
