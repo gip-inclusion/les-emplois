@@ -925,6 +925,11 @@ class TestUtilsUrls:
         expected = "/fallback"
         assert url == expected
 
+        request = RequestFactory().post("/", data={"next": "/\t\n//example.com"})
+        url = get_safe_url(request, "next")
+        expected = "/%09%0A//example.com"
+        assert url == expected
+
     def test_get_absolute_url(self):
         url = get_absolute_url()
         assert f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/" == url
