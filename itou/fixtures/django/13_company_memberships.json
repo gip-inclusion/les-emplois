@@ -1,13 +1,12 @@
 [
   {
     "fields": {
+      "company": 2653,
       "created_at": "2020-12-01T10:08:03.596Z",
       "is_active": true,
       "is_admin": true,
       "joined_at": "2019-10-31T14:56:50Z",
       "notifications": {},
-      "company": 2653,
-      "updated_at": "2020-12-01T10:08:03.596Z",
       "updated_by": null,
       "user": 4
     },
@@ -16,13 +15,12 @@
   },
   {
     "fields": {
+      "company": 3850,
       "created_at": "2020-12-01T10:08:03.598Z",
       "is_active": true,
       "is_admin": true,
       "joined_at": "2020-04-09T13:32:00Z",
       "notifications": {},
-      "company": 3850,
-      "updated_at": "2020-12-01T10:08:03.598Z",
       "updated_by": null,
       "user": 6
     },
@@ -31,13 +29,12 @@
   },
   {
     "fields": {
+      "company": 3850,
       "created_at": "2020-12-01T10:08:03.599Z",
       "is_active": true,
       "is_admin": true,
       "joined_at": "2020-04-09T13:38:13Z",
       "notifications": {},
-      "company": 3850,
-      "updated_at": "2020-12-01T10:08:03.599Z",
       "updated_by": null,
       "user": 4
     },
@@ -46,13 +43,12 @@
   },
   {
     "fields": {
+      "company": 3851,
       "created_at": "2020-12-01T10:08:03.600Z",
       "is_active": true,
       "is_admin": false,
       "joined_at": "2020-04-14T16:09:20Z",
       "notifications": {},
-      "company": 3851,
-      "updated_at": "2020-12-01T10:08:03.600Z",
       "updated_by": null,
       "user": 9
     },
@@ -61,13 +57,12 @@
   },
   {
     "fields": {
+      "company": 3852,
       "created_at": "2020-12-01T10:30:23.026Z",
       "is_active": true,
       "is_admin": true,
       "joined_at": "2020-12-01T10:28:57Z",
       "notifications": {},
-      "company": 3852,
-      "updated_at": "2020-12-01T10:31:37.930Z",
       "updated_by": null,
       "user": 6
     },
@@ -76,13 +71,12 @@
   },
   {
     "fields": {
+      "company": 3853,
       "created_at": "2020-12-18T13:08:08.053Z",
       "is_active": true,
       "is_admin": true,
       "joined_at": "2020-12-18T13:08:08.053Z",
       "notifications": {},
-      "company": 3853,
-      "updated_at": "2020-12-18T13:08:08.053Z",
       "updated_by": null,
       "user": 4
     },
@@ -91,13 +85,12 @@
   },
   {
     "fields": {
+      "company": 3854,
       "created_at": "2020-12-18T13:12:02.928Z",
       "is_active": true,
       "is_admin": true,
       "joined_at": "2020-12-18T13:12:02.928Z",
       "notifications": {},
-      "company": 3854,
-      "updated_at": "2020-12-18T13:12:02.928Z",
       "updated_by": null,
       "user": 4
     },
@@ -106,13 +99,12 @@
   },
   {
     "fields": {
+      "company": 3853,
       "created_at": "2020-12-18T13:08:08.053Z",
       "is_active": true,
       "is_admin": true,
       "joined_at": "2020-12-18T13:08:08.053Z",
       "notifications": {},
-      "company": 3853,
-      "updated_at": "2020-12-18T13:08:08.053Z",
       "updated_by": null,
       "user": 6
     },
@@ -121,13 +113,12 @@
   },
   {
     "fields": {
+      "company": 3854,
       "created_at": "2020-12-18T13:12:02.928Z",
       "is_active": true,
       "is_admin": true,
       "joined_at": "2020-12-18T13:12:02.928Z",
       "notifications": {},
-      "company": 3854,
-      "updated_at": "2020-12-18T13:12:02.928Z",
       "updated_by": null,
       "user": 6
     },
@@ -136,13 +127,12 @@
   },
   {
     "fields": {
+      "company": 3855,
       "created_at": "2021-02-22T15:06:22.049Z",
       "is_active": true,
       "is_admin": true,
       "joined_at": "2021-02-22T14:54:17Z",
       "notifications": {},
-      "company": 3855,
-      "updated_at": "2021-02-22T15:06:22.049Z",
       "updated_by": null,
       "user": 16
     },
@@ -151,13 +141,12 @@
   },
   {
     "fields": {
+      "company": 857,
       "created_at": "2021-11-23T13:43:22.049Z",
       "is_active": true,
       "is_admin": true,
       "joined_at": "2021-11-23T13:43:26Z",
       "notifications": {},
-      "company": 857,
-      "updated_at": "2021-11-23T13:43:22.049Z",
       "updated_by": null,
       "user": 25
     },
@@ -166,13 +155,12 @@
   },
   {
     "fields": {
+      "company": 2653,
       "created_at": "2023-06-21T14:01:40.371Z",
       "is_active": true,
       "is_admin": false,
       "joined_at": "2023-06-21T14:01:40.371Z",
       "notifications": {},
-      "company": 2653,
-      "updated_at": "2023-06-21T14:01:40.372Z",
       "updated_by": null,
       "user": 28
     },
@@ -181,13 +169,12 @@
   },
   {
     "fields": {
+      "company": 7,
       "created_at": "2023-06-21T14:19:59.669Z",
       "is_active": true,
       "is_admin": true,
       "joined_at": "2023-06-21T14:19:59.669Z",
       "notifications": {},
-      "company": 7,
-      "updated_at": "2023-06-21T14:19:59.670Z",
       "updated_by": null,
       "user": 28
     },
@@ -196,13 +183,12 @@
   },
   {
     "fields": {
+      "company": 184,
       "created_at": "2023-06-21T14:19:59.676Z",
       "is_active": true,
       "is_admin": true,
       "joined_at": "2023-06-21T14:19:59.676Z",
       "notifications": {},
-      "company": 184,
-      "updated_at": "2023-06-21T14:19:59.676Z",
       "updated_by": null,
       "user": 28
     },
@@ -211,13 +197,12 @@
   },
   {
     "fields": {
+      "company": 249,
       "created_at": "2023-06-21T14:19:59.681Z",
       "is_active": true,
       "is_admin": true,
       "joined_at": "2023-06-21T14:19:59.681Z",
       "notifications": {},
-      "company": 249,
-      "updated_at": "2023-06-21T14:19:59.682Z",
       "updated_by": null,
       "user": 28
     },
@@ -226,13 +211,12 @@
   },
   {
     "fields": {
+      "company": 250,
       "created_at": "2023-06-21T14:19:59.686Z",
       "is_active": true,
       "is_admin": true,
       "joined_at": "2023-06-21T14:19:59.686Z",
       "notifications": {},
-      "company": 250,
-      "updated_at": "2023-06-21T14:19:59.687Z",
       "updated_by": null,
       "user": 28
     },
@@ -241,13 +225,12 @@
   },
   {
     "fields": {
+      "company": 3611,
       "created_at": "2020-12-01T10:08:03.596Z",
       "is_active": true,
       "is_admin": true,
       "joined_at": "2024-03-05T14:19:59.686Z",
       "notifications": {},
-      "company": 3611,
-      "updated_at": "2020-12-01T10:08:03.596Z",
       "updated_by": null,
       "user": 4
     },

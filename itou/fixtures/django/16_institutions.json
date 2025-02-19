@@ -1,8 +1,10 @@
 [
   {
     "fields": {
+      "active_members_email_reminder_last_sent_at": null,
       "address_line_1": "23 rue Borde",
       "address_line_2": "CS 10009",
+      "automatic_geocoding_update": true,
       "ban_api_resolved_address": null,
       "city": "Marseille",
       "coords": null,
@@ -14,16 +16,17 @@
       "kind": "DREETS IAE",
       "name": "DREETS Provence-Alpes-Côte d’Azur",
       "post_code": "13285",
-      "uid": "01237117-9b60-4ac3-b628-93b332fe2c6f",
-      "updated_at": "2021-07-13T15:34:17.765Z"
+      "uid": "01237117-9b60-4ac3-b628-93b332fe2c6f"
     },
     "model": "institutions.institution",
     "pk": 1
   },
   {
     "fields": {
+      "active_members_email_reminder_last_sent_at": null,
       "address_line_1": "",
       "address_line_2": "",
+      "automatic_geocoding_update": true,
       "ban_api_resolved_address": null,
       "city": "",
       "coords": null,
@@ -35,16 +38,17 @@
       "kind": "DDETS IAE",
       "name": "DDETS de Nîmes",
       "post_code": "30972",
-      "uid": "02c9b4ed-110c-4639-8445-aa5ab9937d2c",
-      "updated_at": "2023-06-02T09:35:44.546Z"
+      "uid": "02c9b4ed-110c-4639-8445-aa5ab9937d2c"
     },
     "model": "institutions.institution",
     "pk": 2
   },
   {
     "fields": {
+      "active_members_email_reminder_last_sent_at": null,
       "address_line_1": "",
       "address_line_2": "",
+      "automatic_geocoding_update": true,
       "ban_api_resolved_address": null,
       "city": "",
       "coords": null,
@@ -56,16 +60,17 @@
       "kind": "DDETS GEIQ",
       "name": "DDETS de Nîmes",
       "post_code": "30972",
-      "uid": "acd5ea76-3aad-476a-a2db-5212d90d09b2",
-      "updated_at": "2024-06-10T09:46:14.663Z"
+      "uid": "acd5ea76-3aad-476a-a2db-5212d90d09b2"
     },
     "model": "institutions.institution",
     "pk": 3
   },
   {
     "fields": {
+      "active_members_email_reminder_last_sent_at": null,
       "address_line_1": "23 rue Borde",
       "address_line_2": "CS 10009",
+      "automatic_geocoding_update": true,
       "ban_api_resolved_address": null,
       "city": "Marseille",
       "coords": null,
@@ -77,8 +82,7 @@
       "kind": "DREETS GEIQ",
       "name": "DREETS Provence-Alpes-Côte d’Azur",
       "post_code": "13285",
-      "uid": "90d63648-3ebc-47f6-bf85-fa432ec6514f",
-      "updated_at": "2024-06-10T09:46:14.663Z"
+      "uid": "90d63648-3ebc-47f6-bf85-fa432ec6514f"
     },
     "model": "institutions.institution",
     "pk": 4
@@ -88,6 +92,7 @@
       "active_members_email_reminder_last_sent_at": null,
       "address_line_1": "",
       "address_line_2": "",
+      "automatic_geocoding_update": true,
       "ban_api_resolved_address": null,
       "city": "",
       "coords": null,
@@ -99,8 +104,7 @@
       "kind": "CONVERGENCE",
       "name": "Convergence France",
       "post_code": "",
-      "uid": "0e7c4a44-af0d-4c7f-a34d-2ea0f8215cc1",
-      "updated_at": "2024-08-28T08:33:13.130Z"
+      "uid": "0e7c4a44-af0d-4c7f-a34d-2ea0f8215cc1"
     },
     "model": "institutions.institution",
     "pk": 5

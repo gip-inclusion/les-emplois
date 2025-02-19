@@ -15,6 +15,7 @@
       "pe_notification_exit_code": null,
       "pe_notification_status": "notification_pending",
       "pe_notification_time": null,
+      "public_id": "b2aa1138-8140-4818-b48f-2a82f45e09d0",
       "start_at": "2024-01-01",
       "user": 17
     },
@@ -37,6 +38,7 @@
       "pe_notification_exit_code": null,
       "pe_notification_status": "notification_pending",
       "pe_notification_time": null,
+      "public_id": "211177fd-fe6f-4b00-9cbc-fa694095ca05",
       "start_at": "2024-01-01",
       "user": 21
     },
@@ -59,6 +61,7 @@
       "pe_notification_exit_code": null,
       "pe_notification_status": "notification_pending",
       "pe_notification_time": null,
+      "public_id": "024c88ca-424f-4357-a070-8abcacd04ce6",
       "start_at": "2024-01-01",
       "user": 20
     },
@@ -81,6 +84,7 @@
       "pe_notification_exit_code": null,
       "pe_notification_status": "notification_pending",
       "pe_notification_time": null,
+      "public_id": "76f47915-20e7-4d13-8930-824c2412d0b1",
       "start_at": "2024-01-01",
       "user": 19
     },
@@ -103,6 +107,7 @@
       "pe_notification_exit_code": null,
       "pe_notification_status": "notification_pending",
       "pe_notification_time": null,
+      "public_id": "fec65a2d-f992-4c28-a8e4-ad1ed546ffb5",
       "start_at": "2024-01-01",
       "user": 18
     },

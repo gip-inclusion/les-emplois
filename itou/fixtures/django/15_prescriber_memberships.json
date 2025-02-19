@@ -6,7 +6,6 @@
       "is_admin": true,
       "joined_at": "2020-04-09T13:46:54Z",
       "organization": 115,
-      "updated_at": "2020-12-01T10:08:03.594Z",
       "updated_by": null,
       "user": 3
     },
@@ -20,7 +19,6 @@
       "is_admin": true,
       "joined_at": "2020-04-09T13:49:51Z",
       "organization": 121,
-      "updated_at": "2020-12-01T10:08:03.595Z",
       "updated_by": null,
       "user": 7
     },
@@ -34,7 +32,6 @@
       "is_admin": true,
       "joined_at": "2020-12-01T10:50:58Z",
       "organization": 999,
-      "updated_at": "2020-12-01T10:52:38.385Z",
       "updated_by": null,
       "user": 10
     },
@@ -48,7 +45,6 @@
       "is_admin": true,
       "joined_at": "2020-12-01T10:50:58Z",
       "organization": 999,
-      "updated_at": "2020-12-01T10:52:38.385Z",
       "updated_by": null,
       "user": 11
     },
@@ -62,7 +58,6 @@
       "is_admin": false,
       "joined_at": "2020-12-01T10:50:58Z",
       "organization": 999,
-      "updated_at": "2020-12-01T10:52:38.386Z",
       "updated_by": null,
       "user": 12
     },
@@ -76,7 +71,6 @@
       "is_admin": false,
       "joined_at": "2020-12-01T10:50:58Z",
       "organization": 999,
-      "updated_at": "2020-12-01T10:52:38.386Z",
       "updated_by": null,
       "user": 13
     },
@@ -90,7 +84,6 @@
       "is_admin": false,
       "joined_at": "2020-12-01T10:50:58Z",
       "organization": 999,
-      "updated_at": "2020-12-01T10:52:38.387Z",
       "updated_by": null,
       "user": 14
     },
