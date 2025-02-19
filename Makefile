@@ -68,7 +68,7 @@ fix: fast_fix
 # Django.
 # =============================================================================
 
-.PHONY: populate_db populate_db_with_cities populate_db_minimal
+.PHONY: populate_db
 
 # After migrate
 populate_db_with_reference_data: $(VIRTUAL_ENV)
