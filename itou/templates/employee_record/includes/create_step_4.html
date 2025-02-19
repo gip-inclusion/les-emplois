@@ -21,7 +21,7 @@
                     {% url_add_query secondary_url status=request.GET.status as secondary_url %}
                     {% url_add_query reset_url status=request.GET.status as reset_url %}
                 {% endif %}
-                {% itou_buttons_form primary_label="Suivant" secondary_url=secondary_url reset_url=reset_url %}
+                {% itou_buttons_form primary_label="Suivant" secondary_url=secondary_url reset_url=reset_url show_mandatory_fields_mention=False %}
             </form>
         </div>
     </div>
