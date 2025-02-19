@@ -4,7 +4,7 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory
 
-from itou.common_apps.address.departments import DEPARTMENTS, REGIONS
+from itou.common_apps.address.departments import DEPARTMENTS
 from itou.companies.enums import CompanyKind
 from itou.institutions.enums import InstitutionKind
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -212,28 +212,12 @@ def test_can_view_stats_ft_as_dgft():
 @pytest.mark.parametrize(
     "kind",
     [
+        PrescriberOrganizationKind.CAP_EMPLOI,
+        PrescriberOrganizationKind.ML,
         PrescriberOrganizationKind.CHRS,
         PrescriberOrganizationKind.CHU,
         PrescriberOrganizationKind.OIL,
         PrescriberOrganizationKind.RS_FJT,
-    ],
-)
-@pytest.mark.parametrize("region", ["Île-de-France", "Auvergne-Rhône-Alpes", "Nouvelle-Aquitaine"])
-def test_can_view_stats_ph_limited_access_organization_kind_whitelist(kind, region):
-    organization = PrescriberOrganizationWithMembershipFactory(
-        authorized=True,
-        kind=kind,
-        department=factory.fuzzy.FuzzyChoice(REGIONS[region]),
-    )
-    request = get_request(organization.members.get())
-    assert utils.can_view_stats_ph(request)
-
-
-@pytest.mark.parametrize(
-    "kind",
-    [
-        PrescriberOrganizationKind.CAP_EMPLOI,
-        PrescriberOrganizationKind.ML,
     ],
 )
 def test_can_view_stats_ph_full_access_organization_kind_whitelist(kind):
