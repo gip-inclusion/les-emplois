@@ -739,6 +739,9 @@ class FilterJobApplicationsForm(forms.Form):
                 pass_status_filter |= Q(has_suspended_approval=True)
             filters.append(pass_status_filter)
 
+        if data.get("pass_iae_expired"):
+            filters.append(Q(approval__end_at__lt=timezone.localdate()))
+
         if start_date := data.get("start_date"):
             filters.append(Q(created_at__gte=start_date))
         if end_date := data.get("end_date"):
@@ -784,6 +787,7 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
 
     pass_iae_suspended = forms.BooleanField(label="Suspendu", required=False)
     pass_iae_active = forms.BooleanField(label="Actif", required=False)
+    pass_iae_expired = forms.BooleanField(label="Expiré", required=False)
     criteria = forms.MultipleChoiceField(required=False, label="", widget=Select2MultipleWidget)
     eligibility_validated = forms.BooleanField(label="Valide", required=False)
     eligibility_pending = forms.BooleanField(label="À valider", required=False)
@@ -888,6 +892,7 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
             del self.fields["eligibility_pending"]
             del self.fields["pass_iae_active"]
             del self.fields["pass_iae_suspended"]
+            del self.fields["pass_iae_expired"]
 
         if not company.can_have_prior_action:
             # Drop "pré-embauche" state from filter for non-GEIQ companies

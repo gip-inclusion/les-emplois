@@ -408,6 +408,23 @@ class TestProcessListSiae:
         response = client.get(reverse("apply:list_for_siae"), {"pass_iae_active": True, "pass_iae_suspended": True})
         assert response.context["job_applications_page"].object_list == [job_application]
 
+        # So far no approval was expired
+        response = client.get(reverse("apply:list_for_siae"), {"pass_iae_expired": True})
+        assert response.context["job_applications_page"].object_list == []
+
+        jobapp_with_expired_pass = JobApplicationFactory(
+            with_approval=True,
+            state=JobApplicationState.ACCEPTED,
+            hiring_start_at=yesterday - timezone.timedelta(days=365),
+            approval__start_at=yesterday - timezone.timedelta(days=365),
+            approval__end_at=yesterday,
+            to_company=company,
+        )
+
+        # The pass_iae_expired filter works as expected
+        response = client.get(reverse("apply:list_for_siae"), {"pass_iae_expired": True})
+        assert response.context["job_applications_page"].object_list == [jobapp_with_expired_pass]
+
     def test_list_for_siae_filtered_by_eligibility_state(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
