@@ -1,0 +1,7 @@
+<div class="c-title">
+    <div class="c-title__main">{{ c_title__main }}</div>
+    {% if c_title__cta %}
+        <div class="c-title__cta" {% attrs role aria-label %}>{{ c_title__cta }}</div>
+    {% endif %}
+    {% if c_title__secondary %}<div class="c-title__secondary">{{ c_title__secondary }}</div>{% endif %}
+</div>
