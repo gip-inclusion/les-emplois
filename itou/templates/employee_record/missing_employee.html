@@ -31,11 +31,10 @@
                                 </p>
                             {% elif case == MissingEmployeeCase.NO_APPROVAL %}
                                 <p>
-                                    Ce salarié a été embauché mais sans PASS IAE car vous aviez cliqué sur l’option “Embaucher sans aide au poste”,
-                                    par conséquent la création de fiche salarié est impossible.
+                                    La création d’une fiche salarié pour cette personne est impossible car vous aviez déclaré une embauche sans aide au poste. Par conséquent, elle ne possède pas de PASS IAE.
                                 </p>
                                 <p>
-                                    Si vous souhaitez créer une fiche salarié, vous devez préalablement déclarer une embauche afin de récupérer un PASS IAE.
+                                    Si vous souhaitez bénéficier d’une aide au poste, vous devez d’abord obtenir un PASS IAE en effectuant une nouvelle embauche, puis créer sa fiche salarié.
                                 </p>
                             {% else %}
                                 <p>Ce salarié a {{ approvals_data|length }} PASS IAE disponible{{ approvals_data|length|pluralizefr }}</p>
@@ -51,17 +50,24 @@
                                         </p>
                                     {% elif approval_case == MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_OTHER_COMPANY %}
                                         <p>
-                                            Une fiche salarié existe déjà pour ce PASS IAE dans une autre structure avec la même convention : {{ employee_record.job_application.to_company.display_name }}
+                                            Une fiche salarié existe déjà pour ce PASS IAE dans une autre structure avec la même convention : {{ employee_record.job_application.to_company.kind }} {{ employee_record.job_application.to_company.display_name }} - SIRET {{ employee_record.job_application.to_company.siret|format_siret }}
                                         </p>
                                         <p>
-                                            Si vous souhaitez visualiser cette fiche salarié, vous devez vous connecter au tableau de bord de cette structure. En cas de difficultés vous pouvez
-                                            <a href="{{ ITOU_HELP_CENTER_URL }}/requests/new" target="_blank" rel="noopener" class="has-external-link">
-                                                nous contacter
-                                            </a>.
+                                            Si vous souhaitez visualiser cette fiche salarié, vous devez vous connecter au tableau de bord de cette structure.
+                                        </p>
+                                        <p>
+                                            Seule la première embauche avec ce PASS IAE nécessite une transmission de la fiche salarié.
+                                            <br>
+                                            En cas de besoin vous pouvez ajouter un nouveau contrat depuis votre espace Extranet IAE 2.0 de l’ASP.
                                         </p>
                                     {% elif approval_case == MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_SAME_COMPANY %}
                                         <p>
                                             Une fiche salarié existe déjà pour ce PASS IAE : <a href="{% url 'employee_record_views:summary' employee_record.pk %}">Voir la fiche salarié</a>.
+                                        </p>
+                                        <p>
+                                            Seule la première embauche avec ce PASS IAE, nécessite une transmission de la fiche salarié.
+                                            <br>
+                                            En cas de besoin vous pouvez ajouter un nouveau contrat depuis votre espace Extranet IAE 2.0 de l’ASP.
                                         </p>
                                     {% else %}
                                         <a href="{% url 'employee_record_views:create' job_application_id=job_application.pk %}">Créer la fiche salarié</a>
