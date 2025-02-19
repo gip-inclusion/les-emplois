@@ -20,8 +20,7 @@ from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
-def assert_contains_button_apply_for(response, job_seeker, with_city=True, with_intro_js=False):
-    id_intro_js = 'id="introJsBtnPostuler"' if with_intro_js else ""
+def assert_contains_button_apply_for(response, job_seeker, with_city=True):
     city = f"&city={job_seeker.city_slug}" if with_city else ""
     assertContains(
         response,
@@ -32,7 +31,6 @@ def assert_contains_button_apply_for(response, job_seeker, with_city=True, with_
                 data-matomo-event="true"
                 data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="postuler-pour-ce-candidat"
-                {id_intro_js}
                 href="{reverse("search:employers_results")}?job_seeker={job_seeker.public_id}{city}">
                 <i class="ri-draft-line" aria-label="Postuler pour ce candidat"></i>
             </a>
@@ -150,7 +148,7 @@ def test_multiple(client, snapshot):
 
         # Address is in search URL
         for i, application in enumerate([job_app, job_app2, job_app3]):
-            assert_contains_button_apply_for(response, application.job_seeker, with_city=True, with_intro_js=i == 0)
+            assert_contains_button_apply_for(response, application.job_seeker, with_city=True)
 
         # Job seeker does not have an address, so it is not in the URL
         assert_contains_button_apply_for(response, job_app4.job_seeker, with_city=False)
@@ -158,7 +156,7 @@ def test_multiple(client, snapshot):
     # Current user cannot view personal information, so the city is not in the URL
     client.force_login(unauthorized_prescriber)
     response = client.get(url)
-    assert_contains_button_apply_for(response, job_app5.job_seeker, with_city=False, with_intro_js=True)
+    assert_contains_button_apply_for(response, job_app5.job_seeker, with_city=False)
 
 
 @freeze_time("2024-08-30")
@@ -243,7 +241,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         # Job seekers are displayed for the prescriber
         for job_seeker in [alain, bernard, charlotte, david]:
             assert_contains_job_seeker(response, job_seeker, with_personal_information=True)
-            assert_contains_button_apply_for(response, job_seeker, with_city=True, with_intro_js=job_seeker == alain)
+            assert_contains_button_apply_for(response, job_seeker, with_city=True)
 
         # Job seeker not displayed for the prescriber
         assertNotContains(response, edouard.get_full_name())
@@ -355,7 +353,7 @@ def test_multiple_with_job_seekers_created_by_unauthorized_organization(client):
     response = client.get(url)
     # A job seeker created by the user is shown with personal information
     assert_contains_job_seeker(response, alain, with_personal_information=True)
-    assert_contains_button_apply_for(response, alain, with_city=True, with_intro_js=True)
+    assert_contains_button_apply_for(response, alain, with_city=True)
 
     # A job seeker created by a member of the unauthorized organization is shown *without* personal information
     assert_contains_job_seeker(response, bernard, with_personal_information=False)
@@ -407,7 +405,7 @@ def test_job_seeker_created_by_prescriber_without_org(client):
     assertNotContains(response, reverse("job_seekers_views:details", kwargs={"public_id": alain.public_id}))
 
     assert_contains_job_seeker(response, bernard, with_personal_information=True)
-    assert_contains_button_apply_for(response, bernard, with_city=True, with_intro_js=True)
+    assert_contains_button_apply_for(response, bernard, with_city=True)
 
     assert_contains_job_seeker(response, charlotte, with_personal_information=True)
     assert_contains_button_apply_for(response, charlotte, with_city=True)

@@ -58,40 +58,4 @@
 {% block script %}
     {{ block.super }}
     <script src='{% static "js/htmx_compat.js" %}'></script>
-    <script nonce="{{ CSP_NONCE }}">
-        function show() {
-            for (const cookie of document.cookie.split(';')) {
-                const [name, value] = cookie.split('=');
-                if ('introJsBtnPostulerDontShowAgain' == name.trim()) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        const breakpointMD = getComputedStyle(document.documentElement).getPropertyValue('--bs-breakpoint-md');
-        const applyBtn = document.getElementById('introJsBtnPostuler');
-        if (applyBtn && show() && window.matchMedia('(min-width: ' + breakpointMD + ')').matches) {
-            setTimeout(function() {
-                introJs().setOptions({
-                        disableInteraction: true,
-                        showProgress: false,
-                        showBullets: false,
-                        skipLabel: '',
-                        nextLabel: 'Suivant',
-                        prevLabel: 'Précédent',
-                        doneLabel: 'Fin',
-                        steps: [{
-                            title: 'Postulez directement pour ce candidat !',
-                            element: document.querySelector('#introJsBtnPostuler'),
-                            intro: 'En cliquant ici, vous n’aurez pas à ressaisir les informations de ce candidat en postulant.'
-                        }]
-                    })
-                    .onexit(() => {
-                        document.cookie = `introJsBtnPostulerDontShowAgain=true; max-age=${90 * 24 * 60 * 60}; samesite=Lax;`;
-                    })
-                    .start();
-            }, 600)
-        }
-    </script>
 {% endblock %}
