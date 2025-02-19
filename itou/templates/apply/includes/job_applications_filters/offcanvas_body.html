@@ -29,7 +29,7 @@
             <input type="hidden" name="{{ filters_form.job_seeker.name }}" value="{{ filters_form.job_seeker.value }}">
         {% endif %}
         <hr>
-        {% include "apply/includes/job_applications_filters/field_collapse.html" with field=filters_form.archived legend="Type de candidature" only %}
+        {% include "apply/includes/job_applications_filters/field_collapse.html" with field=filters_form.archived legend="Candidatures archivées" only %}
     {% endif %}
     {% include "apply/includes/job_applications_filters/dates.html" %}
 </div>

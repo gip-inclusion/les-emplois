@@ -3290,7 +3290,7 @@
   
   <fieldset>
       <legend>
-          <button aria-controls="collapse-archived" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-archived" data-bs-toggle="collapse" type="button">Type de candidature</button>
+          <button aria-controls="collapse-archived" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-archived" data-bs-toggle="collapse" type="button">Candidatures archivées</button>
       </legend>
       <div class="mt-3 collapse" id="collapse-archived"><div class="form-group"><div class="" id="id_archived">
       
@@ -3560,7 +3560,7 @@
   
   <fieldset>
       <legend>
-          <button aria-controls="collapse-archived" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-archived" data-bs-toggle="collapse" type="button">Type de candidature</button>
+          <button aria-controls="collapse-archived" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-archived" data-bs-toggle="collapse" type="button">Candidatures archivées</button>
       </legend>
       <div class="mt-3 collapse" id="collapse-archived"><div class="form-group"><div class="" id="id_archived">
       
@@ -3804,7 +3804,7 @@
   
   <fieldset>
       <legend>
-          <button aria-controls="collapse-archived" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-archived" data-bs-toggle="collapse" type="button">Type de candidature</button>
+          <button aria-controls="collapse-archived" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-archived" data-bs-toggle="collapse" type="button">Candidatures archivées</button>
       </legend>
       <div class="mt-3 collapse" id="collapse-archived"><div class="form-group"><div class="" id="id_archived">
       
