@@ -36,19 +36,23 @@
                 {% regroup selected_administrative_criteria|dictsort:"administrative_criteria.level" by administrative_criteria.get_level_display as levels_list %}
                 <ul>
                     {% for level, criteria in levels_list %}
-                        <li>
-                            {% comment %}
-                            Les candidatures envoyées par des prescripteurs habilités ne sont pas affichées de manière
-                            hiérarchisée afin de ne pas induire les employeurs en erreur.
-                            Avec des critères hiérarchisés, ils ont tendance à penser que le candidat n'est pas éligible car pas suffisamment de critères de niveau 2 par exemple.
-                            {% endcomment %}
-                            {% if not is_sent_by_authorized_prescriber %}<span class="fw-bold">{{ level }}</span>{% endif %}
-                            <ul>
+                        {% comment %}
+                        Les candidatures envoyées par des prescripteurs habilités ne sont pas affichées de manière
+                        hiérarchisée afin de ne pas induire les employeurs en erreur.
+                        Avec des critères hiérarchisés, ils ont tendance à penser que le candidat n'est pas éligible car pas suffisamment de critères de niveau 2 par exemple.
+                        {% endcomment %}
+                        {% if not is_sent_by_authorized_prescriber %}
+                            <li>
+                                <span class="fw-bold">{{ level }}</span>
+                                <ul>
+                                {% endif %}
                                 {% for criterion in criteria %}
                                     {% include "apply/includes/selected_administrative_criteria_display.html" with diagnosis=eligibility_diagnosis criterion=criterion %}
                                 {% endfor %}
-                            </ul>
-                        </li>
+                                {% if not is_sent_by_authorized_prescriber %}
+                                </ul>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             {% endwith %}
