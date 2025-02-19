@@ -2,6 +2,7 @@ from urllib.parse import SplitResult, parse_qsl, urlsplit
 
 from django.conf import settings
 from django.http import QueryDict
+from django.utils.encoding import iri_to_uri
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 from django.utils.safestring import mark_safe
 
@@ -31,7 +32,7 @@ def get_safe_url(request, param_name=None, fallback_url=None, url=None):
         else:
             url_to_check = url
         if url_has_allowed_host_and_scheme(url_to_check, allowed_hosts, require_https):
-            return url
+            return iri_to_uri(url)
 
     return fallback_url
 
