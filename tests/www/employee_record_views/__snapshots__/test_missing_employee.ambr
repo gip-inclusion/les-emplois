@@ -19,13 +19,15 @@
                                       </p>
                                       
                                           <p>
-                                              Une fiche salarié existe déjà pour ce PASS IAE dans une autre structure avec la même convention : Monster &amp; Cie
+                                              Une fiche salarié existe déjà pour ce PASS IAE dans une autre structure avec la même convention : EI Acme inc. - SIRET 012 345 678 910
                                           </p>
                                           <p>
-                                              Si vous souhaitez visualiser cette fiche salarié, vous devez vous connecter au tableau de bord de cette structure. En cas de difficultés vous pouvez
-                                              <a class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noopener" target="_blank">
-                                                  nous contacter
-                                              </a>.
+                                              Si vous souhaitez visualiser cette fiche salarié, vous devez vous connecter au tableau de bord de cette structure.
+                                          </p>
+                                          <p>
+                                              Seule la première embauche avec ce PASS IAE nécessite une transmission de la fiche salarié.
+                                              <br/>
+                                              En cas de besoin vous pouvez ajouter un nouveau contrat depuis votre espace Extranet IAE 2.0 de l’ASP.
                                           </p>
                                       
                                   
@@ -59,6 +61,11 @@
                                       
                                           <p>
                                               Une fiche salarié existe déjà pour ce PASS IAE : <a href="/employee_record/summary/[PK of EmployeeRecord]">Voir la fiche salarié</a>.
+                                          </p>
+                                          <p>
+                                              Seule la première embauche avec ce PASS IAE, nécessite une transmission de la fiche salarié.
+                                              <br/>
+                                              En cas de besoin vous pouvez ajouter un nouveau contrat depuis votre espace Extranet IAE 2.0 de l’ASP.
                                           </p>
                                       
                                   
@@ -175,11 +182,10 @@
   
                               
                                   <p>
-                                      Ce salarié a été embauché mais sans PASS IAE car vous aviez cliqué sur l’option “Embaucher sans aide au poste”,
-                                      par conséquent la création de fiche salarié est impossible.
+                                      La création d’une fiche salarié pour cette personne est impossible car vous aviez déclaré une embauche sans aide au poste. Par conséquent, elle ne possède pas de PASS IAE.
                                   </p>
                                   <p>
-                                      Si vous souhaitez créer une fiche salarié, vous devez préalablement déclarer une embauche afin de récupérer un PASS IAE.
+                                      Si vous souhaitez bénéficier d’une aide au poste, vous devez d’abord obtenir un PASS IAE en effectuant une nouvelle embauche, puis créer sa fiche salarié.
                                   </p>
                               
                           
