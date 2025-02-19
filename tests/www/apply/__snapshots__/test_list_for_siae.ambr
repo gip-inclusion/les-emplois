@@ -3577,6 +3577,7 @@
               <ul>
                   <li><div class=""><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Actif</label></div></div></li>
                   <li><div class=""><div class="form-check"><input class="form-check-input" id="id_pass_iae_suspended" name="pass_iae_suspended" type="checkbox"/><label class="form-check-label" for="id_pass_iae_suspended">Suspendu</label></div></div></li>
+                  <li><div class=""><div class="form-check"><input class="form-check-input" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/><label class="form-check-label" for="id_pass_iae_expired">Expiré</label></div></div></li>
               </ul>
           </div>
       </fieldset>
