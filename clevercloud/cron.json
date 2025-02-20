@@ -1,6 +1,7 @@
 [
   "*/5 * * * * $ROOT/clevercloud/status-probes.sh",
   "*/5 * * * * $ROOT/clevercloud/run_management_command.sh scan_s3_files",
+  "*/5 * * * * $ROOT/clevercloud/send_approvals_to_pe.sh",
 
   "5 * * * * $ROOT/clevercloud/run_management_command.sh sync_pec_offers --wet-run",
   "5 * * * * $ROOT/clevercloud/run_management_command.sh update_companies_job_app_score",
@@ -8,7 +9,6 @@
   "15 * * * * $ROOT/clevercloud/run_management_command.sh sanitize_employee_records",
   "0 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=companies",
   "20 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=prescribers",
-  "35 * * * * $ROOT/clevercloud/send_approvals_to_pe.sh",
   "40 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=job_seekers",
 
   "25 8-18/2 * * 1-5 $ROOT/clevercloud/transfer_employee_records.sh --download",
