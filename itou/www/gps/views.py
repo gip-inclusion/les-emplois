@@ -121,6 +121,15 @@ class GroupDetailsMixin(LoginRequiredMixin):
             )
         super().setup(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        back_url = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("gps:group_list"))
+        return context | {
+            "back_url": back_url,
+            "group": self.group,
+            "membership": self.membership,
+        }
+
 
 class GroupMembershipsView(GroupDetailsMixin, TemplateView):
     template_name = "gps/group_memberships.html"
@@ -135,8 +144,6 @@ class GroupMembershipsView(GroupDetailsMixin, TemplateView):
             .order_by("-created_at")
             .select_related("member")
         )
-
-        back_url = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("gps:group_list"))
 
         request_new_participant_form_url = add_url_params(
             "https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?",
@@ -155,8 +162,6 @@ class GroupMembershipsView(GroupDetailsMixin, TemplateView):
         )
 
         context = context | {
-            "back_url": back_url,
-            "group": self.group,
             "gps_memberships": memberships,
             "is_referent": self.membership.is_referent,
             "matomo_custom_title": "Profil GPS - participants",
@@ -179,14 +184,10 @@ class GroupBeneficiaryView(GroupDetailsMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        back_url = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("gps:group_list"))
-
         org_department = getattr(self.request.current_organization, "department", None)
         matomo_option = org_department if org_department in self.get_live_department_codes() else None
 
         context = context | {
-            "back_url": back_url,
-            "group": self.group,
             "can_see_diagnostic": is_allowed_to_use_gps_advanced_features(self.request.user),
             "matomo_custom_title": "Profil GPS - bénéficiaire",
             "render_advisor_matomo_option": matomo_option,
