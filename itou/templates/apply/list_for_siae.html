@@ -49,7 +49,7 @@
                             {% include "apply/includes/list_view_switcher.html" %}
                         </div>
                     </div>
-                    {% include "apply/includes/list_job_applications.html" with job_applications_page=job_applications_page filters_counter=filters_counter request=request csrf_token=csrf_token pending_states_job_applications_count=pending_states_job_applications_count list_exports_url=list_exports_url SenderKind=SenderKind job_applications_list_kind=job_applications_list_kind JobApplicationsListKind=JobApplicationsListKind JobApplicationOrigin=JobApplicationOrigin display_kind=display_kind only %}
+                    {% include "apply/includes/list_job_applications.html" with job_applications_page=job_applications_page filters_counter=filters_counter request=request csrf_token=csrf_token pending_states_job_applications_count=pending_states_job_applications_count list_exports_url=list_exports_url SenderKind=SenderKind job_applications_list_kind=job_applications_list_kind JobApplicationsListKind=JobApplicationsListKind JobApplicationOrigin=JobApplicationOrigin display_kind=display_kind show_rdvi_promote_page=show_rdvi_promote_page only %}
                 </div>
             </div>
         </div>

@@ -57,6 +57,8 @@ API_SENTRY_ORG_ID = "gip"
 API_UPDOWN_TOKEN = "ro-XXXXXXXX"
 API_UPDOWN_CHECK_ID = "blabla"
 
+RDV_INSERTION_PROMOTE_DEPARTMENTS = []
+
 if os.getenv("DEBUG_SQL_SNAPSHOT"):
     # Mandatory to have detailed stacktrace inside templates
     TEMPLATES[0]["OPTIONS"]["debug"] = True  # noqa: F405

@@ -7,4 +7,5 @@ app_name = "rdv_insertion"
 
 urlpatterns = [
     path("webhook", views.webhook, name="webhook"),
+    path("discover", views.discover, name="discover"),
 ]
