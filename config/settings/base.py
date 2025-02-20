@@ -737,6 +737,7 @@ RDV_SOLIDARITES_TOKEN_EXPIRY = os.getenv("RDV_SOLIDARITES_TOKEN_EXPIRY", 86000) 
 RDV_INSERTION_API_BASE_URL = os.getenv("RDV_INSERTION_API_BASE_URL")
 RDV_INSERTION_INVITE_HOLD_DURATION = datetime.timedelta(days=int(os.getenv("RDV_INSERTION_INVITE_HOLD_DAYS", 10)))
 RDV_INSERTION_WEBHOOK_SECRET = os.getenv("RDV_INSERTION_WEBHOOK_SECRET")
+RDV_INSERTION_PROMOTE_DEPARTMENTS = ["69"]
 
 # API Particuliers
 # ------------------------------------------------------------------------------
