@@ -1,5 +1,5 @@
 {% if employee_record.status == "NEW" %}
-    <span class="badge rounded-pill badge-sm text-nowrap bg-emploi">Nouvelle à complétée</span>
+    <span class="badge rounded-pill badge-sm text-nowrap bg-emploi">Nouvelle à compléter</span>
 {% elif employee_record.status == "SENT" %}
     <span class="badge rounded-pill badge-sm text-nowrap bg-warning">
         Envoyée à l'ASP le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
