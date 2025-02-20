@@ -74,6 +74,7 @@ django-htmx  # https://github.com/adamchainz/django-htmx
 
 # Easy Componants
 slippers # https://mitchel.me/slippers
+django_components # https://django-components.github.io/django-components/latest/overview/welcome
 
 # Data management
 # ------------------------------------------------------------------------------

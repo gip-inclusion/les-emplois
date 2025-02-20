@@ -52,6 +52,18 @@ TEST Slippers
     </p>
 {% /c_info %}
 
+<hr>
+
+{% comment %}
+TEST Django Component
+ - test avec un .c-title multi-children (fragment) optionnels
+ - test avec un badge
+ - test avec un composant dans un composant (badge dans c-title)
+ - test avec un c-info ayant la possibilitée d'avoir un collapse ou non
+{% endcomment %}
+
+{% component "calendar" / %}
+
 
 {% endblock %}
 
