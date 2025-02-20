@@ -74,24 +74,3 @@ def test_create_follow_up_membership(admin_client):
     assert membership.created_at == datetime.datetime(2025, 1, 1, 11, 34, 56, tzinfo=datetime.UTC)
     assert membership.last_contact_at == datetime.datetime(2025, 1, 1, 11, 34, 57, tzinfo=datetime.UTC)
     assert membership.started_at == datetime.date(2025, 1, 1)
-
-    url = reverse("admin:gps_followupgroupmembership_change", args=(membership.pk,))
-    response = admin_client.post(
-        url,
-        data={
-            # no is_active to set it to False
-            "created_at_0": "01/01/2025",
-            "created_at_1": "12:34:58",
-            "last_contact_at_0": "01/01/2025",
-            "last_contact_at_1": "12:34:59",
-            "started_at": "01/01/2025",
-            "ended_at": "",
-        },
-    )
-    assert response.status_code == 302
-
-    membership.refresh_from_db()
-    assert membership.ended_at is not None
-    assert membership.created_at == datetime.datetime(2025, 1, 1, 11, 34, 58, tzinfo=datetime.UTC)
-    assert membership.last_contact_at == datetime.datetime(2025, 1, 1, 11, 34, 59, tzinfo=datetime.UTC)
-    assert membership.started_at == datetime.date(2025, 1, 1)

@@ -21,7 +21,7 @@ class FollowUpGroupManager(models.Manager):
             group, _ = FollowUpGroup.objects.get_or_create(beneficiary=beneficiary)
 
             update_args = {
-                "is_active": True,
+                "ended_at": None,
                 "last_contact_at": now,
             }
             if is_referent is not None:

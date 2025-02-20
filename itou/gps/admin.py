@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.utils import timezone
 
 import itou.gps.models as models
 from itou.utils.admin import ItouModelAdmin
@@ -71,10 +70,6 @@ class FollowUpGroupMembershipAdmin(ItouModelAdmin):
     def save_model(self, request, obj, form, change):
         if not change:
             obj.creator = request.user
-
-        else:
-            if not form.cleaned_data["is_active"] and form.initial["is_active"]:
-                obj.ended_at = timezone.localdate()
 
         super().save_model(request, obj, form, change)
 

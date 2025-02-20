@@ -601,9 +601,9 @@
                FROM "gps_followupgroupmembership" U0
                INNER JOIN "gps_followupgroup" U2 ON (U0."follow_up_group_id" = U2."id")
                LEFT OUTER JOIN "gps_followupgroupmembership" U3 ON (U2."id" = U3."follow_up_group_id")
-               WHERE (U0."member_id" = %s
-                      AND U0."ended_at" IS NULL
-                      AND U0."is_active")
+               WHERE (U0."is_active"
+                      AND U0."member_id" = %s
+                      AND U0."ended_at" IS NULL)
                GROUP BY U0."id",
                         U2."beneficiary_id")
           ORDER BY RANDOM() ASC
@@ -623,9 +623,9 @@
              FROM "gps_followupgroupmembership"
              INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
              LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
-             WHERE ("gps_followupgroupmembership"."member_id" = %s
-                    AND "gps_followupgroupmembership"."ended_at" IS NULL
-                    AND "gps_followupgroupmembership"."is_active")
+             WHERE ("gps_followupgroupmembership"."is_active"
+                    AND "gps_followupgroupmembership"."member_id" = %s
+                    AND "gps_followupgroupmembership"."ended_at" IS NULL)
              GROUP BY 1) subquery
         ''',
       }),
@@ -752,9 +752,9 @@
           INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
           LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
           INNER JOIN "users_user" T6 ON ("gps_followupgroup"."beneficiary_id" = T6."id")
-          WHERE ("gps_followupgroupmembership"."member_id" = %s
-                 AND "gps_followupgroupmembership"."ended_at" IS NULL
-                 AND "gps_followupgroupmembership"."is_active")
+          WHERE ("gps_followupgroupmembership"."is_active"
+                 AND "gps_followupgroupmembership"."member_id" = %s
+                 AND "gps_followupgroupmembership"."ended_at" IS NULL)
           GROUP BY "gps_followupgroupmembership"."id",
                    "gps_followupgroup"."id",
                    T6."id",
@@ -1169,7 +1169,8 @@
                FROM "gps_followupgroupmembership" U0
                INNER JOIN "gps_followupgroup" U2 ON (U0."follow_up_group_id" = U2."id")
                LEFT OUTER JOIN "gps_followupgroupmembership" U3 ON (U2."id" = U3."follow_up_group_id")
-               WHERE (U0."member_id" = %s
+               WHERE (U0."is_active"
+                      AND U0."member_id" = %s
                       AND NOT (U0."ended_at" IS NULL))
                GROUP BY U0."id",
                         U2."beneficiary_id")
@@ -1190,7 +1191,8 @@
              FROM "gps_followupgroupmembership"
              INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
              LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
-             WHERE ("gps_followupgroupmembership"."member_id" = %s
+             WHERE ("gps_followupgroupmembership"."is_active"
+                    AND "gps_followupgroupmembership"."member_id" = %s
                     AND NOT ("gps_followupgroupmembership"."ended_at" IS NULL))
              GROUP BY 1) subquery
         ''',
@@ -1318,7 +1320,8 @@
           INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
           LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
           INNER JOIN "users_user" T6 ON ("gps_followupgroup"."beneficiary_id" = T6."id")
-          WHERE ("gps_followupgroupmembership"."member_id" = %s
+          WHERE ("gps_followupgroupmembership"."is_active"
+                 AND "gps_followupgroupmembership"."member_id" = %s
                  AND NOT ("gps_followupgroupmembership"."ended_at" IS NULL))
           GROUP BY "gps_followupgroupmembership"."id",
                    "gps_followupgroup"."id",

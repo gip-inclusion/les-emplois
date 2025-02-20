@@ -104,14 +104,11 @@ def test_group_list(snapshot, client):
         member=user,
     ).follow_up_group
 
-    # old group
-    FollowUpGroupMembershipFactory(
-        follow_up_group__beneficiary__first_name="Jean",
-        follow_up_group__beneficiary__last_name="Bon",
-        is_referent=False,
-        ended_at=timezone.localdate(),
-        member=user,
-    )
+    # old membership
+    FollowUpGroupMembershipFactory(ended_at=timezone.localdate(), member=user)
+
+    # inactive membership
+    FollowUpGroupMembershipFactory(is_active=False, member=user)
 
     with assertSnapshotQueries(snapshot):
         response = client.get(reverse("gps:group_list"))
@@ -139,7 +136,7 @@ def test_old_group_list(snapshot, client):
     user = PrescriberFactory(membership__organization__authorized=True, membership__organization__for_snapshot=True)
     client.force_login(user)
 
-    # old group
+    # old membership
     membership = FollowUpGroupMembershipFactory(
         follow_up_group__beneficiary__first_name="Jean",
         follow_up_group__beneficiary__last_name="Bon",
@@ -148,8 +145,11 @@ def test_old_group_list(snapshot, client):
         member=user,
     )
 
-    # active group
+    # ongoing membership
     FollowUpGroupMembershipFactory(member=user)
+
+    # inactive membership
+    FollowUpGroupMembershipFactory(is_active=False, member=user)
 
     with assertSnapshotQueries(snapshot):
         response = client.get(reverse("gps:old_group_list"))
@@ -195,8 +195,8 @@ def test_leave_group(client):
     # We have 4 group members
     assert my_group.members.count() == 4
 
-    # And the 4 are active
-    assert FollowUpGroupMembership.objects.filter(is_active=True).filter(follow_up_group=my_group).count() == 4
+    # And the 4 are ongoing
+    assert FollowUpGroupMembership.objects.filter(ended_at=None).filter(follow_up_group=my_group).count() == 4
 
     client.force_login(member)
     response = client.get(reverse("gps:leave_group", kwargs={"group_id": my_group.id}))
@@ -204,14 +204,14 @@ def test_leave_group(client):
 
     # We still have 4 group members
     assert my_group.members.count() == 4
-    # But only 3 are active
-    assert FollowUpGroupMembership.objects.filter(is_active=True).filter(follow_up_group=my_group).count() == 3
+    # But only 3 are ongoing
+    assert FollowUpGroupMembership.objects.filter(ended_at=None).filter(follow_up_group=my_group).count() == 3
 
     # We can't leave a group we're not part of
     assert another_group.members.count() == 2
     response = client.get(reverse("gps:leave_group", kwargs={"group_id": another_group.id}))
     assert response.status_code == 302
-    assert FollowUpGroupMembership.objects.filter(is_active=True).filter(follow_up_group=another_group).count() == 2
+    assert FollowUpGroupMembership.objects.filter(ended_at=None).filter(follow_up_group=another_group).count() == 2
 
 
 def test_referent_group(client):
@@ -396,39 +396,6 @@ def test_display_participant_contact_info_not_allowed(client):
     assert response.status_code == 404
     response = client.post(display_email_url)
     assert response.status_code == 404
-
-
-def test_remove_members_from_group(client):
-    prescriber = PrescriberFactory(membership__organization__authorized=True)
-    beneficiary = JobSeekerFactory()
-    my_group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=4, memberships__member=prescriber)
-    my_groups_url = reverse("gps:group_list")
-    user_details_url = reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id})
-
-    client.force_login(prescriber)
-
-    # Prescriber has only one group.
-    response = client.get(my_groups_url)
-    groups = response.context["memberships_page"]
-    assert len(groups.object_list) == 1
-
-    # The group of this beneficiary contains 4 members.
-    response = client.get(user_details_url)
-    members = response.context["gps_memberships"]
-    assert members.count() == 4
-
-    # Setting is_active False to the prescriber membership should remove it from the group.
-    membership = FollowUpGroupMembership.objects.filter(member=prescriber).filter(follow_up_group=my_group).first()
-    membership.is_active = False
-    membership.save()
-
-    # Prescriber doesn't belong to a group anymore.
-    response = client.get(my_groups_url)
-    groups = response.context["memberships_page"]
-    assert len(groups.object_list) == 0
-
-    response = client.get(user_details_url)
-    assert response.status_code == 403
 
 
 def test_groups_pagination_and_name_filter(client):
