@@ -12,6 +12,7 @@ urlpatterns = [
     path("groups/<int:group_id>/leave", views.leave_group, name="leave_group"),
     path("groups/<int:group_id>/toggle_referent", views.toggle_referent, name="toggle_referent"),
     path("groups/<int:group_id>/memberships", views.GroupMembershipsView.as_view(), name="group_memberships"),
+    path("groups/<int:group_id>/beneficiary", views.GroupBeneficiaryView.as_view(), name="group_beneficiary"),
     # FIXME Old view to delete in a few days
     path("details/<uuid:public_id>", views.UserDetailsView.as_view(), name="user_details"),
     path(

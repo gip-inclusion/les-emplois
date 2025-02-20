@@ -10,11 +10,7 @@
     <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
         <h1 class="m-0">{{ group.beneficiary.get_full_name }}</h1>
     </div>
-    <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
-        <li class="nav-item">
-            <a class="nav-link active" href="{% url 'gps:group_memberships' group_id=group.pk %}?back_url={{ back_url|urlencode }}">Intervenants</a>
-        </li>
-    </ul>
+    {% include "gps/includes/group_details_tabs.html" with active_tab="memberships" %}
 {% endblock %}
 
 {% block title_prevstep %}
