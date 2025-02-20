@@ -375,6 +375,40 @@ class TestGroupDetailsBeneficiaryTab:
         assert str(html_details) == snapshot(name="with_diagnostic")
 
 
+class TestGroupDetailsContributionTyab:
+    @freezegun.freeze_time("2024-06-21")
+    def test_tab(self, client, snapshot):
+        prescriber = PrescriberFactory(membership=True)
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
+
+        client.force_login(prescriber)
+
+        user_details_url = reverse("gps:group_contribution", kwargs={"group_id": group.pk})
+        response = client.get(user_details_url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+            ],
+        )
+        assert str(html_details) == snapshot(name="ongoing_membership")
+
+        membership = group.memberships.get()
+        membership.ended_at = timezone.localdate()
+        membership.save()
+        response = client.get(user_details_url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+            ],
+        )
+        assert str(html_details) == snapshot(name="ended_membership")
+
+
 # tests that will soon be removed or re-written
 # -------------------------------------------------------------------------------------------
 
