@@ -9,7 +9,7 @@ All these helpers are specific to SIAE logic (not GEIQ, EA, EATT).
 from django.utils import timezone
 
 from itou.common_apps.address.departments import department_from_postcode
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
+from itou.companies.enums import CompanyKind
 from itou.companies.management.commands._import_siae.utils import could_siae_be_deleted, geocode_siae
 from itou.companies.models import Company, SiaeConvention
 from itou.utils.emails import send_email_messages
@@ -243,7 +243,7 @@ def manage_staff_created_siaes():
     """
     three_months_ago = timezone.now() - timezone.timedelta(days=90)
     staff_created_siaes = Company.objects.filter(
-        kind__in=SIAE_WITH_CONVENTION_KINDS,
+        kind__in=CompanyKind.siae_kinds(),
         source=Company.SOURCE_STAFF_CREATED,
     )
     # Sometimes our staff creates a siae then later attaches it manually to the correct convention. In that

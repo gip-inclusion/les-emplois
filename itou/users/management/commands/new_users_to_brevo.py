@@ -8,7 +8,7 @@ from django.conf import settings
 from django.db.models import Exists, OuterRef, Q
 from sentry_sdk.crons import monitor
 
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
+from itou.companies.enums import CompanyKind
 from itou.companies.models import CompanyMembership
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import IdentityProvider, UserKind
@@ -128,7 +128,7 @@ class Command(BaseCommand):
                     CompanyMembership.objects.filter(
                         user_id=OuterRef("pk"),
                         is_active=True,
-                        company__kind__in=SIAE_WITH_CONVENTION_KINDS,
+                        company__kind__in=CompanyKind.siae_kinds(),
                     )
                 )
             )
