@@ -7,6 +7,7 @@ import datetime
 import json
 import os
 import warnings
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -22,6 +23,8 @@ load_dotenv()
 
 _current_dir = os.path.dirname(os.path.realpath(__file__))
 ROOT_DIR = os.path.abspath(os.path.join(_current_dir, "../.."))
+
+BASE_DIR = ROOT_DIR
 
 APPS_DIR = os.path.abspath(os.path.join(ROOT_DIR, "itou"))
 FIXTURE_DIRS = [os.path.abspath(os.path.join(ROOT_DIR, "itou/fixtures/django"))]
@@ -63,6 +66,7 @@ INSTALLED_APPS = [
     "hijack.contrib.admin",
     "pgtrigger",
     "slippers",
+    "django_components",
     # Register adapters before to load allauth apps.
     "itou.allauth_adapters",
     "allauth",
@@ -157,8 +161,20 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [os.path.join(APPS_DIR, "templates")],
-        "APP_DIRS": True,
         "OPTIONS": {
+            "loaders": [
+                (
+                    "django.template.loaders.cached.Loader",
+                    [
+                        # Default Django loader
+                        "django.template.loaders.filesystem.Loader",
+                        # Including this is the same as APP_DIRS=True
+                        "django.template.loaders.app_directories.Loader",
+                        # Components loader
+                        "django_components.template_loader.Loader",
+                    ],
+                )
+            ],
             "context_processors": [
                 "django.contrib.auth.context_processors.auth",
                 "django.template.context_processors.debug",
@@ -176,7 +192,10 @@ TEMPLATES = [
                 "itou.utils.context_processors.matomo",
                 "itou.utils.context_processors.active_announcement_campaign",
             ],
-            "builtins": ["slippers.templatetags.slippers"],
+            "builtins": [
+                "slippers.templatetags.slippers",
+                "django_components.templatetags.component_tags",
+            ],
         },
     }
 ]
@@ -755,3 +774,9 @@ PILOTAGE_SHOW_STATS_WEBINAR = os.getenv("PILOTAGE_SHOW_STATS_WEBINAR", True) in 
 
 # Github
 API_GITHUB_BASE_URL = "https://api.github.com"
+
+COMPONENTS = {
+    "dirs": [
+        Path(BASE_DIR) / "components",
+    ],
+}

@@ -53,6 +53,71 @@ TEST Slippers
 {% /c_info %}
 
 
+
+{% comment %}
+TEST Django-Components
+ - test avec un .c-title multi-children (slot) optionnels
+ - test avec un badge
+ - test avec un composant dans un composant (badge dans c-title)
+ - test avec un c-info ayant la possibilitée d'avoir un collapse ou non
+
+
+ TODO:
+ - Trouver un moyen de passer des attributs html proprement
+ - Remonter le répertoire "components" dans itou
+{% endcomment %}
+<hr>
+<p>TEST DJANGO COMPONENTS 👇</p>
+
+{% component "title" only %}
+    {% fill "c_title__main" %}
+        <h1>
+            Déclaration d'accessibilité
+            {% component "badge" extra_class="bg-danger" only %}
+                {% fill "badge__body" %}Ze badge{% endfill %}
+            {% endcomponent %}
+        </h1>
+    {% endfill %}
+    {% fill "c_title__cta" %}
+        <a href="" class="btn btn-lg btn-outline-primary btn-ico">
+            <i class="ri-user-unfollow-line fw-medium" aria-hidden="true"></i>
+            <span>Ne plus suivre</span>
+        </a>
+        <a href="" class="btn btn-lg btn-ico btn-primary">
+            <i class="ri-user-add-line" aria-hidden="true"></i>
+            <span>Ajouter un bénéficiaire</span>
+        </a>
+    {% endfill %}
+    {% fill "c_title__secondary" %}
+        <h2 class="h3">
+            <strong>Le GIP Plateforme de l’inclusion</strong> s’engage à rendre ses sites internet et applications accessibles conformément à l’article 47 de la loi n°2005-102 du 11 février 2005.
+        </h2>
+        <p>
+            Son schéma pluriannuel décrit les points importants sur lesquels le GIP de la plateforme de l’inclusion s’appuiera pour améliorer l’accessibilité numérique de l’ensemble de ses sites internet et applications. Ce schéma s’accompagne du plans d’action annuels (<a href="https://inclusion.beta.gouv.fr/documents/86/GIP_plateforme_de_linclusion_-_Plan_annuel_daccessibilite_2023.pdf" target="_blank" class="has-external-link">2023</a>) qui détaillent les opérations programmées et mises en œuvre pour l'année courante, ainsi que l’état de suivis de ces actions, détaillé dans le <a href="https://inclusion.beta.gouv.fr/documents/87/GIP_plateforme_de_linclusion_-_Schema_pluriannuel_daccessibilite_2023-2026.pdf" target="_blank" class="has-external-link">schéma pluriannuel d’accessibilité 2023-2026</a>.
+        </p>
+        <p>
+            Cette déclaration d'accessibilité s'applique au site web <b>Les emplois de l'inclusion</b>.
+        </p>
+    {% endfill %}
+{% endcomponent %}
+
+
+{% component "info" extra_class="mt-5" only %}
+    {% fill "info__summary" %}Vous devrez contacter l’employeur pour en savoir plus{% endfill %}
+{% endcomponent %}
+
+
+{% component "info" extra_class="mt-5" collapsibleID="collapseInfoExampleTest" only %}
+    {% fill "info__summary" %}Vous devrez contacter l’employeur pour en savoir plus{% endfill %}
+    {% fill "info__detail" %}
+        <p>
+            L’employeur a refusé la candidature avec le motif “Autre”.
+            <br>
+            Si les détails apportés dans le message de réponse ne vous ont pas permis d’en savoir plus, vous pouvez contacter l’employeur.
+        </p>
+    {% endfill %}
+{% endcomponent %}
+
 {% endblock %}
 
 {% block content %}

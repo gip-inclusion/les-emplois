@@ -1,0 +1,15 @@
+<div class="c-title">
+    <div class="c-title__main">
+        {% slot "c_title__main" required %}{% endslot %}
+    </div>
+    {% if component_vars.is_filled.c_title__cta %}
+        <div class="c-title__cta">
+            {% slot "c_title__cta" %}{% endslot %}
+        </div>
+    {% endif %}
+    {% if component_vars.is_filled.c_title__secondary %}
+        <div class="c-title__secondary">
+            {% slot "c_title__secondary" %}{% endslot %}
+        </div>
+    {% endif %}
+</div>

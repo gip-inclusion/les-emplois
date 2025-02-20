@@ -1,0 +1,19 @@
+{% comment %}
+    The c-info component can be used with a bold text line or with an optional collapsible area.
+    In this case, you must define the "collapsible" var and pass an collapsibleID to the component.
+    The collapsibleID must be unique in the page.
+{% endcomment %}
+<div class="c-info {{ extra_class }}">
+    {% if component_vars.is_filled.info__detail %}
+        <button class="c-info__summary" data-bs-toggle="collapse" data-bs-target="#{{ collapsibleID }}" aria-expanded="false" aria-controls="{{ collapsibleID }}">
+            <span>
+                {% slot "info__summary" required %}{% endslot %}
+            </span>
+        </button>
+        <div class="c-info__detail collapse" id="{{ collapsibleID }}">
+            {% slot "info__detail" %}{% endslot %}
+        </div>
+    {% else %}
+        <span class="c-info__summary">{% slot "info__summary" required %}{% endslot %}</span>
+    {% endif %}
+</div>
