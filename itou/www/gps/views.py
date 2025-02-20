@@ -6,6 +6,7 @@ from django.db.models import Count, Prefetch
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 
@@ -32,10 +33,10 @@ def in_gard(request):
 
 @check_user(is_allowed_to_use_gps)
 def group_list(request, current, template_name="gps/group_list.html"):
-    qs = FollowUpGroupMembership.objects.filter(member=request.user)
+    qs = FollowUpGroupMembership.objects.filter(member=request.user, is_active=True)
 
     if current:
-        qs = qs.filter(is_active=True, ended_at=None)
+        qs = qs.filter(ended_at=None)
     else:
         qs = qs.exclude(ended_at=None)
 
@@ -88,7 +89,7 @@ def leave_group(request, group_id):
     )
 
     if membership:
-        membership.is_active = False
+        membership.ended_at = timezone.localdate()
         membership.save()
 
     return HttpResponseRedirect(reverse("gps:group_list"))

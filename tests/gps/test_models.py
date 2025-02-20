@@ -36,14 +36,14 @@ def test_follow_beneficiary():
         FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber, is_referent=True)
         group = FollowUpGroup.objects.get()
         membership = group.memberships.get()
-        assert membership.is_active is True
         assert membership.is_referent is True
         assert membership.created_at == created_at
         assert membership.started_at == started_at
+        assert membership.ended_at is None
         assert membership.last_contact_at == created_at
         assert membership.creator == prescriber
 
-        membership.is_active = False
+        membership.ended_at = started_at
         membership.is_referent = False
         membership.save()
         frozen_time.tick()
@@ -51,18 +51,14 @@ def test_follow_beneficiary():
 
         FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber, is_referent=True)
         membership.refresh_from_db()
-        assert membership.is_active is True
         assert membership.is_referent is True
         assert membership.created_at == created_at
         assert membership.started_at == started_at
+        assert membership.ended_at is None
         assert membership.last_contact_at == updated_at
-
-        membership.is_active = False
-        membership.save()
 
         FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber, is_referent=False)
         membership.refresh_from_db()
-        assert membership.is_active is True
         assert membership.is_referent is False
 
         FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber)
@@ -92,9 +88,9 @@ def test_follow_beneficiary():
 )
 def test_manager_organizations_names(UserFactory, MembershipFactory, relation_name):
     user = UserFactory()
-    first_membership = MembershipFactory(is_active=True, is_admin=False, user=user)
-    admin_membership = MembershipFactory(is_active=True, is_admin=True, user=user)
-    last_membership = MembershipFactory(is_active=True, is_admin=False, user=user)
+    first_membership = MembershipFactory(is_admin=False, user=user)
+    admin_membership = MembershipFactory(is_admin=True, user=user)
+    last_membership = MembershipFactory(is_admin=False, user=user)
     FollowUpGroupFactory(memberships=True, memberships__member=user)
     with assertNumQueries(1):
         group_membership = FollowUpGroupMembership.objects.with_members_organizations_names().get(member_id=user.pk)
