@@ -89,5 +89,44 @@
     },
     "model": "prescribers.prescribermembership",
     "pk": 8
+  },
+  {
+    "fields": {
+      "created_at": "2020-12-01T10:08:03.594Z",
+      "is_active": true,
+      "is_admin": false,
+      "joined_at": "2020-04-09T13:46:54Z",
+      "organization": 115,
+      "updated_by": null,
+      "user": 65
+    },
+    "model": "prescribers.prescribermembership",
+    "pk": 9
+  },
+  {
+    "fields": {
+      "created_at": "2020-12-01T10:08:03.594Z",
+      "is_active": true,
+      "is_admin": false,
+      "joined_at": "2020-04-09T13:46:54Z",
+      "organization": 115,
+      "updated_by": null,
+      "user": 66
+    },
+    "model": "prescribers.prescribermembership",
+    "pk": 10
+  },
+  {
+    "fields": {
+      "created_at": "2020-12-01T10:08:03.594Z",
+      "is_active": true,
+      "is_admin": false,
+      "joined_at": "2020-04-09T13:46:54Z",
+      "organization": 115,
+      "updated_by": null,
+      "user": 67
+    },
+    "model": "prescribers.prescribermembership",
+    "pk": 11
   }
 ]
