@@ -37,6 +37,8 @@
   
   
                               
+      
+  
                           </div>
                       </div>
                   </div>
@@ -55,6 +57,9 @@
   </p>
   
                           <div class="flex-column flex-md-row mt-3 mt-md-0">
+                              
+                                  
+                              
                               <form hx-get="/job-seekers/list" hx-indicator="#job-seekers-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-seekers-section" hx-trigger="change from:#id_order, change delay:.5s">
                                   <div class="w-lg-400px"><label class="visually-hidden" for="id_job_seeker">Nom</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du candidat" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
     <option selected="" value=""></option>
@@ -221,16 +226,9 @@
              WHERE "users_user"."created_by_id" = %s
              ORDER BY RANDOM() ASC)
           UNION
-            (SELECT "users_jobseekerprofile"."user_id" AS "col1"
-             FROM "users_jobseekerprofile"
-             WHERE "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s
-             ORDER BY RANDOM() ASC)
-          UNION
             (SELECT "job_applications_jobapplication"."job_seeker_id" AS "col1"
              FROM "job_applications_jobapplication"
-             WHERE (("job_applications_jobapplication"."sender_id" = %s
-                     AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
-                    OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
+             WHERE "job_applications_jobapplication"."sender_id" = %s
              ORDER BY "job_applications_jobapplication"."created_at" DESC)
         ''',
       }),
@@ -998,7 +996,7 @@
                       
                           <tr>
                               <td>
-                                  <a class="btn-link" href="/job-seekers/details/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list">Alain ZORRO</a>
+                                  <a class="btn-link" href="/job-seekers/details/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list-organization">Alain ZORRO</a>
                               </td>
                               <td>
                                   
@@ -1027,7 +1025,7 @@
                       
                           <tr>
                               <td>
-                                  <a class="btn-link" href="/job-seekers/details/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list">Bernard YGREC</a>
+                                  <a class="btn-link" href="/job-seekers/details/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list-organization">Bernard YGREC</a>
                               </td>
                               <td>
                                   
@@ -1056,7 +1054,7 @@
                       
                           <tr>
                               <td>
-                                  <a class="btn-link" href="/job-seekers/details/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list">Charlotte XERUS</a>
+                                  <a class="btn-link" href="/job-seekers/details/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list-organization">Charlotte XERUS</a>
                               </td>
                               <td>
                                   
@@ -1085,7 +1083,7 @@
                       
                           <tr>
                               <td>
-                                  <a class="btn-link" href="/job-seekers/details/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list">David WATERFORD</a>
+                                  <a class="btn-link" href="/job-seekers/details/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list-organization">David WATERFORD</a>
                               </td>
                               <td>
                                   
