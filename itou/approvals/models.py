@@ -925,8 +925,9 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         # - the approval was ready to be sent (user OK, dates OK)
         # - we had an actual issue.
         now = timezone.now()
-        if self.start_at > now.date():
-            self.pe_log_err("start_at={} starts after today={}", self.start_at, now.date())
+        today = timezone.localdate(now)
+        if self.start_at > today:
+            self.pe_log_err("start_at={} starts after today={}", self.start_at, today)
             return self.pe_save_pending(
                 api_enums.PEApiPreliminaryCheckFailureReason.STARTS_IN_FUTURE,
                 now,
