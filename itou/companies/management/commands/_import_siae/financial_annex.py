@@ -4,8 +4,6 @@ SiaeFinancialAnnex object logic used by the import_siae.py script is gathered he
 
 """
 
-from django.utils import timezone
-
 from itou.companies.models import SiaeConvention, SiaeFinancialAnnex
 
 
@@ -33,7 +31,7 @@ def get_creatable_and_deletable_afs(af_number_to_row):
 
         updated_fields = set()
         for field in ["start_at", "end_at"]:
-            row_value = timezone.make_aware(getattr(row, field))
+            row_value = getattr(row, field)
             if getattr(af, field) != row_value:
                 setattr(af, field, row_value)
                 updated_fields.add(field)
@@ -77,8 +75,8 @@ def build_financial_annex_from_number(row):
         return SiaeFinancialAnnex(
             number=row.number,
             state=row.state,
-            start_at=timezone.make_aware(row.start_at),
-            end_at=timezone.make_aware(row.end_at),
+            start_at=row.start_at,
+            end_at=row.end_at,
             convention=convention,
         )
 
