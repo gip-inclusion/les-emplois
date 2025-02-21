@@ -1,5 +1,4 @@
 from unittest.mock import patch
-from urllib.parse import urlencode
 
 import pytest
 import respx
@@ -376,53 +375,3 @@ class TestExistingUserLogin:
     def test_login_404(self, client):
         response = client.get(reverse("login:existing_user", args=("c0fee70e-cf34-4d37-919d-a1ae3e3bf7e5",)))
         assert response.status_code == 404
-
-
-def test_prescriber_account_activation_view_with_next(client, pro_connect):
-    user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
-    client.force_login(user)
-
-    url = reverse("dashboard:activate_pro_connect_account")
-    response = client.get(url)
-    # Check the href link
-    params = {
-        "user_kind": UserKind.PRESCRIBER,
-        "previous_url": url,
-        "user_email": user.email,
-    }
-    pc_auhtorize_url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-    assertContains(response, f'{pc_auhtorize_url}"')
-
-    next_url = "/test_join"
-    url = f"{reverse('dashboard:activate_pro_connect_account')}?{urlencode({'next': next_url})}"
-    response = client.get(url)
-    # Check the href link
-    params["previous_url"] = url
-    params["next_url"] = next_url
-    pc_auhtorize_url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-    assertContains(response, f'{pc_auhtorize_url}"')
-
-
-def test_employer_account_activation_view(client, pro_connect):
-    user = EmployerFactory(with_company=True, identity_provider=IdentityProvider.DJANGO)
-    client.force_login(user)
-
-    url = reverse("dashboard:activate_pro_connect_account")
-    response = client.get(url)
-    # Check the href link
-    params = {
-        "user_kind": UserKind.EMPLOYER,
-        "previous_url": url,
-        "user_email": user.email,
-    }
-    pc_auhtorize_url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-    assertContains(response, f'{pc_auhtorize_url}"')
-
-    next_url = "/test_join"
-    url = f"{reverse('dashboard:activate_pro_connect_account')}?{urlencode({'next': next_url})}"
-    response = client.get(url)
-    # Check the href link
-    params["previous_url"] = url
-    params["next_url"] = next_url
-    pc_auhtorize_url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
-    assertContains(response, f'{pc_auhtorize_url}"')

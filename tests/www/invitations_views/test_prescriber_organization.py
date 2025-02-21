@@ -489,7 +489,7 @@ class TestAcceptPrescriberWithOrgInvitation:
             follow=True,
         )
         assert response.context["user"].is_authenticated
-        assertRedirects(response, reverse("dashboard:activate_pro_connect_account"))
+        assertRedirects(response, reverse("dashboard:index"))
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox, new_user=False)
 
 

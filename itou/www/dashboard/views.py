@@ -1,9 +1,7 @@
 import uuid
 
 from allauth.account.views import PasswordChangeView
-from django.conf import settings
 from django.contrib import auth, messages
-from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import PermissionDenied
 from django.db.models import F
 from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
@@ -11,7 +9,6 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-from django.views.generic import TemplateView
 from rest_framework.authtoken.models import Token
 
 from itou.api.token_auth.views import TOKEN_ID_STR
@@ -24,12 +21,12 @@ from itou.geiq.models import ImplementationAssessmentCampaign
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
-from itou.users.enums import MATOMO_ACCOUNT_TYPE, UserKind
+from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
-from itou.utils.urls import add_url_params, get_safe_url
+from itou.utils.urls import get_safe_url
 from itou.www.dashboard.forms import (
     EditJobSeekerInfoForm,
     EditUserEmailForm,
@@ -350,36 +347,3 @@ def api_token(request, template_name="dashboard/api_token.html"):
     }
 
     return render(request, template_name, context)
-
-
-class AccountMigrationView(TemplateView):
-    template_name = "account/activate_pro_connect_account.html"
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.kind not in MATOMO_ACCOUNT_TYPE:
-            return HttpResponseRedirect(reverse("dashboard:index"))
-        return super().dispatch(request, *args, **kwargs)
-
-    def _get_params(self):
-        params = {
-            "user_kind": self.request.user.kind,
-            "previous_url": self.request.get_full_path(),
-            "user_email": self.request.user.email,
-        }
-        next = get_safe_url(self.request, REDIRECT_FIELD_NAME)
-        if next:
-            params["next_url"] = next
-        return params
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        params = self._get_params()
-        pro_connect_url = (
-            add_url_params(reverse("pro_connect:authorize"), params) if settings.PRO_CONNECT_BASE_URL else None
-        )
-
-        extra_context = {
-            "pro_connect_url": pro_connect_url,
-            "matomo_account_type": MATOMO_ACCOUNT_TYPE[self.request.user.kind],
-        }
-        return context | extra_context

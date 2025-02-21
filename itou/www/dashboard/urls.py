@@ -15,9 +15,4 @@ urlpatterns = [
     path("edit_user_notifications", views.edit_user_notifications, name="edit_user_notifications"),
     path("edit_job_seeker_info/<uuid:job_seeker_public_id>", views.edit_job_seeker_info, name="edit_job_seeker_info"),
     path("switch-organization", views.switch_organization, name="switch_organization"),
-    path(
-        "activate-pro-connect-account",
-        views.AccountMigrationView.as_view(),
-        name="activate_pro_connect_account",
-    ),
 ]
