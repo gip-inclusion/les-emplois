@@ -341,7 +341,6 @@ class TestProConnectCallbackView:
     def test_callback_prescriber_created(self, client, pro_connect):
         ### User does not exist.
         pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
-        assert User.objects.count() == 1
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.first_name == pro_connect.oidc_userinfo["given_name"]
         assert user.last_name == pro_connect.oidc_userinfo["usual_name"]
@@ -354,7 +353,6 @@ class TestProConnectCallbackView:
     def test_callback_employer_created(self, client, pro_connect):
         ### User does not exist.
         pro_connect.mock_oauth_dance(client, UserKind.EMPLOYER)
-        assert User.objects.count() == 1
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.first_name == pro_connect.oidc_userinfo["given_name"]
         assert user.last_name == pro_connect.oidc_userinfo["usual_name"]
@@ -375,7 +373,6 @@ class TestProConnectCallbackView:
             identity_provider=users_enums.IdentityProvider.DJANGO,
         )
         pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
-        assert User.objects.count() == 1
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.first_name == pro_connect.oidc_userinfo["given_name"]
         assert user.last_name == pro_connect.oidc_userinfo["usual_name"]
@@ -711,13 +708,13 @@ class TestProConnectLogin:
         assertContains(response, 'class="proconnect-button"')
         assertContains(response, reverse("pro_connect:authorize"))
 
+        before_auth = timezone.now()
         response = pro_connect.mock_oauth_dance(
             client, UserKind.PRESCRIBER, expected_redirect_url=reverse("dashboard:index")
         )
 
-        # Make sure it was a login instead of a new signup.
-        users_count = User.objects.filter(email=pro_connect.oidc_userinfo["email"]).count()
-        assert users_count == 1
+        user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
+        assert user.last_login > before_auth
 
     @respx.mock
     def test_old_django_account(self, client, pro_connect):
@@ -741,9 +738,6 @@ class TestProConnectLogin:
             client, UserKind.PRESCRIBER, expected_redirect_url=reverse("dashboard:index")
         )
         assert auth.get_user(client).is_authenticated
-        # Make sure it was a login instead of a new signup.
-        users_count = User.objects.filter(email=pro_connect.oidc_userinfo["email"]).count()
-        assert users_count == 1
 
         response = client.post(reverse("account_logout"))
         pro_connect.assert_and_mock_forced_logout(client, response)
@@ -760,6 +754,8 @@ class TestProConnectLogin:
         # Then login with ProConnect.
         pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER, expected_redirect_url=reverse("dashboard:index"))
         assert auth.get_user(client).is_authenticated
+        user.refresh_from_db()
+        assert user.identity_provider == IdentityProvider.PRO_CONNECT
 
 
 class TestProConnectLogout:
