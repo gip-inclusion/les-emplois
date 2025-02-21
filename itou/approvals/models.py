@@ -303,14 +303,13 @@ class PENotificationMixin(models.Model):
 
         This will become useless when we will stop managing the PoleEmploiApproval that much.
         """
-        update_dict = {
-            "pe_notification_status": status,
-            "pe_notification_time": at,
-            "pe_notification_endpoint": endpoint,
-            "pe_notification_exit_code": exit_code,
-        }
-        queryset = self.__class__.objects.filter(pk=self.pk)
-        queryset.update(**{key: value for key, value in update_dict.items() if value})
+        self.__class__.objects.filter(pk=self.pk).update(
+            pe_notification_status=status,
+            pe_notification_time=at,
+            pe_notification_endpoint=endpoint,
+            pe_notification_exit_code=exit_code,
+        )
+
         return status
 
     def pe_save_pending(self, at, *, reason):
