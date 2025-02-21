@@ -347,7 +347,13 @@
               
       <section class="s-section">
           <div class="s-section__container container">
-              <h2>Mon intervention</h2>
+              <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
+                  <h2>Mon intervention</h2>
+                  <a class="btn btn-ico btn-primary" href="/gps/groups/[PK of FollowUpGroup]/edition">
+                      <i aria-hidden="true" class="ri-pencil-line"></i>
+                      <span>Modifier</span>
+                  </a>
+              </div>
               <div class="c-box mb-4">
                   <div class="d-flex align-items-center justify-content-between">
                       <h2>Période de l’accompagnement</h2>
@@ -450,7 +456,13 @@
               
       <section class="s-section">
           <div class="s-section__container container">
-              <h2>Mon intervention</h2>
+              <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
+                  <h2>Mon intervention</h2>
+                  <a class="btn btn-ico btn-primary" href="/gps/groups/[PK of FollowUpGroup]/edition">
+                      <i aria-hidden="true" class="ri-pencil-line"></i>
+                      <span>Modifier</span>
+                  </a>
+              </div>
               <div class="c-box mb-4">
                   <div class="d-flex align-items-center justify-content-between">
                       <h2>Période de l’accompagnement</h2>
