@@ -313,16 +313,16 @@ class PENotificationMixin(models.Model):
         queryset.update(**{key: value for key, value in update_dict.items() if value})
         return status
 
-    def pe_save_pending(self, reason, at=None):
+    def pe_save_pending(self, reason, at):
         return self._pe_notification_update(api_enums.PEApiNotificationStatus.PENDING, at, None, reason)
 
-    def pe_save_error(self, endpoint, exit_code, at=None):
+    def pe_save_error(self, endpoint, exit_code, at):
         return self._pe_notification_update(api_enums.PEApiNotificationStatus.ERROR, at, endpoint, exit_code)
 
-    def pe_save_should_retry(self, at=None):
+    def pe_save_should_retry(self, at):
         return self._pe_notification_update(api_enums.PEApiNotificationStatus.SHOULD_RETRY, at)
 
-    def pe_save_success(self, at=None):
+    def pe_save_success(self, at):
         return self._pe_notification_update(api_enums.PEApiNotificationStatus.SUCCESS, at)
 
     def _pe_log(self, prefix, fmt, *args, **kwargs):
