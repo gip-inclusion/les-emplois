@@ -22,6 +22,10 @@ class JobSeekerOrder(enum.StrEnum):
         else:
             return self.__class__(f"-{self.value}")
 
+    @property
+    def order_by(self):
+        return (str(self), "-pk" if self.value.startswith("-") else "pk")
+
     # Make the Enum work in Django's templates
     # See:
     # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
