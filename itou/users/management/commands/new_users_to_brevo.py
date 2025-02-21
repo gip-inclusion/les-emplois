@@ -112,7 +112,6 @@ class Command(BaseCommand):
         professional_qs = (
             User.objects.filter(kind__in=[UserKind.PRESCRIBER, UserKind.EMPLOYER])
             .filter(
-                # Someday only filter on identity_provider ?
                 Exists(
                     EmailAddress.objects.filter(
                         user_id=OuterRef("pk"),
