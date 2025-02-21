@@ -106,7 +106,7 @@ class TestPrescriberLogin:
         response = client.post(url, data=form_data)
         assertRedirects(response, reverse("account_email_verification_sent"))
 
-    def test_login_using_django_but_has_sso_provider(self, client, pro_connect):
+    def test_login_using_django_with_has_sso_provider(self, client, pro_connect):
         user = PrescriberFactory()
         url = reverse("login:prescriber")
         response = client.get(url)
@@ -114,13 +114,10 @@ class TestPrescriberLogin:
 
         form_data = {
             "login": user.email,
-            "password": "a",
+            "password": DEFAULT_PASSWORD,
         }
         response = client.post(url, data=form_data)
-        assertContains(
-            response,
-            "Votre compte est relié à ProConnect. Merci de vous connecter avec ce service.",
-        )
+        assertRedirects(response, reverse("account_email_verification_sent"))
 
 
 class TestEmployerLogin:
@@ -160,7 +157,7 @@ class TestEmployerLogin:
         response = client.post(url, data=form_data)
         assertRedirects(response, reverse("account_email_verification_sent"))
 
-    def test_login_using_django_but_has_sso_provider(self, client, pro_connect):
+    def test_login_using_django_with_has_sso_provider(self, client, pro_connect):
         user = EmployerFactory()
         url = reverse("login:employer")
         response = client.get(url)
@@ -168,13 +165,10 @@ class TestEmployerLogin:
 
         form_data = {
             "login": user.email,
-            "password": "a",
+            "password": DEFAULT_PASSWORD,
         }
         response = client.post(url, data=form_data)
-        assertContains(
-            response,
-            "Votre compte est relié à ProConnect. Merci de vous connecter avec ce service.",
-        )
+        assertRedirects(response, reverse("account_email_verification_sent"))
 
 
 class TestLaborInspectorLogin:

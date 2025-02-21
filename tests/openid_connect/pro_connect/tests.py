@@ -44,7 +44,6 @@ from itou.utils.urls import add_url_params, get_absolute_url
 from tests.job_applications.factories import JobApplicationSentByPrescriberPoleEmploiFactory
 from tests.prescribers.factories import PrescriberPoleEmploiFactory
 from tests.users.factories import (
-    DEFAULT_PASSWORD,
     PrescriberFactory,
     UserFactory,
 )
@@ -737,29 +736,14 @@ class TestProConnectLogin:
         # - ProConnect side: account creation
         # - Django side: account update.
         # This logic is already tested here: ProConnectModelTest
-        response = pro_connect.mock_oauth_dance(
-            client, UserKind.PRESCRIBER, expected_redirect_url=reverse("dashboard:index")
-        )
+        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER, expected_redirect_url=reverse("dashboard:index"))
         assert auth.get_user(client).is_authenticated
         # Make sure it was a login instead of a new signup.
         users_count = User.objects.filter(email=pro_connect.oidc_userinfo["email"]).count()
         assert users_count == 1
 
-        response = client.post(reverse("account_logout"))
-        pro_connect.assert_and_mock_forced_logout(client, response)
-        assert not auth.get_user(client).is_authenticated
-
-        # Try to login with Django.
-        # This is already tested in itou.www.login.tests but only at form level.
-        post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
-        response = client.post(reverse("login:prescriber"), data=post_data)
-        error_message = "Votre compte est relié à ProConnect."
-        assertContains(response, error_message)
-        assert not auth.get_user(client).is_authenticated
-
-        # Then login with ProConnect.
-        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER, expected_redirect_url=reverse("dashboard:index"))
-        assert auth.get_user(client).is_authenticated
+        user.refresh_from_db()
+        assert user.identity_provider == IdentityProvider.PRO_CONNECT
 
 
 class TestProConnectLogout:
