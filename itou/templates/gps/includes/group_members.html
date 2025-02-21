@@ -21,15 +21,16 @@
                                 <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
                                     <p class="fs-sm mb-0 flex-grow-1">
                                         <i class="ri-calendar-line fw-normal me-1" aria-hidden="true"></i>
-                                        Membre du groupe de suivi depuis le {{ membership.started_at|date:"d/m/Y" }}
+                                        {% if membership.ended_at %}
+                                            Accompagnateur du {{ membership.started_at|date:"d/m/Y" }} au {{ membership.ended_at|date:"d/m/Y" }}
+                                        {% else %}
+                                            Accompagnateur depuis le {{ membership.started_at|date:"d/m/Y" }}
+                                        {% endif %}
                                     </p>
-                                    {% if membership.is_referent %}
-                                        <div>
-                                            <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
-                                                <i class="ri-map-pin-user-line" aria-hidden="true"></i>
-                                                Référent⸱e
-                                            </span>
-                                        </div>
+                                    {% if membership.ended_at %}
+                                        {% include "gps/includes/badge_ended_membership.html" %}
+                                    {% elif membership.is_referent %}
+                                        {% include "gps/includes/badge_is_referent_membership.html" %}
                                     {% endif %}
                                 </div>
                                 <div class="c-box--results__summary">
@@ -57,7 +58,7 @@
                                         {% if membership.member_id != request.user.pk %}
                                             <button class="btn-link btn-ico"
                                                     id="email-{{ membership.member_id }}"
-                                                    hx-post="{% url "gps:display_contact_info" beneficiary.follow_up_group.id membership.member.public_id "email" %}"
+                                                    hx-post="{% url "gps:display_contact_info" group.pk membership.member.public_id "email" %}"
                                                     hx-swap="outerHTML"
                                                     {% matomo_event "gps" "clic" "displayed_member_email" %}>
                                                 <div class="stable-text">
@@ -79,7 +80,7 @@
                                             {% if membership.member_id != request.user.pk %}
                                                 <button class="btn-link btn-ico"
                                                         id="phone-{{ membership.member_id }}"
-                                                        hx-post="{% url "gps:display_contact_info" beneficiary.follow_up_group.id membership.member.public_id "phone" %}"
+                                                        hx-post="{% url "gps:display_contact_info" group.pk membership.member.public_id "phone" %}"
                                                         hx-swap="outerHTML"
                                                         {% matomo_event "gps" "clic" "displayed_member_phone" %}>
                                                     <div class="stable-text">

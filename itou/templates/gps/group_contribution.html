@@ -1,0 +1,65 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% load matomo %}
+{% load str_filters %}
+{% load format_filters %}
+
+{% block title %}GPS - Profil de {{ group.beneficiary.get_full_name }} {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
+        <h1 class="m-0">{{ group.beneficiary.get_full_name }}</h1>
+    </div>
+    {% include "gps/includes/group_details_tabs.html" with active_tab="contribution" %}
+{% endblock %}
+
+{% block title_prevstep %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
+                <h2>Mon intervention</h2>
+                <a href="{% url "gps:group_edition" group.pk %}?back_url={{ back_url|urlencode }}" class="btn btn-ico btn-primary">
+                    <i class="ri-pencil-line" aria-hidden="true"></i>
+                    <span>Modifier</span>
+                </a>
+            </div>
+            <div class="c-box mb-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2>Période de l’accompagnement</h2>
+                    {% if membership.ended_at %}
+                        {% include "gps/includes/badge_ended_membership.html" %}
+                    {% else %}
+                        {% include "gps/includes/badge_ongoing_membership.html" %}
+                    {% endif %}
+                </div>
+                <ul class="list-data list-data__two-column-lg">
+                    <li>
+                        <small>Date de début</small>
+                        <strong>{{ membership.started_at|date:"F Y" }}</strong>
+                    </li>
+                    <li>
+                        <small>Date de fin</small>
+                        {% if membership.ended_at %}
+                            <strong>{{ membership.ended_at|date:"F Y" }}</strong>
+                        {% else %}
+                            <span class="text-disabled">(accompagnement en cours)</span>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+            <div class="c-box mb-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2>Motif de l’intervention</h2>
+                    {% if membership.is_referent %}
+                        {% include "gps/includes/badge_is_referent_membership.html" %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
