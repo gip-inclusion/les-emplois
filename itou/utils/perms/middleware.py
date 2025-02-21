@@ -1,9 +1,7 @@
-from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
 from itou.www.logout.enums import LogoutWarning
 
@@ -141,20 +139,6 @@ class ItouCurrentOrganizationMiddleware:
         ]
         if any(skip_middleware_conditions):
             return self.get_response(request)
-
-        # Force ProConnect
-        if (
-            user.is_authenticated
-            and user.identity_provider != IdentityProvider.PRO_CONNECT
-            and user.kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER]
-            and not request.path.startswith(
-                "/dashboard/activate-pro-connect-account"
-            )  # Allow to access ic activation view
-            and not request.path.startswith("/pro_connect")  # Allow to access ProConnect views
-            and settings.FORCE_PROCONNECT_LOGIN  # Allow to disable on dev setup
-        ):
-            # Add request.path as next param ?
-            return HttpResponseRedirect(reverse("dashboard:activate_pro_connect_account"))
 
         if logout_warning is not None:
             return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))

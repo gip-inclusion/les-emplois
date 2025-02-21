@@ -10,6 +10,7 @@ from django.utils.safestring import mark_safe
 from itou.openid_connect.errors import format_error_modal_content
 from itou.users.enums import IdentityProvider
 from itou.users.models import User
+from itou.www.invitations_views.helpers import accept_all_pending_invitations
 from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 
 
@@ -84,16 +85,17 @@ class ItouLoginForm(LoginForm):
             and user.has_sso_provider
             # Bypass sso login error if we show the test account banner and the form received the hidden field value
             and not (self.cleaned_data.get("demo_banner_account") and settings.SHOW_DEMO_ACCOUNTS_BANNER)
+            # Allow ProConnect and Inclusion Connect users to bypass ProConnect as we have issues with it
+            and user.identity_provider not in [IdentityProvider.PRO_CONNECT, IdentityProvider.INCLUSION_CONNECT]
         ):
             identity_provider = IdentityProvider(user.identity_provider)
-            if identity_provider == IdentityProvider.INCLUSION_CONNECT:
-                error_message = (
-                    f"Votre compte est relié à {identity_provider.label}. "
-                    "Merci de vous connecter avec ProConnect qui remplace ce service."
-                )
-            else:
-                error_message = (
-                    f"Votre compte est relié à {identity_provider.label}. Merci de vous connecter avec ce service."
-                )
+            error_message = (
+                f"Votre compte est relié à {identity_provider.label}. Merci de vous connecter avec ce service."
+            )
             raise forms.ValidationError(error_message)
         return super().clean()
+
+    def login(self, request, redirect_url=None):
+        ret = super().login(request=request, redirect_url=redirect_url)
+        accept_all_pending_invitations(request)
+        return ret
