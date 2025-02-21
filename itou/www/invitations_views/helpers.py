@@ -52,6 +52,9 @@ def accept_all_pending_invitations(request):
     if not request.user.is_authenticated:
         return False
 
+    if request.user.is_job_seeker:
+        return False
+
     MAPPING = {
         UserKind.PRESCRIBER: (PrescriberWithOrgInvitation, handle_prescriber_intivation),
         UserKind.EMPLOYER: (EmployerInvitation, handle_employer_invitation),
