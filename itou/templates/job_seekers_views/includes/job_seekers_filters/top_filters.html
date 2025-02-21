@@ -1,0 +1,13 @@
+{% load django_bootstrap5 %}
+
+<div class="s-section__row row selection-indicator" data-emplois-elements-visibility-on-selection="hidden">
+    <div class="col-12">
+        <div>{% bootstrap_form_errors filters_form %}</div>
+        <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+            {% include "job_seekers_views/includes/job_seekers_filters/approval_state.html" with btn_dropdown_filter=True %}
+            {% if list_organization %}
+                {% include "job_seekers_views/includes/job_seekers_filters/organization_members.html" with btn_dropdown_filter=True %}
+            {% endif %}
+        </div>
+    </div>
+</div>
