@@ -291,7 +291,6 @@ def get_fluxiae_df(
     vue_name,
     converters=None,
     description=None,
-    parse_dates=None,
     skip_first_row=True,
     anonymize_sensitive_data=True,
 ):
@@ -346,9 +345,6 @@ def get_fluxiae_df(
 
         if converters:
             kwargs["converters"] = converters
-
-        if parse_dates:
-            kwargs["parse_dates"] = parse_dates
 
         # When guessing date formats, we are more likely to end up with European style dates than American in ASP files
         kwargs["dayfirst"] = True
