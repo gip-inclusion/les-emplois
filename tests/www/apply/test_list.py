@@ -1,11 +1,12 @@
 import uuid
 
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.www.apply.views.list_views import JobApplicationsDisplayKind
+from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
@@ -65,3 +66,10 @@ def test_list_warns_about_long_awaiting_applications(client, snapshot):
     response = client.get(reverse("apply:list_for_job_seeker"))
     results_section = parse_response_to_soup(response, selector="#job-applications-section")
     assert str(results_section) == snapshot(name="JOB SEEKER - no warnings")
+
+
+@pytest.mark.parametrize("order", JobApplicationOrder)
+@pytest.mark.no_django_db
+def test_opposite(order):
+    assert order.opposite != order
+    assert order.opposite.opposite == order

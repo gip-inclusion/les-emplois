@@ -17,7 +17,7 @@ from itou.job_applications.models import JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
-from itou.www.apply.views.list_views import JobApplicationsDisplayKind
+from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
@@ -544,7 +544,7 @@ def test_list_display_kind(client):
     client.force_login(employer)
     url = reverse("apply:list_for_siae")
 
-    TABLE_VIEW_MARKER = '<caption class="visually-hidden">Liste des candidatures</caption>'
+    TABLE_VIEW_MARKER = '<caption class="visually-hidden">Liste des candidatures'
     LIST_VIEW_MARKER = '<div class="c-box--results__header">'
 
     for display_param, expected_marker in [
@@ -972,13 +972,14 @@ def test_reset_filter_button_snapshot(client, snapshot):
     )
 
     filter_params["display"] = JobApplicationsDisplayKind.TABLE
+    filter_params["order"] = JobApplicationOrder.CREATED_AT_ASC
     response = client.get(reverse("apply:list_for_siae"), filter_params)
 
     assert str(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
-        name="reset-filter button in table view"
+        name="reset-filter button in table view & created_at ascending order"
     )
     assert str(parse_response_to_soup(response, selector="#offcanvasApplyFiltersButtons")) == snapshot(
-        name="off-canvas buttons in table view"
+        name="off-canvas buttons in table view & created_at ascending order"
     )
 
 
@@ -1456,3 +1457,80 @@ def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
     simulate_applications_selection([refused_app.pk, refusable_app_1.pk])
     refuse_button = get_refuse_button()
     assert str(refuse_button) == snapshot(name="inactive refuse button as GEIQ")
+
+
+def test_order(client, subtests):
+    company = CompanyFactory(with_membership=True)
+    employer = company.members.first()
+    zorro_application = JobApplicationFactory(
+        job_seeker__first_name="Zorro",
+        job_seeker__last_name="Don Diego",
+        to_company=company,
+    )
+    alice_first_application = JobApplicationFactory(
+        job_seeker__first_name="Alice",
+        job_seeker__last_name="Lewis",
+        to_company=company,
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+    )
+    alice_second_application = JobApplicationFactory(
+        job_seeker__first_name="Alice",
+        job_seeker__last_name="Lewis",
+        to_company=company,
+        pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
+    )
+
+    client.force_login(employer)
+    url = reverse("apply:list_for_siae")
+    query_params = {"display": JobApplicationsDisplayKind.TABLE}
+
+    expected_order = {
+        "created_at": [zorro_application, alice_first_application, alice_second_application],
+        "job_seeker_full_name": [alice_first_application, alice_second_application, zorro_application],
+    }
+
+    with subtests.test(order="<missing_value>"):
+        response = client.get(url, query_params)
+        assert response.context["job_applications_page"].object_list == list(reversed(expected_order["created_at"]))
+
+    with subtests.test(order="<invalid_value>"):
+        response = client.get(url, query_params | {"order": "invalid_value"})
+        assert response.context["job_applications_page"].object_list == list(reversed(expected_order["created_at"]))
+
+    for order, applications in expected_order.items():
+        with subtests.test(order=order):
+            response = client.get(url, query_params | {"order": order})
+            assert response.context["job_applications_page"].object_list == applications
+
+            response = client.get(url, query_params | {"order": f"-{order}"})
+            assert response.context["job_applications_page"].object_list == list(reversed(applications))
+
+
+def test_htmx_order(client):
+    url = reverse("apply:list_for_siae")
+    company = CompanyFactory(with_membership=True)
+    employer = company.members.first()
+
+    JobApplicationFactory.create_batch(2, to_company=company)
+    client.force_login(employer)
+    query_params = {"display": JobApplicationsDisplayKind.TABLE}
+    response = client.get(url, query_params)
+
+    assertContains(response, "2 résultats")
+    simulated_page = parse_response_to_soup(response)
+
+    ORDER_ID = "id_order"
+    CREATED_AT_ASC = "created_at"
+    assert response.context["order"] != CREATED_AT_ASC
+
+    [sort_by_created_at_button] = simulated_page.find_all("button", {"data-emplois-setter-value": CREATED_AT_ASC})
+    assert sort_by_created_at_button["data-emplois-setter-target"] == f"#{ORDER_ID}"
+    [order_input] = simulated_page.find_all(id=ORDER_ID)
+    # Simulate click on button
+    order_input["value"] = CREATED_AT_ASC
+    response = client.get(url, query_params | {"order": CREATED_AT_ASC}, headers={"HX-Request": "true"})
+    update_page_with_htmx(simulated_page, f"form[hx-get='{url}']", response)
+    response = client.get(url, query_params | {"order": CREATED_AT_ASC})
+    assertContains(response, "2 résultats")
+    fresh_page = parse_response_to_soup(response)
+    assertSoupEqual(simulated_page, fresh_page)

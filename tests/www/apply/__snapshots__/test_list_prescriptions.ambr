@@ -564,7 +564,8 @@
         'sql': '''
           SELECT COUNT(*)
           FROM
-            (SELECT COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+            (SELECT (COALESCE(LOWER(T5."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T5."last_name"), %s)), %s)) AS "job_seeker_full_name",
+                    COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
                                (SELECT U0."id"
                                 FROM "eligibility_eligibilitydiagnosis" U0
                                 WHERE (U0."expires_at" > %s
@@ -585,10 +586,12 @@
                     GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change"
              FROM "job_applications_jobapplication"
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
+             INNER JOIN "users_user" T5 ON ("job_applications_jobapplication"."job_seeker_id" = T5."id")
              WHERE ("job_applications_jobapplication"."sender_id" = %s
                     AND "job_applications_jobapplication"."archived_at" IS NULL)
              GROUP BY "job_applications_jobapplication"."id",
-                      1) subquery
+                      1,
+                      2) subquery
         ''',
       }),
       dict({
@@ -663,6 +666,7 @@
                                     AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                              ORDER BY U0."created_at" DESC
                              LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+                 (COALESCE(LOWER(T5."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T5."last_name"), %s)), %s)) AS "job_seeker_full_name",
                  T5."id",
                  T5."password",
                  T5."last_login",
@@ -912,6 +916,7 @@
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           GROUP BY "job_applications_jobapplication"."id",
                    49,
+                   50,
                    T5."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
@@ -921,7 +926,7 @@
                    "companies_siaeconvention"."id",
                    "approvals_approval"."id"
           ORDER BY "job_applications_jobapplication"."created_at" DESC,
-                   "job_applications_jobapplication"."id" ASC
+                   "job_applications_jobapplication"."id" DESC
           LIMIT 2
         ''',
       }),
@@ -2262,6 +2267,7 @@
   
   
       <input id="display-kind" name="display" type="hidden" value="list"/>
+      <input id="id_order" name="order" type="hidden" value="-created_at"/>
       
           
   
@@ -2732,15 +2738,25 @@
           
               <div class="table-responsive mt-3 mt-md-4">
                   
-                      <table class="table table-hover">
-      <caption class="visually-hidden">Liste des candidatures</caption>
+                      <table class="table table-hover table-sortable">
+      <caption class="visually-hidden">Liste des candidatures (les colonnes disposant d’un bouton dans leur entête peuvent être triées en cliquant sur le bouton)</caption>
       <thead>
           <tr>
               
               
-                  <th scope="col">Candidature de</th>
+                  <th aria-sort="none" scope="col">
+      <button data-emplois-elements-visibility-on-selection="disabled" data-emplois-setter-target="#id_order" data-emplois-setter-value="job_seeker_full_name" type="button">
+          Candidature de
+      </button>
+  </th>
+  
               
-              <th scope="col">Émise le</th>
+              <th aria-sort="descending" scope="col">
+      <button data-emplois-elements-visibility-on-selection="disabled" data-emplois-setter-target="#id_order" data-emplois-setter-value="created_at" type="button">
+          Émise le
+      </button>
+  </th>
+  
               <th scope="col">Statut</th>
               <th scope="col">Employeur</th>
               <th scope="col">Poste</th>
@@ -3587,7 +3603,8 @@
         'sql': '''
           SELECT COUNT(*)
           FROM
-            (SELECT COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+            (SELECT (COALESCE(LOWER(T6."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."last_name"), %s)), %s)) AS "job_seeker_full_name",
+                    COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
                                (SELECT U0."id"
                                 FROM "eligibility_eligibilitydiagnosis" U0
                                 WHERE (U0."expires_at" > %s
@@ -3608,12 +3625,14 @@
                     GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change"
              FROM "job_applications_jobapplication"
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
+             INNER JOIN "users_user" T6 ON ("job_applications_jobapplication"."job_seeker_id" = T6."id")
              WHERE ((("job_applications_jobapplication"."sender_id" = %s
                       AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
                      OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
                     AND "job_applications_jobapplication"."archived_at" IS NULL)
              GROUP BY "job_applications_jobapplication"."id",
-                      1) subquery
+                      1,
+                      2) subquery
         ''',
       }),
       dict({
@@ -3688,6 +3707,7 @@
                                     AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                              ORDER BY U0."created_at" DESC
                              LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+                 (COALESCE(LOWER(T6."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."last_name"), %s)), %s)) AS "job_seeker_full_name",
                  T6."id",
                  T6."password",
                  T6."last_login",
@@ -3939,6 +3959,7 @@
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           GROUP BY "job_applications_jobapplication"."id",
                    49,
+                   50,
                    T6."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
@@ -3948,7 +3969,7 @@
                    "companies_siaeconvention"."id",
                    "approvals_approval"."id"
           ORDER BY "job_applications_jobapplication"."created_at" DESC,
-                   "job_applications_jobapplication"."id" ASC
+                   "job_applications_jobapplication"."id" DESC
           LIMIT 2
         ''',
       }),
@@ -4765,7 +4786,8 @@
         'sql': '''
           SELECT COUNT(*)
           FROM
-            (SELECT COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+            (SELECT (COALESCE(LOWER(T6."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."last_name"), %s)), %s)) AS "job_seeker_full_name",
+                    COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
                                (SELECT U0."id"
                                 FROM "eligibility_eligibilitydiagnosis" U0
                                 WHERE (U0."expires_at" > %s
@@ -4786,12 +4808,14 @@
                     GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change"
              FROM "job_applications_jobapplication"
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
+             INNER JOIN "users_user" T6 ON ("job_applications_jobapplication"."job_seeker_id" = T6."id")
              WHERE ((("job_applications_jobapplication"."sender_id" = %s
                       AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
                      OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
                     AND "job_applications_jobapplication"."archived_at" IS NULL)
              GROUP BY "job_applications_jobapplication"."id",
-                      1) subquery
+                      1,
+                      2) subquery
         ''',
       }),
       dict({
@@ -4866,6 +4890,7 @@
                                     AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                              ORDER BY U0."created_at" DESC
                              LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+                 (COALESCE(LOWER(T6."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."last_name"), %s)), %s)) AS "job_seeker_full_name",
                  T6."id",
                  T6."password",
                  T6."last_login",
@@ -5117,6 +5142,7 @@
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           GROUP BY "job_applications_jobapplication"."id",
                    49,
+                   50,
                    T6."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
@@ -5126,7 +5152,7 @@
                    "companies_siaeconvention"."id",
                    "approvals_approval"."id"
           ORDER BY "job_applications_jobapplication"."created_at" DESC,
-                   "job_applications_jobapplication"."id" ASC
+                   "job_applications_jobapplication"."id" DESC
           LIMIT 2
         ''',
       }),
@@ -5359,7 +5385,7 @@
   
   
       
-          <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/prescriptions/list?display=list">
+          <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/prescriptions/list?display=list&amp;order=-created_at">
               <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
               <span>Effacer tout</span>
           </a>
@@ -5369,7 +5395,7 @@
   </div>
   '''
 # ---
-# name: test_reset_filter_button_snapshot[off-canvas buttons in table view]
+# name: test_reset_filter_button_snapshot[off-canvas buttons in table view & created_at ascending order]
   '''
   <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
       <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
@@ -5380,7 +5406,7 @@
   
   
       
-          <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/prescriptions/list?display=table">
+          <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/prescriptions/list?display=table&amp;order=created_at">
               <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
               <span>Effacer tout</span>
           </a>
@@ -5394,7 +5420,7 @@
   '''
   <div class="ms-md-auto" id="apply-list-filter-counter">
           
-              <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/prescriptions/list?display=list">
+              <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/prescriptions/list?display=list&amp;order=-created_at">
                   <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
                   <span>Effacer tout</span>
               </a>
@@ -5402,11 +5428,11 @@
       </div>
   '''
 # ---
-# name: test_reset_filter_button_snapshot[reset-filter button in table view]
+# name: test_reset_filter_button_snapshot[reset-filter button in table view & created_at ascending order]
   '''
   <div class="ms-md-auto" id="apply-list-filter-counter">
           
-              <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/prescriptions/list?display=table">
+              <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/prescriptions/list?display=table&amp;order=created_at">
                   <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
                   <span>Effacer tout</span>
               </a>

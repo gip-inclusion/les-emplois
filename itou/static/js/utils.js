@@ -227,9 +227,11 @@ htmx.onLoad((target) => {
       if (Array.from(form.elements).some((input) => input.name == checkBoxInputName && input.checked)) {
         document.querySelectorAll(`[${attribute}="hidden"]`).forEach((element) => element.classList.add("d-none"))
         document.querySelectorAll(`[${attribute}="shown"]`).forEach((element) => element.classList.remove("d-none"))
+        document.querySelectorAll(`[${attribute}="disabled"]`).forEach((element) => { element.disabled = true; })
       } else {
         document.querySelectorAll(`[${attribute}="shown"]`).forEach((element) => element.classList.add("d-none"))
         document.querySelectorAll(`[${attribute}="hidden"]`).forEach((element) => element.classList.remove("d-none"))
+        document.querySelectorAll(`[${attribute}="disabled"]`).forEach((element) => { element.disabled = false; })
       }
     })
   })
