@@ -1,5 +1,8 @@
 <th scope="col" aria-sort="{% if order == ascending_value %}ascending{% elif order == ascending_value.opposite %}descending{% else %}none{% endif %}">
-    <button type="button" data-emplois-setter-target="#id_order" data-emplois-setter-value="{% if order == ascending_value %}{{ ascending_value.opposite }}{% else %}{{ ascending_value }}{% endif %}">
+    <button type="button"
+            data-emplois-setter-target="#id_order"
+            data-emplois-setter-value="{% if order == ascending_value %}{{ ascending_value.opposite }}{% else %}{{ ascending_value }}{% endif %}"
+            {{ extra_button_attributes|default:"" }}>
         {{ name }}
     </button>
 </th>
