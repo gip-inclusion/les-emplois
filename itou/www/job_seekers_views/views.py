@@ -113,8 +113,13 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
 
 @require_safe
 @check_user(lambda user: user.is_prescriber)
-def list_job_seekers(request, template_name="job_seekers_views/list.html"):
-    job_seekers_ids = list(User.objects.linked_job_seeker_ids(request.user, request.current_organization))
+def list_job_seekers(request, template_name="job_seekers_views/list.html", list_organization=False):
+    if list_organization:
+        if not request.current_organization:
+            raise Http404
+        job_seekers_ids = list(User.objects.linked_job_seeker_ids(request.user, request.current_organization))
+    else:
+        job_seekers_ids = list(User.objects.linked_job_seeker_ids(request.user, None))
 
     form = FilterForm(
         User.objects.filter(kind=UserKind.JOB_SEEKER).filter(pk__in=job_seekers_ids),
@@ -167,6 +172,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
 
     context = {
         "back_url": get_safe_url(request, "back_url"),
+        "list_organization": list_organization,
         "filters_form": form,
         "order": order,
         "page_obj": page_obj,

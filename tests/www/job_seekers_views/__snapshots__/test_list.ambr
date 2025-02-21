@@ -1,5 +1,114 @@
 # serializer version: 1
-# name: test_empty_list
+# name: test_empty_list[/job-seekers/list-organization]
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+  
+  
+                              
+      <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
+          <h1 class="m-0">Candidats</h1>
+          <div aria-label="Actions sur les candidats" class="d-flex flex-column flex-md-row gap-3" role="group">
+              
+              <a class="btn btn-lg btn-secondary btn-ico" data-matomo-action="clic" data-matomo-category="compte-candidat" data-matomo-event="true" data-matomo-option="creer-un-compte-candidat" href="/job-seekers/start?tunnel=standalone&amp;from_url=/job-seekers/list-organization">
+                  <i aria-hidden="true" class="ri-user-add-line fw-medium"></i>
+                  <span>Créer un compte candidat</span>
+              </a>
+              <a class="btn btn-lg btn-primary btn-ico" href="/search/employers/results">
+                  <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+                  <span>Postuler pour un candidat</span>
+              </a>
+          </div>
+      </div>
+  
+                              
+      
+  
+  
+                              
+      
+          <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+              <li class="nav-item">
+                  <a class="nav-link" href="/job-seekers/list">
+                      Mes candidats
+                  </a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link active" href="/job-seekers/list-organization">
+                      Tous les candidats de la structure
+                  </a>
+              </li>
+          </ul>
+      
+  
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="col-12">
+                      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                          
+  
+  <p class="mb-0" id="job-seekers-list-count">
+      0 résultat
+  </p>
+  
+                          <div class="flex-column flex-md-row mt-3 mt-md-0">
+                              
+                                  
+                              
+                              <form hx-get="/job-seekers/list-organization" hx-indicator="#job-seekers-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-seekers-section" hx-trigger="change from:#id_order, change delay:.5s">
+                                  <div class="w-lg-400px"><label class="visually-hidden" for="id_job_seeker">Nom</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du candidat" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
+    <option selected="" value=""></option>
+  
+  </select></div>
+                                  <input id="id_order" name="order" type="hidden" value="full_name"/>
+                              </form>
+                          </div>
+                      </div>
+                      
+  
+  
+  
+  
+  <section aria-labelledby="job-seekers-list-count" id="job-seekers-section">
+      
+          <div class="text-center my-3 my-md-4">
+              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-siae-card-no-result.png"/>
+              <p class="mb-1 mt-3">
+                  <strong>Aucun candidat pour le moment</strong>
+              </p>
+          </div>
+      
+  </section>
+  
+  
+  
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
+# name: test_empty_list[/job-seekers/list]
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
@@ -37,6 +146,21 @@
   
   
                               
+      
+          <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+              <li class="nav-item">
+                  <a class="nav-link active" href="/job-seekers/list">
+                      Mes candidats
+                  </a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="/job-seekers/list-organization">
+                      Tous les candidats de la structure
+                  </a>
+              </li>
+          </ul>
+      
+  
                           </div>
                       </div>
                   </div>
@@ -55,6 +179,9 @@
   </p>
   
                           <div class="flex-column flex-md-row mt-3 mt-md-0">
+                              
+                                  
+                              
                               <form hx-get="/job-seekers/list" hx-indicator="#job-seekers-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-seekers-section" hx-trigger="change from:#id_order, change delay:.5s">
                                   <div class="w-lg-400px"><label class="visually-hidden" for="id_job_seeker">Nom</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du candidat" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
     <option selected="" value=""></option>
@@ -221,16 +348,9 @@
              WHERE "users_user"."created_by_id" = %s
              ORDER BY RANDOM() ASC)
           UNION
-            (SELECT "users_jobseekerprofile"."user_id" AS "col1"
-             FROM "users_jobseekerprofile"
-             WHERE "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s
-             ORDER BY RANDOM() ASC)
-          UNION
             (SELECT "job_applications_jobapplication"."job_seeker_id" AS "col1"
              FROM "job_applications_jobapplication"
-             WHERE (("job_applications_jobapplication"."sender_id" = %s
-                     AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
-                    OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
+             WHERE "job_applications_jobapplication"."sender_id" = %s
              ORDER BY "job_applications_jobapplication"."created_at" DESC)
         ''',
       }),
@@ -1024,7 +1144,7 @@
                       
                           <tr>
                               <td>
-                                  <a class="btn-link" href="/job-seekers/details/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list">Alain ZORRO</a>
+                                  <a class="btn-link" href="/job-seekers/details/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list-organization">Alain ZORRO</a>
                               </td>
                               <td>
                                   
@@ -1053,7 +1173,7 @@
                       
                           <tr>
                               <td>
-                                  <a class="btn-link" href="/job-seekers/details/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list">Bernard YGREC</a>
+                                  <a class="btn-link" href="/job-seekers/details/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list-organization">Bernard YGREC</a>
                               </td>
                               <td>
                                   
@@ -1082,7 +1202,7 @@
                       
                           <tr>
                               <td>
-                                  <a class="btn-link" href="/job-seekers/details/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list">Charlotte XERUS</a>
+                                  <a class="btn-link" href="/job-seekers/details/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list-organization">Charlotte XERUS</a>
                               </td>
                               <td>
                                   
@@ -1111,7 +1231,7 @@
                       
                           <tr>
                               <td>
-                                  <a class="btn-link" href="/job-seekers/details/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list">David WATERFORD</a>
+                                  <a class="btn-link" href="/job-seekers/details/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list-organization">David WATERFORD</a>
                               </td>
                               <td>
                                   

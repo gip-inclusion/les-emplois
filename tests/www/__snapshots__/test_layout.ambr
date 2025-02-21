@@ -50,11 +50,29 @@
       
           
               <li class="nav-item">
-                  <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats" href="/job-seekers/list">
+                  <button aria-controls="collapse-nav-candidats" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-candidats" data-bs-toggle="collapse" type="button">
                       <i aria-hidden="true" class="ri-user-line fw-medium"></i>
                       <span>Candidats</span>
-                      
-                  </a>
+                  </button>
+                  <div class="collapse" id="collapse-nav-candidats">
+                      <ul>
+                          
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-utilisateur" href="/job-seekers/list">
+                                      Mes candidats
+                                      
+                                  </a>
+                              </li>
+                          
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-organisation" href="/job-seekers/list-organization">
+                                      Tous les candidats de la structure
+                                      
+                                  </a>
+                              </li>
+                          
+                      </ul>
+                  </div>
               </li>
           
       
@@ -1104,11 +1122,29 @@
       
           
               <li class="nav-item">
-                  <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats" href="/job-seekers/list">
+                  <button aria-controls="collapse-nav-candidats" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-candidats" data-bs-toggle="collapse" type="button">
                       <i aria-hidden="true" class="ri-user-line fw-medium"></i>
                       <span>Candidats</span>
-                      
-                  </a>
+                  </button>
+                  <div class="collapse" id="collapse-nav-candidats">
+                      <ul>
+                          
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-utilisateur" href="/job-seekers/list">
+                                      Mes candidats
+                                      
+                                  </a>
+                              </li>
+                          
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-organisation" href="/job-seekers/list-organization">
+                                      Tous les candidats de la structure
+                                      
+                                  </a>
+                              </li>
+                          
+                      </ul>
+                  </div>
               </li>
           
       
@@ -1361,11 +1397,22 @@
       
           
               <li class="nav-item">
-                  <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats" href="/job-seekers/list">
+                  <button aria-controls="collapse-nav-candidats" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-candidats" data-bs-toggle="collapse" type="button">
                       <i aria-hidden="true" class="ri-user-line fw-medium"></i>
                       <span>Candidats</span>
-                      
-                  </a>
+                  </button>
+                  <div class="collapse" id="collapse-nav-candidats">
+                      <ul>
+                          
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats-utilisateur" href="/job-seekers/list">
+                                      Mes candidats
+                                      
+                                  </a>
+                              </li>
+                          
+                      </ul>
+                  </div>
               </li>
           
       
