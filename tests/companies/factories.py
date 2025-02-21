@@ -29,8 +29,8 @@ class SiaeFinancialAnnexFactory(factory.django.DjangoModelFactory):
     # e.g. EI59V182019A1M1
     number = factory.Sequence(lambda n: f"EI59V{n:06d}A1M1")
     state = models.SiaeFinancialAnnex.STATE_VALID
-    start_at = factory.LazyFunction(lambda: timezone.now() - ONE_MONTH)
-    end_at = factory.LazyFunction(lambda: timezone.now() + ONE_MONTH)
+    start_at = factory.LazyFunction(lambda: timezone.localdate() - ONE_MONTH)
+    end_at = factory.LazyFunction(lambda: timezone.localdate() + ONE_MONTH)
 
 
 class SiaeConventionFactory(factory.django.DjangoModelFactory):

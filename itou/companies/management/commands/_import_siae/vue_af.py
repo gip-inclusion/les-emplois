@@ -42,10 +42,17 @@ def get_vue_af_df():
     - end_date
     - state
     """
+
+    def parse_date(datestring):
+        return datetime.datetime.strptime(datestring, "%d/%m/%Y").date()
+
     df = get_fluxiae_df(
         vue_name="fluxIAE_AnnexeFinanciere",
-        converters={"af_id_structure": int},
-        parse_dates=["af_date_debut_effet", "af_date_fin_effet"],
+        converters={
+            "af_id_structure": int,
+            "af_date_debut_effet": parse_date,
+            "af_date_fin_effet": parse_date,
+        },
         description="Vue AF",
         skip_first_row=True,
     )
@@ -83,7 +90,7 @@ def get_vue_af_df():
     # A ValidationError will be raised if any number is incorrect.
     df.number.apply(validate_af_number)
 
-    df["ends_in_the_future"] = df.end_at.apply(timezone.make_aware) > timezone.now()
+    df["ends_in_the_future"] = df.end_at > timezone.localdate()
     df["has_active_state"] = df.state.isin(SiaeFinancialAnnex.STATES_ACTIVE)
     df["is_active"] = df.has_active_state & df.ends_in_the_future
 
@@ -147,7 +154,7 @@ def get_conventions_by_siae_key(vue_af_df):
         siae_conventions[(row.asp_id, row.kind)].append(
             Convention(
                 has_active_state=row.has_active_state,
-                end_at=timezone.make_aware(row.end_at).date(),
+                end_at=row.end_at,
             )
         )
     return {
