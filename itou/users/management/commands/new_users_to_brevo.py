@@ -19,7 +19,7 @@ from itou.utils.command import BaseCommand
 logger = logging.getLogger(__name__)
 
 # https://app.brevo.com/contact/list-listing
-BREVO_LIST_ID = 31
+BREVO_LES_EMPLOIS_LIST_ID = 31
 BREVO_API_URL = "https://api.brevo.com/v3"
 
 
@@ -63,7 +63,7 @@ class BrevoClient:
             f"{BREVO_API_URL}/contacts/import",
             headers={"Content-Type": "application/json"},
             json={
-                "listIds": [BREVO_LIST_ID],
+                "listIds": [BREVO_LES_EMPLOIS_LIST_ID],
                 "emailBlacklist": False,
                 "smsBlacklist": False,
                 "updateExistingContacts": False,  # Don't update because we don't want to update emailBlacklist
