@@ -1848,7 +1848,7 @@ class TestPENotificationMixin:
     def test_save_error(self):
         now = timezone.now()
         approval = ApprovalFactory()
-        approval.pe_save_error("foo", "bar", at=now)
+        approval.pe_save_error(now, endpoint="foo", exit_code="bar")
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_error"
         assert approval.pe_notification_time == now

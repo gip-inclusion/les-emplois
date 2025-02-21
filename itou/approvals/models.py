@@ -313,10 +313,10 @@ class PENotificationMixin(models.Model):
         queryset.update(**{key: value for key, value in update_dict.items() if value})
         return status
 
-    def pe_save_pending(self, reason, at):
+    def pe_save_pending(self, at, *, reason):
         return self._pe_notification_update(api_enums.PEApiNotificationStatus.PENDING, at, None, reason)
 
-    def pe_save_error(self, endpoint, exit_code, at):
+    def pe_save_error(self, at, *, endpoint, exit_code):
         return self._pe_notification_update(api_enums.PEApiNotificationStatus.ERROR, at, endpoint, exit_code)
 
     def pe_save_should_retry(self, at):
@@ -365,7 +365,9 @@ class PENotificationMixin(models.Model):
             return self.pe_save_should_retry(at)
         except PoleEmploiAPIBadResponse as exc:
             self.pe_log_err("got an unrecoverable error={} in maj_pass_iae", exc.response_code)
-            return self.pe_save_error(api_enums.PEApiEndpoint.MISE_A_JOUR_PASS_IAE, exc.response_code, at)
+            return self.pe_save_error(
+                at, endpoint=api_enums.PEApiEndpoint.MISE_A_JOUR_PASS_IAE, exit_code=exc.response_code
+            )
         else:
             self.pe_log_info("got success in maj_pass_iae")
             return self.pe_save_success(at)
@@ -413,8 +415,8 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
         if self.start_at > today:
             self.pe_log_err("start_at={} starts after today={}", self.start_at, today)
             return self.pe_save_pending(
-                api_enums.PEApiPreliminaryCheckFailureReason.STARTS_IN_FUTURE,
                 at,
+                reason=api_enums.PEApiPreliminaryCheckFailureReason.STARTS_IN_FUTURE,
             )
 
         type_siae = companies_enums.siae_kind_to_ft_type_siae(self.origin_siae_kind)
@@ -423,9 +425,9 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
                 "could not find PE type for siae_siret={} siae_kind={}", self.origin_siae_siret, self.origin_siae_kind
             )
             return self.pe_save_error(
-                None,
-                api_enums.PEApiPreliminaryCheckFailureReason.INVALID_SIAE_KIND,
                 at,
+                endpoint=None,
+                exit_code=api_enums.PEApiPreliminaryCheckFailureReason.INVALID_SIAE_KIND,
             )
 
         if not all(
@@ -445,8 +447,8 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
             # we save those as pending since the cron will ignore those cases anyway and thus has
             # no chance to block itself.
             return self.pe_save_pending(
-                api_enums.PEApiPreliminaryCheckFailureReason.MISSING_USER_DATA,
                 at,
+                reason=api_enums.PEApiPreliminaryCheckFailureReason.MISSING_USER_DATA,
             )
 
         if not self.user_id_national_pe:
@@ -463,7 +465,9 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
                 return self.pe_save_should_retry(at)
             except PoleEmploiAPIBadResponse as exc:
                 self.pe_log_err("got an unrecoverable error={} in recherche_individu", exc.response_code)
-                return self.pe_save_error(api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exc.response_code, at)
+                return self.pe_save_error(
+                    at, endpoint=api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exit_code=exc.response_code
+                )
             self.user_id_national_pe = id_national
             self.save(update_fields=["user_id_national_pe"])
         return self.pe_maj_pass(
@@ -928,8 +932,8 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         if self.start_at > now.date():
             self.pe_log_err("start_at={} starts after today={}", self.start_at, now.date())
             return self.pe_save_pending(
-                api_enums.PEApiPreliminaryCheckFailureReason.STARTS_IN_FUTURE,
                 now,
+                reason=api_enums.PEApiPreliminaryCheckFailureReason.STARTS_IN_FUTURE,
             )
 
         sender_kind = self.origin_sender_kind
@@ -941,8 +945,8 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             if not job_application:
                 self.pe_log_err("had no accepted job application")
                 return self.pe_save_pending(
-                    api_enums.PEApiPreliminaryCheckFailureReason.NO_JOB_APPLICATION,
                     now,
+                    reason=api_enums.PEApiPreliminaryCheckFailureReason.NO_JOB_APPLICATION,
                 )
 
             siae_siret = job_application.to_company.siret
@@ -955,9 +959,9 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         if not type_siae:
             self.pe_log_err("could not find PE type for siae_siret={} siae_kind={}", siae_siret, siae_kind)
             return self.pe_save_error(
-                None,
-                api_enums.PEApiPreliminaryCheckFailureReason.INVALID_SIAE_KIND,
                 now,
+                endpoint=None,
+                exit_code=api_enums.PEApiPreliminaryCheckFailureReason.INVALID_SIAE_KIND,
             )
 
         if not all(
@@ -972,8 +976,8 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             # we save those as pending since the cron will ignore those cases anyway and thus has
             # no chance to block itself.
             return self.pe_save_pending(
-                api_enums.PEApiPreliminaryCheckFailureReason.MISSING_USER_DATA,
                 now,
+                reason=api_enums.PEApiPreliminaryCheckFailureReason.MISSING_USER_DATA,
             )
 
         if not self.user.jobseeker_profile.pe_obfuscated_nir:
@@ -990,7 +994,9 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 return self.pe_save_should_retry(now)
             except PoleEmploiAPIBadResponse as exc:
                 self.pe_log_err("got an unrecoverable error={} in recherche_individu", exc.response_code)
-                return self.pe_save_error(api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exc.response_code, now)
+                return self.pe_save_error(
+                    now, endpoint=api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exit_code=exc.response_code
+                )
             self.user.jobseeker_profile.pe_obfuscated_nir = id_national
             self.user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
             self.user.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
@@ -1973,7 +1979,9 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
             return self.pe_save_should_retry(now)
         except PoleEmploiAPIBadResponse as exc:
             self.pe_log_err("got an unrecoverable error={} in recherche_individu", exc.response_code)
-            return self.pe_save_error(api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exc.response_code, now)
+            return self.pe_save_error(
+                now, endpoint=api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exit_code=exc.response_code
+            )
 
         return self.pe_maj_pass(
             id_national_pe=id_national,
