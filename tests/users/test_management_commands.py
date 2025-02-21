@@ -19,7 +19,7 @@ from itou.job_applications.models import JobApplication
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityProvider
 from itou.users.management.commands import send_check_authorized_members_email
-from itou.users.management.commands.new_users_to_brevo import BREVO_API_URL, BREVO_LIST_ID
+from itou.users.management.commands.new_users_to_brevo import BREVO_API_URL, BREVO_LES_EMPLOIS_LIST_ID
 from itou.users.models import User
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse
 from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
@@ -294,7 +294,7 @@ class TestCommandNewUsersToBrevo:
 
         assert [json.loads(call.request.content) for call in import_mock.calls] == [
             {
-                "listIds": [BREVO_LIST_ID],
+                "listIds": [BREVO_LES_EMPLOIS_LIST_ID],
                 "emailBlacklist": False,
                 "smsBlacklist": False,
                 "updateExistingContacts": False,
@@ -408,7 +408,7 @@ class TestCommandNewUsersToBrevo:
 
         assert [json.loads(call.request.content) for call in import_mock.calls] == [
             {
-                "listIds": [BREVO_LIST_ID],
+                "listIds": [BREVO_LES_EMPLOIS_LIST_ID],
                 "emailBlacklist": False,
                 "smsBlacklist": False,
                 "updateExistingContacts": False,
@@ -494,7 +494,7 @@ class TestCommandNewUsersToBrevo:
 
         assert [json.loads(call.request.content) for call in import_mock.calls] == [
             {
-                "listIds": [BREVO_LIST_ID],
+                "listIds": [BREVO_LES_EMPLOIS_LIST_ID],
                 "emailBlacklist": False,
                 "smsBlacklist": False,
                 "updateExistingContacts": False,
@@ -570,7 +570,7 @@ class TestCommandNewUsersToBrevo:
 
         assert [json.loads(call.request.content) for call in import_mock.calls] == [
             {
-                "listIds": [BREVO_LIST_ID],
+                "listIds": [BREVO_LES_EMPLOIS_LIST_ID],
                 "emailBlacklist": False,
                 "smsBlacklist": False,
                 "updateExistingContacts": False,
@@ -588,7 +588,7 @@ class TestCommandNewUsersToBrevo:
                 ],
             },
             {
-                "listIds": [BREVO_LIST_ID],
+                "listIds": [BREVO_LES_EMPLOIS_LIST_ID],
                 "emailBlacklist": False,
                 "smsBlacklist": False,
                 "updateExistingContacts": False,
@@ -643,7 +643,7 @@ class TestCommandNewUsersToBrevo:
 
         assert [json.loads(call.request.content) for call in import_mock.calls] == [
             {
-                "listIds": [BREVO_LIST_ID],
+                "listIds": [BREVO_LES_EMPLOIS_LIST_ID],
                 "emailBlacklist": False,
                 "smsBlacklist": False,
                 "updateExistingContacts": False,
