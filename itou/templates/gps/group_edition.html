@@ -69,18 +69,17 @@
 {% block script %}
     {{ block.super }}
     <script nonce="{{ CSP_NONCE }}">
-        function disable_ended_at() {
-            var isOngoing = $("input[name='is_ongoing']:checked", "#id_is_ongoing").val()
-            if (isOngoing == "True") {
-                $("#id_ended_at").prop('disabled', false);
-            } else {
-                $("#id_ended_at").prop('disabled', true);
-            }
-        }
+        htmx.onLoad((target) => {
+            const endedAt = document.querySelector("duet-date-picker[identifier=id_ended_at]");
+            const ongoingContainer = document.getElementById("id_is_ongoing");
 
-        // When page is loaded, do:
-        disable_ended_at()
-        // Then, on any change:
-        $("#id_is_ongoing").change(disable_ended_at)
+            function disableEndedAt() {
+                const checkedOngoingRadio = this.querySelector("input[name='is_ongoing']:checked");
+                endedAt.disabled = checkedOngoingRadio.value === "True";
+            }
+
+            disableEndedAt.call(ongoingContainer);
+            ongoingContainer.addEventListener("change", disableEndedAt);
+        });
     </script>
 {% endblock %}
