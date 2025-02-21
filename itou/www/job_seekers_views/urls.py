@@ -18,6 +18,12 @@ urlpatterns = [
     ),
     path("list", views.list_job_seekers, name="list"),
     path(
+        "list-organization",
+        views.list_job_seekers,
+        name="list_organization",
+        kwargs={"list_organization": True},
+    ),
+    path(
         "start",
         views.GetOrCreateJobSeekerStartView.as_view(),
         name="get_or_create_start",
