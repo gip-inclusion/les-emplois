@@ -1,11 +1,9 @@
 from django import forms
 from django.core.validators import MinLengthValidator, RegexValidator
 from django.urls import reverse_lazy
-from django.utils import timezone
 from django_select2.forms import Select2Widget
 
 from itou.asp.models import Commune, RSAAllocation
-from itou.companies.models import SiaeFinancialAnnex
 from itou.employee_record.enums import Status
 from itou.users.models import JobSeekerProfile
 from itou.utils.validators import validate_pole_emploi_id
@@ -340,6 +338,11 @@ class NewEmployeeRecordStep3ForEITIForm(NewEmployeeRecordStep3Form):
         self.fields["eiti_contributions"].required = True
 
 
+class FinancialAnnexesChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return f"{obj.number} — {obj.start_at:%d/%m/%Y}–{obj.end_at:%d/%m/%Y} — {obj.get_state_display()}"
+
+
 class NewEmployeeRecordStep4(forms.Form):
     """
     New employee record step 4:
@@ -347,10 +350,13 @@ class NewEmployeeRecordStep4(forms.Form):
     select a valid financial annex
     """
 
-    financial_annex = forms.ModelChoiceField(
+    financial_annex = FinancialAnnexesChoiceField(
+        required=False,
         queryset=None,
+        # The Select2Widget adds an empty label when the field is not required.
+        empty_label=None,
         label="Annexe financière",
-        help_text="Vous pouvez rattacher la fiche salarié à une annexe financière validée ou provisoire",
+        widget=Select2Widget(),
     )
 
     def __init__(self, employee_record, *args, **kwargs):
@@ -358,11 +364,8 @@ class NewEmployeeRecordStep4(forms.Form):
 
         self.employee_record = employee_record
 
-        # Fetch active financial annexes for the SIAE
         convention = employee_record.job_application.to_company.convention
-        self.fields["financial_annex"].queryset = convention.financial_annexes.filter(
-            state__in=SiaeFinancialAnnex.STATES_ACTIVE, end_at__gt=timezone.now()
-        )
+        self.fields["financial_annex"].queryset = convention.financial_annexes.order_by("-end_at", "-number")
         self.fields["financial_annex"].initial = employee_record.financial_annex
         self.fields["financial_annex"].required = False
 
