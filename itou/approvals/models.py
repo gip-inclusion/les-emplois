@@ -295,7 +295,7 @@ class PENotificationMixin(models.Model):
         return self.end_at.strftime(DATE_FORMAT)
 
     def _pe_notification_update(
-        self, status: api_enums.PEApiNotificationStatus, at=None, endpoint=None, exit_code=None
+        self, status: api_enums.PEApiNotificationStatus, at: datetime.datetime, endpoint=None, exit_code=None
     ) -> api_enums.PEApiNotificationStatus:
         """A helper method to update the fields of the mixin:
         - whatever the destination class (Approval, PoleEmploiApproval)
@@ -305,7 +305,7 @@ class PENotificationMixin(models.Model):
         """
         update_dict = {
             "pe_notification_status": status,
-            "pe_notification_time": at if at else timezone.now(),
+            "pe_notification_time": at,
             "pe_notification_endpoint": endpoint,
             "pe_notification_exit_code": exit_code,
         }
