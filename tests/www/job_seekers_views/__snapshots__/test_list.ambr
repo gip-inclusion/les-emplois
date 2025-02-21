@@ -392,7 +392,8 @@
                                            %s,
                                            %s,
                                            %s))
-          ORDER BY 34 ASC
+          ORDER BY 34 ASC,
+                   "users_user"."id" ASC
           LIMIT 4
         ''',
       }),
@@ -918,7 +919,8 @@
                                            %s,
                                            %s,
                                            %s))
-          ORDER BY 34 ASC
+          ORDER BY 34 ASC,
+                   "users_user"."id" ASC
           LIMIT 4
         ''',
       }),

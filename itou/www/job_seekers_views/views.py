@@ -158,7 +158,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
         order = JobSeekerOrder(request.GET.get("order"))
     except ValueError:
         order = JobSeekerOrder.FULL_NAME_ASC
-    queryset = queryset.order_by(str(order))
+    queryset = queryset.order_by(*order.order_by)
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=10)
     for job_seeker in page_obj:

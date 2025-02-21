@@ -493,6 +493,11 @@ def test_job_seekers_order(client, subtests):
         first_name="Zorro",
         last_name="Martin",
     )
+    second_created_job_seeker = JobSeekerFactory(
+        created_by=prescriber,
+        first_name="Zorro",
+        last_name="Martin",
+    )
     a_b_job_seeker = JobApplicationFactory(
         sender=prescriber, job_seeker__first_name="Alice", job_seeker__last_name="Berger"
     ).job_seeker
@@ -501,9 +506,9 @@ def test_job_seekers_order(client, subtests):
     url = reverse("job_seekers_views:list")
 
     expected_order = {
-        "full_name": [a_b_job_seeker, c_d_job_seeker, created_job_seeker],
-        "job_applications_nb": [created_job_seeker, a_b_job_seeker, c_d_job_seeker],
-        "last_updated_at": [c_d_job_seeker, a_b_job_seeker, created_job_seeker],
+        "full_name": [a_b_job_seeker, c_d_job_seeker, created_job_seeker, second_created_job_seeker],
+        "job_applications_nb": [created_job_seeker, second_created_job_seeker, a_b_job_seeker, c_d_job_seeker],
+        "last_updated_at": [c_d_job_seeker, a_b_job_seeker, created_job_seeker, second_created_job_seeker],
     }
 
     with subtests.test(order="<missing_value>"):
