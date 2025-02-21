@@ -941,8 +941,8 @@ class SiaeFinancialAnnex(models.Model):
         max_length=20,
         choices=STATE_CHOICES,
     )
-    start_at = models.DateTimeField(verbose_name="date de début d'effet")
-    end_at = models.DateTimeField(verbose_name="date de fin d'effet")
+    start_at = models.DateField(verbose_name="date de début d'effet")
+    end_at = models.DateField(verbose_name="date de fin d'effet")
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
@@ -993,4 +993,4 @@ class SiaeFinancialAnnex(models.Model):
 
     @property
     def is_active(self):
-        return self.state in SiaeFinancialAnnex.STATES_ACTIVE and self.end_at > timezone.now()
+        return self.state in SiaeFinancialAnnex.STATES_ACTIVE and self.end_at > timezone.localdate()

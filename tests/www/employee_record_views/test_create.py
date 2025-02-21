@@ -4,16 +4,18 @@ import random
 import pytest
 from django.contrib.messages import get_messages
 from django.urls import reverse
+from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune, Country, EducationLevel
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
+from itou.companies.models import SiaeFinancialAnnex
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition
 from itou.users.enums import LackOfNIRReason
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK, mock_get_geocoding_data
 from itou.utils.widgets import DuetDatePickerWidget
-from tests.companies.factories import CompanyWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyWithMembershipAndJobsFactory, SiaeFinancialAnnexFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from tests.users.factories import JobSeekerFactory
@@ -685,6 +687,38 @@ class TestCreateEmployeeRecordStep4(CreateEmployeeRecordTestMixin):
 
         response = client.get(self.url)
         assert response.context["form"].employee_record == recent_employee_record
+
+    def test_financial_annexes_ordering(self, client):
+        current_annex = self.company.convention.financial_annexes.get()
+        old_annex = SiaeFinancialAnnexFactory(
+            convention=self.company.convention,
+            state=SiaeFinancialAnnex.STATE_ARCHIVED,
+            start_at=timezone.localdate() - datetime.timedelta(days=730),
+            end_at=timezone.localdate() - datetime.timedelta(days=365),
+        )
+        response = client.get(self.url)
+        assertContains(
+            response,
+            f"""
+            <select name="financial_annex" lang="fr" data-minimum-input-length="0"
+                    data-theme="bootstrap-5" data-allow-clear="true" data-placeholder=""
+                    class="form-select django-select2" id="id_financial_annex">
+              <option value="" selected></option>
+              <option value="{current_annex.pk}">
+                  {current_annex.number}
+                  — {current_annex.start_at:%d/%m/%Y}–{current_annex.end_at:%d/%m/%Y}
+                  — Validée
+                  </option>
+              <option value="{old_annex.pk}">
+                  {old_annex.number}
+                  — {old_annex.start_at:%d/%m/%Y}–{old_annex.end_at:%d/%m/%Y}
+                  — Archivée (invalide)
+              </option>
+            </select>
+            """,
+            html=True,
+            count=1,
+        )
 
 
 class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
