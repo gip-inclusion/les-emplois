@@ -340,7 +340,7 @@ class PENotificationMixin(models.Model):
     def pe_log_err(self, fmt, *args, **kwargs):
         self._pe_log("!", fmt, *args, **kwargs)
 
-    def pe_maj_pass(self, id_national_pe, siae_siret, siae_kind, sender_kind, prescriber_kind=None, at=None):
+    def pe_maj_pass(self, *, id_national_pe, siae_siret, siae_kind, sender_kind, prescriber_kind, at):
         pe_client = pole_emploi_api_client()
 
         typologie_prescripteur = None
