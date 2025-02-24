@@ -41,3 +41,15 @@ def aah_certified_mocker():
 
 def aah_not_certified_mocker():
     return {"status": "non_beneficiaire", "dateDebut": None, "dateFin": None}
+
+
+#################################################
+###################### PI #######################
+#################################################
+def asf_certified_mocker():
+    # https://particulier.api.gouv.fr/developpeurs/openapi#tag/Prestations-sociales/paths/~1api~1v2~1allocation-soutien-familial/get
+    return {"status": "beneficiaire", "dateDebut": "2024-08-01", "dateFin": None}
+
+
+def asf_not_certified_mocker():
+    return {"status": "non_beneficiaire", "dateDebut": None, "dateFin": None}

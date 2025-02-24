@@ -9,7 +9,7 @@ from huey.exceptions import RetryTask
 
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.tasks import async_certify_criteria
-from itou.utils.mocks.api_particulier import aah_certified_mocker, rsa_certified_mocker
+from itou.utils.mocks.api_particulier import aah_certified_mocker, asf_certified_mocker, rsa_certified_mocker
 from itou.utils.types import InclusiveDateRange
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 
@@ -36,6 +36,12 @@ class TestCertifyCriteria:
                 AdministrativeCriteriaKind.AAH,
                 aah_certified_mocker(),
                 id="aah",
+            ),
+            pytest.param(
+                f"{settings.API_PARTICULIER_BASE_URL}v2/allocation-soutien-familial",
+                AdministrativeCriteriaKind.PI,
+                asf_certified_mocker(),
+                id="pi",
             ),
         ],
     )

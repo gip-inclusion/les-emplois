@@ -53,8 +53,16 @@ def has_required_info(job_seeker):
 
 
 def certify_criteria(criteria, client, job_seeker):
+    """
+    Two criteria are the same between the API and Les emplois: AAH and RSA.
+    The "Parent Isolé" criterion is not a subsidy in itself but an administrative terminology.
+    See https://www.service-public.fr/particuliers/vosdroits/F15553/
+    Regarding the Diagnosis Socio-Professionnel, the beneficiary should already receive
+    the Allocation Soutien Familial (ASF) to be considered a Parent Isolé.
+    """
     endpoint_mapping = {
         AdministrativeCriteriaKind.AAH: "/v2/allocation-adulte-handicape",
+        AdministrativeCriteriaKind.PI: "/v2/allocation-soutien-familial",
         AdministrativeCriteriaKind.RSA: "/v2/revenu-solidarite-active",
     }
     response = _request(client, endpoint_mapping[criteria], job_seeker)
