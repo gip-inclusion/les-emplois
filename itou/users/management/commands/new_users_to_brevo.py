@@ -102,8 +102,10 @@ class Command(BaseCommand):
     )
     def handle(self, *args, wet_run, **options):
         client = BrevoClient()
+        self.import_professionals(client, wet_run=wet_run)
 
-        users = (
+    def import_professionals(self, client, *, wet_run):
+        professional_qs = (
             User.objects.filter(kind__in=[UserKind.PRESCRIBER, UserKind.EMPLOYER])
             .filter(
                 # Someday only filter on identity_provider ?
@@ -122,8 +124,12 @@ class Command(BaseCommand):
             )
             .order_by("email")
         )
+        self.import_employers(client, professional_qs, wet_run=wet_run)
+        self.import_prescribers(client, professional_qs, wet_run=wet_run)
+
+    def import_employers(self, client, professional_qs, *, wet_run):
         employers = list(
-            users.filter(kind=UserKind.EMPLOYER)
+            professional_qs.filter(kind=UserKind.EMPLOYER)
             .filter(
                 Exists(
                     CompanyMembership.objects.filter(
@@ -135,28 +141,27 @@ class Command(BaseCommand):
             )
             .values("email", "first_name", "last_name", "date_joined")
         )
+        logger.info("SIAE users count: %d", len(employers))
+        if wet_run:
+            client.import_users(employers, UserCategory.EMPLOYEUR)
 
-        all_prescribers = users.filter(kind=UserKind.PRESCRIBER)
+    def import_prescribers(self, client, professional_qs, *, wet_run):
+        all_prescribers = professional_qs.filter(kind=UserKind.PRESCRIBER)
         prescriber_membership_qs = PrescriberMembership.objects.filter(user_id=OuterRef("pk"), is_active=True)
         prescribers = list(
             all_prescribers.filter(Exists(prescriber_membership_qs.filter(organization__is_authorized=True))).values(
                 "email", "first_name", "last_name", "date_joined"
             )
         )
+        logger.info("Prescribers count: %d", len(prescribers))
+        if wet_run:
+            client.import_users(prescribers, UserCategory.PRESCRIBER)
+
         orienteurs = list(
             all_prescribers.exclude(Exists(prescriber_membership_qs.filter(organization__is_authorized=True))).values(
                 "email", "first_name", "last_name", "date_joined"
             )
         )
-
-        logger.info("SIAE users count: %d", len(employers))
-        logger.info("Prescribers count: %d", len(prescribers))
         logger.info("Orienteurs count: %d", len(orienteurs))
-
         if wet_run:
-            for category, users in [
-                (UserCategory.EMPLOYEUR, employers),
-                (UserCategory.PRESCRIBER, prescribers),
-                (UserCategory.ORIENTEUR, orienteurs),
-            ]:
-                client.import_users(users, category)
+            client.import_users(orienteurs, UserCategory.ORIENTEUR)
