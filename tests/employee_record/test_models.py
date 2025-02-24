@@ -268,6 +268,22 @@ class TestEmployeeRecordModel:
         employee_record_after_approval.unarchive()
         assert employee_record_after_approval.update_notifications.all().count() == 0
 
+    @pytest.mark.parametrize(
+        "code,expected",
+        [
+            (None, Status.NEW),
+            ("0000", Status.PROCESSED),
+            ("31", None),
+            ("32", Status.REJECTED),
+            ("33", Status.REJECTED),
+            ("34", Status.REJECTED),
+            ("3436", Status.PROCESSED),
+        ],
+    )
+    def test_status_based_on_asp_processing_code(self, code, expected):
+        employee_record = BareEmployeeRecordFactory(asp_processing_code=code)
+        assert employee_record.status_based_on_asp_processing_code is expected
+
 
 @pytest.mark.parametrize(
     "factory,expected",
