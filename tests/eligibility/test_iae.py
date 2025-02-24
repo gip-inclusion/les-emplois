@@ -22,6 +22,7 @@ from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.utils.mocks.api_particulier import (
     aah_certified_mocker,
+    asf_certified_mocker,
     rsa_certified_mocker,
     rsa_not_certified_mocker,
     rsa_not_found_mocker,
@@ -468,6 +469,11 @@ class TestEligibilityDiagnosisModel:
                 True,
                 id="employer_certified_criteria__aah",
             ),
+            pytest.param(
+                {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.PI]},
+                True,
+                id="employer_certified_criteria__pi",
+            ),
         ],
     )
     def test_criteria_can_be_certified(self, factory_params, expected):
@@ -567,6 +573,7 @@ def test_certifiable(AdministrativeCriteriaClass):
     [
         pytest.param(AdministrativeCriteriaKind.RSA, rsa_certified_mocker(), id="rsa"),
         pytest.param(AdministrativeCriteriaKind.AAH, aah_certified_mocker(), id="aah"),
+        pytest.param(AdministrativeCriteriaKind.PI, asf_certified_mocker(), id="pi"),
     ],
 )
 @freeze_time("2024-09-12")

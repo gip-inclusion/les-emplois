@@ -9,6 +9,7 @@ from itou.eligibility.tasks import certify_criteria
 from itou.utils.apis import api_particulier
 from itou.utils.mocks.api_particulier import (
     aah_not_certified_mocker,
+    asf_not_certified_mocker,
     rsa_data_provider_error,
     rsa_not_certified_mocker,
     rsa_not_found_mocker,
@@ -56,6 +57,12 @@ def test_build_params_from(snapshot):
             f"{settings.API_PARTICULIER_BASE_URL}v2/allocation-adulte-handicape",
             AdministrativeCriteriaKind.AAH,
             aah_not_certified_mocker(),
+            id="aah",
+        ),
+        pytest.param(
+            f"{settings.API_PARTICULIER_BASE_URL}v2/allocation-soutien-familial",
+            AdministrativeCriteriaKind.PI,
+            asf_not_certified_mocker(),
             id="aah",
         ),
     ],
