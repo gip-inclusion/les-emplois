@@ -79,7 +79,6 @@ METABASE_USER = os.getenv("METABASE_USER", os.getenv("PGUSER", "postgres"))  # n
 METABASE_PASSWORD = os.getenv("METABASE_PASSWORD", os.getenv("PGPASSWORD", "password"))  # noqa: F405
 METABASE_DATABASE = os.getenv("METABASE_DATABASE", os.getenv("PGDATABASE", "metabase"))  # noqa: F405
 
-FORCE_PROCONNECT_LOGIN = os.getenv("FORCE_PROCONNECT_LOGIN", "True") == "True"
 
 AWS_STORAGE_BUCKET_NAME = "dev"
 CSP_IMG_SRC.append(f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/")  # noqa: F405

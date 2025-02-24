@@ -717,7 +717,7 @@ class TestProConnectLogin:
         assert user.last_login > before_auth
 
     @respx.mock
-    def test_old_django_account(self, client, pro_connect):
+    def test_old_django_account(self, client, pro_connect, settings):
         """
         A user has a Django account.
         He clicks on ProConnect button and creates his account.
@@ -728,16 +728,17 @@ class TestProConnectLogin:
             has_completed_welcoming_tour=True,
             **ProConnectPrescriberData.user_info_mapping_dict(user_info),
             identity_provider=IdentityProvider.DJANGO,
+            with_verified_email=True,
         )
 
         # Existing user connects with Proconnect which results in:
         # - ProConnect side: account creation
         # - Django side: account update.
         # This logic is already tested here: ProConnectModelTest
-        response = pro_connect.mock_oauth_dance(
-            client, UserKind.PRESCRIBER, expected_redirect_url=reverse("dashboard:index")
-        )
+        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER, expected_redirect_url=reverse("dashboard:index"))
         assert auth.get_user(client).is_authenticated
+        user.refresh_from_db()
+        assert user.identity_provider == IdentityProvider.PRO_CONNECT
 
         response = client.post(reverse("account_logout"))
         pro_connect.assert_and_mock_forced_logout(client, response)
@@ -751,11 +752,11 @@ class TestProConnectLogin:
         assertContains(response, error_message)
         assert not auth.get_user(client).is_authenticated
 
-        # Then login with ProConnect.
-        pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER, expected_redirect_url=reverse("dashboard:index"))
+        # But it's possible if we allow it
+        settings.FORCE_PROCONNECT_LOGIN = False
+        response = client.post(reverse("login:prescriber"), data=post_data)
+        assertRedirects(response, reverse("dashboard:index"))
         assert auth.get_user(client).is_authenticated
-        user.refresh_from_db()
-        assert user.identity_provider == IdentityProvider.PRO_CONNECT
 
 
 class TestProConnectLogout:

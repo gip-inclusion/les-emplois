@@ -84,6 +84,12 @@ class ItouLoginForm(LoginForm):
             and user.has_sso_provider
             # Bypass sso login error if we show the test account banner and the form received the hidden field value
             and not (self.cleaned_data.get("demo_banner_account") and settings.SHOW_DEMO_ACCOUNTS_BANNER)
+            # TODO(alaurent): Update this behaviour on 2025/05 depending on if ProConnect has less issues
+            # Allow ProConnect and Inclusion Connect users to bypass ProConnect if FORCE_PROCONNECT_LOGIN is False
+            and (
+                settings.FORCE_PROCONNECT_LOGIN
+                or user.identity_provider not in [IdentityProvider.PRO_CONNECT, IdentityProvider.INCLUSION_CONNECT]
+            )
         ):
             identity_provider = IdentityProvider(user.identity_provider)
             if identity_provider == IdentityProvider.INCLUSION_CONNECT:
