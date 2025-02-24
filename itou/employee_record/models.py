@@ -370,19 +370,15 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
 
     @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_NEW)
     def check_unarchive_new(self):
-        return not self.asp_processing_code
+        return self.status_based_on_asp_processing_code is Status.NEW
 
     @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_PROCESSED)
     def check_unarchive_processed(self):
-        return self.asp_processing_code in ["0000", self.ASP_DUPLICATE_ERROR_CODE]
+        return self.status_based_on_asp_processing_code is Status.PROCESSED
 
     @xworkflows.transition_check(EmployeeRecordTransition.UNARCHIVE_REJECTED)
     def check_unarchive_rejected(self):
-        return (
-            self.asp_processing_code
-            and self.asp_processing_code[:2] in ["32", "33", "34"]
-            and self.asp_processing_code != self.ASP_DUPLICATE_ERROR_CODE
-        )
+        return self.status_based_on_asp_processing_code is Status.REJECTED
 
     def unarchive(self):
         for transition_name in [
@@ -402,6 +398,15 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
 
         if self.status != Status.ARCHIVED:
             raise xwf_models.InvalidTransitionError()
+
+    @property
+    def status_based_on_asp_processing_code(self):
+        if not self.asp_processing_code:
+            return Status.NEW
+        if self.asp_processing_code in ["0000", self.ASP_DUPLICATE_ERROR_CODE]:
+            return Status.PROCESSED
+        if self.asp_processing_code[:2] in ["32", "33", "34"]:
+            return Status.REJECTED
 
     @property
     def asp_employer_type(self):
