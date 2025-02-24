@@ -476,12 +476,12 @@ def test_administrativecriteria_level_annex_consistency():
         pytest.param(
             {"from_geiq": True, "criteria_kinds": [AdministrativeCriteriaKind.RSA]},
             True,
-            id="employer_certified_criteria",
+            id="employer_certified_criteria__rsa",
         ),
         pytest.param(
             {"from_geiq": True, "criteria_kinds": [AdministrativeCriteriaKind.AAH]},
             True,
-            id="employer_certified_criteria",
+            id="employer_certified_criteria__aah",
         ),
     ],
 )
