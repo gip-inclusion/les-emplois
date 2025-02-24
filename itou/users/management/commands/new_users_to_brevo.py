@@ -23,6 +23,30 @@ BREVO_LIST_ID = 31
 BREVO_API_URL = "https://api.brevo.com/v3"
 
 
+def professional_serializer(user, brevo_type):
+    return {
+        "email": user["email"],
+        "attributes": {
+            "prenom": user["first_name"].title(),
+            "nom": user["last_name"].upper(),
+            "date_inscription": timezone.localdate(user["date_joined"]).isoformat(),
+            "type": brevo_type,
+        },
+    }
+
+
+def employer_serializer(user):
+    return professional_serializer(user, "employeur")
+
+
+def authorized_prescriber_serializer(user):
+    return professional_serializer(user, "prescripteur habilité")
+
+
+def prescriber_serializer(user):
+    return professional_serializer(user, "orienteur")
+
+
 class BrevoClient:
     IMPORT_BATCH_SIZE = 1000
 
@@ -34,20 +58,7 @@ class BrevoClient:
             }
         )
 
-    def _import_contacts(self, users_data, category):
-        data = [
-            {
-                "email": user["email"],
-                "attributes": {
-                    "prenom": user["first_name"].title(),
-                    "nom": user["last_name"].upper(),
-                    "date_inscription": timezone.localdate(user["date_joined"]).isoformat(),
-                    "type": category,
-                },
-            }
-            for user in users_data
-        ]
-
+    def _import_contacts(self, users_data, serializer):
         response = self.client.post(
             f"{BREVO_API_URL}/contacts/import",
             headers={"Content-Type": "application/json"},
@@ -57,7 +68,7 @@ class BrevoClient:
                 "smsBlacklist": False,
                 "updateExistingContacts": False,  # Don't update because we don't want to update emailBlacklist
                 "emptyContactsAttributes": False,
-                "jsonBody": data,
+                "jsonBody": [serializer(user) for user in users_data],
             },
         )
         if response.status_code != 202:
@@ -67,10 +78,10 @@ class BrevoClient:
                 response.content.decode(),
             )
 
-    def import_users(self, users, category):
+    def import_users(self, users, serializer):
         for batch in batched(users, self.IMPORT_BATCH_SIZE):
             if batch:
-                self._import_contacts(batch, category)
+                self._import_contacts(batch, serializer)
 
 
 class Command(BaseCommand):
@@ -136,7 +147,7 @@ class Command(BaseCommand):
         )
         logger.info("SIAE users count: %d", len(employers))
         if wet_run:
-            client.import_users(employers, "employeur")
+            client.import_users(employers, employer_serializer)
 
     def import_prescribers(self, client, professional_qs, *, wet_run):
         all_prescribers = professional_qs.filter(kind=UserKind.PRESCRIBER)
@@ -148,7 +159,7 @@ class Command(BaseCommand):
         )
         logger.info("Prescribers count: %d", len(prescribers))
         if wet_run:
-            client.import_users(prescribers, "prescripteur habilité")
+            client.import_users(prescribers, authorized_prescriber_serializer)
 
         orienteurs = list(
             all_prescribers.exclude(Exists(prescriber_membership_qs.filter(organization__is_authorized=True))).values(
@@ -157,4 +168,4 @@ class Command(BaseCommand):
         )
         logger.info("Orienteurs count: %d", len(orienteurs))
         if wet_run:
-            client.import_users(orienteurs, "orienteur")
+            client.import_users(orienteurs, prescriber_serializer)
