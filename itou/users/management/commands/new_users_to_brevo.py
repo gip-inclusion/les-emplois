@@ -149,17 +149,15 @@ class Command(BaseCommand):
 
     def import_prescribers(self, client, professional_qs, *, wet_run):
         all_prescribers = professional_qs.filter(kind=UserKind.PRESCRIBER)
-        prescriber_membership_qs = PrescriberMembership.objects.filter(user_id=OuterRef("pk"), is_active=True)
-        prescribers = list(
-            all_prescribers.filter(Exists(prescriber_membership_qs.filter(organization__is_authorized=True)))
+        authorized_prescriber_memberships = PrescriberMembership.objects.filter(
+            user_id=OuterRef("pk"), is_active=True, organization__is_authorized=True
         )
+        prescribers = list(all_prescribers.filter(Exists(authorized_prescriber_memberships)))
         logger.info("Prescribers count: %d", len(prescribers))
         if wet_run:
             client.import_users(prescribers, authorized_prescriber_serializer)
 
-        orienteurs = list(
-            all_prescribers.exclude(Exists(prescriber_membership_qs.filter(organization__is_authorized=True)))
-        )
+        orienteurs = list(all_prescribers.exclude(Exists(authorized_prescriber_memberships)))
         logger.info("Orienteurs count: %d", len(orienteurs))
         if wet_run:
             client.import_users(orienteurs, prescriber_serializer)
