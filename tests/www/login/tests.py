@@ -1,3 +1,4 @@
+from functools import partial
 from unittest.mock import patch
 from urllib.parse import urlencode
 
@@ -22,6 +23,7 @@ from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_da
 from tests.users.factories import (
     DEFAULT_PASSWORD,
     EmployerFactory,
+    ItouStaffFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
@@ -319,8 +321,18 @@ class TestExistingUserLogin:
         assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
         assert str(parse_response_to_soup(response, selector=".c-form")) == snapshot
 
-    def test_login_django(self, client):
-        user = JobSeekerFactory(identity_provider=IdentityProvider.DJANGO)
+    @pytest.mark.parametrize(
+        "user_factory",
+        [
+            JobSeekerFactory,
+            PrescriberFactory,
+            partial(EmployerFactory, with_company=True),
+            LaborInspectorFactory,
+            ItouStaffFactory,
+        ],
+    )
+    def test_login_django(self, client, user_factory):
+        user = user_factory(identity_provider=IdentityProvider.DJANGO)
         url = reverse("login:existing_user", args=(user.public_id,))
         response = client.get(url)
         assert response.status_code == 200

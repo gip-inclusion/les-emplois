@@ -357,7 +357,7 @@ class TestAcceptPrescriberWithOrgInvitation:
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
 
     @respx.mock
-    def test_accept_prescriber_org_invitation_without_link(self, client, mailoutbox, pro_connect):
+    def test_auto_accept_prescriber_org_invitation_on_pro_connect_login(self, client, mailoutbox, pro_connect):
         # The user's invitations are automatically accepted at login
         invitation = PrescriberWithOrgInvitationFactory(
             email=pro_connect.oidc_userinfo["email"],
@@ -374,6 +374,27 @@ class TestAcceptPrescriberWithOrgInvitation:
         response = client.get(response.url)
 
         user = User.objects.get(email=invitation.email)
+        self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
+
+    def test_auto_accept_prescriber_org_invitation_on_django_login(self, client, mailoutbox, settings):
+        settings.FORCE_PROCONNECT_LOGIN = False
+        # The user's invitations are automatically accepted at login
+        user = PrescriberFactory()
+        user.emailaddress_set.create(email=user.email, verified=True, primary=True)
+        invitation = PrescriberWithOrgInvitationFactory(
+            email=user.email,
+            sender=self.sender,
+            organization=self.organization,
+        )
+
+        form_data = {
+            "login": user.email,
+            "password": DEFAULT_PASSWORD,
+        }
+        response = client.post(reverse("login:prescriber"), data=form_data)
+        assertRedirects(response, reverse("welcoming_tour:index"), fetch_redirect_response=False)
+        response = client.get(response.url)
+
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
 
     def test_accept_existing_user_is_prescriber_without_org(self, client, mailoutbox):
