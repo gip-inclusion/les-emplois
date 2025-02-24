@@ -500,9 +500,9 @@ factory-boy==3.3.3 \
     --hash=sha256:1c39e3289f7e667c4285433f305f8d506efc2fe9c73aaea4151ebd5cdea394fc \
     --hash=sha256:866862d226128dfac7f2b4160287e899daf54f2612778327dd03d0e2cb1e3d03
     # via -r requirements/test.txt
-faker==35.2.0 \
-    --hash=sha256:28c24061780f83b45d9cb15a72b8f143b09d276c9ff52eb557744b7a89e8ba19 \
-    --hash=sha256:609abe555761ff31b0e5e16f958696e9b65c9224a7ac612ac96bfc2b8f09fe35
+faker==36.1.1 \
+    --hash=sha256:7cb2bbd4c8f040e4a340ae4019e9a48b6cf1db6a71bda4e5a61d8d13b7bef28d \
+    --hash=sha256:ad1f1be7fd692ec0256517404a9d7f007ab36ac5d4674082fa72404049725eaa
     # via
     #   -r requirements/test.txt
     #   factory-boy
@@ -1298,7 +1298,6 @@ python-dateutil==2.9.0.post0 \
     # via
     #   -r requirements/test.txt
     #   botocore
-    #   faker
     #   freezegun
     #   pandas
     #   python-crontab
@@ -1710,12 +1709,12 @@ typing-extensions==4.12.2 \
     # via
     #   -r requirements/test.txt
     #   beautifulsoup4
-    #   faker
 tzdata==2025.1 \
     --hash=sha256:24894909e88cdb28bd1636c6887801df64cb485bd593f2fd83ef29075a81d694 \
     --hash=sha256:7e127113816800496f027041c570f50bcd464a020098a3b6b199517772303639
     # via
     #   -r requirements/test.txt
+    #   faker
     #   pandas
 unidecode==1.3.8 \
     --hash=sha256:cfdb349d46ed3873ece4586b96aa75258726e2fa8ec21d6f00a591d98806c2f4 \
