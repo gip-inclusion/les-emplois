@@ -92,7 +92,7 @@
 # ---
 # name: test_multiple.1
   dict({
-    'num_queries': 14,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -428,6 +428,32 @@
                                                    %s,
                                                    %s)
           ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'approval_state_badge[utils/templatetags/badges.py]',
+          'SimpleNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[job_seekers_views/includes/list_results.html]',
+          'ForNode[job_seekers_views/includes/list_results.html]',
+          'IfNode[job_seekers_views/includes/list_results.html]',
+          'IncludeNode[job_seekers_views/list.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/list.html]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          LIMIT 1
         ''',
       }),
       dict({
