@@ -25,11 +25,11 @@ BREVO_API_URL = "https://api.brevo.com/v3"
 
 def professional_serializer(user, brevo_type):
     return {
-        "email": user["email"],
+        "email": user.email,
         "attributes": {
-            "prenom": user["first_name"].title(),
-            "nom": user["last_name"].upper(),
-            "date_inscription": timezone.localdate(user["date_joined"]).isoformat(),
+            "prenom": user.first_name.title(),
+            "nom": user.last_name.upper(),
+            "date_inscription": timezone.localdate(user.date_joined).isoformat(),
             "type": brevo_type,
         },
     }
@@ -58,7 +58,7 @@ class BrevoClient:
             }
         )
 
-    def _import_contacts(self, users_data, serializer):
+    def _import_contacts(self, users, serializer):
         response = self.client.post(
             f"{BREVO_API_URL}/contacts/import",
             headers={"Content-Type": "application/json"},
@@ -68,7 +68,7 @@ class BrevoClient:
                 "smsBlacklist": False,
                 "updateExistingContacts": False,  # Don't update because we don't want to update emailBlacklist
                 "emptyContactsAttributes": False,
-                "jsonBody": [serializer(user) for user in users_data],
+                "jsonBody": [serializer(user) for user in users],
             },
         )
         if response.status_code != 202:
@@ -133,8 +133,7 @@ class Command(BaseCommand):
 
     def import_employers(self, client, professional_qs, *, wet_run):
         employers = list(
-            professional_qs.filter(kind=UserKind.EMPLOYER)
-            .filter(
+            professional_qs.filter(kind=UserKind.EMPLOYER).filter(
                 Exists(
                     CompanyMembership.objects.filter(
                         user_id=OuterRef("pk"),
@@ -143,7 +142,6 @@ class Command(BaseCommand):
                     )
                 )
             )
-            .values("email", "first_name", "last_name", "date_joined")
         )
         logger.info("SIAE users count: %d", len(employers))
         if wet_run:
@@ -153,18 +151,14 @@ class Command(BaseCommand):
         all_prescribers = professional_qs.filter(kind=UserKind.PRESCRIBER)
         prescriber_membership_qs = PrescriberMembership.objects.filter(user_id=OuterRef("pk"), is_active=True)
         prescribers = list(
-            all_prescribers.filter(Exists(prescriber_membership_qs.filter(organization__is_authorized=True))).values(
-                "email", "first_name", "last_name", "date_joined"
-            )
+            all_prescribers.filter(Exists(prescriber_membership_qs.filter(organization__is_authorized=True)))
         )
         logger.info("Prescribers count: %d", len(prescribers))
         if wet_run:
             client.import_users(prescribers, authorized_prescriber_serializer)
 
         orienteurs = list(
-            all_prescribers.exclude(Exists(prescriber_membership_qs.filter(organization__is_authorized=True))).values(
-                "email", "first_name", "last_name", "date_joined"
-            )
+            all_prescribers.exclude(Exists(prescriber_membership_qs.filter(organization__is_authorized=True)))
         )
         logger.info("Orienteurs count: %d", len(orienteurs))
         if wet_run:
