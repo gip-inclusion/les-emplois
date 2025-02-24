@@ -6,9 +6,8 @@ from django.db.models import Count, Prefetch
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
-from django.utils import timezone
 from django.views.decorators.http import require_POST
-from django.views.generic import DetailView, TemplateView, UpdateView
+from django.views.generic import TemplateView, UpdateView
 
 from itou.gps.grist import log_contact_info_display
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
@@ -80,35 +79,6 @@ def group_list(request, current, template_name="gps/group_list.html"):
     )
 
     return render(request, "gps/includes/memberships_results.html" if request.htmx else template_name, context)
-
-
-@check_user(is_allowed_to_use_gps)
-def leave_group(request, group_id):
-    membership = (
-        FollowUpGroupMembership.objects.filter(member=request.user).filter(follow_up_group__id=group_id).first()
-    )
-
-    if membership:
-        membership.ended_at = timezone.localdate()
-        membership.save()
-
-    return HttpResponseRedirect(reverse("gps:group_list"))
-
-
-@check_user(is_allowed_to_use_gps)
-def toggle_referent(request, group_id):
-    membership = (
-        FollowUpGroupMembership.objects.filter(member=request.user)
-        .filter(follow_up_group__id=group_id)
-        .select_related("follow_up_group__beneficiary")
-        .first()
-    )
-
-    if membership:
-        membership.is_referent = not membership.is_referent
-        membership.save()
-
-    return HttpResponseRedirect(reverse("gps:user_details", args=(membership.follow_up_group.beneficiary.public_id,)))
 
 
 class GroupDetailsMixin(LoginRequiredMixin):
@@ -229,81 +199,16 @@ class GroupEditionView(GroupDetailsMixin, UpdateView):
         return reverse("gps:group_contribution", args=(self.group.pk,))
 
 
-class UserDetailsView(LoginRequiredMixin, DetailView):
-    model = User
-    queryset = User.objects.select_related("follow_up_group", "jobseeker_profile").prefetch_related(
-        "follow_up_group__memberships"
+@check_user(is_allowed_to_use_gps)
+def user_details(request, public_id):
+    membership = get_object_or_404(
+        FollowUpGroupMembership.objects.select_related("follow_up_group"),
+        follow_up_group__beneficiary__public_id=public_id,
+        member=request.user,
+        is_active=True,
     )
-    template_name = "gps/user_details.html"
-    slug_field = "public_id"
-    slug_url_kwarg = "public_id"
-    context_object_name = "beneficiary"
 
-    def setup(self, request, *args, **kwargs):
-        if request.user.is_authenticated and not (
-            is_allowed_to_use_gps(request.user)
-            and FollowUpGroupMembership.objects.filter(
-                follow_up_group__beneficiary__public_id=kwargs["public_id"],
-                member=request.user,
-                is_active=True,
-            ).exists()
-        ):
-            raise PermissionDenied("Votre utilisateur n'est pas autorisé à accéder à ces informations.")
-        super().setup(request, *args, **kwargs)
-
-    def get_live_department_codes(self):
-        """For the initial release only some departments have the feature"""
-        return [
-            "30",  # Le Gard
-            "55",  # La Meuse
-        ]
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        gps_memberships = (
-            FollowUpGroupMembership.objects.with_members_organizations_names()
-            .filter(follow_up_group=self.object.follow_up_group)
-            .filter(is_active=True)
-            .order_by("-created_at")
-            .select_related("follow_up_group", "member")
-        )
-
-        org_department = getattr(self.request.current_organization, "department", None)
-        matomo_option = org_department if org_department in self.get_live_department_codes() else None
-        back_url = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("gps:group_list"))
-
-        membership = next(m for m in gps_memberships if m.member == self.request.user)
-
-        request_new_participant_form_url = (
-            "https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?"
-            + urllib.parse.urlencode(
-                {
-                    "user_name": self.request.user.get_full_name(),
-                    "user_id": self.request.user.pk,
-                    "user_email": self.request.user.email,
-                    "user_organization_name": getattr(self.request.current_organization, "display_name", ""),
-                    "user_organization_id": getattr(self.request.current_organization, "pk", ""),
-                    "user_type": self.request.user.kind,
-                    "beneficiary_name": self.object.get_full_name(),
-                    "beneficiary_id": self.object.pk,
-                    "beneficiary_email": self.object.email,
-                    "success_url": self.request.build_absolute_uri(),
-                }
-            )
-        )
-
-        context = context | {
-            "back_url": back_url,
-            "gps_memberships": gps_memberships,
-            "is_referent": membership.is_referent,
-            "matomo_custom_title": "Profil GPS",
-            "profile": self.object.jobseeker_profile,
-            "render_advisor_matomo_option": matomo_option,
-            "matomo_option": "coordonnees-conseiller-" + (matomo_option if matomo_option else "ailleurs"),
-            "request_new_participant_form_url": request_new_participant_form_url,
-        }
-
-        return context
+    return HttpResponseRedirect(reverse("gps:group_memberships", args=(membership.follow_up_group.pk,)))
 
 
 @require_POST
