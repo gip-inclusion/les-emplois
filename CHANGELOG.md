@@ -1,5 +1,34 @@
 # Journal des modifications
 
+## 2025-02-24
+
+### Ajouté
+
+- [API: Ajout d'une API pour rechercher les candidatures pour les Conseils Départementaux](https://github.com/gip-inclusion/les-emplois/pull/5588)
+- [Certification Allocation aux Adultes Handicapés](https://github.com/gip-inclusion/les-emplois/pull/5584)
+- [Prescripteur : Permettre de trier la liste des candidats](https://github.com/gip-inclusion/les-emplois/pull/5602)
+
+
+### Modifié
+
+- [Candidature : Clarification de l’intitulé pour le filtre des candidatures archivées](https://github.com/gip-inclusion/les-emplois/pull/5652) 🖼
+- [Candidature : Correctif d’affichage des puces pour les critères administratifs quand le diagnostic est d’origine prescripteur habilité](https://github.com/gip-inclusion/les-emplois/pull/5654) 🖼
+- [GPS : Correction du retrait d’un groupe](https://github.com/gip-inclusion/les-emplois/pull/5646) 🖼
+- [GPS : Nouveau design de la liste des groupes de suivis](https://github.com/gip-inclusion/les-emplois/pull/5614)
+- [GPS : Permettre un meilleur contrôle sur le suivi des bénéficiaires](https://github.com/gip-inclusion/les-emplois/pull/5619)
+- [PASS IAE : Correction du code empêchant l'envoi d'un PASS avant sa date de début](https://github.com/gip-inclusion/les-emplois/pull/5666)
+- [Prescripteur : Stabilisation du tri des candidats en cas d’égalité](https://github.com/gip-inclusion/les-emplois/pull/5668)
+- [Prescripteur : Amélioration de la modale confirmant qu’un candidat existe déjà avec ce NIR ou cet email](https://github.com/gip-inclusion/les-emplois/pull/5537) 🖼
+- [Employeur : Renommage de l’onglet « Recrutement en cours » pour les entreprises sans fiche de poste afin de cesser de décourager les candidatures spontanées.](https://github.com/gip-inclusion/les-emplois/pull/5610) 🖼
+- [UX/UI: Suppression de la mise en avant du bouton « Postuler pour ce candidat »](https://github.com/gip-inclusion/les-emplois/pull/5650)
+
+### Tech
+
+- [GEIQ: Mise à niveau du client d’API Label pour gérer les nouvelles commandes](https://github.com/gip-inclusion/les-emplois/pull/5636)
+- [Pilotage: Supprimer `populate_metabase_flux_iae`](https://github.com/gip-inclusion/les-emplois/pull/5260)
+- [Sécurité: Amélioration de `get_safe_url`](https://github.com/gip-inclusion/les-emplois/pull/5656)
+- [Rétablissement de la fréquence d'envoi des PASS IAE à France Travail](https://github.com/gip-inclusion/les-emplois/pull/5659)
+
 ## 2025-02-17
 
 ### Ajouté
