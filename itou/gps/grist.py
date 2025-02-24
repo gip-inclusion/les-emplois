@@ -37,7 +37,7 @@ def get_user_kind_display(user):
 
 def log_contact_info_display(current_user, follow_up_group, target_participant, mode):
     doc_id = "6tLJYftGnEBTg5yfTCs5N5"
-    table_id = "Consultations"
+    table_id = "Intentions_mer"
 
     referent_mapping = dict(follow_up_group.memberships.values_list("member_id", "is_referent"))
 
