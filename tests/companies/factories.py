@@ -6,7 +6,7 @@ from django.utils import timezone
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
 from itou.companies import models
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType
+from itou.companies.enums import CompanyKind, ContractType
 from itou.jobs.models import Appellation
 from tests.cities.factories import create_city_vannes
 from tests.jobs.factories import create_test_romes_and_appellations
@@ -80,10 +80,10 @@ class CompanyFactory(factory.django.DjangoModelFactory):
 
     class Params:
         subject_to_eligibility = factory.Trait(
-            kind=factory.fuzzy.FuzzyChoice(SIAE_WITH_CONVENTION_KINDS),
+            kind=factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds()),
         )
         not_subject_to_eligibility = factory.Trait(
-            kind=factory.fuzzy.FuzzyChoice([kind for kind in CompanyKind if kind not in SIAE_WITH_CONVENTION_KINDS]),
+            kind=factory.fuzzy.FuzzyChoice([kind for kind in CompanyKind if kind not in CompanyKind.siae_kinds()]),
         )
         use_employee_record = factory.Trait(kind=factory.fuzzy.FuzzyChoice(models.Company.ASP_EMPLOYEE_RECORD_KINDS))
         with_membership = factory.Trait(

@@ -5,7 +5,7 @@ import os
 from django.conf import settings
 
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution, InstitutionMembership
@@ -130,7 +130,7 @@ class Command(BaseCommand):
         siae_csv_rows = []
 
         siae_memberships = CompanyMembership.objects.select_related("user", "company").filter(
-            is_active=True, company__kind__in=SIAE_WITH_CONVENTION_KINDS
+            is_active=True, company__kind__in=CompanyKind.siae_kinds()
         )
 
         for membership in siae_memberships:

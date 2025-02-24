@@ -16,8 +16,6 @@ from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 from itou.companies.enums import (
     POLE_EMPLOI_SIRET,
-    SIAE_WITH_CONVENTION_CHOICES,
-    SIAE_WITH_CONVENTION_KINDS,
     CompanyKind,
     ContractNature,
     ContractType,
@@ -41,7 +39,7 @@ class CompanyQuerySet(OrganizationQuerySet):
         return (
             # GEIQ, EA, EATT, ... have no convention logic and thus are always active.
             # `~` means NOT, similarly to dataframes.
-            ~Q(kind__in=SIAE_WITH_CONVENTION_KINDS)
+            ~Q(kind__in=CompanyKind.siae_kinds())
             # Staff created companiess are always active until eventually
             # converted to ASP source companies by import_siae script.
             # Such companies are created by our staff when ASP data is lacking
@@ -380,13 +378,13 @@ class Company(AddressMixin, OrganizationAbstract):
 
     @property
     def is_subject_to_eligibility_rules(self):
-        return self.kind in SIAE_WITH_CONVENTION_KINDS
+        return self.kind in CompanyKind.siae_kinds()
 
     @property
     def should_have_convention(self):
         # .values is needed since Python considers the members of CompanyKind to be different
         # instances than SiaeWithConventionKind
-        return self.kind in SIAE_WITH_CONVENTION_KINDS
+        return self.kind in CompanyKind.siae_kinds()
 
     def get_card_url(self):
         return reverse("companies_views:card", kwargs={"siae_id": self.pk})
@@ -805,7 +803,7 @@ class SiaeConvention(models.Model):
     kind = models.CharField(
         verbose_name="type",
         max_length=4,
-        choices=SIAE_WITH_CONVENTION_CHOICES,
+        choices=CompanyKind.siae_choices(),
         default=CompanyKind.EI.value,
     )
 

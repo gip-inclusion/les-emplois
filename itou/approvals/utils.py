@@ -1,4 +1,4 @@
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
+from itou.companies.enums import CompanyKind
 
 
 def get_user_last_accepted_siae_job_application(user):
@@ -9,7 +9,7 @@ def get_user_last_accepted_siae_job_application(user):
     # Assuming it's the case can lead to issues downstream
     return (
         user.job_applications.accepted()
-        .filter(to_company__kind__in=SIAE_WITH_CONVENTION_KINDS)
+        .filter(to_company__kind__in=CompanyKind.siae_kinds())
         .with_accepted_at()
         .order_by("-accepted_at", "-hiring_start_at")
         .first()

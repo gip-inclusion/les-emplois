@@ -5,7 +5,7 @@ from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.cities.models import City
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType
+from itou.companies.enums import CompanyKind, ContractType
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType
 from itou.www.apply import forms as apply_forms
 from tests.cities.factories import create_test_cities
@@ -337,7 +337,7 @@ class TestJobApplicationAcceptFormWithGEIQFields:
             assert response.status_code == 200
             return response
 
-        for kind in SIAE_WITH_CONVENTION_KINDS:
+        for kind in CompanyKind.siae_kinds():
             assertContains(_response(kind), self.HELP_START_AT)
             assertContains(_response(kind), self.HELP_END_AT)
 
