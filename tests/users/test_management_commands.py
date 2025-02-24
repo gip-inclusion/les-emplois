@@ -5,6 +5,7 @@ from unittest import mock
 
 import httpx
 import pytest
+from allauth.account import models as allauth_models
 from allauth.account.models import EmailAddress
 from dateutil.relativedelta import relativedelta
 from django.contrib.sessions.models import Session
@@ -15,11 +16,17 @@ from pytest_django.asserts import assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
+from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityProvider
 from itou.users.management.commands import send_check_authorized_members_email
-from itou.users.management.commands.new_users_to_brevo import BREVO_API_URL, BREVO_LES_EMPLOIS_LIST_ID
+from itou.users.management.commands.send_users_to_brevo import (
+    BREVO_API_URL,
+    BREVO_CANDIDATS_AUTONOMES_BLOQUES_LIST_ID,
+    BREVO_CANDIDATS_LIST_ID,
+    BREVO_LES_EMPLOIS_LIST_ID,
+)
 from itou.users.models import User
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse
 from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
@@ -221,15 +228,13 @@ def test_shorten_active_sessions():
     ]
 
 
-class TestCommandNewUsersToBrevo:
+class TestCommandSendUsersToBrevo:
     @pytest.fixture(autouse=True)
     def setup(self, settings):
         settings.BREVO_API_KEY = "BREVO_API_KEY"
 
     @freeze_time("2023-05-01T23:30:00Z")
     def test_wet_run_siae(self, caplog, respx_mock):
-        # Job seekers are ignored.
-        JobSeekerFactory(with_verified_email=True)
         for kind in set(CompanyKind) - set(CompanyKind.siae_kinds()):
             CompanyMembershipFactory(company__kind=kind, user__identity_provider=IdentityProvider.PRO_CONNECT)
         # Missing verified email and not using IC
@@ -290,7 +295,7 @@ class TestCommandNewUsersToBrevo:
         import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
             return_value=httpx.Response(202, json={"processId": 106})
         )
-        call_command("new_users_to_brevo", wet_run=True)
+        call_command("send_users_to_brevo", wet_run=True)
 
         assert [json.loads(call.request.content) for call in import_mock.calls] == [
             {
@@ -349,18 +354,24 @@ class TestCommandNewUsersToBrevo:
             },
         ]
         assert caplog.record_tuples == [
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "SIAE users count: 5"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "SIAE users count: 5"),
             (
                 "httpx",
                 logging.INFO,
                 'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
             ),
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Prescribers count: 0"),
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Prescribers count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Job seekers count: 0"),
             (
-                "itou.users.management.commands.new_users_to_brevo",
+                "itou.users.management.commands.send_users_to_brevo",
                 logging.INFO,
-                "Management command itou.users.management.commands.new_users_to_brevo succeeded in 0.00 seconds",
+                "Stalled autonomous job seekers count: 0",
+            ),
+            (
+                "itou.users.management.commands.send_users_to_brevo",
+                logging.INFO,
+                "Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds",
             ),
         ]
 
@@ -404,7 +415,7 @@ class TestCommandNewUsersToBrevo:
             return_value=httpx.Response(202, json={"processId": 106})
         )
 
-        call_command("new_users_to_brevo", wet_run=True)
+        call_command("send_users_to_brevo", wet_run=True)
 
         assert [json.loads(call.request.content) for call in import_mock.calls] == [
             {
@@ -436,18 +447,24 @@ class TestCommandNewUsersToBrevo:
             },
         ]
         assert caplog.record_tuples == [
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "SIAE users count: 0"),
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Prescribers count: 2"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "SIAE users count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Prescribers count: 2"),
             (
                 "httpx",
                 logging.INFO,
                 'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
             ),
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Job seekers count: 0"),
             (
-                "itou.users.management.commands.new_users_to_brevo",
+                "itou.users.management.commands.send_users_to_brevo",
                 logging.INFO,
-                "Management command itou.users.management.commands.new_users_to_brevo succeeded in 0.00 seconds",
+                "Stalled autonomous job seekers count: 0",
+            ),
+            (
+                "itou.users.management.commands.send_users_to_brevo",
+                logging.INFO,
+                "Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds",
             ),
         ]
 
@@ -490,7 +507,7 @@ class TestCommandNewUsersToBrevo:
             return_value=httpx.Response(202, json={"processId": 106})
         )
 
-        call_command("new_users_to_brevo", wet_run=True)
+        call_command("send_users_to_brevo", wet_run=True)
 
         assert [json.loads(call.request.content) for call in import_mock.calls] == [
             {
@@ -531,20 +548,259 @@ class TestCommandNewUsersToBrevo:
             },
         ]
         assert caplog.record_tuples == [
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "SIAE users count: 0"),
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Prescribers count: 0"),
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 3"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "SIAE users count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Prescribers count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Orienteurs count: 3"),
+            (
+                "httpx",
+                logging.INFO,
+                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
+            ),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Job seekers count: 0"),
+            (
+                "itou.users.management.commands.send_users_to_brevo",
+                logging.INFO,
+                "Stalled autonomous job seekers count: 0",
+            ),
+            (
+                "itou.users.management.commands.send_users_to_brevo",
+                logging.INFO,
+                "Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds",
+            ),
+        ]
+
+    @freeze_time("2025-02-25")
+    def test_wet_run_job_seekers(self, caplog, respx_mock):
+        billy = JobSeekerFactory(
+            first_name="Billy",
+            last_name="Boo",
+            email="billy.boo@mailinator.com",
+            with_ban_geoloc_address=True,
+            with_verified_email=True,
+        )
+        JobSeekerFactory(
+            first_name="Sonny",
+            last_name="Sunder",
+            email="sonny.sunder@mailinator.com",
+            date_joined=datetime.datetime(2025, 1, 25, tzinfo=timezone.get_current_timezone()),
+            with_verified_email=True,
+        )
+        JobSeekerFactory(
+            first_name="Timmy",
+            last_name="Timber",
+            email="timmy.timber@mailinator.com",
+            is_active=False,
+            with_verified_email=True,
+        )
+        valery = JobSeekerFactory(
+            first_name="Valery",
+            last_name="Vanda",
+            email="valery.vanda@mailinator.com",
+            identity_provider=IdentityProvider.PE_CONNECT,
+            with_ban_geoloc_address=True,
+        )
+        not_primary = JobSeekerFactory()
+        EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
+        not_verified = JobSeekerFactory()
+        allauth_models.EmailAddress.objects.create(
+            user=not_verified,
+            email="new@mailinator.com",
+            primary=True,
+            verified=False,
+        )
+
+        import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
+            return_value=httpx.Response(202, json={"processId": 106})
+        )
+
+        call_command("send_users_to_brevo", wet_run=True)
+
+        assert [json.loads(call.request.content) for call in import_mock.calls] == [
+            {
+                "listIds": [BREVO_CANDIDATS_LIST_ID],
+                "emailBlacklist": False,
+                "smsBlacklist": False,
+                "updateExistingContacts": False,
+                "emptyContactsAttributes": False,
+                "jsonBody": [
+                    {
+                        "email": "billy.boo@mailinator.com",
+                        "attributes": {
+                            "prenom": "Billy",
+                            "nom": "BOO",
+                            "date_inscription": "2025-02-25",
+                            "departement": "67",
+                            "id": billy.pk,
+                        },
+                    },
+                    {
+                        "email": "valery.vanda@mailinator.com",
+                        "attributes": {
+                            "prenom": "Valery",
+                            "nom": "VANDA",
+                            "date_inscription": "2025-02-25",
+                            "departement": "67",
+                            "id": valery.pk,
+                        },
+                    },
+                ],
+            },
+        ]
+        assert caplog.record_tuples == [
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "SIAE users count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Prescribers count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Job seekers count: 2"),
             (
                 "httpx",
                 logging.INFO,
                 'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
             ),
             (
-                "itou.users.management.commands.new_users_to_brevo",
+                "itou.users.management.commands.send_users_to_brevo",
                 logging.INFO,
-                "Management command itou.users.management.commands.new_users_to_brevo succeeded in 0.00 seconds",
+                "Stalled autonomous job seekers count: 0",
+            ),
+            (
+                "itou.users.management.commands.send_users_to_brevo",
+                logging.INFO,
+                "Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds",
             ),
         ]
+
+    @freeze_time("2025-02-25")
+    def test_wet_run_stalled_autonomous_job_seekers(self, caplog, respx_mock):
+        billy = JobSeekerFactory(
+            first_name="Billy",
+            last_name="Boo",
+            email="billy.boo@mailinator.com",
+            # Needed to fill the department field.
+            with_ban_geoloc_address=True,
+            with_verified_email=True,
+        )
+        JobApplicationFactory(
+            job_seeker=billy,
+            sender=billy,
+            # More than six months ago, excluded by <6 months, matches >1 month.
+            created_at=timezone.now() - datetime.timedelta(days=183),
+            eligibility_diagnosis=None,
+        )
+        JobApplicationFactory(
+            job_seeker=billy,
+            sender=billy,
+            # Less than 6 months ago.
+            created_at=timezone.now() - datetime.timedelta(days=181),
+            eligibility_diagnosis=None,
+        )
+        valery = JobSeekerFactory(
+            first_name="Valery",
+            last_name="Vanda",
+            email="valery.vanda@mailinator.com",
+            # Needed to fill the department field.
+            with_ban_geoloc_address=True,
+            with_verified_email=True,
+        )
+        valid_stalled_created_at = timezone.now() - datetime.timedelta(days=90)
+        JobApplicationFactory(
+            job_seeker=valery,
+            sender=valery,
+            # More than six months ago, excluded by <6 months, matches >1 month.
+            created_at=valid_stalled_created_at,
+            eligibility_diagnosis=None,
+        )
+
+        # The following job seekers are not sent.
+        # Too recent.
+        too_recent_job_seeker = JobSeekerFactory(first_name="recent", last_name="recent", with_verified_email=True)
+        JobApplicationFactory(
+            job_seeker=too_recent_job_seeker,
+            sender=too_recent_job_seeker,
+            eligibility_diagnosis=None,
+        )
+        # Too old.
+        too_old_job_seeker = JobSeekerFactory(first_name="old", last_name="old", with_verified_email=True)
+        JobApplicationFactory(
+            created_at=timezone.now() - datetime.timedelta(days=185),
+            job_seeker=too_old_job_seeker,
+            sender=too_old_job_seeker,
+            eligibility_diagnosis=None,
+        )
+        # Accepted
+        accepted_job_seeker = JobSeekerFactory(first_name="accepted", last_name="accepted", with_verified_email=True)
+        JobApplicationFactory(
+            created_at=valid_stalled_created_at,
+            state=JobApplicationState.ACCEPTED,
+            job_seeker=accepted_job_seeker,
+            sender=accepted_job_seeker,
+            eligibility_diagnosis=None,
+        )
+        JobApplicationFactory(
+            job_seeker=accepted_job_seeker,
+            sender=accepted_job_seeker,
+            eligibility_diagnosis=None,
+        )
+        # Has diagnosis.
+        iae_job_seeker = JobSeekerFactory(first_name="iae_diag", last_name="iae_diag", with_verified_email=True)
+        JobApplicationFactory(job_seeker=iae_job_seeker, sender=iae_job_seeker)
+        JobApplicationFactory(job_seeker=iae_job_seeker, sender=iae_job_seeker, created_at=valid_stalled_created_at)
+        geiq_job_seeker = JobSeekerFactory(first_name="geiq_diag", last_name="geiq_diag", with_verified_email=True)
+        JobApplicationFactory(job_seeker=geiq_job_seeker, sender=geiq_job_seeker)
+        JobApplicationFactory(job_seeker=geiq_job_seeker, sender=geiq_job_seeker, created_at=valid_stalled_created_at)
+        # Has approval.
+        approval_job_seeker = JobSeekerFactory(first_name="approval", last_name="approval", with_verified_email=True)
+        approval = ApprovalFactory(user=approval_job_seeker)
+        JobApplicationFactory(
+            job_seeker=approval_job_seeker,
+            sender=approval_job_seeker,
+            approval=approval,
+            eligibility_diagnosis=None,
+        )
+        JobApplicationFactory(
+            job_seeker=approval_job_seeker,
+            sender=approval_job_seeker,
+            approval=approval,
+            created_at=valid_stalled_created_at,
+            eligibility_diagnosis=None,
+        )
+        import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
+            return_value=httpx.Response(202, json={"processId": 106})
+        )
+
+        call_command("send_users_to_brevo", wet_run=True)
+
+        # Employers and prescribers are created by the factories, ignore them.
+        assert "Job seekers count: 8" in caplog.messages
+        assert "Stalled autonomous job seekers count: 2" in caplog.messages
+        autonomous_job_seeker_mock_call = import_mock.calls[-1]
+        assert json.loads(autonomous_job_seeker_mock_call.request.content) == {
+            "listIds": [BREVO_CANDIDATS_AUTONOMES_BLOQUES_LIST_ID],
+            "emailBlacklist": False,
+            "smsBlacklist": False,
+            "updateExistingContacts": False,
+            "emptyContactsAttributes": False,
+            "jsonBody": [
+                {
+                    "email": "billy.boo@mailinator.com",
+                    "attributes": {
+                        "prenom": "Billy",
+                        "nom": "BOO",
+                        "date_inscription": "2025-02-25",
+                        "departement": "67",
+                        "id": billy.pk,
+                    },
+                },
+                {
+                    "email": "valery.vanda@mailinator.com",
+                    "attributes": {
+                        "prenom": "Valery",
+                        "nom": "VANDA",
+                        "date_inscription": "2025-02-25",
+                        "departement": "67",
+                        "id": valery.pk,
+                    },
+                },
+            ],
+        }
 
     @freeze_time("2023-05-02")
     def test_wet_run_batch(self, caplog, respx_mock, mocker):
@@ -564,9 +820,9 @@ class TestCommandNewUsersToBrevo:
         import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
             return_value=httpx.Response(202, json={"processId": 106})
         )
-        mocker.patch("itou.users.management.commands.new_users_to_brevo.BrevoClient.IMPORT_BATCH_SIZE", 1)
+        mocker.patch("itou.users.management.commands.send_users_to_brevo.BrevoClient.IMPORT_BATCH_SIZE", 1)
 
-        call_command("new_users_to_brevo", wet_run=True)
+        call_command("send_users_to_brevo", wet_run=True)
 
         assert [json.loads(call.request.content) for call in import_mock.calls] == [
             {
@@ -607,7 +863,7 @@ class TestCommandNewUsersToBrevo:
             },
         ]
         assert caplog.record_tuples == [
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "SIAE users count: 2"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "SIAE users count: 2"),
             (
                 "httpx",
                 logging.INFO,
@@ -618,12 +874,18 @@ class TestCommandNewUsersToBrevo:
                 logging.INFO,
                 'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
             ),
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Prescribers count: 0"),
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Prescribers count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Job seekers count: 0"),
             (
-                "itou.users.management.commands.new_users_to_brevo",
+                "itou.users.management.commands.send_users_to_brevo",
                 logging.INFO,
-                "Management command itou.users.management.commands.new_users_to_brevo succeeded in 0.00 seconds",
+                "Stalled autonomous job seekers count: 0",
+            ),
+            (
+                "itou.users.management.commands.send_users_to_brevo",
+                logging.INFO,
+                "Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds",
             ),
         ]
 
@@ -639,7 +901,7 @@ class TestCommandNewUsersToBrevo:
             return_value=httpx.Response(400, json={})
         )
 
-        call_command("new_users_to_brevo", wet_run=True)
+        call_command("send_users_to_brevo", wet_run=True)
 
         assert [json.loads(call.request.content) for call in import_mock.calls] == [
             {
@@ -662,23 +924,29 @@ class TestCommandNewUsersToBrevo:
             },
         ]
         assert caplog.record_tuples == [
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "SIAE users count: 1"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "SIAE users count: 1"),
             (
                 "httpx",
                 logging.INFO,
                 'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 400 Bad Request"',
             ),
             (
-                "itou.users.management.commands.new_users_to_brevo",
+                "itou.users.management.commands.send_users_to_brevo",
                 logging.ERROR,
                 "Brevo API: Some emails were not imported, status_code=400, content={}",
             ),
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Prescribers count: 0"),
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Prescribers count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
+            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Job seekers count: 0"),
             (
-                "itou.users.management.commands.new_users_to_brevo",
+                "itou.users.management.commands.send_users_to_brevo",
                 logging.INFO,
-                "Management command itou.users.management.commands.new_users_to_brevo succeeded in 0.00 seconds",
+                "Stalled autonomous job seekers count: 0",
+            ),
+            (
+                "itou.users.management.commands.send_users_to_brevo",
+                logging.INFO,
+                "Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds",
             ),
         ]
 
