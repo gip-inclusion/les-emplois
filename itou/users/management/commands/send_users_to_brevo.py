@@ -1,3 +1,4 @@
+import datetime
 import logging
 from itertools import batched
 
@@ -8,8 +9,12 @@ from django.db.models import Exists, OuterRef, Q
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
+from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
 from itou.companies.models import CompanyMembership
+from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
+from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
@@ -20,6 +25,8 @@ logger = logging.getLogger(__name__)
 
 # https://app.brevo.com/contact/list-listing
 BREVO_LES_EMPLOIS_LIST_ID = 31
+BREVO_CANDIDATS_LIST_ID = 82
+BREVO_CANDIDATS_AUTONOMES_BLOQUES_LIST_ID = 83
 BREVO_API_URL = "https://api.brevo.com/v3"
 
 
@@ -47,6 +54,19 @@ def prescriber_serializer(user):
     return professional_serializer(user, "orienteur")
 
 
+def job_seeker_serializer(user):
+    return {
+        "email": user.email,
+        "attributes": {
+            "id": user.pk,
+            "prenom": user.first_name.title(),
+            "nom": user.last_name.upper(),
+            "departement": user.job_seeker_department,
+            "date_inscription": timezone.localdate(user.date_joined).isoformat(),
+        },
+    }
+
+
 class BrevoClient:
     IMPORT_BATCH_SIZE = 1000
 
@@ -58,12 +78,12 @@ class BrevoClient:
             }
         )
 
-    def _import_contacts(self, users, serializer):
+    def _import_contacts(self, users, list_id, serializer):
         response = self.client.post(
             f"{BREVO_API_URL}/contacts/import",
             headers={"Content-Type": "application/json"},
             json={
-                "listIds": [BREVO_LES_EMPLOIS_LIST_ID],
+                "listIds": [list_id],
                 "emailBlacklist": False,
                 "smsBlacklist": False,
                 "updateExistingContacts": False,  # Don't update because we don't want to update emailBlacklist
@@ -78,10 +98,10 @@ class BrevoClient:
                 response.content.decode(),
             )
 
-    def import_users(self, users, serializer):
+    def import_users(self, users, list_id, serializer):
         for batch in batched(users, self.IMPORT_BATCH_SIZE):
             if batch:
-                self._import_contacts(batch, serializer)
+                self._import_contacts(batch, list_id, serializer)
 
 
 class Command(BaseCommand):
@@ -107,6 +127,7 @@ class Command(BaseCommand):
     def handle(self, *args, wet_run, **options):
         client = BrevoClient()
         self.import_professionals(client, wet_run=wet_run)
+        self.import_job_seekers(client, wet_run=wet_run)
 
     def import_professionals(self, client, *, wet_run):
         professional_qs = (
@@ -144,7 +165,7 @@ class Command(BaseCommand):
         )
         logger.info("SIAE users count: %d", len(employers))
         if wet_run:
-            client.import_users(employers, employer_serializer)
+            client.import_users(employers, BREVO_LES_EMPLOIS_LIST_ID, employer_serializer)
 
     def import_prescribers(self, client, professional_qs, *, wet_run):
         all_prescribers = professional_qs.filter(kind=UserKind.PRESCRIBER)
@@ -154,9 +175,62 @@ class Command(BaseCommand):
         prescribers = list(all_prescribers.filter(Exists(authorized_prescriber_memberships)))
         logger.info("Prescribers count: %d", len(prescribers))
         if wet_run:
-            client.import_users(prescribers, authorized_prescriber_serializer)
+            client.import_users(prescribers, BREVO_LES_EMPLOIS_LIST_ID, authorized_prescriber_serializer)
 
         orienteurs = list(all_prescribers.exclude(Exists(authorized_prescriber_memberships)))
         logger.info("Orienteurs count: %d", len(orienteurs))
         if wet_run:
-            client.import_users(orienteurs, prescriber_serializer)
+            client.import_users(orienteurs, BREVO_LES_EMPLOIS_LIST_ID, prescriber_serializer)
+
+    def import_job_seekers(self, client, *, wet_run):
+        job_seekers = User.objects.filter(
+            Q(
+                Exists(
+                    EmailAddress.objects.filter(
+                        user_id=OuterRef("pk"),
+                        email=OuterRef("email"),
+                        primary=True,
+                        verified=True,
+                    )
+                )
+            )
+            | Q(
+                identity_provider__in=[
+                    IdentityProvider.FRANCE_CONNECT,
+                    IdentityProvider.PE_CONNECT,
+                ]
+            ),
+            kind=UserKind.JOB_SEEKER,
+            is_active=True,
+        ).order_by("pk")
+
+        midnight_today = datetime.datetime.combine(
+            timezone.localdate(),
+            datetime.time.min,
+            tzinfo=timezone.get_current_timezone(),
+        )
+        a_month_ago = midnight_today - datetime.timedelta(days=30)
+        recently_joined = job_seekers.filter(date_joined__gte=a_month_ago)
+        logger.info("Job seekers count: %d", len(recently_joined))
+        if wet_run:
+            client.import_users(recently_joined, BREVO_CANDIDATS_LIST_ID, job_seeker_serializer)
+
+        six_months_ago = midnight_today - datetime.timedelta(days=182)
+        job_apps_subquery = JobApplication.objects.filter(job_seeker=OuterRef("pk"))
+        stalled_autonomous_job_seekers = (
+            job_seekers.filter(
+                Exists(job_apps_subquery.filter(sender=OuterRef("pk"), created_at__lte=a_month_ago)),
+                Exists(job_apps_subquery.filter(sender=OuterRef("pk"), created_at__gte=six_months_ago)),
+            )
+            .exclude(Exists(Approval.objects.filter(user=OuterRef("pk"))))
+            .exclude(Exists(EligibilityDiagnosis.objects.filter(job_seeker=OuterRef("pk"))))
+            .exclude(Exists(GEIQEligibilityDiagnosis.objects.filter(job_seeker=OuterRef("pk"))))
+            .exclude(Exists(job_apps_subquery.filter(state=JobApplicationState.ACCEPTED)))
+        )
+        logger.info("Stalled autonomous job seekers count: %d", len(stalled_autonomous_job_seekers))
+        if wet_run:
+            client.import_users(
+                stalled_autonomous_job_seekers,
+                BREVO_CANDIDATS_AUTONOMES_BLOQUES_LIST_ID,
+                job_seeker_serializer,
+            )
