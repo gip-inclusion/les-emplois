@@ -4,7 +4,12 @@
 {% block title %}GPS - Profil de {{ group.beneficiary.get_full_name }} {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1 class="m-3">{{ group.beneficiary.get_full_name }}</h1>
+    <div class="d-flex flex-row gap-3 align-items-center mb-3">
+        <h1 class="m-0">{{ group.beneficiary.get_full_name }}</h1>
+        <button class="btn btn-lg btn-ico-only btn-link" type="button" data-it-action="print" aria-label="Imprimer la page">
+            <i class="ri-printer-line font-weight-normal" aria-hidden="true"></i>
+        </button>
+    </div>
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
         <li class="nav-item">
             <a class="nav-link{% if active_tab == "memberships" %} active{% endif %}" href="{% url 'gps:group_memberships' group_id=group.pk %}?back_url={{ back_url|urlencode }}">Intervenants</a>
