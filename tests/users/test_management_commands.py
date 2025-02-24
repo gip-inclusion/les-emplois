@@ -350,13 +350,13 @@ class TestCommandNewUsersToBrevo:
         ]
         assert caplog.record_tuples == [
             ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "SIAE users count: 5"),
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Prescribers count: 0"),
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
             (
                 "httpx",
                 logging.INFO,
                 'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
             ),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Prescribers count: 0"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
             (
                 "itou.users.management.commands.new_users_to_brevo",
                 logging.INFO,
@@ -438,12 +438,12 @@ class TestCommandNewUsersToBrevo:
         assert caplog.record_tuples == [
             ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "SIAE users count: 0"),
             ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Prescribers count: 2"),
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
             (
                 "httpx",
                 logging.INFO,
                 'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
             ),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
             (
                 "itou.users.management.commands.new_users_to_brevo",
                 logging.INFO,
@@ -608,18 +608,18 @@ class TestCommandNewUsersToBrevo:
         ]
         assert caplog.record_tuples == [
             ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "SIAE users count: 2"),
+            (
+                "httpx",
+                logging.INFO,
+                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
+            ),
+            (
+                "httpx",
+                logging.INFO,
+                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
+            ),
             ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Prescribers count: 0"),
             ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
-            (
-                "httpx",
-                logging.INFO,
-                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
-            ),
-            (
-                "httpx",
-                logging.INFO,
-                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
-            ),
             (
                 "itou.users.management.commands.new_users_to_brevo",
                 logging.INFO,
@@ -663,8 +663,6 @@ class TestCommandNewUsersToBrevo:
         ]
         assert caplog.record_tuples == [
             ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "SIAE users count: 1"),
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Prescribers count: 0"),
-            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
             (
                 "httpx",
                 logging.INFO,
@@ -675,6 +673,8 @@ class TestCommandNewUsersToBrevo:
                 logging.ERROR,
                 "Brevo API: Some emails were not imported, status_code=400, content={}",
             ),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Prescribers count: 0"),
+            ("itou.users.management.commands.new_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
             (
                 "itou.users.management.commands.new_users_to_brevo",
                 logging.INFO,
