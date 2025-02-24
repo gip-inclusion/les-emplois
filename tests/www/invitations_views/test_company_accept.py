@@ -15,7 +15,7 @@ from itou.utils.urls import add_url_params
 from tests.companies.factories import CompanyFactory
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import EmployerFactory
+from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory
 from tests.utils.test import ItouClient
 
 
@@ -123,7 +123,7 @@ class TestAcceptInvitation:
         self.assert_accepted_invitation(response, invitation, user, mailoutbox)
 
     @respx.mock
-    def test_accept_invitation_signup_without_link(self, client, mailoutbox, pro_connect):
+    def test_auto_accept_invitation_on_pro_connect_login(self, client, mailoutbox, pro_connect):
         # The user's invitations are automatically accepted at login
         invitation = EmployerInvitationFactory(email=pro_connect.oidc_userinfo["email"])
 
@@ -140,6 +140,23 @@ class TestAcceptInvitation:
         assert (total_users_before + 1) == total_users_after
 
         user = User.objects.get(email=invitation.email)
+        self.assert_accepted_invitation(response, invitation, user, mailoutbox)
+
+    def test_auto_accept_invitation_on_django_login(self, client, mailoutbox, settings):
+        settings.FORCE_PROCONNECT_LOGIN = False
+        # The user's invitations are automatically accepted at login
+        user = EmployerFactory()
+        user.emailaddress_set.create(email=user.email, verified=True, primary=True)
+        invitation = EmployerInvitationFactory(email=user.email)
+
+        form_data = {
+            "login": user.email,
+            "password": DEFAULT_PASSWORD,
+        }
+        response = client.post(reverse("login:employer"), data=form_data)
+        assertRedirects(response, reverse("welcoming_tour:index"), fetch_redirect_response=False)
+        response = client.get(response.url)
+
         self.assert_accepted_invitation(response, invitation, user, mailoutbox)
 
     @respx.mock

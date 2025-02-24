@@ -8,8 +8,9 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from itou.openid_connect.errors import format_error_modal_content
-from itou.users.enums import IdentityProvider
+from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
+from itou.www.invitations_views.helpers import accept_all_pending_invitations
 from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 
 
@@ -103,3 +104,15 @@ class ItouLoginForm(LoginForm):
                 )
             raise forms.ValidationError(error_message)
         return super().clean()
+
+    def login(self, request, redirect_url=None):
+        ret = super().login(request=request, redirect_url=redirect_url)
+
+        if request.user.is_authenticated and request.user.kind in [
+            UserKind.PRESCRIBER,
+            UserKind.EMPLOYER,
+            UserKind.LABOR_INSPECTOR,
+        ]:
+            accept_all_pending_invitations(request)
+
+        return ret
