@@ -1,4 +1,3 @@
-import enum
 import logging
 from itertools import batched
 
@@ -24,12 +23,6 @@ BREVO_LIST_ID = 31
 BREVO_API_URL = "https://api.brevo.com/v3"
 
 
-class UserCategory(enum.Enum):
-    PRESCRIBER = "prescripteur habilité"
-    ORIENTEUR = "orienteur"
-    EMPLOYEUR = "employeur"
-
-
 class BrevoClient:
     IMPORT_BATCH_SIZE = 1000
 
@@ -49,7 +42,7 @@ class BrevoClient:
                     "prenom": user["first_name"].title(),
                     "nom": user["last_name"].upper(),
                     "date_inscription": timezone.localdate(user["date_joined"]).isoformat(),
-                    "type": category.value,
+                    "type": category,
                 },
             }
             for user in users_data
@@ -143,7 +136,7 @@ class Command(BaseCommand):
         )
         logger.info("SIAE users count: %d", len(employers))
         if wet_run:
-            client.import_users(employers, UserCategory.EMPLOYEUR)
+            client.import_users(employers, "employeur")
 
     def import_prescribers(self, client, professional_qs, *, wet_run):
         all_prescribers = professional_qs.filter(kind=UserKind.PRESCRIBER)
@@ -155,7 +148,7 @@ class Command(BaseCommand):
         )
         logger.info("Prescribers count: %d", len(prescribers))
         if wet_run:
-            client.import_users(prescribers, UserCategory.PRESCRIBER)
+            client.import_users(prescribers, "prescripteur habilité")
 
         orienteurs = list(
             all_prescribers.exclude(Exists(prescriber_membership_qs.filter(organization__is_authorized=True))).values(
@@ -164,4 +157,4 @@ class Command(BaseCommand):
         )
         logger.info("Orienteurs count: %d", len(orienteurs))
         if wet_run:
-            client.import_users(orienteurs, UserCategory.ORIENTEUR)
+            client.import_users(orienteurs, "orienteur")
