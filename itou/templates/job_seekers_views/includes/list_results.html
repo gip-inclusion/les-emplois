@@ -33,7 +33,7 @@
                                 <a href="{% url "job_seekers_views:details" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link">{{ job_seeker.get_full_name|mask_unless:job_seeker.user_can_view_personal_information }}</a>
                             </td>
                             <td>
-                                {% include "apply/includes/eligibility_badge.html" with job_seeker=job_seeker is_subject_to_eligibility_rules=True eligibility_diagnosis=job_seeker.valid_eligibility_diagnosis only %}
+                                {% include "apply/includes/eligibility_badge.html" with job_seeker=job_seeker is_subject_to_eligibility_rules=True eligibility_diagnosis=job_seeker.valid_eligibility_diagnosis force_valid=False only %}
                             </td>
                             <td>{{ job_seeker.job_applications_nb }}</td>
                             <td>{{ job_seeker.last_updated_at|date:"d/m/Y" }}</td>

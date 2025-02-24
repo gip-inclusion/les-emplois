@@ -1,7 +1,7 @@
 {% load badges %}
 {% if is_subject_to_eligibility_rules %}
     {% if job_seeker.has_valid_approval %}
-        {% approval_state_badge job_seeker.latest_approval force_valid=True span_extra_class="badge-base" %}
+        {% approval_state_badge job_seeker.latest_approval force_valid=force_valid span_extra_class="badge-base" %}
     {% else %}
         {% iae_eligibility_badge is_eligible=eligibility_diagnosis extra_class="badge-base" %}
     {% endif %}
