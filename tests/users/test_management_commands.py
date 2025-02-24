@@ -226,7 +226,7 @@ class TestCommandNewUsersToBrevo:
     def setup(self, settings):
         settings.BREVO_API_KEY = "BREVO_API_KEY"
 
-    @freeze_time("2023-05-02")
+    @freeze_time("2023-05-01T23:30:00Z")
     def test_wet_run_siae(self, caplog, respx_mock):
         # Job seekers are ignored.
         JobSeekerFactory(with_verified_email=True)
