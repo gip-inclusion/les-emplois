@@ -6,6 +6,7 @@ import httpx
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.db.models import Exists, OuterRef, Q
+from django.utils import timezone
 from sentry_sdk.crons import monitor
 
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
@@ -47,7 +48,7 @@ class BrevoClient:
                 "attributes": {
                     "prenom": user["first_name"].title(),
                     "nom": user["last_name"].upper(),
-                    "date_inscription": user["date_joined"].strftime("%Y-%m-%d"),
+                    "date_inscription": timezone.localdate(user["date_joined"]).isoformat(),
                     "type": category.value,
                 },
             }
