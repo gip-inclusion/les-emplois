@@ -461,12 +461,12 @@ class TestEligibilityDiagnosisModel:
             pytest.param(
                 {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.RSA]},
                 True,
-                id="employer_certified_criteria",
+                id="employer_certified_criteria__rsa",
             ),
             pytest.param(
                 {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.AAH]},
                 True,
-                id="employer_certified_criteria",
+                id="employer_certified_criteria__aah",
             ),
         ],
     )
