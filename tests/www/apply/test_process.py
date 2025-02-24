@@ -3999,6 +3999,32 @@ def test_reload_qualification_fields(qualification_type, client, snapshot):
     assert response.content.decode() == snapshot()
 
 
+# TODO(calum): a temporary test, for deployment and zero-downtime. Remove in a week or so,
+# when the corresponding URL is removed.
+@pytest.mark.parametrize("qualification_type", job_applications_enums.QualificationType)
+def test_reload_qualification_fields_job_seekerless_variant(qualification_type, client, snapshot):
+    company = CompanyFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
+    employer = company.members.first()
+    client.force_login(employer)
+    url = reverse("apply:reload_qualification_fields_job_seekerless", kwargs={"company_pk": company.pk})
+    response = client.post(
+        url,
+        data={
+            "guidance_days": "0",
+            "contract_type": ContractType.APPRENTICESHIP,
+            "contract_type_details": "",
+            "nb_hours_per_week": "",
+            "hiring_start_at": "",
+            "qualification_type": qualification_type,
+            "qualification_level": "",
+            "planned_training_hours": "0",
+            "hiring_end_at": "",
+            "answer": "",
+        },
+    )
+    assert response.content.decode() == snapshot()
+
+
 def test_reload_qualification_fields_company_404(client):
     company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()

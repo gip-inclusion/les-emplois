@@ -4734,3 +4734,94 @@
   
   '''
 # ---
+# name: test_reload_qualification_fields_job_seekerless_variant[CCN]
+  '''
+  
+  <div id="geiq_qualification_fields_block">
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-trigger="change" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-select="#geiq_qualification_fields_block" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
+    <option value="">---------</option>
+  
+    <option value="STATE_DIPLOMA">Diplôme d&#x27;état ou titre homologué</option>
+  
+    <option value="CQP">CQP</option>
+  
+    <option value="CCN" selected>Positionnement de CCN</option>
+  
+  </select></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_level">Niveau de qualification</label><select name="qualification_level" class="form-select" required id="id_qualification_level">
+    <option value="" selected>---------</option>
+  
+    <option value="LEVEL_3">Niveau 3 (CAP, BEP)</option>
+  
+    <option value="LEVEL_4">Niveau 4 (BP, Bac général, Techno ou Pro, BT)</option>
+  
+    <option value="LEVEL_5">Niveau 5 ou + (Bac+2 ou +)</option>
+  
+    <option value="NOT_RELEVANT">Non concerné</option>
+  
+  </select></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" placeholder="Nombre d&#x27;heures de formation prévues" required id="id_planned_training_hours"></div>
+  </div>
+  
+  '''
+# ---
+# name: test_reload_qualification_fields_job_seekerless_variant[CQP]
+  '''
+  
+  <div id="geiq_qualification_fields_block">
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-trigger="change" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-select="#geiq_qualification_fields_block" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
+    <option value="">---------</option>
+  
+    <option value="STATE_DIPLOMA">Diplôme d&#x27;état ou titre homologué</option>
+  
+    <option value="CQP" selected>CQP</option>
+  
+    <option value="CCN">Positionnement de CCN</option>
+  
+  </select></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_level">Niveau de qualification</label><select name="qualification_level" class="form-select" required id="id_qualification_level">
+    <option value="" selected>---------</option>
+  
+    <option value="LEVEL_3">Niveau 3 (CAP, BEP)</option>
+  
+    <option value="LEVEL_4">Niveau 4 (BP, Bac général, Techno ou Pro, BT)</option>
+  
+    <option value="LEVEL_5">Niveau 5 ou + (Bac+2 ou +)</option>
+  
+    <option value="NOT_RELEVANT">Non concerné</option>
+  
+  </select></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" placeholder="Nombre d&#x27;heures de formation prévues" required id="id_planned_training_hours"></div>
+  </div>
+  
+  '''
+# ---
+# name: test_reload_qualification_fields_job_seekerless_variant[STATE_DIPLOMA]
+  '''
+  
+  <div id="geiq_qualification_fields_block">
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-trigger="change" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-select="#geiq_qualification_fields_block" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
+    <option value="">---------</option>
+  
+    <option value="STATE_DIPLOMA" selected>Diplôme d&#x27;état ou titre homologué</option>
+  
+    <option value="CQP">CQP</option>
+  
+    <option value="CCN">Positionnement de CCN</option>
+  
+  </select></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_level">Niveau de qualification</label><select name="qualification_level" class="form-select" required id="id_qualification_level">
+    <option value="" selected>---------</option>
+  
+    <option value="LEVEL_3">Niveau 3 (CAP, BEP)</option>
+  
+    <option value="LEVEL_4">Niveau 4 (BP, Bac général, Techno ou Pro, BT)</option>
+  
+    <option value="LEVEL_5">Niveau 5 ou + (Bac+2 ou +)</option>
+  
+  </select></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" placeholder="Nombre d&#x27;heures de formation prévues" required id="id_planned_training_hours"></div>
+  </div>
+  
+  '''
+# ---
