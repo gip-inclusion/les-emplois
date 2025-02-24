@@ -175,7 +175,9 @@ class FranceTravailContact(models.Model):
     """
     The 'Conseiller' from France Travail who is the point of contact on a group's beneficiary
 
-    NOTE: this is an interim model and in future will be replaced by group membership
+    NOTE: this is a interim model used to store the data.
+    It's not displayed anymore, but we will soon handle it differently
+    by displaying a fake group membership in the group memberships tab
     """
 
     name = models.CharField(max_length=255)

@@ -1,5 +1,124 @@
 {% extends "gps/group_details_base.html" %}
+{% load str_filters %}
+{% load format_filters %}
+{% load matomo %}
 
 {% block content %}
-    {% include "gps/includes/group_members.html" with gps_memberships=gps_memberships %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12" id="gps_intervenants">
+                    <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
+                        <h2 class="mb-0">Intervenants</h2>
+                        <a href="{{ request_new_participant_form_url }}" id="request-new-participant-link" class="btn btn-ico btn-primary">
+                            <i class="ri-user-add-line" aria-hidden="true"></i>
+                            <span>Ajouter un intervenant existant</span>
+                        </a>
+                    </div>
+                    <form>
+                        {% csrf_token %}
+                        {% for membership in gps_memberships %}
+                            <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-{{ membership.member.public_id }}">
+                                <div class="c-box--results__header">
+                                    <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 align-items-center mb-3">
+                                        <p class="fs-sm mb-0 flex-grow-1">
+                                            <i class="ri-calendar-line fw-normal me-1" aria-hidden="true"></i>
+                                            {% if membership.ended_at %}
+                                                Accompagnateur du {{ membership.started_at|date:"d/m/Y" }} au {{ membership.ended_at|date:"d/m/Y" }}
+                                            {% else %}
+                                                Accompagnateur depuis le {{ membership.started_at|date:"d/m/Y" }}
+                                            {% endif %}
+                                        </p>
+                                        {% if membership.ended_at %}
+                                            <div>{% include "gps/includes/badge_ended_membership.html" %}</div>
+                                        {% elif membership.is_referent %}
+                                            <div>{% include "gps/includes/badge_is_referent_membership.html" %}</div>
+                                        {% endif %}
+                                        {% if membership.member_id == request.user.pk %}
+                                            <a href="{% url 'gps:group_edition' group_id=group.pk %}" class="btn btn-sm btn-ico btn-secondary">
+                                                <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
+                                                <span>Modifier mon intervention</span>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    <div class="c-box--results__summary">
+                                        {% if membership.member.is_employer %}
+                                            <i class="ri-community-line" aria-hidden="true"></i>
+                                        {% elif membership.member.is_prescriber_with_authorized_org %}
+                                            <i class="ri-home-smile-line" aria-hidden="true"></i>
+                                        {% else %}
+                                            <i class="ri-user-line" aria-hidden="true"></i>
+                                        {% endif %}
+                                        <div>
+                                            <div class="d-flex gap-3 align-items-center">
+                                                <h3>{{ membership.member.get_full_name }}</h3>
+                                                {% if membership.member_id == request.user.pk %}
+                                                    <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">c’est vous</span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                                                {{ membership.member.get_kind_display | capfirst }}
+                                                {% if membership.organization_name %}pour {{ membership.organization_name }}{% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr class="m-0">
+                                <div class="c-box--results__body">
+                                    <ul class="list-data list-data__two-column-md">
+                                        <li>
+                                            <small>Adresse e-mail</small>
+                                            {% if membership.member_id != request.user.pk %}
+                                                <button class="btn-link btn-ico"
+                                                        id="email-{{ membership.member_id }}"
+                                                        hx-post="{% url "gps:display_contact_info" group.pk membership.member.public_id "email" %}"
+                                                        hx-swap="outerHTML"
+                                                        {% matomo_event "gps" "clic" "displayed_member_email" %}>
+                                                    <div class="stable-text">
+                                                        <i class="ri-mail-line fw-medium" aria-hidden="true"></i>
+                                                        <span>Afficher l'email</span>
+                                                    </div>
+                                                    <div class="loading-text">
+                                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                        <span>Affichage en cours</span>
+                                                    </div>
+                                                </button>
+                                            {% else %}
+                                                {% include "gps/includes/member_email.html" with member=membership.member %}
+                                            {% endif %}
+                                        </li>
+                                        <li>
+                                            <small>Téléphone</small>
+                                            {% if membership.member.phone %}
+                                                {% if membership.member_id != request.user.pk %}
+                                                    <button class="btn-link btn-ico"
+                                                            id="phone-{{ membership.member_id }}"
+                                                            hx-post="{% url "gps:display_contact_info" group.pk membership.member.public_id "phone" %}"
+                                                            hx-swap="outerHTML"
+                                                            {% matomo_event "gps" "clic" "displayed_member_phone" %}>
+                                                        <div class="stable-text">
+                                                            <i class="ri-phone-line fw-medium" aria-hidden="true"></i>
+                                                            <span>Afficher le téléphone</span>
+                                                        </div>
+                                                        <div class="loading-text">
+                                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                            <span>Affichage en cours</span>
+                                                        </div>
+                                                    </button>
+                                                {% else %}
+                                                    {% include "gps/includes/member_phone.html" with member=membership.member %}
+                                                {% endif %}
+                                            {% else %}
+                                                <i class="text-disabled">Non renseigné</i>
+                                            {% endif %}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
