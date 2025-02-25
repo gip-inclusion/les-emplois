@@ -2,6 +2,7 @@ import random
 import uuid
 
 import pytest
+from django.conf import settings
 from django.contrib import messages
 from django.urls import reverse
 from django.utils import timezone
@@ -910,9 +911,13 @@ class TestBatchRefuse:
     # TODO(xfernandez): remove this parametrization when
     # https://github.com/gip-inclusion/les-emplois/commit/829e972903b0bfa8801eaa801b3197f13193c87b
     # is reverted (or extended to all departments)
-    @pytest.mark.parametrize("rhone", [True, False])
-    def test_refuse_step_bypass(self, client, rhone):
-        extra_kwargs = {"department": "69"} if rhone else {}
+    @pytest.mark.parametrize("reason_is_optional", [True, False])
+    def test_refuse_step_bypass(self, client, reason_is_optional):
+        extra_kwargs = (
+            {"department": random.choice(settings.JOB_APPLICATION_OPTIONAL_REFUSAL_REASON_DEPARTMENTS)}
+            if reason_is_optional
+            else {}
+        )
         company = CompanyFactory(with_membership=True, **extra_kwargs)
         employer = company.members.first()
         next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
