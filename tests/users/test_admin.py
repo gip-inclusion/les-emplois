@@ -1,9 +1,11 @@
 import pytest
+from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.users import admin
 from itou.users.models import JobSeekerProfile, User
+from itou.utils.models import PkSupportRemark
 from tests.companies.factories import CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
@@ -134,6 +136,86 @@ def test_get_fields_to_transfer_for_job_seekers():
     ],
 )
 def test_admin_membership(admin_client, membership_factory):
-    membership = membership_factory()
-    response = admin_client.get(reverse("admin:users_user_change", args=(membership.user_id,)))
+    admin_active_membership = membership_factory()
+    user = admin_active_membership.user
+    active_membership = membership_factory(user=user, is_active=True, is_admin=False)
+    inactive_membership = membership_factory(user=user, is_active=False, is_admin=False)
+    url = reverse("admin:users_user_change", args=(user.pk,))
+    response = admin_client.get(url)
     assert response.status_code == 200
+
+    membership_field_name = active_membership._meta.get_field("user").remote_field.name
+
+    post_data = {
+        "username": user.username,
+        "email": user.email,
+        "last_login_0": "21/02/2025",
+        "last_login_1": "09:46:54",
+        "date_joined_0": "19/02/2025",
+        "date_joined_1": "18:00:47",
+        "initial-date_joined_0": "19/02/2025",
+        "initial-date_joined_1": "18:00:47",
+        "last_checked_at_0": "19/02/2025",
+        "last_checked_at_1": "18:00:47",
+        "initial-last_checked_at_0": "19/02/2025",
+        "initial-last_checked_at_1": "18:00:47",
+        "title": "",
+        "phone": "",
+        "address_line_1": "",
+        "address_line_2": "",
+        "post_code": "",
+        "department": "",
+        "city": "",
+        "created_by": "",
+        "emailaddress_set-TOTAL_FORMS": "0",
+        "emailaddress_set-INITIAL_FORMS": "0",
+        "emailaddress_set-MIN_NUM_FORMS": "0",
+        "emailaddress_set-MAX_NUM_FORMS": "0",
+        f"{membership_field_name}_set-TOTAL_FORMS": "3",
+        f"{membership_field_name}_set-INITIAL_FORMS": "3",
+        f"{membership_field_name}_set-MIN_NUM_FORMS": "0",
+        f"{membership_field_name}_set-MAX_NUM_FORMS": "0",
+        f"{membership_field_name}_set-0-id": admin_active_membership.pk,
+        f"{membership_field_name}_set-0-user": user.pk,
+        f"{membership_field_name}_set-1-id": active_membership.pk,
+        f"{membership_field_name}_set-1-user": user.pk,
+        f"{membership_field_name}_set-2-id": inactive_membership.pk,
+        f"{membership_field_name}_set-2-user": user.pk,
+        "job_applications_sent-TOTAL_FORMS": "0",
+        "job_applications_sent-INITIAL_FORMS": "0",
+        "job_applications_sent-MIN_NUM_FORMS": "0",
+        "job_applications_sent-MAX_NUM_FORMS": "0",
+        "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+        "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
+        "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": "0",
+        "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": "1",
+        "utils-pksupportremark-content_type-object_id-0-remark": "",
+        "utils-pksupportremark-content_type-object_id-0-id": "",
+        "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
+        "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
+        "_save": "Enregistrer",
+    }
+    response = admin_client.post(url, data=post_data)
+    assertRedirects(response, reverse("admin:users_user_changelist"))
+
+    admin_active_membership.refresh_from_db()
+    assert admin_active_membership.is_active is False
+    assert admin_active_membership.is_admin is False
+    active_membership.refresh_from_db()
+    assert active_membership.is_active is False
+    assert active_membership.is_admin is False
+    inactive_membership.refresh_from_db()
+    assert inactive_membership.is_active is False
+    assert inactive_membership.is_admin is False
+
+    user_content_type = ContentType.objects.get_for_model(User)
+    user_remark = PkSupportRemark.objects.filter(content_type=user_content_type, object_id=user.pk).get()
+    assert (
+        f"Désactivation de {admin_active_membership} suite à la désactivation de l'utilisateur : "
+        "is_active=True is_admin=True" in user_remark.remark
+    )
+    assert (
+        f"Désactivation de {active_membership} suite à la désactivation de l'utilisateur : "
+        "is_active=True is_admin=False" in user_remark.remark
+    )
+    assert f"Désactivation de {inactive_membership}" not in user_remark.remark
