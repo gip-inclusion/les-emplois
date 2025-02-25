@@ -5,7 +5,7 @@ import freezegun
 import pytest
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
 from itou.prescribers.models import PrescriberOrganization
@@ -489,6 +489,149 @@ class TestGroupDetailsContributionTab:
         assert str(html_details) == snapshot(name="ended_membership")
 
 
+class TestGroupDetailsEditionTab:
+    @pytest.mark.parametrize(
+        "factory,access",
+        [
+            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(EmployerFactory, with_company=True), True],
+            [PrescriberFactory, True],  # we don't need authorized organizations as of today
+            [partial(LaborInspectorFactory, membership=True), False],
+        ],
+        ids=[
+            "job_seeker",
+            "employer",
+            "prescriber",
+            "labor_inspector",
+        ],
+    )
+    def test_permission(self, client, factory, access):
+        user = factory()
+        client.force_login(user)
+        group = FollowUpGroupFactory()
+        url = reverse("gps:group_edition", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        if access:
+            assert response.status_code == 404
+            FollowUpGroupMembershipFactory(follow_up_group=group, member=user)
+            response = client.get(url)
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 403
+
+    @freezegun.freeze_time("2024-06-21")
+    def test_tab(self, client, snapshot):
+        prescriber = PrescriberFactory(membership=True)
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupFactory(beneficiary=beneficiary)
+        membership = FollowUpGroupMembershipFactory(member=prescriber, is_referent=True, follow_up_group=group)
+
+        client.force_login(prescriber)
+        url = reverse("gps:group_edition", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+            ],
+        )
+        assert str(html_details) == snapshot()
+
+        # The user just clics on "Accompagnement terminé" without setting the ended_at field
+        post_data = {
+            "started_at": "2024-01-03",
+            "is_ongoing": "False",
+            "ended_at": "",
+            "is_referent": "on",
+        }
+        response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+
+        membership.refresh_from_db()
+        assert membership.started_at == date(2024, 1, 3)
+        assert membership.ended_at == date(2024, 6, 21)  # today
+        assert membership.is_referent is False
+
+        # The user just clics on "Accompagnement en cours"
+        post_data = {
+            "started_at": "2024-01-03",
+            "is_ongoing": "True",
+            "ended_at": "2024-06-21",  # The field is set but will be ignored because of is_ongoing
+        }
+        response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+
+        membership.refresh_from_db()
+        assert membership.started_at == date(2024, 1, 3)
+        assert membership.ended_at is None
+        assert membership.is_referent is False
+
+        # The user ends again the membership and sets a date
+        post_data = {
+            "started_at": "2024-01-03",
+            "is_ongoing": "False",
+            "ended_at": "2024-06-20",
+        }
+        response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+
+        membership.refresh_from_db()
+        assert membership.started_at == date(2024, 1, 3)
+        assert membership.ended_at == date(2024, 6, 20)
+        assert membership.is_referent is False
+
+        # The user follows again the beneficiary as referent
+        post_data = {
+            "started_at": "2024-01-03",
+            "is_ongoing": "True",
+            "ended_at": "2024-06-20",  # The field is set but will be ignored because of is_ongoing
+            "is_referent": "on",
+        }
+        response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+
+        membership.refresh_from_db()
+        assert membership.started_at == date(2024, 1, 3)
+        assert membership.ended_at is None
+        assert membership.is_referent is True
+
+    @freezegun.freeze_time("2024-06-21")
+    def test_form_validation(self, client):
+        prescriber = PrescriberFactory(membership=True)
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupFactory(beneficiary=beneficiary)
+        FollowUpGroupMembershipFactory(member=prescriber, is_referent=True, follow_up_group=group)
+
+        client.force_login(prescriber)
+        url = reverse("gps:group_edition", kwargs={"group_id": group.pk})
+
+        # started_at and ended_at must be in the past
+        post_data = {
+            "started_at": "2025-01-03",
+            "is_ongoing": "False",
+            "ended_at": "2025-01-01",
+        }
+        response = client.post(url, data=post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "started_at": ["Ce champ ne peut pas être dans le futur."],
+            "ended_at": ["Ce champ ne peut pas être dans le futur."],
+        }
+
+        # ended_at must be after started_at
+        post_data = {
+            "started_at": "2024-01-03",
+            "is_ongoing": "False",
+            "ended_at": "2024-01-01",
+        }
+        response = client.post(url, data=post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "ended_at": ["Cette date ne peut pas être avant la date de début."],
+        }
+
+
 # tests that will soon be removed or re-written
 # -------------------------------------------------------------------------------------------
 
@@ -592,6 +735,7 @@ def test_beneficiary_details(client, snapshot):
         replace_in_attr=[
             ("href", f"user_id={prescriber.pk}", "user_id=[PK of user]"),
             ("data-bs-confirm-url", f"/gps/groups/{group.pk}/", "/gps/groups/[PK of group]/"),
+            ("href", f"/gps/groups/{group.pk}/", "/gps/groups/[PK of group]/"),
             (
                 "href",
                 f"user_organization_id={prescriber.prescribermembership_set.get().organization_id}",

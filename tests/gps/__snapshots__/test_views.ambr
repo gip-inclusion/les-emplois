@@ -333,7 +333,13 @@
               
       <section class="s-section">
           <div class="s-section__container container">
-              <h2>Mon intervention</h2>
+              <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
+                  <h2 class="mb-0">Mon intervention</h2>
+                  <a class="btn btn-ico btn-primary" href="/gps/groups/[PK of FollowUpGroup]/edition?back_url=/gps/groups/list">
+                      <i aria-hidden="true" class="ri-pencil-line"></i>
+                      <span>Modifier</span>
+                  </a>
+              </div>
               <div class="c-box mb-4">
                   <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
                       <h2 class="mb-0">Période de l’accompagnement</h2>
@@ -432,7 +438,13 @@
               
       <section class="s-section">
           <div class="s-section__container container">
-              <h2>Mon intervention</h2>
+              <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
+                  <h2 class="mb-0">Mon intervention</h2>
+                  <a class="btn btn-ico btn-primary" href="/gps/groups/[PK of FollowUpGroup]/edition?back_url=/gps/groups/list">
+                      <i aria-hidden="true" class="ri-pencil-line"></i>
+                      <span>Modifier</span>
+                  </a>
+              </div>
               <div class="c-box mb-4">
                   <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
                       <h2 class="mb-0">Période de l’accompagnement</h2>
@@ -476,6 +488,120 @@
           </main>
   '''
 # ---
+# name: TestGroupDetailsEditionTab.test_tab
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/gps/groups/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1 class="m-3">Jane DOE</h1>
+      <div class="c-box c-box--action">
+          <h2 class="visually-hidden">Actions rapides</h2>
+          <div class="form-row align-items-center gx-3">
+              <div class="form-group col-12 col-lg-auto">
+                  <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center" form="id-membership-form" type="submit">
+                      <i aria-hidden="true" class="ri-check-line"></i>
+                      <span>Mettre à jour</span>
+                  </button>
+              </div>
+              <div class="form-group col-12 col-lg-auto">
+                  <a class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center" href="/gps/groups/[PK of FollowUpGroup]/contribution?back_url=/gps/groups/list">
+                      <i aria-hidden="true" class="ri-close-line"></i>
+                      <span>Annuler</span>
+                  </a>
+              </div>
+          </div>
+      </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <form id="id-membership-form" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+  
+                          <h2>Mon intervention</h2>
+                          <div class="c-box mb-4">
+                              <h2>Période de l’accompagnement</h2>
+                              <div class="form-group form-group-required"><label class="form-label" for="id_started_at">Date de début</label><duet-date-picker class="" identifier="id_started_at" max="2024-06-21" name="started_at" placeholder="Date de début" required="" value="2024-06-21"></duet-date-picker></div>
+                              <div class="form-group form-group-required"><label class="form-label">Date de fin</label><div class="" data-disable-target="duet-date-picker[identifier=id_ended_at]" id="id_is_ongoing" required="">
+      
+          
+          
+              <div class="form-check">
+                  <input checked="checked" class="form-check-input" id="id_is_ongoing_0" name="is_ongoing" type="radio" value="True"/>
+                  <label class="form-check-label" for="id_is_ongoing_0">Accompagnement en cours</label>
+              </div>
+          
+      
+          
+          
+              <div class="form-check">
+                  <input class="form-check-input" id="id_is_ongoing_1" name="is_ongoing" type="radio" value="False"/>
+                  <label class="form-check-label" for="id_is_ongoing_1">Accompagnement terminé</label>
+              </div>
+          
+      
+  </div></div>
+                              <div class="form-group"><label class="visually-hidden" for="id_ended_at">Date de fin</label><duet-date-picker class="" identifier="id_ended_at" max="2024-06-21" name="ended_at" placeholder="Date de fin"></duet-date-picker></div>
+                              <small class="d-inline-block mb-3">* champs obligatoires</small>
+                          </div>
+                          <div class="c-box mb-4">
+                              <h2>Motif de l’intervention</h2>
+                              <div class="form-group"><div class="form-check"><input checked="" class="form-check-input" id="id_is_referent" name="is_referent" type="checkbox"/><label class="form-check-label" for="id_is_referent"><strong>Me signaler comme référent</strong></label></div></div>
+                              <p>
+                                  Les autres intervenants verront une pastille
+                                  <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
+      <i aria-hidden="true" class="ri-map-pin-user-line"></i>
+      Référent⸱e
+  </span>
+  
+                                  à côté de votre nom.
+                              </p>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
 # name: TestGroupDetailsMembershipTab.test_display_participant_contact_info
   '''
   <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card'[Public ID of target_participant]">
@@ -487,6 +613,7 @@
                                               Accompagnateur depuis le 20/01/2025
                                           
                                       </p>
+                                      
                                       
                                   </div>
                                   <div class="c-box--results__summary">
@@ -626,6 +753,12 @@
   </span>
   </div>
                                       
+                                      
+                                          <a class="btn btn-sm btn-ico btn-secondary" href="/gps/groups/[PK of FollowUpGroup]/edition">
+                                              <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
+                                              <span>Modifier mon intervention</span>
+                                          </a>
+                                      
                                   </div>
                                   <div class="c-box--results__summary">
                                       
@@ -687,6 +820,7 @@
                                               Accompagnateur depuis le 21/06/2024
                                           
                                       </p>
+                                      
                                       
                                   </div>
                                   <div class="c-box--results__summary">
@@ -2048,6 +2182,12 @@
   </span>
   </div>
                                       
+                                      
+                                          <a class="btn btn-sm btn-ico btn-secondary" href="/gps/groups/[PK of group]/edition">
+                                              <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
+                                              <span>Modifier mon intervention</span>
+                                          </a>
+                                      
                                   </div>
                                   <div class="c-box--results__summary">
                                       
@@ -2109,6 +2249,7 @@
                                               Accompagnateur depuis le 21/06/2024
                                           
                                       </p>
+                                      
                                       
                                   </div>
                                   <div class="c-box--results__summary">
@@ -2250,6 +2391,7 @@
                                               Accompagnateur depuis le 20/01/2025
                                           
                                       </p>
+                                      
                                       
                                   </div>
                                   <div class="c-box--results__summary">

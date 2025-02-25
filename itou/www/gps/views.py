@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-from django.views.generic import DetailView, TemplateView
+from django.views.generic import DetailView, TemplateView, UpdateView
 
 from itou.gps.grist import log_contact_info_display
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
@@ -16,7 +16,7 @@ from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.pagination import pager
 from itou.utils.urls import add_url_params, get_safe_url
-from itou.www.gps.forms import MembershipsFiltersForm
+from itou.www.gps.forms import FollowUpGroupMembershipForm, MembershipsFiltersForm
 
 
 def is_allowed_to_use_gps(user):
@@ -210,6 +210,23 @@ class GroupContributionView(GroupDetailsMixin, TemplateView):
             "matomo_custom_title": "Profil GPS - mon intervention",
             "active_tab": "contribution",
         }
+
+
+class GroupEditionView(GroupDetailsMixin, UpdateView):
+    template_name = "gps/group_edition.html"
+    form_class = FollowUpGroupMembershipForm
+    model = FollowUpGroupMembership
+
+    def get_object(self, queryset=None):
+        return self.membership
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "matomo_custom_title": "Profil GPS - mon intervention",
+        }
+
+    def get_success_url(self):
+        return reverse("gps:group_contribution", args=(self.group.pk,))
 
 
 class UserDetailsView(LoginRequiredMixin, DetailView):

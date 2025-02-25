@@ -32,6 +32,12 @@
                                     {% elif membership.is_referent %}
                                         <div>{% include "gps/includes/badge_is_referent_membership.html" %}</div>
                                     {% endif %}
+                                    {% if membership.member_id == request.user.pk %}
+                                        <a href="{% url 'gps:group_edition' group_id=group.pk %}" class="btn btn-sm btn-ico btn-secondary">
+                                            <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
+                                            <span>Modifier mon intervention</span>
+                                        </a>
+                                    {% endif %}
                                 </div>
                                 <div class="c-box--results__summary">
                                     {% if membership.member.is_employer %}

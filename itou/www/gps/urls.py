@@ -14,6 +14,7 @@ urlpatterns = [
     path("groups/<int:group_id>/memberships", views.GroupMembershipsView.as_view(), name="group_memberships"),
     path("groups/<int:group_id>/beneficiary", views.GroupBeneficiaryView.as_view(), name="group_beneficiary"),
     path("groups/<int:group_id>/contribution", views.GroupContributionView.as_view(), name="group_contribution"),
+    path("groups/<int:group_id>/edition", views.GroupEditionView.as_view(), name="group_edition"),
     path("details/<uuid:public_id>", views.UserDetailsView.as_view(), name="user_details"),
     path(
         "display/<int:group_id>/<uuid:target_participant_public_id>/<str:mode>",
