@@ -1,5 +1,5 @@
-<table class="table table-hover">
-    <caption class="visually-hidden">Liste des candidatures</caption>
+<table class="table table-hover table-sortable">
+    <caption class="visually-hidden">Liste des candidatures (les colonnes disposant d’un bouton dans leur entête peuvent être triées en cliquant sur le bouton)</caption>
     <thead>
         <tr>
             {% if job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
@@ -11,9 +11,9 @@
             {% if job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %}
                 <th scope="col">Candidature chez</th>
             {% else %}
-                <th scope="col">Candidature de</th>
+                {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.JOB_SEEKER_FULL_NAME_ASC name="Candidature de" extra_button_attributes='data-emplois-elements-visibility-on-selection="disabled"' only %}
             {% endif %}
-            <th scope="col">Émise le</th>
+            {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.CREATED_AT_ASC name="Émise le" extra_button_attributes='data-emplois-elements-visibility-on-selection="disabled"' only %}
             <th scope="col">Statut</th>
             {% if job_applications_list_kind is JobApplicationsListKind.SENT %}<th scope="col">Employeur</th>{% endif %}
             <th scope="col">Poste</th>

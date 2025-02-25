@@ -36,7 +36,7 @@
                             {% include "apply/includes/list_view_switcher.html" %}
                         </div>
                     </div>
-                    {% include "apply/includes/list_job_applications.html" with job_applications_page=job_applications_page filters_counter=filters_counter request=request list_exports_url=list_exports_url SenderKind=SenderKind job_applications_list_kind=job_applications_list_kind JobApplicationsListKind=JobApplicationsListKind JobApplicationOrigin=JobApplicationOrigin display_kind=display_kind only %}
+                    {% include "apply/includes/list_job_applications.html" with job_applications_page=job_applications_page filters_counter=filters_counter request=request list_exports_url=list_exports_url SenderKind=SenderKind job_applications_list_kind=job_applications_list_kind JobApplicationsListKind=JobApplicationsListKind JobApplicationOrigin=JobApplicationOrigin display_kind=display_kind order=order only %}
                 </div>
             </div>
         </div>
