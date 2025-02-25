@@ -1,0 +1,42 @@
+{% extends "gps/group_details_base.html" %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <h2>Mon intervention</h2>
+            <div class="c-box mb-4">
+                <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
+                    <h2 class="mb-0">Période de l’accompagnement</h2>
+                    {% if membership.ended_at %}
+                        <div>{% include "gps/includes/badge_ended_membership.html" %}</div>
+                    {% else %}
+                        <div>{% include "gps/includes/badge_ongoing_membership.html" %}</div>
+                    {% endif %}
+                </div>
+                <ul class="list-data list-data__two-column-lg">
+                    <li>
+                        <small>Date de début</small>
+                        <strong>{{ membership.started_at|date:"F Y" }}</strong>
+                    </li>
+                    <li>
+                        <small>Date de fin</small>
+                        {% if membership.ended_at %}
+                            <strong>{{ membership.ended_at|date:"F Y" }}</strong>
+                        {% else %}
+                            <span class="text-disabled">(accompagnement en cours)</span>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+            <div class="c-box mb-4">
+                <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
+                    <h2 class="mb-0">Motif de l’intervention</h2>
+                    {% if membership.is_referent %}
+                        <div>{% include "gps/includes/badge_is_referent_membership.html" %}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

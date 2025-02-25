@@ -35,6 +35,9 @@
           <li class="nav-item">
               <a class="nav-link active" href="/gps/groups/[PK of FollowUpGroup]/beneficiary?back_url=/gps/groups/list">Informations</a>
           </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/contribution?back_url=/gps/groups/list">Mon intervention</a>
+          </li>
       </ul>
   
                               
@@ -158,6 +161,9 @@
           <li class="nav-item">
               <a class="nav-link active" href="/gps/groups/[PK of FollowUpGroup]/beneficiary?back_url=/gps/groups/list">Informations</a>
           </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/contribution?back_url=/gps/groups/list">Mon intervention</a>
+          </li>
       </ul>
   
                               
@@ -272,6 +278,204 @@
           </main>
   '''
 # ---
+# name: TestGroupDetailsContributionTab.test_tab[ended_membership]
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/gps/groups/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1 class="m-3">Jane DOE</h1>
+      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+          <li class="nav-item">
+              <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/beneficiary?back_url=/gps/groups/list">Informations</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link active" href="/gps/groups/[PK of FollowUpGroup]/contribution?back_url=/gps/groups/list">Mon intervention</a>
+          </li>
+      </ul>
+  
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              <h2>Mon intervention</h2>
+              <div class="c-box mb-4">
+                  <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
+                      <h2 class="mb-0">Période de l’accompagnement</h2>
+                      
+                          <div><span class="badge badge-sm rounded-pill bg-emploi-light text-primary">
+      <i aria-hidden="true" class="ri-eye-close-line"></i>
+      Accompagnement terminé
+  </span>
+  </div>
+                      
+                  </div>
+                  <ul class="list-data list-data__two-column-lg">
+                      <li>
+                          <small>Date de début</small>
+                          <strong>juin 2024</strong>
+                      </li>
+                      <li>
+                          <small>Date de fin</small>
+                          
+                              <strong>juin 2024</strong>
+                          
+                      </li>
+                  </ul>
+              </div>
+              <div class="c-box mb-4">
+                  <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
+                      <h2 class="mb-0">Motif de l’intervention</h2>
+                      
+                          <div><span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
+      <i aria-hidden="true" class="ri-map-pin-user-line"></i>
+      Référent⸱e
+  </span>
+  </div>
+                      
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+  
+          </main>
+  '''
+# ---
+# name: TestGroupDetailsContributionTab.test_tab[ongoing_membership]
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/gps/groups/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1 class="m-3">Jane DOE</h1>
+      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+          <li class="nav-item">
+              <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/beneficiary?back_url=/gps/groups/list">Informations</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link active" href="/gps/groups/[PK of FollowUpGroup]/contribution?back_url=/gps/groups/list">Mon intervention</a>
+          </li>
+      </ul>
+  
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              <h2>Mon intervention</h2>
+              <div class="c-box mb-4">
+                  <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
+                      <h2 class="mb-0">Période de l’accompagnement</h2>
+                      
+                          <div><span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+      <i aria-hidden="true" class="ri-eye-close-line"></i>
+      Accompagnement en cours
+  </span>
+  </div>
+                      
+                  </div>
+                  <ul class="list-data list-data__two-column-lg">
+                      <li>
+                          <small>Date de début</small>
+                          <strong>juin 2024</strong>
+                      </li>
+                      <li>
+                          <small>Date de fin</small>
+                          
+                              <span class="text-disabled">(accompagnement en cours)</span>
+                          
+                      </li>
+                  </ul>
+              </div>
+              <div class="c-box mb-4">
+                  <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
+                      <h2 class="mb-0">Motif de l’intervention</h2>
+                      
+                          <div><span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
+      <i aria-hidden="true" class="ri-map-pin-user-line"></i>
+      Référent⸱e
+  </span>
+  </div>
+                      
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+  
+          </main>
+  '''
+# ---
 # name: TestGroupDetailsMembershipTab.test_display_participant_contact_info
   '''
   <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card'[Public ID of target_participant]">
@@ -370,6 +574,9 @@
           </li>
           <li class="nav-item">
               <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/beneficiary?back_url=/gps/groups/list">Informations</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/contribution?back_url=/gps/groups/list">Mon intervention</a>
           </li>
       </ul>
   

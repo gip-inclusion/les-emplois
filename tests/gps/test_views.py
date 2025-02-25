@@ -426,6 +426,69 @@ class TestGroupDetailsBeneficiaryTab:
         assert str(html_details) == snapshot(name="with_diagnostic")
 
 
+class TestGroupDetailsContributionTab:
+    @pytest.mark.parametrize(
+        "factory,access",
+        [
+            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(EmployerFactory, with_company=True), True],
+            [PrescriberFactory, True],  # we don't need authorized organizations as of today
+            [partial(LaborInspectorFactory, membership=True), False],
+        ],
+        ids=[
+            "job_seeker",
+            "employer",
+            "prescriber",
+            "labor_inspector",
+        ],
+    )
+    def test_permission(self, client, factory, access):
+        user = factory()
+        client.force_login(user)
+        group = FollowUpGroupFactory()
+        url = reverse("gps:group_contribution", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        if access:
+            assert response.status_code == 404
+            FollowUpGroupMembershipFactory(follow_up_group=group, member=user)
+            response = client.get(url)
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 403
+
+    @freezegun.freeze_time("2024-06-21")
+    def test_tab(self, client, snapshot):
+        prescriber = PrescriberFactory(membership=True)
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
+
+        client.force_login(prescriber)
+
+        url = reverse("gps:group_contribution", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+            ],
+        )
+        assert str(html_details) == snapshot(name="ongoing_membership")
+
+        membership = group.memberships.get()
+        membership.ended_at = timezone.localdate()
+        membership.save()
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+            ],
+        )
+        assert str(html_details) == snapshot(name="ended_membership")
+
+
 # tests that will soon be removed or re-written
 # -------------------------------------------------------------------------------------------
 

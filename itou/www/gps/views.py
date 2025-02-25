@@ -200,6 +200,18 @@ class GroupBeneficiaryView(GroupDetailsMixin, TemplateView):
         return context
 
 
+class GroupContributionView(GroupDetailsMixin, TemplateView):
+    template_name = "gps/group_contribution.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context | {
+            "membership": self.membership,
+            "matomo_custom_title": "Profil GPS - mon intervention",
+            "active_tab": "contribution",
+        }
+
+
 class UserDetailsView(LoginRequiredMixin, DetailView):
     model = User
     queryset = User.objects.select_related("follow_up_group", "jobseeker_profile").prefetch_related(
