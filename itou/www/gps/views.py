@@ -173,6 +173,33 @@ class GroupMembershipsView(GroupDetailsMixin, TemplateView):
         return context
 
 
+class GroupBeneficiaryView(GroupDetailsMixin, TemplateView):
+    template_name = "gps/group_beneficiary.html"
+
+    def get_live_department_codes(self):
+        """For the initial release only some departments have the feature"""
+        return [
+            "30",  # Le Gard
+            "55",  # La Meuse
+        ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        org_department = getattr(self.request.current_organization, "department", None)
+        matomo_option = org_department if org_department in self.get_live_department_codes() else None
+
+        context = context | {
+            "can_see_diagnosis": is_allowed_to_use_gps_advanced_features(self.request.user),
+            "matomo_custom_title": "Profil GPS - bénéficiaire",
+            "render_advisor_matomo_option": matomo_option,
+            "matomo_option": f"coordonnees-conseiller-{matomo_option or 'ailleurs'}",
+            "active_tab": "beneficiary",
+        }
+
+        return context
+
+
 class UserDetailsView(LoginRequiredMixin, DetailView):
     model = User
     queryset = User.objects.select_related("follow_up_group", "jobseeker_profile").prefetch_related(
