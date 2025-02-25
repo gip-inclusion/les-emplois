@@ -352,9 +352,6 @@ class JobApplicationQuerySet(models.QuerySet):
                 create_employee_record=True,
                 # There must be **NO** employee record linked in this part
                 employee_record__isnull=True,
-                # The hiring should have started
-                # don't send a record before it started, it creates too much work for the support
-                hiring_start_at__lte=timezone.localdate(),
             )
             .exclude(approval__number__in=approvals_to_exclude)
             # show the most recent hiring first (and the one with null at the end)

@@ -1,6 +1,7 @@
 import datetime
 import random
 
+import freezegun
 import pytest
 from django.contrib.messages import get_messages
 from django.urls import reverse
@@ -749,6 +750,40 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
         assertRedirects(response, reverse("employee_record_views:list") + "?status=NEW", fetch_redirect_response=False)
         [message] = list(get_messages(response.wsgi_request))
         assert message == snapshot
+
+    @freezegun.freeze_time("2025-02-25")
+    def test_hiring_starts_in_future(self, client, snapshot):
+        self.job_application.hiring_start_at = timezone.localdate() + datetime.timedelta(days=1)
+        self.job_application.save(update_fields={"hiring_start_at"})
+        employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
+        assert employee_record.status == Status.NEW
+
+        response = client.get(self.url)
+        assert str(
+            parse_response_to_soup(
+                response,
+                selector=".s-section .alert.alert-warning",
+                replace_in_attr=[],
+            )
+        ) == snapshot(name="alert")
+        assert str(
+            parse_response_to_soup(
+                response,
+                selector=".s-section form",
+                replace_in_attr=[
+                    (
+                        "action",
+                        f"/employee_record/create_step_5/{self.job_application.pk}",
+                        "/employee_record/create_step_5/[JOB APPLICATION PK]",
+                    ),
+                    (
+                        "href",
+                        f"/employee_record/create_step_4/{self.job_application.pk}",
+                        "/employee_record/create_step_4/[JOB APPLICATION PK]",
+                    ),
+                ],
+            )
+        ) == snapshot(name="form")
 
     def test_retrieved_employee_record_is_the_most_recent_one(self, client, faker):
         older_employee_record = EmployeeRecordFactory(

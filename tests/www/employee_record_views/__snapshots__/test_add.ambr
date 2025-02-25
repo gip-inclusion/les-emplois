@@ -465,7 +465,6 @@
                  AND "job_applications_jobapplication"."approval_id" IS NOT NULL
                  AND "job_applications_jobapplication"."create_employee_record"
                  AND "employee_record_employeerecord"."id" IS NULL
-                 AND "job_applications_jobapplication"."hiring_start_at" <= %s
                  AND "job_applications_jobapplication"."to_company_id" = %s
                  AND NOT ("approvals_approval"."number" IN
                             (SELECT V0."approval_number"
@@ -684,8 +683,6 @@
                               
                                   <p>
                                       Dans le menu déroulant ci-dessous, vous trouverez la liste de vos salariés qui n'ont pas encore de fiche salarié.
-                                      <br/>
-                                      Seules les embauches déjà commencées sont visibles. Celles dont le contrat débute plus tard seront accessibles à compter de la date d'embauche.
                                   </p>
                               
                               <div class="form-group form-group-required"><label class="form-label" for="id_choose-employee-employee">Nom du salarié</label><select aria-describedby="id_choose-employee-employee_helptext" class="form-select django-select2" data-allow-clear="false" data-minimum-input-length="0" data-theme="bootstrap-5" id="id_choose-employee-employee" lang="fr" name="choose-employee-employee" required="">
