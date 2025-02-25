@@ -235,7 +235,7 @@
         </div>
     </section>
 
-    {% include "gps/includes/group_members.html" with gps_memberships=gps_memberships %}
+    {% include "gps/includes/group_members.html" with gps_memberships=gps_memberships group=beneficiary.follow_up_group %}
 {% endblock %}
 
 {% block modals %}
