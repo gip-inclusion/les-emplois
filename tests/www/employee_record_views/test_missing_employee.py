@@ -76,7 +76,19 @@ def test_missing_employee(client, snapshot):
         created_at=timezone.now() - datetime.timedelta(days=1),  # fallback for accepted_at
     )
     response = client.post(url, data={"employee": job_seeker.pk})
-    assert response.context["approvals_data"][0][2] == MissingEmployeeCase.NO_EMPLOYEE_RECORD
+    assert str(
+        parse_response_to_soup(
+            response,
+            selector=".s-section",
+            replace_in_attr=[
+                (
+                    "href",
+                    f"/employee_record/create/{job_application.pk}",
+                    "/employee_record/create/[PK of JobApplication]",
+                )
+            ],
+        )
+    ) == snapshot(name=MissingEmployeeCase.NO_EMPLOYEE_RECORD + "_a")
 
     # hired and already has an employee record
     job_seeker = JobSeekerFactory(first_name="Damien", last_name="Danone")
@@ -151,4 +163,29 @@ def test_missing_employee(client, snapshot):
                 )
             ],
         )
-    ) == snapshot(name=MissingEmployeeCase.NO_EMPLOYEE_RECORD)
+    ) == snapshot(name=MissingEmployeeCase.NO_EMPLOYEE_RECORD + "_b")
+
+    # hired without an hiring_date and employee record
+    job_seeker = JobSeekerFactory(first_name="Fabienne", last_name="Favriseau")
+    approval = ApprovalFactory(user=job_seeker, number="XXXXXXX00005")
+    job_application = JobApplicationFactory(
+        to_company=siae,
+        job_seeker=job_seeker,
+        state=JobApplicationState.ACCEPTED,
+        approval=approval,
+        hiring_start_at=None,
+    )
+    response = client.post(url, data={"employee": job_seeker.pk})
+    assert str(
+        parse_response_to_soup(
+            response,
+            selector=".s-section",
+            replace_in_attr=[
+                (
+                    "href",
+                    f"/employee_record/create/{job_application.pk}",
+                    "/employee_record/create/[PK of JobApplication]",
+                )
+            ],
+        )
+    ) == snapshot(name=MissingEmployeeCase.NO_EMPLOYEE_RECORD + "_c")

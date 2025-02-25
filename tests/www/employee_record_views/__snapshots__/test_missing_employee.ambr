@@ -196,7 +196,38 @@
       </section>
   '''
 # ---
-# name: test_missing_employee[no_employee_record]
+# name: test_missing_employee[no_employee_record_a]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-md-9">
+                      <div class="c-form mb-3 mb-lg-5">
+                          
+                              <h2>Charles CONSTANTIN</h2>
+  
+                              
+                                  <p>Ce salarié a 1 PASS IAE disponible</p>
+  
+                                  
+                                      <hr/>
+                                      <p>
+                                          <strong>XXXXXXX00001</strong> du 14/02/2025 au 13/02/2027
+                                      </p>
+                                      
+                                          <a href="/employee_record/create/[PK of JobApplication]">Créer la fiche salarié</a>
+                                      
+                                  
+                              
+                          
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_missing_employee[no_employee_record_b]
   '''
   <section class="s-section">
           <div class="s-section__container container">
@@ -213,6 +244,37 @@
                                       <hr/>
                                       <p>
                                           <strong>XXXXXXX00004</strong> du 14/02/2025 au 13/02/2027
+                                      </p>
+                                      
+                                          <a href="/employee_record/create/[PK of JobApplication]">Créer la fiche salarié</a>
+                                      
+                                  
+                              
+                          
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_missing_employee[no_employee_record_c]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-md-9">
+                      <div class="c-form mb-3 mb-lg-5">
+                          
+                              <h2>Fabienne FAVRISEAU</h2>
+  
+                              
+                                  <p>Ce salarié a 1 PASS IAE disponible</p>
+  
+                                  
+                                      <hr/>
+                                      <p>
+                                          <strong>XXXXXXX00005</strong> du 14/02/2025 au 13/02/2027
                                       </p>
                                       
                                           <a href="/employee_record/create/[PK of JobApplication]">Créer la fiche salarié</a>

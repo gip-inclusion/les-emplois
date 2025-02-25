@@ -190,7 +190,7 @@ def missing_employee(request, template_name="employee_record/missing_employee.ht
                 else:
                     approval_case = MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_OTHER_COMPANY
             else:
-                if job_application.hiring_start_at > timezone.localdate():
+                if job_application.hiring_start_at and job_application.hiring_start_at > timezone.localdate():
                     approval_case = MissingEmployeeCase.FUTURE_HIRING
                 else:
                     approval_case = MissingEmployeeCase.NO_EMPLOYEE_RECORD
