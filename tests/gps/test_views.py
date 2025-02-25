@@ -239,12 +239,14 @@ class TestGroupDetailsMembershipTab:
             member=prescriber,
             started_at=date(2024, 1, 1),
             ended_at=date(2024, 6, 20),
+            reason="iae",  # With a reason
         ).follow_up_group
         participant = FollowUpGroupMembershipFactory(
             member__first_name="François",
             member__last_name="Le Français",
             follow_up_group=group,
             created_at=timezone.now(),
+            reason="",  # No reason
         ).member
 
         client.force_login(prescriber)
@@ -473,10 +475,11 @@ class TestGroupDetailsContributionTab:
                 ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
             ],
         )
-        assert str(html_details) == snapshot(name="ongoing_membership")
+        assert str(html_details) == snapshot(name="ongoing_membership_no_reason")
 
         membership = group.memberships.get()
         membership.ended_at = timezone.localdate()
+        membership.reason = "parce que"
         membership.save()
         response = client.get(url)
         html_details = parse_response_to_soup(
@@ -486,7 +489,7 @@ class TestGroupDetailsContributionTab:
                 ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
             ],
         )
-        assert str(html_details) == snapshot(name="ended_membership")
+        assert str(html_details) == snapshot(name="ended_membership_with_reason")
 
 
 class TestGroupDetailsEditionTab:
@@ -544,6 +547,7 @@ class TestGroupDetailsEditionTab:
             "is_ongoing": "False",
             "ended_at": "",
             "is_referent": "on",
+            "reason": "",
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
@@ -558,6 +562,7 @@ class TestGroupDetailsEditionTab:
             "started_at": "2024-01-03",
             "is_ongoing": "True",
             "ended_at": "2024-06-21",  # The field is set but will be ignored because of is_ongoing
+            "reason": "",
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
@@ -572,6 +577,7 @@ class TestGroupDetailsEditionTab:
             "started_at": "2024-01-03",
             "is_ongoing": "False",
             "ended_at": "2024-06-20",
+            "reason": "",
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
@@ -587,6 +593,7 @@ class TestGroupDetailsEditionTab:
             "is_ongoing": "True",
             "ended_at": "2024-06-20",  # The field is set but will be ignored because of is_ongoing
             "is_referent": "on",
+            "reason": "",
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
@@ -595,6 +602,20 @@ class TestGroupDetailsEditionTab:
         assert membership.started_at == date(2024, 1, 3)
         assert membership.ended_at is None
         assert membership.is_referent is True
+
+        # The user sets a reason
+        post_data = {
+            "started_at": "2024-01-03",
+            "is_ongoing": "True",
+            "ended_at": "2024-06-20",  # The field is set but will be ignored because of is_ongoing
+            "is_referent": "on",
+            "reason": "iae",
+        }
+        response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+
+        membership.refresh_from_db()
+        assert membership.reason == "iae"
 
     @freezegun.freeze_time("2024-06-21")
     def test_form_validation(self, client):
