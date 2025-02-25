@@ -41,6 +41,11 @@
                         <div>{% include "gps/includes/badge_is_referent_membership.html" %}</div>
                     {% endif %}
                 </div>
+                {% if membership.reason %}
+                    <strong>{{ membership.reason }}</strong>
+                {% else %}
+                    <i class="text-disabled">Non renseigné</i>
+                {% endif %}
             </div>
         </div>
     </section>

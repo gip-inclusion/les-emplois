@@ -45,11 +45,16 @@ class FollowUpGroupMembershipForm(forms.ModelForm):
 
     class Meta:
         model = FollowUpGroupMembership
-        fields = ["started_at", "ended_at", "is_referent"]
+        fields = ["started_at", "ended_at", "is_referent", "reason"]
         labels = {
             "is_referent": mark_safe("<strong>Me signaler comme référent</strong>"),
             "started_at": "Date de début",
             "ended_at": "Date de fin",
+        }
+        widgets = {
+            "reason": forms.Textarea(
+                attrs={"rows": 3, "placeholder": "Raison de l’accompagnement et/ou actions menées avec la personne."}
+            ),
         }
 
     def __init__(self, *args, **kwargs):

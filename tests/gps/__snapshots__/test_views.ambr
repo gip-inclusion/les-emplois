@@ -288,7 +288,7 @@
           </main>
   '''
 # ---
-# name: TestGroupDetailsContributionTab.test_tab[ended_membership]
+# name: TestGroupDetailsContributionTab.test_tab[ended_membership_with_reason]
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
@@ -390,6 +390,9 @@
   </div>
                       
                   </div>
+                  
+                      <strong>parce que</strong>
+                  
               </div>
           </div>
       </section>
@@ -398,7 +401,7 @@
           </main>
   '''
 # ---
-# name: TestGroupDetailsContributionTab.test_tab[ongoing_membership]
+# name: TestGroupDetailsContributionTab.test_tab[ongoing_membership_no_reason]
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
@@ -500,6 +503,9 @@
   </div>
                       
                   </div>
+                  
+                      <i class="text-disabled">Non renseigné</i>
+                  
               </div>
           </div>
       </section>
@@ -602,6 +608,10 @@
                           </div>
                           <div class="c-box mb-4">
                               <h2>Motif de l’intervention</h2>
+                              <div class="c-info mb-1">
+                                  <span class="c-info__summary">Cette information sera visible aux autres intervenants. N’inscrivez aucune information confidentielle dans ce champ.</span>
+                              </div>
+                              <div class="form-group"><label class="visually-hidden" for="id_reason">Motif de suivi</label><textarea class="form-control" cols="40" id="id_reason" name="reason" placeholder="Raison de l’accompagnement et/ou actions menées avec la personne." rows="3"></textarea></div>
                               <div class="form-group"><div class="form-check"><input checked="" class="form-check-input" id="id_is_referent" name="is_referent" type="checkbox"/><label class="form-check-label" for="id_is_referent"><strong>Me signaler comme référent</strong></label></div></div>
                               <p>
                                   Les autres intervenants verront une pastille
@@ -654,6 +664,14 @@
                                   </div>
                                   <hr class="m-0"/>
                                   <div class="c-box--results__body">
+                                      <ul class="list-data mb-3">
+                                          <li>
+                                              <small>Motif de l’accompagnement</small>
+                                              
+                                                  <i class="text-disabled">Non renseigné</i>
+                                              
+                                          </li>
+                                      </ul>
                                       <ul class="list-data list-data__two-column-md">
                                           <li>
                                               <small>Adresse e-mail</small>
@@ -801,6 +819,14 @@
                                   </div>
                                   <hr class="m-0"/>
                                   <div class="c-box--results__body">
+                                      <ul class="list-data mb-3">
+                                          <li>
+                                              <small>Motif de l’accompagnement</small>
+                                              
+                                                  <strong>iae</strong>
+                                              
+                                          </li>
+                                      </ul>
                                       <ul class="list-data list-data__two-column-md">
                                           <li>
                                               <small>Adresse e-mail</small>
@@ -862,6 +888,14 @@
                                   </div>
                                   <hr class="m-0"/>
                                   <div class="c-box--results__body">
+                                      <ul class="list-data mb-3">
+                                          <li>
+                                              <small>Motif de l’accompagnement</small>
+                                              
+                                                  <i class="text-disabled">Non renseigné</i>
+                                              
+                                          </li>
+                                      </ul>
                                       <ul class="list-data list-data__two-column-md">
                                           <li>
                                               <small>Adresse e-mail</small>
