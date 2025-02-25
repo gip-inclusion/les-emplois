@@ -1,0 +1,5 @@
+{% extends "gps/group_details_base.html" %}
+
+{% block content %}
+    {% include "gps/includes/group_members.html" with gps_memberships=gps_memberships %}
+{% endblock %}

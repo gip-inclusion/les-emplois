@@ -16,20 +16,21 @@
                 <form>
                     {% csrf_token %}
                     {% for membership in gps_memberships %}
-                        <div class="c-box c-box--results has-links-inside my-md-4" id="card-{{ membership.member.public_id }}">
+                        <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-{{ membership.member.public_id }}">
                             <div class="c-box--results__header">
-                                <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+                                <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 align-items-center mb-3">
                                     <p class="fs-sm mb-0 flex-grow-1">
                                         <i class="ri-calendar-line fw-normal me-1" aria-hidden="true"></i>
-                                        Membre du groupe de suivi depuis le {{ membership.started_at|date:"d/m/Y" }}
+                                        {% if membership.ended_at %}
+                                            Accompagnateur du {{ membership.started_at|date:"d/m/Y" }} au {{ membership.ended_at|date:"d/m/Y" }}
+                                        {% else %}
+                                            Accompagnateur depuis le {{ membership.started_at|date:"d/m/Y" }}
+                                        {% endif %}
                                     </p>
-                                    {% if membership.is_referent %}
-                                        <div>
-                                            <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
-                                                <i class="ri-map-pin-user-line" aria-hidden="true"></i>
-                                                Référent⸱e
-                                            </span>
-                                        </div>
+                                    {% if membership.ended_at %}
+                                        <div>{% include "gps/includes/badge_ended_membership.html" %}</div>
+                                    {% elif membership.is_referent %}
+                                        <div>{% include "gps/includes/badge_is_referent_membership.html" %}</div>
                                     {% endif %}
                                 </div>
                                 <div class="c-box--results__summary">
@@ -41,7 +42,12 @@
                                         <i class="ri-user-line" aria-hidden="true"></i>
                                     {% endif %}
                                     <div>
-                                        <h3>{{ membership.member.get_full_name }}</h3>
+                                        <div class="d-flex gap-3 align-items-center">
+                                            <h3>{{ membership.member.get_full_name }}</h3>
+                                            {% if membership.member_id == request.user.pk %}
+                                                <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">c’est vous</span>
+                                            {% endif %}
+                                        </div>
                                         <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                                             {{ membership.member.get_kind_display | capfirst }}
                                             {% if membership.organization_name %}pour {{ membership.organization_name }}{% endif %}
@@ -57,7 +63,7 @@
                                         {% if membership.member_id != request.user.pk %}
                                             <button class="btn-link btn-ico"
                                                     id="email-{{ membership.member_id }}"
-                                                    hx-post="{% url "gps:display_contact_info" beneficiary.follow_up_group.id membership.member.public_id "email" %}"
+                                                    hx-post="{% url "gps:display_contact_info" group.pk membership.member.public_id "email" %}"
                                                     hx-swap="outerHTML"
                                                     {% matomo_event "gps" "clic" "displayed_member_email" %}>
                                                 <div class="stable-text">
@@ -79,7 +85,7 @@
                                             {% if membership.member_id != request.user.pk %}
                                                 <button class="btn-link btn-ico"
                                                         id="phone-{{ membership.member_id }}"
-                                                        hx-post="{% url "gps:display_contact_info" beneficiary.follow_up_group.id membership.member.public_id "phone" %}"
+                                                        hx-post="{% url "gps:display_contact_info" group.pk membership.member.public_id "phone" %}"
                                                         hx-swap="outerHTML"
                                                         {% matomo_event "gps" "clic" "displayed_member_phone" %}>
                                                     <div class="stable-text">

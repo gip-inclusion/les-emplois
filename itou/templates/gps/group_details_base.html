@@ -1,0 +1,22 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}GPS - Profil de {{ group.beneficiary.get_full_name }} {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    <h1 class="m-3">{{ group.beneficiary.get_full_name }}</h1>
+    <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+        <li class="nav-item">
+            <a class="nav-link{% if active_tab == "memberships" %} active{% endif %}" href="{% url 'gps:group_memberships' group_id=group.pk %}?back_url={{ back_url|urlencode }}">Intervenants</a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block title_prevstep %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js' %}"></script>
+{% endblock %}

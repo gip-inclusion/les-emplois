@@ -1,3 +1,4 @@
+from datetime import date
 from functools import partial
 
 import freezegun
@@ -89,7 +90,7 @@ class TestGroupLists:
             response,
             selector="#follow-up-groups-section",
             replace_in_attr=[
-                ("href", f"/gps/details/{group.beneficiary.public_id}", "/gps/details/[Public ID of beneficiary]")
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]")
                 for group in [group_1, group_2, group_3]
             ],
         )
@@ -131,11 +132,7 @@ class TestGroupLists:
             response,
             selector="#follow-up-groups-section",
             replace_in_attr=[
-                (
-                    "href",
-                    f"/gps/details/{membership.follow_up_group.beneficiary.public_id}",
-                    "/gps/details/[Public ID of beneficiary]",
-                )
+                ("href", f"/gps/groups/{membership.follow_up_group.pk}", "/gps/groups/[PK of FollowUpGroup]")
             ],
         )
         assert str(groups) == snapshot(name="test_my_groups__group_card")
@@ -195,6 +192,175 @@ class TestGroupLists:
         )
         fresh_results = parse_response_to_soup(response, selector="#follow-up-groups-section")
         assertSoupEqual(results, fresh_results)
+
+
+class TestGroupDetailsMembershipTab:
+    @pytest.mark.parametrize(
+        "factory,access",
+        [
+            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(EmployerFactory, with_company=True), True],
+            [PrescriberFactory, True],  # we don't need authorized organizations as of today
+            [partial(LaborInspectorFactory, membership=True), False],
+        ],
+        ids=[
+            "job_seeker",
+            "employer",
+            "prescriber",
+            "labor_inspector",
+        ],
+    )
+    def test_permission(self, client, factory, access):
+        user = factory()
+        client.force_login(user)
+        group = FollowUpGroupFactory()
+        url = reverse("gps:group_memberships", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        if access:
+            assert response.status_code == 404
+            FollowUpGroupMembershipFactory(follow_up_group=group, member=user)
+            response = client.get(url)
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 403
+
+    @freezegun.freeze_time("2024-06-21")
+    def test_tab(self, client, snapshot):
+        prescriber = PrescriberFactory(
+            membership=True,
+            for_snapshot=True,
+            membership__organization__name="Les Olivades",
+            membership__organization__authorized=True,
+        )
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupMembershipFactory(
+            follow_up_group__beneficiary=beneficiary,
+            member=prescriber,
+            started_at=date(2024, 1, 1),
+            ended_at=date(2024, 6, 20),
+        ).follow_up_group
+        participant = FollowUpGroupMembershipFactory(
+            member__first_name="François",
+            member__last_name="Le Français",
+            follow_up_group=group,
+            created_at=timezone.now(),
+        ).member
+
+        client.force_login(prescriber)
+
+        url = reverse("gps:group_memberships", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+                ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
+                ("href", f"user_id={prescriber.pk}", "user_id=[PK of user]"),
+                (
+                    "href",
+                    f"user_organization_id={prescriber.prescribermembership_set.get().organization_id}",
+                    "user_organization_id=[PK of organization]",
+                ),
+                ("href", f"beneficiary_id={beneficiary.pk}", "beneficiary_id=[PK of beneficiary]"),
+                ("id", f"card-{prescriber.public_id}", "card-[Public ID of prescriber]"),
+                ("id", f"card-{participant.public_id}", "card-[Public ID of participant]"),
+                (
+                    "hx-post",
+                    f"/gps/display/{group.pk}/{participant.public_id}/phone",
+                    "/gps/display/[PK of group]/[Public ID of participant]/phone",
+                ),
+                (
+                    "hx-post",
+                    f"/gps/display/{group.pk}/{participant.public_id}/email",
+                    "/gps/display/[PK of group]/[Public ID of participant]/email",
+                ),
+                ("id", f"phone-{participant.pk}", "phone-[PK of participant]"),
+                ("id", f"email-{participant.pk}", "email-[PK of participant]"),
+            ],
+        )
+        assert str(html_details) == snapshot
+
+        display_phone_txt = "<span>Afficher le téléphone</span>"
+        display_email_txt = "<span>Afficher l'email</span>"
+
+        assertContains(response, display_email_txt, count=1)
+        assertContains(response, display_phone_txt, count=1)
+
+        # Membership card: missing member information.
+        participant.phone = ""
+        participant.save()
+        response = client.get(url)
+        assertContains(response, display_email_txt, count=1)
+        assertNotContains(response, display_phone_txt)
+
+        assertContains(response, "Ajouter un intervenant")
+        assertContains(response, "https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant")
+
+    def test_group_memberships_order(self, client):
+        prescriber = PrescriberFactory(membership=True)
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
+        participant = FollowUpGroupMembershipFactory(follow_up_group=group, created_at=timezone.now()).member
+
+        client.force_login(prescriber)
+        url = reverse("gps:group_memberships", kwargs={"group_id": group.pk})
+        response = client.get(url)
+
+        html_details = parse_response_to_soup(response, selector="#gps_intervenants")
+        cards = html_details.find_all("div", attrs={"class": "c-box c-box--results has-links-inside mb-3 my-md-4"})
+        participant_ids = [card.attrs["id"].split("card-")[1] for card in cards]
+        assert participant_ids == [str(participant.public_id), str(prescriber.public_id)]
+
+    @freezegun.freeze_time("2025-01-20")
+    def test_display_participant_contact_info(self, client, mocker, snapshot):
+        prescriber = PrescriberFactory(
+            membership=True,
+            for_snapshot=True,
+            membership__organization__name="Les Olivades",
+            membership__organization__authorized=True,
+        )
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
+        target_participant = FollowUpGroupMembershipFactory(
+            follow_up_group=group,
+            member__first_name="Jean",
+            member__last_name="Dupont",
+            member__email="jean@dupont.fr",
+            member__phone="0123456789",
+        ).member
+
+        client.force_login(prescriber)
+        grist_log_mock = mocker.patch(
+            "itou.www.gps.views.log_contact_info_display"
+        )  # Mock the import in the views file
+
+        url = reverse("gps:group_memberships", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        display_phone_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "phone"))
+        assertContains(response, display_phone_url)
+        display_email_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "email"))
+        assertContains(response, display_email_url)
+
+        simulated_page = parse_response_to_soup(
+            response,
+            selector=f"#card-{target_participant.public_id}",
+            replace_in_attr=[("id", f"card-{target_participant.public_id}", "card'[Public ID of target_participant]")],
+        )
+
+        response = client.post(display_phone_url)
+        assertContains(response, target_participant.phone)
+        update_page_with_htmx(simulated_page, f"#phone-{target_participant.pk}", response)
+        response = client.post(display_email_url)
+        assertContains(response, target_participant.email)
+        update_page_with_htmx(simulated_page, f"#email-{target_participant.pk}", response)
+
+        assert str(simulated_page) == snapshot
+
+        assert grist_log_mock.call_args_list == [
+            ((prescriber, group, target_participant, "phone"),),
+            ((prescriber, group, target_participant, "email"),),
+        ]
 
 
 # tests that will soon be removed or re-written
@@ -356,7 +522,7 @@ def test_beneficiary_details_members_order(client):
     response = client.get(user_details_url)
 
     html_details = parse_response_to_soup(response, selector="#gps_intervenants")
-    cards = html_details.find_all("div", attrs={"class": "c-box c-box--results has-links-inside my-md-4"})
+    cards = html_details.find_all("div", attrs={"class": "c-box c-box--results has-links-inside mb-3 my-md-4"})
     participant_ids = [card.attrs["id"].split("card-")[1] for card in cards]
     assert participant_ids == [str(participant.public_id), str(prescriber.public_id)]
 
