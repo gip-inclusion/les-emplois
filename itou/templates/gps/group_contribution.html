@@ -3,7 +3,13 @@
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <h2>Mon intervention</h2>
+            <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
+                <h2 class="mb-0">Mon intervention</h2>
+                <a href="{% url "gps:group_edition" group.pk %}?back_url={{ back_url|urlencode }}" class="btn btn-ico btn-primary">
+                    <i class="ri-pencil-line" aria-hidden="true"></i>
+                    <span>Modifier</span>
+                </a>
+            </div>
             <div class="c-box mb-4">
                 <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
                     <h2 class="mb-0">Période de l’accompagnement</h2>

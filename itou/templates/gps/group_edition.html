@@ -1,0 +1,55 @@
+{% extends "gps/group_details_base.html" %}
+{% load django_bootstrap5 %}
+
+{% block title_content %}
+    <h1 class="m-3">{{ group.beneficiary.get_full_name }}</h1>
+    <div class="c-box c-box--action">
+        <h2 class="visually-hidden">Actions rapides</h2>
+        <div class="form-row align-items-center gx-3">
+            <div class="form-group col-12 col-lg-auto">
+                <button type="submit" form="id-membership-form" class="btn btn-lg btn-white btn-block btn-ico justify-content-center">
+                    <i class="ri-check-line" aria-hidden="true"></i>
+                    <span>Mettre à jour</span>
+                </button>
+            </div>
+            <div class="form-group col-12 col-lg-auto">
+                <a class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center" href="{% url "gps:group_contribution" group.pk %}?back_url={{ back_url|urlencode }}">
+                    <i class="ri-close-line" aria-hidden="true"></i>
+                    <span>Annuler</span>
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <form method="post" id="id-membership-form">
+                        {% csrf_token %}
+
+                        <h2>Mon intervention</h2>
+                        <div class="c-box mb-4">
+                            <h2>Période de l’accompagnement</h2>
+                            {% bootstrap_field form.started_at %}
+                            {% bootstrap_field form.is_ongoing %}
+                            {% bootstrap_field form.ended_at show_label=False %}
+                            <small class="d-inline-block mb-3">* champs obligatoires</small>
+                        </div>
+                        <div class="c-box mb-4">
+                            <h2>Motif de l’intervention</h2>
+                            {% bootstrap_field form.is_referent %}
+                            <p>
+                                Les autres intervenants verront une pastille
+                                {% include "gps/includes/badge_is_referent_membership.html" %}
+                                à côté de votre nom.
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
