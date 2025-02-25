@@ -36,7 +36,11 @@ jobs:
     # Environment variables
     - name: 🏷 Set review app name
       run:
-        echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[-;\\/._]+/-/g'`" >> $GITHUB_ENV
+        # The review name can be used as a subdomain for some service (URL, S3, etc)
+        # so we limit to the first 63 characters as it's the maximum length of a
+        # domain label (part of domain name separated by dot).
+        # https://datatracker.ietf.org/doc/html/rfc1035#section-2.3.4
+        echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[-;\\/._]+/-/g' | head -c 63`" >> $GITHUB_ENV
 
     - name: 🏷 Set database addon name
       run:
@@ -44,10 +48,7 @@ jobs:
 
     - name: 🏷 Set deploy url
       run:
-        # The maximum length of a domain label (part of domain name separated
-        # by dot) is 63 characters.
-        # https://datatracker.ietf.org/doc/html/rfc1035#section-2.3.4
-        echo "DEPLOY_URL=`echo \"${REVIEW_APP_NAME::63}.cleverapps.io\"`" >> $GITHUB_ENV
+        echo "DEPLOY_URL=`echo \"${REVIEW_APP_NAME}.cleverapps.io\"`" >> $GITHUB_ENV
     # End of environment variables
 
     - name: 🧫 Create a review app on Clever Cloud
@@ -117,7 +118,7 @@ jobs:
 
     - name: 🏷 Set review app name
       run:
-        echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[-;\\/._]+/-/g'`" >> $GITHUB_ENV
+        echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[-;\\/._]+/-/g' | head -c 63`" >> $GITHUB_ENV
 
     - name: 🤝 Find the application on Clever Cloud
       run: |
