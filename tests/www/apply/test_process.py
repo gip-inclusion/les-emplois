@@ -3787,7 +3787,10 @@ def test_htmx_modify_prior_action_and_cancel(client):
 
 @pytest.mark.parametrize("with_geiq_diagnosis", [True, False])
 def test_details_for_company_with_prior_action(client, with_geiq_diagnosis):
-    job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
+    job_application = JobApplicationFactory(
+        to_company__kind=CompanyKind.GEIQ,
+        to_company__not_in_territorial_experimentation=True,
+    )
     user = job_application.to_company.members.first()
     client.force_login(user)
     if with_geiq_diagnosis:
