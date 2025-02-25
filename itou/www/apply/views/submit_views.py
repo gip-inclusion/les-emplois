@@ -670,10 +670,7 @@ class ApplicationResumeView(RequireApplySessionMixin, ApplicationBaseView):
 
         try:
             # Send notifications
-            company_recipients = User.objects.filter(
-                companymembership__company=job_application.to_company,
-                companymembership__is_active=True,
-            )
+            company_recipients = job_application.to_company.active_members.all()
             for employer in company_recipients:
                 job_application.notifications_new_for_employer(employer).send()
             job_application.notifications_new_for_job_seeker.send()
