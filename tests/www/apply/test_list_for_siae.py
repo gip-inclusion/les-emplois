@@ -756,7 +756,7 @@ def test_table_for_siae_hide_criteria_for_non_SIAE_employers(client, subtests):
 
 @freeze_time("2024-11-27", tick=True)
 def test_list_snapshot(client, snapshot):
-    company = CompanyFactory(with_membership=True)
+    company = CompanyFactory(with_membership=True, not_in_territorial_experimentation=True)
     client.force_login(company.members.get())
     url = reverse("apply:list_for_siae")
 
