@@ -288,7 +288,7 @@
           </main>
   '''
 # ---
-# name: TestGroupDetailsContributionTab.test_tab[ended_membership]
+# name: TestGroupDetailsContributionTab.test_tab[ended_membership_with_reason]
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
@@ -390,6 +390,9 @@
   </div>
                       
                   </div>
+                  
+                      <strong>parce que</strong>
+                  
               </div>
           </div>
       </section>
@@ -398,7 +401,7 @@
           </main>
   '''
 # ---
-# name: TestGroupDetailsContributionTab.test_tab[ongoing_membership]
+# name: TestGroupDetailsContributionTab.test_tab[ongoing_membership_no_reason]
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
@@ -500,6 +503,9 @@
   </div>
                       
                   </div>
+                  
+                      <i class="text-disabled">Non renseigné</i>
+                  
               </div>
           </div>
       </section>
@@ -602,6 +608,10 @@
                           </div>
                           <div class="c-box mb-4">
                               <h2>Motif de l’intervention</h2>
+                              <div class="c-info mb-1">
+                                  <span class="c-info__summary">Cette information sera visible aux autres intervenants. N’inscrivez aucune information confidentielle dans ce champ.</span>
+                              </div>
+                              <div class="form-group"><label class="visually-hidden" for="id_reason">Motif de suivi</label><textarea class="form-control" cols="40" id="id_reason" name="reason" placeholder="Raison de l’accompagnement et/ou actions menées avec la personne." rows="3"></textarea></div>
                               <div class="form-group"><div class="form-check"><input checked="" class="form-check-input" id="id_is_referent" name="is_referent" type="checkbox"/><label class="form-check-label" for="id_is_referent"><strong>Me signaler comme référent</strong></label></div></div>
                               <p>
                                   Les autres intervenants verront une pastille
@@ -654,6 +664,14 @@
                                   </div>
                                   <hr class="m-0"/>
                                   <div class="c-box--results__body">
+                                      <ul class="list-data mb-3">
+                                          <li>
+                                              <small>Motif de l’accompagnement</small>
+                                              
+                                                  <i class="text-disabled">Non renseigné</i>
+                                              
+                                          </li>
+                                      </ul>
                                       <ul class="list-data list-data__two-column-md">
                                           <li>
                                               <small>Adresse e-mail</small>
@@ -801,6 +819,14 @@
                                   </div>
                                   <hr class="m-0"/>
                                   <div class="c-box--results__body">
+                                      <ul class="list-data mb-3">
+                                          <li>
+                                              <small>Motif de l’accompagnement</small>
+                                              
+                                                  <strong>iae</strong>
+                                              
+                                          </li>
+                                      </ul>
                                       <ul class="list-data list-data__two-column-md">
                                           <li>
                                               <small>Adresse e-mail</small>
@@ -862,6 +888,14 @@
                                   </div>
                                   <hr class="m-0"/>
                                   <div class="c-box--results__body">
+                                      <ul class="list-data mb-3">
+                                          <li>
+                                              <small>Motif de l’accompagnement</small>
+                                              
+                                                  <i class="text-disabled">Non renseigné</i>
+                                              
+                                          </li>
+                                      </ul>
                                       <ul class="list-data list-data__two-column-md">
                                           <li>
                                               <small>Adresse e-mail</small>
@@ -1148,6 +1182,7 @@
                  "gps_followupgroupmembership"."follow_up_group_id",
                  "gps_followupgroupmembership"."member_id",
                  "gps_followupgroupmembership"."creator_id",
+                 "gps_followupgroupmembership"."reason",
                  COUNT(T4."member_id") AS "nb_members",
                  "gps_followupgroup"."id",
                  "gps_followupgroup"."created_at",
@@ -1290,7 +1325,8 @@
                  "col42",
                  "col43",
                  "col44",
-                 "col45"
+                 "col45",
+                 "col46"
           FROM
             (SELECT *
              FROM
@@ -1306,42 +1342,43 @@
                        "gps_followupgroupmembership"."follow_up_group_id" AS "col10",
                        "gps_followupgroupmembership"."member_id" AS "col11",
                        "gps_followupgroupmembership"."creator_id" AS "col12",
+                       "gps_followupgroupmembership"."reason" AS "col13",
                        ROW_NUMBER() OVER (PARTITION BY "gps_followupgroupmembership"."follow_up_group_id"
                                           ORDER BY RANDOM() ASC) AS "qual0",
                        RANDOM() AS "qual1",
-                       "users_user"."id" AS "col13",
-                       "users_user"."password" AS "col14",
-                       "users_user"."last_login" AS "col15",
-                       "users_user"."is_superuser" AS "col16",
-                       "users_user"."username" AS "col17",
-                       "users_user"."first_name" AS "col18",
-                       "users_user"."last_name" AS "col19",
-                       "users_user"."is_staff" AS "col20",
-                       "users_user"."is_active" AS "col21",
-                       "users_user"."date_joined" AS "col22",
-                       "users_user"."address_line_1" AS "col23",
-                       "users_user"."address_line_2" AS "col24",
-                       "users_user"."post_code" AS "col25",
-                       "users_user"."city" AS "col26",
-                       "users_user"."department" AS "col27",
-                       "users_user"."coords" AS "col28",
-                       "users_user"."geocoding_score" AS "col29",
-                       "users_user"."geocoding_updated_at" AS "col30",
-                       "users_user"."ban_api_resolved_address" AS "col31",
-                       "users_user"."insee_city_id" AS "col32",
-                       "users_user"."title" AS "col33",
-                       "users_user"."full_name_search_vector" AS "col34",
-                       "users_user"."email" AS "col35",
-                       "users_user"."phone" AS "col36",
-                       "users_user"."kind" AS "col37",
-                       "users_user"."identity_provider" AS "col38",
-                       "users_user"."has_completed_welcoming_tour" AS "col39",
-                       "users_user"."created_by_id" AS "col40",
-                       "users_user"."external_data_source_history" AS "col41",
-                       "users_user"."last_checked_at" AS "col42",
-                       "users_user"."public_id" AS "col43",
-                       "users_user"."address_filled_at" AS "col44",
-                       "users_user"."first_login" AS "col45"
+                       "users_user"."id" AS "col14",
+                       "users_user"."password" AS "col15",
+                       "users_user"."last_login" AS "col16",
+                       "users_user"."is_superuser" AS "col17",
+                       "users_user"."username" AS "col18",
+                       "users_user"."first_name" AS "col19",
+                       "users_user"."last_name" AS "col20",
+                       "users_user"."is_staff" AS "col21",
+                       "users_user"."is_active" AS "col22",
+                       "users_user"."date_joined" AS "col23",
+                       "users_user"."address_line_1" AS "col24",
+                       "users_user"."address_line_2" AS "col25",
+                       "users_user"."post_code" AS "col26",
+                       "users_user"."city" AS "col27",
+                       "users_user"."department" AS "col28",
+                       "users_user"."coords" AS "col29",
+                       "users_user"."geocoding_score" AS "col30",
+                       "users_user"."geocoding_updated_at" AS "col31",
+                       "users_user"."ban_api_resolved_address" AS "col32",
+                       "users_user"."insee_city_id" AS "col33",
+                       "users_user"."title" AS "col34",
+                       "users_user"."full_name_search_vector" AS "col35",
+                       "users_user"."email" AS "col36",
+                       "users_user"."phone" AS "col37",
+                       "users_user"."kind" AS "col38",
+                       "users_user"."identity_provider" AS "col39",
+                       "users_user"."has_completed_welcoming_tour" AS "col40",
+                       "users_user"."created_by_id" AS "col41",
+                       "users_user"."external_data_source_history" AS "col42",
+                       "users_user"."last_checked_at" AS "col43",
+                       "users_user"."public_id" AS "col44",
+                       "users_user"."address_filled_at" AS "col45",
+                       "users_user"."first_login" AS "col46"
                 FROM "gps_followupgroupmembership"
                 INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
                 WHERE ("gps_followupgroupmembership"."is_referent"
@@ -1716,6 +1753,7 @@
                  "gps_followupgroupmembership"."follow_up_group_id",
                  "gps_followupgroupmembership"."member_id",
                  "gps_followupgroupmembership"."creator_id",
+                 "gps_followupgroupmembership"."reason",
                  COUNT(T4."member_id") AS "nb_members",
                  "gps_followupgroup"."id",
                  "gps_followupgroup"."created_at",
@@ -1858,7 +1896,8 @@
                  "col42",
                  "col43",
                  "col44",
-                 "col45"
+                 "col45",
+                 "col46"
           FROM
             (SELECT *
              FROM
@@ -1874,42 +1913,43 @@
                        "gps_followupgroupmembership"."follow_up_group_id" AS "col10",
                        "gps_followupgroupmembership"."member_id" AS "col11",
                        "gps_followupgroupmembership"."creator_id" AS "col12",
+                       "gps_followupgroupmembership"."reason" AS "col13",
                        ROW_NUMBER() OVER (PARTITION BY "gps_followupgroupmembership"."follow_up_group_id"
                                           ORDER BY RANDOM() ASC) AS "qual0",
                        RANDOM() AS "qual1",
-                       "users_user"."id" AS "col13",
-                       "users_user"."password" AS "col14",
-                       "users_user"."last_login" AS "col15",
-                       "users_user"."is_superuser" AS "col16",
-                       "users_user"."username" AS "col17",
-                       "users_user"."first_name" AS "col18",
-                       "users_user"."last_name" AS "col19",
-                       "users_user"."is_staff" AS "col20",
-                       "users_user"."is_active" AS "col21",
-                       "users_user"."date_joined" AS "col22",
-                       "users_user"."address_line_1" AS "col23",
-                       "users_user"."address_line_2" AS "col24",
-                       "users_user"."post_code" AS "col25",
-                       "users_user"."city" AS "col26",
-                       "users_user"."department" AS "col27",
-                       "users_user"."coords" AS "col28",
-                       "users_user"."geocoding_score" AS "col29",
-                       "users_user"."geocoding_updated_at" AS "col30",
-                       "users_user"."ban_api_resolved_address" AS "col31",
-                       "users_user"."insee_city_id" AS "col32",
-                       "users_user"."title" AS "col33",
-                       "users_user"."full_name_search_vector" AS "col34",
-                       "users_user"."email" AS "col35",
-                       "users_user"."phone" AS "col36",
-                       "users_user"."kind" AS "col37",
-                       "users_user"."identity_provider" AS "col38",
-                       "users_user"."has_completed_welcoming_tour" AS "col39",
-                       "users_user"."created_by_id" AS "col40",
-                       "users_user"."external_data_source_history" AS "col41",
-                       "users_user"."last_checked_at" AS "col42",
-                       "users_user"."public_id" AS "col43",
-                       "users_user"."address_filled_at" AS "col44",
-                       "users_user"."first_login" AS "col45"
+                       "users_user"."id" AS "col14",
+                       "users_user"."password" AS "col15",
+                       "users_user"."last_login" AS "col16",
+                       "users_user"."is_superuser" AS "col17",
+                       "users_user"."username" AS "col18",
+                       "users_user"."first_name" AS "col19",
+                       "users_user"."last_name" AS "col20",
+                       "users_user"."is_staff" AS "col21",
+                       "users_user"."is_active" AS "col22",
+                       "users_user"."date_joined" AS "col23",
+                       "users_user"."address_line_1" AS "col24",
+                       "users_user"."address_line_2" AS "col25",
+                       "users_user"."post_code" AS "col26",
+                       "users_user"."city" AS "col27",
+                       "users_user"."department" AS "col28",
+                       "users_user"."coords" AS "col29",
+                       "users_user"."geocoding_score" AS "col30",
+                       "users_user"."geocoding_updated_at" AS "col31",
+                       "users_user"."ban_api_resolved_address" AS "col32",
+                       "users_user"."insee_city_id" AS "col33",
+                       "users_user"."title" AS "col34",
+                       "users_user"."full_name_search_vector" AS "col35",
+                       "users_user"."email" AS "col36",
+                       "users_user"."phone" AS "col37",
+                       "users_user"."kind" AS "col38",
+                       "users_user"."identity_provider" AS "col39",
+                       "users_user"."has_completed_welcoming_tour" AS "col40",
+                       "users_user"."created_by_id" AS "col41",
+                       "users_user"."external_data_source_history" AS "col42",
+                       "users_user"."last_checked_at" AS "col43",
+                       "users_user"."public_id" AS "col44",
+                       "users_user"."address_filled_at" AS "col45",
+                       "users_user"."first_login" AS "col46"
                 FROM "gps_followupgroupmembership"
                 INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
                 WHERE ("gps_followupgroupmembership"."is_referent"

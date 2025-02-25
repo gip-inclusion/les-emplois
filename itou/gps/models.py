@@ -141,6 +141,8 @@ class FollowUpGroupMembership(models.Model):
         on_delete=models.RESTRICT,
     )
 
+    reason = models.TextField(blank=True, verbose_name="motif de suivi")
+
     objects = FollowUpGroupMembershipQueryset.as_manager()
 
     def __str__(self):
