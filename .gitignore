@@ -4,6 +4,7 @@ envs/prod.env
 envs/secrets.env
 
 # Config
+docker-compose.override.yml
 docker-compose-prod.yml
 docker/dev/postgres/
 docker/prod/
