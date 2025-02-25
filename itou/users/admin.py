@@ -728,6 +728,28 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
             context,
         )
 
+    def save_model(self, request, obj, form, change):
+        if change and not obj.is_active:
+            # disable all memberships
+            memberships = []
+            if obj.is_employer:
+                memberships = obj.companymembership_set.all()
+            elif obj.is_prescriber:
+                memberships = obj.prescribermembership_set.all()
+            elif obj.is_labor_inspector:
+                memberships = obj.institutionmembership_set.all()
+            for membership in memberships:
+                if membership.is_active or membership.is_admin:
+                    add_support_remark_to_obj(
+                        obj,
+                        f"Désactivation de {membership} suite à la désactivation de l'utilisateur : "
+                        f"is_active={membership.is_active} is_admin={membership.is_admin}",
+                    )
+                    membership.is_active = False
+                    membership.is_admin = False
+                    membership.save()
+        return super().save_model(request, obj, form, change)
+
 
 class IsPECertifiedFilter(admin.SimpleListFilter):
     title = "Certifié par France Travail"
