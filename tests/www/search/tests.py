@@ -33,6 +33,8 @@ DISTRICTS = "Arrondissements de Paris"
 
 class TestSearchCompany:
     URL = reverse_lazy("search:employers_results")
+    no_spontaneous_applications_str = "Cet employeur ne souhaite pas recevoir de candidatures pour le moment"
+    applications_open_str = "Cette structure vous intéresse ?"
 
     def test_not_existing(self, client):
         response = client.get(self.URL, {"city": "foo-44"})
@@ -335,6 +337,7 @@ class TestSearchCompany:
         job_description_url = (
             f"{job_description.get_absolute_url()}?back_url={urlencode_filter(response.wsgi_request.get_full_path())}"
         )
+        assertContains(response, self.applications_open_str)
         assertContains(response, job_description_url)
 
         # Check that invalid value doesn't crash
@@ -403,6 +406,49 @@ class TestSearchCompany:
         )
         assertContains(response, f"<h3>{searchable_company.display_name}</h3>")
         assertNotContains(response, f"<h3>{unsearchable_company.display_name}</h3>")
+
+    def test_is_not_open_to_spontaneous_applications(self, client):
+        """A company has no open positions and is not open to spontaneous applications"""
+        guerande = create_city_guerande()
+        company = CompanyFactory(
+            department="44",
+            coords=guerande.coords,
+            post_code="44350",
+            spontaneous_applications_open_since=None,
+            with_membership=True,
+        )
+
+        response = client.get(self.URL, {"city": guerande.slug})
+        assertContains(response, f"<h3>{company.display_name}</h3>")
+        assertContains(response, self.no_spontaneous_applications_str)
+        assertNotContains(response, self.applications_open_str)
+        apply_url = f"{reverse('apply:start', kwargs={'company_pk': company.pk})}"
+        assertNotContains(response, apply_url)
+
+    def test_is_not_open_to_spontaneous_applications_but_has_jobs(self, client):
+        guerande = create_city_guerande()
+        searchable_company = CompanyWithMembershipAndJobsFactory(
+            department="44",
+            coords=guerande.coords,
+            post_code="44350",
+            spontaneous_applications_open_since=None,
+            with_membership=True,
+        )
+
+        response = client.get(self.URL, {"city": guerande.slug})
+        assertContains(response, f"<h3>{searchable_company.display_name}</h3>")
+        assertNotContains(response, self.no_spontaneous_applications_str)
+        assertContains(response, self.applications_open_str)
+
+        # If the employer closes the jobs that are available, it should be as though none are available
+        searchable_company.job_description_through.update(is_active=False)
+
+        response = client.get(self.URL, {"city": guerande.slug})
+        assertContains(response, f"<h3>{searchable_company.display_name}</h3>")
+        assertContains(response, self.no_spontaneous_applications_str)
+        assertNotContains(response, self.applications_open_str)
+        apply_url = reverse("apply:start", kwargs={"company_pk": searchable_company.pk})
+        assertNotContains(response, apply_url)
 
     def test_apply_button_is_not_shown_when_applications_are_blocked(self, client):
         guerande = create_city_guerande()
