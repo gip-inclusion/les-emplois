@@ -9,6 +9,9 @@
         <li class="nav-item">
             <a class="nav-link{% if active_tab == "memberships" %} active{% endif %}" href="{% url 'gps:group_memberships' group_id=group.pk %}?back_url={{ back_url|urlencode }}">Intervenants</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link{% if active_tab == "beneficiary" %} active{% endif %}" href="{% url 'gps:group_beneficiary' group_id=group.pk %}?back_url={{ back_url|urlencode }}">Informations</a>
+        </li>
     </ul>
 {% endblock %}
 

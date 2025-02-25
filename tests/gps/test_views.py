@@ -8,6 +8,7 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
+from itou.prescribers.models import PrescriberOrganization
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -361,6 +362,68 @@ class TestGroupDetailsMembershipTab:
             ((prescriber, group, target_participant, "phone"),),
             ((prescriber, group, target_participant, "email"),),
         ]
+
+
+class TestGroupDetailsBeneficiaryTab:
+    @pytest.mark.parametrize(
+        "factory,access",
+        [
+            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(EmployerFactory, with_company=True), True],
+            [PrescriberFactory, True],  # we don't need authorized organizations as of today
+            [partial(LaborInspectorFactory, membership=True), False],
+        ],
+        ids=[
+            "job_seeker",
+            "employer",
+            "prescriber",
+            "labor_inspector",
+        ],
+    )
+    def test_permission(self, client, factory, access):
+        user = factory()
+        client.force_login(user)
+        group = FollowUpGroupFactory()
+        url = reverse("gps:group_beneficiary", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        if access:
+            assert response.status_code == 404
+            FollowUpGroupMembershipFactory(follow_up_group=group, member=user)
+            response = client.get(url)
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 403
+
+    def test_tab(self, client, snapshot):
+        prescriber = PrescriberFactory(membership=True, for_snapshot=True)
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
+
+        client.force_login(prescriber)
+
+        url = reverse("gps:group_beneficiary", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+                ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
+            ],
+        )
+        assert str(html_details) == snapshot(name="no_diagnostic")
+
+        PrescriberOrganization.objects.update(is_authorized=True)
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+                ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
+            ],
+        )
+        assert str(html_details) == snapshot(name="with_diagnostic")
 
 
 # tests that will soon be removed or re-written
