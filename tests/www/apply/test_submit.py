@@ -656,6 +656,38 @@ class TestApplyAsJobSeeker:
 
         assertContains(response, LINK_RESET_MARKUP % reset_url_job_description)
 
+    def test_apply_as_job_seeker_sent_emails(self, client, pdf_file, mailoutbox):
+        company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
+        employer = company.members.get()
+        # Inactive user that should not receive an email
+        CompanyMembershipFactory(company=company, user__is_active=False).user
+        user = JobSeekerFactory()
+        client.force_login(user)
+        session = client.session
+        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
+        session.save()
+        client.session.save()
+
+        with mock.patch(
+            "itou.www.apply.views.submit_views.uuid.uuid4",
+            return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        ):
+            client.post(
+                reverse(
+                    "apply:application_resume",
+                    kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id},
+                ),
+                data={
+                    "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                    "resume": pdf_file,
+                },
+            )
+
+        assert JobApplication.objects.filter(sender=user, to_company=company).exists()
+        assert len(mailoutbox) == 2
+        assert mailoutbox[0].to == [employer.email]
+        assert mailoutbox[1].to == [user.email]
+
     def test_apply_as_job_seeker_resume_not_pdf(self, client):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
         user = JobSeekerFactory()
