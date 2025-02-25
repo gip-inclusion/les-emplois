@@ -103,7 +103,13 @@ class CompanyFactory(factory.django.DjangoModelFactory):
         )
         not_in_territorial_experimentation = factory.Trait(
             post_code=factory.LazyFunction(
-                functools.partial(create_fake_postcode, ignore=settings.GPS_NAV_ENTRY_DEPARTMENTS)
+                functools.partial(
+                    create_fake_postcode,
+                    ignore=[
+                        *settings.GPS_NAV_ENTRY_DEPARTMENTS,
+                        *settings.JOB_APPLICATION_OPTIONAL_REFUSAL_REASON_DEPARTMENTS,
+                    ],
+                )
             )
         )
         for_snapshot = factory.Trait(
