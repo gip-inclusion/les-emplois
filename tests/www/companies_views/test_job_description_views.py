@@ -4,6 +4,7 @@ from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from django.template.defaultfilters import urlencode
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
@@ -16,7 +17,7 @@ from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import assertSnapshotQueries
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
 POSTULER = "Postuler"
@@ -153,6 +154,23 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
         assertNotContains(response, self.UNBLOCK_JOB_APPS_BTN)
         self.company.refresh_from_db()
         assert not self.company.block_job_applications
+
+    @freeze_time("2025-01-01")
+    def test_toggle_spontaneous_applications(self, client, snapshot):
+        response = self._login(client, self.user)
+        assert (
+            str(parse_response_to_soup(response, "#toggle_job_description_form_spontaneous_applications")) == snapshot
+        )
+
+        post_data = {"action": "toggle_spontaneous_applications"}
+        client.post(self.url, data=post_data)
+        self.company.refresh_from_db()
+        assert self.company.spontaneous_applications_open_since is None
+
+        post_data = {"action": "toggle_spontaneous_applications"}
+        client.post(self.url, data=post_data)
+        self.company.refresh_from_db()
+        assert self.company.spontaneous_applications_open_since == timezone.now()
 
     @freeze_time("2021-06-21 10:10:10.10")
     def test_toggle_job_description_activity(self, client):

@@ -117,6 +117,7 @@
                  "companies_company"."created_by_id",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",

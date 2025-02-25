@@ -218,6 +218,27 @@ def job_description_list(request, template_name="companies/job_description_list.
                         )
                 else:
                     messages.error(request, "La fiche de poste que vous souhaitiez modifier n'existe plus.")
+            case "toggle_spontaneous_applications":
+                set_active = company.spontaneous_applications_open_since is None
+                company.spontaneous_applications_open_since = timezone.now() if set_active else None
+                company.save(update_fields=["spontaneous_applications_open_since"])
+                if company.block_job_applications:
+                    messages.warning(
+                        request,
+                        (
+                            "La réception de candidatures est temporairement bloquée.||"
+                            "Pour recevoir de nouvelles candidatures, veuillez désactiver le blocage"
+                        ),
+                        extra_tags="toast",
+                    )
+                else:
+                    if set_active:
+                        state = "activées"
+                        add_message = messages.success
+                    else:
+                        state = "désactivées"
+                        add_message = messages.warning
+                    add_message(request, f"Les candidatures spontanées sont maintenant {state}", extra_tags="toast")
             case "block_job_applications":
                 company = form.save()
                 if company.block_job_applications:

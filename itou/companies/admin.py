@@ -164,6 +164,7 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
                     "is_searchable",
                     "block_job_applications",
                     "job_applications_blocked_at",
+                    "spontaneous_applications_open_since",
                     "approvals_list",
                     "rdv_solidarites_id",
                 )
