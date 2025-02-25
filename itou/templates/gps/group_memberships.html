@@ -65,6 +65,16 @@
                                 </div>
                                 <hr class="m-0">
                                 <div class="c-box--results__body">
+                                    <ul class="list-data mb-3">
+                                        <li>
+                                            <small>Motif de l’accompagnement</small>
+                                            {% if membership.reason %}
+                                                <strong>{{ membership.reason }}</strong>
+                                            {% else %}
+                                                <i class="text-disabled">Non renseigné</i>
+                                            {% endif %}
+                                        </li>
+                                    </ul>
                                     <ul class="list-data list-data__two-column-md">
                                         <li>
                                             <small>Adresse e-mail</small>
