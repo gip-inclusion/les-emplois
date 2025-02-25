@@ -8,14 +8,14 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-from django.views.generic import DetailView
+from django.views.generic import DetailView, TemplateView
 
 from itou.gps.grist import log_contact_info_display
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.pagination import pager
-from itou.utils.urls import get_safe_url
+from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.gps.forms import MembershipsFiltersForm
 
 
@@ -109,6 +109,68 @@ def toggle_referent(request, group_id):
         membership.save()
 
     return HttpResponseRedirect(reverse("gps:user_details", args=(membership.follow_up_group.beneficiary.public_id,)))
+
+
+class GroupDetailsMixin(LoginRequiredMixin):
+    # Don't use UserPassesTestMixin because we need the kwargs
+    def setup(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            if not is_allowed_to_use_gps(request.user):
+                raise PermissionDenied("Votre utilisateur n'est pas autorisé à accéder à ces informations.")
+            self.group = get_object_or_404(FollowUpGroup.objects.select_related("beneficiary"), pk=kwargs["group_id"])
+            self.membership = get_object_or_404(
+                FollowUpGroupMembership.objects.filter(is_active=True), follow_up_group=self.group, member=request.user
+            )
+        super().setup(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        back_url = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("gps:group_list"))
+        return context | {
+            "back_url": back_url,
+            "group": self.group,
+        }
+
+
+class GroupMembershipsView(GroupDetailsMixin, TemplateView):
+    template_name = "gps/group_memberships.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        memberships = (
+            FollowUpGroupMembership.objects.with_members_organizations_names()
+            .filter(follow_up_group=self.group)
+            .filter(is_active=True)
+            .order_by("-created_at")
+            .select_related("member")
+        )
+
+        request_new_participant_form_url = add_url_params(
+            "https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?",
+            {
+                "user_name": self.request.user.get_full_name(),
+                "user_id": self.request.user.pk,
+                "user_email": self.request.user.email,
+                "user_organization_name": getattr(self.request.current_organization, "display_name", ""),
+                "user_organization_id": getattr(self.request.current_organization, "pk", ""),
+                "user_type": self.request.user.kind,
+                "beneficiary_name": self.group.beneficiary.get_full_name(),
+                "beneficiary_id": self.group.beneficiary.pk,
+                "beneficiary_email": self.group.beneficiary.email,
+                "success_url": self.request.build_absolute_uri(),
+            },
+        )
+
+        context = context | {
+            "gps_memberships": memberships,
+            "is_referent": self.membership.is_referent,
+            "matomo_custom_title": "Profil GPS - participants",
+            "request_new_participant_form_url": request_new_participant_form_url,
+            "active_tab": "memberships",
+        }
+
+        return context
 
 
 class UserDetailsView(LoginRequiredMixin, DetailView):

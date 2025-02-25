@@ -1,4 +1,276 @@
 # serializer version: 1
+# name: TestGroupDetailsMembershipTab.test_display_participant_contact_info
+  '''
+  <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card'[Public ID of target_participant]">
+                              <div class="c-box--results__header">
+                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 align-items-center mb-3">
+                                      <p class="fs-sm mb-0 flex-grow-1">
+                                          <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
+                                          
+                                              Accompagnateur depuis le 20/01/2025
+                                          
+                                      </p>
+                                      
+                                  </div>
+                                  <div class="c-box--results__summary">
+                                      
+                                          <i aria-hidden="true" class="ri-user-line"></i>
+                                      
+                                      <div>
+                                          <div class="d-flex gap-3 align-items-center">
+                                              <h3>Jean DUPONT</h3>
+                                              
+                                          </div>
+                                          <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                                              Prescripteur
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <hr class="m-0"/>
+                              <div class="c-box--results__body">
+                                  <ul class="list-data list-data__two-column-md">
+                                      <li>
+                                          <small>Adresse e-mail</small>
+                                          
+                                              <strong>jean@dupont.fr</strong>
+  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jean@dupont.fr">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  
+                                          
+                                      </li>
+                                      <li>
+                                          <small>Téléphone</small>
+                                          
+                                              
+                                                  <strong>0123456789</strong>
+  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0123456789">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  
+                                              
+                                          
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+  '''
+# ---
+# name: TestGroupDetailsMembershipTab.test_tab
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/gps/groups/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1 class="m-3">Jane DOE</h1>
+      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+          <li class="nav-item">
+              <a class="nav-link active" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
+          </li>
+      </ul>
+  
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      
+  
+  
+  
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12" id="gps_intervenants">
+                  <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
+                      <h2 class="mb-0">Intervenants</h2>
+                      <a class="btn btn-ico btn-primary" href="https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?user_name=Pierre+DUPONT&amp;user_id=[PK of user]&amp;user_email=pierre.dupont%40test.local&amp;user_organization_name=Les+Olivades&amp;user_organization_id=[PK of organization]&amp;user_type=prescriber&amp;beneficiary_name=Jane+DOE&amp;beneficiary_id=[PK of beneficiary]&amp;beneficiary_email=jane.doe%40test.local&amp;success_url=http%3A%2F%2Ftestserver%2Fgps%2Fgroups%2F[PK of FollowUpGroup]%2Fmemberships" id="request-new-participant-link">
+                          <i aria-hidden="true" class="ri-user-add-line"></i>
+                          <span>Ajouter un intervenant existant</span>
+                      </a>
+                  </div>
+                  <form>
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      
+                          <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-[Public ID of prescriber]">
+                              <div class="c-box--results__header">
+                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 align-items-center mb-3">
+                                      <p class="fs-sm mb-0 flex-grow-1">
+                                          <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
+                                          
+                                              Accompagnateur du 01/01/2024 au 20/06/2024
+                                          
+                                      </p>
+                                      
+                                          <div><span class="badge badge-sm rounded-pill bg-emploi-light text-primary">
+      <i aria-hidden="true" class="ri-eye-close-line"></i>
+      Accompagnement terminé
+  </span>
+  </div>
+                                      
+                                  </div>
+                                  <div class="c-box--results__summary">
+                                      
+                                          <i aria-hidden="true" class="ri-home-smile-line"></i>
+                                      
+                                      <div>
+                                          <div class="d-flex gap-3 align-items-center">
+                                              <h3>Pierre DUPONT</h3>
+                                              
+                                                  <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">c’est vous</span>
+                                              
+                                          </div>
+                                          <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                                              Prescripteur
+                                              pour Les Olivades
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <hr class="m-0"/>
+                              <div class="c-box--results__body">
+                                  <ul class="list-data list-data__two-column-md">
+                                      <li>
+                                          <small>Adresse e-mail</small>
+                                          
+                                              <strong>pierre.dupont@test.local</strong>
+  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dupont@test.local">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  
+                                          
+                                      </li>
+                                      <li>
+                                          <small>Téléphone</small>
+                                          
+                                              
+                                                  <strong>0612345678</strong>
+  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  
+                                              
+                                          
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      
+                          <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-[Public ID of participant]">
+                              <div class="c-box--results__header">
+                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 align-items-center mb-3">
+                                      <p class="fs-sm mb-0 flex-grow-1">
+                                          <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
+                                          
+                                              Accompagnateur depuis le 21/06/2024
+                                          
+                                      </p>
+                                      
+                                  </div>
+                                  <div class="c-box--results__summary">
+                                      
+                                          <i aria-hidden="true" class="ri-user-line"></i>
+                                      
+                                      <div>
+                                          <div class="d-flex gap-3 align-items-center">
+                                              <h3>François LE FRANÇAIS</h3>
+                                              
+                                          </div>
+                                          <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                                              Prescripteur
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <hr class="m-0"/>
+                              <div class="c-box--results__body">
+                                  <ul class="list-data list-data__two-column-md">
+                                      <li>
+                                          <small>Adresse e-mail</small>
+                                          
+                                              <button class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_email" hx-post="/gps/display/[PK of group]/[Public ID of participant]/email" hx-swap="outerHTML" id="email-[PK of participant]">
+                                                  <div class="stable-text">
+                                                      <i aria-hidden="true" class="ri-mail-line fw-medium"></i>
+                                                      <span>Afficher l'email</span>
+                                                  </div>
+                                                  <div class="loading-text">
+                                                      <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+                                                      <span>Affichage en cours</span>
+                                                  </div>
+                                              </button>
+                                          
+                                      </li>
+                                      <li>
+                                          <small>Téléphone</small>
+                                          
+                                              
+                                                  <button class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="displayed_member_phone" hx-post="/gps/display/[PK of group]/[Public ID of participant]/phone" hx-swap="outerHTML" id="phone-[PK of participant]">
+                                                      <div class="stable-text">
+                                                          <i aria-hidden="true" class="ri-phone-line fw-medium"></i>
+                                                          <span>Afficher le téléphone</span>
+                                                      </div>
+                                                      <div class="loading-text">
+                                                          <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+                                                          <span>Affichage en cours</span>
+                                                      </div>
+                                                  </button>
+                                              
+                                          
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      
+                  </form>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  
+          </main>
+  '''
+# ---
 # name: TestGroupLists.test_group_list
   dict({
     'num_queries': 13,
@@ -501,7 +773,7 @@
                       
                           <tr>
                               <td>
-                                  <a aria-label="Consulter la fiche de Jean BON" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/details/[Public ID of beneficiary]?back_url=/gps/groups/list">
+                                  <a aria-label="Consulter la fiche de Jean BON" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">
                                       Jean BON
                                   </a>
                               </td>
@@ -518,7 +790,7 @@
                       
                           <tr>
                               <td>
-                                  <a aria-label="Consulter la fiche de François LE FRANÇAIS" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/details/[Public ID of beneficiary]?back_url=/gps/groups/list">
+                                  <a aria-label="Consulter la fiche de François LE FRANÇAIS" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">
                                       François LE FRANÇAIS
                                   </a>
                               </td>
@@ -537,7 +809,7 @@
                       
                           <tr>
                               <td>
-                                  <a aria-label="Consulter la fiche de Jane DOE" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/details/[Public ID of beneficiary]?back_url=/gps/groups/list">
+                                  <a aria-label="Consulter la fiche de Jane DOE" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">
                                       Jane DOE
                                   </a>
                               </td>
@@ -1068,7 +1340,7 @@
                       
                           <tr>
                               <td>
-                                  <a aria-label="Consulter la fiche de Jean BON" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/details/[Public ID of beneficiary]?back_url=/gps/groups/old/list">
+                                  <a aria-label="Consulter la fiche de Jean BON" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/old/list">
                                       Jean BON
                                   </a>
                               </td>
@@ -1277,20 +1549,21 @@
                   <form>
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                       
-                          <div class="c-box c-box--results has-links-inside my-md-4" id="card-[PK of prescriber]">
+                          <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-[PK of prescriber]">
                               <div class="c-box--results__header">
-                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 align-items-center mb-3">
                                       <p class="fs-sm mb-0 flex-grow-1">
                                           <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
-                                          Membre du groupe de suivi depuis le 21/06/2024
+                                          
+                                              Accompagnateur depuis le 21/06/2024
+                                          
                                       </p>
                                       
-                                          <div>
-                                              <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
-                                                  <i aria-hidden="true" class="ri-map-pin-user-line"></i>
-                                                  Référent⸱e
-                                              </span>
-                                          </div>
+                                          <div><span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
+      <i aria-hidden="true" class="ri-map-pin-user-line"></i>
+      Référent⸱e
+  </span>
+  </div>
                                       
                                   </div>
                                   <div class="c-box--results__summary">
@@ -1298,7 +1571,12 @@
                                           <i aria-hidden="true" class="ri-home-smile-line"></i>
                                       
                                       <div>
-                                          <h3>Pierre DUPONT</h3>
+                                          <div class="d-flex gap-3 align-items-center">
+                                              <h3>Pierre DUPONT</h3>
+                                              
+                                                  <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">c’est vous</span>
+                                              
+                                          </div>
                                           <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                                               Prescripteur
                                               pour Les Olivades
@@ -1339,12 +1617,14 @@
                               </div>
                           </div>
                       
-                          <div class="c-box c-box--results has-links-inside my-md-4" id="card-[PK of participant]">
+                          <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-[PK of participant]">
                               <div class="c-box--results__header">
-                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 align-items-center mb-3">
                                       <p class="fs-sm mb-0 flex-grow-1">
                                           <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
-                                          Membre du groupe de suivi depuis le 21/06/2024
+                                          
+                                              Accompagnateur depuis le 21/06/2024
+                                          
                                       </p>
                                       
                                   </div>
@@ -1353,7 +1633,10 @@
                                           <i aria-hidden="true" class="ri-user-line"></i>
                                       
                                       <div>
-                                          <h3>François LE FRANÇAIS</h3>
+                                          <div class="d-flex gap-3 align-items-center">
+                                              <h3>François LE FRANÇAIS</h3>
+                                              
+                                          </div>
                                           <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                                               Prescripteur
                                               
@@ -1475,12 +1758,14 @@
 # ---
 # name: test_display_participant_contact_info
   '''
-  <div class="c-box c-box--results has-links-inside my-md-4" id="card'[Public ID of target_participant]">
+  <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card'[Public ID of target_participant]">
                               <div class="c-box--results__header">
-                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+                                  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 align-items-center mb-3">
                                       <p class="fs-sm mb-0 flex-grow-1">
                                           <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
-                                          Membre du groupe de suivi depuis le 20/01/2025
+                                          
+                                              Accompagnateur depuis le 20/01/2025
+                                          
                                       </p>
                                       
                                   </div>
@@ -1489,7 +1774,10 @@
                                           <i aria-hidden="true" class="ri-user-line"></i>
                                       
                                       <div>
-                                          <h3>Jean DUPONT</h3>
+                                          <div class="d-flex gap-3 align-items-center">
+                                              <h3>Jean DUPONT</h3>
+                                              
+                                          </div>
                                           <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                                               Prescripteur
                                               
