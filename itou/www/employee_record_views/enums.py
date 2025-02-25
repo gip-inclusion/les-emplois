@@ -14,7 +14,6 @@ class EmployeeRecordOrder(models.TextChoices):
 class MissingEmployeeCase(enum.StrEnum):
     NO_HIRING = "no_hiring"
     NO_APPROVAL = "no_approval"
-    FUTURE_HIRING = "future_hiring"
     EXISTING_EMPLOYEE_RECORD_SAME_COMPANY = "existing_employee_record_same_company"
     EXISTING_EMPLOYEE_RECORD_OTHER_COMPANY = "existing_employee_record_other_company"
     NO_EMPLOYEE_RECORD = "no_employee_record"

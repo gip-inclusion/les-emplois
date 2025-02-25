@@ -44,11 +44,7 @@
                                     <p>
                                         <strong>{{ approval.number }}</strong> du {{ approval.start_at|date:'d/m/Y' }} au {{ approval.end_at|date:'d/m/Y' }}
                                     </p>
-                                    {% if approval_case == MissingEmployeeCase.FUTURE_HIRING %}
-                                        <p>
-                                            La création de fiche salarié sera possible à compter de la date d’embauche : {{ job_application.hiring_start_at|date:'d/m/Y' }}.
-                                        </p>
-                                    {% elif approval_case == MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_OTHER_COMPANY %}
+                                    {% if approval_case == MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_OTHER_COMPANY %}
                                         <p>
                                             Une fiche salarié existe déjà pour ce PASS IAE dans une autre structure avec la même convention : {{ employee_record.job_application.to_company.kind }} {{ employee_record.job_application.to_company.display_name }} - SIRET {{ employee_record.job_application.to_company.siret|format_siret }}
                                         </p>

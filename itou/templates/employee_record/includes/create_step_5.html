@@ -25,6 +25,30 @@
 
             {% include "employee_record/includes/employee_record_summary.html" %}
 
+            {% if job_application.hiring_starts_in_future %}
+                <hr class="my-3 my-md-5">
+                <div class="alert alert-warning mb-4" role="status">
+                    <div class="row">
+                        <div class="col-auto pe-0">
+                            <i class="ri-error-warning-line ri-xl text-warning" aria-hidden="true"></i>
+                        </div>
+                        <div class="col">
+                            <p class="mb-2">
+                                <strong>Validation impossible avant la date d’embauche</strong>
+                            </p>
+                            <p>
+                                La validation de la fiche salarié sera possible à compter de la date d’embauche : {{ job_application.hiring_start_at|date:"d/m/Y" }}.
+                                <br>
+                                Vous ne pouvez donc pas envoyer cette fiche à l’Extranet IAE 2.0 de l'ASP, vous pouvez néanmoins sauvegarder les informations pour un envoi à compter du démarrage effectif du salarié.
+                            </p>
+                            <p>
+                                <strong>Si vous utilisez un logiciel de gestion RH, veuillez vous assurer que celui-ci prend également en compte les fiches salarié dont le statut est "Nouvelle à compléter".</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
             <form method="post" action="{% url "employee_record_views:create_step_5" employee_record.job_application.id %}" class="js-prevent-multiple-submit">
                 {% csrf_token %}
                 {% url "employee_record_views:create_step_4" employee_record.job_application.id as secondary_url %}
@@ -33,7 +57,11 @@
                     {% url_add_query secondary_url status=request.GET.status as secondary_url %}
                     {% url_add_query reset_url status=request.GET.status as reset_url %}
                 {% endif %}
-                {% itou_buttons_form primary_label="Valider la fiche salarié" secondary_url=secondary_url show_mandatory_fields_mention=False reset_url=reset_url %}
+                {% if job_application.hiring_starts_in_future %}
+                    {% itou_buttons_form primary_label="Sauvegarder les informations" primary_url=reset_url secondary_url=secondary_url show_mandatory_fields_mention=False reset_url=reset_url %}
+                {% else %}
+                    {% itou_buttons_form primary_label="Valider la fiche salarié" secondary_url=secondary_url show_mandatory_fields_mention=False reset_url=reset_url %}
+                {% endif %}
             </form>
         </div>
     </div>

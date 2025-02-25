@@ -190,10 +190,7 @@ def missing_employee(request, template_name="employee_record/missing_employee.ht
                 else:
                     approval_case = MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_OTHER_COMPANY
             else:
-                if job_application.hiring_start_at > timezone.localdate():
-                    approval_case = MissingEmployeeCase.FUTURE_HIRING
-                else:
-                    approval_case = MissingEmployeeCase.NO_EMPLOYEE_RECORD
+                approval_case = MissingEmployeeCase.NO_EMPLOYEE_RECORD
             approvals_data.append([approval, job_application, approval_case, employee_record])
 
         approvals_data = sorted(approvals_data, key=lambda a: a[0].end_at, reverse=True)
@@ -490,7 +487,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
 
     employee_record = job_application.employee_record.full_fetch().latest("created_at")
 
-    if request.method == "POST":
+    if request.method == "POST" and not job_application.hiring_starts_in_future:
         back_url = f"{reverse('employee_record_views:list')}?status={employee_record.status}"
         employee_record.ready(user=request.user)
         toast_title, toast_message = (

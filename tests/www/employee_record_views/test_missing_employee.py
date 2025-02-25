@@ -51,23 +51,10 @@ def test_missing_employee(client, snapshot):
         name=MissingEmployeeCase.NO_APPROVAL
     )
 
-    # hired in the future
+    # hired with an approval (nominal case)
     job_seeker = JobSeekerFactory(first_name="Charles", last_name="Constantin")
     approval = ApprovalFactory(user=job_seeker, number="XXXXXXX00001")
     JobApplicationFactory(
-        to_company=siae,
-        job_seeker=job_seeker,
-        state=JobApplicationState.ACCEPTED,
-        approval=approval,
-        hiring_start_at=datetime.date(2025, 2, 15),
-    )
-    response = client.post(url, data={"employee": job_seeker.pk})
-    assert str(parse_response_to_soup(response, selector=".s-section")) == snapshot(
-        name=MissingEmployeeCase.FUTURE_HIRING
-    )
-
-    # But if there also was a previous accepted job application it works
-    job_application = JobApplicationFactory(
         to_company=siae,
         job_seeker=job_seeker,
         state=JobApplicationState.ACCEPTED,

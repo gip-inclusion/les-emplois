@@ -542,7 +542,16 @@ class TestJobApplicationQuerySet:
             state=JobApplicationState.ACCEPTED,
             with_approval=True,
         )
-        assert job_app == JobApplication.objects.eligible_as_employee_record(job_app.to_company).get()
+        job_app_with_future_hiring_start_at = JobApplicationFactory(
+            to_company=job_app.to_company,
+            state=JobApplicationState.ACCEPTED,
+            with_approval=True,
+            hiring_start_at=timezone.localdate() + datetime.timedelta(days=1),
+        )
+        assert set(JobApplication.objects.eligible_as_employee_record(job_app.to_company)) == {
+            job_app,
+            job_app_with_future_hiring_start_at,
+        }
 
         # Test all disabling criterias
         # ----------------------------
@@ -603,13 +612,6 @@ class TestJobApplicationQuerySet:
             approval=job_app_with_employee_record.approval,
         )
         assert_job_app_not_in_queryset(job_app_on_same_convention)
-
-        job_app_with_future_hiring_start_at = JobApplicationFactory(
-            state=JobApplicationState.ACCEPTED,
-            with_approval=True,
-            hiring_start_at=timezone.localdate() + datetime.timedelta(days=1),
-        )
-        assert_job_app_not_in_queryset(job_app_with_future_hiring_start_at)
 
     def test_with_accepted_at_for_created_from_pe_approval(self):
         JobApplicationFactory(

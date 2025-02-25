@@ -322,7 +322,6 @@
                  AND "job_applications_jobapplication"."approval_id" IS NOT NULL
                  AND "job_applications_jobapplication"."create_employee_record"
                  AND "employee_record_employeerecord"."id" IS NULL
-                 AND "job_applications_jobapplication"."hiring_start_at" <= %s
                  AND "job_applications_jobapplication"."to_company_id" = %s
                  AND NOT ("approvals_approval"."number" IN
                             (SELECT V0."approval_number"
