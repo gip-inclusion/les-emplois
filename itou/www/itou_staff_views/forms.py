@@ -88,3 +88,24 @@ class MergeUserConfirmForm(forms.Form):
         if self.errors:
             self.add_error(None, "Vous devez choisir l'identité à conserver")
         return cleaned_data
+
+
+class ConfirmTOTPDeviceForm(forms.Form):
+    name = forms.CharField(label="Nom de l'appareil")
+    otp_token = forms.CharField()
+
+    def __init__(self, *args, device, **kwargs):
+        self.device = device
+        super().__init__(*args, **kwargs)
+        self.fields["otp_token"].widget.attrs["placeholder"] = ""
+        self.fields["otp_token"].widget.attrs["max_length"] = 6
+        self.fields["name"].widget.attrs["placeholder"] = ""
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        otp_token = cleaned_data["otp_token"]
+        if self.device.verify_token(otp_token) is False:
+            self.add_error("otp_token", "Mauvais code OTP")
+
+        return cleaned_data

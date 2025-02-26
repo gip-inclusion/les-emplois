@@ -1,6 +1,7 @@
 import csv
 import datetime
 import io
+from base64 import b32encode
 
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
@@ -11,6 +12,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.http import content_disposition_header
+from django_otp import devices_for_user, login as otp_login
+from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from itou.approvals.models import Approval
 from itou.companies.models import CompanyMembership
@@ -28,7 +31,12 @@ from itou.www.itou_staff_views.export_utils import (
     get_export_ts,
     job_app_export_spec,
 )
-from itou.www.itou_staff_views.forms import ItouStaffExportJobApplicationForm, MergeUserConfirmForm, MergeUserForm
+from itou.www.itou_staff_views.forms import (
+    ConfirmTOTPDeviceForm,
+    ItouStaffExportJobApplicationForm,
+    MergeUserConfirmForm,
+    MergeUserForm,
+)
 
 
 class Echo:
@@ -286,4 +294,36 @@ def merge_users_confirm(
         "transfer_data": transfer_data,
         "form": form,
     }
+    return render(request, template_name, context)
+
+
+@check_user(lambda user: user.is_staff)
+def otp_setup(request, template_name="itou_staff_views/otp_setup.html"):
+    if request.method == "POST":
+        device = TOTPDevice.objects.create(user=request.user, confirmed=False)
+        return HttpResponseRedirect(reverse("itou_staff_views:otp_confirm", kwargs={"device_id": device.pk}))
+
+    context = {"has_devices": bool(devices_for_user(request.user))}
+    return render(request, template_name, context)
+
+
+@check_user(lambda user: user.is_staff)
+def otp_confirm(request, device_id, template_name="itou_staff_views/otp_confirm.html"):
+    device = get_object_or_404(TOTPDevice.objects.filter(user=request.user, confirmed=False), pk=device_id)
+
+    form = ConfirmTOTPDeviceForm(data=request.POST or None, device=device)
+    context = {
+        "form": form,
+        # A bit sad there's no way to retreive this directly from the model
+        "otp_secret": b32encode(device.bin_key).decode(),
+    }
+
+    if request.method == "POST" and form.is_valid():
+        device.confirmed = True
+        device.name = form.cleaned_data["name"]
+        device.save(update_fields=["name", "confirmed"])
+        context["otp_verified"] = True
+        # Mark the user as verified
+        otp_login(request, device)
+
     return render(request, template_name, context)
