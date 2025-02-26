@@ -25,7 +25,7 @@ jobs:
 
     - name: 🏷 Set review app name
       run:
-        echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[-;\\/._]+/-/g' | head -c 63`" >> $GITHUB_ENV
+        echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[^[:alnum:]-]+/-/g' | head -c 63`" >> $GITHUB_ENV
 
     - name: 🏷 Set database addon name
       run:
