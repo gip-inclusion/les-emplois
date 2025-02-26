@@ -26,3 +26,11 @@ ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY = mark_safe(
     "habilité : France Travail, Mission Locale, Cap emploi, etc."
     f"<br>{_doc_link}"  # Display doc link only for proxies.
 )
+
+ERROR_EMPLOYER_BLOCKING_APPLICATIONS = "Cet employeur ne souhaite pas recevoir de candidatures pour le moment."
+ERROR_EMPLOYER_BLOCKING_SPONTANEOUS_APPLICATIONS = (
+    "Cet employeur ne souhaite pas recevoir de candidatures spontanées pour le moment."
+)
+ERROR_EMPLOYER_BLOCKING_APPLICATIONS_FOR_JOB_DESCRIPTION = (
+    "Cet employeur a fermé les candidatures pour un des métiers sélectionnés."
+)
