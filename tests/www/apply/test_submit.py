@@ -3219,6 +3219,9 @@ class TestApplicationView:
     )
     DIAGORIENTE_URL = "https://diagoriente.beta.gouv.fr/services/plateforme"
 
+    spontaneous_application_field = "spontaneous_application"
+    spontaneous_application_label = "Candidature spontanée"
+
     @staticmethod
     def apply_session_key(company):
         return f"job_application-{company.pk}"
@@ -3239,8 +3242,24 @@ class TestApplicationView:
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
-        assert response.status_code == 200
+        assertContains(response, self.spontaneous_application_label)
         assert response.context["form"].initial["selected_jobs"] == [selected_job.pk]
+        assert self.spontaneous_application_field in response.context["form"].fields
+
+    def test_application_jobs_spontaneous_applications_disabled(self, client):
+        company = CompanyFactory(with_membership=True, with_jobs=True, spontaneous_applications_open_since=None)
+
+        client.force_login(company.members.first())
+        job_seeker = JobSeekerFactory()
+
+        response = client.get(
+            reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
+        )
+        assertNotContains(response, self.spontaneous_application_label)
+        assert self.spontaneous_application_field not in response.context["form"].fields
 
     def test_application_start_with_invalid_job_description_id(self, client):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True, with_jobs=True)
