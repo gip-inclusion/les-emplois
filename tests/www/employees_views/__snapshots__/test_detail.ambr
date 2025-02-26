@@ -54,7 +54,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -208,6 +209,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."otp_secret",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -385,6 +387,7 @@
                  T7."public_id",
                  T7."address_filled_at",
                  T7."first_login",
+                 T7."otp_secret",
                  T8."id",
                  T8."address_line_1",
                  T8."address_line_2",
@@ -504,6 +507,7 @@
                  T10."public_id",
                  T10."address_filled_at",
                  T10."first_login",
+                 T10."otp_secret",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -663,6 +667,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."otp_secret",
                  T4."id",
                  T4."password",
                  T4."last_login",
@@ -696,6 +701,7 @@
                  T4."public_id",
                  T4."address_filled_at",
                  T4."first_login",
+                 T4."otp_secret",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -759,7 +765,8 @@
                  T6."last_checked_at",
                  T6."public_id",
                  T6."address_filled_at",
-                 T6."first_login"
+                 T6."first_login",
+                 T6."otp_secret"
           FROM "approvals_prolongationrequest"
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongationrequest"."declared_by_id" = "users_user"."id")
           LEFT OUTER JOIN "users_user" T4 ON ("approvals_prolongationrequest"."validated_by_id" = T4."id")
@@ -889,7 +896,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -938,7 +946,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1095,6 +1104,7 @@
                  T4."public_id",
                  T4."address_filled_at",
                  T4."first_login",
+                 T4."otp_secret",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -1342,6 +1352,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."otp_secret",
                  T4."id",
                  T4."password",
                  T4."last_login",
@@ -1375,6 +1386,7 @@
                  T4."public_id",
                  T4."address_filled_at",
                  T4."first_login",
+                 T4."otp_secret",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1438,7 +1450,8 @@
                  T6."last_checked_at",
                  T6."public_id",
                  T6."address_filled_at",
-                 T6."first_login"
+                 T6."first_login",
+                 T6."otp_secret"
           FROM "approvals_prolongationrequest"
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongationrequest"."declared_by_id" = "users_user"."id")
           LEFT OUTER JOIN "users_user" T4 ON ("approvals_prolongationrequest"."validated_by_id" = T4."id")

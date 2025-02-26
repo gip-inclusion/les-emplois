@@ -81,6 +81,7 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 class ItouStaffFactory(UserFactory):
     kind = UserKind.ITOU_STAFF
+    otp_secret = "some_secret"
 
 
 class PrescriberFactory(UserFactory):

@@ -54,7 +54,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -269,7 +270,8 @@
                              "users_user"."last_checked_at",
                              "users_user"."public_id",
                              "users_user"."address_filled_at",
-                             "users_user"."first_login"
+                             "users_user"."first_login",
+                             "users_user"."otp_secret"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
           WHERE "job_applications_jobapplication"."to_company_id" = %s
@@ -362,7 +364,8 @@
                              "users_user"."last_checked_at",
                              "users_user"."public_id",
                              "users_user"."address_filled_at",
-                             "users_user"."first_login"
+                             "users_user"."first_login",
+                             "users_user"."otp_secret"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
           WHERE "job_applications_jobapplication"."to_company_id" = %s
@@ -884,6 +887,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."otp_secret",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -954,6 +958,7 @@
                  T10."public_id",
                  T10."address_filled_at",
                  T10."first_login",
+                 T10."otp_secret",
                  T11."id",
                  T11."address_line_1",
                  T11."address_line_2",
@@ -1565,7 +1570,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1780,7 +1786,8 @@
                              "users_user"."last_checked_at",
                              "users_user"."public_id",
                              "users_user"."address_filled_at",
-                             "users_user"."first_login"
+                             "users_user"."first_login",
+                             "users_user"."otp_secret"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
           WHERE "job_applications_jobapplication"."to_company_id" = %s
@@ -1873,7 +1880,8 @@
                              "users_user"."last_checked_at",
                              "users_user"."public_id",
                              "users_user"."address_filled_at",
-                             "users_user"."first_login"
+                             "users_user"."first_login",
+                             "users_user"."otp_secret"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
           WHERE "job_applications_jobapplication"."to_company_id" = %s
@@ -2355,6 +2363,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."otp_secret",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -2425,6 +2434,7 @@
                  T7."public_id",
                  T7."address_filled_at",
                  T7."first_login",
+                 T7."otp_secret",
                  T8."id",
                  T8."address_line_1",
                  T8."address_line_2",

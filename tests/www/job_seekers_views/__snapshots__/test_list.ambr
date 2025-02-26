@@ -145,7 +145,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -273,7 +274,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
@@ -361,6 +363,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."otp_secret",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -392,7 +395,7 @@
                                            %s,
                                            %s,
                                            %s))
-          ORDER BY 34 ASC,
+          ORDER BY 35 ASC,
                    "users_user"."id" ASC
           LIMIT 4
         ''',
@@ -672,7 +675,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -800,7 +804,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
@@ -888,6 +893,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."otp_secret",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -919,7 +925,7 @@
                                            %s,
                                            %s,
                                            %s))
-          ORDER BY 34 ASC,
+          ORDER BY 35 ASC,
                    "users_user"."id" ASC
           LIMIT 4
         ''',
