@@ -39,17 +39,19 @@
                 </li>
             {% endwith %}
         {% endfor %}
-        <li class="list-group-item list-group-item-action">
-            <div class="d-flex align-items-start">
-                <div class="d-inline-flex mt-1 me-2">{{ form.spontaneous_application }}</div>
-                <div>
-                    <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                        <label class="fw-bold stretched-link m-0" for="{{ form.spontaneous_application.id_for_label }}">
-                            {{ form.spontaneous_application.label }}
-                        </label>
+        {% if form.spontaneous_application %}
+            <li class="list-group-item list-group-item-action">
+                <div class="d-flex align-items-start">
+                    <div class="d-inline-flex mt-1 me-2">{{ form.spontaneous_application }}</div>
+                    <div>
+                        <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                            <label class="fw-bold stretched-link m-0" for="{{ form.spontaneous_application.id_for_label }}">
+                                {{ form.spontaneous_application.label }}
+                            </label>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </li>
+            </li>
+        {% endif %}
     </ul>
 {% endblock %}

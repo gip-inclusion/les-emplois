@@ -266,6 +266,17 @@ class Company(AddressMixin, OrganizationAbstract):
     job_applications_blocked_at = models.DateTimeField(
         verbose_name="date du dernier blocage de candidatures", blank=True, null=True
     )
+    # Spontaneous applications can be opened for a period. A null value indicates spontaneous applications are blocked.
+    spontaneous_applications_open_since = models.DateTimeField(
+        verbose_name="date ouverture des candidatures spontanées",
+        blank=True,
+        null=True,
+        default=timezone.now,
+        help_text=(
+            "Les candidatures spontanées peuvent être ouvertes pendant 90 jours. Une valeur nulle indique que "
+            "les candidatures spontanées sont bloquées."
+        ),
+    )
 
     convention = models.ForeignKey(
         "SiaeConvention",
@@ -351,6 +362,14 @@ class Company(AddressMixin, OrganizationAbstract):
     @property
     def is_opcs(self):
         return self.kind == CompanyKind.OPCS
+
+    @property
+    def is_open_to_spontaneous_applications(self):
+        return (
+            not self.block_job_applications
+            and self.spontaneous_applications_open_since is not None
+            and timezone.now() > self.spontaneous_applications_open_since
+        )
 
     @property
     def obfuscated_auth_email(self):
