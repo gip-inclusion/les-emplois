@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
 
 from itou.common_apps.address.departments import DEPARTMENTS, REGIONS
@@ -6,6 +7,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
+from itou.metabase.models import DatumKey
 from itou.prescribers.enums import (
     DTFT_SAFIR_CODE_TO_DEPARTMENTS,
     PrescriberAuthorizationStatus,
@@ -230,3 +232,25 @@ def get_stats_ft_departments(request):
         departments = DTFT_SAFIR_CODE_TO_DEPARTMENTS[request.current_organization.code_safir_pole_emploi]
         return [request.current_organization.department] if departments is None else departments
     return [request.current_organization.department]
+
+
+def get_stats_for_institution(institution: Institution, datum_key: DatumKey, *, is_percentage=False):
+    match institution.kind:
+        case (
+            InstitutionKind.DGEFP_GEIQ
+            | InstitutionKind.DGEFP_IAE
+            | InstitutionKind.DIHAL
+            | InstitutionKind.IAE_NETWORK
+        ):
+            grouped_by = None
+        case InstitutionKind.DREETS_GEIQ | InstitutionKind.DREETS_IAE | InstitutionKind.DRIHL:
+            grouped_by = "region"
+        case InstitutionKind.DDETS_GEIQ | InstitutionKind.DDETS_IAE | InstitutionKind.DDETS_LOG:
+            grouped_by = "department"
+        case _:
+            raise ValueError
+
+    datum_key_to_fetch = datum_key.grouped_by(grouped_by) if grouped_by else datum_key
+    data = caches["stats"].get(datum_key_to_fetch)
+    value = data.get(getattr(institution, grouped_by)) if grouped_by and data else data
+    return value * 100 if is_percentage and value else value
