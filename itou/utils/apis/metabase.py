@@ -280,9 +280,6 @@ METABASE_DASHBOARDS = {
         "tally_popup_form_id": "w2az2j",
         "tally_embed_form_id": "3Nlvzl",
     },
-    "stats_dgefp_iae_iae": {
-        "dashboard_id": 117,
-    },
     "stats_dgefp_iae_ph_prescription": {
         "dashboard_id": 289,
         "tally_popup_form_id": "wbWKEo",
@@ -290,9 +287,6 @@ METABASE_DASHBOARDS = {
     },
     "stats_dgefp_iae_siae_evaluation": {
         "dashboard_id": 144,
-    },
-    "stats_dgefp_iae_af": {
-        "dashboard_id": 142,
     },
     "stats_dgefp_iae_orga_etp": {
         "dashboard_id": 485,
