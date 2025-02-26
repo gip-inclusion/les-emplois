@@ -768,12 +768,6 @@ def stats_dgefp_iae_state(request):
     )
 
 
-def stats_dgefp_iae_iae(request):
-    return render_stats_dgefp_iae(
-        request=request, page_title="Données des régions", extra_params=get_params_for_whole_country()
-    )
-
-
 def stats_dgefp_iae_ph_prescription(request):
     return render_stats_dgefp_iae(
         request=request,
@@ -789,10 +783,6 @@ def stats_dgefp_iae_siae_evaluation(request):
         extra_context={"show_siae_evaluation_message": True},
         extra_params=get_params_for_whole_country(),
     )
-
-
-def stats_dgefp_iae_af(request):
-    return render_stats_dgefp_iae(request=request, page_title="Annexes financières actives")
 
 
 def stats_dgefp_iae_orga_etp(request):

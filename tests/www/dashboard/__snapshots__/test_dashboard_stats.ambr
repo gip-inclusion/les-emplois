@@ -3791,15 +3791,6 @@
                                   <span>Suivi des demandes de prolongation</span>
                               </a>
                           </li>
-                          <!-- Stats temporarily suspended until we stabilize them
-                              Which should happen once the dgefp starts working with us properly
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a href="/stats/dgefp/iae" class="btn-link btn-ico">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
-                                  <span>Données IAE France entière</span>
-                              </a>
-                          </li>
-                          -->
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dgefp/siae_evaluation">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -3914,15 +3905,6 @@
                                   <span>Suivi des demandes de prolongation</span>
                               </a>
                           </li>
-                          <!-- Stats temporarily suspended until we stabilize them
-                              Which should happen once the dgefp starts working with us properly
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a href="/stats/dgefp/iae" class="btn-link btn-ico">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
-                                  <span>Données IAE France entière</span>
-                              </a>
-                          </li>
-                          -->
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dgefp/siae_evaluation">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -4037,15 +4019,6 @@
                                   <span>Suivi des demandes de prolongation</span>
                               </a>
                           </li>
-                          <!-- Stats temporarily suspended until we stabilize them
-                              Which should happen once the dgefp starts working with us properly
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a href="/stats/dgefp/iae" class="btn-link btn-ico">
-                                  <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
-                                  <span>Données IAE France entière</span>
-                              </a>
-                          </li>
-                          -->
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dgefp/siae_evaluation">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
