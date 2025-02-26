@@ -53,6 +53,19 @@ htmx.onLoad((target) => {
   })
 
   /**
+    * JS to disable/enable targeted field depending on radio select choice
+    **/
+  function toggleDisableOnRadioSelect() {
+    const targetId = this.getAttribute("data-disable-target");
+    const checkedRadio = this.querySelector("input:checked");
+    $(targetId).attr("disabled", checkedRadio.value === "True");
+  }
+  querySelectorAllIncludingTarget(target, 'div[data-disable-target]').forEach(function (radioWithDisable) {
+    toggleDisableOnRadioSelect.call(radioWithDisable);
+    $(radioWithDisable).change(toggleDisableOnRadioSelect);
+  });
+
+  /**
   * JS to disable/enable and set another select field value.
   **/
   function toggleDisableAndSetValue() {

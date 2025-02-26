@@ -1,12 +1,14 @@
+from datetime import date
 from functools import partial
 
 import freezegun
 import pytest
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
+from itou.gps.models import FollowUpGroup
+from itou.prescribers.models import PrescriberOrganization
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -89,7 +91,7 @@ class TestGroupLists:
             response,
             selector="#follow-up-groups-section",
             replace_in_attr=[
-                ("href", f"/gps/details/{group.beneficiary.public_id}", "/gps/details/[Public ID of beneficiary]")
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]")
                 for group in [group_1, group_2, group_3]
             ],
         )
@@ -131,11 +133,7 @@ class TestGroupLists:
             response,
             selector="#follow-up-groups-section",
             replace_in_attr=[
-                (
-                    "href",
-                    f"/gps/details/{membership.follow_up_group.beneficiary.public_id}",
-                    "/gps/details/[Public ID of beneficiary]",
-                )
+                ("href", f"/gps/groups/{membership.follow_up_group.pk}", "/gps/groups/[PK of FollowUpGroup]")
             ],
         )
         assert str(groups) == snapshot(name="test_my_groups__group_card")
@@ -197,326 +195,438 @@ class TestGroupLists:
         assertSoupEqual(results, fresh_results)
 
 
-# tests that will soon be removed or re-written
-# -------------------------------------------------------------------------------------------
-
-
-def test_job_seeker_cannot_use_gps(client):
-    job_seeker = JobSeekerFactory()
-    client.force_login(job_seeker)
-    group = FollowUpGroupFactory(beneficiary=job_seeker)
-
-    for route, kwargs in [
-        ("gps:leave_group", {"group_id": group.pk}),
-        ("gps:toggle_referent", {"group_id": group.pk}),
-    ]:
-        response = client.get(reverse(route, kwargs=kwargs))
-        assert response.status_code == 403
-    response = client.get(reverse("gps:user_details", kwargs={"public_id": job_seeker.public_id}))
-    assert response.status_code == 403
-
-
-def test_leave_group(client):
-    member = PrescriberFactory(membership__organization__authorized=True)
-    another_member = PrescriberFactory(membership=True)
-
-    beneficiary = JobSeekerFactory()
-    another_beneficiary = JobSeekerFactory()
-
-    my_group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=4, memberships__member=member)
-    another_group = FollowUpGroupFactory(
-        beneficiary=another_beneficiary,
-        memberships=2,
-        memberships__member=another_member,
-    )
-
-    # We have 4 group members
-    assert my_group.members.count() == 4
-
-    # And the 4 are ongoing
-    assert FollowUpGroupMembership.objects.filter(ended_at=None).filter(follow_up_group=my_group).count() == 4
-
-    client.force_login(member)
-    response = client.get(reverse("gps:leave_group", kwargs={"group_id": my_group.id}))
-    assert response.status_code == 302
-
-    # We still have 4 group members
-    assert my_group.members.count() == 4
-    # But only 3 are ongoing
-    assert FollowUpGroupMembership.objects.filter(ended_at=None).filter(follow_up_group=my_group).count() == 3
-
-    # We can't leave a group we're not part of
-    assert another_group.members.count() == 2
-    response = client.get(reverse("gps:leave_group", kwargs={"group_id": another_group.id}))
-    assert response.status_code == 302
-    assert FollowUpGroupMembership.objects.filter(ended_at=None).filter(follow_up_group=another_group).count() == 2
-
-
-def test_referent_group(client):
-    prescriber = PrescriberFactory(membership__organization__authorized=True)
-
-    beneficiary = JobSeekerFactory()
-
-    my_group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=4, memberships__member=prescriber)
-
-    membership = FollowUpGroupMembership.objects.filter(member=prescriber).filter(follow_up_group=my_group).first()
-
-    assert membership.is_referent
-
-    client.force_login(prescriber)
-    response = client.get(reverse("gps:toggle_referent", kwargs={"group_id": my_group.id}))
-    assert response.status_code == 302
-
-    membership.refresh_from_db()
-
-    assert not membership.is_referent
-
-
-@freezegun.freeze_time("2024-06-21")
-def test_beneficiary_details(client, snapshot):
-    prescriber = PrescriberFactory(
-        membership=True,
-        for_snapshot=True,
-        membership__organization__name="Les Olivades",
-        membership__organization__authorized=True,
-        membership__organization__department="24",
-    )
-    beneficiary = JobSeekerFactory(for_snapshot=True)
-    group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
-    participant = FollowUpGroupMembershipFactory(
-        member__first_name="François",
-        member__last_name="Le Français",
-        follow_up_group=group,
-        created_at=timezone.now(),
-    ).member
-
-    client.force_login(prescriber)
-
-    user_details_url = reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id})
-    response = client.get(user_details_url)
-    html_details = parse_response_to_soup(
-        response,
-        selector="#main",
-        replace_in_attr=[
-            ("href", f"user_id={prescriber.pk}", "user_id=[PK of user]"),
-            ("data-bs-confirm-url", f"/gps/groups/{group.pk}/", "/gps/groups/[PK of group]/"),
-            (
-                "href",
-                f"user_organization_id={prescriber.prescribermembership_set.get().organization_id}",
-                "user_organization_id=[PK of organization]",
-            ),
-            ("href", f"beneficiary_id={beneficiary.pk}", "beneficiary_id=[PK of beneficiary]"),
-            ("id", f"card-{prescriber.public_id}", "card-[PK of prescriber]"),
-            ("id", f"card-{participant.public_id}", "card-[PK of participant]"),
-            (
-                "hx-post",
-                f"/gps/display/{group.pk}/{participant.public_id}/phone",
-                "/gps/display/[PK of group]/[Public ID of participant]/phone",
-            ),
-            (
-                "hx-post",
-                f"/gps/display/{group.pk}/{participant.public_id}/email",
-                "/gps/display/[PK of group]/[Public ID of participant]/email",
-            ),
-            ("id", f"phone-{participant.pk}", "phone-[PK of participant]"),
-            ("id", f"email-{participant.pk}", "email-[PK of participant]"),
+class TestGroupDetailsMembershipTab:
+    @pytest.mark.parametrize(
+        "factory,access",
+        [
+            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(EmployerFactory, with_company=True), True],
+            [PrescriberFactory, True],  # we don't need authorized organizations as of today
+            [partial(LaborInspectorFactory, membership=True), False],
+        ],
+        ids=[
+            "job_seeker",
+            "employer",
+            "prescriber",
+            "labor_inspector",
         ],
     )
-    assert str(html_details) == snapshot
-    user_dropdown_menu = parse_response_to_soup(response, selector="div#dashboardUserDropdown")
+    def test_permission(self, client, factory, access):
+        user = factory()
+        client.force_login(user)
+        group = FollowUpGroupFactory()
+        url = reverse("gps:group_memberships", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        if access:
+            assert response.status_code == 404
+            FollowUpGroupMembershipFactory(follow_up_group=group, member=user)
+            response = client.get(url)
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 403
 
-    assert prescriber.email in str(user_dropdown_menu)
-    assert beneficiary.email not in str(user_dropdown_menu)
+    @freezegun.freeze_time("2024-06-21")
+    def test_tab(self, client, snapshot):
+        prescriber = PrescriberFactory(
+            membership=True,
+            for_snapshot=True,
+            membership__organization__name="Les Olivades",
+            membership__organization__authorized=True,
+        )
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupMembershipFactory(
+            follow_up_group__beneficiary=beneficiary,
+            member=prescriber,
+            started_at=date(2024, 1, 1),
+            ended_at=date(2024, 6, 20),
+        ).follow_up_group
+        participant = FollowUpGroupMembershipFactory(
+            member__first_name="François",
+            member__last_name="Le Français",
+            follow_up_group=group,
+            created_at=timezone.now(),
+        ).member
 
-    display_phone_txt = "<span>Afficher le téléphone</span>"
-    display_email_txt = "<span>Afficher l'email</span>"
+        client.force_login(prescriber)
 
-    assertContains(response, display_email_txt)
-    assertContains(response, display_phone_txt)
+        url = reverse("gps:group_memberships", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+                ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
+                ("href", f"user_id={prescriber.pk}", "user_id=[PK of user]"),
+                (
+                    "href",
+                    f"user_organization_id={prescriber.prescribermembership_set.get().organization_id}",
+                    "user_organization_id=[PK of organization]",
+                ),
+                ("href", f"beneficiary_id={beneficiary.pk}", "beneficiary_id=[PK of beneficiary]"),
+                ("id", f"card-{prescriber.public_id}", "card-[Public ID of prescriber]"),
+                ("id", f"card-{participant.public_id}", "card-[Public ID of participant]"),
+                (
+                    "hx-post",
+                    f"/gps/display/{group.pk}/{participant.public_id}/phone",
+                    "/gps/display/[PK of group]/[Public ID of participant]/phone",
+                ),
+                (
+                    "hx-post",
+                    f"/gps/display/{group.pk}/{participant.public_id}/email",
+                    "/gps/display/[PK of group]/[Public ID of participant]/email",
+                ),
+                ("id", f"phone-{participant.pk}", "phone-[PK of participant]"),
+                ("id", f"email-{participant.pk}", "email-[PK of participant]"),
+            ],
+        )
+        assert str(html_details) == snapshot
 
-    # Membership card: missing member information.
-    participant.phone = ""
-    participant.save()
-    response = client.get(user_details_url)
-    assertContains(response, display_email_txt)
-    assertNotContains(response, display_phone_txt)
+        display_phone_txt = "<span>Afficher le téléphone</span>"
+        display_email_txt = "<span>Afficher l'email</span>"
 
-    assertContains(response, "Ajouter un intervenant")
-    assertContains(response, "https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant")
+        assertContains(response, display_email_txt, count=1)
+        assertContains(response, display_phone_txt, count=1)
+
+        # Membership card: missing member information.
+        participant.phone = ""
+        participant.save()
+        response = client.get(url)
+        assertContains(response, display_email_txt, count=1)
+        assertNotContains(response, display_phone_txt)
+
+        assertContains(response, "Ajouter un intervenant")
+        assertContains(response, "https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant")
+
+    def test_group_memberships_order(self, client):
+        prescriber = PrescriberFactory(membership=True)
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
+        participant = FollowUpGroupMembershipFactory(follow_up_group=group, created_at=timezone.now()).member
+
+        client.force_login(prescriber)
+        url = reverse("gps:group_memberships", kwargs={"group_id": group.pk})
+        response = client.get(url)
+
+        html_details = parse_response_to_soup(response, selector="#gps_intervenants")
+        cards = html_details.find_all("div", attrs={"class": "c-box c-box--results has-links-inside mb-3 my-md-4"})
+        participant_ids = [card.attrs["id"].split("card-")[1] for card in cards]
+        assert participant_ids == [str(participant.public_id), str(prescriber.public_id)]
+
+    @freezegun.freeze_time("2025-01-20")
+    def test_display_participant_contact_info(self, client, mocker, snapshot):
+        prescriber = PrescriberFactory(
+            membership=True,
+            for_snapshot=True,
+            membership__organization__name="Les Olivades",
+            membership__organization__authorized=True,
+        )
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
+        target_participant = FollowUpGroupMembershipFactory(
+            follow_up_group=group,
+            member__first_name="Jean",
+            member__last_name="Dupont",
+            member__email="jean@dupont.fr",
+            member__phone="0123456789",
+        ).member
+
+        client.force_login(prescriber)
+        grist_log_mock = mocker.patch(
+            "itou.www.gps.views.log_contact_info_display"
+        )  # Mock the import in the views file
+
+        url = reverse("gps:group_memberships", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        display_phone_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "phone"))
+        assertContains(response, display_phone_url)
+        display_email_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "email"))
+        assertContains(response, display_email_url)
+
+        simulated_page = parse_response_to_soup(
+            response,
+            selector=f"#card-{target_participant.public_id}",
+            replace_in_attr=[("id", f"card-{target_participant.public_id}", "card'[Public ID of target_participant]")],
+        )
+
+        response = client.post(display_phone_url)
+        assertContains(response, target_participant.phone)
+        update_page_with_htmx(simulated_page, f"#phone-{target_participant.pk}", response)
+        response = client.post(display_email_url)
+        assertContains(response, target_participant.email)
+        update_page_with_htmx(simulated_page, f"#email-{target_participant.pk}", response)
+
+        assert str(simulated_page) == snapshot
+
+        assert grist_log_mock.call_args_list == [
+            ((prescriber, group, target_participant, "phone"),),
+            ((prescriber, group, target_participant, "email"),),
+        ]
 
 
-def test_beneficiary_details_members_order(client):
-    prescriber = PrescriberFactory(membership=True, membership__organization__authorized=True)
-    beneficiary = JobSeekerFactory(for_snapshot=True)
-    group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
-    participant = FollowUpGroupMembershipFactory(follow_up_group=group, created_at=timezone.now()).member
-
-    client.force_login(prescriber)
-    user_details_url = reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id})
-    response = client.get(user_details_url)
-
-    html_details = parse_response_to_soup(response, selector="#gps_intervenants")
-    cards = html_details.find_all("div", attrs={"class": "c-box c-box--results has-links-inside my-md-4"})
-    participant_ids = [card.attrs["id"].split("card-")[1] for card in cards]
-    assert participant_ids == [str(participant.public_id), str(prescriber.public_id)]
-
-
-@freezegun.freeze_time("2025-01-20")
-def test_display_participant_contact_info(client, mocker, snapshot):
-    prescriber = PrescriberFactory(
-        membership=True,
-        for_snapshot=True,
-        membership__organization__name="Les Olivades",
-        membership__organization__authorized=True,
-        membership__organization__department="24",
+class TestGroupDetailsBeneficiaryTab:
+    @pytest.mark.parametrize(
+        "factory,access",
+        [
+            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(EmployerFactory, with_company=True), True],
+            [PrescriberFactory, True],  # we don't need authorized organizations as of today
+            [partial(LaborInspectorFactory, membership=True), False],
+        ],
+        ids=[
+            "job_seeker",
+            "employer",
+            "prescriber",
+            "labor_inspector",
+        ],
     )
-    beneficiary = JobSeekerFactory(for_snapshot=True)
-    group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
-    target_participant = FollowUpGroupMembershipFactory(
-        follow_up_group=group,
-        member__first_name="Jean",
-        member__last_name="Dupont",
-        member__email="jean@dupont.fr",
-        member__phone="0123456789",
-    ).member
+    def test_permission(self, client, factory, access):
+        user = factory()
+        client.force_login(user)
+        group = FollowUpGroupFactory()
+        url = reverse("gps:group_beneficiary", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        if access:
+            assert response.status_code == 404
+            FollowUpGroupMembershipFactory(follow_up_group=group, member=user)
+            response = client.get(url)
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 403
 
-    client.force_login(prescriber)
-    grist_log_mock = mocker.patch("itou.www.gps.views.log_contact_info_display")  # Mock the import in the views file
+    def test_tab(self, client, snapshot):
+        prescriber = PrescriberFactory(membership=True, for_snapshot=True)
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
 
-    user_details_url = reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id})
-    response = client.get(user_details_url)
-    display_phone_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "phone"))
-    assertContains(response, display_phone_url)
-    display_email_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "email"))
-    assertContains(response, display_email_url)
+        client.force_login(prescriber)
 
-    simulated_page = parse_response_to_soup(
-        response,
-        selector=f"#card-{target_participant.public_id}",
-        replace_in_attr=[("id", f"card-{target_participant.public_id}", "card'[Public ID of target_participant]")],
+        url = reverse("gps:group_beneficiary", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+                ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
+            ],
+        )
+        assert str(html_details) == snapshot(name="no_diagnostic")
+
+        PrescriberOrganization.objects.update(is_authorized=True)
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+                ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
+            ],
+        )
+        assert str(html_details) == snapshot(name="with_diagnostic")
+
+
+class TestGroupDetailsContributionTab:
+    @pytest.mark.parametrize(
+        "factory,access",
+        [
+            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(EmployerFactory, with_company=True), True],
+            [PrescriberFactory, True],  # we don't need authorized organizations as of today
+            [partial(LaborInspectorFactory, membership=True), False],
+        ],
+        ids=[
+            "job_seeker",
+            "employer",
+            "prescriber",
+            "labor_inspector",
+        ],
     )
+    def test_permission(self, client, factory, access):
+        user = factory()
+        client.force_login(user)
+        group = FollowUpGroupFactory()
+        url = reverse("gps:group_contribution", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        if access:
+            assert response.status_code == 404
+            FollowUpGroupMembershipFactory(follow_up_group=group, member=user)
+            response = client.get(url)
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 403
 
-    response = client.post(display_phone_url)
-    assertContains(response, target_participant.phone)
-    update_page_with_htmx(simulated_page, f"#phone-{target_participant.pk}", response)
-    response = client.post(display_email_url)
-    assertContains(response, target_participant.email)
-    update_page_with_htmx(simulated_page, f"#email-{target_participant.pk}", response)
+    @freezegun.freeze_time("2024-06-21")
+    def test_tab(self, client, snapshot):
+        prescriber = PrescriberFactory(membership=True)
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
 
-    assert str(simulated_page) == snapshot
+        client.force_login(prescriber)
 
-    assert grist_log_mock.call_args_list == [
-        ((prescriber, group, target_participant, "phone"),),
-        ((prescriber, group, target_participant, "email"),),
-    ]
+        url = reverse("gps:group_contribution", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+            ],
+        )
+        assert str(html_details) == snapshot(name="ongoing_membership")
+
+        membership = group.memberships.get()
+        membership.ended_at = timezone.localdate()
+        membership.save()
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+            ],
+        )
+        assert str(html_details) == snapshot(name="ended_membership")
 
 
-def test_display_participant_contact_info_not_allowed(client):
-    prescriber = PrescriberFactory(
-        membership=True,
-        membership__organization__authorized=True,
+class TestGroupDetailsEditionTab:
+    @pytest.mark.parametrize(
+        "factory,access",
+        [
+            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(EmployerFactory, with_company=True), True],
+            [PrescriberFactory, True],  # we don't need authorized organizations as of today
+            [partial(LaborInspectorFactory, membership=True), False],
+        ],
+        ids=[
+            "job_seeker",
+            "employer",
+            "prescriber",
+            "labor_inspector",
+        ],
     )
-    group = FollowUpGroupFactory(memberships=1)
-    target_participant = FollowUpGroupMembershipFactory(
-        follow_up_group=group,
-        member__first_name="Jean",
-        member__last_name="Dupont",
-        member__email="jean@dupont.fr",
-        member__phone="0123456789",
-    ).member
+    def test_permission(self, client, factory, access):
+        user = factory()
+        client.force_login(user)
+        group = FollowUpGroupFactory()
+        url = reverse("gps:group_edition", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        if access:
+            assert response.status_code == 404
+            FollowUpGroupMembershipFactory(follow_up_group=group, member=user)
+            response = client.get(url)
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 403
 
-    client.force_login(prescriber)
+    @freezegun.freeze_time("2024-06-21")
+    def test_tab(self, client, snapshot):
+        prescriber = PrescriberFactory(membership=True)
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupFactory(beneficiary=beneficiary)
+        membership = FollowUpGroupMembershipFactory(member=prescriber, is_referent=True, follow_up_group=group)
 
-    display_phone_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "phone"))
-    display_email_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "email"))
+        client.force_login(prescriber)
+        url = reverse("gps:group_edition", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+            ],
+        )
+        assert str(html_details) == snapshot()
 
-    response = client.post(display_phone_url)
-    assert response.status_code == 404
-    response = client.post(display_email_url)
-    assert response.status_code == 404
+        # The user just clics on "Accompagnement terminé" without setting the ended_at field
+        post_data = {
+            "started_at": "2024-01-03",
+            "is_ongoing": "False",
+            "ended_at": "",
+            "is_referent": "on",
+        }
+        response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
 
+        membership.refresh_from_db()
+        assert membership.started_at == date(2024, 1, 3)
+        assert membership.ended_at == date(2024, 6, 21)  # today
+        assert membership.is_referent is False
 
-def test_contact_information_display(client, snapshot):
-    prescriber = PrescriberFactory(
-        membership=True,
-        for_snapshot=True,
-        membership__organization__address_line_1="14 Rue Saint-Agricol",
-        membership__organization__post_code="30000",
-        membership__organization__city="Nîmes",
-        membership__organization__name="Les Olivades",
-        membership__organization__authorized=True,
-    )
+        # The user just clics on "Accompagnement en cours"
+        post_data = {
+            "started_at": "2024-01-03",
+            "is_ongoing": "True",
+            "ended_at": "2024-06-21",  # The field is set but will be ignored because of is_ongoing
+        }
+        response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
 
-    beneficiary = JobSeekerFactory(for_snapshot=True)
-    FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
-    user_details_url = reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id})
-    client.force_login(prescriber)
+        membership.refresh_from_db()
+        assert membership.started_at == date(2024, 1, 3)
+        assert membership.ended_at is None
+        assert membership.is_referent is False
 
-    # no contact information to display
-    response = client.get(user_details_url)
-    assert response.status_code == 200
-    assert response.context["render_advisor_matomo_option"] == "30"
-    assert str(parse_response_to_soup(response, selector="#advisor-info-details-collapsable")) == snapshot(
-        name="info_not_available"
-    )
+        # The user ends again the membership and sets a date
+        post_data = {
+            "started_at": "2024-01-03",
+            "is_ongoing": "False",
+            "ended_at": "2024-06-20",
+        }
+        response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
 
-    # contact information to display
-    FranceTravailContact.objects.create(
-        name="Test MacTest", email="test.mactest@francetravail.fr", jobseeker_profile=beneficiary.jobseeker_profile
-    )
+        membership.refresh_from_db()
+        assert membership.started_at == date(2024, 1, 3)
+        assert membership.ended_at == date(2024, 6, 20)
+        assert membership.is_referent is False
 
-    response = client.get(user_details_url)
+        # The user follows again the beneficiary as referent
+        post_data = {
+            "started_at": "2024-01-03",
+            "is_ongoing": "True",
+            "ended_at": "2024-06-20",  # The field is set but will be ignored because of is_ongoing
+            "is_referent": "on",
+        }
+        response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
 
-    assert str(parse_response_to_soup(response, selector="#advisor-info-details-collapsable")) == snapshot(
-        name="info_displayed"
-    )
+        membership.refresh_from_db()
+        assert membership.started_at == date(2024, 1, 3)
+        assert membership.ended_at is None
+        assert membership.is_referent is True
 
+    @freezegun.freeze_time("2024-06-21")
+    def test_form_validation(self, client):
+        prescriber = PrescriberFactory(membership=True)
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupFactory(beneficiary=beneficiary)
+        FollowUpGroupMembershipFactory(member=prescriber, is_referent=True, follow_up_group=group)
 
-def test_contact_information_display_not_live(client, snapshot):
-    # NOTE: this can be removed when the service goes live for everyone
-    prescriber = PrescriberFactory(
-        membership=True,
-        for_snapshot=True,
-        membership__organization__address_line_1="12 Rue de Rivoli",
-        membership__organization__post_code="75004",
-        membership__organization__city="Paris",
-        membership__organization__name="Enterprise Test",
-        membership__organization__authorized=True,
-    )
+        client.force_login(prescriber)
+        url = reverse("gps:group_edition", kwargs={"group_id": group.pk})
 
-    beneficiary = JobSeekerFactory(for_snapshot=True)
-    FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
-    FranceTravailContact.objects.create(
-        name="Test MacTest", email="test.mactest@francetravail.fr", jobseeker_profile=beneficiary.jobseeker_profile
-    )
+        # started_at and ended_at must be in the past
+        post_data = {
+            "started_at": "2025-01-03",
+            "is_ongoing": "False",
+            "ended_at": "2025-01-01",
+        }
+        response = client.post(url, data=post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "started_at": ["Ce champ ne peut pas être dans le futur."],
+            "ended_at": ["Ce champ ne peut pas être dans le futur."],
+        }
 
-    client.force_login(prescriber)
-    response = client.get(reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id}))
-    assert response.status_code == 200
-    assert not response.context["render_advisor_matomo_option"]
-    assert str(parse_response_to_soup(response, selector="#advisor-info-details-collapsable")) == snapshot(
-        name="preview_displayed"
-    )
-
-
-@pytest.mark.parametrize(
-    "UserFactory, factory_args",
-    [
-        (PrescriberFactory, {"membership": False}),
-        (PrescriberFactory, {"membership": True}),
-        (PrescriberFactory, {"membership__organization__authorized": True}),
-        (EmployerFactory, {"with_company": True}),
-    ],
-)
-def test_contact_information_access(client, UserFactory, factory_args):
-    user = UserFactory(**factory_args)
-    client.force_login(user)
-
-    beneficiary = JobSeekerFactory()
-
-    response = client.get(reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id}))
-    assert response.status_code == 403
-
-    FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=user)
-    response = client.get(reverse("gps:user_details", kwargs={"public_id": beneficiary.public_id}))
-    assert response.status_code == 200
+        # ended_at must be after started_at
+        post_data = {
+            "started_at": "2024-01-03",
+            "is_ongoing": "False",
+            "ended_at": "2024-01-01",
+        }
+        response = client.post(url, data=post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "ended_at": ["Cette date ne peut pas être avant la date de début."],
+        }
