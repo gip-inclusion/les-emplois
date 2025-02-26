@@ -134,10 +134,16 @@
                 </button>
             </div>
         {% endif %}
+    {% elif not siae.is_open_to_spontaneous_applications %}
+        <div class="c-box--results__body">
+            <div class="c-info mt-2">
+                <span class="c-info__summary">Cet employeur ne souhaite pas recevoir de candidatures pour le moment</span>
+            </div>
+        </div>
     {% endif %}
 
 
-    {% if siae.has_active_members and not siae.block_job_applications and not siae.active_job_descriptions %}
+    {% if siae.has_active_members and not siae.block_job_applications and not siae.active_job_descriptions and siae.is_open_to_spontaneous_applications %}
         {% if job_app_to_transfer|default:False %}
             <div class="c-box--results__footer">
                 <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
