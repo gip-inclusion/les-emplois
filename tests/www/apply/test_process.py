@@ -2208,6 +2208,40 @@ class TestProcessAcceptViews:
         )
         assertFormError(response.context["form_accept"], None, JobApplication.ERROR_END_IS_BEFORE_START)
 
+    def test_accept_hiring_date_after_approval(self, client, mocker):
+        # Jobseeker has an approval, but it ends after the start date of the job.
+        approval = ApprovalFactory(end_at=timezone.localdate() + datetime.timedelta(days=1))
+        self.job_seeker.approvals.add(approval)
+        job_application = self.create_job_application(
+            job_seeker=self.job_seeker,
+            to_company=self.company,
+            sent_by_authorized_prescriber_organisation=True,
+            approval=approval,
+            hiring_start_at=approval.end_at + datetime.timedelta(days=1),
+        )
+
+        employer = self.company.members.first()
+        client.force_login(employer)
+
+        post_data = self._accept_view_post_data(
+            job_application=job_application,
+            post_data={
+                "hiring_start_at": job_application.hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT)
+            },
+        )
+        response, _ = self.accept_job_application(
+            client, job_application, post_data=post_data, assert_successful=False
+        )
+        assertFormError(
+            response.context["form_accept"],
+            "hiring_start_at",
+            JobApplication.ERROR_HIRES_AFTER_APPROVAL_EXPIRES,
+        )
+
+        # employer amends the situation by submitting a different hiring start date
+        post_data["hiring_start_at"] = timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT)
+        response, _ = self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
+
     def test_no_address(self, client):
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
         employer = self.company.members.first()
@@ -3942,7 +3976,11 @@ def test_reload_qualification_fields(qualification_type, client, snapshot):
     company = CompanyFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    url = reverse("apply:reload_qualification_fields", kwargs={"company_pk": company.pk})
+    job_seeker = JobSeekerFactory(for_snapshot=True)
+    url = reverse(
+        "apply:reload_qualification_fields",
+        kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+    )
     response = client.post(
         url,
         data={
@@ -3961,11 +3999,67 @@ def test_reload_qualification_fields(qualification_type, client, snapshot):
     assert response.content.decode() == snapshot()
 
 
-def test_reload_qualification_fields_404(client):
+# TODO(calum): a temporary test, for deployment and zero-downtime. Remove in a week or so,
+# when the corresponding URL is removed.
+@pytest.mark.parametrize("qualification_type", job_applications_enums.QualificationType)
+def test_reload_qualification_fields_job_seekerless_variant(qualification_type, client, snapshot):
+    company = CompanyFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
+    employer = company.members.first()
+    client.force_login(employer)
+    url = reverse("apply:reload_qualification_fields_job_seekerless", kwargs={"company_pk": company.pk})
+    response = client.post(
+        url,
+        data={
+            "guidance_days": "0",
+            "contract_type": ContractType.APPRENTICESHIP,
+            "contract_type_details": "",
+            "nb_hours_per_week": "",
+            "hiring_start_at": "",
+            "qualification_type": qualification_type,
+            "qualification_level": "",
+            "planned_training_hours": "0",
+            "hiring_end_at": "",
+            "answer": "",
+        },
+    )
+    assert response.content.decode() == snapshot()
+
+
+def test_reload_qualification_fields_company_404(client):
     company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    url = reverse("apply:reload_qualification_fields", kwargs={"company_pk": 0})
+    job_seeker = JobSeekerFactory()
+    url = reverse(
+        "apply:reload_qualification_fields", kwargs={"company_pk": 0, "job_seeker_public_id": job_seeker.public_id}
+    )
+    response = client.post(
+        url,
+        data={
+            "guidance_days": "0",
+            "contract_type": ContractType.APPRENTICESHIP,
+            "contract_type_details": "",
+            "nb_hours_per_week": "",
+            "hiring_start_at": "",
+            "qualification_type": job_applications_enums.QualificationType.CQP,
+            "qualification_level": "",
+            "planned_training_hours": "0",
+            "hiring_end_at": "",
+            "answer": "",
+        },
+    )
+    assert response.status_code == 404
+
+
+def test_reload_qualification_fields_job_seeker_404(client):
+    company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
+    employer = company.members.first()
+    client.force_login(employer)
+
+    url = reverse(
+        "apply:reload_qualification_fields",
+        kwargs={"company_pk": company.pk, "job_seeker_public_id": "304aa171-5128-4d59-aae6-8ef77ef9ff72"},
+    )
     response = client.post(
         url,
         data={
@@ -3991,7 +4085,11 @@ def test_reload_contract_type_and_options(contract_type, client, snapshot):
     company = CompanyFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    url = reverse("apply:reload_contract_type_and_options", kwargs={"company_pk": company.pk})
+    job_seeker = JobSeekerFactory(for_snapshot=True)
+    url = reverse(
+        "apply:reload_contract_type_and_options",
+        kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+    )
     response = client.post(
         url,
         data={
@@ -4010,11 +4108,41 @@ def test_reload_contract_type_and_options(contract_type, client, snapshot):
     assert response.content.decode() == snapshot()
 
 
-def test_reload_contract_type_and_options_404(client):
+def test_reload_contract_type_and_options_company_404(client):
     company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    url = reverse("apply:reload_contract_type_and_options", kwargs={"company_pk": 0})
+    job_seeker = JobSeekerFactory()
+    url = reverse(
+        "apply:reload_contract_type_and_options",
+        kwargs={"company_pk": 0, "job_seeker_public_id": job_seeker.public_id},
+    )
+    response = client.post(
+        url,
+        data={
+            "guidance_days": "0",
+            "contract_type": ContractType.APPRENTICESHIP,
+            "contract_type_details": "",
+            "nb_hours_per_week": "",
+            "hiring_start_at": "",
+            "qualification_type": "CQP",
+            "qualification_level": "",
+            "planned_training_hours": "0",
+            "hiring_end_at": "",
+            "answer": "",
+        },
+    )
+    assert response.status_code == 404
+
+
+def test_reload_contract_type_and_options_job_seeker_404(client):
+    company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
+    employer = company.members.first()
+    client.force_login(employer)
+    url = reverse(
+        "apply:reload_contract_type_and_options",
+        kwargs={"company_pk": company.pk, "job_seeker_public_id": "304aa171-5128-4d59-aae6-8ef77ef9ff72"},
+    )
     response = client.post(
         url,
         data={
@@ -4035,7 +4163,9 @@ def test_reload_contract_type_and_options_404(client):
 
 def test_htmx_reload_contract_type_and_options(client):
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.GEIQ, state=job_applications_enums.JobApplicationState.PROCESSING
+        to_company__kind=CompanyKind.GEIQ,
+        state=job_applications_enums.JobApplicationState.PROCESSING,
+        job_seeker__for_snapshot=True,
     )
     employer = job_application.to_company.members.first()
     client.force_login(employer)
@@ -4058,7 +4188,11 @@ def test_htmx_reload_contract_type_and_options(client):
 
     # Update form soup with htmx call
     reload_url = reverse(
-        "apply:reload_contract_type_and_options", kwargs={"company_pk": job_application.to_company.pk}
+        "apply:reload_contract_type_and_options",
+        kwargs={
+            "company_pk": job_application.to_company.pk,
+            "job_seeker_public_id": job_application.job_seeker.public_id,
+        },
     )
     data["contract_type"] = ContractType.PERMANENT
     htmx_response = client.post(
