@@ -362,6 +362,10 @@ class Company(AddressMixin, OrganizationAbstract):
         return self.kind == CompanyKind.OPCS
 
     @property
+    def is_open_to_spontaneous_applications(self):
+        return not self.block_job_applications and self.spontaneous_applications_open_since is not None
+
+    @property
     def obfuscated_auth_email(self):
         """
         Used during the Company secure signup process to avoid

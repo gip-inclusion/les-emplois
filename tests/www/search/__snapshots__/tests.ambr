@@ -149,6 +149,7 @@
                  "companies_company"."created_by_id",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
@@ -466,6 +467,7 @@
                  "companies_company"."created_by_id",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
@@ -700,6 +702,7 @@
                  "companies_company"."created_by_id",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
@@ -854,6 +857,7 @@
                  "companies_company"."created_by_id",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
@@ -882,7 +886,7 @@
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable"
                  AND "companies_company"."id" = %s)
-          ORDER BY 37 DESC,
+          ORDER BY 38 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -969,6 +973,7 @@
                  "companies_company"."created_by_id",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
@@ -1092,6 +1097,7 @@
                  "companies_company"."created_by_id",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
@@ -1245,6 +1251,7 @@
                  "companies_company"."created_by_id",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
@@ -1272,7 +1279,7 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 37 DESC,
+          ORDER BY 38 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -1359,6 +1366,7 @@
                  "companies_company"."created_by_id",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
@@ -1483,6 +1491,7 @@
                  "companies_company"."created_by_id",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
@@ -1636,6 +1645,7 @@
                  "companies_company"."created_by_id",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
@@ -1663,7 +1673,7 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 37 DESC,
+          ORDER BY 38 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -1750,6 +1760,7 @@
                  "companies_company"."created_by_id",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
@@ -1873,6 +1884,7 @@
                  "companies_company"."created_by_id",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
@@ -2026,6 +2038,7 @@
                  "companies_company"."created_by_id",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
@@ -2053,7 +2066,7 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 37 DESC,
+          ORDER BY 38 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -2140,6 +2153,7 @@
                  "companies_company"."created_by_id",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
