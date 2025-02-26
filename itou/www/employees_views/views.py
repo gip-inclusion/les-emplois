@@ -119,9 +119,10 @@ class EmployeeDetailView(DetailView):
         context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("approvals:list"))
         context["link_immersion_facile"] = None
 
-        if approval and approval.remainder.days < 90 and self.request.user.is_employer:
+        if approval and self.request.user.is_employer:
             context["link_immersion_facile"] = immersion_search_url(approval.user)
             context["approval_expired"] = not approval.is_in_progress
+            context["approval_expires_soon"] = approval.remainder.days < 90
 
         context["all_job_applications"] = (
             JobApplication.objects.filter(
