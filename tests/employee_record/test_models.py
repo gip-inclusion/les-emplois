@@ -246,6 +246,44 @@ class TestEmployeeRecordModel:
                 employee_record.unarchive()
                 assert employee_record.status == expected_status
 
+    def test_unarchive_create_the_missed_notification(self, faker):
+        employee_record_before_approval = EmployeeRecordFactory(
+            status=Status.ARCHIVED,
+            updated_at=faker.date_time_between(end_date="-1y", tzinfo=datetime.UTC),
+            job_application__approval__updated_at=faker.date_time_between(
+                start_date="-1y", end_date="-1d", tzinfo=datetime.UTC
+            ),
+        )
+        employee_record_after_approval = EmployeeRecordFactory(
+            status=Status.ARCHIVED,
+            updated_at=faker.date_time_between(start_date="-1y", end_date="-1d", tzinfo=datetime.UTC),
+            job_application__approval__updated_at=faker.date_time_between(end_date="-1y", tzinfo=datetime.UTC),
+        )
+
+        assert employee_record_before_approval.update_notifications.all().count() == 0
+        employee_record_before_approval.unarchive()
+        assert employee_record_before_approval.update_notifications.all().count() == 1
+
+        assert employee_record_after_approval.update_notifications.all().count() == 0
+        employee_record_after_approval.unarchive()
+        assert employee_record_after_approval.update_notifications.all().count() == 0
+
+    @pytest.mark.parametrize(
+        "code,expected",
+        [
+            (None, Status.NEW),
+            ("0000", Status.PROCESSED),
+            ("31", None),
+            ("32", Status.REJECTED),
+            ("33", Status.REJECTED),
+            ("34", Status.REJECTED),
+            ("3436", Status.PROCESSED),
+        ],
+    )
+    def test_status_based_on_asp_processing_code(self, code, expected):
+        employee_record = BareEmployeeRecordFactory(asp_processing_code=code)
+        assert employee_record.status_based_on_asp_processing_code is expected
+
 
 @pytest.mark.parametrize(
     "factory,expected",

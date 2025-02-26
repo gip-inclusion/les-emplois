@@ -133,3 +133,11 @@ def test_available_transitions(snapshot, client, status):
     client.force_login(ro_user)
     response = client.get(url)
     assertNotContains(response, '<div class="submit-row" id="employee-record-transitions">')
+
+
+@pytest.mark.parametrize("code", ["", "0000", "32##", "3436"])
+def test_available_transitions_for_unarchive(faker, snapshot, admin_client, code):
+    employee_record = EmployeeRecordFactory(status=Status.ARCHIVED, asp_processing_code=faker.numerify(code))
+
+    response = admin_client.get(reverse("admin:employee_record_employeerecord_change", args=[employee_record.pk]))
+    assert str(parse_response_to_soup(response, "#employee-record-transitions")) == snapshot()
