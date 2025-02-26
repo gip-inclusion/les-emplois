@@ -18,6 +18,10 @@ from itou.users.enums import UserKind
 STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST = [
     PrescriberOrganizationKind.CAP_EMPLOI,
     PrescriberOrganizationKind.ML,
+    PrescriberOrganizationKind.CHRS,
+    PrescriberOrganizationKind.CHU,
+    PrescriberOrganizationKind.OIL,
+    PrescriberOrganizationKind.RS_FJT,
 ]
 
 
@@ -110,23 +114,10 @@ def can_view_stats_ft(request):
 
 
 def can_view_stats_ph(request):
-    limited_access_organization_kind_whitelist = [
-        PrescriberOrganizationKind.CHRS,
-        PrescriberOrganizationKind.CHU,
-        PrescriberOrganizationKind.OIL,
-        PrescriberOrganizationKind.RS_FJT,
-    ]
     return (
         request.user.is_prescriber
         and isinstance(request.current_organization, PrescriberOrganization)
-        and (
-            request.current_organization.kind in STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST
-            or (
-                request.current_organization.kind in limited_access_organization_kind_whitelist
-                and request.current_organization.region
-                in ["Île-de-France", "Auvergne-Rhône-Alpes", "Nouvelle-Aquitaine"]
-            )
-        )
+        and request.current_organization.kind in STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST
         and request.current_organization.is_authorized
         and request.current_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
     )
