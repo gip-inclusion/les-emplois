@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.html import format_html
 
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 
@@ -52,15 +53,21 @@ class GEIQAdministrativeCriteriaForm(forms.Form):
             # `hx-post` is not inherited
             # see: https://htmx.org/docs/#parameters
             self.fields[criterion.key].widget.attrs.update(
-                {"hx-trigger": "change", "hx-post": form_url, "class": "form-check-input"}
+                {
+                    "hx-trigger": "change",
+                    "hx-post": form_url,
+                    "class": "form-check-input",
+                    "hx-indicator": "closest .form-check",
+                }
             )
 
             # Displayed for GEIQ, not for prescribers
             if not accept_no_criteria and criterion.written_proof:
-                self.fields[criterion.key].help_text += (
-                    f"<p class='mt-2 form-text text-muted fs-xs'><strong>Pièce justificative :</strong> "
-                    f"{criterion.written_proof}</p>"
-                )
+                help_text = format_html("<strong>Pièce justificative :</strong> {}", criterion.written_proof)
+                if self.fields[criterion.key].help_text:
+                    self.fields[criterion.key].help_text += f'<span class="d-block mt-2">{help_text}</span>'
+                else:
+                    self.fields[criterion.key].help_text = help_text
 
         # Setting-up conditional radio field for PE duration
         radio_choices = [
@@ -69,7 +76,13 @@ class GEIQAdministrativeCriteriaForm(forms.Form):
             if c.slug in ("de-inscrit-depuis-moins-de-12-mois", "deld-12-24-mois", "detld-24-mois")
         ]
         self.fields["pole_emploi_related"].widget = forms.RadioSelect(choices=radio_choices)
-        self.fields["pole_emploi_related"].widget.attrs.update({"hx-trigger": "change", "hx-post": form_url})
+        self.fields["pole_emploi_related"].widget.attrs.update(
+            {
+                "hx-trigger": "change",
+                "hx-post": form_url,
+                "hx-indicator": "#id_pole_emploi_related",
+            }
+        )
 
         for pk, _ in radio_choices:
             if pk in selected_pks:
@@ -99,7 +112,6 @@ class GEIQAdministrativeCriteriaForm(forms.Form):
             if self.cleaned_data[key]:
                 for field_key in fields_to_disable:
                     self.fields[field_key].disabled = True
-                    self.fields[field_key].widget.attrs.update({"class": "bg-light"})
 
     def clean(self):
         cleaned_data = super().clean()
@@ -145,7 +157,9 @@ class GEIQAdministrativeCriteriaForGEIQForm(GEIQAdministrativeCriteriaForm):
         super().__init__(company, administrative_criteria, form_url, accept_no_criteria=False, **kwargs)
 
         proof_of_eligibility = self.fields["proof_of_eligibility"]
-        proof_of_eligibility.widget.attrs.update({"hx-trigger": "change", "hx-post": form_url})
+        proof_of_eligibility.widget.attrs.update(
+            {"hx-trigger": "change", "hx-post": form_url, "hx-indicator": "closest .form-check"}
+        )
         proof_of_eligibility.label = (
             "Si le candidat est éligible à l’aide à l’accompagnement GEIQ, "
             "je m'engage à conserver les justificatifs correspondants aux critères "
