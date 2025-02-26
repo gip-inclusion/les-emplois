@@ -251,45 +251,45 @@ METABASE_DASHBOARDS = {
     # Institution stats - DGEFP - nation level.
     #
     "stats_dgefp_iae_auto_prescription": {
-        "dashboard_id": 267,
+        "dashboard_id": 515,
         "tally_popup_form_id": "3qLpE2",
         "tally_embed_form_id": "nG6gBj",
     },
     "stats_dgefp_iae_follow_siae_evaluation": {
-        "dashboard_id": 265,
+        "dashboard_id": 516,
         "tally_popup_form_id": "w2XZxV",
         "tally_embed_form_id": "n9Ba6G",
     },
     "stats_dgefp_iae_follow_prolongation": {
-        "dashboard_id": 357,
+        "dashboard_id": 517,
         "tally_popup_form_id": "nG0lDp",
         "tally_embed_form_id": "mO0GY7",
     },
     "stats_dgefp_iae_tension": {
-        "dashboard_id": 389,
+        "dashboard_id": 519,
         "tally_popup_form_id": "nrEPLl",
         "tally_embed_form_id": "3jxPWx",
     },
     "stats_dgefp_iae_hiring": {
-        "dashboard_id": 160,
+        "dashboard_id": 520,
         "tally_popup_form_id": "mVLBXv",
         "tally_embed_form_id": "nPpXpQ",
     },
     "stats_dgefp_iae_state": {
-        "dashboard_id": 310,
+        "dashboard_id": 521,
         "tally_popup_form_id": "w2az2j",
         "tally_embed_form_id": "3Nlvzl",
     },
     "stats_dgefp_iae_ph_prescription": {
-        "dashboard_id": 289,
+        "dashboard_id": 522,
         "tally_popup_form_id": "wbWKEo",
         "tally_embed_form_id": "wvPEvQ",
     },
     "stats_dgefp_iae_siae_evaluation": {
-        "dashboard_id": 144,
+        "dashboard_id": 518,
     },
     "stats_dgefp_iae_orga_etp": {
-        "dashboard_id": 485,
+        "dashboard_id": 523,
         "tally_popup_form_id": "3N0oLB",
         "tally_embed_form_id": "mOoDva",
     },

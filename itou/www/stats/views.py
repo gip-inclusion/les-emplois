@@ -729,42 +729,32 @@ def render_stats_dgefp_iae(request, page_title, extra_params=None, extra_context
 
 
 def stats_dgefp_iae_auto_prescription(request):
-    return render_stats_dgefp_iae(
-        request=request, page_title="Focus auto-prescription", extra_params=get_params_for_whole_country()
-    )
+    return render_stats_dgefp_iae(request=request, page_title="Focus auto-prescription")
 
 
 def stats_dgefp_iae_follow_siae_evaluation(request):
-    return render_stats_dgefp_iae(
-        request=request, page_title="Suivi du contrôle à posteriori", extra_params=get_params_for_whole_country()
-    )
+    return render_stats_dgefp_iae(request=request, page_title="Suivi du contrôle à posteriori")
 
 
 def stats_dgefp_iae_follow_prolongation(request):
-    return render_stats_dgefp_iae(
-        request=request, page_title="Suivi des demandes de prolongation", extra_params=get_params_for_whole_country()
-    )
+    return render_stats_dgefp_iae(request=request, page_title="Suivi des demandes de prolongation")
 
 
 def stats_dgefp_iae_tension(request):
     return render_stats_dgefp_iae(
         request=request,
         page_title="SIAE qui peinent à recruter sur le territoire",
-        extra_params=get_params_for_whole_country(),
     )
 
 
 def stats_dgefp_iae_hiring(request):
-    return render_stats_dgefp_iae(
-        request=request, page_title="Données facilitation de l'embauche", extra_params=get_params_for_whole_country()
-    )
+    return render_stats_dgefp_iae(request=request, page_title="Données facilitation de l'embauche")
 
 
 def stats_dgefp_iae_state(request):
     return render_stats_dgefp_iae(
         request=request,
         page_title="Suivi des prescriptions des AHI de ma région",
-        extra_params=get_params_for_whole_country(),
     )
 
 
@@ -772,7 +762,6 @@ def stats_dgefp_iae_ph_prescription(request):
     return render_stats_dgefp_iae(
         request=request,
         page_title="Suivi des prescriptions des prescripteurs habilités",
-        extra_params=get_params_for_whole_country(),
     )
 
 
@@ -781,7 +770,6 @@ def stats_dgefp_iae_siae_evaluation(request):
         request=request,
         page_title="Données (version bêta) du contrôle a posteriori",
         extra_context={"show_siae_evaluation_message": True},
-        extra_params=get_params_for_whole_country(),
     )
 
 
@@ -789,7 +777,6 @@ def stats_dgefp_iae_orga_etp(request):
     return render_stats_dgefp_iae(
         request=request,
         page_title="Suivi des effectifs annuels et mensuels en ETP",
-        extra_params=get_params_for_whole_country(),
     )
 
 
