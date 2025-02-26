@@ -98,10 +98,10 @@ def test_geiq_administrative_criteria_validation_for_geiq(new_geiq, administrati
     assert [["Vous devez saisir au moins un critère d'éligibilité GEIQ"]] == list(form.errors.values())
 
     for criterion in administrative_criteria_for_checkboxes:
-        # Check CSS classes
+        # Check <strong> element
         help_text = form.fields[criterion.key].help_text
 
-        assert "mt-2 form-text text-muted fs-xs" in help_text or help_text == ""
+        assert "<strong>" in help_text or help_text == ""
 
 
 def test_geiq_administrative_criteria_exclusions(new_geiq):
