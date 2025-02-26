@@ -1,6 +1,14 @@
 {% extends "apply/submit/application/base.html" %}
+{% load buttons_form %}
 {% load dict_filters %}
 {% load django_bootstrap5 %}
+
+{% block title_prevstep %}
+    {% if not form.available_jobs %}
+        {% url "companies_views:card" siae_id=siae.pk as default_back_url %}
+        {% include "layout/previous_step.html" with back_url=back_url|default:default_back_url only %}
+    {% endif %}
+{% endblock %}
 
 {% block progress_title %}{{ block.super }} - Métiers recherchés{% endblock %}
 {% block step_title %}Sélectionner les métiers recherchés{% endblock %}
@@ -54,4 +62,17 @@
             </li>
         {% endif %}
     </ul>
+    {% if not form.available_jobs %}
+        <p>Cet employeur ne souhaite pas recevoir de candidatures pour le moment.</p>
+    {% endif %}
+{% endblock %}
+
+{% block form_submit_button %}
+    {# Disable the form submission if there are no available jobs #}
+    {% if form.available_jobs %}
+        {{ block.super }}
+    {% else %}
+        {% url "companies_views:card" siae_id=siae.pk as default_back_url %}
+        {% itou_buttons_form primary_disabled=True reset_url=back_url|default:default_back_url %}
+    {% endif %}
 {% endblock %}

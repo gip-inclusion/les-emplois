@@ -1,4 +1,57 @@
 # serializer version: 1
+# name: TestApplicationView.test_application_jobs_none_available
+  '''
+  <form method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+  
+                              
+      <ul class="list-group list-group-flush">
+          
+          
+      </ul>
+      
+          <p>Cet employeur ne souhaite pas recevoir de candidatures pour le moment.</p>
+      
+  
+  
+                              
+      
+      
+          
+          
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/company/[Pk of Company]/card">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button class="btn btn-block btn-primary disabled" type="button">
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+      
+  
+                          </form>
+  '''
+# ---
 # name: TestHireConfirmation.test_as_company[view queries]
   dict({
     'num_queries': 24,

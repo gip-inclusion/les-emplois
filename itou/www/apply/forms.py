@@ -67,6 +67,10 @@ class ApplicationJobsForm(forms.ModelForm):
                 f"Vous ne pouvez pas sélectionner des métiers et '{self.fields['spontaneous_application'].label}'."
             )
 
+    @property
+    def available_jobs(self):
+        return self.fields.get("spontaneous_application") or self.fields["selected_jobs"].choices
+
 
 class SubmitJobApplicationForm(forms.Form):
     """
