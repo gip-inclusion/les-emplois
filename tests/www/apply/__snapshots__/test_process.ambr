@@ -1009,7 +1009,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_approval[job application detail for company]
   dict({
-    'num_queries': 22,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -1913,48 +1913,6 @@
           FROM "eligibility_selectedadministrativecriteria"
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
           ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.latest_approval[users/models.py]',
-          'User.has_valid_approval[users/models.py]',
-          'EligibilityDiagnosis.considered_to_expire_at[eligibility/models/iae.py]',
-          'VariableNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IncludeNode[apply/process_details_company.html]',
-          'IfNode[apply/process_details_company.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_approval"."id",
-                 "approvals_approval"."start_at",
-                 "approvals_approval"."end_at",
-                 "approvals_approval"."created_at",
-                 "approvals_approval"."number",
-                 "approvals_approval"."pe_notification_status",
-                 "approvals_approval"."pe_notification_time",
-                 "approvals_approval"."pe_notification_endpoint",
-                 "approvals_approval"."pe_notification_exit_code",
-                 "approvals_approval"."user_id",
-                 "approvals_approval"."created_by_id",
-                 "approvals_approval"."origin",
-                 "approvals_approval"."eligibility_diagnosis_id",
-                 "approvals_approval"."updated_at",
-                 "approvals_approval"."origin_siae_siret",
-                 "approvals_approval"."origin_siae_kind",
-                 "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind",
-                 "approvals_approval"."public_id"
-          FROM "approvals_approval"
-          WHERE "approvals_approval"."user_id" = %s
-          ORDER BY "approvals_approval"."created_at" DESC
         ''',
       }),
       dict({
@@ -2172,7 +2130,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_list[job application detail for company]
   dict({
-    'num_queries': 22,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -3076,48 +3034,6 @@
           FROM "eligibility_selectedadministrativecriteria"
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
           ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.latest_approval[users/models.py]',
-          'User.has_valid_approval[users/models.py]',
-          'EligibilityDiagnosis.considered_to_expire_at[eligibility/models/iae.py]',
-          'VariableNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IncludeNode[apply/process_details_company.html]',
-          'IfNode[apply/process_details_company.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_approval"."id",
-                 "approvals_approval"."start_at",
-                 "approvals_approval"."end_at",
-                 "approvals_approval"."created_at",
-                 "approvals_approval"."number",
-                 "approvals_approval"."pe_notification_status",
-                 "approvals_approval"."pe_notification_time",
-                 "approvals_approval"."pe_notification_endpoint",
-                 "approvals_approval"."pe_notification_exit_code",
-                 "approvals_approval"."user_id",
-                 "approvals_approval"."created_by_id",
-                 "approvals_approval"."origin",
-                 "approvals_approval"."eligibility_diagnosis_id",
-                 "approvals_approval"."updated_at",
-                 "approvals_approval"."origin_siae_siret",
-                 "approvals_approval"."origin_siae_kind",
-                 "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind",
-                 "approvals_approval"."public_id"
-          FROM "approvals_approval"
-          WHERE "approvals_approval"."user_id" = %s
-          ORDER BY "approvals_approval"."created_at" DESC
         ''',
       }),
       dict({
@@ -3391,7 +3307,7 @@
 # ---
 # name: TestProcessViews.test_details_for_job_seeker
   dict({
-    'num_queries': 16,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -4150,47 +4066,6 @@
           FROM "eligibility_selectedadministrativecriteria"
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
           ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.latest_approval[users/models.py]',
-          'User.has_valid_approval[users/models.py]',
-          'EligibilityDiagnosis.considered_to_expire_at[eligibility/models/iae.py]',
-          'VariableNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IncludeNode[apply/process_details.html]',
-          'IfNode[apply/process_details.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details.html]',
-          'details_for_jobseeker[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_approval"."id",
-                 "approvals_approval"."start_at",
-                 "approvals_approval"."end_at",
-                 "approvals_approval"."created_at",
-                 "approvals_approval"."number",
-                 "approvals_approval"."pe_notification_status",
-                 "approvals_approval"."pe_notification_time",
-                 "approvals_approval"."pe_notification_endpoint",
-                 "approvals_approval"."pe_notification_exit_code",
-                 "approvals_approval"."user_id",
-                 "approvals_approval"."created_by_id",
-                 "approvals_approval"."origin",
-                 "approvals_approval"."eligibility_diagnosis_id",
-                 "approvals_approval"."updated_at",
-                 "approvals_approval"."origin_siae_siret",
-                 "approvals_approval"."origin_siae_kind",
-                 "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind",
-                 "approvals_approval"."public_id"
-          FROM "approvals_approval"
-          WHERE "approvals_approval"."user_id" = %s
-          ORDER BY "approvals_approval"."created_at" DESC
         ''',
       }),
       dict({
