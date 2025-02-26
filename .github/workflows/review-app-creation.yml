@@ -40,7 +40,7 @@ jobs:
         # so we limit to the first 63 characters as it's the maximum length of a
         # domain label (part of domain name separated by dot).
         # https://datatracker.ietf.org/doc/html/rfc1035#section-2.3.4
-        echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[-;\\/._]+/-/g' | head -c 63`" >> $GITHUB_ENV
+        echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[^[:alnum:]-]+/-/g' | head -c 63`" >> $GITHUB_ENV
 
     - name: 🏷 Set database addon name
       run:
@@ -118,7 +118,7 @@ jobs:
 
     - name: 🏷 Set review app name
       run:
-        echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[-;\\/._]+/-/g' | head -c 63`" >> $GITHUB_ENV
+        echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[^[:alnum:]-]+/-/g' | head -c 63`" >> $GITHUB_ENV
 
     - name: 🤝 Find the application on Clever Cloud
       run: |
