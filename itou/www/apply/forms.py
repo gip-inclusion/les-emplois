@@ -34,14 +34,9 @@ logger = logging.getLogger(__name__)
 
 
 class ApplicationJobsForm(forms.ModelForm):
-    spontaneous_application = forms.BooleanField(
-        required=False,
-        label="Candidature spontanée",
-    )
-
     class Meta:
         model = JobApplication
-        fields = ["selected_jobs", "spontaneous_application"]
+        fields = ["selected_jobs"]
         widgets = {
             "selected_jobs": forms.CheckboxSelectMultiple,
         }
@@ -52,8 +47,15 @@ class ApplicationJobsForm(forms.ModelForm):
         self.fields["selected_jobs"].queryset = (
             company.job_description_through.active().with_annotation_is_overwhelmed().prefetch_related("appellation")
         )
-        if not self.initial.get("selected_jobs"):
-            self.initial["spontaneous_application"] = True
+
+        if company.is_open_to_spontaneous_applications:
+            self.fields["spontaneous_application"] = forms.BooleanField(
+                required=False,
+                label="Candidature spontanée",
+            )
+
+            if not self.initial.get("selected_jobs"):
+                self.initial["spontaneous_application"] = True
 
     def clean(self):
         super().clean()
