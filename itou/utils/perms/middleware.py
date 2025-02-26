@@ -156,6 +156,15 @@ class ItouCurrentOrganizationMiddleware:
             # Add request.path as next param ?
             return HttpResponseRedirect(reverse("dashboard:activate_pro_connect_account"))
 
+        # Force OTP for staff users
+        if (
+            user.is_authenticated
+            and user.kind == UserKind.ITOU_STAFF
+            and not user.otp_secret
+            and not request.path.startswith("/staff/otp")
+        ):
+            return HttpResponseRedirect(reverse("itou_staff_views:otp_setup"))
+
         if logout_warning is not None:
             return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))
 
