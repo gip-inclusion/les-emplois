@@ -60,6 +60,10 @@
             </div>
         {% endif %}
 
+        {% if show_rdvi_promote_page|default:False %}
+            <div class="form-group col-12 col-lg-auto">{% include "apply/includes/buttons/rdv_insertion_promote.html" %}</div>
+        {% endif %}
+
         {# Transfer ------------------------------------------------------ #}
         {% if job_application.transfer.is_available %}
             <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
