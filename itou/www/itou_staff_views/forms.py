@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.users.models import User
+from itou.utils.otp import verify_otp
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -87,4 +88,22 @@ class MergeUserConfirmForm(forms.Form):
         cleaned_data = super().clean()
         if self.errors:
             self.add_error(None, "Vous devez choisir l'identité à conserver")
+        return cleaned_data
+
+
+class ConfirmOTP(forms.Form):
+    otp = forms.CharField(max_length=6)
+    otp_secret = forms.CharField()
+
+    def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        self.fields["otp"].widget.attrs["placeholder"] = ""
+
+    def clean(self):
+        cleaned_data = super().clean()
+        otp = cleaned_data.get("otp")
+        otp_secret = cleaned_data.get("otp_secret")
+        if not verify_otp(otp_secret, otp):
+            self.add_error("otp", "Mauvais code OTP")
         return cleaned_data
