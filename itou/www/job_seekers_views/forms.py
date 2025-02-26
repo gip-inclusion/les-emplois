@@ -27,6 +27,13 @@ class FilterForm(forms.Form):
         ),
     )
 
+    eligibility_status_valid = forms.BooleanField(label="Valide", required=False)
+    eligibility_status_not_validated = forms.BooleanField(label="À valider", required=False)
+
+    approval_status_valid = forms.BooleanField(label="Valide", required=False)
+    approval_status_suspended = forms.BooleanField(label="Suspendu", required=False)
+    approval_status_expired = forms.BooleanField(label="Expiré", required=False)
+
     def __init__(self, job_seeker_qs, data, *args, request_user, **kwargs):
         super().__init__(data, *args, **kwargs)
         self.fields["job_seeker"].choices = [
