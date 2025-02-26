@@ -54,6 +54,9 @@ class ApplicationJobsForm(forms.ModelForm):
         if not self.initial.get("selected_jobs"):
             self.initial["spontaneous_application"] = True
 
+        if not company.is_open_to_spontaneous_applications:
+            self.fields.pop("spontaneous_application")
+
     def clean(self):
         super().clean()
 
