@@ -263,3 +263,17 @@ class TestMembers:
 
         institution.refresh_from_db()
         assert_set_admin_role__removal(guest, institution, mailoutbox)
+
+    def test_suspicious_action(self, client):
+        suspicious_action = "h4ckm3"
+        institution = InstitutionFactory()
+        admin_membership = InstitutionMembershipFactory(institution=institution, is_admin=True)
+        client.force_login(admin_membership.user)
+
+        response = client.get(
+            reverse(
+                "institutions_views:update_admin_role",
+                kwargs={"action": suspicious_action, "public_id": admin_membership.user.public_id},
+            )
+        )
+        assert response.status_code == 400
