@@ -427,6 +427,21 @@ class TestGroupDetailsBeneficiaryTab:
         )
         assert str(html_details) == snapshot(name="with_diagnostic")
 
+        # When the user can edit the beneficiary details
+        beneficiary.created_by = prescriber
+        beneficiary.save()
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+                ("href", beneficiary.public_id, "[PublicID of Beneficiary]"),
+                ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
+            ],
+        )
+        assert str(html_details) == snapshot(name="with_beneficiary_edition")
+
 
 class TestGroupDetailsContributionTab:
     @pytest.mark.parametrize(
