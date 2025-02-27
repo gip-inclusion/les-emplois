@@ -19,6 +19,7 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.companies.models import Company, JobDescription, SiaeFinancialAnnex
 from itou.jobs.models import Appellation
+from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiException
 from itou.utils.apis.exceptions import GeocodingDataError
@@ -28,7 +29,7 @@ from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
 from itou.www.companies_views import forms as companies_forms
-from itou.users.models import User
+
 
 ITOU_SESSION_EDIT_COMPANY_KEY = "edit_siae_session_key"
 ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
@@ -642,6 +643,16 @@ def deactivate_member(request, public_id, template_name="companies/deactivate_me
         user.id,
         success_url=reverse("companies_views:members"),
         template_name=template_name,
+    )
+
+
+# To be removed when the old URL is no longer used
+@check_user(lambda user: user.is_employer)
+def deactivate_member_temp_redirection(request, user_id):
+    _user = get_object_or_404(User, pk=user_id)
+    return deactivate_member(
+        request,
+        _user.public_id,
     )
 
 

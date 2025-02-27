@@ -29,6 +29,12 @@ urlpatterns = [
     path("edit-company-preview", views.edit_company_step_preview, name="edit_company_step_preview"),
     path("colleagues", views.members, name="members"),
     path("deactivate_member/<uuid:public_id>", views.deactivate_member, name="deactivate_member"),
+    # to be removed when old url is not used anymore
+    path(
+        "deactivate_member/<int:user_id>",
+        views.deactivate_member_temp_redirection,
+        name="deactivate_member",
+    ),
     # Tricky: when using `re_path` you CAN'T mix re parts with non re ones
     # here, user_id was defined as <int:user_id> and action as re
     # as a result the eval of the url fails silently (404)

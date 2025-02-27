@@ -145,6 +145,25 @@ class TestUserMembershipDeactivation:
         sent_invitation_to_other.refresh_from_db()
         assert sent_invitation_to_other.has_expired is False
 
+    # To be removed when the old URL is no longer used
+    def test_deactivate_user_temp_redirection(self, client):
+        company = CompanyWith2MembershipsFactory(name="Les petits paniers", email="petitspaniers@mailinator.com")
+        admin = company.members.filter(companymembership__is_admin=True).first()
+        guest = company.members.filter(companymembership__is_admin=False).first()
+
+        membership = guest.companymembership_set.first()
+        assert guest not in company.active_admin_members
+        assert admin in company.active_admin_members
+
+        client.force_login(admin)
+        url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
+        response = client.post(url)
+        assert response.status_code == 302
+
+        # User should be deactivated now
+        membership.refresh_from_db()
+        assert not membership.is_active
+
     def test_deactivate_with_no_perms(self, client):
         """
         Non-admin user can't change memberships
