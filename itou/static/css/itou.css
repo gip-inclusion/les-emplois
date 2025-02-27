@@ -255,10 +255,6 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     border-left-width: 3px !important;
 }
 
-.test-accounts-image-menu {
-    min-height: 11rem;
-}
-
 /* step 1/5 */
 .progress-bar-20 {
     width: 20%;

@@ -16,43 +16,28 @@ def employers_accounts_tag():
     action_url = reverse("login:employer")
     return [
         {
+            "title": "ETTI",
             "email": "test+etti@inclusion.gouv.fr",
-            "description": "1 poste ouvert au recrutement",
-            "image": "etti.svg",
-            "location": "Beaucaire (30)",
-            "title": "Entreprise de Travail Temporaire d'Insertion (E.T.T.I)",
             "action_url": action_url,
         },
         {
+            "title": "EI",
             "email": "test+ei@inclusion.gouv.fr",
-            "description": "2 postes ouverts au recrutement",
-            "image": "ei.svg",
-            "location": "St-Etienne du Grès (13)",
-            "title": "Entreprise d'Insertion (E.I.)",
             "action_url": action_url,
         },
         {
+            "title": "GEIQ",
             "email": "test+geiq@inclusion.gouv.fr",
-            "description": "1 poste ouvert au recrutement",
-            "image": "geiq.svg",
-            "location": "Tarascon (13)",
-            "title": "Groupement d'Employeurs pour l'Insertion et la Qualification (G.E.I.Q.)",
             "action_url": action_url,
         },
         {
+            "title": "EA",
             "email": "test+ea@inclusion.gouv.fr",
-            "description": "1 poste ouvert au recrutement",
-            "image": "ea.svg",
-            "location": "Fontvieille (13)",
-            "title": "Entreprise Adaptée (E.A.)",
             "action_url": action_url,
         },
         {
+            "title": "AI",
             "email": "test+ai@inclusion.gouv.fr",
-            "description": "1 poste ouvert au recrutement",
-            "image": "ai.svg",
-            "location": "Tours (37)",
-            "title": "Association intermédiaire (A.I.)",
             "action_url": action_url,
         },
     ]
@@ -65,19 +50,16 @@ def prescribers_accounts_tag():
         {
             "title": "Prescripteur habilité",
             "email": "test+prescripteur@inclusion.gouv.fr",
-            "image": "prescripteur_habilite.svg",
             "action_url": action_url,
         },
         {
-            "title": "Orienteur <br>(prescripteur non habilité)",
+            "title": "Orienteur",
             "email": "test+orienteur@inclusion.gouv.fr",
-            "image": "prescripteur_non_habilite.svg",
             "action_url": action_url,
         },
         {
-            "title": "Orienteur seul,<br> sans organisation",
+            "title": "Orienteur seul sans organisation",
             "email": "test+orienteur-solo@inclusion.gouv.fr",
-            "image": "prescripteur_solo.svg",
             "action_url": action_url,
         },
     ]
@@ -95,4 +77,4 @@ def job_seekers_accounts_tag():
         return []  # Fail.
 
     action_url = reverse("login:existing_user", kwargs={"user_public_id": user_public_id})
-    return [{"email": user_email, "image": "de.svg", "action_url": action_url}]
+    return [{"title": "Candidat", "email": user_email, "action_url": action_url}]

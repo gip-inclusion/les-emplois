@@ -5,26 +5,31 @@
 {% if SHOW_DEMO_ACCOUNTS_BANNER %}
     <div class="alert alert-danger alert-dismissible fade show" role="status">
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-        <p class="mb-0">
-            <strong class="text-uppercase">{{ ITOU_ENVIRONMENT }} - Données fictives</strong>
-            {% if not user.is_authenticated %}
-                <i class="ri-arrow-right-line" aria-hidden="true"></i>
-                <button type="button" class="text-white text-decoration-underline" data-bs-toggle="modal" data-bs-target="#testAccountsModal">
-                    Voir les comptes de démonstration
+        <strong class="me-2">{{ ITOU_ENVIRONMENT }} - Données fictives</strong>
+        {% if not user.is_authenticated %}
+            <button type="button" class="btn btn-sm btn-ico btn-outline-white" data-bs-toggle="modal" data-bs-target="#testAccountsModal">
+                <i class="ri-user-community-line" aria-hidden="true"></i>
+                <span>Sélectionner un compte</span>
+            </button>
+        {% else %}
+            <form method="post" action="{% url 'account_logout' %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-ico btn-outline-white">
+                    <i class="ri-refresh-line" aria-hidden="true"></i>
+                    <span>Changer de compte</span>
                 </button>
-            {% endif %}
-        </p>
+            </form>
+        {% endif %}
     </div>
 
     <div class="modal fade" id="testAccountsModal" tabindex=-1 role="dialog" aria-modal="true" aria-labelledby="testAccountsModalTitle">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 class="modal-title" id="testAccountsModalTitle">Comptes de démonstration</h3>
+                    <h3 class="modal-title" id="testAccountsModalTitle">Sélectionner un compte de démonstration</h3>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
-                <div class="modal-body">
-
+                <div class="modal-body mt-n3">
                     <div class="alert alert-danger" role="status">
                         <p class="mb-0">
                             L'environnement de démonstration des <b>emplois de l'inclusion</b> est limité à des fins de formation.
@@ -33,87 +38,42 @@
                             Ils sont susceptibles d'être <b>détruits à intervalle régulier</b>.
                         </p>
                     </div>
-
-                    <div class="pt-2 pb-5">
-                        <h4 class="h3 text-center">Employeurs</h4>
-                        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 text-center g-3">
+                    <div>
+                        <h4 class="h5">Employeurs</h4>
+                        <div class="d-flex flex-column flex-sm-row gap-3">
                             {% employers_accounts_tag as employers_accounts %}
                             {% for account in employers_accounts %}
-                                <div class="col">
-                                    <div class="c-card card has-links-inside w-100 h-100">
-                                        <div class="card-body mb-auto py-0">
-                                            <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" loading="lazy" width="400" class="card-img-top p-2 test-accounts-image-menu" alt="">
-                                            <h5 class="h5 card-title fw-bold text-center">{{ account.title }}</h5>
-                                        </div>
-                                        <div class="p-3 text-center">
-                                            <p class="card-text">{{ account.description }}</p>
-                                            <p class="m-auto card-text">
-                                                <i class="ri-map-line me-1" aria-hidden="true"></i>
-                                                {{ account.location }}
-                                            </p>
-                                        </div>
-                                        <div class="card-footer text-center">
-                                            <a href="#" class="postLogin btn btn-link stretched-link" data-email="{{ account.email }}" data-action-url="{{ account.action_url }}">
-                                                Utiliser ce compte
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
+                                <button type="button" class="btn btn-secondary postLogin" data-email="{{ account.email }}" data-action-url="{{ account.action_url }}">
+                                    {{ account.title }}
+                                </button>
                             {% endfor %}
                         </div>
                     </div>
-
-                    <div class="pb-5">
-                        <h4 class="h3 text-center">Prescripteurs</h4>
-                        <div class="row row-cols-1 row-cols-md-3 text-center g-3">
+                    <hr class="my-4">
+                    <div>
+                        <h4 class="h5">Prescripteurs</h4>
+                        <div class="d-flex flex-column flex-sm-row gap-3">
                             {% prescribers_accounts_tag as prescribers_accounts %}
                             {% for account in prescribers_accounts %}
-                                <div class="col">
-                                    <div class="c-card card has-links-inside w-100 h-100">
-                                        <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" loading="lazy" width="400" class="card-img-top p-2 test-accounts-image-menu" alt="">
-                                        <div class="card-body">
-                                            <h5 class="h5 card-title h6 fw-bold text-center">{{ account.title|safe }}</h5>
-                                            <p class="card-text">{{ account.description }}</p>
-                                        </div>
-                                        <div class="card-footer text-center">
-                                            <a href="#" class="postLogin btn btn-link stretched-link" data-email="{{ account.email }}" data-action-url="{{ account.action_url }}">
-                                                Utiliser ce compte
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
+                                <button type="button" class="btn btn-secondary postLogin" data-email="{{ account.email }}" data-action-url="{{ account.action_url }}">
+                                    {{ account.title }}
+                                </button>
                             {% endfor %}
                         </div>
                     </div>
-
-                    <div class="pb-5">
-                        <h4 class="h3 text-center">Candidat</h4>
-                        <div class="row row-cols-1 row-cols-md-3 justify-content-center text-center g-3">
+                    <hr class="my-4">
+                    <div>
+                        <h4 class="h5">Candidat</h4>
+                        <div class="d-flex flex-column flex-sm-row gap-3">
                             {% job_seekers_accounts_tag as job_seekers_accounts %}
                             {% for account in job_seekers_accounts %}
-                                <div class="col">
-                                    <div class="c-card card has-links-inside w-100 h-100">
-                                        <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" loading="lazy" width="400" class="card-img-top p-2 test-accounts-image-menu" alt="">
-                                        <div class="card-body">
-                                            <h5 class="h5 card-title fw-bold text-center mb-0">{{ account.title }}</h5>
-                                            <p class="card-text">{{ account.description }}</p>
-                                        </div>
-                                        <div class="card-footer text-center">
-                                            <a href="#" class="postLogin btn btn-link stretched-link" data-email="{{ account.email }}" data-action-url="{{ account.action_url }}">
-                                                Utiliser ce compte
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
+                                <button type="button" class="btn btn-secondary postLogin" data-email="{{ account.email }}" data-action-url="{{ account.action_url }}">
+                                    {{ account.title }}
+                                </button>
                             {% endfor %}
                         </div>
                     </div>
-
                 </div>
-                <div class="modal-footer">
-                    <button class="btn btn-sm btn-primary" data-bs-dismiss="modal">Fermer</button>
-                </div>
-
                 <div class="d-none">
                     <!-- `action` is set by demo_accounts.js based on clicked link's "data-action-url" attribute. -->
                     <form id="testAccountsForm" method="post">
