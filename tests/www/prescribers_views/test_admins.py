@@ -1,6 +1,5 @@
-import pytest
+import pytest  # noqa
 from django.urls import reverse
-from django.urls.exceptions import NoReverseMatch
 
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.prescribers.factories import PrescriberOrganizationWith2MembershipFactory
@@ -95,9 +94,10 @@ class TestPrescribersOrganizationAdminMembersManagement:
 
         client.force_login(guest)
 
-        # update: possible actions are now filtered via RE_PATH in urls.py
-        with pytest.raises(NoReverseMatch):
+        response = client.get(
             reverse(
                 "prescribers_views:update_admin_role",
                 kwargs={"action": suspicious_action, "public_id": admin.public_id},
             )
+        )
+        assert response.status_code == 400
