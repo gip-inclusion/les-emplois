@@ -1,6 +1,5 @@
 import pytest
 from django.urls import reverse
-from django.urls.exceptions import NoReverseMatch
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
@@ -399,8 +398,10 @@ class TestCompanyAdminMembersManagement:
         guest = company.members.filter(companymembership__is_admin=False).first()
 
         client.force_login(guest)
-        # update: less test with RE_PATH
-        with pytest.raises(NoReverseMatch):
+        response = client.get(
             reverse(
-                "companies_views:update_admin_role", kwargs={"action": suspicious_action, "public_id": admin.public_id}
+                "companies_views:update_admin_role",
+                kwargs={"action": suspicious_action, "public_id": admin.public_id},
             )
+        )
+        assert response.status_code == 400
