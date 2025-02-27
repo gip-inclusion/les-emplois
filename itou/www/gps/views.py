@@ -165,6 +165,7 @@ class GroupBeneficiaryView(GroupDetailsMixin, TemplateView):
             "render_advisor_matomo_option": matomo_option,
             "matomo_option": f"coordonnees-conseiller-{matomo_option or 'ailleurs'}",
             "active_tab": "beneficiary",
+            "can_edit_personal_information": self.request.user.can_edit_personal_information(self.group.beneficiary),
         }
 
         return context

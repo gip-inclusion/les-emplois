@@ -5,7 +5,21 @@
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <h2>Informations</h2>
+            <div class="row mb-3">
+                <div class="col-12 col-sm">
+                    <h2>Informations</h2>
+                </div>
+                {% if can_edit_personal_information %}
+                    <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                        <a href="{% url 'dashboard:edit_job_seeker_info' job_seeker_public_id=group.beneficiary.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                           class="btn btn-ico btn-primary"
+                           aria-label="Modifier les informations personnelles de {{ group.beneficiary.get_full_name }}">
+                            <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
+                            <span>Modifier</span>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
             <div class="c-box mb-5">
                 <h2>Informations de contact</h2>
                 <div class="row">
