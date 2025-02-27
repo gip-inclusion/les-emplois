@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
 from django.core.cache import caches
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import BadRequest, PermissionDenied
 from django.db.models import Count, Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -658,6 +658,8 @@ def deactivate_member_temp_redirection(request, user_id):
 
 @check_user(lambda user: user.is_employer)
 def update_admin_role(request, action, public_id, template_name="companies/update_admins.html"):
+    if action not in ["add", "remove"]:
+        raise BadRequest("Invalid action")
     user = get_object_or_404(User, public_id=public_id)
     return update_org_admin_role(
         request,
