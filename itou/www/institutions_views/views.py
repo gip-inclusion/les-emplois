@@ -48,6 +48,13 @@ def deactivate_member(request, public_id, template_name="institutions/deactivate
     )
 
 
+# To be removed when the old URL is no longer used
+@check_user(lambda user: user.is_labor_inspector)
+def deactivate_member_temp_redirection(request, user_id):
+    _user = get_object_or_404(User, id=user_id)
+    return deactivate_member(request, public_id=_user.public_id)
+
+
 @check_user(lambda user: user.is_labor_inspector)
 def update_admin_role(request, action, public_id, template_name="institutions/update_admins.html"):
     user = get_object_or_404(User, public_id=public_id)
