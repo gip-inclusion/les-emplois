@@ -149,6 +149,24 @@ class TestUserMembershipDeactivation:
         sent_invitation_to_other.refresh_from_db()
         assert sent_invitation_to_other.has_expired is False
 
+    # To be removed when the old URL is no longer used
+    def test_temp_redirection_deactivate_user(self, client):
+        organization = PrescriberOrganizationWith2MembershipFactory(name="Mission locale", email="ml@mailinator.com")
+        admin = organization.members.filter(prescribermembership__is_admin=True).first()
+        guest = organization.members.filter(prescribermembership__is_admin=False).first()
+
+        memberships = guest.prescribermembership_set.all()
+        membership = memberships.first()
+
+        client.force_login(admin)
+        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
+        response = client.post(url)
+        assert response.status_code == 302
+
+        # User should be deactivated now
+        membership.refresh_from_db()
+        assert not membership.is_active
+
     def test_deactivate_user_from_another_organisation(self, client, mailoutbox):
         my_organization = PrescriberOrganizationFactory()
         other_organization = PrescriberOrganizationFactory()
