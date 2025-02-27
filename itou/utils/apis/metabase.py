@@ -35,13 +35,13 @@ METABASE_DASHBOARDS = {
     },
     "stats_siae_etp": {
         "dashboard_id": 465,
-        "tally_popup_form_id": "3N0oLB",
-        "tally_embed_form_id": "n9lQOp",
+        "tally_popup_form_id": "mYxB7W",
+        "tally_embed_form_id": "3qPVOY",
     },
     "stats_siae_orga_etp": {
         "dashboard_id": 440,
         "tally_popup_form_id": "n0POQP",
-        "tally_embed_form_id": "mYda5z",
+        "tally_embed_form_id": "wzeYxZ",
     },
     "stats_siae_hiring": {
         "dashboard_id": 185,
