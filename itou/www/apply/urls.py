@@ -218,19 +218,36 @@ urlpatterns = [
         process_views.send_diagoriente_invite,
         name="send_diagoriente_invite",
     ),
-    # HTMX fragments loading
+    # TODO(calum): temporary views for preventing downtime during deployment,
+    # can be removed in a week or so.
     path(
         "<int:company_pk>/accept/reload_qualification_fields",
         process_views.ReloadQualificationFields.as_view(),
-        name="reload_qualification_fields",
+        name="reload_qualification_fields_job_seekerless",
     ),
     path(
         "<int:company_pk>/accept/reload_contract_type_and_options",
         process_views.ReloadContractTypeAndOptions.as_view(),
-        name="reload_contract_type_and_options",
+        name="reload_contract_type_and_options_job_seekerless",
     ),
     path(
         "<int:company_pk>/accept/reload_job_description_fields",
+        process_views.ReloadJobDescriptionFields.as_view(),
+        name="reload_job_description_fields_job_seekerless",
+    ),
+    # HTMX fragments loading
+    path(
+        "<int:company_pk>/accept/<uuid:job_seeker_public_id>/reload_qualification_fields",
+        process_views.ReloadQualificationFields.as_view(),
+        name="reload_qualification_fields",
+    ),
+    path(
+        "<int:company_pk>/accept/<uuid:job_seeker_public_id>/reload_contract_type_and_options",
+        process_views.ReloadContractTypeAndOptions.as_view(),
+        name="reload_contract_type_and_options",
+    ),
+    path(
+        "<int:company_pk>/accept/<uuid:job_seeker_public_id>/reload_job_description_fields",
         process_views.ReloadJobDescriptionFields.as_view(),
         name="reload_job_description_fields",
     ),
