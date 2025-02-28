@@ -24,7 +24,7 @@
   <div class="tab-content">
                           <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
                               
-                                  <p class="mb-0">Cet employeur accepte de recevoir des candidatures spontanées.</p>
+                                  <p class="mb-0">Cet employeur n’a pas de recrutement en cours.</p>
                               
                           </div>
                           
