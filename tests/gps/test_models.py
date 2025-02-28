@@ -26,57 +26,98 @@ def test_bulk_created():
     assert FollowUpGroupMembership.objects.bulk_created().count() == 6
 
 
-def test_follow_beneficiary():
-    beneficiary = JobSeekerFactory()
-    prescriber = PrescriberFactory(membership=True)
+class TestFollowBeneficiary:
+    def test_dates(self):
+        beneficiary = JobSeekerFactory()
+        prescriber = PrescriberFactory()
 
-    with freeze_time() as frozen_time:
-        created_at = timezone.now()
-        started_at = timezone.localdate()
+        with freeze_time() as frozen_time:
+            created_at = timezone.now()
+            started_at = timezone.localdate()
+            created = FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber)
+            assert created is True
+            group = FollowUpGroup.objects.get()
+            membership = group.memberships.get()
+            assert membership.created_at == created_at
+            assert membership.started_at == started_at
+            assert membership.ended_at is None
+            assert membership.last_contact_at == created_at
+            assert membership.creator == prescriber
+
+            membership.ended_at = started_at
+            membership.save()
+            frozen_time.tick()
+            updated_at = timezone.now()
+
+            created = FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber)
+            assert created is False
+            membership.refresh_from_db()
+            assert membership.created_at == created_at
+            assert membership.started_at == started_at
+            assert membership.ended_at is None
+            assert membership.last_contact_at == updated_at
+
+    def test_is_referent(self):
+        beneficiary = JobSeekerFactory()
+        prescriber = PrescriberFactory()
+
+        # New follower uses kwarg value
         FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber, is_referent=True)
         group = FollowUpGroup.objects.get()
         membership = group.memberships.get()
         assert membership.is_referent is True
-        assert membership.created_at == created_at
-        assert membership.started_at == started_at
-        assert membership.ended_at is None
-        assert membership.last_contact_at == created_at
-        assert membership.creator == prescriber
 
-        membership.ended_at = started_at
-        membership.is_referent = False
-        membership.save()
-        frozen_time.tick()
-        updated_at = timezone.now()
-
-        FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber, is_referent=True)
-        membership.refresh_from_db()
-        assert membership.is_referent is True
-        assert membership.created_at == created_at
-        assert membership.started_at == started_at
-        assert membership.ended_at is None
-        assert membership.last_contact_at == updated_at
+        membership.delete()
+        group.delete()
 
         FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber, is_referent=False)
-        membership.refresh_from_db()
+        group = FollowUpGroup.objects.get()
+        membership = group.memberships.get()
         assert membership.is_referent is False
 
+        membership.delete()
+        group.delete()
+
+        FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber)
+        group = FollowUpGroup.objects.get()
+        membership = group.memberships.get()
+        assert membership.is_referent is False  # default is False
+
+        # Without is_referent kwargs, the value doesn't change
         FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber)
         membership.refresh_from_db()
-        assert membership.is_referent is False  # does not change
+        assert membership.is_referent is False
 
         membership.is_referent = True
         membership.save()
 
         FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber)
         membership.refresh_from_db()
-        assert membership.is_referent is True  # does not change
+        assert membership.is_referent is True
 
+        # There's not limit to the number of referent
         other_member = EmployerFactory()
         FollowUpGroup.objects.follow_beneficiary(beneficiary, other_member, is_referent=True)
         assert group.memberships.count() == 2
         other_membership = group.memberships.get(member=other_member)
         assert other_membership.is_referent is True  # No limit to the number of referent
+
+    def test_is_active(self):
+        beneficiary = JobSeekerFactory()
+        prescriber = PrescriberFactory()
+
+        # New follower uses kwarg value
+        FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber)
+        group = FollowUpGroup.objects.get()
+        membership = group.memberships.get()
+        assert membership.is_active is True
+
+        membership.is_active = False
+        membership.save()
+
+        FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber)
+        membership.refresh_from_db()
+        assert membership.is_active is True
 
 
 @pytest.mark.parametrize(
