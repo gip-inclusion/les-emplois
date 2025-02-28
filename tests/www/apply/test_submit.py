@@ -42,6 +42,7 @@ from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
+from itou.www.apply.views import constants as apply_view_constants
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.cities.factories import create_city_geispolsheim, create_city_in_zrr, create_test_cities
@@ -239,6 +240,81 @@ class TestApply:
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
         )
+
+    def test_blocked_application(self, client):
+        # It's possible that for example the user loaded this page before spontaneous applications were closed.
+        company = CompanyFactory(with_jobs=True, with_membership=True, block_job_applications=True)
+        job_seeker = JobSeekerFactory()
+        client.force_login(job_seeker)
+        session = client.session
+        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
+        session.save()
+
+        response = client.post(
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+            {"message": "Hire me?"},
+        )
+        assert JobApplication.objects.exists() is False
+        assertRedirects(
+            response,
+            reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+        )
+        assertMessages(
+            response,
+            [messages.Message(messages.ERROR, apply_view_constants.ERROR_EMPLOYER_BLOCKING_APPLICATIONS)],
+        )
+
+    def test_spontaneous_application_blocked(self, client):
+        company = CompanyFactory(with_jobs=True, with_membership=True, spontaneous_applications_open_since=None)
+        job_seeker = JobSeekerFactory()
+        client.force_login(job_seeker)
+        session = client.session
+        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
+        session.save()
+
+        response = client.post(
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+            {"message": "Hire me?"},
+        )
+        assert JobApplication.objects.exists() is False
+        assertRedirects(
+            response,
+            reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+        )
+        assertMessages(
+            response,
+            [messages.Message(messages.ERROR, apply_view_constants.ERROR_EMPLOYER_BLOCKING_SPONTANEOUS_APPLICATIONS)],
+        )
+
+    def test_application_block_ineffective_against_company_member(self, client):
+        # A member of the SIAE can bypass the block.
+        company = CompanyFactory(with_jobs=True, with_membership=True, block_job_applications=True)
+        job_seeker = JobSeekerFactory()
+        client.force_login(company.members.first())
+        session = client.session
+        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
+        session.save()
+
+        client.post(
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+            {"message": "Hire me?"},
+        )
+        assert JobApplication.objects.get().message == "Hire me?"
 
     def test_resume_is_optional(self, client):
         company = CompanyFactory(with_jobs=True, with_membership=True)
@@ -3219,6 +3295,8 @@ class TestApplicationView:
     )
     DIAGORIENTE_URL = "https://diagoriente.beta.gouv.fr/services/plateforme"
 
+    spontaneous_application_label = "Candidature spontanée"
+
     @staticmethod
     def apply_session_key(company):
         return f"job_application-{company.pk}"
@@ -3241,6 +3319,26 @@ class TestApplicationView:
         )
         assert response.status_code == 200
         assert response.context["form"].initial["selected_jobs"] == [selected_job.pk]
+        assert "spontaneous_application" in response.context["form"].fields
+        assertContains(response, self.spontaneous_application_label)
+
+    def test_application_jobs_spontaneous_applications_disabled(self, client):
+        company = CompanyFactory(
+            subject_to_eligibility=True, with_membership=True, with_jobs=True, spontaneous_applications_open_since=None
+        )
+
+        client.force_login(company.members.first())
+        job_seeker = JobSeekerFactory()
+
+        response = client.get(
+            reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
+        )
+        assert response.status_code == 200
+        assert "spontaneous_application" not in response.context["form"].fields
+        assertNotContains(response, self.spontaneous_application_label)
 
     def test_application_start_with_invalid_job_description_id(self, client):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True, with_jobs=True)
