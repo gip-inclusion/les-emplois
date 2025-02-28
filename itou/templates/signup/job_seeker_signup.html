@@ -6,66 +6,68 @@
 {% load buttons_form %}
 
 {% block job_seeker_signup_content %}
-    <form method="post" action="" role="form" class="js-format-nir" data-matomo-name="signup-job-seeker-identity">
+    <div class="c-form">
+        <form method="post" action="" role="form" class="js-format-nir" data-matomo-name="signup-job-seeker-identity">
 
-        {% csrf_token %}
+            {% csrf_token %}
 
-        {% bootstrap_form_errors form type="all" %}
-        {% redirection_input_field value=redirect_field_value %}
+            {% bootstrap_form_errors form type="all" %}
+            {% redirection_input_field value=redirect_field_value %}
 
-        {% bootstrap_field form.title %}
-        {% bootstrap_field form.first_name %}
-        {% bootstrap_field form.last_name %}
-        {% bootstrap_field form.birthdate %}
-        {% bootstrap_field form.birth_place %}
-        {% bootstrap_field form.birth_country %}
+            {% bootstrap_field form.title wrapper_class="form-group form-group-input-w-lg-33" %}
+            {% bootstrap_field form.first_name %}
+            {% bootstrap_field form.last_name %}
+            {% bootstrap_field form.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
+            {% bootstrap_field form.birth_place %}
+            {% bootstrap_field form.birth_country %}
 
-        <div class="form-group mb-1 form-group-required">
-            {% bootstrap_label "Adresse e-mail" label_for="id_email" %}
-            <div class="form-text mt-0 mb-2">
-                Si vous avez un compte <strong>France Travail</strong> ou <strong>FranceConnect</strong> et que vous souhaitez vous connecter avec ce compte,
-                merci de renseigner dans ce champ l’adresse e-mail qui y est associée.
-            </div>
-            {% bootstrap_field form.email wrapper_class="form-group mb-0" show_label=False %}
-            <div class="form-text mb-3">
-                <div class="text-end mt-1">
-                    <a href="#" class="fs-sm text-secondary" data-bs-toggle="modal" data-bs-target="#no-email-modal">Pas d'adresse e-mail ?</a>
+            <div class="form-group mb-1 form-group-required">
+                {% bootstrap_label "Adresse e-mail" label_for="id_email" %}
+                <div class="form-text mt-n2 mb-2">
+                    Si vous avez un compte <strong>France Travail</strong> ou <strong>FranceConnect</strong> et que vous souhaitez vous connecter avec ce compte,
+                    merci de renseigner dans ce champ l’adresse e-mail qui y est associée.
                 </div>
-                {% include "signup/includes/no_email_link.html" with exclude_button=True only %}
-            </div>
-        </div>
-
-        {% bootstrap_field form.nir wrapper_class="form-group mt-1" %}
-
-        {% if "nir" in form.errors or form.skip %}
-            <div class="alert alert-info">
-                <div class="row">
-                    <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                    </div>
-                    <div class="col">
-                        <p class="mb-0">Vous possédez un numéro de sécurité sociale temporaire ?</p>
-                        <button name="skip" value="1" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "inscription" %}>
-                            Cliquez ici pour accéder à l'étape suivante.
-                        </button>
-                    </div>
+                {% bootstrap_field form.email wrapper_class="form-group form-group-input-w-lg-66" show_label=False %}
+                <div class="mt-n2 mb-3">
+                    <button type="button" class="btn-link fs-sm" data-bs-toggle="modal" data-bs-target="#no-email-modal">
+                        Pas d'adresse e-mail ?
+                    </button>
+                    {% include "signup/includes/no_email_link.html" with exclude_button=True only %}
                 </div>
             </div>
-        {% endif %}
 
-        <p class="mt-5 text-primary">
-            Vous n'avez pas de numéro de sécurité sociale ?
-            <a href="https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale"
-               aria-label="Article concernant le numéro de sécurité sociale (ouverture dans un nouvel onglet)"
-               rel="noopener"
-               class="has-external-link"
-               target="_blank">ameli.fr</a>, le site de l'assurance maladie vous explique comment l'obtenir.
-        </p>
+            {% bootstrap_field form.nir %}
 
-        {% itou_buttons_form primary_label="Continuer" %}
+            {% if "nir" in form.errors or form.skip %}
+                <div class="alert alert-info">
+                    <div class="row">
+                        <div class="col-auto pe-0">
+                            <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
+                        </div>
+                        <div class="col">
+                            <p class="mb-0">Vous possédez un numéro de sécurité sociale temporaire ?</p>
+                            <button name="skip" value="1" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "inscription" %}>
+                                Cliquez ici pour accéder à l'étape suivante.
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
 
+            <p>
+                Vous n'avez pas de numéro de sécurité sociale ?
+                <a href="https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale"
+                   aria-label="Article concernant le numéro de sécurité sociale (ouverture dans un nouvel onglet)"
+                   rel="noopener"
+                   class="has-external-link"
+                   target="_blank">ameli.fr</a>, le site de l'assurance maladie vous explique comment l'obtenir.
+            </p>
+
+            {% itou_buttons_form primary_label="Continuer" %}
+
+        </form>
         {% include "signup/includes/login_reminder.html" only %}
-    </form>
+    </div>
 {% endblock job_seeker_signup_content %}
 
 
