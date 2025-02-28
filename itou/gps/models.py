@@ -23,6 +23,7 @@ class FollowUpGroupManager(models.Manager):
             update_args = {
                 "ended_at": None,
                 "last_contact_at": now,
+                "is_active": True,
             }
             if is_referent is not None:
                 update_args["is_referent"] = is_referent
@@ -33,12 +34,13 @@ class FollowUpGroupManager(models.Manager):
                 "started_at": timezone.localdate(),
             }
 
-            FollowUpGroupMembership.objects.update_or_create(
+            _, created = FollowUpGroupMembership.objects.update_or_create(
                 follow_up_group=group,
                 member=user,
                 defaults=update_args,
                 create_defaults=create_args,
             )
+            return created
 
 
 class FollowUpGroupQueryset(BulkCreatedAtQuerysetProxy, models.QuerySet):
