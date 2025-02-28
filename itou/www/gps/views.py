@@ -1,5 +1,6 @@
 import urllib.parse
 
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Prefetch
@@ -26,8 +27,8 @@ def is_allowed_to_use_gps_advanced_features(user):
     return user.is_employer or user.is_prescriber_with_authorized_org
 
 
-def in_gard(request):
-    return getattr(request.current_organization, "department", None) == "30"
+def show_gps_as_a_nav_entry(request):
+    return getattr(request.current_organization, "department", None) in settings.GPS_NAV_ENTRY_DEPARTMENTS
 
 
 @check_user(is_allowed_to_use_gps)

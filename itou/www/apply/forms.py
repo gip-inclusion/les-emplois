@@ -5,6 +5,7 @@ from operator import itemgetter
 import sentry_sdk
 from dateutil.relativedelta import relativedelta
 from django import forms
+from django.conf import settings
 from django.db.models import Q, TextChoices
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse
@@ -176,7 +177,7 @@ class JobApplicationRefusalReasonForm(forms.Form):
                     job_applications_enums.RefusalReason.NON_ELIGIBLE,
                 ]
             )
-        if company.department == "69":
+        if company.department in settings.JOB_APPLICATION_OPTIONAL_REFUSAL_REASON_DEPARTMENTS:
             self.fields["refusal_reason"].required = False
 
 

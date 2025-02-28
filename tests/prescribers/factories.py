@@ -1,7 +1,9 @@
+import functools
 import string
 
 import factory
 import factory.fuzzy
+from django.conf import settings
 
 from itou.common_apps.address.departments import department_from_postcode
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
@@ -23,6 +25,18 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
         )
         with_pending_authorization = factory.Trait(
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
+        )
+        not_in_territorial_experimentation = factory.Trait(
+            post_code=factory.LazyFunction(
+                functools.partial(
+                    create_fake_postcode,
+                    ignore=[
+                        *settings.GPS_NAV_ENTRY_DEPARTMENTS,
+                        *settings.JOB_APPLICATION_OPTIONAL_REFUSAL_REASON_DEPARTMENTS,
+                        *settings.RDV_INSERTION_PROMOTE_DEPARTMENTS,
+                    ],
+                )
+            )
         )
         for_snapshot = factory.Trait(
             uid="0260ad4f-2008-48bd-88cc-b41c0211e219",
