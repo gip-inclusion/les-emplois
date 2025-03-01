@@ -300,7 +300,7 @@ def merge_users_confirm(
 @check_user(lambda user: user.is_staff)
 def otp_setup(request, template_name="itou_staff_views/otp_setup.html"):
     if request.method == "POST":
-        device = TOTPDevice.objects.create(user=request.user, confirmed=False)
+        device, _ = TOTPDevice.objects.get_or_create(user=request.user, confirmed=False)
         return HttpResponseRedirect(reverse("itou_staff_views:otp_confirm", kwargs={"device_id": device.pk}))
 
     context = {"has_devices": bool(devices_for_user(request.user))}
