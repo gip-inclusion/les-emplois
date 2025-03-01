@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django_otp import user_has_device
 
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityProvider, UserKind
@@ -155,6 +156,18 @@ class ItouCurrentOrganizationMiddleware:
         ):
             # Add request.path as next param ?
             return HttpResponseRedirect(reverse("dashboard:activate_pro_connect_account"))
+
+        # Force OTP for staff users
+        if (
+            user.is_authenticated
+            and user.kind == UserKind.ITOU_STAFF
+            and not user.is_verified()
+            and not request.path.startswith("/staff/otp")
+            and not request.path.startswith("/admin/confirm-otp")
+        ):
+            if user_has_device(user):
+                return HttpResponseRedirect(reverse("admin:confirm_otp"))
+            return HttpResponseRedirect(reverse("itou_staff_views:otp_setup"))
 
         if logout_warning is not None:
             return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))

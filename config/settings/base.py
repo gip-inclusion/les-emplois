@@ -36,7 +36,6 @@ SITE_ID = 1
 
 INSTALLED_APPS = [
     # Django apps.
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -59,14 +58,15 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "django_filters",
     "django_htmx",
-    "hijack",
-    "hijack.contrib.admin",
     "pgtrigger",
+    "django_otp",
+    "django_otp.plugins.otp_totp",
     # Register adapters before to load allauth apps.
     "itou.allauth_adapters",
     "allauth",
     "allauth.account",
     # ITOU apps.
+    "itou.admin",
     "itou.utils",
     "itou.cities",
     "itou.companies",
@@ -114,6 +114,9 @@ INSTALLED_APPS = [
     "itou.communications",
     "itou.gps",
     "itou.rdv_insertion",
+    # Register hijack after the admin and users apps
+    "hijack",
+    "hijack.contrib.admin",
 ]
 
 # TODO: Remove with Django 6.0
@@ -140,6 +143,7 @@ MIDDLEWARE = [
     "csp.middleware.CSPMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "hijack.middleware.HijackUserMiddleware",
+    "django_otp.middleware.OTPMiddleware",
     # Itou specific
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
     "itou.www.middleware.never_cache",
