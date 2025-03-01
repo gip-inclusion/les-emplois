@@ -1177,7 +1177,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1281,7 +1282,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "users_user"
           WHERE "users_user"."id" IN
               (SELECT U2."beneficiary_id"
@@ -1402,6 +1404,7 @@
                  T6."public_id",
                  T6."address_filled_at",
                  T6."first_login",
+                 T6."otp_secret",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -1434,7 +1437,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "gps_followupgroupmembership"
           INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
           INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
@@ -1506,7 +1510,8 @@
                  "col43",
                  "col44",
                  "col45",
-                 "col46"
+                 "col46",
+                 "col47"
           FROM
             (SELECT *
              FROM
@@ -1558,7 +1563,8 @@
                        "users_user"."last_checked_at" AS "col43",
                        "users_user"."public_id" AS "col44",
                        "users_user"."address_filled_at" AS "col45",
-                       "users_user"."first_login" AS "col46"
+                       "users_user"."first_login" AS "col46",
+                       "users_user"."otp_secret" AS "col47"
                 FROM "gps_followupgroupmembership"
                 INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
                 WHERE ("gps_followupgroupmembership"."is_referent"
@@ -1748,7 +1754,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1852,7 +1859,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "users_user"
           WHERE "users_user"."id" IN
               (SELECT U2."beneficiary_id"
@@ -1973,6 +1981,7 @@
                  T6."public_id",
                  T6."address_filled_at",
                  T6."first_login",
+                 T6."otp_secret",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -2005,7 +2014,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "gps_followupgroupmembership"
           INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
           INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
@@ -2077,7 +2087,8 @@
                  "col43",
                  "col44",
                  "col45",
-                 "col46"
+                 "col46",
+                 "col47"
           FROM
             (SELECT *
              FROM
@@ -2129,7 +2140,8 @@
                        "users_user"."last_checked_at" AS "col43",
                        "users_user"."public_id" AS "col44",
                        "users_user"."address_filled_at" AS "col45",
-                       "users_user"."first_login" AS "col46"
+                       "users_user"."first_login" AS "col46",
+                       "users_user"."otp_secret" AS "col47"
                 FROM "gps_followupgroupmembership"
                 INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
                 WHERE ("gps_followupgroupmembership"."is_referent"

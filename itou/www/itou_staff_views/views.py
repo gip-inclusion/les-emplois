@@ -21,6 +21,7 @@ from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.db import or_queries
 from itou.utils.export import generate_excel_sheet
+from itou.utils.otp import generate_otp_secret
 from itou.www.itou_staff_views import merge_utils
 from itou.www.itou_staff_views.export_utils import (
     cta_export_spec,
@@ -28,7 +29,12 @@ from itou.www.itou_staff_views.export_utils import (
     get_export_ts,
     job_app_export_spec,
 )
-from itou.www.itou_staff_views.forms import ItouStaffExportJobApplicationForm, MergeUserConfirmForm, MergeUserForm
+from itou.www.itou_staff_views.forms import (
+    ConfirmOTP,
+    ItouStaffExportJobApplicationForm,
+    MergeUserConfirmForm,
+    MergeUserForm,
+)
 
 
 class Echo:
@@ -286,4 +292,24 @@ def merge_users_confirm(
         "transfer_data": transfer_data,
         "form": form,
     }
+    return render(request, template_name, context)
+
+
+@check_user(lambda user: user.is_staff)
+def otp_setup(request, template_name="itou_staff_views/otp_setup.html"):
+    return render(request, template_name)
+
+
+@check_user(lambda user: user.is_staff)
+def otp_confirm(request, template_name="itou_staff_views/otp_confirm.html"):
+    otp_secret = generate_otp_secret()
+
+    form = ConfirmOTP(data=request.POST or None, initial={"otp_secret": otp_secret}, user=request.user)
+    context = {"form": form}
+
+    if request.method == "POST" and form.is_valid():
+        request.user.otp_secret = form.cleaned_data["otp_secret"]
+        request.user.save()
+        context["otp_verified"] = True
+
     return render(request, template_name, context)

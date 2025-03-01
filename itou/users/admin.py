@@ -531,7 +531,8 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
         )
 
         assert fieldsets[0] == (None, {"fields": ("username", "password")})
-        fieldsets[0] = (None, {"fields": ("username", "public_id", "password")})
+        # FIXME remove otp_secret and juste allow to reset OTP
+        fieldsets[0] = (None, {"fields": ("username", "public_id", "password", "otp_secret")})
 
         # Add last_checked_at in "Important dates" section, alongside last_login & date_joined
         assert "last_login" in fieldsets[-2][1]["fields"]
