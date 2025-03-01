@@ -9,7 +9,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.postgres.indexes import GinIndex, OpClass
-from django.contrib.postgres.search import SearchVector, SearchVectorField
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, SearchVectorField
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, MinLengthValidator, RegexValidator
@@ -159,6 +159,15 @@ class ItouUserManager(UserManager):
                 "job_seeker_id", flat=True
             )
         return job_seekers_created_by_user.union(job_seekers_created_by_orga, job_seekers_applications)
+
+    def search_by_full_name(self, name):
+        """
+        Eficient search using PSQL full text search
+        """
+        search_query = SearchQuery(name, config="simple_unaccent")
+        users_qs = self.filter(full_name_search_vector=search_query)
+        users_qs = users_qs.annotate(rank=SearchRank("full_name_search_vector", search_query)).order_by("-rank")
+        return users_qs
 
 
 class User(AbstractUser, AddressMixin):
