@@ -54,7 +54,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -253,7 +254,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -454,7 +456,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."otp_secret"
           FROM "job_applications_jobapplication"
           INNER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           LEFT OUTER JOIN "employee_record_employeerecord" ON ("job_applications_jobapplication"."id" = "employee_record_employeerecord"."job_application_id")

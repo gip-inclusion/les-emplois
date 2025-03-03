@@ -257,6 +257,9 @@ class User(AbstractUser, AddressMixin):
     # for first connections prior to 2024-06-01 the first_login is set to date_joined
     first_login = models.DateTimeField(verbose_name="date de première connexion", null=True, blank=True)
 
+    # otp data, only for staff users for now
+    otp_secret = models.CharField(null=True, blank=True)
+
     objects = ItouUserManager()
 
     class Meta(AbstractUser.Meta):
