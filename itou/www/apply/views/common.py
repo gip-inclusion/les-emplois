@@ -64,7 +64,9 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
             )
             forms.append(form_birth_place)
 
-    form_accept = AcceptForm(instance=job_application, company=company, data=request.POST or None)
+    form_accept = AcceptForm(
+        instance=job_application, company=company, job_seeker=job_seeker, data=request.POST or None
+    )
     forms.append(form_accept)
 
     context = {

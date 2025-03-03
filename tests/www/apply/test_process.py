@@ -1,6 +1,7 @@
 import datetime
 import logging
 import random
+import uuid
 from itertools import product
 
 import factory
@@ -3938,11 +3939,20 @@ def test_details_for_geiq_with_inverted_vae_contract(client, inverted_vae_contra
 
 
 @pytest.mark.parametrize("qualification_type", job_applications_enums.QualificationType)
-def test_reload_qualification_fields(qualification_type, client, snapshot):
+@pytest.mark.parametrize(
+    "url_params",
+    [
+        ("apply:reload_qualification_fields", ["company_pk", "job_seeker_public_id"]),
+        ("apply:reload_qualification_fields_job_seekerless", ["company_pk"]),
+    ],
+)
+def test_reload_qualification_fields(qualification_type, url_params, client, snapshot):
     company = CompanyFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    url = reverse("apply:reload_qualification_fields", kwargs={"company_pk": company.pk})
+    job_seeker = JobSeekerFactory(for_snapshot=True)
+    kwargs = {"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id}
+    url = reverse(url_params[0], kwargs={k: kwargs[k] for k in url_params[1]})
     response = client.post(
         url,
         data={
@@ -3961,11 +3971,15 @@ def test_reload_qualification_fields(qualification_type, client, snapshot):
     assert response.content.decode() == snapshot()
 
 
-def test_reload_qualification_fields_404(client):
+@pytest.mark.parametrize("missing_field", [("company_pk", 0), ("job_seeker_public_id", str(uuid.uuid4()))])
+def test_reload_qualification_fields_404(client, missing_field):
     company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    url = reverse("apply:reload_qualification_fields", kwargs={"company_pk": 0})
+    job_seeker = JobSeekerFactory(for_snapshot=True)
+    kwargs = {"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id}
+    kwargs[missing_field[0]] = missing_field[1]
+    url = reverse("apply:reload_qualification_fields", kwargs=kwargs)
     response = client.post(
         url,
         data={
@@ -3985,13 +3999,23 @@ def test_reload_qualification_fields_404(client):
 
 
 @pytest.mark.parametrize(
-    "contract_type", [value for value, _label in ContractType.choices_for_company_kind(CompanyKind.GEIQ)]
+    "contract_type",
+    [value for value, _label in ContractType.choices_for_company_kind(CompanyKind.GEIQ)],
 )
-def test_reload_contract_type_and_options(contract_type, client, snapshot):
+@pytest.mark.parametrize(
+    "url_params",
+    [
+        ("apply:reload_contract_type_and_options", ["company_pk", "job_seeker_public_id"]),
+        ("apply:reload_contract_type_and_options_job_seekerless", ["company_pk"]),
+    ],
+)
+def test_reload_contract_type_and_options(contract_type, url_params, client, snapshot):
     company = CompanyFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    url = reverse("apply:reload_contract_type_and_options", kwargs={"company_pk": company.pk})
+    job_seeker = JobSeekerFactory(for_snapshot=True)
+    kwargs = {"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id}
+    url = reverse(url_params[0], kwargs={k: kwargs[k] for k in url_params[1]})
     response = client.post(
         url,
         data={
@@ -4010,11 +4034,15 @@ def test_reload_contract_type_and_options(contract_type, client, snapshot):
     assert response.content.decode() == snapshot()
 
 
-def test_reload_contract_type_and_options_404(client):
+@pytest.mark.parametrize("missing_field", [("company_pk", 0), ("job_seeker_public_id", str(uuid.uuid4()))])
+def test_reload_contract_type_and_options_404(client, missing_field):
     company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    url = reverse("apply:reload_contract_type_and_options", kwargs={"company_pk": 0})
+    job_seeker = JobSeekerFactory(for_snapshot=True)
+    kwargs = {"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id}
+    kwargs[missing_field[0]] = missing_field[1]
+    url = reverse("apply:reload_contract_type_and_options", kwargs=kwargs)
     response = client.post(
         url,
         data={
@@ -4035,7 +4063,9 @@ def test_reload_contract_type_and_options_404(client):
 
 def test_htmx_reload_contract_type_and_options(client):
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.GEIQ, state=job_applications_enums.JobApplicationState.PROCESSING
+        to_company__kind=CompanyKind.GEIQ,
+        state=job_applications_enums.JobApplicationState.PROCESSING,
+        job_seeker__for_snapshot=True,
     )
     employer = job_application.to_company.members.first()
     client.force_login(employer)
@@ -4058,7 +4088,11 @@ def test_htmx_reload_contract_type_and_options(client):
 
     # Update form soup with htmx call
     reload_url = reverse(
-        "apply:reload_contract_type_and_options", kwargs={"company_pk": job_application.to_company.pk}
+        "apply:reload_contract_type_and_options",
+        kwargs={
+            "company_pk": job_application.to_company.pk,
+            "job_seeker_public_id": job_application.job_seeker.public_id,
+        },
     )
     data["contract_type"] = ContractType.PERMANENT
     htmx_response = client.post(
