@@ -1,5 +1,34 @@
 # Journal des modifications
 
+## 2025-03-03
+
+### Ajouté
+
+- [Candidature : Ajout d'une page pour découvrir l'interconnexion avec RDV-Insertion](https://github.com/gip-inclusion/les-emplois/pull/5663) 🖼
+- [Demandeur d’emploi : Certification du critère Parent Isolé (Allocation de Soutien Familial)](https://github.com/gip-inclusion/les-emplois/pull/5674)
+
+### Modifié
+
+- [Alimenter les listes de contacts Brevo avec certains profils candidats](https://github.com/gip-inclusion/les-emplois/pull/5702)
+- [Connexion : Ne plus rendre obligatoire ProConnect](https://github.com/gip-inclusion/les-emplois/pull/5664)
+- [Fiche entreprise : Correctif de la phrase “Cet employeur accepte de recevoir des candidatures spontanées” pour les employeurs qui ont bloqué la réception de candidatures](https://github.com/gip-inclusion/les-emplois/pull/5707) 🖼
+- [Fiches salarié : Autoriser les employeurs à séléctionner une annexe financière non valide](https://github.com/gip-inclusion/les-emplois/pull/5671) 🖼
+- [Fiches salarié : Mise en place d’une page d’aide pour les employeurs](https://github.com/gip-inclusion/les-emplois/pull/5616)
+- [Fiches salarié : Permettre la création mais pas la complétion pour les embauches dans le futur](https://github.com/gip-inclusion/les-emplois/pull/5687) 🖼
+- [GPS : Ajout d'un bouton pour modifier le profil candidat](https://github.com/gip-inclusion/les-emplois/pull/5699)
+- [GPS : Ajout du motif de suivi](https://github.com/gip-inclusion/les-emplois/pull/5688)
+- [GPS : Nouvelle page de détail de suivi d'un bénéficiaire](https://github.com/gip-inclusion/les-emplois/pull/5648)
+- [Notifications : Correction de l'envoi des emails de nouvelle candidature reçue](https://github.com/gip-inclusion/les-emplois/pull/5693)
+- [UX/UI: mise a jour du theme vers v2.7.3](https://github.com/gip-inclusion/les-emplois/pull/5700)
+
+### Supprimé
+
+- [Fiches salarié : Retirer la mention « champs obligatoire » de l’étape de sélection des Annexes financières](https://github.com/gip-inclusion/les-emplois/pull/5657) 🖼
+
+### Tech
+
+- [Tech : Ajouter des méthodes pour tracer les types d'enterprise SIAEs](https://github.com/gip-inclusion/les-emplois/pull/5535)
+
 ## 2025-02-24
 
 ### Ajouté
