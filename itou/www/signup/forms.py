@@ -63,11 +63,13 @@ class FullnameFormMixin(forms.Form):
     first_name = forms.CharField(
         label="Prénom",
         max_length=User._meta.get_field("first_name").max_length,
+        widget=forms.TextInput(attrs={"placeholder": "Dominique"}),
     )
 
     last_name = forms.CharField(
-        label="Nom",
+        label="Nom de famille",
         max_length=User._meta.get_field("last_name").max_length,
+        widget=forms.TextInput(attrs={"placeholder": "Durand"}),
     )
 
 
@@ -137,9 +139,6 @@ class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, B
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["email"].widget.attrs["placeholder"] = "adresse@email.fr"
-        self.fields["first_name"].widget.attrs["placeholder"] = "Dominique"
-        self.fields["last_name"].widget.attrs["placeholder"] = "Durand"
-        self.fields["last_name"].label = "Nom de famille"
         self.fields["birth_place"].help_text = (
             "La commune de naissance est obligatoire lorsque vous êtes né en France. "
             "Elle ne doit pas être renseignée si vous êtes né à l'étranger."
