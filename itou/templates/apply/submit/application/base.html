@@ -52,12 +52,12 @@
             {% else %}
                 <div class="row">
                     <div class="col-12 col-lg-8">
-                        <div class="c-stepper mb-4">
-                            <div class="progress progress--emploi mb-2">
+                        <div class="c-stepper mb-3 mb-lg-5">
+                            <div class="progress">
                                 <div class="progress-bar progress-bar-{{ progress }}" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
                                 </div>
                             </div>
-                            <span>
+                            <p>
                                 {% block progress_title %}
                                     {% if auto_prescription_process %}
                                         Auto-prescription
@@ -65,7 +65,7 @@
                                         Postuler
                                     {% endif %}
                                 {% endblock %}
-                            </span>
+                            </p>
                         </div>
                     </div>
                 </div>
