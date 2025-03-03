@@ -347,9 +347,9 @@ cryptography==44.0.2 \
     # via
     #   -r requirements/test.txt
     #   paramiko
-cssbeautifier==1.15.3 \
-    --hash=sha256:0dcaf5ce197743a79b3a160b84ea58fcbd9e3e767c96df1171e428125b16d410 \
-    --hash=sha256:406b04d09e7d62c0be084fbfa2cba5126fe37359ea0d8d9f7b963a6354fc8303
+cssbeautifier==1.15.4 \
+    --hash=sha256:78c84d5e5378df7d08622bbd0477a1abdbd209680e95480bf22f12d5701efc98 \
+    --hash=sha256:9bb08dc3f64c101a01677f128acf01905914cf406baf87434dcde05b74c0acf5
     # via
     #   -r requirements/test.txt
     #   djlint
