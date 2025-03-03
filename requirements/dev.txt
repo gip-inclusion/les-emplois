@@ -732,8 +732,8 @@ jsbeautifier==1.15.3 \
     #   -r requirements/test.txt
     #   cssbeautifier
     #   djlint
-json-log-formatter==1.1 \
-    --hash=sha256:fe8fd801c58c1234df86211720921f60149105ef8d1e2a72966bb61da9bed584
+json-log-formatter==1.1.1 \
+    --hash=sha256:0815e3b4469e5c79cf3f6dc8a0613ba6601f4a7464f85ba03655cfa6e3e17d10
     # via
     #   -r requirements/test.txt
     #   django-datadog-logger
