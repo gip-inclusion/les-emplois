@@ -10,7 +10,7 @@
         <div class="c-form">
             {% if nir %}
                 <div class="form-group form-group-required">
-                    <label for="id_nir">Numéro de sécurité sociale du candidat</label>
+                    <label for="id_nir">Numéro de sécurité sociale du {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}</label>
                     <input id="id_nir" name="nir" class="form-control" disabled value="{{ nir }}">
                 </div>
             {% endif %}
@@ -22,10 +22,10 @@
                     </div>
                     <div class="col">
                         <p class="mb-2">
-                            <strong>Créer un compte pour votre candidat</strong>
+                            <strong>Créer un compte pour votre {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}</strong>
                         </p>
                         <p class="mb-0">
-                            Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale. Merci de renseigner l'adresse e-mail de votre candidat pour l'inscrire.
+                            Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale. Merci de renseigner l'adresse e-mail de votre {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }} pour l'inscrire.
                         </p>
                     </div>
                 </div>
