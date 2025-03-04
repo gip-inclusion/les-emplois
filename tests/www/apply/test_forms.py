@@ -19,7 +19,7 @@ class TestAcceptForm:
     def test_accept_form_without_geiq(self):
         # Job application accept form for a "standard" SIAE
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.EI)
-        form = apply_forms.AcceptForm(company=job_application.to_company)
+        form = apply_forms.AcceptForm(company=job_application.to_company, job_seeker=job_application.job_seeker)
 
         assert sorted(form.fields.keys()) == [
             "answer",
@@ -50,7 +50,7 @@ class TestAcceptForm:
         ]
         # Job application accept form for a GEIQ: more fields
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
-        form = apply_forms.AcceptForm(company=job_application.to_company)
+        form = apply_forms.AcceptForm(company=job_application.to_company, job_seeker=job_application.job_seeker)
 
         assert sorted(form.fields.keys()) == EXPECTED_FIELDS
 
@@ -58,6 +58,7 @@ class TestAcceptForm:
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
         form = apply_forms.AcceptForm(
             company=job_application.to_company,
+            job_seeker=job_application.job_seeker,
             data={"contract_type": ContractType.OTHER},
         )
         assert sorted(form.fields.keys()) == EXPECTED_FIELDS
@@ -68,7 +69,9 @@ class TestAcceptForm:
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
         job_description = JobDescriptionFactory(company=job_application.to_company, location=None)
         post_data = {"hiring_start_at": f"{datetime.now():%Y-%m-%d}"}
-        form = apply_forms.AcceptForm(company=job_application.to_company, data=post_data)
+        form = apply_forms.AcceptForm(
+            company=job_application.to_company, job_seeker=job_application.job_seeker, data=post_data
+        )
         sorted_errors = dict(sorted(form.errors.items()))
         assert sorted_errors == {
             "contract_type": ["Ce champ est obligatoire."],
@@ -81,7 +84,9 @@ class TestAcceptForm:
         }
 
         post_data |= {"prehiring_guidance_days": faker.pyint()}
-        form = apply_forms.AcceptForm(company=job_application.to_company, data=post_data)
+        form = apply_forms.AcceptForm(
+            company=job_application.to_company, job_seeker=job_application.job_seeker, data=post_data
+        )
         sorted_errors = dict(sorted(form.errors.items()))
         assert sorted_errors == {
             "contract_type": ["Ce champ est obligatoire."],
@@ -96,7 +101,9 @@ class TestAcceptForm:
         post_data |= {"hired_job": job_description.pk, "location": city.pk}
 
         post_data |= {"contract_type": ContractType.APPRENTICESHIP}
-        form = apply_forms.AcceptForm(company=job_application.to_company, data=post_data)
+        form = apply_forms.AcceptForm(
+            company=job_application.to_company, job_seeker=job_application.job_seeker, data=post_data
+        )
         sorted_errors = dict(sorted(form.errors.items()))
         assert sorted_errors == {
             "nb_hours_per_week": ["Ce champ est obligatoire."],
@@ -112,7 +119,9 @@ class TestAcceptForm:
             "planned_training_hours": faker.pyint(),
             "contract_type": ContractType.PROFESSIONAL_TRAINING,
         }
-        form = apply_forms.AcceptForm(company=job_application.to_company, data=post_data)
+        form = apply_forms.AcceptForm(
+            company=job_application.to_company, job_seeker=job_application.job_seeker, data=post_data
+        )
         assert form.is_valid()
 
     def test_accept_form_geiq_contract_type_field_validation(self, faker):
@@ -128,7 +137,9 @@ class TestAcceptForm:
 
         # ContractType.OTHER ask for more details
         form = apply_forms.AcceptForm(
-            company=job_application.to_company, data=post_data | {"contract_type": ContractType.OTHER}
+            company=job_application.to_company,
+            job_seeker=job_application.job_seeker,
+            data=post_data | {"contract_type": ContractType.OTHER},
         )
 
         sorted_errors = dict(sorted(form.errors.items()))
@@ -141,6 +152,7 @@ class TestAcceptForm:
 
         form = apply_forms.AcceptForm(
             company=job_application.to_company,
+            job_seeker=job_application.job_seeker,
             data=post_data
             | {
                 "contract_type": ContractType.OTHER,
@@ -156,6 +168,7 @@ class TestAcceptForm:
         # ContractType.APPRENTICESHIP doesn't ask for more details
         form = apply_forms.AcceptForm(
             company=job_application.to_company,
+            job_seeker=job_application.job_seeker,
             data=post_data
             | {
                 "contract_type": ContractType.APPRENTICESHIP,
@@ -170,6 +183,7 @@ class TestAcceptForm:
         # ContractType.PROFESSIONAL_TRAINING doesn't ask for more details
         form = apply_forms.AcceptForm(
             company=job_application.to_company,
+            job_seeker=job_application.job_seeker,
             data=post_data
             | {
                 "contract_type": ContractType.PROFESSIONAL_TRAINING,
