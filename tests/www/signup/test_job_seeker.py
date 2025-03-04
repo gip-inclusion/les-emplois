@@ -434,7 +434,7 @@ class TestJobSeekerSignup:
         )
         assertContains(
             response,
-            """<div class="form-text">
+            """<div id="id_birth_place_helptext" class="form-text">
                 La commune de naissance est obligatoire lorsque vous êtes né en France.
                 Elle ne doit pas être renseignée si vous êtes né à l'étranger.
             </div>""",
@@ -470,7 +470,7 @@ class TestJobSeekerSignup:
         )
         assertContains(
             response,
-            """<div class="form-text">
+            """<div id="id_birth_place_helptext" class="form-text">
                 La commune de naissance est obligatoire lorsque vous êtes né en France.
                 Elle ne doit pas être renseignée si vous êtes né à l'étranger.
             </div>""",

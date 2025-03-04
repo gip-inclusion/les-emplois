@@ -22,7 +22,7 @@
           <div class="form-group"><label class="form-label" for="id_birth_place">Commune de naissance</label><select aria-describedby="id_birth_place_helptext" class="form-select django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/autocomplete/communes" data-allow-clear="true" data-disable-target="#id_birth_country" data-minimum-input-length="1" data-placeholder="Nom de la commune" data-select2-link-with-birthdate="id_birthdate" data-target-value="91" data-theme="bootstrap-5" id="id_birth_place" lang="fr" name="birth_place">
     <option value=""></option>
   
-  </select><div class="form-text">La commune de naissance est obligatoire lorsque vous êtes né en France. Elle ne doit pas être renseignée si vous êtes né à l'étranger.</div>
+  </select><div class="form-text" id="id_birth_place_helptext">La commune de naissance est obligatoire lorsque vous êtes né en France. Elle ne doit pas être renseignée si vous êtes né à l'étranger.</div>
   </div>
           <div class="form-group"><label class="form-label" for="id_birth_country">Pays de naissance</label><select class="form-select" id="id_birth_country" name="birth_country">
     <option selected="" value="">---------</option>
@@ -223,7 +223,7 @@
   
       <div class="invalid-feedback">Le mot de passe doit contenir au moins 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.</div>
   
-  <div class="form-text">Le mot de passe doit contenir au moins 14 caractères et 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.</div>
+  <div class="form-text" id="id_password1_helptext">Le mot de passe doit contenir au moins 14 caractères et 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.</div>
   </div>
           <div class="form-group mb-0 form-group-required"><label class="form-label" for="id_password2">Mot de passe (confirmation)</label><div class="input-group">
       <input autocomplete="new-password" class="form-control" id="id_password2" name="password2" placeholder="**********" required="" type="password"/>
