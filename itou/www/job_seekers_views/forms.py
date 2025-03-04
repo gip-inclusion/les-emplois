@@ -1,8 +1,11 @@
 from django import forms
+from django.db.models import Exists, OuterRef, Q, Subquery
 from django.forms import ValidationError
+from django.utils import timezone
 from django.utils.html import format_html
 from django_select2.forms import Select2Widget
 
+from itou.approvals.models import Approval, Suspension
 from itou.asp import models as asp_models
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
@@ -27,9 +30,19 @@ class FilterForm(forms.Form):
         ),
     )
 
+    eligibility_validated = forms.BooleanField(label="Valide", required=False)
+    eligibility_to_validate = forms.BooleanField(label="À valider", required=False)
+
+    pass_iae_active = forms.BooleanField(label="Valide", required=False)
+    pass_iae_suspended = forms.BooleanField(label="Suspendu", required=False)
+    pass_iae_expired = forms.BooleanField(label="Expiré", required=False)
+
     def __init__(self, job_seeker_qs, data, *args, request_user, **kwargs):
         super().__init__(data, *args, **kwargs)
-        self.fields["job_seeker"].choices = [
+        self.fields["job_seeker"].choices = self._get_choices_for_job_seeker(job_seeker_qs, request_user)
+
+    def _get_choices_for_job_seeker(self, job_seeker_qs, request_user):
+        return [
             (
                 job_seeker.pk,
                 mask_unless(
@@ -39,6 +52,46 @@ class FilterForm(forms.Form):
             for job_seeker in job_seeker_qs.order_by("first_name", "last_name")
             if job_seeker.get_full_name()
         ]
+
+    def get_filters_counter(self):
+        return sum(bool(self.cleaned_data.get(field.name)) for field in self)
+
+    def filter(self, queryset):
+        filters = []
+
+        if job_seeker_id := self.cleaned_data.get("job_seeker"):
+            filters.append(Q(pk=job_seeker_id))
+
+        # Eligibility status
+        if self.cleaned_data.get("eligibility_validated") and not self.cleaned_data.get("eligibility_to_validate"):
+            queryset = queryset.eligibility_validated()
+        if self.cleaned_data.get("eligibility_to_validate") and not self.cleaned_data.get("eligibility_validated"):
+            queryset = queryset.eligibility_to_validate()
+
+        # Approval (PASS IAE) status
+        if (
+            self.cleaned_data.get("pass_iae_active")
+            or self.cleaned_data.get("pass_iae_suspended")
+            or self.cleaned_data.get("pass_iae_expired")
+        ):
+            has_suspended_approval = Subquery(Suspension.objects.filter(approval__user=OuterRef("pk")).in_progress())
+            last_approval_end_at = Subquery(
+                Approval.objects.filter(user=OuterRef("pk")).order_by("-end_at").values("end_at")[:1]
+            )
+            queryset = queryset.annotate(
+                has_suspended_approval=Exists(has_suspended_approval), last_approval_end_at=last_approval_end_at
+            )
+
+            pass_status_filter = Q()
+            if self.cleaned_data.get("pass_iae_active"):
+                pass_status_filter |= Q(last_approval_end_at__gte=timezone.localdate(), has_suspended_approval=False)
+            if self.cleaned_data.get("pass_iae_suspended"):
+                pass_status_filter |= Q(has_suspended_approval=True)
+            if self.cleaned_data.get("pass_iae_expired"):
+                pass_status_filter |= Q(last_approval_end_at__lt=timezone.localdate())
+            filters.append(pass_status_filter)
+
+        return queryset.filter(*filters)
 
 
 class CheckJobSeekerNirForm(forms.Form):

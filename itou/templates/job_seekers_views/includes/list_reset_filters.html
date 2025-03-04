@@ -1,0 +1,15 @@
+{% load str_filters %}
+
+{% if list_organization %}
+    {% url 'job_seekers_views:list_organization' as reset_url %}
+{% else %}
+    {% url 'job_seekers_views:list' as reset_url %}
+{% endif %}
+<div class="ms-md-auto" id="job-seekers-list-filter-counter"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    {% if filters_counter > 0 %}
+        <a href="{{ reset_url }}?order={{ order }}" class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser {{ filters_counter|pluralizefr:"le filtre actif,les filtres actifs" }}">
+            <i class="ri-eraser-line fw-medium" aria-hidden="true"></i>
+            <span>Effacer tout</span>
+        </a>
+    {% endif %}
+</div>
