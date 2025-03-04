@@ -20,4 +20,5 @@ urlpatterns = [
         views.display_contact_info,
         name="display_contact_info",
     ),
+    path("groups/join", views.join_group, name="join_group"),
 ]

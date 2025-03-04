@@ -91,3 +91,9 @@ class FollowUpGroupMembershipForm(forms.ModelForm):
                 cleaned_data["ended_at"] = timezone.localdate()
             elif cleaned_data["ended_at"] < cleaned_data["started_at"]:
                 self.add_error("ended_at", "Cette date ne peut pas être avant la date de début.")
+
+
+class JoinGroupChannelForm(forms.Form):
+    channel = forms.ChoiceField(
+        widget=forms.RadioSelect, choices=[(v, v) for v in ["from_collegue", "from_nir", "from_name"]]
+    )

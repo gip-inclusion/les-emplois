@@ -666,3 +666,37 @@ class TestGroupDetailsEditionTab:
         assert response.context["form"].errors == {
             "ended_at": ["Cette date ne peut pas être avant la date de début."],
         }
+
+
+class TestJoinGroup:
+    @pytest.mark.parametrize(
+        "user_factory",
+        [
+            partial(PrescriberFactory, membership__organization__authorized=True),
+            partial(EmployerFactory, with_company=True),
+            partial(PrescriberFactory, membership__organization__authorized=False),
+            PrescriberFactory,
+        ],
+        ids=[
+            "authorized_prescriber",
+            "employer",
+            "prescriber_with_org",
+            "prescriber_no_org",
+        ],
+    )
+    def test_view(self, client, snapshot, user_factory):
+        url = reverse("gps:join_group")
+        user = user_factory()
+        client.force_login(user)
+        response = client.get(url)
+        assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+
+        # All redirection work : the join_group_from_* view will check if the user is allowed
+        response = client.post(url, data={"channel": "from_collegue"})
+        assertRedirects(response, url)  # FIXME
+
+        response = client.post(url, data={"channel": "from_nir"})
+        assertRedirects(response, url)  # FIXME
+
+        response = client.post(url, data={"channel": "from_name"})
+        assertRedirects(response, url)  # FIXME
