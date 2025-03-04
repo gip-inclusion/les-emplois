@@ -1,11 +1,14 @@
 from django import forms
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django_select2.forms import Select2Widget
 
 from itou.gps.models import FollowUpGroupMembership
+from itou.users.enums import UserKind
 from itou.users.models import User
-from itou.utils.widgets import DuetDatePickerWidget
+from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Widget
+from itou.www.gps.utils import get_all_collegues
 
 
 class MembershipsFiltersForm(forms.Form):
@@ -97,3 +100,36 @@ class JoinGroupChannelForm(forms.Form):
     channel = forms.ChoiceField(
         widget=forms.RadioSelect, choices=[(v, v) for v in ["from_collegue", "from_nir", "from_name"]]
     )
+
+
+class JobSeekersFollowedByCollegueSearchForm(forms.Form):
+    user = forms.ModelChoiceField(
+        queryset=User.objects.filter(kind=UserKind.JOB_SEEKER),
+        label="Nom et prénom du bénéficiaire",
+        widget=RemoteAutocompleteSelect2Widget(
+            attrs={
+                "data-ajax--url": reverse_lazy("gps:beneficiaries_autocomplete"),
+                "data-ajax--cache": "true",
+                "data-ajax--type": "GET",
+                "data-minimum-input-length": 2,
+                "lang": "",  # Needed to override the noResults i18n translation in JS.
+                "id": "js-search-user-input",
+            },
+        ),
+        required=True,
+    )
+
+    def __init__(self, *args, organizations, **kwargs):
+        self.organizations = organizations
+        super().__init__(*args, **kwargs)
+
+    def clean_user(self):
+        user = self.cleaned_data["user"]
+        all_collegues = get_all_collegues(self.organizations)
+        if not FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=user,
+            member__in=all_collegues.values("pk"),
+        ):
+            raise forms.ValidationError("Ce candidat ne peut être suivi.")
+        self.job_seeker = user
+        return user
