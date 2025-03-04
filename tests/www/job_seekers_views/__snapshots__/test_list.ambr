@@ -37,6 +37,8 @@
   
   
                               
+      
+  
                           </div>
                       </div>
                   </div>
@@ -49,19 +51,63 @@
                   <div class="col-12">
                       <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
                           
+                              
+                          
+                          <form hx-get="/job-seekers/list" hx-include="#id_job_seeker" hx-indicator="#job-seekers-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-seekers-section" hx-trigger="change from:#id_order, change delay:.5s, change from:#id_job_seeker">
+                              
+  
+  <div class="s-section__row row selection-indicator" data-emplois-elements-visibility-on-selection="hidden">
+      <div class="col-12">
+          <div></div>
+          <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+              
+  
+  <div class="dropdown">
+      <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
+          Situation IAE
+      </button>
+      <ul class="dropdown-menu">
+          <li>
+              <strong class="dropdown-header">Éligibilité IAE</strong>
+          </li>
+          <li class="dropdown-item"><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Valide</label></div></div></li>
+          <li class="dropdown-item"><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_eligibility_to_validate" name="eligibility_to_validate" type="checkbox"/><label class="form-check-label" for="id_eligibility_to_validate">À valider</label></div></div></li>
+          <hr/>
+          <li>
+              <strong class="dropdown-header">Statut du PASS IAE</strong>
+          </li>
+          <li class="dropdown-item"><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Valide</label></div></div></li>
+          <li class="dropdown-item"><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_pass_iae_suspended" name="pass_iae_suspended" type="checkbox"/><label class="form-check-label" for="id_pass_iae_suspended">Suspendu</label></div></div></li>
+          <li class="dropdown-item"><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/><label class="form-check-label" for="id_pass_iae_expired">Expiré</label></div></div></li>
+      </ul>
+  </div>
+  
+              
+  
+  
+      
+  
+  <div class="ms-md-auto" id="job-seekers-list-filter-counter">
+      
+  </div>
+  
+          </div>
+      </div>
+  </div>
+  
+                              
   
   <p class="mb-0" id="job-seekers-list-count">
       0 résultat
   </p>
   
+                          </form>
                           <div class="flex-column flex-md-row mt-3 mt-md-0">
-                              <form hx-get="/job-seekers/list" hx-indicator="#job-seekers-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-seekers-section" hx-trigger="change from:#id_order, change delay:.5s">
-                                  <div class="w-lg-400px"><label class="visually-hidden" for="id_job_seeker">Nom</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du candidat" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
+                              <div class="w-lg-400px"><label class="visually-hidden" for="id_job_seeker">Nom</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du candidat" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
     <option selected="" value=""></option>
   
   </select></div>
-                                  <input id="id_order" name="order" type="hidden" value="full_name"/>
-                              </form>
+                              <input id="id_order" name="order" type="hidden" value="full_name"/>
                           </div>
                       </div>
                       
@@ -92,7 +138,7 @@
 # ---
 # name: test_multiple.1
   dict({
-    'num_queries': 14,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -221,21 +267,15 @@
              WHERE "users_user"."created_by_id" = %s
              ORDER BY RANDOM() ASC)
           UNION
-            (SELECT "users_jobseekerprofile"."user_id" AS "col1"
-             FROM "users_jobseekerprofile"
-             WHERE "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s
-             ORDER BY RANDOM() ASC)
-          UNION
             (SELECT "job_applications_jobapplication"."job_seeker_id" AS "col1"
              FROM "job_applications_jobapplication"
-             WHERE (("job_applications_jobapplication"."sender_id" = %s
-                     AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
-                    OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
+             WHERE "job_applications_jobapplication"."sender_id" = %s
              ORDER BY "job_applications_jobapplication"."created_at" DESC)
         ''',
       }),
       dict({
         'origin': list([
+          'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
@@ -289,6 +329,7 @@
           'User.is_prescriber_with_authorized_org[users/models.py]',
           'User.can_edit_personal_information[users/models.py]',
           'User.can_view_personal_information[users/models.py]',
+          'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
@@ -432,6 +473,32 @@
       }),
       dict({
         'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'approval_state_badge[utils/templatetags/badges.py]',
+          'SimpleNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[job_seekers_views/includes/list_results.html]',
+          'ForNode[job_seekers_views/includes/list_results.html]',
+          'IfNode[job_seekers_views/includes/list_results.html]',
+          'IncludeNode[job_seekers_views/list.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/list.html]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -479,7 +546,7 @@
       </button>
   </th>
   
-                          <th scope="col">Statut du PASS IAE</th>
+                          <th scope="col">Situation IAE</th>
                           <th aria-sort="none" scope="col">
       <button data-emplois-setter-target="#id_order" data-emplois-setter-value="job_applications_nb" type="button">
           Nombre de candidatures
@@ -763,6 +830,7 @@
       }),
       dict({
         'origin': list([
+          'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
@@ -816,6 +884,7 @@
           'User.is_prescriber_with_authorized_org[users/models.py]',
           'User.can_edit_personal_information[users/models.py]',
           'User.can_view_personal_information[users/models.py]',
+          'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
@@ -998,7 +1067,7 @@
                       
                           <tr>
                               <td>
-                                  <a class="btn-link" href="/job-seekers/details/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list">Alain ZORRO</a>
+                                  <a class="btn-link" href="/job-seekers/details/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list-organization">Alain ZORRO</a>
                               </td>
                               <td>
                                   
@@ -1027,7 +1096,7 @@
                       
                           <tr>
                               <td>
-                                  <a class="btn-link" href="/job-seekers/details/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list">Bernard YGREC</a>
+                                  <a class="btn-link" href="/job-seekers/details/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list-organization">Bernard YGREC</a>
                               </td>
                               <td>
                                   
@@ -1056,7 +1125,7 @@
                       
                           <tr>
                               <td>
-                                  <a class="btn-link" href="/job-seekers/details/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list">Charlotte XERUS</a>
+                                  <a class="btn-link" href="/job-seekers/details/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list-organization">Charlotte XERUS</a>
                               </td>
                               <td>
                                   
@@ -1085,7 +1154,7 @@
                       
                           <tr>
                               <td>
-                                  <a class="btn-link" href="/job-seekers/details/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list">David WATERFORD</a>
+                                  <a class="btn-link" href="/job-seekers/details/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list-organization">David WATERFORD</a>
                               </td>
                               <td>
                                   

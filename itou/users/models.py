@@ -14,7 +14,7 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, MinLengthValidator, RegexValidator
 from django.db import models
-from django.db.models import Count, Q
+from django.db.models import Count, Exists, OuterRef, Q
 from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils import timezone
@@ -44,6 +44,34 @@ from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_birth_location, validate_birthdate, validate_nir, validate_pole_emploi_id
+
+
+class UserQuerySet(models.QuerySet):
+    def _eligibility_tuple(self, siae=None):
+        from itou.approvals.models import Approval
+        from itou.eligibility.models import EligibilityDiagnosis
+
+        return (
+            Exists(
+                Approval.objects.filter(
+                    user=OuterRef("pk"),
+                ).valid()
+            ),
+            Exists(
+                EligibilityDiagnosis.objects.for_job_seeker_and_siae(
+                    OuterRef("pk"),
+                    siae=siae,
+                ).valid()
+            ),
+        )
+
+    def eligibility_validated(self, siae=None):
+        [approval_exists, eligibility_exists] = self._eligibility_tuple(siae=siae)
+        return self.filter(approval_exists | eligibility_exists)
+
+    def eligibility_to_validate(self, siae=None):
+        [approval_exists, eligibility_exists] = self._eligibility_tuple(siae=siae)
+        return self.filter(~approval_exists & ~eligibility_exists)
 
 
 class ItouUserManager(UserManager):
@@ -257,7 +285,7 @@ class User(AbstractUser, AddressMixin):
     # for first connections prior to 2024-06-01 the first_login is set to date_joined
     first_login = models.DateTimeField(verbose_name="date de première connexion", null=True, blank=True)
 
-    objects = ItouUserManager()
+    objects = ItouUserManager.from_queryset(UserQuerySet)()
 
     class Meta(AbstractUser.Meta):
         indexes = [

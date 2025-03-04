@@ -20,7 +20,7 @@
                 <thead>
                     <tr>
                         {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.FULL_NAME_ASC name="Prénom NOM" only %}
-                        <th scope="col">Statut du PASS IAE</th>
+                        <th scope="col">Situation IAE</th>
                         {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.JOB_APPLICATIONS_NB_ASC name="Nombre de candidatures" only %}
                         {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.LAST_UPDATED_AT_ASC name="Dernière mise à jour de candidature" only %}
                         <th scope="col" class="text-end w-50px"></th>
@@ -33,7 +33,7 @@
                                 <a href="{% url "job_seekers_views:details" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link">{{ job_seeker.get_full_name|mask_unless:job_seeker.user_can_view_personal_information }}</a>
                             </td>
                             <td>
-                                {% include "apply/includes/eligibility_badge.html" with job_seeker=job_seeker is_subject_to_eligibility_rules=True eligibility_diagnosis=job_seeker.valid_eligibility_diagnosis only %}
+                                {% include "apply/includes/eligibility_badge.html" with job_seeker=job_seeker is_subject_to_eligibility_rules=True eligibility_diagnosis=job_seeker.valid_eligibility_diagnosis force_valid=False only %}
                             </td>
                             <td>{{ job_seeker.job_applications_nb }}</td>
                             <td>{{ job_seeker.last_updated_at|date:"d/m/Y" }}</td>
@@ -60,4 +60,5 @@
 
 {% if request.htmx %}
     {% include "job_seekers_views/includes/list_counter.html" with paginator=page_obj.paginator request=request only %}
+    {% include "job_seekers_views/includes/list_reset_filters.html" with filters_counter=filters_counter request=request list_organization=list_organization order=order only %}
 {% endif %}

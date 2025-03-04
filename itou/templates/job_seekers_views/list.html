@@ -35,23 +35,47 @@
     {% include "includes/mon_recap_banner.html" with request=request only %}
 {% endblock title_messages %}
 
+{% block title_extra %}
+    {% if request.current_organization %}
+        <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+            <li class="nav-item">
+                <a class="nav-link{% if not list_organization %} active{% endif %}" href="{% url 'job_seekers_views:list' %}">
+                    Mes candidats
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link{% if list_organization %} active{% endif %}" href="{% url 'job_seekers_views:list_organization' %}">
+                    Tous les candidats de la structure
+                </a>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock title_extra %}
+
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="col-12">
                     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                        {% include "job_seekers_views/includes/list_counter.html" with paginator=page_obj.paginator request=request only %}
+                        {% if list_organization %}
+                            {% url 'job_seekers_views:list_organization' as url_list %}
+                        {% else %}
+                            {% url 'job_seekers_views:list' as url_list %}
+                        {% endif %}
+                        <form hx-get="{{ url_list }}"
+                              hx-trigger="change from:#id_order, change delay:.5s, change from:#id_job_seeker"
+                              hx-indicator="#job-seekers-section"
+                              hx-target="#job-seekers-section"
+                              hx-swap="outerHTML"
+                              hx-push-url="true"
+                              hx-include="#id_job_seeker">
+                            {% include "job_seekers_views/includes/job_seekers_filters/top_filters.html" with request=request filters_counter=filters_counter filters_form=filters_form list_organization=list_organization order=order only %}
+                            {% include "job_seekers_views/includes/list_counter.html" with paginator=page_obj.paginator request=request only %}
+                        </form>
                         <div class="flex-column flex-md-row mt-3 mt-md-0">
-                            <form hx-get="{% url 'job_seekers_views:list' %}"
-                                  hx-trigger="change from:#id_order, change delay:.5s"
-                                  hx-indicator="#job-seekers-section"
-                                  hx-target="#job-seekers-section"
-                                  hx-swap="outerHTML"
-                                  hx-push-url="true">
-                                {% bootstrap_field filters_form.job_seeker wrapper_class="w-lg-400px" show_label=False %}
-                                <input id="id_order" type="hidden" name="order" value="{{ order }}">
-                            </form>
+                            {% bootstrap_field filters_form.job_seeker wrapper_class="w-lg-400px" show_label=False %}
+                            <input id="id_order" type="hidden" name="order" value="{{ order }}">
                         </div>
                     </div>
                     {% include "job_seekers_views/includes/list_results.html" with page_obj=page_obj request=request order=order only %}
@@ -64,4 +88,5 @@
 {% block script %}
     {{ block.super }}
     <script src='{% static "js/htmx_compat.js" %}'></script>
+    <script src='{% static "js/sliding_tabs.js" %}'></script>
 {% endblock %}

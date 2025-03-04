@@ -112,8 +112,13 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
 
 @require_safe
 @check_user(lambda user: user.is_prescriber)
-def list_job_seekers(request, template_name="job_seekers_views/list.html"):
-    job_seekers_ids = list(User.objects.linked_job_seeker_ids(request.user, request.current_organization))
+def list_job_seekers(request, template_name="job_seekers_views/list.html", list_organization=False):
+    if list_organization:
+        if not request.current_organization:
+            raise Http404
+        job_seekers_ids = list(User.objects.linked_job_seeker_ids(request.user, request.current_organization))
+    else:
+        job_seekers_ids = list(User.objects.linked_job_seeker_ids(request.user, None))
 
     form = FilterForm(
         User.objects.filter(kind=UserKind.JOB_SEEKER).filter(pk__in=job_seekers_ids),
@@ -151,8 +156,10 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
         )
     )
 
-    if form.is_valid() and (job_seeker_pk := form.cleaned_data["job_seeker"]):
-        queryset = queryset.filter(pk=job_seeker_pk)
+    filters_counter = 0
+    if form.is_valid():
+        queryset = form.filter(queryset)
+        filters_counter = form.get_filters_counter()
 
     try:
         order = JobSeekerOrder(request.GET.get("order"))
@@ -166,7 +173,9 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
 
     context = {
         "back_url": get_safe_url(request, "back_url"),
+        "list_organization": list_organization,
         "filters_form": form,
+        "filters_counter": filters_counter,
         "order": order,
         "page_obj": page_obj,
     }
