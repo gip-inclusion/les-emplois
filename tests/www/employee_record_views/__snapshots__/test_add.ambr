@@ -573,7 +573,7 @@
                               <div class="form-group form-group-required"><label class="form-label" for="id_choose-approval-approval">PASS IAE de Jane DOE</label><select aria-describedby="id_choose-approval-approval_helptext" class="form-select" id="id_choose-approval-approval" name="choose-approval-approval">
     <option value="[PK of Approval]">999999999999 — Du 01/01/2000 au 01/01/3000</option>
   
-  </select><div class="form-text">Le PASS IAE concerné par le transfert de données vers l'Extranet IAE 2.0 de l'ASP</div>
+  </select><div class="form-text" id="id_choose-approval-approval_helptext">Le PASS IAE concerné par le transfert de données vers l'Extranet IAE 2.0 de l'ASP</div>
   </div>
   
                               <div class="c-info">
@@ -690,7 +690,7 @@
   
     <option value="[PK of job seeker]">Jane DOE</option>
   
-  </select><div class="form-text">Le salarié concerné par le transfert de données vers l'Extranet IAE 2.0 de l'ASP</div>
+  </select><div class="form-text" id="id_choose-employee-employee_helptext">Le salarié concerné par le transfert de données vers l'Extranet IAE 2.0 de l'ASP</div>
   </div>
   
                               <div class="c-info">
