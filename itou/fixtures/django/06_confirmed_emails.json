@@ -218,5 +218,45 @@
     },
     "model": "account.emailaddress",
     "pk": 22
+  },
+  {
+    "fields": {
+      "email": "test+de1@inclusion.gouv.fr",
+      "primary": false,
+      "user": 68,
+      "verified": false
+    },
+    "model": "account.emailaddress",
+    "pk": 23
+  },
+  {
+    "fields": {
+      "email": "test+de2@inclusion.gouv.fr",
+      "primary": false,
+      "user": 69,
+      "verified": false
+    },
+    "model": "account.emailaddress",
+    "pk": 24
+  },
+  {
+    "fields": {
+      "email": "test+de3@inclusion.gouv.fr",
+      "primary": false,
+      "user": 70,
+      "verified": false
+    },
+    "model": "account.emailaddress",
+    "pk": 25
+  },
+  {
+    "fields": {
+      "email": "test+de4@inclusion.gouv.fr",
+      "primary": false,
+      "user": 71,
+      "verified": false
+    },
+    "model": "account.emailaddress",
+    "pk": 26
   }
 ]
