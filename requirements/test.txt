@@ -356,6 +356,7 @@ django==5.1.6 \
     #   django-hijack
     #   django-htmx
     #   django-markdownify
+    #   django-otp
     #   django-pgtrigger
     #   django-redis
     #   django-select2
@@ -411,6 +412,10 @@ django-htmx==1.22.0 \
 django-markdownify==0.9.5 \
     --hash=sha256:2c4ae44e386c209453caf5e9ea1b74f64535985d338ad2d5ad5e7089cc94be86 \
     --hash=sha256:34c34eba4a797282a5c5bd97b13cec84d6a4c0673ad47ce1c1d000d74dd8d4ab
+    # via -r requirements/base.txt
+django-otp==1.5.4 \
+    --hash=sha256:0d9497ea4fb13fc04d50b49aa53dd1c740fe4bc5dde0ca27fb394f84e5da7bac \
+    --hash=sha256:783dea669ac0eaf5cd336f73839443584ee665af427a84175cca5a9d620366db
     # via -r requirements/base.txt
 django-pgtrigger==4.13.3 \
     --hash=sha256:c525f9e81f120d166c4bd5fe8c3770640356f0644edf0fc2b7f6426008e52f77 \

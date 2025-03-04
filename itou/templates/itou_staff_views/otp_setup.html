@@ -1,0 +1,34 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Configuration 2FA {{ block.super }}{% endblock %}
+
+{% block title_content %}<h1>Configuration 2FA</h1>{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-6">
+                    <div class="c-box">
+                        <h2>Mes appareils</h2>
+                        {% if has_devices %}
+                            <p>Vous avez déjà configuré OTP</p>
+                            <ul>
+                                <li>
+                                    Vous pouvez supprimer un appareil depuis <a class="btn-link" href="{% url 'admin:otp_totp_totpdevice_changelist' %}?user={{ request.user.pk }}">cette page</a>.
+                                </li>
+                                <li>Vous pouvez configurer un nouvel appareil.</li>
+                            </ul>
+                        {% else %}
+                            <p>Vous n'avez pas configuré d'appareil OTP</p>
+                        {% endif %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-block btn-primary">Configurer un appareil</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
