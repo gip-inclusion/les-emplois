@@ -1,8 +1,10 @@
+from django.core.exceptions import BadRequest
 from django.db.models import Count, Q
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
+from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.perms.institution import get_current_institution_or_404
 
@@ -37,21 +39,32 @@ def member_list(request, template_name="institutions/members.html"):
 
 
 @check_user(lambda user: user.is_labor_inspector)
-def deactivate_member(request, user_id, template_name="institutions/deactivate_member.html"):
+def deactivate_member(request, public_id, template_name="institutions/deactivate_member.html"):
+    user = get_object_or_404(User, public_id=public_id)
     return deactivate_org_member(
         request,
-        user_id,
+        user.id,
         success_url=reverse_lazy("institutions_views:members"),
         template_name=template_name,
     )
 
 
+# To be removed when the old URL is no longer used
 @check_user(lambda user: user.is_labor_inspector)
-def update_admin_role(request, action, user_id, template_name="institutions/update_admins.html"):
+def deactivate_member_temp_redirection(request, user_id):
+    _user = get_object_or_404(User, id=user_id)
+    return deactivate_member(request, public_id=_user.public_id)
+
+
+@check_user(lambda user: user.is_labor_inspector)
+def update_admin_role(request, action, public_id, template_name="institutions/update_admins.html"):
+    if action not in ["add", "remove"]:
+        raise BadRequest
+    user = get_object_or_404(User, public_id=public_id)
     return update_org_admin_role(
         request,
         action,
-        user_id,
+        user.id,
         success_url=reverse("institutions_views:members"),
         template_name=template_name,
     )

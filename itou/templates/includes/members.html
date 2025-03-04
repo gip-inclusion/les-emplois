@@ -39,13 +39,13 @@
                                         <i class="ri-more-2-fill" aria-hidden="true"></i>
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
-                                        <a href="{% url base_url|add:":deactivate_member" member.user.pk %}" class="dropdown-item">Retirer de la structure</a>
+                                        <a href="{% url base_url|add:":deactivate_member" member.user.public_id %}" class="dropdown-item">Retirer de la structure</a>
                                         {% if not member.user in active_admin_members %}
-                                            <a href="{% url base_url|add:":update_admin_role" "add" member.user.pk %}" class="dropdown-item">
+                                            <a href="{% url base_url|add:":update_admin_role" "add" member.user.public_id %}" class="dropdown-item">
                                                 Ajouter en tant qu'administrateur
                                             </a>
                                         {% else %}
-                                            <a href="{% url base_url|add:":update_admin_role" "remove" member.user.pk %}" class="dropdown-item">
+                                            <a href="{% url base_url|add:":update_admin_role" "remove" member.user.public_id %}" class="dropdown-item">
                                                 Retirer les droits d'administrateur
                                             </a>
                                         {% endif %}
