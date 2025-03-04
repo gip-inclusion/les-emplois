@@ -2725,36 +2725,6 @@
 # ---
 # name: TestJoinGroupFromNameAndEmail.test_view_with_gps_advanced_features[can_use_advanced_features][existing_mail]
   '''
-  <div aria-labelledby="email-confirmation-label" aria-modal="true" class="modal" id="email-confirmation-modal" role="dialog" tabindex="-1">
-                  <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content">
-                          <div class="modal-header">
-                              <h3 class="modal-title" id="email-confirmation-label">Email existant</h3>
-                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
-                          </div>
-                          <div class="modal-body">
-                              
-                              <p>
-                                  L'adresse jane.doe@test.local est associée au compte de <b>Jane DOE</b>.
-                              </p>
-                              
-                              <p>
-                                  
-                                      L'identité du candidat est une information clé pour la structure.
-                                      Si vous ne souhaitez pas suivre <b>Jane DOE</b>, cliquez sur « Suivre un autre bénéficiaire » afin d'enregistrer ses informations personnelles.
-                                  
-                              </p>
-                              
-                          </div>
-                          <div class="modal-footer">
-  
-                              
-                                  
-                                      <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">Suivre un autre bénéficiaire</button>
-                                  
-                                  
-                                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Continuer</button>
-  '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
   
@@ -2775,7 +2745,6 @@
                           </div>
                       </div>
                   </div>
-              </div>
               </section>
   
               
