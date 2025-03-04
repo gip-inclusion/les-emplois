@@ -106,6 +106,7 @@ class EmployeeRecordTransitionLogInline(ReadonlyMixin, ItouTabularInline):
     )
     readonly_fields = fields
     raw_id_fields = ("user",)
+    list_select_related = ("employee_record", "employee_record__job_application")
 
     @admin.display(description="statut initial")
     def from_state_display(self, obj):
