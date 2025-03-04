@@ -736,7 +736,7 @@ class TestJoinGroup:
         assertRedirects(response, reverse("gps:join_group_from_nir"), fetch_redirect_response=False)
 
         response = client.post(url, data={"channel": "from_name"})
-        assertRedirects(response, url)  # FIXME
+        assertRedirects(response, reverse("gps:join_group_from_name_and_email"), fetch_redirect_response=False)
 
 
 class TestBeneficiariesAutocomplete:
@@ -1222,3 +1222,108 @@ class TestJoinGroupFromNir:
         assert FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).exists()
+
+
+class TestJoinGroupFromNameAndEmail:
+    URL = reverse("gps:join_group_from_name_and_email")
+
+    @pytest.mark.parametrize(
+        "factory,access",
+        [
+            [partial(JobSeekerFactory, for_snapshot=True), False],
+            (partial(PrescriberFactory, membership__organization__authorized=True), True),
+            (partial(PrescriberFactory, membership__organization__authorized=False), True),
+            (PrescriberFactory, True),
+            (partial(EmployerFactory, with_company=True), True),
+            [partial(LaborInspectorFactory, membership=True), False],
+        ],
+        ids=[
+            "job_seeker",
+            "authorized_prescriber",
+            "prescriber_with_org",
+            "prescriber_no_org",
+            "employer",
+            "labor_inspector",
+        ],
+    )
+    def test_permissions(self, client, factory, access):
+        user = factory()
+        client.force_login(user)
+        response = client.get(self.URL)
+        if access:
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 403
+
+    @pytest.mark.parametrize(
+        "factory",
+        [
+            partial(PrescriberFactory, membership__organization__authorized=True),
+            partial(PrescriberFactory, membership__organization__authorized=False),
+        ],
+        ids=["can_use_advanced_features", "cannot_use_advanced_features"],
+    )
+    def test_view_with_gps_advanced_features(self, client, snapshot, factory):
+        prescriber = factory()
+
+        client.force_login(prescriber)
+        response = client.get(self.URL)
+        assert str(parse_response_to_soup(response, selector="#main")) == snapshot(name="get")
+
+        # unknown email :
+        post_data = {
+            "email": "mon@email.fr",
+            "first_name": "John",
+            "last_name": "Snow",
+            "preview": "1",
+        }
+        response = client.post(self.URL, data=post_data)
+        # FIXME
+        assert response.status_code == 200
+
+        # existing email :
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        post_data = {
+            "email": job_seeker.email,
+            "first_name": "John",
+            "last_name": "Snow",
+            "preview": "1",
+        }
+        response = client.post(self.URL, data=post_data)
+        assert str(parse_response_to_soup(response, selector="#main")) == snapshot(name="existing_mail")
+
+        # # if we cancel: back to start with the nir we didn't find in the input
+        # response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "cancel": "1"})
+        # html_detail = parse_response_to_soup(response, selector="#main")
+        # del html_detail.find(id="id_nir").attrs["value"]
+        # assert str(html_detail) == snapshot(name="get")
+
+        # # But if we accept:
+        # response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": "1"})
+        # assertRedirects(response, reverse("gps:group_list"))
+        # assertMessages(
+        #     response,
+        #     [
+        #         messages.Message(
+        #             messages.SUCCESS,
+        #             "Bénéficiaire ajouté||"
+        #             f"{job_seeker.get_full_name()} fait maintenant partie de la liste de vos bénéficiaires.",
+        #             extra_tags="toast",
+        #         ),
+        #     ],
+        # )
+
+        # # If we were already following the user
+        # response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": "1"})
+        # assertRedirects(response, reverse("gps:group_list"))
+        # assertMessages(
+        #     response,
+        #     [
+        #         messages.Message(
+        #             messages.INFO,
+        #             "Bénéficiaire déjà dans la list||"
+        #             f"{job_seeker.get_full_name()} fait déjà partie de la liste de vos bénéficiaires.",
+        #             extra_tags="toast",
+        #         ),
+        #     ],
+        # )

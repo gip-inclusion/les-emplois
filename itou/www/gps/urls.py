@@ -23,5 +23,6 @@ urlpatterns = [
     path("groups/join", views.join_group, name="join_group"),
     path("groups/join/from-collegue", views.join_group_from_collegue, name="join_group_from_collegue"),
     path("groups/join/from-nir", views.join_group_from_nir, name="join_group_from_nir"),
+    path("groups/join/from-name-email", views.join_group_from_name_and_email, name="join_group_from_name_and_email"),
     path("beneficiaries-autocomplete", views.beneficiaries_autocomplete, name="beneficiaries_autocomplete"),
 ]

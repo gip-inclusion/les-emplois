@@ -9,6 +9,7 @@ from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Widget
 from itou.www.gps.utils import get_all_collegues
+from itou.www.signup.forms import FullnameFormMixin
 
 
 class MembershipsFiltersForm(forms.Form):
@@ -133,3 +134,15 @@ class JobSeekersFollowedByCollegueSearchForm(forms.Form):
             raise forms.ValidationError("Ce candidat ne peut être suivi.")
         self.job_seeker = user
         return user
+
+
+class JobSeekerSearchByNameEmailForm(FullnameFormMixin, forms.Form):
+    email = forms.EmailField(
+        widget=forms.TextInput(
+            attrs={
+                "type": "email",
+                "placeholder": "adresse@email.fr",
+                "autocomplete": "email",
+            }
+        )
+    )
