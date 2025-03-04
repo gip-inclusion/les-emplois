@@ -20,14 +20,25 @@
                     <div class="col-auto pe-0">
                         <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
                     </div>
-                    <div class="col">
-                        <p class="mb-2">
-                            <strong>Créer un compte pour votre candidat</strong>
-                        </p>
-                        <p class="mb-0">
-                            Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale. Merci de renseigner l'adresse e-mail de votre candidat pour l'inscrire.
-                        </p>
-                    </div>
+                    {% if is_gps|default:False %}
+                        <div class="col">
+                            <p class="mb-2">
+                                <strong>Créer un compte pour votre bénéficiaire</strong>
+                            </p>
+                            <p class="mb-0">
+                                Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale. Merci de renseigner l'adresse e-mail de votre bénéficiaire pour l'inscrire.
+                            </p>
+                        </div>
+                    {% else %}
+                        <div class="col">
+                            <p class="mb-2">
+                                <strong>Créer un compte pour votre candidat</strong>
+                            </p>
+                            <p class="mb-0">
+                                Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale. Merci de renseigner l'adresse e-mail de votre candidat pour l'inscrire.
+                            </p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
 
