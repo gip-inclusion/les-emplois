@@ -1,8 +1,10 @@
 import pytest
+from django.core.exceptions import BadRequest
+from django.test import RequestFactory
 from django.urls import reverse
-from django.urls.exceptions import NoReverseMatch
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.www.companies_views.views import deactivate_member
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.companies.factories import (
     CompanyFactory,
@@ -87,7 +89,7 @@ class TestUserMembershipDeactivation:
         membership = memberships.first()
 
         client.force_login(admin)
-        url = reverse("companies_views:deactivate_member", kwargs={"user_id": admin.id})
+        url = reverse("companies_views:deactivate_member", kwargs={"public_id": admin.public_id})
         response = client.post(url)
         assert response.status_code == 403
 
@@ -114,7 +116,7 @@ class TestUserMembershipDeactivation:
         sent_invitation_to_other = EmployerInvitationFactory(sender=guest)
 
         client.force_login(admin)
-        url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("companies_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
 
@@ -145,6 +147,31 @@ class TestUserMembershipDeactivation:
         sent_invitation_to_other.refresh_from_db()
         assert sent_invitation_to_other.has_expired is False
 
+    # To be removed when the old URL is no longer used
+    def test_deactivate_user_with_user_id(self, client):
+        company = CompanyWith2MembershipsFactory(name="Les petits paniers", email="petitspaniers@mailinator.com")
+        admin = company.members.filter(companymembership__is_admin=True).first()
+        guest = company.members.filter(companymembership__is_admin=False).first()
+
+        membership = guest.companymembership_set.first()
+        assert guest not in company.active_admin_members
+        assert admin in company.active_admin_members
+
+        client.force_login(admin)
+        url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
+        response = client.post(url)
+        assert response.status_code == 302
+
+        # User should be deactivated now
+        membership.refresh_from_db()
+        assert not membership.is_active
+
+    def test_deactivate_member_wo_public_id_nor_user_id(self):
+        request = RequestFactory().get("/")
+        request.user = EmployerFactory()
+        with pytest.raises(BadRequest, match="Missing user ID"):
+            deactivate_member(request, None, None, None)
+
     def test_deactivate_with_no_perms(self, client):
         """
         Non-admin user can't change memberships
@@ -152,7 +179,7 @@ class TestUserMembershipDeactivation:
         company = CompanyWith2MembershipsFactory()
         guest = company.members.filter(companymembership__is_admin=False).first()
         client.force_login(guest)
-        url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("companies_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 403
 
@@ -166,7 +193,7 @@ class TestUserMembershipDeactivation:
         response = client.post(
             reverse(
                 "companies_views:deactivate_member",
-                kwargs={"user_id": other_membership.user_id},
+                kwargs={"public_id": other_membership.user.public_id},
             ),
         )
 
@@ -182,7 +209,9 @@ class TestUserMembershipDeactivation:
 
         client.force_login(admin_membership.user)
         request = getattr(client, method)
-        response = request(reverse("companies_views:deactivate_member", kwargs={"user_id": guest_membership.user_id}))
+        response = request(
+            reverse("companies_views:deactivate_member", kwargs={"public_id": guest_membership.user.public_id})
+        )
         assert response.status_code == 404
         guest_membership.refresh_from_db()
         assert guest_membership.is_active is False
@@ -195,7 +224,7 @@ class TestUserMembershipDeactivation:
         other_user = EmployerFactory()
         client.force_login(admin_membership.user)
         request = getattr(client, method)
-        response = request(reverse("companies_views:deactivate_member", kwargs={"user_id": other_user.pk}))
+        response = request(reverse("companies_views:deactivate_member", kwargs={"public_id": other_user.public_id}))
         assert response.status_code == 404
         assert mailoutbox == []
 
@@ -207,7 +236,9 @@ class TestUserMembershipDeactivation:
         invitation = EmployerInvitationFactory(email=other_admin.email, company=company)
 
         client.force_login(admin_membership.user)
-        response = client.post(reverse("companies_views:deactivate_member", kwargs={"user_id": other_admin.pk}))
+        response = client.post(
+            reverse("companies_views:deactivate_member", kwargs={"public_id": other_admin.public_id})
+        )
 
         assertRedirects(response, reverse("companies_views:members"))
         other_admin_membership.refresh_from_db()
@@ -242,7 +273,7 @@ class TestUserMembershipDeactivation:
         guest = company.members.filter(companymembership__is_admin=False).first()
 
         client.force_login(admin)
-        url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("companies_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
         client.logout()
@@ -271,7 +302,7 @@ class TestUserMembershipDeactivation:
 
         # Admin remove guest from structure
         client.force_login(admin)
-        url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("companies_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
         client.logout()
@@ -298,7 +329,7 @@ class TestCompanyAdminMembersManagement:
         guest = company.members.filter(companymembership__is_admin=False).first()
 
         client.force_login(admin)
-        url = reverse("companies_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
+        url = reverse("companies_views:update_admin_role", kwargs={"action": "add", "public_id": guest.public_id})
 
         # Redirection to confirm page
         response = client.get(url)
@@ -325,7 +356,7 @@ class TestCompanyAdminMembersManagement:
         assert guest in company.active_admin_members
 
         client.force_login(admin)
-        url = reverse("companies_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
+        url = reverse("companies_views:update_admin_role", kwargs={"action": "remove", "public_id": guest.public_id})
 
         # Redirection to confirm page
         response = client.get(url)
@@ -347,7 +378,7 @@ class TestCompanyAdminMembersManagement:
         guest = company.members.filter(companymembership__is_admin=False).first()
 
         client.force_login(guest)
-        url = reverse("companies_views:update_admin_role", kwargs={"action": "remove", "user_id": admin.id})
+        url = reverse("companies_views:update_admin_role", kwargs={"action": "remove", "public_id": admin.public_id})
 
         # Redirection to confirm page
         response = client.get(url)
@@ -358,7 +389,7 @@ class TestCompanyAdminMembersManagement:
         assert response.status_code == 403
 
         # Add self as admin with no privilege
-        url = reverse("companies_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
+        url = reverse("companies_views:update_admin_role", kwargs={"action": "add", "public_id": guest.public_id})
 
         response = client.get(url)
         assert response.status_code == 403
@@ -376,6 +407,10 @@ class TestCompanyAdminMembersManagement:
         guest = company.members.filter(companymembership__is_admin=False).first()
 
         client.force_login(guest)
-        # update: less test with RE_PATH
-        with pytest.raises(NoReverseMatch):
-            reverse("companies_views:update_admin_role", kwargs={"action": suspicious_action, "user_id": admin.id})
+        response = client.get(
+            reverse(
+                "companies_views:update_admin_role",
+                kwargs={"action": suspicious_action, "public_id": admin.public_id},
+            )
+        )
+        assert response.status_code == 400

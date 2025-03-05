@@ -1,4 +1,4 @@
-from django.urls import path, re_path
+from django.urls import path
 
 from itou.www.companies_views import views
 
@@ -28,14 +28,10 @@ urlpatterns = [
     path("edit-company-description", views.edit_company_step_description, name="edit_company_step_description"),
     path("edit-company-preview", views.edit_company_step_preview, name="edit_company_step_preview"),
     path("colleagues", views.members, name="members"),
+    path("deactivate_member/<uuid:public_id>", views.deactivate_member, name="deactivate_member"),
+    # to be removed when old url is not used anymore
     path("deactivate_member/<int:user_id>", views.deactivate_member, name="deactivate_member"),
-    # Tricky: when using `re_path` you CAN'T mix re parts with non re ones
-    # here, user_id was defined as <int:user_id> and action as re
-    # as a result the eval of the url fails silently (404)
-    # ROT: if using `re_path`, use RE everywhere
-    re_path(
-        "admin_role/(?P<action>add|remove)/(?P<user_id>[0-9]+)", views.update_admin_role, name="update_admin_role"
-    ),
+    path("admin_role/<str:action>/<uuid:public_id>", views.update_admin_role, name="update_admin_role"),
     path("dora-services/<str:code_insee>", views.hx_dora_services, name="hx_dora_services"),
     path(
         "dora-service-redirect/<str:source>/<str:service_id>",
