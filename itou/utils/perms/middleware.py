@@ -163,6 +163,7 @@ class ItouCurrentOrganizationMiddleware:
             and not user.otp_secret
             and not request.path.startswith("/staff/otp")
         ):
+            # FIXME Handle unverifired users
             return HttpResponseRedirect(reverse("itou_staff_views:otp_setup"))
 
         if logout_warning is not None:
