@@ -1,7 +1,10 @@
 import pytest
+from django.core.exceptions import BadRequest
+from django.test import RequestFactory
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.www.prescribers_views.views import deactivate_member
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
 from tests.prescribers.factories import (
     PrescriberFactory,
@@ -86,7 +89,7 @@ class TestUserMembershipDeactivation:
         membership = memberships.first()
 
         client.force_login(admin)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": admin.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"public_id": admin.public_id})
         response = client.post(url)
         assert response.status_code == 403
 
@@ -112,7 +115,7 @@ class TestUserMembershipDeactivation:
         sent_invitation_to_other = PrescriberWithOrgInvitationFactory(sender=guest)
 
         client.force_login(admin)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
 
@@ -149,6 +152,30 @@ class TestUserMembershipDeactivation:
         sent_invitation_to_other.refresh_from_db()
         assert sent_invitation_to_other.has_expired is False
 
+    # To be removed when the old URL is no longer used
+    def test_deactivate_user_with_user_id(self, client):
+        organization = PrescriberOrganizationWith2MembershipFactory(name="Mission locale", email="ml@mailinator.com")
+        admin = organization.members.filter(prescribermembership__is_admin=True).first()
+        guest = organization.members.filter(prescribermembership__is_admin=False).first()
+
+        memberships = guest.prescribermembership_set.all()
+        membership = memberships.first()
+
+        client.force_login(admin)
+        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
+        response = client.post(url)
+        assert response.status_code == 302
+
+        # User should be deactivated now
+        membership.refresh_from_db()
+        assert not membership.is_active
+
+    def test_deactivate_member_wo_public_id_nor_user_id(self):
+        request = RequestFactory().get("/")
+        request.user = PrescriberFactory()
+        with pytest.raises(BadRequest, match="Missing user ID"):
+            deactivate_member(request, None, None, None)
+
     def test_deactivate_user_from_another_organisation(self, client, mailoutbox):
         my_organization = PrescriberOrganizationFactory()
         other_organization = PrescriberOrganizationFactory()
@@ -159,7 +186,7 @@ class TestUserMembershipDeactivation:
         response = client.post(
             reverse(
                 "prescribers_views:deactivate_member",
-                kwargs={"user_id": other_membership.user_id},
+                kwargs={"public_id": other_membership.user.public_id},
             ),
         )
 
@@ -177,7 +204,7 @@ class TestUserMembershipDeactivation:
         organization.members.add(guest)
 
         client.force_login(guest)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 403
 
@@ -190,7 +217,7 @@ class TestUserMembershipDeactivation:
         client.force_login(admin_membership.user)
         request = getattr(client, method)
         response = request(
-            reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest_membership.user_id})
+            reverse("prescribers_views:deactivate_member", kwargs={"public_id": guest_membership.user.public_id})
         )
         assert response.status_code == 404
         guest_membership.refresh_from_db()
@@ -204,7 +231,7 @@ class TestUserMembershipDeactivation:
         other_user = PrescriberFactory()
         client.force_login(admin_membership.user)
         request = getattr(client, method)
-        response = request(reverse("prescribers_views:deactivate_member", kwargs={"user_id": other_user.pk}))
+        response = request(reverse("prescribers_views:deactivate_member", kwargs={"public_id": other_user.public_id}))
         assert response.status_code == 404
         assert mailoutbox == []
 
@@ -219,7 +246,7 @@ class TestUserMembershipDeactivation:
         guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
         client.force_login(admin)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
 
@@ -237,7 +264,9 @@ class TestUserMembershipDeactivation:
         invitation = PrescriberWithOrgInvitationFactory(email=other_admin.email, organization=organization)
 
         client.force_login(admin_membership.user)
-        response = client.post(reverse("prescribers_views:deactivate_member", kwargs={"user_id": other_admin.pk}))
+        response = client.post(
+            reverse("prescribers_views:deactivate_member", kwargs={"public_id": other_admin.public_id})
+        )
 
         assertRedirects(response, reverse("prescribers_views:members"))
         other_admin_membership.refresh_from_db()
@@ -280,7 +309,7 @@ class TestUserMembershipDeactivation:
 
         # Admin remove guest from structure
         client.force_login(admin)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
         client.logout()
