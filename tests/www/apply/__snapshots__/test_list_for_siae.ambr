@@ -4414,6 +4414,11 @@
               
               
                   
+                      <a class="btn btn-secondary btn-ico w-100 w-md-auto" href="/rdvi/discover?back_url=/apply/siae/list%3Fdisplay%3Dlist">
+                          <i aria-hidden="true" class="ri-mail-send-line fw-medium"></i>
+                          <span>Proposer un rendez-vous</span>
+                      </a>
+                  
                   <a aria-label="Gérer la candidature de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dlist">Voir sa candidature</a>
               
           </div>
@@ -4492,6 +4497,11 @@
               
               
                   
+                      <a class="btn btn-secondary btn-ico w-100 w-md-auto" href="/rdvi/discover?back_url=/apply/siae/list%3Fdisplay%3Dlist">
+                          <i aria-hidden="true" class="ri-mail-send-line fw-medium"></i>
+                          <span>Proposer un rendez-vous</span>
+                      </a>
+                  
                   <a aria-label="Gérer la candidature de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dlist">Voir sa candidature</a>
               
           </div>
@@ -4569,6 +4579,11 @@
           <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
               
               
+                  
+                      <a class="btn btn-secondary btn-ico w-100 w-md-auto" href="/rdvi/discover?back_url=/apply/siae/list%3Fdisplay%3Dlist">
+                          <i aria-hidden="true" class="ri-mail-send-line fw-medium"></i>
+                          <span>Proposer un rendez-vous</span>
+                      </a>
                   
                   <a aria-label="Gérer la candidature de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dlist">Voir sa candidature</a>
               

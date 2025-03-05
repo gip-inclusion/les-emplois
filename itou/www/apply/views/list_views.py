@@ -385,9 +385,6 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "list_exports_url": reverse("apply:list_for_siae_exports"),
         "back_url": reverse("dashboard:index"),
         "can_apply": company.kind in CompanyKind.siae_kinds() + [CompanyKind.GEIQ],
-        "show_rdvi_promote_page": (
-            request.current_organization.department in settings.RDV_INSERTION_PROMOTE_DEPARTMENTS
-        ),
     }
     return render(
         request,

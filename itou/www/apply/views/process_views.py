@@ -271,10 +271,6 @@ def details_for_company(request, job_application_id, template_name="apply/proces
         ),
         "matomo_custom_title": "Candidature",
         "job_application_sender_left_org": job_application_sender_left_org(job_application),
-        "show_rdvi_promote_page": (
-            request.current_organization.department in settings.RDV_INSERTION_PROMOTE_DEPARTMENTS
-            and not request.current_organization.rdv_solidarites_id
-        ),
     }
 
     return render(request, template_name, context)
