@@ -1,7 +1,10 @@
 import pytest
+from django.core.exceptions import BadRequest
+from django.test import RequestFactory
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.www.institutions_views.views import deactivate_member
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.institutions.factories import (
     InstitutionFactory,
@@ -83,7 +86,7 @@ class TestMembers:
         guest = institution.members.filter(institutionmembership__is_admin=False).first()
 
         client.force_login(admin)
-        url = reverse("institutions_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
+        url = reverse("institutions_views:update_admin_role", kwargs={"action": "add", "public_id": guest.public_id})
 
         # Redirection to confirm page
         response = client.get(url)
@@ -107,7 +110,7 @@ class TestMembers:
         sent_invitation_to_other = LaborInspectorInvitationFactory(sender=guest)
 
         client.force_login(admin_membership.user)
-        url = reverse("institutions_views:deactivate_member", kwargs={"user_id": guest.pk})
+        url = reverse("institutions_views:deactivate_member", kwargs={"public_id": guest.public_id})
         response = client.post(url)
         assert response.status_code == 302
 
@@ -140,6 +143,28 @@ class TestMembers:
         sent_invitation_to_other.refresh_from_db()
         assert sent_invitation_to_other.has_expired is False
 
+    # To be removed when the old URL is no longer used
+    def test_deactivate_user_with_user_id(self, client):
+        institution = InstitutionFactory(name="DDETS 14")
+        admin_membership = InstitutionMembershipFactory(institution=institution, is_admin=True)
+        guest_membership = InstitutionMembershipFactory(institution=institution, is_admin=False)
+        guest = guest_membership.user
+
+        client.force_login(admin_membership.user)
+        url = reverse("institutions_views:deactivate_member", kwargs={"user_id": guest.id})
+        response = client.post(url)
+        assert response.status_code == 302
+
+        # User should be deactivated now
+        guest_membership.refresh_from_db()
+        assert guest_membership.is_active is False
+
+    def test_deactivate_member_wo_public_id_nor_user_id(self):
+        request = RequestFactory().get("/")
+        request.user = LaborInspectorFactory()
+        with pytest.raises(BadRequest, match="Missing user ID"):
+            deactivate_member(request, None, None, None)
+
     def test_deactivate_user_from_another_organisation(self, client, mailoutbox):
         my_institution = InstitutionFactory()
         other_institution = InstitutionFactory()
@@ -150,7 +175,7 @@ class TestMembers:
         response = client.post(
             reverse(
                 "institutions_views:deactivate_member",
-                kwargs={"user_id": other_membership.user_id},
+                kwargs={"public_id": other_membership.user.public_id},
             ),
         )
 
@@ -167,7 +192,7 @@ class TestMembers:
         client.force_login(admin_membership.user)
         request = getattr(client, method)
         response = request(
-            reverse("institutions_views:deactivate_member", kwargs={"user_id": guest_membership.user_id})
+            reverse("institutions_views:deactivate_member", kwargs={"public_id": guest_membership.user.public_id})
         )
         assert response.status_code == 404
         guest_membership.refresh_from_db()
@@ -181,7 +206,7 @@ class TestMembers:
         other_user = LaborInspectorFactory()
         client.force_login(admin_membership.user)
         request = getattr(client, method)
-        response = request(reverse("institutions_views:deactivate_member", kwargs={"user_id": other_user.pk}))
+        response = request(reverse("institutions_views:deactivate_member", kwargs={"public_id": other_user.public_id}))
         assert response.status_code == 404
         assert mailoutbox == []
 
@@ -193,7 +218,9 @@ class TestMembers:
         invitation = LaborInspectorInvitationFactory(email=other_admin.email, institution=institution)
 
         client.force_login(admin_membership.user)
-        response = client.post(reverse("institutions_views:deactivate_member", kwargs={"user_id": other_admin.pk}))
+        response = client.post(
+            reverse("institutions_views:deactivate_member", kwargs={"public_id": other_admin.public_id})
+        )
 
         assertRedirects(response, reverse("institutions_views:members"))
         other_admin_membership.refresh_from_db()
@@ -231,7 +258,9 @@ class TestMembers:
         assert guest in institution.active_admin_members
 
         client.force_login(admin)
-        url = reverse("institutions_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
+        url = reverse(
+            "institutions_views:update_admin_role", kwargs={"action": "remove", "public_id": guest.public_id}
+        )
 
         # Redirection to confirm page
         response = client.get(url)
@@ -243,3 +272,17 @@ class TestMembers:
 
         institution.refresh_from_db()
         assert_set_admin_role__removal(guest, institution, mailoutbox)
+
+    def test_suspicious_action(self, client):
+        suspicious_action = "h4ckm3"
+        institution = InstitutionFactory()
+        admin_membership = InstitutionMembershipFactory(institution=institution, is_admin=True)
+        client.force_login(admin_membership.user)
+
+        response = client.get(
+            reverse(
+                "institutions_views:update_admin_role",
+                kwargs={"action": suspicious_action, "public_id": admin_membership.user.public_id},
+            )
+        )
+        assert response.status_code == 400
