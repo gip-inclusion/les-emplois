@@ -64,6 +64,7 @@ class RefusalReason(models.TextChoices):
     )
     NO_POSITION = "no_position", "Pas de recrutement en cours"
     DUPLICATE = "duplicate", "Candidature en doublon"
+    AUTO = "auto", "Refus automatique"
     OTHER = "other", "Autre"
 
     # Hidden reasons kept for history.
@@ -81,13 +82,14 @@ class RefusalReason(models.TextChoices):
 
     @classmethod
     def hidden(cls):
-        """Old refusal reasons kept for history but not displayed to end users."""
+        """Refusal reasons not displayed to end users."""
         return [
-            cls.APPROVAL_EXPIRATION_TOO_CLOSE,
-            cls.DEACTIVATION,
-            cls.ELIGIBILITY_DOUBT,
-            cls.UNAVAILABLE,
-            cls.POORLY_INFORMED,
+            cls.APPROVAL_EXPIRATION_TOO_CLOSE,  # kept for history
+            cls.DEACTIVATION,  # kept for history
+            cls.ELIGIBILITY_DOUBT,  # kept for history
+            cls.UNAVAILABLE,  # kept for history
+            cls.POORLY_INFORMED,  # kept for history
+            cls.AUTO,
         ]
 
     @classmethod
