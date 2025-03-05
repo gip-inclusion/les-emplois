@@ -30,7 +30,7 @@
         <p>En cas d'erreur, vous pourrez toujours lui renvoyer une invitation pour rejoindre votre {{ org_display }}.</p>
     {% endwith %}
 
-    <form action="{% url base_url|add:":deactivate_member" target_member.pk %}" method="post">
+    <form action="{% url base_url|add:":deactivate_member" target_member.public_id %}" method="post">
         {% url base_url|add:":members" as reset_url %}
         {% csrf_token %}
         {% itou_buttons_form primary_label="Retirer l'utilisateur" reset_url=reset_url %}

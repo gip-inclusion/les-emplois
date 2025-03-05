@@ -22,7 +22,7 @@
             <li>Cet utilisateur sera notifié par e-mail de la modification de son rôle.</li>
         </ul>
 
-        <form action="{% url base_url|add:":update_admin_role" action target_member.pk %}" method="post">
+        <form action="{% url base_url|add:":update_admin_role" action target_member.public_id %}" method="post">
             {% url base_url|add:":members" as reset_url %}
             {% csrf_token %}
             {% if action == "remove" %}

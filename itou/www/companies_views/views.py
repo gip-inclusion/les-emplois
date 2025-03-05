@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
 from django.core.cache import caches
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import BadRequest, PermissionDenied
 from django.db.models import Count, Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -19,6 +19,7 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.companies.models import Company, JobDescription, SiaeFinancialAnnex
 from itou.jobs.models import Appellation
+from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiException
 from itou.utils.apis.exceptions import GeocodingDataError
@@ -635,21 +636,30 @@ def members(request, template_name="companies/members.html"):
 
 
 @check_user(lambda user: user.is_employer)
-def deactivate_member(request, user_id, template_name="companies/deactivate_member.html"):
+def deactivate_member(request, public_id=None, user_id=None, template_name="companies/deactivate_member.html"):
+    if public_id:
+        user = get_object_or_404(User, public_id=public_id)
+    elif user_id:
+        user = get_object_or_404(User, pk=user_id)
+    else:
+        raise BadRequest("Missing user ID")
     return deactivate_org_member(
         request,
-        user_id,
+        user.id,
         success_url=reverse("companies_views:members"),
         template_name=template_name,
     )
 
 
 @check_user(lambda user: user.is_employer)
-def update_admin_role(request, action, user_id, template_name="companies/update_admins.html"):
+def update_admin_role(request, action, public_id, template_name="companies/update_admins.html"):
+    if action not in ["add", "remove"]:
+        raise BadRequest("Invalid action")
+    user = get_object_or_404(User, public_id=public_id)
     return update_org_admin_role(
         request,
         action,
-        user_id,
+        user.id,
         success_url=reverse("companies_views:members"),
         template_name=template_name,
     )
