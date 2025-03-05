@@ -513,6 +513,11 @@ class EmployeeRecordTransitionLog(xwf_models.BaseTransitionLog, ASPExchangeInfor
         on_delete=models.RESTRICT,  # For traceability and accountability
         related_name="+",
     )
+    recovered = models.BooleanField(
+        verbose_name="récupéré rétroactivement avec un script",
+        default=False,
+        editable=False,
+    )
 
     class Meta(ASPExchangeInformation.Meta):
         verbose_name = "log des transitions de la fiche salarié"
