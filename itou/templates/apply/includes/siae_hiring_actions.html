@@ -60,8 +60,10 @@
             </div>
         {% endif %}
 
-        {% if show_rdvi_promote_page|default:False %}
-            <div class="form-group col-12 col-lg-auto">{% include "apply/includes/buttons/rdv_insertion_promote.html" %}</div>
+        {% if not request.current_organization.rdv_solidarites_id %}
+            <div class="form-group col-12 col-lg-auto">
+                {% include "apply/includes/buttons/rdv_insertion_promote.html" with job_application=job_application %}
+            </div>
         {% endif %}
 
         {# Transfer ------------------------------------------------------ #}

@@ -70,7 +70,7 @@
             {% elif job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
                 {% if request.current_organization.rdv_solidarites_id %}
                     {% include "apply/includes/buttons/rdv_insertion_invite.html" with job_application=job_application for_detail=False %}
-                {% elif show_rdvi_promote_page|default:False %}
+                {% else %}
                     <a href="{% url 'rdv_insertion:discover' %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-secondary btn-ico w-100 w-md-auto">
                         <i class="ri-mail-send-line fw-medium" aria-hidden="true"></i>
                         <span>Proposer un rendez-vous</span>
