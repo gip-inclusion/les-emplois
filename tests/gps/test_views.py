@@ -195,6 +195,20 @@ class TestGroupLists:
         assertSoupEqual(results, fresh_results)
 
 
+def test_backward_compat_urls(client):
+    prescriber = PrescriberFactory()
+    client.force_login(prescriber)
+
+    response = client.get("/gps", follow=True)  # there is a first redirection to /gps/
+    assertRedirects(response, reverse("gps:group_list"), status_code=301)
+
+    response = client.get("/gps/")
+    assertRedirects(response, reverse("gps:group_list"), status_code=301)
+
+    response = client.get("/gps/groups")
+    assertRedirects(response, reverse("gps:group_list"), status_code=301)
+
+
 class TestGroupDetailsMembershipTab:
     @pytest.mark.parametrize(
         "factory,access",
