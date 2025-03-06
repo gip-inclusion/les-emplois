@@ -1293,7 +1293,30 @@
                       AND U0."ended_at" IS NULL)
                GROUP BY U0."id",
                         U2."beneficiary_id")
-          ORDER BY RANDOM() ASC
+          ORDER BY "users_user"."first_name" ASC,
+                   "users_user"."last_name" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.is_prescriber_with_authorized_org[users/models.py]',
+          'User.can_edit_personal_information[users/models.py]',
+          'User.can_view_personal_information[users/models.py]',
+          'MembershipsFiltersForm._get_beneficiary_choices[www/gps/forms.py]',
+          'MembershipsFiltersForm.__init__[www/gps/forms.py]',
+          'group_list[www/gps/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."user_id" = %s
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescriberorganization"."is_authorized"
+                 AND "users_user"."is_active")
+          LIMIT 1
         ''',
       }),
       dict({
@@ -1318,34 +1341,6 @@
       }),
       dict({
         'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'IfNode[layout/_header_help_dropdown_content.html]',
-          'IfNode[layout/_header_help_dropdown_content.html]',
-          'IncludeNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[gps/group_list.html]',
-          'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'IfNode[gps/includes/memberships_results.html]',
-          'IncludeNode[gps/group_list.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[gps/group_list.html]',
           'group_list[www/gps/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -1453,10 +1448,6 @@
       }),
       dict({
         'origin': list([
-          'IfNode[gps/includes/memberships_results.html]',
-          'IncludeNode[gps/group_list.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[gps/group_list.html]',
           'group_list[www/gps/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -1615,7 +1606,7 @@
                   <caption class="visually-hidden">Liste des bénéficiaires</caption>
                   <thead>
                       <tr>
-                          <th scope="col">Prénom Nom</th>
+                          <th scope="col">Prénom NOM</th>
                           
                               <th scope="col">Accompagné depuis</th>
                           
@@ -1864,7 +1855,30 @@
                       AND NOT (U0."ended_at" IS NULL))
                GROUP BY U0."id",
                         U2."beneficiary_id")
-          ORDER BY RANDOM() ASC
+          ORDER BY "users_user"."first_name" ASC,
+                   "users_user"."last_name" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.is_prescriber_with_authorized_org[users/models.py]',
+          'User.can_edit_personal_information[users/models.py]',
+          'User.can_view_personal_information[users/models.py]',
+          'MembershipsFiltersForm._get_beneficiary_choices[www/gps/forms.py]',
+          'MembershipsFiltersForm.__init__[www/gps/forms.py]',
+          'group_list[www/gps/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."user_id" = %s
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescriberorganization"."is_authorized"
+                 AND "users_user"."is_active")
+          LIMIT 1
         ''',
       }),
       dict({
@@ -1889,34 +1903,6 @@
       }),
       dict({
         'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'IfNode[layout/_header_help_dropdown_content.html]',
-          'IfNode[layout/_header_help_dropdown_content.html]',
-          'IncludeNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[gps/group_list.html]',
-          'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'IfNode[gps/includes/memberships_results.html]',
-          'IncludeNode[gps/group_list.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[gps/group_list.html]',
           'group_list[www/gps/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -2024,10 +2010,6 @@
       }),
       dict({
         'origin': list([
-          'IfNode[gps/includes/memberships_results.html]',
-          'IncludeNode[gps/group_list.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[gps/group_list.html]',
           'group_list[www/gps/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -2184,7 +2166,7 @@
                   <caption class="visually-hidden">Liste des bénéficiaires</caption>
                   <thead>
                       <tr>
-                          <th scope="col">Prénom Nom</th>
+                          <th scope="col">Prénom NOM</th>
                           
                               <th scope="col">Début d’accompagnement</th>
                               <th scope="col">Fin d’accompagnement</th>
