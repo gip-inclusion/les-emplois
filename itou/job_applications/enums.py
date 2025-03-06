@@ -33,6 +33,11 @@ ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL = [
     JobApplicationState.OBSOLETE,
 ]
 
+AUTO_REJECT_JOB_APPLICATION_STATES = [
+    JobApplicationState.NEW,
+    JobApplicationState.PROCESSING,
+]
+
 
 class SenderKind(models.TextChoices):
     JOB_SEEKER = users_enums.KIND_JOB_SEEKER, "Demandeur d'emploi"
@@ -141,3 +146,5 @@ class QualificationLevel(models.TextChoices):
 
 GEIQ_MIN_HOURS_PER_WEEK = 1
 GEIQ_MAX_HOURS_PER_WEEK = 48
+
+AUTO_REJECT_JOB_APPLICATION_DELAY = 60  # in days
