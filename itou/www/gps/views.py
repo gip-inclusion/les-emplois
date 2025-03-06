@@ -108,6 +108,7 @@ class GroupDetailsMixin(LoginRequiredMixin):
         return context | {
             "back_url": back_url,
             "group": self.group,
+            "can_view_personal_information": self.request.user.can_view_personal_information(self.group.beneficiary),
         }
 
 

@@ -1,4 +1,97 @@
 # serializer version: 1
+# name: TestGroupDetailsBeneficiaryTab.test_tab[masked_info]
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/gps/groups/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <div class="d-flex flex-row gap-3 align-items-center mb-3">
+          <h1 class="m-0">J… D…</h1>
+          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+              <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+          </button>
+      </div>
+      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+          <li class="nav-item">
+              <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link active" href="/gps/groups/[PK of FollowUpGroup]/beneficiary?back_url=/gps/groups/list">Informations</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/contribution?back_url=/gps/groups/list">Mon intervention</a>
+          </li>
+      </ul>
+  
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row mb-3">
+                  <div class="col-12 col-sm">
+                      <h2>Informations</h2>
+                  </div>
+                  
+              </div>
+              <div class="c-box mb-5">
+                  <h2>Informations de contact</h2>
+                  <div class="row">
+                      <div class="col-12 col-md-6 mb-3 mb-md-0">
+                          <ul class="list-data">
+                              <li>
+                                  <small>Nom</small>
+                                  <strong>D…</strong>
+                              </li>
+                              <li>
+                                  <small>Prénom</small>
+                                  <strong>J…</strong>
+                              </li>
+                              
+                          </ul>
+                      </div>
+                      
+  
+                  </div>
+              </div>
+              
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
 # name: TestGroupDetailsBeneficiaryTab.test_tab[no_diagnostic]
   '''
   <main class="s-main" id="main" role="main">
@@ -64,6 +157,13 @@
                       <h2>Informations</h2>
                   </div>
                   
+                      <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                          <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-primary" href="/dashboard/edit_job_seeker_info/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/gps/groups/[PK of FollowUpGroup]/beneficiary">
+                              <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
+                              <span>Modifier</span>
+                          </a>
+                      </div>
+                  
               </div>
               <div class="c-box mb-5">
                   <h2>Informations de contact</h2>
@@ -78,54 +178,59 @@
                                   <small>Prénom</small>
                                   <strong>Jane</strong>
                               </li>
-                              <li>
-                                  <small>Date de naissance</small>
-                                  
-                                      <strong>01/01/1990</strong>
-                                  
-                              </li>
-                          </ul>
-                      </div>
-                      <div class="col-12 col-md-6">
-                          <ul class="list-data">
-                              <li>
-                                  <small>Téléphone</small>
-                                  
-                                      <strong>06 12 34 56 78</strong>
+                              
+                                  <li>
+                                      <small>Date de naissance</small>
                                       
-                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-                                  
-                              </li>
-                              <li>
-                                  <small>Adresse e-mail</small>
-                                  <strong>jane.doe@test.local</strong>
-                                  
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-                              </li>
-                              <li>
-                                  <small>Adresse</small>
-                                  
-                                      <ul class="list-unstyled mb-0">
-                                          <li>
-                                              <strong>12 rue Georges Bizet</strong>
-                                          </li>
-                                          
-                                          <li>
-                                              <strong>35000 Rennes</strong>
-                                          </li>
-                                      </ul>
-                                  
-                              </li>
+                                          <strong>01/01/1990</strong>
+                                      
+                                  </li>
+                              
                           </ul>
                       </div>
+                      
+                          <div class="col-12 col-md-6">
+                              <ul class="list-data">
+                                  <li>
+                                      <small>Téléphone</small>
+                                      
+                                          <strong>06 12 34 56 78</strong>
+                                          
+                                          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+                                      
+                                  </li>
+                                  <li>
+                                      <small>Adresse e-mail</small>
+                                      <strong>jane.doe@test.local</strong>
+                                      
+                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+                                  </li>
+                                  <li>
+                                      <small>Adresse</small>
+                                      
+                                          <ul class="list-unstyled mb-0">
+                                              <li>
+                                                  <strong>12 rue Georges Bizet</strong>
+                                              </li>
+                                              
+                                              <li>
+                                                  <strong>35000 Rennes</strong>
+                                              </li>
+                                          </ul>
+                                      
+                                  </li>
+                              </ul>
+                          </div>
+                      
+  
                   </div>
               </div>
               
@@ -221,54 +326,59 @@
                                   <small>Prénom</small>
                                   <strong>Jane</strong>
                               </li>
-                              <li>
-                                  <small>Date de naissance</small>
-                                  
-                                      <strong>01/01/1990</strong>
-                                  
-                              </li>
-                          </ul>
-                      </div>
-                      <div class="col-12 col-md-6">
-                          <ul class="list-data">
-                              <li>
-                                  <small>Téléphone</small>
-                                  
-                                      <strong>06 12 34 56 78</strong>
+                              
+                                  <li>
+                                      <small>Date de naissance</small>
                                       
-                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-                                  
-                              </li>
-                              <li>
-                                  <small>Adresse e-mail</small>
-                                  <strong>jane.doe@test.local</strong>
-                                  
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-                              </li>
-                              <li>
-                                  <small>Adresse</small>
-                                  
-                                      <ul class="list-unstyled mb-0">
-                                          <li>
-                                              <strong>12 rue Georges Bizet</strong>
-                                          </li>
-                                          
-                                          <li>
-                                              <strong>35000 Rennes</strong>
-                                          </li>
-                                      </ul>
-                                  
-                              </li>
+                                          <strong>01/01/1990</strong>
+                                      
+                                  </li>
+                              
                           </ul>
                       </div>
+                      
+                          <div class="col-12 col-md-6">
+                              <ul class="list-data">
+                                  <li>
+                                      <small>Téléphone</small>
+                                      
+                                          <strong>06 12 34 56 78</strong>
+                                          
+                                          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+                                      
+                                  </li>
+                                  <li>
+                                      <small>Adresse e-mail</small>
+                                      <strong>jane.doe@test.local</strong>
+                                      
+                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+                                  </li>
+                                  <li>
+                                      <small>Adresse</small>
+                                      
+                                          <ul class="list-unstyled mb-0">
+                                              <li>
+                                                  <strong>12 rue Georges Bizet</strong>
+                                              </li>
+                                              
+                                              <li>
+                                                  <strong>35000 Rennes</strong>
+                                              </li>
+                                          </ul>
+                                      
+                                  </li>
+                              </ul>
+                          </div>
+                      
+  
                   </div>
               </div>
               
@@ -370,6 +480,13 @@
                       <h2>Informations</h2>
                   </div>
                   
+                      <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                          <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-primary" href="/dashboard/edit_job_seeker_info/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/gps/groups/[PK of FollowUpGroup]/beneficiary">
+                              <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
+                              <span>Modifier</span>
+                          </a>
+                      </div>
+                  
               </div>
               <div class="c-box mb-5">
                   <h2>Informations de contact</h2>
@@ -384,54 +501,59 @@
                                   <small>Prénom</small>
                                   <strong>Jane</strong>
                               </li>
-                              <li>
-                                  <small>Date de naissance</small>
-                                  
-                                      <strong>01/01/1990</strong>
-                                  
-                              </li>
-                          </ul>
-                      </div>
-                      <div class="col-12 col-md-6">
-                          <ul class="list-data">
-                              <li>
-                                  <small>Téléphone</small>
-                                  
-                                      <strong>06 12 34 56 78</strong>
+                              
+                                  <li>
+                                      <small>Date de naissance</small>
                                       
-                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-                                  
-                              </li>
-                              <li>
-                                  <small>Adresse e-mail</small>
-                                  <strong>jane.doe@test.local</strong>
-                                  
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-                              </li>
-                              <li>
-                                  <small>Adresse</small>
-                                  
-                                      <ul class="list-unstyled mb-0">
-                                          <li>
-                                              <strong>12 rue Georges Bizet</strong>
-                                          </li>
-                                          
-                                          <li>
-                                              <strong>35000 Rennes</strong>
-                                          </li>
-                                      </ul>
-                                  
-                              </li>
+                                          <strong>01/01/1990</strong>
+                                      
+                                  </li>
+                              
                           </ul>
                       </div>
+                      
+                          <div class="col-12 col-md-6">
+                              <ul class="list-data">
+                                  <li>
+                                      <small>Téléphone</small>
+                                      
+                                          <strong>06 12 34 56 78</strong>
+                                          
+                                          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+                                      
+                                  </li>
+                                  <li>
+                                      <small>Adresse e-mail</small>
+                                      <strong>jane.doe@test.local</strong>
+                                      
+                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+                                  </li>
+                                  <li>
+                                      <small>Adresse</small>
+                                      
+                                          <ul class="list-unstyled mb-0">
+                                              <li>
+                                                  <strong>12 rue Georges Bizet</strong>
+                                              </li>
+                                              
+                                              <li>
+                                                  <strong>35000 Rennes</strong>
+                                              </li>
+                                          </ul>
+                                      
+                                  </li>
+                              </ul>
+                          </div>
+                      
+  
                   </div>
               </div>
               
@@ -497,7 +619,7 @@
   
                               
       <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">Jane DOE</h1>
+          <h1 class="m-0">J… D…</h1>
           <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
               <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
           </button>
@@ -610,7 +732,7 @@
   
                               
       <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">Jane DOE</h1>
+          <h1 class="m-0">J… D…</h1>
           <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
               <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
           </button>

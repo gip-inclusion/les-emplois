@@ -1,11 +1,14 @@
 {% extends "layout/base.html" %}
+{% load str_filters %}
 {% load static %}
 
-{% block title %}GPS - Profil de {{ group.beneficiary.get_full_name }} {{ block.super }}{% endblock %}
+{% block title %}
+    GPS - Profil de {{ group.beneficiary.get_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+{% endblock %}
 
 {% block title_content %}
     <div class="d-flex flex-row gap-3 align-items-center mb-3">
-        <h1 class="m-0">{{ group.beneficiary.get_full_name }}</h1>
+        <h1 class="m-0">{{ group.beneficiary.get_full_name|mask_unless:can_view_personal_information }}</h1>
         <button class="btn btn-lg btn-ico-only btn-link" type="button" data-it-action="print" aria-label="Imprimer la page">
             <i class="ri-printer-line font-weight-normal" aria-hidden="true"></i>
         </button>
