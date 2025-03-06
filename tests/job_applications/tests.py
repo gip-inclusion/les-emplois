@@ -183,22 +183,6 @@ class TestJobApplicationModel:
         assert membership.creator == user
 
 
-class TestJobApplicationQueryset:
-    def test_is_active_company_member(self):
-        job_application = JobApplicationFactory()
-        user = EmployerFactory()
-        assert JobApplication.objects.is_active_company_member(user).count() == 0
-
-        job_application.to_company.add_or_activate_membership(user)
-        assert JobApplication.objects.is_active_company_member(user).get() == job_application
-
-        membership = job_application.to_company.memberships.filter(user=user).get()
-        membership.is_active = False
-        membership.save(update_fields=("is_active",))
-
-        assert JobApplication.objects.is_active_company_member(user).count() == 0
-
-
 def test_can_be_cancelled():
     assert JobApplicationFactory().can_be_cancelled is True
 
@@ -692,6 +676,20 @@ class TestJobApplicationQuerySet:
         job_application = JobApplication.objects.with_accepted_at().first()
         assert job_application.accepted_at.date() == job_application.hiring_start_at
         assert job_application.accepted_at != job_application.created_at
+
+    def test_is_active_company_member(self):
+        job_application = JobApplicationFactory()
+        user = EmployerFactory()
+        assert JobApplication.objects.is_active_company_member(user).count() == 0
+
+        job_application.to_company.add_or_activate_membership(user)
+        assert JobApplication.objects.is_active_company_member(user).get() == job_application
+
+        membership = job_application.to_company.memberships.filter(user=user).get()
+        membership.is_active = False
+        membership.save(update_fields=("is_active",))
+
+        assert JobApplication.objects.is_active_company_member(user).count() == 0
 
 
 class TestJobApplicationNotifications:
