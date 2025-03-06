@@ -13,14 +13,10 @@ from itou.cities.models import City
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
 from itou.users.models import User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
-from tests.companies.factories import (
-    CompanyFactory,
-)
+from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberFactory
 from tests.prescribers import factories as prescribers_factories
-from tests.users.factories import (
-    PrescriberFactory,
-)
+from tests.users.factories import PrescriberFactory
 from tests.utils.test import assertSnapshotQueries
 
 
@@ -370,7 +366,7 @@ class TestEditJobSeekerInfo:
             <div class="form-group is-invalid form-group-required">
             <label class="form-label" for="id_first_name">Prénom</label>
             <input type="text" name="first_name" maxlength="150" class="form-control is-invalid"
-                   placeholder="Prénom" required aria-invalid="true" id="id_first_name">
+                   required aria-invalid="true" id="id_first_name">
             <div class="invalid-feedback">Ce champ est obligatoire.</div>
             </div>
             """,
@@ -383,7 +379,7 @@ class TestEditJobSeekerInfo:
             <div class="form-group is-invalid form-group-required">
             <label class="form-label" for="id_last_name">Nom</label>
             <input type="text" name="last_name" maxlength="150" class="form-control is-invalid"
-                   placeholder="Nom" required aria-invalid="true" id="id_last_name">
+                    required aria-invalid="true" id="id_last_name">
             <div class="invalid-feedback">Ce champ est obligatoire.</div>
             </div>
             """,

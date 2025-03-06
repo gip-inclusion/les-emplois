@@ -45,8 +45,7 @@ class TestEasyMDEEditor:
                 id="id_description"
                 name="description"
                 required
-                rows="10"
-                placeholder="Description">
+                rows="10">
             </div>
             """,
         )
