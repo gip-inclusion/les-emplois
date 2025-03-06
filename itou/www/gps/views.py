@@ -1,8 +1,8 @@
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count, Prefetch
-from django.http import HttpResponseRedirect
+from django.db.models import Count, Exists, OuterRef, Prefetch
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.views.decorators.http import require_POST
@@ -10,12 +10,18 @@ from django.views.generic import TemplateView, UpdateView
 
 from itou.gps.grist import log_contact_info_display
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.pagination import pager
 from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.gps.enums import Channel
-from itou.www.gps.forms import FollowUpGroupMembershipForm, JoinGroupChannelForm, MembershipsFiltersForm
+from itou.www.gps.forms import (
+    FollowUpGroupMembershipForm,
+    JoinGroupChannelForm,
+    MembershipsFiltersForm,
+)
+from itou.www.gps.utils import get_all_coworkers
 
 
 def is_allowed_to_use_gps(user):
@@ -246,3 +252,48 @@ def join_group(request, template_name="gps/join_group.html"):
         "Channel": Channel,
     }
     return render(request, template_name, context)
+
+
+@check_user(is_allowed_to_use_gps)
+def beneficiaries_autocomplete(request):
+    """
+    Returns JSON data compliant with Select2
+    """
+    if request.current_organization is None:
+        raise PermissionDenied("Il faut une organisation ou une structure pour accéder à cette page")
+
+    term = request.GET.get("term", "").strip()
+    users = []
+
+    if term:
+        all_coworkers = get_all_coworkers(request.organizations)
+        users_qs = (
+            User.objects.search_by_full_name(term)
+            .filter(kind=UserKind.JOB_SEEKER)
+            .filter(
+                Exists(
+                    FollowUpGroupMembership.objects.filter(
+                        follow_up_group__beneficiary_id=OuterRef("pk"),
+                        member__in=all_coworkers.values("pk"),
+                    )
+                )
+            )
+        )
+
+        def format_data(user):
+            data = {
+                "id": user.pk,
+                "title": "",
+                "name": user.get_full_name(),
+                "birthdate": "",
+            }
+            if user.title:
+                # only add a . after M, not Mme
+                data["title"] = f"{user.title.capitalize()}."[:3]
+            if getattr(user.jobseeker_profile, "birthdate", None):
+                data["birthdate"] = user.jobseeker_profile.birthdate.strftime("%d/%m/%Y")
+            return data
+
+        users = [format_data(user) for user in users_qs[:10]]
+
+    return JsonResponse({"results": users})
