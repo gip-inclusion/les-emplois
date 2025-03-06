@@ -48,12 +48,7 @@ class UserKindLoginMixin:
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        login_url = reverse("account_login")
-        signup_url = reverse("account_signup")
         extra_context = {
-            "login_url": login_url,
-            "signup_url": signup_url,
-            "signup_allowed": True,
             "redirect_field_value": get_safe_url(self.request, REDIRECT_FIELD_NAME),
             "pro_connect_url": self._get_pro_connect_url(context),
         }
@@ -86,9 +81,6 @@ class PrescriberLoginView(ItouLoginView):
 
         extra_context = {
             "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.PRESCRIBER],
-            "login_url": reverse("login:prescriber"),
-            "signup_url": reverse("signup:prescriber_check_already_exists"),
-            "signup_allowed": True,
             "uses_pro_connect": True,
         }
         return context | extra_context
@@ -103,9 +95,6 @@ class EmployerLoginView(ItouLoginView):
 
         extra_context = {
             "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.EMPLOYER],
-            "login_url": reverse("login:employer"),
-            "signup_url": reverse("signup:company_select"),
-            "signup_allowed": True,
             "uses_pro_connect": True,
         }
         return context | extra_context
@@ -118,8 +107,6 @@ class LaborInspectorLoginView(ItouLoginView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         extra_context = {
-            "login_url": reverse("login:labor_inspector"),
-            "signup_allowed": False,
             "uses_pro_connect": False,
         }
         return context | extra_context
