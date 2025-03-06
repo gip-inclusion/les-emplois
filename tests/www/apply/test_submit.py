@@ -13,6 +13,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import (
     assertContains,
+    assertFormError,
     assertMessages,
     assertNotContains,
     assertRedirects,
@@ -5334,6 +5335,41 @@ class TestHireConfirmation:
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
         assert job_application.resume_link == ""
+
+    def test_cannot_hire_start_date_after_approval_expires(self, client):
+        self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
+        client.force_login(self.company.members.first())
+
+        today = timezone.localdate()
+        approval = ApprovalFactory(end_at=today + datetime.timedelta(days=1))
+        self.job_seeker.approvals.add(approval)
+
+        hiring_start_at = today + datetime.timedelta(days=2)
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": "",
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
+            "birthdate": self.job_seeker.jobseeker_profile.birthdate.isoformat(),
+            "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
+            "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
+            "answer": "",
+            "ban_api_resolved_address": self.job_seeker.geocoding_address,
+            "address_line_1": self.job_seeker.address_line_1,
+            "post_code": self.city.post_codes[0],
+            "insee_code": self.city.code_insee,
+            "city": self.city.name,
+            "phone": self.job_seeker.phone,
+            "fill_mode": "ban_api",
+            "address_for_autocomplete": "0",
+        }
+        response = client.post(self._reverse("apply:hire_confirmation"), data=post_data)
+        assert response.status_code == 200
+        assertFormError(
+            response.context["form_accept"],
+            "hiring_start_at",
+            JobApplication.ERROR_HIRES_AFTER_APPROVAL_EXPIRES,
+        )
 
     def test_as_company_elibility_diagnosis_from_another_company(self, client, snapshot):
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_employer=True, job_seeker=self.job_seeker)
