@@ -21,6 +21,9 @@ from itou.employee_record.enums import Status
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import (
+    ARCHIVABLE_JOB_APPLICATION_STATES,
+    AUTO_REJECT_JOB_APPLICATION_DELAY,
+    AUTO_REJECT_JOB_APPLICATION_STATES,
     JobApplicationState,
     Origin,
     QualificationLevel,
@@ -690,6 +693,29 @@ class TestJobApplicationQuerySet:
         membership.save(update_fields=("is_active",))
 
         assert JobApplication.objects.is_active_company_member(user).count() == 0
+
+    @pytest.mark.parametrize(
+        "state,expected",
+        [(state, state in AUTO_REJECT_JOB_APPLICATION_STATES) for state in JobApplicationState],
+    )
+    def test_automatically_rejectable_applications(self, state, expected):
+        old_job_application = JobApplicationFactory(
+            state=state, updated_at=timezone.now() - AUTO_REJECT_JOB_APPLICATION_DELAY
+        )
+        if state in ARCHIVABLE_JOB_APPLICATION_STATES:
+            JobApplicationFactory(
+                state=state,
+                updated_at=timezone.now() - AUTO_REJECT_JOB_APPLICATION_DELAY,
+                archived_at=timezone.now(),
+            )
+        JobApplicationFactory(
+            state=state, updated_at=timezone.now() - AUTO_REJECT_JOB_APPLICATION_DELAY + datetime.timedelta(days=1)
+        )
+
+        qs = JobApplication.objects.automatically_rejectable_applications()
+        assert qs.exists() == expected
+        if expected:
+            assert set(qs) == {old_job_application}
 
 
 class TestJobApplicationNotifications:

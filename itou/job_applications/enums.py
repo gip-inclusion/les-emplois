@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 
 from itou.users import enums as users_enums
@@ -31,6 +33,11 @@ ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL = [
     JobApplicationState.REFUSED,
     JobApplicationState.CANCELLED,
     JobApplicationState.OBSOLETE,
+]
+
+AUTO_REJECT_JOB_APPLICATION_STATES = [
+    JobApplicationState.NEW,
+    JobApplicationState.PROCESSING,
 ]
 
 
@@ -141,3 +148,5 @@ class QualificationLevel(models.TextChoices):
 
 GEIQ_MIN_HOURS_PER_WEEK = 1
 GEIQ_MAX_HOURS_PER_WEEK = 48
+
+AUTO_REJECT_JOB_APPLICATION_DELAY = datetime.timedelta(days=60)
