@@ -1530,11 +1530,9 @@ class TestJobApplicationWorkflow:
         """
         To be accepted a job must start while the approval is valid.
         """
-        job_seeker = JobSeekerFactory()
         job_application = JobApplicationFactory(
             with_approval=True,
             state=JobApplicationState.PROCESSING,
-            job_seeker=job_seeker,
             hiring_start_at=timezone.localdate() + relativedelta(days=2),
             approval__end_at=timezone.localdate() + relativedelta(days=1),
         )
