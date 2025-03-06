@@ -1,5 +1,6 @@
 import uuid
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -22,6 +23,8 @@ from itou.gps.models import FollowUpGroup
 from itou.job_applications import notifications as job_application_notifications
 from itou.job_applications.enums import (
     ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL,
+    AUTO_REJECT_JOB_APPLICATION_DELAY,
+    AUTO_REJECT_JOB_APPLICATION_STATES,
     GEIQ_MAX_HOURS_PER_WEEK,
     GEIQ_MIN_HOURS_PER_WEEK,
     JobApplicationState,
@@ -383,6 +386,12 @@ class JobApplicationQuerySet(models.QuerySet):
         elif user.is_employer and organization:
             return self.filter(sender_company=organization).exclude(to_company=organization)
         return self.none()
+
+    def oldest_job_applications_rejectable_after_delay(self, limit=50):
+        return self.filter(
+            state__in=AUTO_REJECT_JOB_APPLICATION_STATES,
+            updated_at__lte=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY),
+        ).order_by("updated_at")[:limit]
 
 
 class JobApplication(xwf_models.WorkflowEnabled, models.Model):

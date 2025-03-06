@@ -21,6 +21,8 @@ from itou.employee_record.enums import Status
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import (
+    AUTO_REJECT_JOB_APPLICATION_DELAY,
+    AUTO_REJECT_JOB_APPLICATION_STATES,
     JobApplicationState,
     Origin,
     QualificationLevel,
@@ -690,6 +692,35 @@ class TestJobApplicationQuerySet:
         membership.save(update_fields=("is_active",))
 
         assert JobApplication.objects.is_active_company_member(user).count() == 0
+
+    @pytest.mark.parametrize(
+        "state,expected",
+        [(state, True) for state in AUTO_REJECT_JOB_APPLICATION_STATES]
+        + [(state, False) for state in JobApplicationState.values if state not in AUTO_REJECT_JOB_APPLICATION_STATES],
+    )
+    def test_oldest_job_applications_rejectable_after_delay_state_and_delay(self, state, expected):
+        old_job_application = JobApplicationFactory(
+            state=state, updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY)
+        )
+        JobApplicationFactory(
+            state=state, updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY - 1)
+        )
+        qs = JobApplication.objects.oldest_job_applications_rejectable_after_delay()
+        assert qs.exists() == expected
+        if qs.exists():
+            assert qs.get() == old_job_application
+
+    def test_oldest_job_applications_rejectable_after_delay_limit_and_ordering(self):
+        job_applications = [
+            JobApplicationFactory(
+                state=AUTO_REJECT_JOB_APPLICATION_STATES[0],
+                updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY + i),
+            )
+            for i in range(3)
+        ]
+        job_applications.reverse()
+        qs = JobApplication.objects.oldest_job_applications_rejectable_after_delay(limit=2)
+        assert list(qs) == job_applications[:2]
 
 
 class TestJobApplicationNotifications:
