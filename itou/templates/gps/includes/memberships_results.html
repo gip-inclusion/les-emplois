@@ -12,7 +12,7 @@
                 <caption class="visually-hidden">Liste des bénéficiaires</caption>
                 <thead>
                     <tr>
-                        <th scope="col">Prénom Nom</th>
+                        <th scope="col">Prénom NOM</th>
                         {% if active_memberships %}
                             <th scope="col">Accompagné depuis</th>
                         {% else %}
@@ -29,9 +29,9 @@
                             <td>
                                 <a href="{% url 'gps:group_memberships' group_id=membership.follow_up_group.pk %}?back_url={{ request.get_full_path|urlencode }}"
                                    class="btn-link"
-                                   aria-label="Consulter la fiche de {{ membership.follow_up_group.beneficiary.get_full_name }}"
+                                   aria-label="Consulter la fiche de {{ membership.follow_up_group.beneficiary.get_full_name|mask_unless:membership.user_can_view_personal_information }}"
                                    {% matomo_event "GPS_liste_groupes" "clic" "consulter_fiche_candidat" %}>
-                                    {{ membership.follow_up_group.beneficiary.get_full_name }}
+                                    {{ membership.follow_up_group.beneficiary.get_full_name|mask_unless:membership.user_can_view_personal_information }}
                                 </a>
                             </td>
                             {% if active_memberships %}

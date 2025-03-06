@@ -52,12 +52,20 @@ def group_list(request, current, template_name="gps/group_list.html"):
             ),
         )
     )
-    filters_form = MembershipsFiltersForm(memberships_qs=memberships, data=request.GET or None)
+    filters_form = MembershipsFiltersForm(
+        memberships_qs=memberships,
+        data=request.GET or None,
+        request_user=request.user,
+    )
 
     if filters_form.is_valid():
         memberships = filters_form.filter()
 
     memberships_page = pager(memberships, request.GET.get("page"), items_per_page=50)
+    for membership in memberships_page:
+        membership.user_can_view_personal_information = request.user.can_view_personal_information(
+            membership.follow_up_group.beneficiary
+        )
 
     context = {
         "filters_form": filters_form,

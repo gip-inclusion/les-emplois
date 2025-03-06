@@ -5,6 +5,7 @@ from django_select2.forms import Select2Widget
 
 from itou.gps.models import FollowUpGroupMembership
 from itou.users.models import User
+from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -17,10 +18,10 @@ class MembershipsFiltersForm(forms.Form):
         ),
     )
 
-    def __init__(self, memberships_qs, *args, **kwargs):
+    def __init__(self, memberships_qs, *args, request_user, **kwargs):
         self.queryset = memberships_qs
         super().__init__(*args, **kwargs)
-        self.fields["beneficiary"].choices = self._get_beneficiary_choices()
+        self.fields["beneficiary"].choices = self._get_beneficiary_choices(request_user)
 
     def filter(self):
         queryset = self.queryset
@@ -28,11 +29,20 @@ class MembershipsFiltersForm(forms.Form):
             queryset = queryset.filter(follow_up_group__beneficiary_id=beneficiary, is_active=True)
         return queryset
 
-    def _get_beneficiary_choices(self):
+    def _get_beneficiary_choices(self, request_user):
         beneficiaries_ids = self.queryset.values_list("follow_up_group__beneficiary_id", flat=True)
-        users = User.objects.filter(id__in=beneficiaries_ids)
-        users = [(user.id, user.get_full_name().title()) for user in users if user.get_full_name()]
-        return sorted(users, key=lambda user: user[1])
+        beneficiaries = User.objects.filter(id__in=beneficiaries_ids)
+        beneficiaries = [
+            (
+                beneficiary.id,
+                mask_unless(
+                    beneficiary.get_full_name(), predicate=request_user.can_view_personal_information(beneficiary)
+                ),
+            )
+            for beneficiary in beneficiaries.order_by("first_name", "last_name")
+            if beneficiary.get_full_name()
+        ]
+        return beneficiaries
 
 
 class FollowUpGroupMembershipForm(forms.ModelForm):
