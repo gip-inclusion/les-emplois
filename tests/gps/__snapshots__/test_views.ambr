@@ -2328,3 +2328,963 @@
   </div>
   '''
 # ---
+# name: TestJoinGroup.test_view_with_org[authorized_prescriber]
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/gps/groups/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              <h1>Ajouter un bénéficiaire</h1>
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-form">
+                          <h2>Sélectionnez votre situation *</h2>
+  
+                          <form method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+  
+                              <div class="form-group">
+                                  
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="from_collegue_id" name="channel" type="radio" value="from_collegue"/>
+                                          <label class="form-check-label" for="from_collegue_id">
+                                              Le bénéficiaire est suivi par une personne de ma structure.
+                                          </label>
+                                      </div>
+                                  
+                                  
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="from_nir_id" name="channel" type="radio" value="from_nir"/>
+                                          <label class="form-check-label" for="from_nir_id">
+                                              Je connais le numéro de numéro de sécurité sociale du bénéficiaire.
+                                          </label>
+                                      </div>
+                                  
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="from_name_email_id" name="channel" type="radio" value="from_name_email"/>
+                                      <label class="form-check-label" for="from_name_email_id">Je connais le nom et l’adresse e-mail du bénéficiaire.</label>
+                                  </div>
+                              </div>
+  
+                              
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
+# name: TestJoinGroup.test_view_with_org[employer]
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/gps/groups/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              <h1>Ajouter un bénéficiaire</h1>
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-form">
+                          <h2>Sélectionnez votre situation *</h2>
+  
+                          <form method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+  
+                              <div class="form-group">
+                                  
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="from_collegue_id" name="channel" type="radio" value="from_collegue"/>
+                                          <label class="form-check-label" for="from_collegue_id">
+                                              Le bénéficiaire est suivi par une personne de ma structure.
+                                          </label>
+                                      </div>
+                                  
+                                  
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="from_nir_id" name="channel" type="radio" value="from_nir"/>
+                                          <label class="form-check-label" for="from_nir_id">
+                                              Je connais le numéro de numéro de sécurité sociale du bénéficiaire.
+                                          </label>
+                                      </div>
+                                  
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="from_name_email_id" name="channel" type="radio" value="from_name_email"/>
+                                      <label class="form-check-label" for="from_name_email_id">Je connais le nom et l’adresse e-mail du bénéficiaire.</label>
+                                  </div>
+                              </div>
+  
+                              
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
+# name: TestJoinGroup.test_view_with_org[prescriber_with_org]
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/gps/groups/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              <h1>Ajouter un bénéficiaire</h1>
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-form">
+                          <h2>Sélectionnez votre situation *</h2>
+  
+                          <form method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+  
+                              <div class="form-group">
+                                  
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="from_collegue_id" name="channel" type="radio" value="from_collegue"/>
+                                          <label class="form-check-label" for="from_collegue_id">
+                                              Le bénéficiaire est suivi par une personne de ma structure.
+                                          </label>
+                                      </div>
+                                  
+                                  
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="from_name_email_id" name="channel" type="radio" value="from_name_email"/>
+                                      <label class="form-check-label" for="from_name_email_id">Je connais le nom et l’adresse e-mail du bénéficiaire.</label>
+                                  </div>
+                              </div>
+  
+                              
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
+# name: TestJoinGroupFromCollegue.test_view
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+                              <h1>Ajouter un bénéficiaire</h1>
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section" id="join_group">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="col-8">
+                      <div class="c-form">
+                          <form class="js-prevent-multiple-submit" id="join_group_form" method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              
+                              <div class="form-group form-group-required"><label class="form-label" for="js-search-user-input">Nom et prénom du bénéficiaire</label><select class="form-select django-select2" data-ajax--cache="true" data-ajax--type="GET" data-ajax--url="/gps/beneficiaries-autocomplete" data-allow-clear="false" data-minimum-input-length="2" data-theme="bootstrap-5" id="js-search-user-input" lang="" name="user" required="">
+  </select></div>
+                              
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/gps/groups/join">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button class="btn btn-block btn-primary disabled" type="button">
+                          <span>Ajouter le bénéficiaire</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
+# name: TestJoinGroupFromNameAndEmail.test_full_match_with_advanced_features
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+                              <h1>Ajouter un bénéficiaire</h1>
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section" id="join_group">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="col-8">
+                      <div class="c-form">
+                          <form class="js-prevent-multiple-submit js-format-nir" method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              <div class="form-group form-group-required"><label class="form-label" for="id_first_name">Prénom</label><input class="form-control" id="id_first_name" maxlength="150" name="first_name" required="" type="text" value="Jane"/></div><div class="form-group form-group-required"><label class="form-label" for="id_last_name">Nom</label><input class="form-control" id="id_last_name" maxlength="150" name="last_name" required="" type="text" value="Doe"/></div><div class="form-group form-group-required"><label class="form-label" for="id_email">Email</label><input autocomplete="off" class="form-control" id="id_email" maxlength="320" name="email" required="" type="text" value="jane.doe@test.local"/></div>
+                              
+                              
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/gps/groups/join">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" name="preview" type="submit" value="1">
+                          <span>Ajouter le bénéficiaire</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                              
+                                  <!-- Modal -->
+                                  <div aria-labelledby="nir-confirmation-label" aria-modal="true" class="modal" id="user-confirmation-modal" role="dialog" tabindex="-1">
+                                      <div class="modal-dialog modal-dialog-centered">
+                                          <div class="modal-content">
+                                              <div class="modal-header">
+                                                  <h3 class="modal-title" id="nir-confirmation-label">Un compte Utilisateur avec ce numéro a été trouvé</h3>
+                                                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                              </div>
+                                              <div class="modal-body">
+                                                  
+                                                      <p>
+                                                          Un bénéficiaire avec ce nom et cette adresse e-mail, dont la date de naissance est le <strong>01/01/1990</strong>, a été trouvé.
+                                                      </p>
+                                                      
+                                                  
+                                              </div>
+                                              <div class="modal-footer">
+                                                  
+                                                      
+                                                      <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">Ce n'est pas le bénéficiaire que je cherche</button>
+                                                      
+                                                      <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Ajouter le bénéficiaire</button>
+                                                  
+  
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
+# name: TestJoinGroupFromNameAndEmail.test_full_match_without_advanced_features
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+                              <h1>Ajouter un bénéficiaire</h1>
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section" id="join_group">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="col-8">
+                      <div class="c-form">
+                          <form class="js-prevent-multiple-submit js-format-nir" method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              <div class="form-group form-group-required"><label class="form-label" for="id_first_name">Prénom</label><input class="form-control" id="id_first_name" maxlength="150" name="first_name" required="" type="text" value="Jane"/></div><div class="form-group form-group-required"><label class="form-label" for="id_last_name">Nom</label><input class="form-control" id="id_last_name" maxlength="150" name="last_name" required="" type="text" value="Doe"/></div><div class="form-group form-group-required"><label class="form-label" for="id_email">Email</label><input autocomplete="off" class="form-control" id="id_email" maxlength="320" name="email" required="" type="text" value="jane.doe@test.local"/></div>
+                              
+                              
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/gps/groups/join">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" name="preview" type="submit" value="1">
+                          <span>Ajouter le bénéficiaire</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                              
+                                  <!-- Modal -->
+                                  <div aria-labelledby="nir-confirmation-label" aria-modal="true" class="modal" id="user-confirmation-modal" role="dialog" tabindex="-1">
+                                      <div class="modal-dialog modal-dialog-centered">
+                                          <div class="modal-content">
+                                              <div class="modal-header">
+                                                  <h3 class="modal-title" id="nir-confirmation-label">Un compte Utilisateur avec ce numéro a été trouvé</h3>
+                                                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                              </div>
+                                              <div class="modal-body">
+                                                  
+                                                      <p>
+                                                          Un bénéficiaire avec ce nom et cette adresse e-mail, dont la date de naissance est le <strong>01/01/1990</strong>, a été trouvé.
+                                                      </p>
+                                                      
+                                                          <p>
+                                                              Vous serez ajouté à la liste des intervenants quand le bénéficiaire ou le référent de parcours accepteront votre demande d’accès.
+                                                          </p>
+                                                      
+                                                  
+                                              </div>
+                                              <div class="modal-footer">
+                                                  
+                                                      
+                                                      <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">Annuler</button>
+                                                      
+                                                      <button class="btn btn-sm btn-primary" name="ask" type="submit" value="1">Demander à être ajouté</button>
+                                                  
+  
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
+# name: TestJoinGroupFromNameAndEmail.test_partial_match_with_advanced_features
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+                              <h1>Ajouter un bénéficiaire</h1>
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section" id="join_group">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="col-8">
+                      <div class="c-form">
+                          <form class="js-prevent-multiple-submit js-format-nir" method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              <div class="form-group form-group-required"><label class="form-label" for="id_first_name">Prénom</label><input class="form-control" id="id_first_name" maxlength="150" name="first_name" required="" type="text" value="John"/></div><div class="form-group form-group-required"><label class="form-label" for="id_last_name">Nom</label><input class="form-control" id="id_last_name" maxlength="150" name="last_name" required="" type="text" value="Snow"/></div><div class="form-group form-group-required"><label class="form-label" for="id_email">Email</label><input autocomplete="off" class="form-control" id="id_email" maxlength="320" name="email" required="" type="text" value="jane.doe@test.local"/></div>
+                              
+                              
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/gps/groups/join">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" name="preview" type="submit" value="1">
+                          <span>Ajouter le bénéficiaire</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                              
+                                  <!-- Modal -->
+                                  <div aria-labelledby="nir-confirmation-label" aria-modal="true" class="modal" id="user-confirmation-modal" role="dialog" tabindex="-1">
+                                      <div class="modal-dialog modal-dialog-centered">
+                                          <div class="modal-content">
+                                              <div class="modal-header">
+                                                  <h3 class="modal-title" id="nir-confirmation-label">Un compte Utilisateur avec ce numéro a été trouvé</h3>
+                                                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                              </div>
+                                              <div class="modal-body">
+                                                  
+                                                      <p>
+                                                          Cette adresse e-mail est associée à <strong>Jane DOE</strong>, dont la date de naissance est le <strong>01/01/1990</strong>.
+                                                      </p>
+                                                  
+                                              </div>
+                                              <div class="modal-footer">
+                                                  
+                                                      
+                                                      <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">Ce n'est pas le bénéficiaire que je cherche</button>
+                                                      
+                                                      <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Ajouter le bénéficiaire</button>
+                                                  
+  
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
+# name: TestJoinGroupFromNameAndEmail.test_partial_match_without_advanced_features
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+                              <h1>Ajouter un bénéficiaire</h1>
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section" id="join_group">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="col-8">
+                      <div class="c-form">
+                          <form class="js-prevent-multiple-submit js-format-nir" method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              
+  <div class="alert alert-danger" role="alert">
+      
+          <strong>Veuillez vérifier le nom ou l’e-mail.</strong><br/>un compte bénéficiaire avec un nom différent existe déjà pour cette adresse e-mail.
+          
+      
+  </div>
+  <div class="form-group form-group-required"><label class="form-label" for="id_first_name">Prénom</label><input class="form-control" id="id_first_name" maxlength="150" name="first_name" required="" type="text" value="John"/></div><div class="form-group form-group-required"><label class="form-label" for="id_last_name">Nom</label><input class="form-control" id="id_last_name" maxlength="150" name="last_name" required="" type="text" value="Snow"/></div><div class="form-group form-group-required"><label class="form-label" for="id_email">Email</label><input autocomplete="off" class="form-control" id="id_email" maxlength="320" name="email" required="" type="text" value="jane.doe@test.local"/></div>
+                              
+                              
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/gps/groups/join">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" name="preview" type="submit" value="1">
+                          <span>Ajouter le bénéficiaire</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                              
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
+# name: TestJoinGroupFromNir.test_unknown_nir_known_email_with_another_nir
+  '''
+  <div aria-labelledby="email-confirmation-label" aria-modal="true" class="modal" id="email-confirmation-modal" role="dialog" tabindex="-1">
+                  <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h3 class="modal-title" id="email-confirmation-label">Email existant</h3>
+                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                          </div>
+                          <div class="modal-body">
+                              
+                              <p>
+                                  L'adresse jane.doe@test.local est associée au compte de <b>Jane DOE</b>.
+                              </p>
+                              
+                              <p>
+                                  
+                                      L'identité du candidat est une information clé pour la structure.
+                                      Si vous ne souhaitez pas suivre <b>Jane DOE</b>, cliquez sur « Suivre un autre bénéficiaire » afin d'enregistrer ses informations personnelles.
+                                  
+                              </p>
+                              
+                          </div>
+                          <div class="modal-footer">
+  
+                              
+                                  
+                                      <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">Suivre un autre bénéficiaire</button>
+                                  
+                                  
+                                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Continuer</button>
+                              
+                          </div>
+                      </div>
+                  </div>
+              </div>
+  '''
+# ---
+# name: TestJoinGroupFromNir.test_unknown_nir_known_email_with_no_nir
+  '''
+  <div aria-labelledby="email-confirmation-label" aria-modal="true" class="modal" id="email-confirmation-modal" role="dialog" tabindex="-1">
+                  <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h3 class="modal-title" id="email-confirmation-label">Email existant</h3>
+                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                          </div>
+                          <div class="modal-body">
+                              
+                              <p>
+                                  L'adresse jane.doe@test.local est associée au compte de <b>Jane DOE</b>.
+                              </p>
+                              
+                              <p>
+                                  
+                                      L'identité du candidat est une information clé pour la structure.
+                                      Si vous ne souhaitez pas suivre <b>Jane DOE</b>, cliquez sur « Suivre un autre bénéficiaire » afin d'enregistrer ses informations personnelles.
+                                  
+                              </p>
+                              
+                                  <p>
+                                      En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale <span>2</span><span class="ms-1">76</span><span class="ms-1">02</span><span class="ms-1">47</span><span class="ms-1">197</span><span class="ms-1">113</span><span class="ms-1">71</span> soit associé à ce bénéficiaire.</b>
+                                  </p>
+                              
+                          </div>
+                          <div class="modal-footer">
+  
+                              
+                                  
+                                      <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">Suivre un autre bénéficiaire</button>
+                                  
+                                  
+                                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Continuer</button>
+                              
+                          </div>
+                      </div>
+                  </div>
+              </div>
+  '''
+# ---
+# name: TestJoinGroupFromNir.test_view[get]
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+                              <h1>Ajouter un bénéficiaire</h1>
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section" id="join_group">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="col-8">
+                      <div class="c-form">
+                          <form class="js-prevent-multiple-submit js-format-nir" method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              <div class="form-group form-group-required"><label class="form-label" for="id_nir">Numéro de sécurité sociale du bénéficiaire</label><input class="form-control" id="id_nir" maxlength="21" name="nir" placeholder="2 69 05 49 588 157 80" required="" type="text"/></div>
+                              
+                              
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/gps/groups/join">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" name="preview" type="submit" value="1">
+                          <span>Ajouter le bénéficiaire</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                              
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
+# name: TestJoinGroupFromNir.test_view[modal]
+  '''
+  <div aria-labelledby="nir-confirmation-label" aria-modal="true" class="modal" id="nir-confirmation-modal" role="dialog" tabindex="-1">
+                                      <div class="modal-dialog modal-dialog-centered">
+                                          <div class="modal-content">
+                                              <div class="modal-header">
+                                                  <h3 class="modal-title" id="nir-confirmation-label">Un compte Utilisateur avec ce numéro a été trouvé</h3>
+                                                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                              </div>
+                                              <div class="modal-body">
+                                                  <p>
+                                                      Le numéro <span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span> est associé au compte de <b>Jane DOE</b>.
+                                                  </p>
+                                              </div>
+                                              <div class="modal-footer">
+                                                  
+                                                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">Ce n'est pas le bénéficiaire que je cherche</button>
+                                                  
+                                                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Ajouter le bénéficiaire</button>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+  '''
+# ---
