@@ -22,6 +22,8 @@ from itou.gps.models import FollowUpGroup
 from itou.job_applications import notifications as job_application_notifications
 from itou.job_applications.enums import (
     ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL,
+    AUTO_REJECT_JOB_APPLICATION_DELAY,
+    AUTO_REJECT_JOB_APPLICATION_STATES,
     GEIQ_MAX_HOURS_PER_WEEK,
     GEIQ_MIN_HOURS_PER_WEEK,
     JobApplicationState,
@@ -383,6 +385,13 @@ class JobApplicationQuerySet(models.QuerySet):
         elif user.is_employer and organization:
             return self.filter(sender_company=organization).exclude(to_company=organization)
         return self.none()
+
+    def automatically_rejectable_applications(self):
+        return self.filter(
+            state__in=AUTO_REJECT_JOB_APPLICATION_STATES,
+            archived_at__isnull=True,
+            updated_at__lte=timezone.now() - AUTO_REJECT_JOB_APPLICATION_DELAY,
+        )
 
 
 class JobApplication(xwf_models.WorkflowEnabled, models.Model):
