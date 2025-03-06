@@ -820,6 +820,13 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
 
             if self.is_gps:
                 gps_utils.add_beneficiary(request, user)
+                if (
+                    User.objects.filter(kind=UserKind.JOB_SEEKER, first_name=user.first_name, last_name=user.last_name)
+                    .exclude(pk=user.pk)
+                    .exists()
+                ):
+                    # FIXME Add slack notification
+                    pass
 
         return HttpResponseRedirect(url)
 
