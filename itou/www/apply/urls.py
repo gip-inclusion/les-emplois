@@ -234,23 +234,6 @@ urlpatterns = [
         process_views.ReloadJobDescriptionFields.as_view(),
         name="reload_job_description_fields",
     ),
-    # Variants without jobseeker public ID for use during deployment
-    # TODO(calum): remove these URLs from production after a week or so
-    path(
-        "<int:company_pk>/accept/reload_qualification_fields",
-        process_views.ReloadQualificationFields.as_view(),
-        name="reload_qualification_fields_job_seekerless",
-    ),
-    path(
-        "<int:company_pk>/accept/reload_contract_type_and_options",
-        process_views.ReloadContractTypeAndOptions.as_view(),
-        name="reload_contract_type_and_options_job_seekerless",
-    ),
-    path(
-        "<int:company_pk>/accept/reload_job_description_fields",
-        process_views.ReloadJobDescriptionFields.as_view(),
-        name="reload_job_description_fields_job_seekerless",
-    ),
     path(
         "<uuid:job_application_id>/rdv-insertion-invite",
         process_views.rdv_insertion_invite,
