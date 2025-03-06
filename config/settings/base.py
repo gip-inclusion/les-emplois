@@ -348,6 +348,7 @@ BOOTSTRAP5 = {
     "field_renderers": {"default": "itou.utils.custom_renderer.CustomFieldRenderer"},
     "wrapper_class": "form-group",
     "error_css_class": "is-invalid",
+    "set_placeholder": False,
 }
 
 SELECT2_THEME = "bootstrap-5"
