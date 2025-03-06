@@ -7,6 +7,7 @@ from itou.gps.models import FollowUpGroupMembership
 from itou.users.models import User
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.widgets import DuetDatePickerWidget
+from itou.www.gps.enums import Channel
 
 
 class MembershipsFiltersForm(forms.Form):
@@ -101,3 +102,7 @@ class FollowUpGroupMembershipForm(forms.ModelForm):
                 cleaned_data["ended_at"] = timezone.localdate()
             elif cleaned_data["ended_at"] < cleaned_data["started_at"]:
                 self.add_error("ended_at", "Cette date ne peut pas être avant la date de début.")
+
+
+class JoinGroupChannelForm(forms.Form):
+    channel = forms.ChoiceField(widget=forms.RadioSelect, choices=Channel)
