@@ -1315,8 +1315,9 @@ class TestJoinGroupFromNameAndEmail:
     @pytest.mark.parametrize("known_name", [True, False])
     def test_unknown_email(self, client, settings, mocker, known_name):
         # This process is the same with or without gps advanced features
-
         user = PrescriberFactory()
+        slack_mock = mocker.patch("itou.www.gps.utils.send_slack_message_for_gps")  # mock the imported link
+
         client.force_login(user)
 
         dummy_job_seeker = JobSeekerFactory.build(
@@ -1474,7 +1475,18 @@ class TestJoinGroupFromNameAndEmail:
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).exists()
 
-        # FIXME assert slack notification if known_name
+        expected_mock_calls = []
+        if known_name:
+            new_job_seeker_admin_url = reverse("admin:users_user_change", args=(new_job_seeker.pk,))
+            expected_mock_calls = [
+                (
+                    (
+                        ":black_square_for_stop: Création d’un nouveau bénéficiaire : "
+                        f'<a href="{new_job_seeker_admin_url}">{new_job_seeker.get_full_name()}</a>.',
+                    ),
+                )
+            ]
+        assert slack_mock.mock_calls == expected_mock_calls
 
     def test_full_match_with_advanced_features(self, client, snapshot):
         user = PrescriberFactory(membership__organization__authorized=True)
@@ -1501,8 +1513,9 @@ class TestJoinGroupFromNameAndEmail:
         assert_new_beneficiary_toast(response, job_seeker)
         assert FollowUpGroupMembership.objects.filter(follow_up_group__beneficiary=job_seeker, member=user).exists()
 
-    def test_full_match_without_advanced_features(self, client, snapshot):
+    def test_full_match_without_advanced_features(self, client, snapshot, mocker):
         user = PrescriberFactory(membership__organization__authorized=False)
+        slack_mock = mocker.patch("itou.www.gps.views.send_slack_message_for_gps")  # mock the imported link
         client.force_login(user)
 
         job_seeker = JobSeekerFactory(for_snapshot=True)
@@ -1543,7 +1556,16 @@ class TestJoinGroupFromNameAndEmail:
             follow_up_group__beneficiary=job_seeker, member=user
         ).exists()
 
-        # FIXME assert slack notification
+        job_seeker_admin_url = reverse("admin:users_user_change", args=(job_seeker.pk,))
+        user_admin_url = reverse("admin:users_user_change", args=(user.pk,))
+        assert slack_mock.mock_calls == [
+            (
+                (
+                    f':gemini: Demande d’ajout <a href="{user_admin_url}">{user.get_full_name()}</a> '
+                    f'veut suivre <a href="{job_seeker_admin_url}">{job_seeker.get_full_name()}</a>.',
+                ),
+            )
+        ]
 
     def test_partial_match_with_advanced_features(self, client, snapshot):
         user = PrescriberFactory(membership__organization__authorized=True)
