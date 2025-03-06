@@ -26,7 +26,7 @@ from itou.www.gps.forms import (
     JoinGroupChannelForm,
     MembershipsFiltersForm,
 )
-from itou.www.gps.utils import add_beneficiary, get_all_coworkers
+from itou.www.gps.utils import add_beneficiary, get_all_coworkers, send_slack_message_for_gps
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import CheckJobSeekerNirForm
 
@@ -391,7 +391,12 @@ def join_group_from_name_and_email(request, template_name="gps/join_group_from_n
 
         # For non authorized prescribers
         if form.data.get("ask"):
-            # FIXME add Slack notification
+            job_seeker_admin_url = reverse("admin:users_user_change", args=(job_seeker.pk,))
+            user_admin_url = reverse("admin:users_user_change", args=(request.user.pk,))
+            send_slack_message_for_gps(
+                f':gemini: Demande d’ajout <a href="{user_admin_url}">{request.user.get_full_name()}</a> '
+                f'veut suivre <a href="{job_seeker_admin_url}">{job_seeker.get_full_name()}</a>.'
+            )
             messages.info(
                 request,
                 "Demande d’ajout envoyée||"
