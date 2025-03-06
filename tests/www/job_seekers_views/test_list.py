@@ -57,24 +57,22 @@ def assert_contains_job_seeker(
     )
 
 
-def test_anonymous_user(client):
-    url = reverse("job_seekers_views:list")
+@pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
+def test_anonymous_user(client, url):
     response = client.get(url)
     assertRedirects(response, reverse("account_login") + f"?next={url}")
 
 
-def test_refused_access(client):
-    urls = [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")]
-
+@pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
+def test_refused_access(client, url):
     for user in [
         JobSeekerFactory(),
         LaborInspectorFactory(membership=True),
         CompanyWithMembershipAndJobsFactory().members.first(),
     ]:
-        for url in urls:
-            client.force_login(user)
-            response = client.get(url)
-            assert response.status_code == 403
+        client.force_login(user)
+        response = client.get(url)
+        assert response.status_code == 403
 
 
 def test_raise_404_on_organization_tab_for_prescriber_without_org(client):
@@ -96,10 +94,9 @@ def test_displayed_tabs(client, with_membership, assertion):
     assertion(response, "Tous les candidats de la structure")
 
 
-def test_empty_list(client, snapshot):
-    url = reverse("job_seekers_views:list")
-
-    client.force_login(PrescriberFactory())
+@pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
+def test_empty_list(client, url, snapshot):
+    client.force_login(PrescriberFactory(membership=True))
     response = client.get(url)
     assert str(parse_response_to_soup(response, selector="#main")) == snapshot
 
@@ -456,9 +453,8 @@ def test_job_seeker_created_by_prescriber_without_org(client):
     assert_contains_button_apply_for(response, charlotte, with_city=True)
 
 
-def test_htmx_job_seeker_filter(client):
-    url = reverse("job_seekers_views:list")
-
+@pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
+def test_htmx_job_seeker_filter(client, url):
     job_app = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
     prescriber = job_app.sender
     other_app = JobApplicationFactory(sender=prescriber)
@@ -524,8 +520,9 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
     ]
 
 
-def test_job_seekers_order(client, subtests):
-    prescriber = PrescriberFactory()
+@pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
+def test_job_seekers_order(client, url, subtests):
+    prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
     c_d_job_seeker = JobApplicationFactory(
         sender=prescriber,
         job_seeker__created_by=prescriber,
@@ -548,7 +545,6 @@ def test_job_seekers_order(client, subtests):
     ).job_seeker
 
     client.force_login(prescriber)
-    url = reverse("job_seekers_views:list")
 
     expected_order = {
         "full_name": [a_b_job_seeker, c_d_job_seeker, created_job_seeker, second_created_job_seeker],
@@ -573,9 +569,8 @@ def test_job_seekers_order(client, subtests):
             assert response.context["page_obj"].object_list == list(reversed(job_seekers))
 
 
-def test_htmx_order(client):
-    url = reverse("job_seekers_views:list")
-
+@pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
+def test_htmx_order(client, url):
     job_app = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
     prescriber = job_app.sender
     other_app = JobApplicationFactory(sender=prescriber)
