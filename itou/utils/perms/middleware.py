@@ -1,10 +1,12 @@
 from django.conf import settings
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
+from itou.utils.urls import add_url_params
 from itou.www.logout.enums import LogoutWarning
 
 
@@ -155,6 +157,12 @@ class ItouCurrentOrganizationMiddleware:
         ):
             # Add request.path as next param ?
             return HttpResponseRedirect(reverse("dashboard:activate_pro_connect_account"))
+
+        # Log staff users in dedicated login page
+        if not user.is_authenticated and request.path.startswith("/admin"):
+            return HttpResponseRedirect(
+                add_url_params(reverse("login:itou_staff"), {REDIRECT_FIELD_NAME: request.get_full_path()})
+            )
 
         if logout_warning is not None:
             return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))

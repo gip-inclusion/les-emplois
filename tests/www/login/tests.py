@@ -470,3 +470,19 @@ class TestItouStaffLogin:
         }
         response = client.post(url, data=form_data)
         assertRedirects(response, reverse("account_email_verification_sent"))
+
+    def test_admin_login(self, client):
+        user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
+        login_url = reverse("login:itou_staff")
+        admin_url = reverse("admin:users_user_change", args=(user.pk,))
+
+        response = client.get(admin_url)
+        expected_url = add_url_params(login_url, {"next": admin_url})
+        assertRedirects(response, expected_url)
+
+        form_data = {
+            "login": user.email,
+            "password": DEFAULT_PASSWORD,
+        }
+        response = client.post(expected_url, data=form_data)
+        assertRedirects(response, admin_url)
