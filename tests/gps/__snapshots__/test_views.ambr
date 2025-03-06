@@ -2378,34 +2378,28 @@
                           <form method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
   
-                              
-                                  <label class="align-top my-2">
-                                      <div class="row">
-                                          <div class="col-auto pe-0">
-                                              <input name="channel" required="" type="radio" value="from_collegue"/>
-                                          </div>
-                                          <div class="col">Le bénéficiaire est suivi par une personne de ma structure.</div>
+                              <div class="form-group">
+                                  
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="from_collegue_id" name="channel" type="radio" value="from_collegue"/>
+                                          <label class="form-check-label" for="from_collegue_id">
+                                              Le bénéficiaire est suivi par une personne de ma structure.
+                                          </label>
                                       </div>
-                                  </label>
-                              
-                              
-                                  <label class="align-top my-2">
-                                      <div class="row">
-                                          <div class="col-auto pe-0">
-                                              <input name="channel" required="" type="radio" value="from_nir"/>
-                                          </div>
-                                          <div class="col">Je connais le numéro de numéro de sécurité sociale du bénéficiaire.</div>
+                                  
+                                  
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="from_nir_id" name="channel" type="radio" value="from_nir"/>
+                                          <label class="form-check-label" for="from_nir_id">
+                                              Je connais le numéro de numéro de sécurité sociale du bénéficiaire.
+                                          </label>
                                       </div>
-                                  </label>
-                              
-                              <label class="align-top my-2 mb-4">
-                                  <div class="row">
-                                      <div class="col-auto pe-0">
-                                          <input name="channel" required="" type="radio" value="from_name_email"/>
-                                      </div>
-                                      <div class="col">Je connais le nom et l’adresse e-mail du bénéficiaire.</div>
+                                  
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="from_name_email_id" name="channel" type="radio" value="from_name_email"/>
+                                      <label class="form-check-label" for="from_name_email_id">Je connais le nom et l’adresse e-mail du bénéficiaire.</label>
                                   </div>
-                              </label>
+                              </div>
   
                               
   
@@ -2491,34 +2485,28 @@
                           <form method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
   
-                              
-                                  <label class="align-top my-2">
-                                      <div class="row">
-                                          <div class="col-auto pe-0">
-                                              <input name="channel" required="" type="radio" value="from_collegue"/>
-                                          </div>
-                                          <div class="col">Le bénéficiaire est suivi par une personne de ma structure.</div>
+                              <div class="form-group">
+                                  
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="from_collegue_id" name="channel" type="radio" value="from_collegue"/>
+                                          <label class="form-check-label" for="from_collegue_id">
+                                              Le bénéficiaire est suivi par une personne de ma structure.
+                                          </label>
                                       </div>
-                                  </label>
-                              
-                              
-                                  <label class="align-top my-2">
-                                      <div class="row">
-                                          <div class="col-auto pe-0">
-                                              <input name="channel" required="" type="radio" value="from_nir"/>
-                                          </div>
-                                          <div class="col">Je connais le numéro de numéro de sécurité sociale du bénéficiaire.</div>
+                                  
+                                  
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="from_nir_id" name="channel" type="radio" value="from_nir"/>
+                                          <label class="form-check-label" for="from_nir_id">
+                                              Je connais le numéro de numéro de sécurité sociale du bénéficiaire.
+                                          </label>
                                       </div>
-                                  </label>
-                              
-                              <label class="align-top my-2 mb-4">
-                                  <div class="row">
-                                      <div class="col-auto pe-0">
-                                          <input name="channel" required="" type="radio" value="from_name_email"/>
-                                      </div>
-                                      <div class="col">Je connais le nom et l’adresse e-mail du bénéficiaire.</div>
+                                  
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="from_name_email_id" name="channel" type="radio" value="from_name_email"/>
+                                      <label class="form-check-label" for="from_name_email_id">Je connais le nom et l’adresse e-mail du bénéficiaire.</label>
                                   </div>
-                              </label>
+                              </div>
   
                               
   
@@ -2604,25 +2592,21 @@
                           <form method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
   
-                              
-                                  <label class="align-top my-2">
-                                      <div class="row">
-                                          <div class="col-auto pe-0">
-                                              <input name="channel" required="" type="radio" value="from_collegue"/>
-                                          </div>
-                                          <div class="col">Le bénéficiaire est suivi par une personne de ma structure.</div>
+                              <div class="form-group">
+                                  
+                                      <div class="form-check">
+                                          <input class="form-check-input" id="from_collegue_id" name="channel" type="radio" value="from_collegue"/>
+                                          <label class="form-check-label" for="from_collegue_id">
+                                              Le bénéficiaire est suivi par une personne de ma structure.
+                                          </label>
                                       </div>
-                                  </label>
-                              
-                              
-                              <label class="align-top my-2 mb-4">
-                                  <div class="row">
-                                      <div class="col-auto pe-0">
-                                          <input name="channel" required="" type="radio" value="from_name_email"/>
-                                      </div>
-                                      <div class="col">Je connais le nom et l’adresse e-mail du bénéficiaire.</div>
+                                  
+                                  
+                                  <div class="form-check">
+                                      <input class="form-check-input" id="from_name_email_id" name="channel" type="radio" value="from_name_email"/>
+                                      <label class="form-check-label" for="from_name_email_id">Je connais le nom et l’adresse e-mail du bénéficiaire.</label>
                                   </div>
-                              </label>
+                              </div>
   
                               
   
