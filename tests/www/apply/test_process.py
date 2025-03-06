@@ -2210,21 +2210,20 @@ class TestProcessAcceptViews:
         assertFormError(response.context["form_accept"], None, JobApplication.ERROR_END_IS_BEFORE_START)
 
     def test_accept_hiring_date_after_approval(self, client, mocker):
-        # jobseeker has a PASS IAE, but it ends before the start date of the job
+        # Jobseeker has an approval, but it ends after the start date of the job.
+        approval = ApprovalFactory(end_at=timezone.localdate() + datetime.timedelta(days=1))
+        self.job_seeker.approvals.add(approval)
         job_application = self.create_job_application(
             job_seeker=self.job_seeker,
             to_company=self.company,
             sent_by_authorized_prescriber_organisation=True,
-            approval=ApprovalFactory(end_at=(timezone.localdate() + datetime.timedelta(days=1))),
-            hiring_start_at=timezone.localdate() + datetime.timedelta(days=2),
+            approval=approval,
+            hiring_start_at=approval.end_at + datetime.timedelta(days=1),
         )
 
-        # cannot accept the job application
         employer = self.company.members.first()
         client.force_login(employer)
 
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        response = client.get(url_accept, follow=True)
         post_data = self._accept_view_post_data(
             job_application=job_application,
             post_data={
@@ -3977,20 +3976,15 @@ def test_details_for_geiq_with_inverted_vae_contract(client, inverted_vae_contra
 
 
 @pytest.mark.parametrize("qualification_type", job_applications_enums.QualificationType)
-@pytest.mark.parametrize(
-    "url_params",
-    [
-        ("apply:reload_qualification_fields", ["company_pk", "job_seeker_public_id"]),
-        ("apply:reload_qualification_fields_job_seekerless", ["company_pk"]),
-    ],
-)
-def test_reload_qualification_fields(qualification_type, url_params, client, snapshot):
+def test_reload_qualification_fields(qualification_type, client, snapshot):
     company = CompanyFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
     job_seeker = JobSeekerFactory(for_snapshot=True)
-    kwargs = {"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id}
-    url = reverse(url_params[0], kwargs={k: kwargs[k] for k in url_params[1]})
+    url = reverse(
+        "apply:reload_qualification_fields",
+        kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+    )
     response = client.post(
         url,
         data={
@@ -4040,20 +4034,15 @@ def test_reload_qualification_fields_404(client, missing_field):
     "contract_type",
     [value for value, _label in ContractType.choices_for_company_kind(CompanyKind.GEIQ)],
 )
-@pytest.mark.parametrize(
-    "url_params",
-    [
-        ("apply:reload_contract_type_and_options", ["company_pk", "job_seeker_public_id"]),
-        ("apply:reload_contract_type_and_options_job_seekerless", ["company_pk"]),
-    ],
-)
-def test_reload_contract_type_and_options(contract_type, url_params, client, snapshot):
+def test_reload_contract_type_and_options(contract_type, client, snapshot):
     company = CompanyFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
     job_seeker = JobSeekerFactory(for_snapshot=True)
-    kwargs = {"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id}
-    url = reverse(url_params[0], kwargs={k: kwargs[k] for k in url_params[1]})
+    url = reverse(
+        "apply:reload_contract_type_and_options",
+        kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+    )
     response = client.post(
         url,
         data={
