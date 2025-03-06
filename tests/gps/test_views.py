@@ -10,6 +10,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from itou.gps.models import FollowUpGroup
 from itou.prescribers.models import PrescriberOrganization
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
+from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
     JobSeekerFactory,
@@ -743,3 +744,67 @@ class TestJoinGroup:
         client.force_login(user)
         response = client.get(url)
         assertRedirects(response, url, fetch_redirect_response=False)  # FIXME
+
+
+class TestBeneficiariesAutocomplete:
+    @pytest.mark.parametrize(
+        "factory,access",
+        [
+            [partial(JobSeekerFactory, for_snapshot=True), False],
+            (partial(PrescriberFactory, membership__organization__authorized=True), True),
+            (partial(PrescriberFactory, membership__organization__authorized=False), True),
+            (PrescriberFactory, False),
+            (partial(EmployerFactory, with_company=True), True),
+            [partial(LaborInspectorFactory, membership=True), False],
+        ],
+        ids=[
+            "job_seeker",
+            "authorized_prescriber",
+            "prescriber_with_org",
+            "prescriber_no_org",
+            "employer",
+            "labor_inspector",
+        ],
+    )
+    def test_permissions(self, client, factory, access):
+        user = factory()
+        client.force_login(user)
+        url = reverse("gps:beneficiaries_autocomplete")
+        response = client.get(url)
+        if access:
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 403
+
+    def test_autocomplete(self, client):
+        prescriber = PrescriberFactory(first_name="gps member Vince")
+        organization_1 = PrescriberMembershipFactory(user=prescriber).organization
+        coworker_1 = PrescriberMembershipFactory(organization=organization_1).user
+        organization_2 = PrescriberMembershipFactory(user=prescriber).organization
+        coworker_2 = PrescriberMembershipFactory(organization=organization_2).user
+
+        first_beneficiary = JobSeekerFactory(first_name="gps beneficiary Bob", last_name="Le Brico")
+        second_beneficiary = JobSeekerFactory(first_name="gps second beneficiary Martin", last_name="Pêcheur")
+        third_beneficiary = JobSeekerFactory(first_name="gps third beneficiary Foo", last_name="Bar")
+        JobSeekerFactory(first_name="gps other beneficiary Joe", last_name="Dalton")
+
+        FollowUpGroupFactory(beneficiary=first_beneficiary, memberships=4, memberships__member=prescriber)
+        FollowUpGroupFactory(beneficiary=second_beneficiary, memberships=2, memberships__member=coworker_1)
+        FollowUpGroupFactory(beneficiary=third_beneficiary, memberships=3, memberships__member=coworker_2)
+
+        def get_autocomplete_results(user, term="gps"):
+            client.force_login(user)
+            response = client.get(reverse("gps:beneficiaries_autocomplete") + f"?term={term}")
+            return [r["id"] for r in response.json()["results"]]
+
+        # The prescriber should see the 3 job seekers followed by members of his organizations, but no the other one
+        results = get_autocomplete_results(prescriber)
+        assert set(results) == {first_beneficiary.pk, second_beneficiary.pk, third_beneficiary.pk}
+
+        # a random other user won't see anyone
+        results = get_autocomplete_results(EmployerFactory(with_company=True))
+        assert results == []
+
+        # with "martin gps" Martin is the only match
+        results = get_autocomplete_results(prescriber, term="martin gps")
+        assert results == [second_beneficiary.pk]
