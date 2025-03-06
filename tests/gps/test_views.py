@@ -194,6 +194,17 @@ class TestGroupLists:
         fresh_results = parse_response_to_soup(response, selector="#follow-up-groups-section")
         assertSoupEqual(results, fresh_results)
 
+    def test_mask_names(self, client):
+        prescriber = PrescriberFactory(membership__organization__authorized=False)
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        FollowUpGroupFactory(memberships=1, memberships__member=prescriber, beneficiary=job_seeker)
+
+        client.force_login(prescriber)
+        my_groups_url = reverse("gps:group_list")
+        response = client.get(my_groups_url)
+        assertNotContains(response, "Jane DOE")
+        assertContains(response, "J… D…")
+
 
 def test_backward_compat_urls(client):
     prescriber = PrescriberFactory()
