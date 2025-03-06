@@ -448,3 +448,25 @@ def test_employer_account_activation_view(client, pro_connect):
     params["next_url"] = next_url
     pc_auhtorize_url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
     assertContains(response, f'{pc_auhtorize_url}"')
+
+
+class TestItouStaffLogin:
+    def test_login_options(self, client):
+        url = reverse("login:itou_staff")
+        response = client.get(url)
+        assertNotContains(response, PRO_CONNECT_BTN)
+        assertContains(response, "Adresse e-mail")
+        assertContains(response, "Mot de passe")
+
+    def test_login(self, client):
+        user = ItouStaffFactory()
+        url = reverse("login:itou_staff")
+        response = client.get(url)
+        assert response.status_code == 200
+
+        form_data = {
+            "login": user.email,
+            "password": DEFAULT_PASSWORD,
+        }
+        response = client.post(url, data=form_data)
+        assertRedirects(response, reverse("account_email_verification_sent"))

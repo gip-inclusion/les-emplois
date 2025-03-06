@@ -172,3 +172,12 @@ class ExistingUserLoginView(ItouLoginView):
             "show_peamu": bool(settings.PEAMU_AUTH_BASE_URL),
         }
         return context | extra_context
+
+
+class ItouStaffLoginView(ItouLoginView):
+    template_name = "account/login_generic.html"
+    user_kind = UserKind.ITOU_STAFF
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context | {"uses_pro_connect": False}
