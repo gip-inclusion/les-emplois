@@ -1,4 +1,5 @@
-from django.urls import path
+from django.urls import path, reverse_lazy
+from django.views.generic import RedirectView
 
 from itou.www.gps import views
 
@@ -20,4 +21,7 @@ urlpatterns = [
         views.display_contact_info,
         name="display_contact_info",
     ),
+    # Backward compatibility - used in bizdev mailing
+    path("", RedirectView.as_view(url=reverse_lazy("gps:group_list"), permanent=True)),
+    path("groups", RedirectView.as_view(url=reverse_lazy("gps:group_list"), permanent=True)),
 ]
