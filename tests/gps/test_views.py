@@ -14,11 +14,12 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import LackOfPoleEmploiId
 from itou.users.models import User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
+from itou.utils.templatetags.str_filters import mask_unless
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
-from tests.prescribers.factories import PrescriberMembershipFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
     JobSeekerFactory,
@@ -29,28 +30,28 @@ from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import KNOWN_SESSION_KEYS, assertSnapshotQueries, parse_response_to_soup
 
 
-def assert_new_beneficiary_toast(response, job_seeker):
+def assert_new_beneficiary_toast(response, job_seeker, can_view_personal_info=True):
+    name = mask_unless(job_seeker.get_full_name(), predicate=can_view_personal_info)
     assertMessages(
         response,
         [
             messages.Message(
                 messages.SUCCESS,
-                "Bénéficiaire ajouté||"
-                f"{job_seeker.get_full_name()} fait maintenant partie de la liste de vos bénéficiaires.",
+                f"Bénéficiaire ajouté||{name} fait maintenant partie de la liste de vos bénéficiaires.",
                 extra_tags="toast",
             ),
         ],
     )
 
 
-def assert_already_followed_beneficiary_toast(response, job_seeker):
+def assert_already_followed_beneficiary_toast(response, job_seeker, can_view_personal_info=True):
+    name = mask_unless(job_seeker.get_full_name(), predicate=can_view_personal_info)
     assertMessages(
         response,
         [
             messages.Message(
                 messages.INFO,
-                "Bénéficiaire déjà dans la liste||"
-                f"{job_seeker.get_full_name()} fait déjà partie de la liste de vos bénéficiaires.",
+                f"Bénéficiaire déjà dans la liste||{name} fait déjà partie de la liste de vos bénéficiaires.",
                 extra_tags="toast",
             ),
         ],
@@ -58,13 +59,13 @@ def assert_already_followed_beneficiary_toast(response, job_seeker):
 
 
 def assert_ask_to_follow_beneficiary_toast(response, job_seeker):
+    name = mask_unless(job_seeker.get_full_name(), False)
     assertMessages(
         response,
         [
             messages.Message(
                 messages.INFO,
-                "Demande d’ajout envoyée||"
-                f"Votre demande d’ajout pour {job_seeker.get_full_name()} a bien été transmise pour validation.",
+                f"Demande d’ajout envoyée||Votre demande d’ajout pour {name} a bien été transmise pour validation.",
                 extra_tags="toast",
             ),
         ],
@@ -925,6 +926,21 @@ class TestJoinGroupFromCoworker:
         response = client.post(self.URL, data={"user": another_job_seeker.pk})
         assert response.status_code == 200
         assert response.context["form"].errors == {"user": ["Ce candidat ne peut être suivi."]}
+
+    @pytest.mark.parametrize("can_view_personal_info", [True, False])
+    def test_toasts(self, client, can_view_personal_info):
+        organization = PrescriberOrganizationFactory(authorized=can_view_personal_info)
+        user = PrescriberMembershipFactory(organization=organization).user
+        coworker = PrescriberMembershipFactory(organization=organization).user
+        client.force_login(user)
+
+        coworker_job_seeker = JobSeekerFactory()
+        FollowUpGroupFactory(beneficiary=coworker_job_seeker, memberships=1, memberships__member=coworker)
+        response = client.post(self.URL, data={"user": coworker_job_seeker.pk}, follow=True)
+        assert_new_beneficiary_toast(response, coworker_job_seeker, can_view_personal_info)
+
+        response = client.post(self.URL, data={"user": coworker_job_seeker.pk}, follow=True)
+        assert_already_followed_beneficiary_toast(response, coworker_job_seeker, can_view_personal_info)
 
 
 class TestJoinGroupFromNir:

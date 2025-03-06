@@ -17,6 +17,7 @@ from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.pagination import pager
 from itou.utils.session import SessionNamespace
+from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.gps.enums import Channel
 from itou.www.gps.forms import (
@@ -397,10 +398,11 @@ def join_group_from_name_and_email(request, template_name="gps/join_group_from_n
                 f':gemini: Demande d’ajout <a href="{user_admin_url}">{request.user.get_full_name()}</a> '
                 f'veut suivre <a href="{job_seeker_admin_url}">{job_seeker.get_full_name()}</a>.'
             )
+            masked_name = mask_unless(job_seeker.get_full_name(), False)
             messages.info(
                 request,
                 "Demande d’ajout envoyée||"
-                f"Votre demande d’ajout pour {job_seeker.get_full_name()} a bien été transmise pour validation.",
+                f"Votre demande d’ajout pour {masked_name} a bien été transmise pour validation.",
                 extra_tags="toast",
             )
             return HttpResponseRedirect(reverse("gps:group_list"))

@@ -5,22 +5,22 @@ from django.urls import reverse
 from itou.common_apps.organizations.models import MembershipQuerySet
 from itou.gps.models import FollowUpGroup
 from itou.utils import slack
+from itou.utils.templatetags.str_filters import mask_unless
 
 
 def add_beneficiary(request, beneficiary, notify_duplicate=False):
     added = FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=request.user)
+    name = mask_unless(beneficiary.get_full_name(), predicate=request.user.can_view_personal_information(beneficiary))
     if added:
         messages.success(
             request,
-            "Bénéficiaire ajouté||"
-            f"{beneficiary.get_full_name()} fait maintenant partie de la liste de vos bénéficiaires.",
+            f"Bénéficiaire ajouté||{name} fait maintenant partie de la liste de vos bénéficiaires.",
             extra_tags="toast",
         )
     else:
         messages.info(
             request,
-            "Bénéficiaire déjà dans la liste||"
-            f"{beneficiary.get_full_name()} fait déjà partie de la liste de vos bénéficiaires.",
+            f"Bénéficiaire déjà dans la liste||{name} fait déjà partie de la liste de vos bénéficiaires.",
             extra_tags="toast",
         )
     if notify_duplicate:
