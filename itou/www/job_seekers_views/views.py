@@ -825,8 +825,11 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                     .exclude(pk=user.pk)
                     .exists()
                 ):
-                    # FIXME Add slack notification
-                    pass
+                    job_seeker_admin_url = reverse("admin:users_user_change", args=(user.pk,))
+                    gps_utils.send_slack_message_for_gps(
+                        ":black_square_for_stop: Création d’un nouveau bénéficiaire : "
+                        f'<a href="{job_seeker_admin_url}">{user.get_full_name()}</a>.'
+                    )
 
         return HttpResponseRedirect(url)
 
