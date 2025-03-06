@@ -4,8 +4,9 @@ import json
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.exceptions import ValidationError
-from django.db.models import Max
+from django.db.models import Max, Min
 from django.forms.models import model_to_dict
 from django.urls import reverse
 from django.utils import timezone
@@ -21,6 +22,9 @@ from itou.employee_record.enums import Status
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import (
+    ARCHIVABLE_JOB_APPLICATION_STATES,
+    AUTO_REJECT_JOB_APPLICATION_DELAY,
+    AUTO_REJECT_JOB_APPLICATION_STATES,
     JobApplicationState,
     Origin,
     QualificationLevel,
@@ -690,6 +694,66 @@ class TestJobApplicationQuerySet:
         membership.save(update_fields=("is_active",))
 
         assert JobApplication.objects.is_active_company_member(user).count() == 0
+
+    @pytest.mark.parametrize(
+        "state,expected",
+        [(state, state in AUTO_REJECT_JOB_APPLICATION_STATES) for state in JobApplicationState],
+    )
+    def test_job_applications_rejectable_after_delay_state_and_delay(self, state, expected):
+        old_job_application = JobApplicationFactory(
+            state=state, updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY)
+        )
+        if state in ARCHIVABLE_JOB_APPLICATION_STATES:
+            JobApplicationFactory(
+                state=state,
+                updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY),
+                archived_at=timezone.now(),
+            )
+        JobApplicationFactory(
+            state=state, updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY - 1)
+        )
+
+        qs = JobApplication.objects.job_applications_rejectable_after_delay()
+        assert qs.exists() == expected
+        if qs.exists():
+            assert list(qs) == list(
+                JobApplication.objects.filter(pk=old_job_application.pk)
+                .values("job_seeker")
+                .annotate(applications=ArrayAgg("pk"), min_updated_at=Min("updated_at"))
+            )
+
+    @pytest.mark.parametrize("state", AUTO_REJECT_JOB_APPLICATION_STATES)
+    def test_job_applications_rejectable_after_delay_limit_and_ordering(self, state):
+        limit = 2
+
+        oldest_expected_job_application = JobApplicationFactory(
+            state=state,
+            updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY + 4),
+        )
+        recent_job_application_of_the_same_job_seeker = JobApplicationFactory(
+            state=state,
+            job_seeker=oldest_expected_job_application.job_seeker,
+            updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY + 1),
+        )
+        other_expected_job_application = JobApplicationFactory(
+            state=state,
+            updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY + 3),
+        )
+        # unexpected othe old job application
+        JobApplicationFactory(
+            state=state,
+            updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY + 2),
+        )
+
+        qs = JobApplication.objects.job_applications_rejectable_after_delay(limit=limit)
+        assert qs.count() == limit
+        assert qs[0]["job_seeker"] == oldest_expected_job_application.job_seeker.pk
+        assert qs[0]["applications"] == [
+            oldest_expected_job_application.pk,
+            recent_job_application_of_the_same_job_seeker.pk,
+        ]
+        assert qs[1]["job_seeker"] == other_expected_job_application.job_seeker.pk
+        assert qs[1]["applications"] == [other_expected_job_application.pk]
 
 
 class TestJobApplicationNotifications:
