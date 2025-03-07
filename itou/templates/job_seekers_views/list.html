@@ -53,6 +53,7 @@
 {% endblock title_extra %}
 
 {% block content %}
+    {% include "job_seekers_views/includes/job_seekers_filters/offcanvas.html" with list_organization=list_organization %}
     <section class="s-section">
         <div class="s-section__container container">
             {% if list_organization %}
@@ -91,4 +92,5 @@
     {{ block.super }}
     <script src='{% static "js/htmx_compat.js" %}'></script>
     <script src='{% static "js/sliding_tabs.js" %}'></script>
+    <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
 {% endblock %}
