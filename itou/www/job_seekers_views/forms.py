@@ -1,8 +1,11 @@
 from django import forms
+from django.db.models import OuterRef, Q, Subquery
 from django.forms import ValidationError
+from django.utils import timezone
 from django.utils.html import format_html
-from django_select2.forms import Select2Widget
+from django_select2.forms import Select2MultipleWidget, Select2Widget
 
+from itou.approvals.models import Approval
 from itou.asp import models as asp_models
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
@@ -27,9 +30,27 @@ class FilterForm(forms.Form):
         ),
     )
 
-    def __init__(self, job_seeker_qs, data, *args, request_user, **kwargs):
+    eligibility_validated = forms.BooleanField(label="Valide", required=False)
+    eligibility_to_validate = forms.BooleanField(label="À valider", required=False)
+
+    pass_iae_active = forms.BooleanField(label="Valide", required=False)
+    pass_iae_expired = forms.BooleanField(label="Expiré", required=False)
+    no_pass_iae = forms.BooleanField(label="Aucun", required=False)
+
+    organization_members = forms.MultipleChoiceField(
+        label="Nom de la personne", required=False, widget=Select2MultipleWidget
+    )
+
+    def __init__(self, job_seeker_qs, data, *args, request_user, request_organization, **kwargs):
         super().__init__(data, *args, **kwargs)
-        self.fields["job_seeker"].choices = [
+        self.fields["job_seeker"].choices = self._get_choices_for_job_seeker(job_seeker_qs, request_user)
+        if request_organization:
+            self.fields["organization_members"].choices = self._get_choices_for_organization_members(
+                job_seeker_qs, request_organization
+            )
+
+    def _get_choices_for_job_seeker(self, job_seeker_qs, request_user):
+        return [
             (
                 job_seeker.pk,
                 mask_unless(
@@ -39,6 +60,72 @@ class FilterForm(forms.Form):
             for job_seeker in job_seeker_qs.order_by("first_name", "last_name")
             if job_seeker.get_full_name()
         ]
+
+    def _get_choices_for_organization_members(self, job_seeker_qs, request_organization):
+        """
+        Get members of the current user's organization, present or past,
+        that created or applied for a job seeker.
+        """
+        created_by_id = [job_seeker.created_by_id for job_seeker in job_seeker_qs]
+        application_sent_by_id = sum([job_seeker.application_sent_by for job_seeker in job_seeker_qs], [])
+
+        past_and_present_members = request_organization.members.filter(
+            pk__in=((set(created_by_id) | set(application_sent_by_id)) - set([None]))
+        )
+
+        users = [
+            (user.id, user_full_name) for user in past_and_present_members if (user_full_name := user.get_full_name())
+        ]
+        return sorted(users, key=lambda user: user[1])
+
+    def get_filters_counter(self):
+        return sum(bool(self.cleaned_data.get(field.name)) for field in self)
+
+    def filter(self, queryset):
+        filters = []
+
+        if job_seeker_id := self.cleaned_data.get("job_seeker"):
+            filters.append(Q(pk=job_seeker_id))
+
+        # Eligibility status (all checkboxes checked = all cases, so do not filter out results)
+        if self.cleaned_data.get("eligibility_validated") and not self.cleaned_data.get("eligibility_to_validate"):
+            queryset = queryset.eligibility_validated()
+        if self.cleaned_data.get("eligibility_to_validate") and not self.cleaned_data.get("eligibility_validated"):
+            queryset = queryset.eligibility_to_validate()
+
+        # Approval (PASS IAE) status (all checkboxes checked = all cases, so do not filter out results)
+        if (
+            self.cleaned_data.get("pass_iae_active")
+            or self.cleaned_data.get("pass_iae_expired")
+            or self.cleaned_data.get("no_pass_iae")
+        ) and not (
+            self.cleaned_data.get("pass_iae_active")
+            and self.cleaned_data.get("pass_iae_expired")
+            and self.cleaned_data.get("no_pass_iae")
+        ):
+            last_approval_end_at = Subquery(
+                Approval.objects.filter(user=OuterRef("pk")).order_by("-end_at").values("end_at")[:1]
+            )
+            queryset = queryset.annotate(last_approval_end_at=last_approval_end_at)
+
+            pass_status_filter = Q()
+            if self.cleaned_data.get("pass_iae_active"):
+                pass_status_filter |= Q(last_approval_end_at__gte=timezone.localdate())
+            if self.cleaned_data.get("pass_iae_expired"):
+                pass_status_filter |= Q(last_approval_end_at__lt=timezone.localdate())
+            if self.cleaned_data.get("no_pass_iae"):
+                pass_status_filter |= Q(last_approval_end_at__isnull=True)
+            filters.append(pass_status_filter)
+
+        # Organization members
+        if organization_members := self.cleaned_data.get("organization_members"):
+            organization_members_filter = Q()
+            organization_members_filter |= Q(created_by__in=organization_members)
+            for user in organization_members:
+                organization_members_filter |= Q(application_sent_by__contains=[user])
+            filters.append(organization_members_filter)
+
+        return queryset.filter(*filters)
 
 
 class CheckJobSeekerNirForm(forms.Form):
