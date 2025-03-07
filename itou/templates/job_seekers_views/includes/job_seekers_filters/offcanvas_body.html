@@ -1,3 +1,7 @@
 <div class="offcanvas-body" id="offcanvasApplyFiltersContent"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
     {% include "job_seekers_views/includes/job_seekers_filters/approval_state.html" %}
+    {% if list_organization %}
+        <hr>
+        {% include "job_seekers_views/includes/job_seekers_filters/organization_members.html" %}
+    {% endif %}
 </div>

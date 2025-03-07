@@ -17,11 +17,16 @@ from tests.eligibility.factories import (
 )
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
+    PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
-from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import (
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+)
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
@@ -661,6 +666,31 @@ def test_filtered_by_approval_state(client, url):
             job_seeker_valid_eligibility_no_approval,
         ]
     ) == set(job_seekers)
+
+
+def test_filtered_by_organization_members(client, url):
+    organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
+    prescriber = organization.members.first()
+    other_prescriber = organization.members.last()
+    other_old_prescriber = PrescriberMembershipFactory(organization=organization, user__is_active=False)
+    other_prescriber_not_in_orga = PrescriberFactory()
+
+    # job_seeker_created_by_user
+    # job_seeker_created_by_member
+    # job_seeker_created_by_old_member
+
+    # job_seeker_applied_by_user
+    # job_seeker_applied_by_member
+    # job_seeker_applied_by_old_member
+    # job_seeker_created_by_user_not_in_orga_applied_by_member
+
+    # assert organization_members
+    # assert other prescriber not in organization_members
+
+    # assert jobseekers found filter user
+    # assert jobseekers found filter member
+    # assert jobseekers found filter old member
+    # assert jobseekers found filter member
 
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
