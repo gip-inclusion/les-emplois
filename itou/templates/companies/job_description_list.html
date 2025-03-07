@@ -79,6 +79,32 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {# Special row for controlling spontaneous applications #}
+                                        <tr>
+                                            <td>
+                                                <strong>Candidatures spontanées</strong>
+                                            </td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>
+                                                {# Change status for accepting spontaneous applications #}
+                                                <form method="post" hx-boost="true" hx-trigger="change" id="toggle_job_description_form_spontaneous_applications" class="js-prevent-multiple-submit">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="toggle_spontaneous_applications" />
+                                                    <div class="form-check form-switch has-state-label">
+                                                        <input type="checkbox"
+                                                               class="form-check-input"
+                                                               name="spontaneous_applications_is_active"
+                                                               id="spontaneous_applications_is_active"
+                                                               {% if siae.spontaneous_applications_open_since %}checked{% endif %}
+                                                               {% if siae.block_job_applications %}disabled{% endif %} />
+                                                        <label class="form-check-label" for="spontaneous_applications_is_active" data-it-state-label-off="Fermé" data-it-state-label-on="Ouvert">
+                                                        </label>
+                                                    </div>
+                                                </form>
+                                            </td>
+                                            <td></td>
+                                        </tr>
                                         {% for job_description in job_pager %}
                                             <tr>
                                                 <td>
