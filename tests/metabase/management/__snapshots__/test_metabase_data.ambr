@@ -1,0 +1,211 @@
+# serializer version: 1
+# name: test_fetch[False][cache]
+  OrderedDict({
+  })
+# ---
+# name: test_fetch[False][logs]
+  list([
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=flux_iae_data_updated_at',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=job_seeker_still_seeking_after_30_days',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=job_seeker_still_seeking_after_30_days group_by=department',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=job_seeker_still_seeking_after_30_days group_by=region',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=job_application_with_hiring_difficulty',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=job_application_with_hiring_difficulty group_by=department',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=job_application_with_hiring_difficulty group_by=region',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=rate_of_auto_prescription',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=rate_of_auto_prescription group_by=department',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=rate_of_auto_prescription group_by=region',
+    ),
+  ])
+# ---
+# name: test_fetch[False][stdout and stderr]
+  CaptureResult(
+    err='',
+    out='''
+      {<DatumKey.DATA_UPDATED_AT: 'data_updated_at'>: FakeDatetime(2024, 11, 20, 0, 0, tzinfo=datetime.timezone.utc),
+       <DatumKey.FLUX_IAE_DATA_UPDATED_AT: 'flux_iae_data_updated_at'>: FakeDatetime(2024, 11, 20, 0, 0, tzinfo=datetime.timezone.utc),
+       <DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY: 'job_application_with_hiring_difficulty'>: 1175,
+       <DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY_BY_DEPARTMENTS: 'job_application_with_hiring_difficulty_by_departments'>: {'Département Structure': 1175},
+       <DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY_BY_REGIONS: 'job_application_with_hiring_difficulty_by_regions'>: {'Région Structure': 1175},
+       <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS: 'job_seeker_still_seeking_after_30_days'>: 4413,
+       <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS_BY_DEPARTMENTS: 'job_seeker_still_seeking_after_30_days_by_departments'>: {'Département': 4413},
+       <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS_BY_REGIONS: 'job_seeker_still_seeking_after_30_days_by_regions'>: {'Région': 4413},
+       <DatumKey.RATE_OF_AUTO_PRESCRIPTION: 'rate_of_auto_prescription'>: 5292,
+       <DatumKey.RATE_OF_AUTO_PRESCRIPTION_BY_DEPARTMENTS: 'rate_of_auto_prescription_by_departments'>: {'Département Structure': 5292},
+       <DatumKey.RATE_OF_AUTO_PRESCRIPTION_BY_REGIONS: 'rate_of_auto_prescription_by_regions'>: {'Région Structure': 5292}}
+  
+    ''',
+  )
+# ---
+# name: test_fetch[True][cache]
+  OrderedDict({
+    <DatumKey.DATA_UPDATED_AT: 'data_updated_at'>: FakeDatetime(2024, 11, 20, 0, 0, tzinfo=datetime.timezone.utc),
+    <DatumKey.FLUX_IAE_DATA_UPDATED_AT: 'flux_iae_data_updated_at'>: FakeDatetime(2024, 11, 20, 0, 0, tzinfo=datetime.timezone.utc),
+    <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS: 'job_seeker_still_seeking_after_30_days'>: 4413,
+    <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS_BY_DEPARTMENTS: 'job_seeker_still_seeking_after_30_days_by_departments'>: dict({
+      'Département': 4413,
+    }),
+    <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS_BY_REGIONS: 'job_seeker_still_seeking_after_30_days_by_regions'>: dict({
+      'Région': 4413,
+    }),
+    <DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY: 'job_application_with_hiring_difficulty'>: 1175,
+    <DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY_BY_DEPARTMENTS: 'job_application_with_hiring_difficulty_by_departments'>: dict({
+      'Département Structure': 1175,
+    }),
+    <DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY_BY_REGIONS: 'job_application_with_hiring_difficulty_by_regions'>: dict({
+      'Région Structure': 1175,
+    }),
+    <DatumKey.RATE_OF_AUTO_PRESCRIPTION: 'rate_of_auto_prescription'>: 5292,
+    <DatumKey.RATE_OF_AUTO_PRESCRIPTION_BY_DEPARTMENTS: 'rate_of_auto_prescription_by_departments'>: dict({
+      'Département Structure': 5292,
+    }),
+    <DatumKey.RATE_OF_AUTO_PRESCRIPTION_BY_REGIONS: 'rate_of_auto_prescription_by_regions'>: dict({
+      'Région Structure': 5292,
+    }),
+  })
+# ---
+# name: test_fetch[True][logs]
+  list([
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=flux_iae_data_updated_at',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=job_seeker_still_seeking_after_30_days',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=job_seeker_still_seeking_after_30_days group_by=department',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=job_seeker_still_seeking_after_30_days group_by=region',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=job_application_with_hiring_difficulty',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=job_application_with_hiring_difficulty group_by=department',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=job_application_with_hiring_difficulty group_by=region',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=rate_of_auto_prescription',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=rate_of_auto_prescription group_by=department',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Fetching datum_key=rate_of_auto_prescription group_by=region',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      "Saving data into cache 'stats'",
+    ),
+  ])
+# ---
+# name: test_fetch[True][stdout and stderr]
+  CaptureResult(
+    err='',
+    out='',
+  )
+# ---
+# name: test_show[stdout and stderr]
+  CaptureResult(
+    err='',
+    out='''
+      <DatumKey.DATA_UPDATED_AT: 'data_updated_at'>
+      "The value of 'data_updated_at'"
+      
+      <DatumKey.FLUX_IAE_DATA_UPDATED_AT: 'flux_iae_data_updated_at'>
+      "The value of 'flux_iae_data_updated_at'"
+      
+      <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS: 'job_seeker_still_seeking_after_30_days'>
+      "The value of 'job_seeker_still_seeking_after_30_days'"
+      
+      <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS_BY_DEPARTMENTS: 'job_seeker_still_seeking_after_30_days_by_departments'>
+      "The value of 'job_seeker_still_seeking_after_30_days_by_departments'"
+      
+      <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS_BY_REGIONS: 'job_seeker_still_seeking_after_30_days_by_regions'>
+      "The value of 'job_seeker_still_seeking_after_30_days_by_regions'"
+      
+      <DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY: 'job_application_with_hiring_difficulty'>
+      "The value of 'job_application_with_hiring_difficulty'"
+      
+      <DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY_BY_DEPARTMENTS: 'job_application_with_hiring_difficulty_by_departments'>
+      "The value of 'job_application_with_hiring_difficulty_by_departments'"
+      
+      <DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY_BY_REGIONS: 'job_application_with_hiring_difficulty_by_regions'>
+      "The value of 'job_application_with_hiring_difficulty_by_regions'"
+      
+      <DatumKey.RATE_OF_AUTO_PRESCRIPTION: 'rate_of_auto_prescription'>
+      "The value of 'rate_of_auto_prescription'"
+      
+      <DatumKey.RATE_OF_AUTO_PRESCRIPTION_BY_DEPARTMENTS: 'rate_of_auto_prescription_by_departments'>
+      "The value of 'rate_of_auto_prescription_by_departments'"
+      
+      <DatumKey.RATE_OF_AUTO_PRESCRIPTION_BY_REGIONS: 'rate_of_auto_prescription_by_regions'>
+      "The value of 'rate_of_auto_prescription_by_regions'"
+      
+  
+    ''',
+  )
+# ---

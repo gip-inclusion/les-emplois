@@ -4,6 +4,7 @@ from allauth.account.views import PasswordChangeView
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
 from django.db.models import F
 from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
@@ -23,6 +24,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.geiq.models import ImplementationAssessmentCampaign
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
+from itou.metabase.models import DatumKey
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.users.enums import MATOMO_ACCOUNT_TYPE, UserKind
 from itou.users.models import User
@@ -39,6 +41,7 @@ from itou.www.dashboard.forms import (
 from itou.www.gps.views import is_allowed_to_use_gps, show_gps_as_a_nav_entry
 from itou.www.search.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
+from itou.www.stats.utils import get_stats_for_institution
 
 
 def _employer_dashboard_context(request):
@@ -175,6 +178,7 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
         "can_view_stats_drihl": stats_utils.can_view_stats_drihl(request),
         "can_view_stats_iae_network": stats_utils.can_view_stats_iae_network(request),
         "can_view_stats_convergence": stats_utils.can_view_stats_convergence(request),
+        "stats_kpi": None,
     }
     context["has_view_stats_items"] = any(v for k, v in context.items() if k.startswith("can_view_stats_"))
     if request.user.is_employer:
@@ -184,6 +188,26 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
             if request.current_organization.is_subject_to_eligibility_rules
             else None
         )
+    if request.user.is_labor_inspector:
+        if request.current_organization.kind in [
+            InstitutionKind.DGEFP_IAE,
+            InstitutionKind.DREETS_IAE,
+            InstitutionKind.DDETS_IAE,
+        ]:
+            context["stats_kpi"] = {
+                DatumKey.FLUX_IAE_DATA_UPDATED_AT: caches["stats"].get(DatumKey.FLUX_IAE_DATA_UPDATED_AT),
+                DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS: get_stats_for_institution(
+                    request.current_organization, DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS
+                ),
+                DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY: get_stats_for_institution(
+                    request.current_organization, DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY
+                ),
+                DatumKey.RATE_OF_AUTO_PRESCRIPTION: get_stats_for_institution(
+                    request.current_organization,
+                    DatumKey.RATE_OF_AUTO_PRESCRIPTION,
+                    is_percentage=True,
+                ),
+            }
     return render(request, template_name, context)
 
 
