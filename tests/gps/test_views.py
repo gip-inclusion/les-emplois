@@ -194,6 +194,17 @@ class TestGroupLists:
         fresh_results = parse_response_to_soup(response, selector="#follow-up-groups-section")
         assertSoupEqual(results, fresh_results)
 
+    def test_mask_names(self, client):
+        prescriber = PrescriberFactory(membership__organization__authorized=False)
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        FollowUpGroupFactory(memberships=1, memberships__member=prescriber, beneficiary=job_seeker)
+
+        client.force_login(prescriber)
+        my_groups_url = reverse("gps:group_list")
+        response = client.get(my_groups_url)
+        assertNotContains(response, "Jane DOE")
+        assertContains(response, "J… D…")
+
 
 def test_backward_compat_urls(client):
     prescriber = PrescriberFactory()
@@ -417,7 +428,22 @@ class TestGroupDetailsBeneficiaryTab:
 
         client.force_login(prescriber)
 
+        # When th prescriber cannont view personnal info
         url = reverse("gps:group_beneficiary", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+                ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
+            ],
+        )
+        assert str(html_details) == snapshot(name="masked_info")
+
+        # When he can but is not from an authorized organization
+        beneficiary.created_by = prescriber
+        beneficiary.save()
         response = client.get(url)
         html_details = parse_response_to_soup(
             response,
@@ -429,6 +455,7 @@ class TestGroupDetailsBeneficiaryTab:
         )
         assert str(html_details) == snapshot(name="no_diagnostic")
 
+        # When he is
         PrescriberOrganization.objects.update(is_authorized=True)
         response = client.get(url)
         html_details = parse_response_to_soup(
