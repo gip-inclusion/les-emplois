@@ -60,3 +60,5 @@ API_UPDOWN_CHECK_ID = "blabla"
 if os.getenv("DEBUG_SQL_SNAPSHOT"):
     # Mandatory to have detailed stacktrace inside templates
     TEMPLATES[0]["OPTIONS"]["debug"] = True  # noqa: F405
+
+FORCE_PROCONNECT_LOGIN = True  # default behaviour in tests
