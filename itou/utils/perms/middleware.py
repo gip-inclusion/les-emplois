@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django_otp import user_has_device
 
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityProvider, UserKind
@@ -163,6 +164,21 @@ class ItouCurrentOrganizationMiddleware:
             return HttpResponseRedirect(
                 add_url_params(reverse("login:itou_staff"), {REDIRECT_FIELD_NAME: request.get_full_path()})
             )
+
+        # Force OTP for staff users
+        OTP_WHITELISTED_PATHS = ("/staff/otp", "/login/confirm-otp")
+        if (
+            settings.REQUIRE_OTP_FOR_STAFF
+            and user.is_authenticated
+            and user.kind == UserKind.ITOU_STAFF
+            and not user.is_verified()
+            and not request.path.startswith(OTP_WHITELISTED_PATHS)
+        ):
+            if user_has_device(user):
+                return HttpResponseRedirect(
+                    add_url_params(reverse("login:confirm_otp"), {REDIRECT_FIELD_NAME: request.get_full_path()})
+                )
+            return HttpResponseRedirect(reverse("itou_staff_views:otp_setup"))
 
         if logout_warning is not None:
             return HttpResponseRedirect(reverse("logout:warning", kwargs={"kind": logout_warning}))

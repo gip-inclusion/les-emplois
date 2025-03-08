@@ -326,6 +326,7 @@ django==5.1.7 \
     #   django-hijack
     #   django-htmx
     #   django-markdownify
+    #   django-otp
     #   django-pgtrigger
     #   django-redis
     #   django-select2
@@ -379,6 +380,10 @@ django-htmx==1.22.0 \
 django-markdownify==0.9.5 \
     --hash=sha256:2c4ae44e386c209453caf5e9ea1b74f64535985d338ad2d5ad5e7089cc94be86 \
     --hash=sha256:34c34eba4a797282a5c5bd97b13cec84d6a4c0673ad47ce1c1d000d74dd8d4ab
+    # via -r requirements/base.in
+django-otp==1.5.4 \
+    --hash=sha256:0d9497ea4fb13fc04d50b49aa53dd1c740fe4bc5dde0ca27fb394f84e5da7bac \
+    --hash=sha256:783dea669ac0eaf5cd336f73839443584ee665af427a84175cca5a9d620366db
     # via -r requirements/base.in
 django-pgtrigger==4.13.3 \
     --hash=sha256:c525f9e81f120d166c4bd5fe8c3770640356f0644edf0fc2b7f6426008e52f77 \
@@ -1240,6 +1245,10 @@ s3transfer==0.10.4 \
     --hash=sha256:244a76a24355363a68164241438de1b72f8781664920260c48465896b712a41e \
     --hash=sha256:29edc09801743c21eb5ecbc617a152df41d3c287f67b615f73e5f750583666a7
     # via boto3
+segno==1.6.1 \
+    --hash=sha256:e90c6ff82c633f757a96d4b1fb06cc932589b5237f33be653f52252544ac64df \
+    --hash=sha256:f23da78b059251c36e210d0cf5bfb1a9ec1604ae6e9f3d42f9a7c16d306d847e
+    # via -r requirements/base.in
 sentry-sdk==2.22.0 \
     --hash=sha256:3d791d631a6c97aad4da7074081a57073126c69487560c6f8bffcf586461de66 \
     --hash=sha256:b4bf43bb38f547c84b2eadcefbe389b36ef75f3f38253d7a74d6b928c07ae944

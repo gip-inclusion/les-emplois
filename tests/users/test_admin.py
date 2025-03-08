@@ -107,6 +107,7 @@ def test_get_fields_to_transfer_for_job_seekers():
         "companymembership",  # CompanyMembership.user
         "submitted_geiq_assessment_set",  # ImplementationAssessment.submitted_by
         "suspension",  # Suspension.updated_by
+        "totpdevice",  # TOTPDevice.user
         "updated_institutionmembership_set",  # InstitutionMembership.updated_by
         "updated_prescribermembership_set",  # PrescriberMembership.updated_by
         "updated_companymembership_set",  # CompanyMembership.updated_by
