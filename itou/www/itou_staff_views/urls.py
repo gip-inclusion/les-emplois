@@ -19,4 +19,6 @@ urlpatterns = [
         views.merge_users_confirm,
         name="merge_users_confirm",
     ),
+    path("otp/setup", views.otp_setup, name="otp_setup"),
+    path("otp/confirm/<int:device_id>", views.otp_confirm, name="otp_confirm"),
 ]

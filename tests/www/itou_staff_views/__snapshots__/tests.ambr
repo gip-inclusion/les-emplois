@@ -2582,3 +2582,55 @@
                   </div>
   '''
 # ---
+# name: TestOTP.test_setup[no_device]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-6">
+                      <div class="c-box">
+                          <h2>Mes appareils</h2>
+                          
+                              <p>Vous n'avez pas configuré d'appareil OTP.</p>
+                          
+                          <form method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              <button class="btn btn-block btn-primary" type="submit">
+                                  Configurer un
+                                  
+                                  appareil
+                              </button>
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: TestOTP.test_setup[with_device]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-6">
+                      <div class="c-box">
+                          <h2>Mes appareils</h2>
+                          
+                              <p>Vous avez déjà configuré un appareil OTP.</p>
+                          
+                          <form method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              <button class="btn btn-block btn-primary" type="submit">
+                                  Configurer un
+                                  nouvel
+                                  appareil
+                              </button>
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
