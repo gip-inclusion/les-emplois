@@ -62,6 +62,8 @@ INSTALLED_APPS = [
     "hijack",
     "hijack.contrib.admin",
     "pgtrigger",
+    "django_otp",
+    "django_otp.plugins.otp_totp",
     # Register adapters before to load allauth apps.
     "itou.allauth_adapters",
     "allauth",
@@ -140,6 +142,7 @@ MIDDLEWARE = [
     "csp.middleware.CSPMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "hijack.middleware.HijackUserMiddleware",
+    "django_otp.middleware.OTPMiddleware",
     # Itou specific
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
     "itou.www.middleware.never_cache",
@@ -764,3 +767,8 @@ JOB_APPLICATION_OPTIONAL_REFUSAL_REASON_DEPARTMENTS = ["69"]
 SERIALIZATION_MODULES = {
     "json-no-auto-fields": "itou.utils.json_no_auto_fields_serializer",
 }
+
+# OTP
+# ------------------------------------------------------------------------------
+OTP_TOTP_ISSUER = "Les Emplois de l'inclusion"
+OTP_ADMIN_HIDE_SENSITIVE_DATA = True
