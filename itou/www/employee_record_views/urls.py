@@ -6,14 +6,10 @@ from itou.www.employee_record_views import views
 app_name = "employee_record_views"
 
 urlpatterns = [
+    path("add/", views.start_add_wizard, name="add"),
     path(
-        "add/",
-        views.AddView.as_view(url_name="employee_record_views:add"),
-        name="add",
-    ),
-    path(
-        "add/<slug:step>",
-        views.AddView.as_view(url_name="employee_record_views:add"),
+        "add/<uuid:session_uuid>/<slug:step>",
+        views.AddView.as_view(),
         name="add",
     ),
     path("missing", views.missing_employee, name="missing_employee"),

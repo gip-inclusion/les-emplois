@@ -1,13 +1,15 @@
+import enum
+
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Count
-from django.http.response import HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views.decorators.http import require_safe
-from formtools.wizard.views import NamedUrlSessionWizardView
 
 from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
@@ -35,6 +37,7 @@ from itou.www.employee_record_views.forms import (
     NewEmployeeRecordStep4,
     SelectEmployeeRecordStatusForm,
 )
+from itou.www.utils.wizard import WizardView
 
 
 # Labels and steps for multi-steps component
@@ -62,23 +65,34 @@ STEPS = [
 ]
 
 
-class AddView(NamedUrlSessionWizardView):
+@check_user(lambda user: user.is_employer)
+def start_add_wizard(request):
+    return AddView.initiliaze_session_and_start(request, reset_url=get_safe_url(request, "reset_url"))
+
+
+class AddViewStep(enum.StrEnum):
+    CHOOSE_EMPLOYEE = "choose-employee"
+    CHOOSE_APPROVAL = "choose-approval"
+
+
+class AddView(UserPassesTestMixin, WizardView):
+    url_name = "employee_record_views:add"
+    expected_session_kind = "add-employee-record"
+    steps_config = {
+        AddViewStep.CHOOSE_EMPLOYEE: AddEmployeeRecordChooseEmployeeForm,
+        AddViewStep.CHOOSE_APPROVAL: AddEmployeeRecordChooseApprovalForm,
+    }
     template_name = "employee_record/add.html"
-    form_list = [
-        ("choose-employee", AddEmployeeRecordChooseEmployeeForm),
-        ("choose-approval", AddEmployeeRecordChooseApprovalForm),
-    ]
 
-    def dispatch(self, request, *args, **kwargs):
-        self.company = get_current_company_or_404(request)
-        if not self.company.can_use_employee_record:
-            raise PermissionDenied
+    def test_func(self):
+        return self.company.can_use_employee_record
 
-        return super().dispatch(request, *args, **kwargs)
+    def setup_wizard(self):
+        self.company = get_current_company_or_404(self.request)
 
-    def get_form_kwargs(self, step=None):
+    def get_form_kwargs(self, step):
         hiring_of_the_company = JobApplication.objects.accepted().filter(to_company=self.company)
-        if step == "choose-employee":
+        if step == AddViewStep.CHOOSE_EMPLOYEE:
             employees = []
             # Add job seekers in order, whithout duplicates
             for job_app in hiring_of_the_company.eligible_as_employee_record(self.company).select_related(
@@ -87,9 +101,10 @@ class AddView(NamedUrlSessionWizardView):
                 if job_app.job_seeker not in employees:
                     employees.append(job_app.job_seeker)
             return {"employees": employees}
-        elif step == "choose-approval":
+        elif step == AddViewStep.CHOOSE_APPROVAL:
             employee = User.objects.get(
-                pk=self.get_cleaned_data_for_step("choose-employee")["employee"], kind=UserKind.JOB_SEEKER
+                kind=UserKind.JOB_SEEKER,
+                pk=self.wizard_session.get(AddViewStep.CHOOSE_EMPLOYEE)["employee"],
             )
             return {
                 "employee": employee,
@@ -101,38 +116,11 @@ class AddView(NamedUrlSessionWizardView):
             }
         return {}
 
-    def get_prefix(self, request, *args, **kwargs):
-        """
-        Ensure that each add session is bound to a company.
-        Avoid session conflicts when using multiple tabs.
-        """
-        return f"company_{self.company.pk}_add_employee_record"
-
-    def check_wizard_state(self, *args, **kwargs):
-        step_url = kwargs.get("step", None)
-        if step_url is None:
-            # let the wizard redirect at the correct place
-            return
-        if step_url == "done" and self.steps.current == self.steps.last:
-            # it's okay, we can go to "done" step : the wizard will redirect to self.steps.last if needed
-            return
-        if step_url != self.steps.current:
-            # The user is accessing the wrong step (e.g. he tried to go back to the last step after finishing)
-            return HttpResponseRedirect(reverse("employee_record_views:add", kwargs={"step": self.steps.current}))
-
-    def get(self, *args, **kwargs):
-        if check_response := self.check_wizard_state(*args, **kwargs):
-            return check_response
-        return super().get(*args, **kwargs)
-
-    def post(self, *args, **kwargs):
-        if check_response := self.check_wizard_state(*args, **kwargs):
-            return check_response
-        return super().post(*args, **kwargs)
-
-    def done(self, form_list, *args, **kwargs):
+    def done(self, *args, **kwargs):
+        session_data = self.wizard_session.as_dict()
         approval = Approval.objects.get(
-            pk=self.get_all_cleaned_data()["approval"], user=self.get_all_cleaned_data()["employee"]
+            pk=session_data[AddViewStep.CHOOSE_APPROVAL]["approval"],
+            user=session_data[AddViewStep.CHOOSE_EMPLOYEE]["employee"],
         )
         job_application = (
             JobApplication.objects.filter(to_company=self.company, approval=approval)
@@ -140,9 +128,7 @@ class AddView(NamedUrlSessionWizardView):
             .with_accepted_at()
             .latest("accepted_at")
         )
-        return HttpResponseRedirect(
-            reverse("employee_record_views:create", kwargs={"job_application_id": job_application.pk})
-        )
+        return reverse("employee_record_views:create", kwargs={"job_application_id": job_application.pk})
 
 
 @check_user(lambda user: user.is_employer)
