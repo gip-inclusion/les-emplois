@@ -390,6 +390,38 @@ def get_table():
                 }
             ]
         )
+        if criteria.is_certifiable:
+            certification_comment = f"Certification du critère {column_comment} (niveau {criteria.level})"
+            job_seekers_table.add_columns(
+                [
+                    {
+                        "name": f"{column_name}_certifié",
+                        "type": "boolean",
+                        "comment": certification_comment,
+                        "fn": lambda o: getattr(
+                            get_latest_diagnosis_criteria(job_seeker=o, criteria_id=criteria.id), "certified", None
+                        ),
+                    },
+                    {
+                        "name": f"{column_name}_date_certification",
+                        "type": "timestamp with time zone",
+                        "comment": f"Date de la dernière {certification_comment}",
+                        "fn": lambda o: getattr(
+                            get_latest_diagnosis_criteria(job_seeker=o, criteria_id=criteria.id), "certified_at", None
+                        ),
+                    },
+                    {
+                        "name": f"{column_name}_période_certification",
+                        "type": "daterange",
+                        "comment": f"Période de {certification_comment}",
+                        "fn": lambda o: getattr(
+                            get_latest_diagnosis_criteria(job_seeker=o, criteria_id=criteria.id),
+                            "certification_period",
+                            None,
+                        ),
+                    },
+                ]
+            )
 
     job_seekers_table.add_columns(
         [
