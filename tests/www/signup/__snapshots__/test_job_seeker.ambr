@@ -105,6 +105,7 @@
               </p>
   
               
+              
   
   <div class="row">
       <div class="col-12">
@@ -113,7 +114,7 @@
           <div class="form-row align-items-center justify-content-end gx-3">
               <div class="form-group col-12 col-lg order-3 order-lg-1">
                   
-                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/dashboard/">
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/search/employers">
                           <i aria-hidden="true" class="ri-close-line ri-lg"></i>
                           <span>Annuler</span>
                       </a>
@@ -123,7 +124,7 @@
               <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
-                          <span>Continuer</span>
+                          <span>Suivant</span>
                       </button>
                   
               </div>
