@@ -785,7 +785,8 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     pass_iae_suspended = forms.BooleanField(label="Suspendu", required=False)
     pass_iae_active = forms.BooleanField(label="Actif", required=False)
     criteria = forms.MultipleChoiceField(required=False, label="", widget=Select2MultipleWidget)
-    eligibility_validated = forms.BooleanField(label="Éligibilité validée", required=False)
+    eligibility_validated = forms.BooleanField(label="Valide", required=False)
+    eligibility_pending = forms.BooleanField(label="À valider", required=False)
     departments = forms.MultipleChoiceField(
         required=False,
         label="Départements",
@@ -842,6 +843,9 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         if self.cleaned_data.get("eligibility_validated"):
             queryset = queryset.eligibility_validated()
 
+        if self.cleaned_data.get("eligibility_pending"):
+            queryset = queryset.eligibility_pending()
+
         if senders := self.cleaned_data.get("senders"):
             queryset = queryset.filter(sender__id__in=senders)
 
@@ -881,6 +885,7 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
 
         if company.kind not in CompanyKind.siae_kinds():
             del self.fields["eligibility_validated"]
+            del self.fields["eligibility_pending"]
             del self.fields["pass_iae_active"]
             del self.fields["pass_iae_suspended"]
 

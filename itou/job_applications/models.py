@@ -258,19 +258,23 @@ class JobApplicationQuerySet(models.QuerySet):
             )
         )
 
-    def eligibility_validated(self):
-        return self.filter(
-            Exists(
-                Approval.objects.filter(
-                    user=OuterRef("job_seeker"),
-                ).valid()
-            )
-            | Exists(
-                EligibilityDiagnosis.objects.for_job_seeker_and_siae(
-                    OuterRef("job_seeker"), siae=OuterRef("to_company")
-                ).valid()
-            )
+    @property
+    def eligibility_validated_lookup(self):
+        return Exists(
+            Approval.objects.filter(
+                user=OuterRef("job_seeker"),
+            ).valid()
+        ) | Exists(
+            EligibilityDiagnosis.objects.for_job_seeker_and_siae(
+                OuterRef("job_seeker"), siae=OuterRef("to_company")
+            ).valid()
         )
+
+    def eligibility_validated(self):
+        return self.filter(self.eligibility_validated_lookup)
+
+    def eligibility_pending(self):
+        return self.exclude(self.eligibility_validated_lookup)
 
     def with_eligibility_diagnosis_criterion(self, criterion):
         """
