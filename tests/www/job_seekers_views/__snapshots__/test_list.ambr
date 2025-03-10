@@ -144,6 +144,25 @@
       </fieldset>
   
   
+      
+          <hr/>
+          
+  
+  <fieldset>
+      <legend>
+          <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
+              Collaborateurs
+          </button>
+      </legend>
+      <div class="mt-3 collapse" id="collapseSenders">
+          
+              <div class="form-group"><label class="form-label" for="id_organization_members">Nom de la personne</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_organization_members" lang="fr" multiple="" name="organization_members">
+  </select></div>
+          
+      </div>
+  </fieldset>
+  
+      
   </div>
   
       <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
@@ -166,7 +185,7 @@
               
                   
               
-              <form hx-get="/job-seekers/list-organization" hx-include="#id_job_seeker" hx-indicator="#job-seekers-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-seekers-section" hx-trigger="change from:#id_order, change delay:.5s, change from:#id_job_seeker delay:.5s">
+              <form hx-get="/job-seekers/list-organization" hx-include="#id_job_seeker,#id_organization_members" hx-indicator="#job-seekers-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-seekers-section" hx-trigger="change from:#id_order, change delay:.5s, change from:#id_job_seeker delay:.5s, change from:#id_organization_members delay:.5s">
                   
   
   <div class="s-section__row row selection-indicator" data-emplois-elements-visibility-on-selection="hidden">
@@ -411,6 +430,7 @@
       </fieldset>
   
   
+      
   </div>
   
       <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
@@ -530,7 +550,7 @@
 # ---
 # name: test_multiple.1
   dict({
-    'num_queries': 15,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -667,6 +687,262 @@
       }),
       dict({
         'origin': list([
+          'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
+          'FilterForm.__init__[www/job_seekers_views/forms.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
+                 COALESCE(
+                            (SELECT COUNT(U0."id") AS "count"
+                             FROM "job_applications_jobapplication" U0
+                             WHERE (((U0."sender_id" = %s
+                                      AND U0."sender_prescriber_organization_id" IS NULL)
+                                     OR U0."sender_prescriber_organization_id" = %s)
+                                    AND U0."job_seeker_id" = ("users_user"."id"))
+                             GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
+          
+            (SELECT MAX(U0."updated_at") AS "last_update"
+             FROM "job_applications_jobapplication" U0
+             WHERE (((U0."sender_id" = %s
+                      AND U0."sender_prescriber_organization_id" IS NULL)
+                     OR U0."sender_prescriber_organization_id" = %s)
+                    AND U0."job_seeker_id" = ("users_user"."id"))
+             GROUP BY U0."job_seeker_id") AS "last_updated_at",
+          
+            (SELECT U0."id"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE (U0."expires_at" > %s
+                    AND U0."author_kind" = %s
+                    AND U0."job_seeker_id" = ("users_user"."id"))
+             ORDER BY U0."created_at" DESC
+             LIMIT 1) AS "valid_eligibility_diagnosis",
+                 ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
+                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
+          FROM "users_user"
+          LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
+          WHERE ("users_user"."kind" = %s
+                 AND "users_user"."id" IN (%s,
+                                           %s,
+                                           %s,
+                                           %s))
+          GROUP BY "users_user"."id",
+                   34,
+                   35
+          ORDER BY "users_user"."first_name" ASC,
+                   "users_user"."last_name" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
+          'FilterForm.__init__[www/job_seekers_views/forms.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."user_id" IN (%s,
+                                                   %s,
+                                                   %s,
+                                                   %s)
+          ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.is_prescriber_with_authorized_org[users/models.py]',
+          'User.can_edit_personal_information[users/models.py]',
+          'User.can_view_personal_information[users/models.py]',
+          'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
+          'FilterForm.__init__[www/job_seekers_views/forms.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."user_id" = %s
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescriberorganization"."is_authorized"
+                 AND "users_user"."is_active")
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'FilterForm._get_choices_for_organization_members[www/job_seekers_views/forms.py]',
+          'FilterForm.__init__[www/job_seekers_views/forms.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
+                 COALESCE(
+                            (SELECT COUNT(U0."id") AS "count"
+                             FROM "job_applications_jobapplication" U0
+                             WHERE (((U0."sender_id" = %s
+                                      AND U0."sender_prescriber_organization_id" IS NULL)
+                                     OR U0."sender_prescriber_organization_id" = %s)
+                                    AND U0."job_seeker_id" = ("users_user"."id"))
+                             GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
+          
+            (SELECT MAX(U0."updated_at") AS "last_update"
+             FROM "job_applications_jobapplication" U0
+             WHERE (((U0."sender_id" = %s
+                      AND U0."sender_prescriber_organization_id" IS NULL)
+                     OR U0."sender_prescriber_organization_id" = %s)
+                    AND U0."job_seeker_id" = ("users_user"."id"))
+             GROUP BY U0."job_seeker_id") AS "last_updated_at",
+          
+            (SELECT U0."id"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE (U0."expires_at" > %s
+                    AND U0."author_kind" = %s
+                    AND U0."job_seeker_id" = ("users_user"."id"))
+             ORDER BY U0."created_at" DESC
+             LIMIT 1) AS "valid_eligibility_diagnosis",
+                 ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
+                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
+          FROM "users_user"
+          LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
+          WHERE ("users_user"."kind" = %s
+                 AND "users_user"."id" IN (%s,
+                                           %s,
+                                           %s,
+                                           %s))
+          GROUP BY "users_user"."id",
+                   34,
+                   35
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'FilterForm._get_choices_for_organization_members[www/job_seekers_views/forms.py]',
+          'FilterForm.__init__[www/job_seekers_views/forms.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."user_id" IN (%s,
+                                                   %s,
+                                                   %s,
+                                                   %s)
+          ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'FilterForm._get_choices_for_organization_members[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
@@ -706,34 +982,10 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login"
           FROM "users_user"
-          WHERE ("users_user"."kind" = %s
-                 AND "users_user"."id" IN (%s,
-                                           %s,
-                                           %s,
-                                           %s))
-          ORDER BY "users_user"."first_name" ASC,
-                   "users_user"."last_name" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
-          'FilterForm.__init__[www/job_seekers_views/forms.py]',
-          'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
+          INNER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."user_id")
+          WHERE ("prescribers_prescribermembership"."organization_id" = %s
+                 AND "users_user"."id" IN (%s))
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -744,13 +996,43 @@
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "users_user"
-          WHERE ("users_user"."kind" = %s
-                 AND "users_user"."id" IN (%s,
-                                           %s,
-                                           %s,
-                                           %s))
+          SELECT COUNT(*)
+          FROM
+            (SELECT (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
+                    COALESCE(
+                               (SELECT COUNT(U0."id") AS "count"
+                                FROM "job_applications_jobapplication" U0
+                                WHERE (((U0."sender_id" = %s
+                                         AND U0."sender_prescriber_organization_id" IS NULL)
+                                        OR U0."sender_prescriber_organization_id" = %s)
+                                       AND U0."job_seeker_id" = ("users_user"."id"))
+                                GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
+          
+               (SELECT MAX(U0."updated_at") AS "last_update"
+                FROM "job_applications_jobapplication" U0
+                WHERE (((U0."sender_id" = %s
+                         AND U0."sender_prescriber_organization_id" IS NULL)
+                        OR U0."sender_prescriber_organization_id" = %s)
+                       AND U0."job_seeker_id" = ("users_user"."id"))
+                GROUP BY U0."job_seeker_id") AS "last_updated_at",
+          
+               (SELECT U0."id"
+                FROM "eligibility_eligibilitydiagnosis" U0
+                WHERE (U0."expires_at" > %s
+                       AND U0."author_kind" = %s
+                       AND U0."job_seeker_id" = ("users_user"."id"))
+                ORDER BY U0."created_at" DESC
+                LIMIT 1) AS "valid_eligibility_diagnosis"
+             FROM "users_user"
+             LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
+             WHERE ("users_user"."kind" = %s
+                    AND "users_user"."id" IN (%s,
+                                              %s,
+                                              %s,
+                                              %s))
+             GROUP BY "users_user"."id",
+                      1,
+                      2) subquery
         ''',
       }),
       dict({
@@ -816,13 +1098,19 @@
                     AND U0."author_kind" = %s
                     AND U0."job_seeker_id" = ("users_user"."id"))
              ORDER BY U0."created_at" DESC
-             LIMIT 1) AS "valid_eligibility_diagnosis"
+             LIMIT 1) AS "valid_eligibility_diagnosis",
+                 ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
+                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
           FROM "users_user"
+          LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
                                            %s,
                                            %s))
+          GROUP BY "users_user"."id",
+                   34,
+                   35
           ORDER BY 34 ASC,
                    "users_user"."id" ASC
           LIMIT 4
@@ -1076,7 +1364,7 @@
 # ---
 # name: test_multiple_with_job_seekers_created_by_organization.1
   dict({
-    'num_queries': 14,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -1220,6 +1508,262 @@
       }),
       dict({
         'origin': list([
+          'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
+          'FilterForm.__init__[www/job_seekers_views/forms.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
+                 COALESCE(
+                            (SELECT COUNT(U0."id") AS "count"
+                             FROM "job_applications_jobapplication" U0
+                             WHERE (((U0."sender_id" = %s
+                                      AND U0."sender_prescriber_organization_id" IS NULL)
+                                     OR U0."sender_prescriber_organization_id" = %s)
+                                    AND U0."job_seeker_id" = ("users_user"."id"))
+                             GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
+          
+            (SELECT MAX(U0."updated_at") AS "last_update"
+             FROM "job_applications_jobapplication" U0
+             WHERE (((U0."sender_id" = %s
+                      AND U0."sender_prescriber_organization_id" IS NULL)
+                     OR U0."sender_prescriber_organization_id" = %s)
+                    AND U0."job_seeker_id" = ("users_user"."id"))
+             GROUP BY U0."job_seeker_id") AS "last_updated_at",
+          
+            (SELECT U0."id"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE (U0."expires_at" > %s
+                    AND U0."author_kind" = %s
+                    AND U0."job_seeker_id" = ("users_user"."id"))
+             ORDER BY U0."created_at" DESC
+             LIMIT 1) AS "valid_eligibility_diagnosis",
+                 ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
+                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
+          FROM "users_user"
+          LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
+          WHERE ("users_user"."kind" = %s
+                 AND "users_user"."id" IN (%s,
+                                           %s,
+                                           %s,
+                                           %s))
+          GROUP BY "users_user"."id",
+                   34,
+                   35
+          ORDER BY "users_user"."first_name" ASC,
+                   "users_user"."last_name" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
+          'FilterForm.__init__[www/job_seekers_views/forms.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."user_id" IN (%s,
+                                                   %s,
+                                                   %s,
+                                                   %s)
+          ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.is_prescriber_with_authorized_org[users/models.py]',
+          'User.can_edit_personal_information[users/models.py]',
+          'User.can_view_personal_information[users/models.py]',
+          'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
+          'FilterForm.__init__[www/job_seekers_views/forms.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."user_id" = %s
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescriberorganization"."is_authorized"
+                 AND "users_user"."is_active")
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'FilterForm._get_choices_for_organization_members[www/job_seekers_views/forms.py]',
+          'FilterForm.__init__[www/job_seekers_views/forms.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
+                 COALESCE(
+                            (SELECT COUNT(U0."id") AS "count"
+                             FROM "job_applications_jobapplication" U0
+                             WHERE (((U0."sender_id" = %s
+                                      AND U0."sender_prescriber_organization_id" IS NULL)
+                                     OR U0."sender_prescriber_organization_id" = %s)
+                                    AND U0."job_seeker_id" = ("users_user"."id"))
+                             GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
+          
+            (SELECT MAX(U0."updated_at") AS "last_update"
+             FROM "job_applications_jobapplication" U0
+             WHERE (((U0."sender_id" = %s
+                      AND U0."sender_prescriber_organization_id" IS NULL)
+                     OR U0."sender_prescriber_organization_id" = %s)
+                    AND U0."job_seeker_id" = ("users_user"."id"))
+             GROUP BY U0."job_seeker_id") AS "last_updated_at",
+          
+            (SELECT U0."id"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE (U0."expires_at" > %s
+                    AND U0."author_kind" = %s
+                    AND U0."job_seeker_id" = ("users_user"."id"))
+             ORDER BY U0."created_at" DESC
+             LIMIT 1) AS "valid_eligibility_diagnosis",
+                 ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
+                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
+          FROM "users_user"
+          LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
+          WHERE ("users_user"."kind" = %s
+                 AND "users_user"."id" IN (%s,
+                                           %s,
+                                           %s,
+                                           %s))
+          GROUP BY "users_user"."id",
+                   34,
+                   35
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'FilterForm._get_choices_for_organization_members[www/job_seekers_views/forms.py]',
+          'FilterForm.__init__[www/job_seekers_views/forms.py]',
+          'list_job_seekers[www/job_seekers_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."user_id" IN (%s,
+                                                   %s,
+                                                   %s,
+                                                   %s)
+          ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'FilterForm._get_choices_for_organization_members[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
@@ -1259,34 +1803,12 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login"
           FROM "users_user"
-          WHERE ("users_user"."kind" = %s
+          INNER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."user_id")
+          WHERE ("prescribers_prescribermembership"."organization_id" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
-                                           %s,
                                            %s))
-          ORDER BY "users_user"."first_name" ASC,
-                   "users_user"."last_name" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
-          'FilterForm.__init__[www/job_seekers_views/forms.py]',
-          'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -1297,13 +1819,43 @@
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "users_user"
-          WHERE ("users_user"."kind" = %s
-                 AND "users_user"."id" IN (%s,
-                                           %s,
-                                           %s,
-                                           %s))
+          SELECT COUNT(*)
+          FROM
+            (SELECT (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
+                    COALESCE(
+                               (SELECT COUNT(U0."id") AS "count"
+                                FROM "job_applications_jobapplication" U0
+                                WHERE (((U0."sender_id" = %s
+                                         AND U0."sender_prescriber_organization_id" IS NULL)
+                                        OR U0."sender_prescriber_organization_id" = %s)
+                                       AND U0."job_seeker_id" = ("users_user"."id"))
+                                GROUP BY U0."job_seeker_id"), %s) AS "job_applications_nb",
+          
+               (SELECT MAX(U0."updated_at") AS "last_update"
+                FROM "job_applications_jobapplication" U0
+                WHERE (((U0."sender_id" = %s
+                         AND U0."sender_prescriber_organization_id" IS NULL)
+                        OR U0."sender_prescriber_organization_id" = %s)
+                       AND U0."job_seeker_id" = ("users_user"."id"))
+                GROUP BY U0."job_seeker_id") AS "last_updated_at",
+          
+               (SELECT U0."id"
+                FROM "eligibility_eligibilitydiagnosis" U0
+                WHERE (U0."expires_at" > %s
+                       AND U0."author_kind" = %s
+                       AND U0."job_seeker_id" = ("users_user"."id"))
+                ORDER BY U0."created_at" DESC
+                LIMIT 1) AS "valid_eligibility_diagnosis"
+             FROM "users_user"
+             LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
+             WHERE ("users_user"."kind" = %s
+                    AND "users_user"."id" IN (%s,
+                                              %s,
+                                              %s,
+                                              %s))
+             GROUP BY "users_user"."id",
+                      1,
+                      2) subquery
         ''',
       }),
       dict({
@@ -1369,13 +1921,19 @@
                     AND U0."author_kind" = %s
                     AND U0."job_seeker_id" = ("users_user"."id"))
              ORDER BY U0."created_at" DESC
-             LIMIT 1) AS "valid_eligibility_diagnosis"
+             LIMIT 1) AS "valid_eligibility_diagnosis",
+                 ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
+                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
           FROM "users_user"
+          LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
                                            %s,
                                            %s))
+          GROUP BY "users_user"."id",
+                   34,
+                   35
           ORDER BY 34 ASC,
                    "users_user"."id" ASC
           LIMIT 4
