@@ -16,10 +16,12 @@
                 <div class="col-12 col-lg-8">
                     {% block job_seeker_signup_content %}{% endblock %}
                 </div>
-                <!-- Hide left column on small devices. -->
+                <!-- Hide right column on small devices. -->
                 <div class="d-none d-lg-inline-flex col-lg-4 justify-content-center">
                     <div class="w-75">
-                        <img class="img-fluid img-fitcover" src="{% static 'img/job_seeker_signup.png' %}" alt="">
+                        {% block image %}
+                            <img class="img-fluid img-fitcover" src="{% static 'img/job_seeker_signup.png' %}" alt="">
+                        {% endblock %}
                     </div>
                 </div>
             </div>
