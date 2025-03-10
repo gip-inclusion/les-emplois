@@ -11,7 +11,8 @@
         <p>
             Avant de poursuivre votre inscription, <strong>vérifiez que vous remplissez les conditions d’accès à ce type d’emploi</strong>. En cas de doute, demandez à votre conseiller à l’emploi.
         </p>
-        <a href="{% url 'signup:job_seeker_criteria' %}" class="btn btn-sm btn-outline-primary has-external-link mb-4" target="_blank" rel="noopener">Voir les critères d’accès aux emplois inclusifs</a>
+        <a href="{% url 'signup:job_seeker_criteria' %}" class="btn btn-link has-external-link mb-3 ps-0" target="_blank" rel="noopener">Voir les critères d’accès aux emplois inclusifs</a>
+
         {% url 'search:employers_home' as reset_url %}
         {% url 'signup:job_seeker' as next_url %}
         {% url 'signup:job_seeker_start' as previous_url %}
