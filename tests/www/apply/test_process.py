@@ -3551,12 +3551,13 @@ def test_add_prior_action_new(client):
     job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
     client.force_login(job_application.to_company.members.first())
     add_prior_action_url = reverse("apply:add_prior_action", kwargs={"job_application_id": job_application.pk})
+    today = timezone.localdate()
     response = client.post(
         add_prior_action_url,
         data={
             "action": job_applications_enums.Prequalification.AFPR,
-            "start_at": timezone.localdate(),
-            "end_at": timezone.localdate() + relativedelta(days=2),
+            "start_at": today,
+            "end_at": today + relativedelta(days=2),
         },
     )
     assert response.status_code == 403
@@ -3596,12 +3597,13 @@ def test_add_prior_action_processing(client, snapshot):
     job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
     job_application.processed_at = timezone.now()
     job_application.save(update_fields=("state", "processed_at"))
+    today = timezone.localdate()
     response = client.post(
         add_prior_action_url,
         data={
             "action": job_applications_enums.Prequalification.POE,
-            "start_at": timezone.localdate(),
-            "end_at": timezone.localdate() + relativedelta(days=2),
+            "start_at": today,
+            "end_at": today + relativedelta(days=2),
         },
     )
     assert response.status_code == 403
@@ -3612,12 +3614,13 @@ def test_add_prior_action_processing(client, snapshot):
         to_company__kind=CompanyKind.AI, state=job_applications_enums.JobApplicationState.PROCESSING
     )
     client.force_login(job_application.to_company.members.first())
+    today = timezone.localdate()
     response = client.post(
         add_prior_action_url,
         data={
             "action": job_applications_enums.Prequalification.AFPR,
-            "start_at": timezone.localdate(),
-            "end_at": timezone.localdate() + relativedelta(days=2),
+            "start_at": today,
+            "end_at": today + relativedelta(days=2),
         },
     )
     assert response.status_code == 404
@@ -3892,12 +3895,13 @@ def test_details_for_company_with_prior_action(client, with_geiq_diagnosis):
     assertContains(response, "La date de fin prévisionnelle doit être postérieure à la date de début")
     update_page_with_htmx(simulated_page, "#add_prior_action > form", response)
 
+    today = timezone.localdate()
     response = client.post(
         add_prior_action_url,
         data={
             "action": job_applications_enums.Prequalification.AFPR,
-            "start_at": timezone.localdate(),
-            "end_at": timezone.localdate() + relativedelta(days=2),
+            "start_at": today,
+            "end_at": today + relativedelta(days=2),
         },
     )
     assertContains(response, "Type : <b>Pré-qualification</b>", html=True)
@@ -3921,12 +3925,13 @@ def test_details_for_company_with_prior_action(client, with_geiq_diagnosis):
     )
     response = client.get(modify_prior_action_url + "?modify=")
     update_page_with_htmx(simulated_page, f"#prior-action-{prior_action.pk}-modify-btn", response)
+    today = timezone.localdate()
     response = client.post(
         modify_prior_action_url,
         data={
             "action": job_applications_enums.Prequalification.POE,
-            "start_at": timezone.localdate(),
-            "end_at": timezone.localdate() + relativedelta(days=2),
+            "start_at": today,
+            "end_at": today + relativedelta(days=2),
         },
     )
     update_page_with_htmx(simulated_page, f"#prior-action-{prior_action.pk} > form", response)
