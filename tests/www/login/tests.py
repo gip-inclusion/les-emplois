@@ -244,7 +244,7 @@ class TestJobSeekerPreLogin:
             "Cette adresse e-mail est inconnue. Veuillez en saisir une autre, ou vous inscrire."
         ]
         assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
-        assertContains(response, reverse("signup:job_seeker_situation"))
+        assertContains(response, reverse("signup:job_seeker_start"))
 
     @respx.mock
     @override_settings(

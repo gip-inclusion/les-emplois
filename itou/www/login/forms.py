@@ -45,7 +45,7 @@ class FindExistingUserViaEmailForm(forms.Form):
                         "<p>Si vous n'êtes pas encore inscrit(e), "
                         "nous vous invitons à cliquer sur Inscription pour créer votre compte.</p>"
                     ),
-                    reverse("signup:job_seeker_situation"),
+                    reverse("signup:job_seeker_start"),
                     "Inscription",
                 ),
                 extra_tags="modal login_failure email_does_not_exist",
