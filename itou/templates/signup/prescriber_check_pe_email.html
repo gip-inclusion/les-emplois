@@ -30,7 +30,8 @@
 
                         {% bootstrap_form form alert_error_type="all" %}
 
-                        {% itou_buttons_form primary_label="Continuer" secondary_url=prev_url %}
+                        {% url 'search:employers_home' as reset_url %}
+                        {% itou_buttons_form primary_label="Suivant" secondary_url=prev_url reset_url=reset_url %}
 
                     </form>
                 </div>
