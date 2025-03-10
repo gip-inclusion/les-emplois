@@ -19,7 +19,7 @@
                               
       <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
           <h1 class="m-0">Candidats</h1>
-          <div aria-label="Actions sur les candidatures" class="d-flex flex-column flex-md-row gap-3" role="group">
+          <div aria-label="Actions sur les candidats" class="d-flex flex-column flex-md-row gap-3" role="group">
               
               <a class="btn btn-lg btn-secondary btn-ico" data-matomo-action="clic" data-matomo-category="compte-candidat" data-matomo-event="true" data-matomo-option="creer-un-compte-candidat" href="/job-seekers/start?tunnel=standalone&amp;from_url=/job-seekers/list">
                   <i aria-hidden="true" class="ri-user-add-line fw-medium"></i>
