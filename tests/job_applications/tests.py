@@ -4,8 +4,9 @@ import json
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.exceptions import ValidationError
-from django.db.models import Max
+from django.db.models import Max, Min
 from django.forms.models import model_to_dict
 from django.urls import reverse
 from django.utils import timezone
@@ -21,6 +22,9 @@ from itou.employee_record.enums import Status
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import (
+    ARCHIVABLE_JOB_APPLICATION_STATES,
+    AUTO_REJECT_JOB_APPLICATION_DELAY,
+    AUTO_REJECT_JOB_APPLICATION_STATES,
     JobApplicationState,
     Origin,
     QualificationLevel,
@@ -106,6 +110,13 @@ class TestJobApplicationModel:
         job_application.refuse(user=user)
         assert job_application.refused_by == user
 
+    def test_refused_wo_user(self):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+        )
+        job_application.refuse(user=None)
+        assert job_application.refused_by is None
+
     def test_is_sent_by_authorized_prescriber(self):
         job_application = JobApplicationSentByJobSeekerFactory()
         assert not job_application.is_sent_by_authorized_prescriber
@@ -181,22 +192,6 @@ class TestJobApplicationModel:
         membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
         assert membership.member == user
         assert membership.creator == user
-
-
-class TestJobApplicationQueryset:
-    def test_is_active_company_member(self):
-        job_application = JobApplicationFactory()
-        user = EmployerFactory()
-        assert JobApplication.objects.is_active_company_member(user).count() == 0
-
-        job_application.to_company.add_or_activate_membership(user)
-        assert JobApplication.objects.is_active_company_member(user).get() == job_application
-
-        membership = job_application.to_company.memberships.filter(user=user).get()
-        membership.is_active = False
-        membership.save(update_fields=("is_active",))
-
-        assert JobApplication.objects.is_active_company_member(user).count() == 0
 
 
 def test_can_be_cancelled():
@@ -692,6 +687,80 @@ class TestJobApplicationQuerySet:
         job_application = JobApplication.objects.with_accepted_at().first()
         assert job_application.accepted_at.date() == job_application.hiring_start_at
         assert job_application.accepted_at != job_application.created_at
+
+    def test_is_active_company_member(self):
+        job_application = JobApplicationFactory()
+        user = EmployerFactory()
+        assert JobApplication.objects.is_active_company_member(user).count() == 0
+
+        job_application.to_company.add_or_activate_membership(user)
+        assert JobApplication.objects.is_active_company_member(user).get() == job_application
+
+        membership = job_application.to_company.memberships.filter(user=user).get()
+        membership.is_active = False
+        membership.save(update_fields=("is_active",))
+
+        assert JobApplication.objects.is_active_company_member(user).count() == 0
+
+    @pytest.mark.parametrize(
+        "state,expected",
+        [(state, state in AUTO_REJECT_JOB_APPLICATION_STATES) for state in JobApplicationState],
+    )
+    def test_job_applications_rejectable_after_delay_state_and_delay(self, state, expected):
+        old_job_application = JobApplicationFactory(
+            state=state, updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY)
+        )
+        if state in ARCHIVABLE_JOB_APPLICATION_STATES:
+            JobApplicationFactory(
+                state=state,
+                updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY),
+                archived_at=timezone.now(),
+            )
+        JobApplicationFactory(
+            state=state, updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY - 1)
+        )
+
+        qs = JobApplication.objects.job_applications_rejectable_after_delay()
+        assert qs.exists() == expected
+        if qs.exists():
+            assert list(qs) == list(
+                JobApplication.objects.filter(pk=old_job_application.pk)
+                .values("job_seeker")
+                .annotate(applications=ArrayAgg("pk"), min_updated_at=Min("updated_at"))
+            )
+
+    @pytest.mark.parametrize("state", AUTO_REJECT_JOB_APPLICATION_STATES)
+    def test_job_applications_rejectable_after_delay_limit_and_ordering(self, state):
+        limit = 2
+
+        oldest_expected_job_application = JobApplicationFactory(
+            state=state,
+            updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY + 4),
+        )
+        recent_job_application_of_the_same_job_seeker = JobApplicationFactory(
+            state=state,
+            job_seeker=oldest_expected_job_application.job_seeker,
+            updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY + 1),
+        )
+        other_expected_job_application = JobApplicationFactory(
+            state=state,
+            updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY + 3),
+        )
+        # unexpected othe old job application
+        JobApplicationFactory(
+            state=state,
+            updated_at=timezone.now() - relativedelta(days=AUTO_REJECT_JOB_APPLICATION_DELAY + 2),
+        )
+
+        qs = JobApplication.objects.job_applications_rejectable_after_delay(limit=limit)
+        assert qs.count() == limit
+        assert qs[0]["job_seeker"] == oldest_expected_job_application.job_seeker.pk
+        assert qs[0]["applications"] == [
+            oldest_expected_job_application.pk,
+            recent_job_application_of_the_same_job_seeker.pk,
+        ]
+        assert qs[1]["job_seeker"] == other_expected_job_application.job_seeker.pk
+        assert qs[1]["applications"] == [other_expected_job_application.pk]
 
 
 class TestJobApplicationNotifications:
@@ -1594,6 +1663,19 @@ class TestJobApplicationWorkflow:
             # Check sent email.
             assert len(mailoutbox) == 1
             assert "Candidature déclinée" in mailoutbox[0].subject
+
+    @pytest.mark.parametrize("disable_notif_to_proxy", [True, False])
+    def test_refuse_notif_to_proxy(self, django_capture_on_commit_callbacks, mailoutbox, disable_notif_to_proxy):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True, state=JobApplicationState.PROCESSING
+        )
+        with django_capture_on_commit_callbacks(execute=True):
+            job_application.refuse(
+                user=job_application.to_company.members.first(), disable_notif_to_proxy=disable_notif_to_proxy
+            )
+
+        assert [job_application.job_seeker.email] in [box.to for box in mailoutbox]
+        assert ([job_application.sender.email] not in [box.to for box in mailoutbox]) == disable_notif_to_proxy
 
     def test_cancel_delete_linked_approval(self, *args, **kwargs):
         job_application = JobApplicationFactory(with_approval=True)
