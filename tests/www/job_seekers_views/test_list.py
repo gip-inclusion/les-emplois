@@ -99,6 +99,21 @@ def test_displayed_tabs(client, with_membership, assertion):
     assertion(response, "Tous les candidats de la structure")
 
 
+@pytest.mark.parametrize(
+    "url, assertion",
+    [
+        (reverse("job_seekers_views:list"), assertNotContains),
+        (reverse("job_seekers_views:list_organization"), assertContains),
+    ],
+)
+def test_displayed_filters(client, url, assertion):
+    user = PrescriberFactory(membership=True)
+    client.force_login(user)
+    response = client.get(url)
+
+    assertion(response, "Tous les filtres")
+
+
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_empty_list(client, url, snapshot):
     client.force_login(
@@ -652,8 +667,11 @@ def test_htmx_filters(client, url):
     )
     response = client.get(url)
     page = parse_response_to_soup(response, selector="#main")
-    eligibility_validated_checkbox = page.find("input", attrs={"name": "eligibility_validated"})
-    eligibility_validated_checkbox["checked"] = ""
+    # Simulate the data-sync-with and check both checkboxes.
+    eligibility_validated_checkboxes = page.find_all("input", attrs={"name": "eligibility_validated"})
+    assert len(eligibility_validated_checkboxes) == 2
+    for checkbox in eligibility_validated_checkboxes:
+        checkbox["checked"] = ""
 
     response = client.get(url, {"eligibility_validated": "on"}, headers={"HX-Request": "true"})
     update_page_with_htmx(page, f"form[hx-get='{url}']", response)

@@ -1,23 +1,67 @@
 {% load django_bootstrap5 %}
 
-<div class="dropdown">
-    <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-        Situation IAE
-    </button>
-    <ul class="dropdown-menu">
-        <li>
-            <strong class="dropdown-header">Éligibilité IAE</strong>
-        </li>
-        <li>{% bootstrap_field filters_form.eligibility_validated wrapper_class="dropdown-item" %}</li>
-        <li>{% bootstrap_field filters_form.eligibility_pending wrapper_class="dropdown-item" %}</li>
-        <li>
-            <hr class="dropdown-divider">
-        </li>
-        <li>
-            <strong class="dropdown-header">PASS IAE</strong>
-        </li>
-        <li>{% bootstrap_field filters_form.pass_iae_active wrapper_class="dropdown-item" %}</li>
-        <li>{% bootstrap_field filters_form.pass_iae_expired wrapper_class="dropdown-item" %}</li>
-        <li>{% bootstrap_field filters_form.no_pass_iae wrapper_class="dropdown-item" %}</li>
-    </ul>
-</div>
+{% if btn_dropdown_filter|default:False %}
+    <div class="dropdown">
+        <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+            Situation IAE
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                <strong class="dropdown-header">Éligibilité IAE</strong>
+            </li>
+            <li>{% bootstrap_field filters_form.eligibility_validated wrapper_class="dropdown-item" %}</li>
+            <li>{% bootstrap_field filters_form.eligibility_pending wrapper_class="dropdown-item" %}</li>
+            <li>
+                <hr class="dropdown-divider">
+            </li>
+            <li>
+                <strong class="dropdown-header">PASS IAE</strong>
+            </li>
+            <li>{% bootstrap_field filters_form.pass_iae_active wrapper_class="dropdown-item" %}</li>
+            <li>{% bootstrap_field filters_form.pass_iae_expired wrapper_class="dropdown-item" %}</li>
+            <li>{% bootstrap_field filters_form.no_pass_iae wrapper_class="dropdown-item" %}</li>
+        </ul>
+    </div>
+{% else %}
+    <fieldset>
+        <legend>
+            <button class="btn btn-outline-transparent has-collapse-caret collapsed"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseEligibility"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="collapseEligibility">Éligibilité IAE</button>
+        </legend>
+        <div class="my-3 collapse" id="collapseEligibility">
+            <ul>
+                <li>
+                    {% include "job_seekers_views/includes/job_seekers_filters/single_checkbox.html" with field=filters_form.eligibility_validated wrapper_class="dropdown-item" id_suffix="-offcanvas" only %}
+                </li>
+                <li>
+                    {% include "job_seekers_views/includes/job_seekers_filters/single_checkbox.html" with field=filters_form.eligibility_pending wrapper_class="dropdown-item" id_suffix="-offcanvas" only %}
+                </li>
+            </ul>
+        </div>
+    </fieldset>
+    <hr>
+    <fieldset>
+        <legend>
+            <button class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-toggle="collapse" data-bs-target="#collapseApproval" type="button" aria-expanded="false" aria-controls="collapseApproval">
+                PASS IAE
+            </button>
+        </legend>
+        <div class="my-3 collapse" id="collapseApproval">
+            <ul>
+                <li>
+                    {% include "job_seekers_views/includes/job_seekers_filters/single_checkbox.html" with field=filters_form.pass_iae_active wrapper_class="dropdown-item" id_suffix="-offcanvas" only %}
+                </li>
+                <li>
+                    {% include "job_seekers_views/includes/job_seekers_filters/single_checkbox.html" with field=filters_form.pass_iae_expired wrapper_class="dropdown-item" id_suffix="-offcanvas" only %}
+                </li>
+                <li>
+                    {% include "job_seekers_views/includes/job_seekers_filters/single_checkbox.html" with field=filters_form.no_pass_iae wrapper_class="dropdown-item" id_suffix="-offcanvas" only %}
+                </li>
+            </ul>
+        </div>
+    </fieldset>
+{% endif %}

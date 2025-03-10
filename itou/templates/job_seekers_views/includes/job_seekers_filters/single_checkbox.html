@@ -1,0 +1,17 @@
+{% comment %}
+Arguments:
+- field
+- id_suffix: When the field is present multiple times on the page, use the
+    suffix to make its input id unique.
+{% endcomment %}
+<div class="{{ wrapper_class }}">
+    <div class="form-check">
+        <input id="{{ field.id_for_label }}{{ id_suffix|default:'' }}"
+               class="form-check-input"
+               type="checkbox"
+               name="{{ field.name }}"
+               {% if field.value %}checked{% endif %}
+               {% if id_suffix|default:"" %}data-sync-with="{{ field.id_for_label }}"{% endif %}>
+        <label class="form-check-label" for="{{ field.id_for_label }}{{ id_suffix|default:'' }}">{{ field.label }}</label>
+    </div>
+</div>

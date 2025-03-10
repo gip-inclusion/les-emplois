@@ -1,0 +1,3 @@
+<div class="offcanvas-body" id="offcanvasApplyFiltersContent"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    {% include "job_seekers_views/includes/job_seekers_filters/approval_state.html" with filters_form=filters_form only %}
+</div>
