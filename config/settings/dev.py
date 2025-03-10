@@ -87,3 +87,5 @@ CSP_IMG_SRC.append(f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/
 del LOGGING["handlers"]["console"]["formatter"]  # noqa: F405
 
 API_PARTICULIER_BASE_URL = "https://staging.particulier.api.gouv.fr/api/"
+
+FORCE_PROCONNECT_LOGIN = os.getenv("FORCE_PROCONNECT_LOGIN", "True") == "True"
