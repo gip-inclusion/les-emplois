@@ -110,6 +110,13 @@ class TestJobApplicationModel:
         job_application.refuse(user=user)
         assert job_application.refused_by == user
 
+    def test_refused_wo_user(self):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+        )
+        job_application.refuse(user=None)
+        assert job_application.refused_by is None
+
     def test_is_sent_by_authorized_prescriber(self):
         job_application = JobApplicationSentByJobSeekerFactory()
         assert not job_application.is_sent_by_authorized_prescriber
@@ -1656,6 +1663,19 @@ class TestJobApplicationWorkflow:
             # Check sent email.
             assert len(mailoutbox) == 1
             assert "Candidature déclinée" in mailoutbox[0].subject
+
+    @pytest.mark.parametrize("disable_notif_to_proxy", [True, False])
+    def test_refuse_notif_to_proxy(self, django_capture_on_commit_callbacks, mailoutbox, disable_notif_to_proxy):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True, state=JobApplicationState.PROCESSING
+        )
+        with django_capture_on_commit_callbacks(execute=True):
+            job_application.refuse(
+                user=job_application.to_company.members.first(), disable_notif_to_proxy=disable_notif_to_proxy
+            )
+
+        assert [job_application.job_seeker.email] in [box.to for box in mailoutbox]
+        assert ([job_application.sender.email] not in [box.to for box in mailoutbox]) == disable_notif_to_proxy
 
     def test_cancel_delete_linked_approval(self, *args, **kwargs):
         job_application = JobApplicationFactory(with_approval=True)

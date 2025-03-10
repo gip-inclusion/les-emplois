@@ -1070,10 +1070,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.notifications_postpone_for_proxy.send()
 
     @xwf_models.transition()
-    def refuse(self, *, user):
+    def refuse(self, *, user, disable_notif_to_proxy=False):
         # Send notification.
         self.notifications_refuse_for_job_seeker.send()
-        if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
+        if (
+            self.is_sent_by_proxy and self.sender_id and not disable_notif_to_proxy
+        ):  # Sender user may have been deleted.
             self.notifications_refuse_for_proxy.send()
 
     @xwf_models.transition()
