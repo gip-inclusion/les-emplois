@@ -1,6 +1,7 @@
 {% extends "gps/group_details_base.html" %}
 {% load matomo %}
 {% load format_filters %}
+{% load str_filters %}
 
 {% block content %}
     <section class="s-section">
@@ -27,62 +28,67 @@
                         <ul class="list-data">
                             <li>
                                 <small>Nom</small>
-                                <strong>{{ group.beneficiary.last_name|upper }}</strong>
+                                <strong>{{ group.beneficiary.last_name|upper|mask_unless:can_view_personal_information }}</strong>
                             </li>
                             <li>
                                 <small>Prénom</small>
-                                <strong>{{ group.beneficiary.first_name|title }}</strong>
+                                <strong>{{ group.beneficiary.first_name|title|mask_unless:can_view_personal_information }}</strong>
                             </li>
-                            <li>
-                                <small>Date de naissance</small>
-                                {% if group.beneficiary.jobseeker_profile.birthdate %}
-                                    <strong>{{ group.beneficiary.jobseeker_profile.birthdate|date:"d/m/Y" }}</strong>
-                                {% else %}
-                                    <i class="text-disabled">Non renseignée</i>
-                                {% endif %}
-                            </li>
+                            {% if can_view_personal_information %}
+                                <li>
+                                    <small>Date de naissance</small>
+                                    {% if group.beneficiary.jobseeker_profile.birthdate %}
+                                        <strong>{{ group.beneficiary.jobseeker_profile.birthdate|date:"d/m/Y" }}</strong>
+                                    {% else %}
+                                        <i class="text-disabled">Non renseignée</i>
+                                    {% endif %}
+                                </li>
+                            {% endif %}
                         </ul>
                     </div>
-                    <div class="col-12 col-md-6">
-                        <ul class="list-data">
-                            <li>
-                                <small>Téléphone</small>
-                                {% if group.beneficiary.phone %}
-                                    <strong>{{ group.beneficiary.phone|format_phone }}</strong>
-                                    {% matomo_event "gps" "clic" "copied_user_phone" as matomo_event_attrs %}
-                                    {% include 'includes/copy_to_clipboard.html' with content=group.beneficiary.phone css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
-                                {% else %}
-                                    <i class="text-disabled">Non renseigné</i>
-                                {% endif %}
-                            </li>
-                            <li>
-                                <small>Adresse e-mail</small>
-                                <strong>{{ group.beneficiary.email }}</strong>
-                                {% matomo_event "gps" "clic" "copied_user_email" as matomo_event_attrs %}
-                                {% include 'includes/copy_to_clipboard.html' with content=group.beneficiary.email css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
-                            </li>
-                            <li>
-                                <small>Adresse</small>
-                                {% if group.beneficiary.address_on_one_line %}
-                                    <ul class="list-unstyled mb-0">
-                                        <li>
-                                            <strong>{{ group.beneficiary.address_line_1 }}</strong>
-                                        </li>
-                                        {% if group.beneficiary.address_line_2 %}
+                    {% if can_view_personal_information %}
+                        <div class="col-12 col-md-6">
+                            <ul class="list-data">
+                                <li>
+                                    <small>Téléphone</small>
+                                    {% if group.beneficiary.phone %}
+                                        <strong>{{ group.beneficiary.phone|format_phone }}</strong>
+                                        {% matomo_event "gps" "clic" "copied_user_phone" as matomo_event_attrs %}
+                                        {% include 'includes/copy_to_clipboard.html' with content=group.beneficiary.phone css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
+                                    {% else %}
+                                        <i class="text-disabled">Non renseigné</i>
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    <small>Adresse e-mail</small>
+                                    <strong>{{ group.beneficiary.email }}</strong>
+                                    {% matomo_event "gps" "clic" "copied_user_email" as matomo_event_attrs %}
+                                    {% include 'includes/copy_to_clipboard.html' with content=group.beneficiary.email css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
+                                </li>
+                                <li>
+                                    <small>Adresse</small>
+                                    {% if group.beneficiary.address_on_one_line %}
+                                        <ul class="list-unstyled mb-0">
                                             <li>
-                                                <strong>{{ group.beneficiary.address_line_2 }}</strong>
+                                                <strong>{{ group.beneficiary.address_line_1 }}</strong>
                                             </li>
-                                        {% endif %}
-                                        <li>
-                                            <strong>{{ group.beneficiary.post_code }} {{ group.beneficiary.city }}</strong>
-                                        </li>
-                                    </ul>
-                                {% else %}
-                                    <i class="text-disabled">Non renseignée</i>
-                                {% endif %}
-                            </li>
-                        </ul>
-                    </div>
+                                            {% if group.beneficiary.address_line_2 %}
+                                                <li>
+                                                    <strong>{{ group.beneficiary.address_line_2 }}</strong>
+                                                </li>
+                                            {% endif %}
+                                            <li>
+                                                <strong>{{ group.beneficiary.post_code }} {{ group.beneficiary.city }}</strong>
+                                            </li>
+                                        </ul>
+                                    {% else %}
+                                        <i class="text-disabled">Non renseignée</i>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    {% endif %}
+
                 </div>
             </div>
             {% if can_see_diagnosis %}
