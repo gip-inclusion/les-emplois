@@ -4,8 +4,14 @@
     <div class="col-12">
         <div>{% bootstrap_form_errors filters_form %}</div>
         <div class="btn-dropdown-filter-group mb-3 mb-md-4">
-            {% include "job_seekers_views/includes/job_seekers_filters/approval_state.html" with filters_form=filters_form only %}
-            {% include "job_seekers_views/includes/list_reset_filters.html" with request=request filters_counter=filters_counter list_organization=list_organization order=order only %}
+            {% include "job_seekers_views/includes/job_seekers_filters/approval_state.html" with filters_form=filters_form btn_dropdown_filter=True only %}
+            {% if list_organization %}
+                <button type="button" class="btn btn-ico btn-dropdown-filter" data-bs-toggle="offcanvas" data-bs-target="#offcanvasApplyFilters" aria-controls="offcanvasApplyFilters">
+                    <i class="ri-sound-module-fill fw-medium" aria-hidden="true"></i>
+                    <span>Tous les filtres <span id="all-filters-btn"></span></span>
+                </button>
+            {% endif %}
+            {% include "job_seekers_views/includes/list_reset_filters.html" with btn_dropdown_filter=True request=request filters_counter=filters_counter list_organization=list_organization order=order only %}
         </div>
     </div>
 </div>

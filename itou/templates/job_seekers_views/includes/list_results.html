@@ -60,5 +60,6 @@
 
 {% if request.htmx %}
     {% include "job_seekers_views/includes/list_counter.html" with paginator=page_obj.paginator request=request only %}
-    {% include "job_seekers_views/includes/list_reset_filters.html" with filters_counter=filters_counter request=request list_organization=list_organization order=order only %}
+    {% include "job_seekers_views/includes/list_reset_filters.html" with btn_dropdown_filter=True filters_counter=filters_counter request=request list_organization=list_organization order=order only %}
+    {% include "job_seekers_views/includes/job_seekers_filters/offcanvas_footer.html" %}
 {% endif %}

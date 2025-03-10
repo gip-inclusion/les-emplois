@@ -58,6 +58,109 @@
               </section>
   
               
+      
+  <div aria-labelledby="offcanvasApplyFiltersLabel" class="c-offcanvas-filters offcanvas offcanvas-end" id="offcanvasApplyFilters" tabindex="-1">
+      <div class="offcanvas-header">
+          <h4 class="mb-0 btn-ico" id="offcanvasApplyFiltersLabel">
+              <i aria-hidden="true" class="ri-sound-module-fill fw-medium"></i>
+              <span>Filtrer</span>
+          </h4>
+          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="offcanvas" type="button"></button>
+      </div>
+      <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
+      
+  
+  
+      <fieldset>
+          <legend>
+              <button aria-controls="collapseEligibility" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseEligibility" data-bs-toggle="collapse" type="button">Éligibilité IAE</button>
+          </legend>
+          <div class="my-3 collapse" id="collapseEligibility">
+              <ul>
+                  <li>
+                      
+  <div class="dropdown-item">
+      <div class="form-check">
+          <input class="form-check-input" data-sync-with="id_eligibility_validated" id="id_eligibility_validated-offcanvas" name="eligibility_validated" type="checkbox"/>
+          <label class="form-check-label" for="id_eligibility_validated-offcanvas">Valide</label>
+      </div>
+  </div>
+  
+                  </li>
+                  <li>
+                      
+  <div class="dropdown-item">
+      <div class="form-check">
+          <input class="form-check-input" data-sync-with="id_eligibility_pending" id="id_eligibility_pending-offcanvas" name="eligibility_pending" type="checkbox"/>
+          <label class="form-check-label" for="id_eligibility_pending-offcanvas">À valider</label>
+      </div>
+  </div>
+  
+                  </li>
+              </ul>
+          </div>
+      </fieldset>
+      <hr/>
+      <fieldset>
+          <legend>
+              <button aria-controls="collapseApproval" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseApproval" data-bs-toggle="collapse" type="button">
+                  PASS IAE
+              </button>
+          </legend>
+          <div class="my-3 collapse" id="collapseApproval">
+              <ul>
+                  <li>
+                      
+  <div class="dropdown-item">
+      <div class="form-check">
+          <input class="form-check-input" data-sync-with="id_pass_iae_active" id="id_pass_iae_active-offcanvas" name="pass_iae_active" type="checkbox"/>
+          <label class="form-check-label" for="id_pass_iae_active-offcanvas">Valide</label>
+      </div>
+  </div>
+  
+                  </li>
+                  <li>
+                      
+  <div class="dropdown-item">
+      <div class="form-check">
+          <input class="form-check-input" data-sync-with="id_pass_iae_expired" id="id_pass_iae_expired-offcanvas" name="pass_iae_expired" type="checkbox"/>
+          <label class="form-check-label" for="id_pass_iae_expired-offcanvas">Expiré</label>
+      </div>
+  </div>
+  
+                  </li>
+                  <li>
+                      
+  <div class="dropdown-item">
+      <div class="form-check">
+          <input class="form-check-input" data-sync-with="id_no_pass_iae" id="id_no_pass_iae-offcanvas" name="no_pass_iae" type="checkbox"/>
+          <label class="form-check-label" for="id_no_pass_iae-offcanvas">Aucun</label>
+      </div>
+  </div>
+  
+                  </li>
+              </ul>
+          </div>
+      </fieldset>
+  
+  
+  </div>
+  
+      <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
+      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
+      
+  
+  
+      
+  
+  
+      
+  
+  
+  </div>
+  
+  </div>
+  
       <section class="s-section">
           <div class="s-section__container container">
               
@@ -72,36 +175,46 @@
           <div class="btn-dropdown-filter-group mb-3 mb-md-4">
               
   
-  <div class="dropdown">
-      <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
-          Situation IAE
-      </button>
-      <ul class="dropdown-menu">
-          <li>
-              <strong class="dropdown-header">Éligibilité IAE</strong>
-          </li>
-          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Valide</label></div></div></li>
-          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_eligibility_pending" name="eligibility_pending" type="checkbox"/><label class="form-check-label" for="id_eligibility_pending">À valider</label></div></div></li>
-          <li>
-              <hr class="dropdown-divider"/>
-          </li>
-          <li>
-              <strong class="dropdown-header">PASS IAE</strong>
-          </li>
-          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Valide</label></div></div></li>
-          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/><label class="form-check-label" for="id_pass_iae_expired">Expiré</label></div></div></li>
-          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_no_pass_iae" name="no_pass_iae" type="checkbox"/><label class="form-check-label" for="id_no_pass_iae">Aucun</label></div></div></li>
-      </ul>
-  </div>
   
+      <div class="dropdown">
+          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
+              Situation IAE
+          </button>
+          <ul class="dropdown-menu">
+              <li>
+                  <strong class="dropdown-header">Éligibilité IAE</strong>
+              </li>
+              <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Valide</label></div></div></li>
+              <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_eligibility_pending" name="eligibility_pending" type="checkbox"/><label class="form-check-label" for="id_eligibility_pending">À valider</label></div></div></li>
+              <li>
+                  <hr class="dropdown-divider"/>
+              </li>
+              <li>
+                  <strong class="dropdown-header">PASS IAE</strong>
+              </li>
+              <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Valide</label></div></div></li>
+              <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/><label class="form-check-label" for="id_pass_iae_expired">Expiré</label></div></div></li>
+              <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_no_pass_iae" name="no_pass_iae" type="checkbox"/><label class="form-check-label" for="id_no_pass_iae">Aucun</label></div></div></li>
+          </ul>
+      </div>
+  
+  
+              
+                  <button aria-controls="offcanvasApplyFilters" class="btn btn-ico btn-dropdown-filter" data-bs-target="#offcanvasApplyFilters" data-bs-toggle="offcanvas" type="button">
+                      <i aria-hidden="true" class="ri-sound-module-fill fw-medium"></i>
+                      <span>Tous les filtres <span id="all-filters-btn"></span></span>
+                  </button>
+              
               
   
   
       
   
-  <div class="ms-md-auto" id="job-seekers-list-filter-counter">
-      
-  </div>
+  
+      <div class="ms-md-auto" id="job-seekers-list-filter-counter">
+          
+      </div>
+  
   
           </div>
       </div>
@@ -212,6 +325,109 @@
               </section>
   
               
+      
+  <div aria-labelledby="offcanvasApplyFiltersLabel" class="c-offcanvas-filters offcanvas offcanvas-end" id="offcanvasApplyFilters" tabindex="-1">
+      <div class="offcanvas-header">
+          <h4 class="mb-0 btn-ico" id="offcanvasApplyFiltersLabel">
+              <i aria-hidden="true" class="ri-sound-module-fill fw-medium"></i>
+              <span>Filtrer</span>
+          </h4>
+          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="offcanvas" type="button"></button>
+      </div>
+      <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
+      
+  
+  
+      <fieldset>
+          <legend>
+              <button aria-controls="collapseEligibility" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseEligibility" data-bs-toggle="collapse" type="button">Éligibilité IAE</button>
+          </legend>
+          <div class="my-3 collapse" id="collapseEligibility">
+              <ul>
+                  <li>
+                      
+  <div class="dropdown-item">
+      <div class="form-check">
+          <input class="form-check-input" data-sync-with="id_eligibility_validated" id="id_eligibility_validated-offcanvas" name="eligibility_validated" type="checkbox"/>
+          <label class="form-check-label" for="id_eligibility_validated-offcanvas">Valide</label>
+      </div>
+  </div>
+  
+                  </li>
+                  <li>
+                      
+  <div class="dropdown-item">
+      <div class="form-check">
+          <input class="form-check-input" data-sync-with="id_eligibility_pending" id="id_eligibility_pending-offcanvas" name="eligibility_pending" type="checkbox"/>
+          <label class="form-check-label" for="id_eligibility_pending-offcanvas">À valider</label>
+      </div>
+  </div>
+  
+                  </li>
+              </ul>
+          </div>
+      </fieldset>
+      <hr/>
+      <fieldset>
+          <legend>
+              <button aria-controls="collapseApproval" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseApproval" data-bs-toggle="collapse" type="button">
+                  PASS IAE
+              </button>
+          </legend>
+          <div class="my-3 collapse" id="collapseApproval">
+              <ul>
+                  <li>
+                      
+  <div class="dropdown-item">
+      <div class="form-check">
+          <input class="form-check-input" data-sync-with="id_pass_iae_active" id="id_pass_iae_active-offcanvas" name="pass_iae_active" type="checkbox"/>
+          <label class="form-check-label" for="id_pass_iae_active-offcanvas">Valide</label>
+      </div>
+  </div>
+  
+                  </li>
+                  <li>
+                      
+  <div class="dropdown-item">
+      <div class="form-check">
+          <input class="form-check-input" data-sync-with="id_pass_iae_expired" id="id_pass_iae_expired-offcanvas" name="pass_iae_expired" type="checkbox"/>
+          <label class="form-check-label" for="id_pass_iae_expired-offcanvas">Expiré</label>
+      </div>
+  </div>
+  
+                  </li>
+                  <li>
+                      
+  <div class="dropdown-item">
+      <div class="form-check">
+          <input class="form-check-input" data-sync-with="id_no_pass_iae" id="id_no_pass_iae-offcanvas" name="no_pass_iae" type="checkbox"/>
+          <label class="form-check-label" for="id_no_pass_iae-offcanvas">Aucun</label>
+      </div>
+  </div>
+  
+                  </li>
+              </ul>
+          </div>
+      </fieldset>
+  
+  
+  </div>
+  
+      <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
+      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
+      
+  
+  
+      
+  
+  
+      
+  
+  
+  </div>
+  
+  </div>
+  
       <section class="s-section">
           <div class="s-section__container container">
               
@@ -226,36 +442,41 @@
           <div class="btn-dropdown-filter-group mb-3 mb-md-4">
               
   
-  <div class="dropdown">
-      <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
-          Situation IAE
-      </button>
-      <ul class="dropdown-menu">
-          <li>
-              <strong class="dropdown-header">Éligibilité IAE</strong>
-          </li>
-          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Valide</label></div></div></li>
-          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_eligibility_pending" name="eligibility_pending" type="checkbox"/><label class="form-check-label" for="id_eligibility_pending">À valider</label></div></div></li>
-          <li>
-              <hr class="dropdown-divider"/>
-          </li>
-          <li>
-              <strong class="dropdown-header">PASS IAE</strong>
-          </li>
-          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Valide</label></div></div></li>
-          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/><label class="form-check-label" for="id_pass_iae_expired">Expiré</label></div></div></li>
-          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_no_pass_iae" name="no_pass_iae" type="checkbox"/><label class="form-check-label" for="id_no_pass_iae">Aucun</label></div></div></li>
-      </ul>
-  </div>
   
+      <div class="dropdown">
+          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
+              Situation IAE
+          </button>
+          <ul class="dropdown-menu">
+              <li>
+                  <strong class="dropdown-header">Éligibilité IAE</strong>
+              </li>
+              <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Valide</label></div></div></li>
+              <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_eligibility_pending" name="eligibility_pending" type="checkbox"/><label class="form-check-label" for="id_eligibility_pending">À valider</label></div></div></li>
+              <li>
+                  <hr class="dropdown-divider"/>
+              </li>
+              <li>
+                  <strong class="dropdown-header">PASS IAE</strong>
+              </li>
+              <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Valide</label></div></div></li>
+              <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/><label class="form-check-label" for="id_pass_iae_expired">Expiré</label></div></div></li>
+              <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_no_pass_iae" name="no_pass_iae" type="checkbox"/><label class="form-check-label" for="id_no_pass_iae">Aucun</label></div></div></li>
+          </ul>
+      </div>
+  
+  
+              
               
   
   
       
   
-  <div class="ms-md-auto" id="job-seekers-list-filter-counter">
-      
-  </div>
+  
+      <div class="ms-md-auto" id="job-seekers-list-filter-counter">
+          
+      </div>
+  
   
           </div>
       </div>
