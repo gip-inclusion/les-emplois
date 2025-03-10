@@ -1,22 +1,35 @@
-import urllib.parse
-
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count, Prefetch
-from django.http import HttpResponseRedirect
+from django.db.models import Count, Exists, OuterRef, Prefetch
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
+from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView, UpdateView
 
 from itou.gps.grist import log_contact_info_display
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.pagination import pager
+from itou.utils.session import SessionNamespace
+from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import add_url_params, get_safe_url
-from itou.www.gps.forms import FollowUpGroupMembershipForm, MembershipsFiltersForm
+from itou.www.gps.enums import Channel
+from itou.www.gps.forms import (
+    FollowUpGroupMembershipForm,
+    JobSeekerSearchByNameEmailForm,
+    JobSeekersFollowedByCollegueSearchForm,
+    JoinGroupChannelForm,
+    MembershipsFiltersForm,
+)
+from itou.www.gps.utils import add_beneficiary, get_all_collegues, send_slack_message_for_gps
+from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
+from itou.www.job_seekers_views.forms import CheckJobSeekerNirForm
 
 
 def is_allowed_to_use_gps(user):
@@ -72,20 +85,6 @@ def group_list(request, current, template_name="gps/group_list.html"):
         "memberships_page": memberships_page,
         "active_memberships": current,
     }
-
-    context["request_new_beneficiary_form_url"] = (
-        "https://formulaires.gps.inclusion.gouv.fr/ajouter-usager?"
-        + urllib.parse.urlencode(
-            {
-                "user_name": request.user.get_full_name(),
-                "user_id": request.user.pk,
-                "user_email": request.user.email,
-                "user_organization_name": getattr(request.current_organization, "display_name", ""),
-                "user_organization_id": getattr(request.current_organization, "pk", ""),
-                "success_url": request.build_absolute_uri(),
-            }
-        )
-    )
 
     return render(request, "gps/includes/memberships_results.html" if request.htmx else template_name, context)
 
@@ -239,3 +238,230 @@ def display_contact_info(request, group_id, target_participant_public_id, mode):
     )
     log_contact_info_display(request.user, follow_up_group, target_participant, mode)
     return render(request, template_name, {"member": target_participant})
+
+
+@check_user(is_allowed_to_use_gps)
+def join_group(request, template_name="gps/join_group.html"):
+    urls = {
+        Channel.FROM_COLLEGUE: reverse("gps:join_group_from_collegue"),
+        Channel.FROM_NIR: reverse("gps:join_group_from_nir"),
+        Channel.FROM_NAME_EMAIL: reverse("gps:join_group_from_name_and_email"),
+    }
+    if request.current_organization is None:
+        return HttpResponseRedirect(urls[Channel.FROM_NAME_EMAIL])
+
+    form = JoinGroupChannelForm(data=request.POST or None)
+    if request.POST and form.is_valid():
+        return HttpResponseRedirect(urls[form.cleaned_data["channel"]])
+
+    context = {
+        "back_url": get_safe_url(request, "back_url", fallback_url=reverse_lazy("gps:group_list")),
+        "can_use_gps_advanced_features": is_allowed_to_use_gps_advanced_features(request.user),
+    }
+    return render(request, template_name, context)
+
+
+@check_user(is_allowed_to_use_gps)
+def join_group_from_collegue(request, template_name="gps/join_group_from_collegue.html"):
+    if request.current_organization is None:
+        raise PermissionDenied("Il faut une organisation ou une structure pour accéder à cette page")
+
+    form = JobSeekersFollowedByCollegueSearchForm(data=request.POST or None, organizations=request.organizations)
+
+    if request.method == "POST" and form.is_valid():
+        add_beneficiary(request, form.job_seeker)
+        return HttpResponseRedirect(reverse("gps:group_list"))
+
+    context = {
+        "form": form,
+        "reset_url": get_safe_url(request, "back_url", fallback_url=reverse("gps:join_group")),
+    }
+
+    return render(request, template_name, context)
+
+
+@check_user(is_allowed_to_use_gps_advanced_features)
+def join_group_from_nir(request, template_name="gps/join_group_from_nir.html"):
+    form = CheckJobSeekerNirForm(data=request.POST or None, is_gps=True)
+    context = {
+        "form": form,
+        "reset_url": get_safe_url(request, "back_url", fallback_url=reverse("gps:join_group")),
+        "job_seeker": None,
+        "preview_mode": False,
+    }
+
+    if request.method == "POST" and form.is_valid():
+        job_seeker = form.get_job_seeker()
+
+        if job_seeker is None:
+            # Maybe plug into GetOrCreateJobSeekerStartView
+            data = {
+                "config": {
+                    "tunnel": "gps",
+                    "from_url": request.get_full_path(),
+                    "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
+                },
+                "profile": {"nir": form.cleaned_data["nir"]},
+            }
+            job_seeker_session = SessionNamespace.create_uuid_namespace(request.session, data)
+            return HttpResponseRedirect(
+                reverse(
+                    "job_seekers_views:search_by_email_for_sender",
+                    kwargs={"session_uuid": job_seeker_session.name},
+                )
+            )
+
+        if form.data.get("confirm"):
+            add_beneficiary(request, job_seeker)
+            return HttpResponseRedirect(reverse("gps:group_list"))
+
+        context |= {
+            # Ask the sender to confirm the NIR we found is associated to the correct user
+            "preview_mode": job_seeker and bool(form.data.get("preview")),
+            "job_seeker": job_seeker,
+            "nir_not_found": job_seeker is None,
+        }
+
+    return render(request, template_name, context)
+
+
+@check_user(is_allowed_to_use_gps)
+def join_group_from_name_and_email(request, template_name="gps/join_group_from_name_and_email.html"):
+    form = JobSeekerSearchByNameEmailForm(data=request.POST or None)
+    context = {
+        "form": form,
+        "reset_url": get_safe_url(request, "back_url", fallback_url=reverse("gps:join_group")),
+        "job_seeker": None,
+        "email_only_match": False,
+        "preview_mode": False,
+    }
+
+    if request.method == "POST" and form.is_valid():
+        job_seeker = (
+            User.objects.filter(
+                kind=UserKind.JOB_SEEKER,
+                first_name__iexact=form.cleaned_data["first_name"],
+                last_name__iexact=form.cleaned_data["last_name"],
+                email=form.cleaned_data["email"],
+            )
+            .select_related("jobseeker_profile")
+            .first()
+        )
+
+        if job_seeker is None:
+            job_seeker_email_match = User.objects.filter(
+                kind=UserKind.JOB_SEEKER, email=form.cleaned_data["email"]
+            ).first()
+            if job_seeker_email_match:
+                context["email_only_match"] = True
+                if is_allowed_to_use_gps_advanced_features(request.user):
+                    # slight change in modal wording
+                    job_seeker = job_seeker_email_match
+                else:
+                    form.add_error(
+                        "__all__",
+                        mark_safe(
+                            "<strong>Veuillez vérifier le nom ou l’e-mail.</strong><br>"
+                            "un compte bénéficiaire avec un nom différent existe déjà pour cette adresse e-mail."
+                        ),
+                    )
+
+            else:
+                # Maybe plug into GetOrCreateJobSeekerStartView
+                data = {
+                    "config": {
+                        "tunnel": "gps",
+                        "from_url": request.get_full_path(),
+                        "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
+                    },
+                    "user": form.cleaned_data,
+                }
+                job_seeker_session = SessionNamespace.create_uuid_namespace(request.session, data)
+                return HttpResponseRedirect(
+                    reverse(
+                        "job_seekers_views:create_job_seeker_step_1_for_sender",
+                        kwargs={"session_uuid": job_seeker_session.name},
+                    )
+                )
+
+        # For authorized prescribers + employers
+        if form.data.get("confirm") and is_allowed_to_use_gps_advanced_features(request.user):
+            add_beneficiary(request, job_seeker)
+            return HttpResponseRedirect(reverse("gps:group_list"))
+
+        # For non authorized prescribers
+        if form.data.get("ask"):
+            job_seeker_admin_url = reverse("admin:users_user_change", args=(job_seeker.pk,))
+            user_admin_url = reverse("admin:users_user_change", args=(request.user.pk,))
+            send_slack_message_for_gps(
+                f':gemini: Demande d’ajout <a href="{user_admin_url}">{request.user.get_full_name()}</a> '
+                f'veut suivre <a href="{job_seeker_admin_url}">{job_seeker.get_full_name()}</a>.'
+            )
+            masked_name = mask_unless(job_seeker.get_full_name(), False)
+            messages.info(
+                request,
+                "Demande d’ajout envoyée||"
+                f"Votre demande d’ajout pour {masked_name} a bien été transmise pour validation.",
+                extra_tags="toast",
+            )
+            return HttpResponseRedirect(reverse("gps:group_list"))
+
+        context |= {
+            # Ask the sender to confirm the found user is correct
+            "preview_mode": job_seeker and bool(form.data.get("preview")),
+            "job_seeker": job_seeker,
+            "can_use_gps_advanced_features": is_allowed_to_use_gps_advanced_features(request.user),
+        }
+
+    return render(request, template_name, context)
+
+
+@check_user(is_allowed_to_use_gps)
+def beneficiaries_autocomplete(request):
+    """
+    Returns JSON data compliant with Select2
+    """
+    if request.current_organization is None:
+        raise PermissionDenied("Il faut une organisation ou une structure pour accéder à cette page")
+
+    term = request.GET.get("term", "").strip()
+    users = []
+
+    if term:
+        all_collegues = get_all_collegues(request.organizations)
+        users_qs = (
+            User.objects.search_by_full_name(term)
+            .filter(kind=UserKind.JOB_SEEKER)
+            .filter(
+                Exists(
+                    FollowUpGroupMembership.objects.filter(
+                        follow_up_group__beneficiary_id=OuterRef("pk"),
+                        member__in=all_collegues.values("pk"),
+                    )
+                )
+            )
+        )
+
+        def format_data(user):
+            data = {
+                "id": user.pk,
+                "title": "",
+                "name": mask_unless(user.get_full_name(), predicate=request.user.can_view_personal_information(user)),
+                "birthdate": "",
+            }
+            if user.title:
+                # only add a . after M, not Mme
+                data["title"] = (
+                    f"{user.title.capitalize()}."[:3] if request.user.can_view_personal_information(user) else ""
+                )
+            if getattr(user.jobseeker_profile, "birthdate", None):
+                data["birthdate"] = (
+                    user.jobseeker_profile.birthdate.strftime("%d/%m/%Y")
+                    if request.user.can_view_personal_information(user)
+                    else ""
+                )
+            return data
+
+        users = [format_data(user) for user in users_qs[:10]]
+
+    return JsonResponse({"results": users})

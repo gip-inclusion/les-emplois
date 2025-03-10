@@ -11,11 +11,12 @@ import httpx
 from django.conf import settings
 
 
-def send_slack_message(text="Hello world :wave:"):
-    if not settings.SLACK_CRON_WEBHOOK_URL:
+def send_slack_message(text="Hello world :wave:", url=None):
+    url = url or settings.SLACK_CRON_WEBHOOK_URL
+    if not url:
         return
     response = httpx.post(
-        url=settings.SLACK_CRON_WEBHOOK_URL,
+        url=url,
         data=json.dumps({"text": text}),
         headers={"Content-Type": "application/json"},
     )

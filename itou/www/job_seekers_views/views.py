@@ -19,7 +19,6 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
-from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
@@ -30,6 +29,7 @@ from itou.utils.pagination import pager
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.apply.views.submit_views import ApplicationBaseView
+from itou.www.gps import utils as gps_utils
 from itou.www.job_seekers_views.enums import JobSeekerOrder, JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import (
     CheckJobSeekerInfoForm,
@@ -443,8 +443,6 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
 
             # The NIR we found is correct
             if self.form.data.get("confirm"):
-                if self.is_gps:
-                    FollowUpGroup.objects.follow_beneficiary(job_seeker, request.user, is_referent=True)
                 return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
             context = {
@@ -517,6 +515,8 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
             # The email we found is correct
             if self.form.data.get("confirm"):
                 if not can_add_nir:
+                    if self.is_gps:
+                        gps_utils.add_beneficiary(request, job_seeker)
                     return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
                 try:
@@ -535,7 +535,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                     logger.exception("step_job_seeker: error when saving job_seeker=%s nir=%s", job_seeker, nir)
                 else:
                     if self.is_gps:
-                        FollowUpGroup.objects.follow_beneficiary(job_seeker, request.user, is_referent=True)
+                        gps_utils.add_beneficiary(request, job_seeker)
                     return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
         return self.render_to_response(
@@ -819,7 +819,17 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             url = self.get_exit_url(self.profile.user, created=True)
 
             if self.is_gps:
-                FollowUpGroup.objects.follow_beneficiary(user, request.user, is_referent=True)
+                gps_utils.add_beneficiary(request, user)
+                if (
+                    User.objects.filter(kind=UserKind.JOB_SEEKER, first_name=user.first_name, last_name=user.last_name)
+                    .exclude(pk=user.pk)
+                    .exists()
+                ):
+                    job_seeker_admin_url = reverse("admin:users_user_change", args=(user.pk,))
+                    gps_utils.send_slack_message_for_gps(
+                        ":black_square_for_stop: Création d’un nouveau bénéficiaire : "
+                        f'<a href="{job_seeker_admin_url}">{user.get_full_name()}</a>.'
+                    )
 
         return HttpResponseRedirect(url)
 
