@@ -96,7 +96,7 @@ def test_displayed_tabs(client, with_membership, assertion):
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_empty_list(client, url, snapshot):
-    client.force_login(PrescriberFactory(membership=True))
+    client.force_login(PrescriberFactory(membership=True, membership__organization__for_snapshot=True))
     response = client.get(url)
     assert str(parse_response_to_soup(response, selector="#main")) == snapshot
 
