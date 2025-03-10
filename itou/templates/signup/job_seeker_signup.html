@@ -63,11 +63,12 @@
                    target="_blank">ameli.fr</a>, le site de l'assurance maladie vous explique comment l'obtenir.
             </p>
 
-            {% itou_buttons_form primary_label="Continuer" %}
-
+            {% url 'search:employers_home' as reset_url %}
+            {% url 'signup:job_seeker_situation' as previous_url %}
+            {% itou_buttons_form primary_label="Suivant" secondary_url=previous_url reset_url=reset_url %}
         </form>
-        {% include "signup/includes/login_reminder.html" only %}
     </div>
+    {% include "signup/includes/login_reminder.html" only %}
 {% endblock job_seeker_signup_content %}
 
 
