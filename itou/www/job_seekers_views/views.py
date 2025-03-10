@@ -2,9 +2,10 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, IntegerField, Max, OuterRef, Subquery, Value
+from django.db.models import Count, DateTimeField, IntegerField, Max, OuterRef, Q, Subquery, Value
 from django.db.models.functions import Coalesce, Concat, Lower
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
@@ -112,14 +113,13 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
 
 @require_safe
 @check_user(lambda user: user.is_prescriber)
-def list_job_seekers(request, template_name="job_seekers_views/list.html"):
-    job_seekers_ids = list(User.objects.linked_job_seeker_ids(request.user, request.current_organization))
-
-    form = FilterForm(
-        User.objects.filter(kind=UserKind.JOB_SEEKER).filter(pk__in=job_seekers_ids),
-        request.GET,
-        request_user=request.user,
-    )
+def list_job_seekers(request, template_name="job_seekers_views/list.html", list_organization=False):
+    if list_organization:
+        if not request.current_organization:
+            raise Http404
+        job_seekers_ids = list(User.objects.linked_job_seeker_ids(request.user, request.current_organization))
+    else:
+        job_seekers_ids = list(User.objects.linked_job_seeker_ids(request.user, None))
 
     user_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization).filter(
         job_seeker=OuterRef("pk")
@@ -148,11 +148,24 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
             job_applications_nb=Coalesce(subquery_count, 0),
             last_updated_at=subquery_last_update,
             valid_eligibility_diagnosis=subquery_diagnosis,
+            application_sent_by=ArrayAgg(
+                "job_applications__sender", distinct=True, filter=Q(job_applications__sender__isnull=False)
+            ),
         )
     )
 
-    if form.is_valid() and (job_seeker_pk := form.cleaned_data["job_seeker"]):
-        queryset = queryset.filter(pk=job_seeker_pk)
+    form = FilterForm(
+        # User.objects.filter(kind=UserKind.JOB_SEEKER).filter(pk__in=job_seekers_ids),
+        queryset,
+        request.GET,
+        request_user=request.user,
+        request_organization=request.current_organization,
+    )
+
+    filters_counter = 0
+    if form.is_valid():
+        queryset = form.filter(queryset)
+        filters_counter = form.get_filters_counter()
 
     try:
         order = JobSeekerOrder(request.GET.get("order"))
@@ -166,7 +179,9 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
 
     context = {
         "back_url": get_safe_url(request, "back_url"),
+        "list_organization": list_organization,
         "filters_form": form,
+        "filters_counter": filters_counter,
         "order": order,
         "page_obj": page_obj,
     }
