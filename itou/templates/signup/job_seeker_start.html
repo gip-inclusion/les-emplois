@@ -1,0 +1,27 @@
+{% extends "signup/job_seeker_signup_base.html" %}
+{% load static %}
+{% load buttons_form %}
+
+{% block job_seeker_signup_content %}
+    <div class="c-form">
+        <h3>Vous souhaitez augmenter vos chances d’être recruté ?</h3>
+        <p>
+            C’est prouvé ! En vous faisant accompagner par un conseiller à l’emploi, vous augmentez considérablement vos chances d’être recruté par un employeur inclusif.
+            <br>
+            N’attendez pas, prenez contact avec votre conseiller pour qu’il vous accompagne dans vos démarches et vos candidatures.
+        </p>
+        <p>
+            <strong>Trouvez un conseiller à l’emploi près de chez vous,</strong> grâce à la recherche de prescripteurs habilités :
+        </p>
+        <a href="{% url 'search:prescribers_home' %}" class="btn btn-sm btn-outline-primary mb-4" target="_blank" rel="noopener">Rechercher un prescripteur habilité</a>
+        {% url 'search:employers_home' as reset_url %}
+        {% url 'signup:choose_user_kind' as previous_url %}
+        {% url 'signup:job_seeker_situation' as next_url %}
+        {% itou_buttons_form primary_label="Suivant" primary_url=next_url secondary_url=previous_url reset_url=reset_url show_mandatory_fields_mention=False %}
+    </div>
+    {% include "signup/includes/login_reminder.html" %}
+{% endblock %}
+
+{% block image %}
+    <img class="img-fluid img-fitcover" src="{% static 'img/job_seeker_start.png' %}" alt="">
+{% endblock %}

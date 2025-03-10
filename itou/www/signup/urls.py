@@ -12,6 +12,11 @@ urlpatterns = [
     path("", views.ChooseUserKindSignupView.as_view(), name="choose_user_kind"),
     # Job seeker.
     path(
+        "job_seeker/start",
+        views.JobSeekerStartSignupView.as_view(),
+        name="job_seeker_start",
+    ),
+    path(
         "job_seeker/situation",
         views.job_seeker_situation,
         name="job_seeker_situation",
