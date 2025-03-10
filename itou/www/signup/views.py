@@ -87,11 +87,15 @@ class ChooseUserKindSignupView(LoginNotRequiredMixin, FormView):
 
     def form_valid(self, form):
         urls = {
-            UserKind.JOB_SEEKER: reverse("signup:job_seeker_situation"),
+            UserKind.JOB_SEEKER: reverse("signup:job_seeker_start"),
             UserKind.PRESCRIBER: reverse("signup:prescriber_check_already_exists"),
             UserKind.EMPLOYER: reverse("signup:company_select"),
         }
         return HttpResponseRedirect(urls[form.cleaned_data["kind"]])
+
+
+class JobSeekerStartSignupView(LoginNotRequiredMixin, TemplateView):
+    template_name = "signup/job_seeker_start.html"
 
 
 @login_not_required
