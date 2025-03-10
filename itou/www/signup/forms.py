@@ -78,29 +78,6 @@ class ChooseUserKindSignupForm(forms.Form):
     )
 
 
-class JobSeekerSituationForm(forms.Form):
-    ERROR_NOTHING_CHECKED = (
-        "Si vous êtes dans l’une des situations ci-dessous, vous devez cocher au moins une case  avant de continuer"
-    )
-
-    SITUATIONS_CHOICES = (
-        ("rsa", "Bénéficiaire du RSA (revenu de solidarité active)"),
-        ("ass", "Allocataire ASS (allocation spécifique de solidarité)"),
-        ("aah", "Allocataire AAH (allocation adulte handicapé) ou bénéficiaire d'une RQTH"),
-        ("pe", "Inscrit à France Travail depuis plus de 2 ans (inscription en continu)"),
-        ("autre", "Autre"),
-    )
-
-    ELIGIBLE_SITUATION = ["rsa", "ass", "aah", "pe"]
-
-    situation = forms.MultipleChoiceField(
-        label="",
-        choices=SITUATIONS_CHOICES,
-        widget=forms.CheckboxSelectMultiple(attrs={"class": "form-checkbox-greater-spacing"}),
-        error_messages={"required": ERROR_NOTHING_CHECKED},
-    )
-
-
 class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, BaseSignupForm):
     birthdate = forms.DateField(
         label="Date de naissance",
