@@ -492,6 +492,14 @@ class TestItouStaffLogin:
         next_url = add_url_params(confirm_otp_url, {"next": admin_url})
         assertRedirects(response, next_url)
 
+        # The user should not be able to access the setup otp pages
+        response = client.get(setup_otp_url)
+        assertRedirects(response, add_url_params(confirm_otp_url, {"next": setup_otp_url}))
+        other_device = TOTPDevice.objects.create(user=user, confirmed=False)
+        setup_otp_confirm_url = reverse("itou_staff_views:otp_confirm", args=(other_device.pk,))
+        response = client.get(setup_otp_confirm_url)
+        assertRedirects(response, add_url_params(confirm_otp_url, {"next": setup_otp_confirm_url}))
+
         # Give a bad token
         totp = TOTP(device.bin_key, drift=100)
         post_data = {
