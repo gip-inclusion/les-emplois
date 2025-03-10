@@ -4165,7 +4165,7 @@
               <li>
                   <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
                   <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
-                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
+                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
@@ -4176,7 +4176,7 @@
       <li>
       <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
-      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
+      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
@@ -4190,7 +4190,7 @@
   <li>
       <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
-      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
+      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
@@ -4271,7 +4271,7 @@
               <li>
                   <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
                   <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
-                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
+                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
@@ -4282,7 +4282,7 @@
       <li>
       <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
-      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
+      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
@@ -4296,7 +4296,7 @@
   <li>
       <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
-      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
+      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
