@@ -3299,6 +3299,9 @@
   
           
           
+  
+  
+  
           
   
   
@@ -3544,17 +3547,22 @@
   
           
           
-              <hr/>
-              
   
-  <fieldset>
-      <legend>
-          <button aria-controls="collapse-eligibility_validated" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-eligibility_validated" data-bs-toggle="collapse" type="button">Éligibilité IAE</button>
-      </legend>
-      <div class="mt-3 collapse" id="collapse-eligibility_validated"><div class="form-group"><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Éligibilité validée</label></div></div></div>
-  </fieldset>
   
-          
+      <hr/>
+      <fieldset>
+          <legend>
+              <button aria-controls="collapseEligibility" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseEligibility" data-bs-toggle="collapse" type="button">Éligibilité IAE</button>
+          </legend>
+          <div class="my-3 collapse" id="collapseEligibility">
+              <ul>
+                  <li><div class=""><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Valide</label></div></div></li>
+                  <li><div class=""><div class="form-check"><input class="form-check-input" id="id_eligibility_pending" name="eligibility_pending" type="checkbox"/><label class="form-check-label" for="id_eligibility_pending">À valider</label></div></div></li>
+              </ul>
+          </div>
+      </fieldset>
+  
+  
           
   
   
@@ -3815,6 +3823,9 @@
   
           
           
+  
+  
+  
           
   
   
