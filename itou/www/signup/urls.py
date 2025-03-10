@@ -1,6 +1,4 @@
-from django.contrib.auth.decorators import login_not_required
 from django.urls import path, re_path
-from django.views.generic import TemplateView
 
 from itou.www.signup import views
 
@@ -18,19 +16,19 @@ urlpatterns = [
     ),
     path(
         "job_seeker/situation",
-        views.job_seeker_situation,
+        views.JobSeekerSituationSignupView.as_view(),
         name="job_seeker_situation",
+    ),
+    path(
+        "job_seeker/criteria",
+        views.JobSeekerCriteriaSignupView.as_view(),
+        name="job_seeker_criteria",
     ),
     path("job_seeker", views.job_seeker_signup_info, name="job_seeker"),
     path(
         "job_seeker/credentials",
         views.JobSeekerCredentialsSignupView.as_view(),
         name="job_seeker_credentials",
-    ),
-    path(
-        "job_seeker/situation_not_eligible",
-        login_not_required(TemplateView.as_view(template_name="signup/job_seeker_situation_not_eligible.html")),
-        name="job_seeker_situation_not_eligible",
     ),
     path(
         "facilitator/search",

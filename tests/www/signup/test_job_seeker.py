@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.test import override_settings
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertFormError, assertMessages, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune, Country
 from itou.openid_connect.france_connect import constants as fc_constants
@@ -16,7 +16,6 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
-from itou.www.signup.forms import JobSeekerSituationForm
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, JobSeekerFactory
@@ -33,59 +32,21 @@ class TestJobSeekerSignup:
         assertContains(response, "Candidat")
 
         response = client.post(url, data={"kind": UserKind.JOB_SEEKER})
-        start_url = reverse("signup:job_seeker_start")
-        assertRedirects(response, start_url)
+        assertRedirects(response, reverse("signup:job_seeker_start"))
 
+    def test_initial_steps(self, client):
+        start_url = reverse("signup:job_seeker_start")
         response = client.get(start_url)
         situation_url = reverse("signup:job_seeker_situation")
         assertContains(response, situation_url)
 
-    def test_job_seeker_signup_situation(self, client):
-        """
-        Test the redirects according to the chosen situations
-        """
+        response = client.get(situation_url)
+        signup_url = reverse("signup:job_seeker")
+        assertContains(response, signup_url)
+        criterias_url = reverse("signup:job_seeker_criteria")
+        assertContains(response, criterias_url)
 
-        # Check if the form page is displayed correctly.
-        url = reverse("signup:job_seeker_situation")
-        response = client.get(url)
-        assert response.status_code == 200
-
-        # Check if none of the boxes are checked 'some data' needed to raise
-        # form error.
-        post_data = {"some": "data"}
-        response = client.post(url, post_data)
-        assert response.status_code == 200
-        assertFormError(response.context["form"], "situation", [JobSeekerSituationForm.ERROR_NOTHING_CHECKED])
-
-        # Check if one of eligibility criterion is checked.
-        next_url = reverse("signup:job_seeker")
-        for choice in JobSeekerSituationForm.ELIGIBLE_SITUATION:
-            post_data = {"situation": [choice]}
-            response = client.post(url, data=post_data)
-            assert response.status_code == 302
-            assertRedirects(response, next_url)
-
-            post_data["situation"].append("autre")
-            response = client.post(url, data=post_data)
-            assert response.status_code == 302
-            assertRedirects(response, next_url)
-
-        # Check if all the eligibility criteria are checked.
-        post_data = {"situation": JobSeekerSituationForm.ELIGIBLE_SITUATION}
-        response = client.post(url, data=post_data)
-        assert response.status_code == 302
-        assertRedirects(response, next_url)
-
-        # Check if "Autre" is the only one checked.
-        post_data = {"situation": "autre"}
-        response = client.post(url, data=post_data)
-        assert response.status_code == 302
-        next_url = reverse("signup:job_seeker_situation_not_eligible")
-        assertRedirects(response, next_url)
-
-        # Check not eligible destination page.
-        url = reverse("signup:job_seeker_situation_not_eligible")
-        response = client.get(url)
+        response = client.get(criterias_url)
         assert response.status_code == 200
 
     def _test_job_seeker_signup_forms(self, client, nir, **extra_signup_kwargs):

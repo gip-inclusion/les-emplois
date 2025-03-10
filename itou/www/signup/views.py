@@ -98,34 +98,12 @@ class JobSeekerStartSignupView(LoginNotRequiredMixin, TemplateView):
     template_name = "signup/job_seeker_start.html"
 
 
-@login_not_required
-def job_seeker_situation(request, template_name="signup/job_seeker_situation.html"):
-    """
-    Second step of the signup process for jobseeker.
+class JobSeekerSituationSignupView(LoginNotRequiredMixin, TemplateView):
+    template_name = "signup/job_seeker_situation.html"
 
-    The user is asked to choose at least one eligibility criterion to continue the signup process.
-    """
 
-    form = forms.JobSeekerSituationForm(data=request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        next_url = reverse("signup:job_seeker_situation_not_eligible")
-
-        # If at least one of the eligibility choices is selected, go to the signup form.
-        if any(choice in forms.JobSeekerSituationForm.ELIGIBLE_SITUATION for choice in form.cleaned_data["situation"]):
-            next_url = reverse("signup:job_seeker")
-
-        # forward next page
-        if REDIRECT_FIELD_NAME in form.data:
-            next_url = f"{next_url}?{REDIRECT_FIELD_NAME}={form.data[REDIRECT_FIELD_NAME]}"
-
-        return HttpResponseRedirect(next_url)
-
-    context = {
-        "form": form,
-        "redirect_field_value": get_safe_url(request, REDIRECT_FIELD_NAME),
-    }
-    return render(request, template_name, context)
+class JobSeekerCriteriaSignupView(LoginNotRequiredMixin, TemplateView):
+    template_name = "signup/job_seeker_criteria.html"
 
 
 @login_not_required
