@@ -1,0 +1,76 @@
+{% extends "signup/job_seeker_signup_base.html" %}
+{% load static %}
+
+{% block job_seeker_signup_content %}
+    <div class="c-box">
+        <h3>Critères d’accès aux emplois inclusifs</h3>
+        <p>
+            Liste des différents critères pouvant vous donner accès à un parcours en structure d’insertion par l’activité économique (IAE), dans un groupement d’employeurs pour l’insertion et la qualification (GEIQ) ou en Entreprise adaptée (EA ou EATT) :
+        </p>
+
+        <p class="mb-0">
+            <strong>Vous êtes bénéficiaire de minima sociaux :</strong>
+        </p>
+        <ul>
+            <li>Bénéficiaire du RSA (Revenu de solidarité active)</li>
+            <li>Allocataire ASS (Allocation de solidarité spécifique)</li>
+            <li>Allocataire AAH (Allocation aux adultes handicapés)</li>
+        </ul>
+
+        <p class="mb-0">
+            <strong>Vous êtes dans l’une des tranches d’âge suivantes :</strong>
+        </p>
+        <ul>
+            <li>Jeune de moins de 26 ans</li>
+            <li>Demandeurs d’emploi de 45 ans et plus</li>
+            <li>Senior ( + 50 ans )</li>
+        </ul>
+
+        <p class="mb-0">
+            <strong>Vous êtes inscrit à France Travail et êtes dans l’une des situations suivantes :</strong>
+        </p>
+        <ul>
+            <li>depuis au moins 12 mois au cours des 15 derniers mois (Demandeur d’emploi de longue durée (DELD))</li>
+            <li>depuis au moins 24 mois au cours des 27 derniers mois (Demandeur d’emploi de très longue durée (DETLD))</li>
+        </ul>
+
+        <p class="mb-0">
+            <strong>Vous résidez dans une zone prioritaire :</strong>
+        </p>
+        <ul>
+            <li>Résident en ZRR : Zone de revitalisation rurale</li>
+            <li>Résident QPV : Quartier prioritaire de la politique de la ville</li>
+        </ul>
+
+        <p class="mb-0">
+            <strong>Autres critères :</strong>
+        </p>
+        <ul>
+            <li>Travailleur handicapé (RQTH)</li>
+            <li>Niveau d’étude 3 (CAP, BEP) ou infra</li>
+            <li>Sortant de l’ASE (Aide sociale à l’enfance)</li>
+            <li>Personnes en reconversion professionnelle contrainte</li>
+            <li>Maîtrise de la langue française</li>
+            <li>Problème de mobilité</li>
+            <li>Parent isolé</li>
+            <li>Personne sans hébergement ou hébergée ou ayant un parcours de rue</li>
+            <li>Réfugié statutaire, bénéficiaire d’une protection temporaire, protégé subsidiaire ou demandeur d’asile.</li>
+            <li>Sortant de détention ou personne placée sous main de justice</li>
+            <li>Personnes bénéficiant ou sortant d’un dispositif d’insertion</li>
+        </ul>
+        <div>
+            <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733921254161--Les-crit%C3%A8res-d-%C3%A9ligibilit%C3%A9-IAE" class="btn btn-link has-external-link" target="_blank" rel="noopener">En savoir plus sur les critères d’éligibilité à l’IAE</a>
+        </div>
+        <div>
+            <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/15292304442129--Crit%C3%A8res-publics-prioritaires-en-Geiq" class="btn btn-link has-external-link" target="_blank" rel="noopener">En savoir plus sur les critères d’éligibilité GEIQ</a>
+        </div>
+        <div>
+            <a href="https://www.unea.fr/sites/default/files/fiche_proposition_candidat_th_ea_maj_20200605_criteres.pdf" class="btn btn-link has-external-link" target="_blank" rel="noopener">En savoir plus sur les critères d’accès à une EA ou une EATT</a>
+        </div>
+    </div>
+    {% include "signup/includes/login_reminder.html" %}
+{% endblock %}
+
+{% block image %}
+    <img class="img-fluid img-fitcover" src="{% static 'img/job_seeker_criteria.png' %}" alt="">
+{% endblock %}

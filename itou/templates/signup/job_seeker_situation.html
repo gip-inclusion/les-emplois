@@ -1,22 +1,25 @@
 {% extends "signup/job_seeker_signup_base.html" %}
-{% load django_bootstrap5 %}
-{% load redirection_fields %}
 {% load static %}
 {% load buttons_form %}
 
 {% block job_seeker_signup_content %}
     <div class="c-form">
-        <form method="post" action="" role="form" class="js-prevent-multiple-submit">
-            {% csrf_token %}
-            <fieldset>
-                <legend class="fs-base form-label">Sélectionnez votre situation</legend>
-                {% redirection_input_field value=redirect_field_value %}
-
-                {% bootstrap_form form alert_error_type="all" %}
-
-                {% itou_buttons_form primary_label="Continuer" %}
-            </fieldset>
-        </form>
-        {% include "signup/includes/login_reminder.html" only %}
+        <h3>Ce service est-il adapté à votre situation ?</h3>
+        <p>
+            Les Emplois de l’inclusion met en relation les personnes éloignées de l’emploi avec des employeurs dont la mission est d’apporter un accompagnement socioprofessionnel pour les aider à accéder à l’emploi durable.
+        </p>
+        <p>
+            Avant de poursuivre votre inscription, <strong>vérifiez que vous remplissez les conditions d’accès à ce type d’emploi</strong>. En cas de doute, demandez à votre conseiller à l’emploi.
+        </p>
+        <a href="{% url 'signup:job_seeker_criteria' %}" class="btn btn-sm btn-outline-primary has-external-link mb-4" target="_blank" rel="noopener">Voir les critères d’accès aux emplois inclusifs</a>
+        {% url 'search:employers_home' as reset_url %}
+        {% url 'signup:job_seeker' as next_url %}
+        {% url 'signup:job_seeker_start' as previous_url %}
+        {% itou_buttons_form primary_label="Suivant" primary_url=next_url secondary_url=previous_url reset_url=reset_url show_mandatory_fields_mention=False %}
     </div>
+    {% include "signup/includes/login_reminder.html" %}
+{% endblock %}
+
+{% block image %}
+    <img class="img-fluid img-fitcover" src="{% static 'img/job_seeker_situation.png' %}" alt="">
 {% endblock %}
