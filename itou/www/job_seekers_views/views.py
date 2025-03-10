@@ -3,9 +3,10 @@ import logging
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, DateTimeField, IntegerField, Max, OuterRef, Subquery, Value
+from django.db.models import Count, DateTimeField, IntegerField, Max, OuterRef, Q, Subquery, Value
 from django.db.models.functions import Coalesce, Concat, Lower
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
@@ -121,12 +122,6 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     else:
         job_seekers_ids = list(User.objects.linked_job_seeker_ids(request.user, None))
 
-    form = FilterForm(
-        User.objects.filter(kind=UserKind.JOB_SEEKER).filter(pk__in=job_seekers_ids),
-        request.GET,
-        request_user=request.user,
-    )
-
     user_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization).filter(
         job_seeker=OuterRef("pk")
     )
@@ -154,7 +149,17 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
             job_applications_nb=Coalesce(subquery_count, 0),
             last_updated_at=subquery_last_update,
             valid_eligibility_diagnosis=subquery_diagnosis,
+            application_sent_by=ArrayAgg(
+                "job_applications__sender", distinct=True, filter=Q(job_applications__sender__isnull=False)
+            ),
         )
+    )
+
+    form = FilterForm(
+        queryset,
+        request.GET,
+        request_user=request.user,
+        request_organization=request.current_organization,
     )
 
     filters_counter = 0

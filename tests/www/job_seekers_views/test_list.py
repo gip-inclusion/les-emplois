@@ -17,11 +17,16 @@ from tests.eligibility.factories import (
 )
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
+    PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
-from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import (
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+)
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
@@ -653,6 +658,86 @@ def test_filtered_by_approval_state(client, url):
         job_seeker_expired_eligibility_expired_approval,
         job_seeker_expired_eligibility_valid_approval,
         job_seeker_valid_eligibility_no_approval,
+    ]
+
+
+def test_filtered_by_organization_members(client):
+    organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
+    prescriber = organization.members.first()
+    member = organization.members.last()
+    old_member = PrescriberMembershipFactory(organization=organization, user__is_active=False).user
+    other_prescriber_not_in_orga = PrescriberFactory()
+
+    job_seeker_created_by_user = JobSeekerFactory(
+        created_by=prescriber,
+        jobseeker_profile__created_by_prescriber_organization=organization,
+        first_name="created_by_user",
+        last_name="Zorro",
+    )
+    job_seeker_created_by_member = JobSeekerFactory(
+        created_by=member,
+        jobseeker_profile__created_by_prescriber_organization=organization,
+        first_name="created_by_member",
+        last_name="Zorro",
+    )
+    job_seeker_created_by_old_member = JobSeekerFactory(
+        created_by=old_member,
+        jobseeker_profile__created_by_prescriber_organization=organization,
+        first_name="created_by_old_member",
+        last_name="Zorro",
+    )
+
+    job_seeker_applied_by_user = JobApplicationFactory(
+        sender=prescriber,
+        sender_prescriber_organization=organization,
+        job_seeker__first_name="applied_by_user",
+        job_seeker__last_name="Zorro",
+    ).job_seeker
+    job_seeker_applied_by_member = JobApplicationFactory(
+        sender=member,
+        sender_prescriber_organization=organization,
+        job_seeker__first_name="applied_by_member",
+        job_seeker__last_name="Zorro",
+        updated_at=timezone.now() - datetime.timedelta(days=1),
+    ).job_seeker
+    job_seeker_applied_by_old_member = JobApplicationFactory(
+        sender=old_member,
+        sender_prescriber_organization=organization,
+        job_seeker__first_name="applied_by_old_member",
+        job_seeker__last_name="Zorro",
+    ).job_seeker
+    job_seeker_applied_by_user_created_by_user_not_in_orga = JobApplicationFactory(
+        sender=prescriber,
+        job_seeker__first_name="applied_by_user_created_by_other_user_not_in_orga",
+        job_seeker__last_name="Zorro",
+        job_seeker__created_by=other_prescriber_not_in_orga,
+    ).job_seeker
+
+    client.force_login(prescriber)
+    url = reverse("job_seekers_views:list_organization")
+
+    response = client.get(url)
+    assert response.context["page_obj"].object_list == [
+        job_seeker_applied_by_member,
+        job_seeker_applied_by_old_member,
+        job_seeker_applied_by_user_created_by_user_not_in_orga,
+        job_seeker_applied_by_user,
+        job_seeker_created_by_member,
+        job_seeker_created_by_old_member,
+        job_seeker_created_by_user,
+    ]
+
+    for organization_member in [prescriber, member, old_member]:
+        assertContains(response, organization_member.get_full_name())
+    assertNotContains(response, other_prescriber_not_in_orga.get_full_name())
+
+    response = client.get(url, {"organization_members": member.pk})
+    assert response.context["page_obj"].object_list == [job_seeker_applied_by_member, job_seeker_created_by_member]
+
+    response = client.get(url, {"organization_members": old_member.pk})
+    assert response.context["page_obj"].object_list == [
+        job_seeker_applied_by_old_member,
+        job_seeker_created_by_old_member,
     ]
 
 
