@@ -408,7 +408,7 @@ class TestProcessListSiae:
         response = client.get(reverse("apply:list_for_siae"), {"pass_iae_active": True, "pass_iae_suspended": True})
         assert response.context["job_applications_page"].object_list == [job_application]
 
-    def test_list_for_siae_filtered_by_eligibility_validated(self, client):
+    def test_list_for_siae_filtered_by_eligibility_state(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
 
@@ -418,11 +418,15 @@ class TestProcessListSiae:
         client.force_login(employer)
         response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
         assert response.context["job_applications_page"].object_list == []
+        response = client.get(reverse("apply:list_for_siae"), {"eligibility_pending": True})
+        assert set(response.context["job_applications_page"].object_list) == set([job_app, _another_job_app])
 
         # Authorized prescriber diagnosis
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_app.job_seeker)
         response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
         assert response.context["job_applications_page"].object_list == [job_app]
+        response = client.get(reverse("apply:list_for_siae"), {"eligibility_pending": True})
+        assert response.context["job_applications_page"].object_list == [_another_job_app]
 
         # Make sure the diagnostic expired - it should be ignored
         diagnosis.expires_at = timezone.localdate() - datetime.timedelta(
@@ -431,6 +435,8 @@ class TestProcessListSiae:
         diagnosis.save(update_fields=("expires_at",))
         response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
         assert response.context["job_applications_page"].object_list == []
+        response = client.get(reverse("apply:list_for_siae"), {"eligibility_pending": True})
+        assert set(response.context["job_applications_page"].object_list) == set([job_app, _another_job_app])
 
         # Diagnosis made by employer's SIAE
         diagnosis.delete()
@@ -439,12 +445,16 @@ class TestProcessListSiae:
         )
         response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
         assert response.context["job_applications_page"].object_list == [job_app]
+        response = client.get(reverse("apply:list_for_siae"), {"eligibility_pending": True})
+        assert response.context["job_applications_page"].object_list == [_another_job_app]
 
         # Diagnosis made by an other SIAE - it should be ignored
         diagnosis.delete()
         diagnosis = IAEEligibilityDiagnosisFactory(job_seeker=job_app.job_seeker, from_employer=True)
         response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
         assert response.context["job_applications_page"].object_list == []
+        response = client.get(reverse("apply:list_for_siae"), {"eligibility_pending": True})
+        assert set(response.context["job_applications_page"].object_list) == set([job_app, _another_job_app])
 
         # With a valid approval
         approval = ApprovalFactory(
@@ -453,6 +463,8 @@ class TestProcessListSiae:
         )
         response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
         assert response.context["job_applications_page"].object_list == [job_app]
+        response = client.get(reverse("apply:list_for_siae"), {"eligibility_pending": True})
+        assert response.context["job_applications_page"].object_list == [_another_job_app]
 
         # With an expired approval
         approval_diagnosis = approval.eligibility_diagnosis
@@ -461,6 +473,8 @@ class TestProcessListSiae:
         approval = ApprovalFactory(expired=True)
         response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
         assert response.context["job_applications_page"].object_list == []
+        response = client.get(reverse("apply:list_for_siae"), {"eligibility_pending": True})
+        assert set(response.context["job_applications_page"].object_list) == set([job_app, _another_job_app])
 
     def test_list_for_siae_filtered_by_administrative_criteria(self, client):
         company = CompanyFactory(with_membership=True)

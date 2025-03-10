@@ -222,12 +222,18 @@ def test_filtered_by_company(client):
     assert len(applications) == 3
 
 
-def test_filtered_by_eligibility_validated_prescriber(client):
-    prescriber_jobapp = JobApplicationFactory()
-    client.force_login(prescriber_jobapp.sender)
-    response = client.get(reverse("apply:list_prescriptions"), {"eligiblity_validated": "on"})
+def test_filtered_by_eligibility_state_prescriber(client):
+    eligibility_validated_jobapp = JobApplicationFactory()
+    eligibility_pending_jobapp = JobApplicationFactory(
+        sender=eligibility_validated_jobapp.sender, eligibility_diagnosis=None
+    )
+    client.force_login(eligibility_validated_jobapp.sender)
+    response = client.get(reverse("apply:list_prescriptions"), {"eligibility_validated": "on"})
     applications = response.context["job_applications_page"].object_list
-    assert applications == [prescriber_jobapp]
+    assert applications == [eligibility_validated_jobapp]
+    response = client.get(reverse("apply:list_prescriptions"), {"eligibility_pending": "on"})
+    applications = response.context["job_applications_page"].object_list
+    assert applications == [eligibility_pending_jobapp]
 
 
 def test_list_display_kind(client):
