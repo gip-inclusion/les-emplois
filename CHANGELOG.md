@@ -1,5 +1,23 @@
 # Journal des modifications
 
+## 2025-03-10
+
+### Modifié
+
+- [Admin: Remplacer la page de connexion de l'admin](https://github.com/gip-inclusion/les-emplois/pull/5727)
+- [Candidature: ajout du tri sur les listes de candidatures](https://github.com/gip-inclusion/les-emplois/pull/5649)
+- [Candidature: Ajout d’un nouveau motif de refus “Refus automatique”](https://github.com/gip-inclusion/les-emplois/pull/5726) 🖼
+- [Fiches salarié : Améliorations pour le désarchivage et la création automatique des notifications](https://github.com/gip-inclusion/les-emplois/pull/5641)
+- [GPS: Ajout d'urls de compatibilité](https://github.com/gip-inclusion/les-emplois/pull/5730)
+- [UX/UI: Ajustement UI du stepper et la progress bar](https://github.com/gip-inclusion/les-emplois/pull/5716)
+- [UX/UI: Changement UI de la modale de connexion aux comptes de démonstration](https://github.com/gip-inclusion/les-emplois/pull/5703)
+- [UX/UI: Correction du formulaire critères administratifs GEIQ](https://github.com/gip-inclusion/les-emplois/pull/5697)
+- [UX/UI: Optimisations UX/UI/A11Y des formulaires d'inscription](https://github.com/gip-inclusion/les-emplois/pull/5643) 🖼
+
+### Tech
+
+- [Admin: sécurisation des urls de gestion des membres](https://github.com/gip-inclusion/les-emplois/pull/5417)
+
 ## 2025-03-03
 
 ### Ajouté
