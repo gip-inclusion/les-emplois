@@ -27,7 +27,7 @@
     <div class="c-box c-box--action">
         <h2 class="visually-hidden">Actions rapides</h2>
         <div class="form-row align-items-center gx-3">
-            {% if siae.has_active_members and not siae.block_job_applications %}
+            {% if siae.has_active_members and siae.is_open_to_spontaneous_applications or active_job_descriptions %}
                 {% if job_app_to_transfer %}
                     <div class="form-group col-12 col-lg-auto">
                         <a href="{% url 'apply:job_application_external_transfer_step_2' job_application_id=job_app_to_transfer.pk company_pk=siae.pk %}?back_url={{ request.get_full_path|urlencode }}"
@@ -176,7 +176,7 @@
                                         {% include "companies/includes/_siae_jobdescription.html" %}
                                     {% endfor %}
                                 </ul>
-                            {% elif siae.block_job_applications %}
+                            {% elif not siae.is_open_to_spontaneous_applications %}
                                 <p class="mb-0">Cet employeur n’a pas de recrutement en cours.</p>
                             {% else %}
                                 <p class="mb-0">Cet employeur accepte de recevoir des candidatures spontanées.</p>
@@ -191,7 +191,7 @@
                                 </ul>
                             </div>
                         {% endif %}
-                        {% if not siae.block_job_applications and siae.has_active_members %}
+                        {% if active_job_descriptions or siae.is_open_to_spontaneous_applications and siae.has_active_members %}
                             {% if job_app_to_transfer %}
                                 <div class="d-flex justify-content-end mt-3">
                                     <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"

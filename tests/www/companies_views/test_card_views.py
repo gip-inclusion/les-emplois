@@ -20,6 +20,8 @@ from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_
 class TestCardView:
     OTHER_TAB_ID = "autres-metiers"
     APPLY = "Postuler"
+    SPONTANEOUS_APPLICATIONS_OPEN = "Cet employeur accepte de recevoir des candidatures spontanées."
+    SPONTANEOUS_APPLICATIONS_CLOSED = "Cet employeur n’a pas de recrutement en cours."
 
     @pytest.fixture(autouse=True)
     def setup_method(self, client):
@@ -91,6 +93,26 @@ class TestCardView:
         assert str(tab_content_soup) == snapshot(name="tab-content")
 
         assertContains(response, self.APPLY)
+        assertContains(response, self.SPONTANEOUS_APPLICATIONS_OPEN)
+        assertNotContains(response, self.SPONTANEOUS_APPLICATIONS_CLOSED)
+
+    def test_card_spontaneous_applications_closed(self, client):
+        # Company has no active job offers, and they are not open to spontaneous applications
+        company = CompanyFactory(
+            name="les petits jardins", with_membership=True, spontaneous_applications_open_since=None
+        )
+        JobDescriptionFactory(
+            company=company,
+            custom_name="Plaquiste",
+            location=self.vannes,
+            contract_type=ContractType.PERMANENT,
+            is_active=False,
+        )
+        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        response = client.get(url)
+        assertNotContains(response, self.APPLY)
+        assertNotContains(response, self.SPONTANEOUS_APPLICATIONS_OPEN)
+        assertContains(response, self.SPONTANEOUS_APPLICATIONS_CLOSED)
 
     def test_card_no_other_jobs(self, client, snapshot):
         company = CompanyFactory(name="les petits jardins", with_membership=True)
