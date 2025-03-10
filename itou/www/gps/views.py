@@ -447,14 +447,20 @@ def beneficiaries_autocomplete(request):
             data = {
                 "id": user.pk,
                 "title": "",
-                "name": user.get_full_name(),
+                "name": mask_unless(user.get_full_name(), predicate=request.user.can_view_personal_information(user)),
                 "birthdate": "",
             }
             if user.title:
                 # only add a . after M, not Mme
-                data["title"] = f"{user.title.capitalize()}."[:3]
+                data["title"] = (
+                    f"{user.title.capitalize()}."[:3] if request.user.can_view_personal_information(user) else ""
+                )
             if getattr(user.jobseeker_profile, "birthdate", None):
-                data["birthdate"] = user.jobseeker_profile.birthdate.strftime("%d/%m/%Y")
+                data["birthdate"] = (
+                    user.jobseeker_profile.birthdate.strftime("%d/%m/%Y")
+                    if request.user.can_view_personal_information(user)
+                    else ""
+                )
             return data
 
         users = [format_data(user) for user in users_qs[:10]]

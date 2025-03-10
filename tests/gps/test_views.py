@@ -11,7 +11,7 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 from itou.asp.models import Commune, Country, RSAAllocation
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.enums import LackOfPoleEmploiId
+from itou.users.enums import LackOfPoleEmploiId, Title
 from itou.users.models import User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.templatetags.str_filters import mask_unless
@@ -827,15 +827,31 @@ class TestBeneficiariesAutocomplete:
         else:
             assert response.status_code == 403
 
-    def test_autocomplete(self, client):
+    @pytest.mark.parametrize("can_view_personal_info", [True, False])
+    def test_autocomplete(self, client, can_view_personal_info):
         prescriber = PrescriberFactory(first_name="gps member Vince")
-        organization_1 = PrescriberMembershipFactory(user=prescriber).organization
+        organization_1 = PrescriberMembershipFactory(
+            user=prescriber, organization__authorized=can_view_personal_info
+        ).organization
         coworker_1 = PrescriberMembershipFactory(organization=organization_1).user
-        organization_2 = PrescriberMembershipFactory(user=prescriber).organization
+        organization_2 = PrescriberMembershipFactory(
+            user=prescriber, organization__authorized=can_view_personal_info
+        ).organization
         coworker_2 = PrescriberMembershipFactory(organization=organization_2).user
 
-        first_beneficiary = JobSeekerFactory(first_name="gps beneficiary Bob", last_name="Le Brico")
-        second_beneficiary = JobSeekerFactory(first_name="gps second beneficiary Martin", last_name="Pêcheur")
+        first_beneficiary = JobSeekerFactory(
+            first_name="gps beneficiary Bob",
+            last_name="Le Brico",
+            created_by=prescriber,
+            jobseeker_profile__birthdate=date(1980, 1, 1),
+            title=Title.M,
+        )
+        second_beneficiary = JobSeekerFactory(
+            first_name="gps second beneficiary Martin",
+            last_name="Pêcheur",
+            jobseeker_profile__birthdate=date(1990, 1, 1),
+            title=Title.MME,
+        )
         third_beneficiary = JobSeekerFactory(first_name="gps third beneficiary Foo", last_name="Bar")
         JobSeekerFactory(first_name="gps other beneficiary Joe", last_name="Dalton")
 
@@ -847,6 +863,32 @@ class TestBeneficiariesAutocomplete:
             client.force_login(user)
             response = client.get(reverse("gps:beneficiaries_autocomplete") + f"?term={term}")
             return [r["id"] for r in response.json()["results"]]
+
+        # check we mask personal info when required
+        client.force_login(prescriber)
+        response = client.get(reverse("gps:beneficiaries_autocomplete") + "?term=gps")
+        data = {d["id"]: d for d in response.json()["results"]}
+        assert data[first_beneficiary.pk] == {
+            "birthdate": "01/01/1980",
+            "id": first_beneficiary.pk,
+            "title": "M.",
+            "name": first_beneficiary.get_full_name(),
+        }
+        if can_view_personal_info:
+            second_beneficiary_data = {
+                "birthdate": "01/01/1990",
+                "id": second_beneficiary.pk,
+                "title": "Mme",
+                "name": second_beneficiary.get_full_name(),
+            }
+        else:
+            second_beneficiary_data = {
+                "birthdate": "",
+                "id": second_beneficiary.pk,
+                "title": "",
+                "name": mask_unless(second_beneficiary.get_full_name(), False),
+            }
+        assert data[second_beneficiary.pk] == second_beneficiary_data
 
         # The prescriber should see the 3 job seekers followed by members of his organizations, but no the other one
         results = get_autocomplete_results(prescriber)
