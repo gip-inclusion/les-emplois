@@ -1,0 +1,21 @@
+{% load django_bootstrap5 %}
+
+{% if filters_form.eligibility_validated %}
+    <hr>
+    <fieldset>
+        <legend>
+            <button class="btn btn-outline-transparent has-collapse-caret collapsed"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseEligibility"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="collapseEligibility">Éligibilité IAE</button>
+        </legend>
+        <div class="my-3 collapse" id="collapseEligibility">
+            <ul>
+                <li>{% bootstrap_field filters_form.eligibility_validated wrapper_class="" %}</li>
+                <li>{% bootstrap_field filters_form.eligibility_pending wrapper_class="" %}</li>
+            </ul>
+        </div>
+    </fieldset>
+{% endif %}
