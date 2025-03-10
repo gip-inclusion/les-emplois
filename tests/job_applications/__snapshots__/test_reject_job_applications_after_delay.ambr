@@ -1,0 +1,25 @@
+# serializer version: 1
+# name: test_reject_job_applications_after_delay[new][auto.txt]
+  '''
+  Votre candidature a été automatiquement déclinée car elle n’a pas reçu de réponse depuis plus de 2 mois.
+  
+  Si vous êtes toujours en recherche d’emploi, nous vous invitons à poursuivre vos démarches. Pour maximiser vos chances de retour à l’emploi, n’hésitez pas à vous faire accompagner par un prescripteur habilité (France Travail, Mission Locale, Cap emploi, Service social du Conseil départemental…).
+  
+  Pour trouver les prescripteurs habilités présents sur votre territoire, consultez notre moteur de recherche : https://emplois.inclusion.beta.gouv.fr/search/prescribers/results
+  
+  Nous vous souhaitons une pleine réussite dans vos démarches.
+  
+  '''
+# ---
+# name: test_reject_job_applications_after_delay[processing][auto.txt]
+  '''
+  Votre candidature a été automatiquement déclinée car elle n’a pas reçu de réponse depuis plus de 2 mois.
+  
+  Si vous êtes toujours en recherche d’emploi, nous vous invitons à poursuivre vos démarches. Pour maximiser vos chances de retour à l’emploi, n’hésitez pas à vous faire accompagner par un prescripteur habilité (France Travail, Mission Locale, Cap emploi, Service social du Conseil départemental…).
+  
+  Pour trouver les prescripteurs habilités présents sur votre territoire, consultez notre moteur de recherche : https://emplois.inclusion.beta.gouv.fr/search/prescribers/results
+  
+  Nous vous souhaitons une pleine réussite dans vos démarches.
+  
+  '''
+# ---
