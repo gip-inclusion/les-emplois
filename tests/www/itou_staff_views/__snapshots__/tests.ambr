@@ -2617,7 +2617,28 @@
                       <div class="c-box">
                           <h2>Mes appareils</h2>
                           
-                              <p>Vous avez déjà configuré un appareil OTP.</p>
+                              <p>Voici la liste de vos appareils configurés :</p>
+                              <table class="table table-sm">
+                                  <caption>Si vous souhaitez en supprimer, demandez à Supportix</caption>
+                                  <thead>
+                                      <tr>
+                                          <th scope="col">Nom</th>
+                                          <th scope="col">créé le</th>
+                                          <th scope="col">dernière utilisation</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      
+                                          <tr>
+                                              <td>Mon appareil</td>
+                                              <td>10 mars 2025 15:43</td>
+                                              <td>
+                                                  <i class="text-disabled">jamais</i>
+                                              </td>
+                                          </tr>
+                                      
+                                  </tbody>
+                              </table>
                           
                           <form method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>

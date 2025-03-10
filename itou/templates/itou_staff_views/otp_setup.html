@@ -11,8 +11,29 @@
                 <div class="col-6">
                     <div class="c-box">
                         <h2>Mes appareils</h2>
-                        {% if has_devices %}
-                            <p>Vous avez déjà configuré un appareil OTP.</p>
+                        {% if devices %}
+                            <p>Voici la liste de vos appareils configurés :</p>
+                            <table class="table table-sm">
+                                <caption>Si vous souhaitez en supprimer, demandez à Supportix</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Nom</th>
+                                        <th scope="col">créé le</th>
+                                        <th scope="col">dernière utilisation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for device in devices %}
+                                        <tr>
+                                            <td>{{ device.name }}</td>
+                                            <td>{{ device.created_at }}</td>
+                                            <td>
+                                                {{ device.last_used_at|default:'<i class="text-disabled">jamais</i>' }}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         {% else %}
                             <p>Vous n'avez pas configuré d'appareil OTP.</p>
                         {% endif %}
@@ -20,7 +41,7 @@
                             {% csrf_token %}
                             <button type="submit" class="btn btn-block btn-primary">
                                 Configurer un
-                                {% if has_devices %}nouvel{% endif %}
+                                {% if devices %}nouvel{% endif %}
                                 appareil
                             </button>
                         </form>

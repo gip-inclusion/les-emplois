@@ -94,11 +94,11 @@ class ConfirmTOTPDeviceForm(forms.Form):
     name = forms.CharField(label="Nom de l'appareil")
     otp_token = forms.CharField()
 
-    otp_token.widget.attrs.update(max_length=6, autocomplete="one-time-code")
-
     def __init__(self, *args, device, **kwargs):
         super().__init__(*args, **kwargs)
         self.device = device
+        self.fields["otp_token"].widget.attrs["max_length"] = 6
+        self.fields["otp_token"].widget.attrs["autocomplete"] = "one-time-code"
 
     def clean(self):
         cleaned_data = super().clean()

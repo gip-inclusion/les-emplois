@@ -304,7 +304,7 @@ def otp_setup(request, template_name="itou_staff_views/otp_setup.html"):
         device, _ = TOTPDevice.objects.get_or_create(user=request.user, confirmed=False)
         return HttpResponseRedirect(reverse("itou_staff_views:otp_confirm", kwargs={"device_id": device.pk}))
 
-    context = {"has_devices": any(devices_for_user(request.user))}
+    context = {"devices": list(devices_for_user(request.user))}
     return render(request, template_name, context)
 
 

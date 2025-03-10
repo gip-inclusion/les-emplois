@@ -658,6 +658,7 @@ class TestOTP:
         assertRedirects(response, reverse("itou_staff_views:otp_confirm", args=(device.pk,)))
 
         # When the user already confirmed a device, the page is different
+        device.name = "Mon appareil"
         device.confirmed = True
         device.save()
         response = client.get(url)
