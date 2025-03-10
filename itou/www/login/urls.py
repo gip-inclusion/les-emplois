@@ -13,4 +13,5 @@ urlpatterns = [
     path("job_seeker", views.JobSeekerPreLoginView.as_view(), name="job_seeker"),
     path("itou_staff", views.ItouStaffLoginView.as_view(), name="itou_staff"),
     path("existing/<uuid:user_public_id>", views.ExistingUserLoginView.as_view(), name="existing_user"),
+    path("confirm-otp", views.ConfirmOTPView.as_view(), name="confirm_otp"),
 ]
