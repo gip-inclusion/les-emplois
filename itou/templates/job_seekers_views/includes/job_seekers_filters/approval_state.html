@@ -1,0 +1,23 @@
+{% load django_bootstrap5 %}
+
+<div class="dropdown">
+    <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+        Situation IAE
+    </button>
+    <ul class="dropdown-menu">
+        <li>
+            <strong class="dropdown-header">Éligibilité IAE</strong>
+        </li>
+        <li>{% bootstrap_field filters_form.eligibility_validated wrapper_class="dropdown-item" %}</li>
+        <li>{% bootstrap_field filters_form.eligibility_pending wrapper_class="dropdown-item" %}</li>
+        <li>
+            <hr class="dropdown-divider">
+        </li>
+        <li>
+            <strong class="dropdown-header">PASS IAE</strong>
+        </li>
+        <li>{% bootstrap_field filters_form.pass_iae_active wrapper_class="dropdown-item" %}</li>
+        <li>{% bootstrap_field filters_form.pass_iae_expired wrapper_class="dropdown-item" %}</li>
+        <li>{% bootstrap_field filters_form.no_pass_iae wrapper_class="dropdown-item" %}</li>
+    </ul>
+</div>
