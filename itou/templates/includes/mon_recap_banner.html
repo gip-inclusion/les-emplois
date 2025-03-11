@@ -1,4 +1,4 @@
-{% if request.current_organization.department == "59" or request.current_organization.department == "69" or request.current_organization.department == "93" %}
+{% if request.current_organization.department in mon_recap_banner_departments %}
     <div id="mon-recap-banner" class="alert alert-important alert-dismissible-once d-none" role="status">
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         <div class="row">

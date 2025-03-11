@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
@@ -169,6 +170,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html"):
         "filters_form": form,
         "order": order,
         "page_obj": page_obj,
+        "mon_recap_banner_departments": settings.MON_RECAP_BANNER_DEPARTMENTS,
     }
 
     return render(request, "job_seekers_views/includes/list_results.html" if request.htmx else template_name, context)

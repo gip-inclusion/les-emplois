@@ -723,6 +723,11 @@ GPS_GROUPS_CREATED_AT_DATE = datetime.date(2024, 6, 12)
 GPS_NAV_ENTRY_DEPARTMENTS = ["30"]
 GRIST_API_KEY = os.getenv("GRIST_API_KEY")
 
+# Mon récap
+# ------------------------------------------------------------------------------
+MON_RECAP_BANNER_DEPARTMENTS = ["59", "69", "93"]
+
+
 # Datadog
 # ------------------------------------------------------------------------------
 API_DATADOG_BASE_URL = "https://api.datadoghq.eu/api/v2"
