@@ -109,6 +109,13 @@ class TestJobApplicationModel:
         job_application.refuse(user=user)
         assert job_application.refused_by == user
 
+    def test_refused_by_without_user(self):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+        )
+        job_application.refuse(user=None)
+        assert job_application.refused_by is None
+
     def test_is_sent_by_authorized_prescriber(self):
         job_application = JobApplicationSentByJobSeekerFactory()
         assert not job_application.is_sent_by_authorized_prescriber
@@ -938,6 +945,28 @@ class TestJobApplicationNotifications:
             job_application.refuse(user=job_application.to_company.members.first())
         [email] = mailoutbox
         assert email.to == [job_application.job_seeker.email]
+
+    @pytest.mark.parametrize(
+        "refusal_reason,expected",
+        [(reason, reason != RefusalReason.AUTO) for reason in RefusalReason],
+    )
+    def test_refuse_notification_is_applicable(
+        self, refusal_reason, expected, django_capture_on_commit_callbacks, mailoutbox
+    ):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            refusal_reason=refusal_reason,
+        )
+        with django_capture_on_commit_callbacks(execute=True):
+            job_application.refuse(user=job_application.to_company.members.first())
+
+        if expected:
+            assert [mail.to for mail in mailoutbox] == [
+                [job_application.job_seeker.email],
+                [job_application.sender.email],
+            ]
+        else:
+            assert [mail.to for mail in mailoutbox] == [[job_application.job_seeker.email]]
 
     def test_notifications_deliver_approval(self):
         job_seeker = JobSeekerFactory()
