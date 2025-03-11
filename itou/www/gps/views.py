@@ -1,5 +1,3 @@
-import urllib.parse
-
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
@@ -16,7 +14,8 @@ from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.pagination import pager
 from itou.utils.urls import add_url_params, get_safe_url
-from itou.www.gps.forms import FollowUpGroupMembershipForm, MembershipsFiltersForm
+from itou.www.gps.enums import Channel
+from itou.www.gps.forms import FollowUpGroupMembershipForm, JoinGroupChannelForm, MembershipsFiltersForm
 
 
 def is_allowed_to_use_gps(user):
@@ -72,20 +71,6 @@ def group_list(request, current, template_name="gps/group_list.html"):
         "memberships_page": memberships_page,
         "active_memberships": current,
     }
-
-    context["request_new_beneficiary_form_url"] = (
-        "https://formulaires.gps.inclusion.gouv.fr/ajouter-usager?"
-        + urllib.parse.urlencode(
-            {
-                "user_name": request.user.get_full_name(),
-                "user_id": request.user.pk,
-                "user_email": request.user.email,
-                "user_organization_name": getattr(request.current_organization, "display_name", ""),
-                "user_organization_id": getattr(request.current_organization, "pk", ""),
-                "success_url": request.build_absolute_uri(),
-            }
-        )
-    )
 
     return render(request, "gps/includes/memberships_results.html" if request.htmx else template_name, context)
 
@@ -239,3 +224,25 @@ def display_contact_info(request, group_id, target_participant_public_id, mode):
     )
     log_contact_info_display(request.user, follow_up_group, target_participant, mode)
     return render(request, template_name, {"member": target_participant})
+
+
+@check_user(is_allowed_to_use_gps)
+def join_group(request, template_name="gps/join_group.html"):
+    urls = {
+        Channel.FROM_COWORKER: "",  # FIXME
+        Channel.FROM_NIR: "",  # FIXME
+        Channel.FROM_NAME_EMAIL: "",  # FIXME
+    }
+    if request.current_organization is None:
+        return HttpResponseRedirect(urls[Channel.FROM_NAME_EMAIL])
+
+    form = JoinGroupChannelForm(data=request.POST or None)
+    if request.POST and form.is_valid():
+        return HttpResponseRedirect(urls[form.cleaned_data["channel"]])
+
+    context = {
+        "back_url": get_safe_url(request, "back_url", fallback_url=reverse_lazy("gps:group_list")),
+        "can_use_gps_advanced_features": is_allowed_to_use_gps_advanced_features(request.user),
+        "Channel": Channel,
+    }
+    return render(request, template_name, context)

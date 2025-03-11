@@ -24,10 +24,10 @@
                 <i class="ri-mail-send-line" aria-hidden="true"></i>
                 <span>Inviter un partenaire</span>
             </a>
-            <a href="{{ request_new_beneficiary_form_url }}" id="request-new-beneficiary-link" class="btn btn-lg btn-ico btn-primary mt-3 mt-md-0">
+
+            <a href="{% url 'gps:join_group' %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-lg btn-ico btn-primary mt-3 mt-md-0">
                 <i class="ri-user-add-line" aria-hidden="true"></i>
-                <span>Demander l'ajout d'un bénéficiaire</span>
-                <i class="ri-external-link-line ms-2" aria-hidden="true"></i>
+                <span>Ajouter un bénéficiaire</span>
             </a>
         </div>
     </div>
