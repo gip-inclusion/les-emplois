@@ -238,7 +238,7 @@ def nav(request):
             jobseekers_items = [
                 NAV_ENTRIES["prescriber-jobseekers-user"],
             ]
-            if request.current_organization:
+            if request.current_organization and request.current_organization.memberships.count() > 1:
                 jobseekers_items.append(NAV_ENTRIES["prescriber-jobseekers-organization"])
             menu_items.append(NavGroup(label="Candidats", icon="ri-user-line", items=jobseekers_items))
             if request.current_organization:

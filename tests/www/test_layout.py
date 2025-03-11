@@ -3,6 +3,7 @@ from functools import partial
 import pytest
 from django.urls import reverse
 
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.test import parse_response_to_soup
 
@@ -42,6 +43,18 @@ def test_navigation_not_authenticated(snapshot, client):
                 membership__organization__not_in_territorial_experimentation=True,
             ),
             id="PrescriberWithOrganization",
+        ),
+        pytest.param(
+            lambda for_snapshot, first_name, last_name, email: PrescriberFactory(
+                for_snapshot=for_snapshot,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                membership__organization=PrescriberOrganizationWithMembershipFactory(
+                    authorized=True, name="ACME Inc.", not_in_territorial_experimentation=True
+                ),
+            ),
+            id="PrescriberWithMultiMemberOrganization",
         ),
         pytest.param(
             partial(

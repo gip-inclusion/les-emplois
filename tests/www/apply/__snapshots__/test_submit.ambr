@@ -1280,7 +1280,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -1519,6 +1519,21 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
+        ''',
       }),
       dict({
         'origin': list([
@@ -1571,7 +1586,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 8,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -1773,12 +1788,27 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_2.html]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
+        ''',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 8,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -2017,6 +2047,21 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_3.html]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
+        ''',
       }),
     ]),
   })
@@ -3417,7 +3462,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -3656,6 +3701,21 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
+        ''',
       }),
       dict({
         'origin': list([
@@ -3708,7 +3768,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 8,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -3910,12 +3970,27 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_2.html]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
+        ''',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 8,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -4154,6 +4229,21 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_3.html]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
+        ''',
       }),
     ]),
   })
@@ -5554,7 +5644,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -5793,6 +5883,21 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
+        ''',
       }),
       dict({
         'origin': list([
@@ -5845,7 +5950,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 8,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -6047,12 +6152,27 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_2.html]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
+        ''',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 8,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -6291,6 +6411,21 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_3.html]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
+        ''',
       }),
     ]),
   })
@@ -7691,7 +7826,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -7930,6 +8065,21 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
+        ''',
       }),
       dict({
         'origin': list([
@@ -7982,7 +8132,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 8,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -8184,12 +8334,27 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_2.html]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
+        ''',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 8,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -8428,6 +8593,21 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_3.html]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
+        ''',
       }),
     ]),
   })

@@ -703,7 +703,7 @@
 # ---
 # name: test_empty_list_view[SQL queries]
   dict({
-    'num_queries': 10,
+    'num_queries': 11,
     'queries': list([
       dict({
         'origin': list([
@@ -830,6 +830,21 @@
           SELECT COUNT(*) AS "__count"
           FROM "approvals_prolongationrequest"
           WHERE "approvals_prolongationrequest"."prescriber_organization_id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[approvals/prolongation_requests/list.html]',
+          'prolongation_requests_list[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
         ''',
       }),
       dict({
@@ -1017,7 +1032,7 @@
 # ---
 # name: test_list_view[SQL queries]
   dict({
-    'num_queries': 11,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -1144,6 +1159,21 @@
           SELECT COUNT(*) AS "__count"
           FROM "approvals_prolongationrequest"
           WHERE "approvals_prolongationrequest"."prescriber_organization_id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[approvals/prolongation_requests/list.html]',
+          'prolongation_requests_list[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
         ''',
       }),
       dict({

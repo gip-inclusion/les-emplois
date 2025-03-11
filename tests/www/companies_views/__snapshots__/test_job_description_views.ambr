@@ -285,7 +285,7 @@
 # ---
 # name: TestJobDescriptionCard.test_prescriber_card_actions
   dict({
-    'num_queries': 11,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -495,6 +495,20 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[companies/job_description_card.html]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
+        ''',
       }),
       dict({
         'origin': list([
