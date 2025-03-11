@@ -8,8 +8,14 @@ from django.urls import reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
+from itou.asp.models import Commune, Country, RSAAllocation
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.prescribers.models import PrescriberOrganization
+from itou.users.enums import LackOfPoleEmploiId
+from itou.users.models import User
+from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
+from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
+from tests.cities.factories import create_city_geispolsheim
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
@@ -20,7 +26,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import KNOWN_SESSION_KEYS, assertSnapshotQueries, parse_response_to_soup
 
 
 def assert_new_beneficiary_toast(response, job_seeker):
@@ -763,7 +769,7 @@ class TestJoinGroup:
         assertRedirects(response, reverse("gps:join_group_from_coworker"), fetch_redirect_response=False)
 
         response = client.post(url, data={"channel": "from_nir"})
-        assertRedirects(response, url)  # FIXME
+        assertRedirects(response, reverse("gps:join_group_from_nir"), fetch_redirect_response=False)
 
         response = client.post(url, data={"channel": "from_name_email"})
         assertRedirects(response, url)  # FIXME
@@ -905,3 +911,357 @@ class TestJoinGroupFromCoworker:
         response = client.post(self.URL, data={"user": another_job_seeker.pk})
         assert response.status_code == 200
         assert response.context["form"].errors == {"user": ["Ce candidat ne peut être suivi."]}
+
+
+class TestJoinGroupFromNir:
+    URL = reverse("gps:join_group_from_nir")
+
+    @pytest.mark.parametrize(
+        "factory,access",
+        [
+            [partial(JobSeekerFactory, for_snapshot=True), False],
+            (partial(PrescriberFactory, membership__organization__authorized=True), True),
+            (partial(PrescriberFactory, membership__organization__authorized=False), False),
+            (PrescriberFactory, False),
+            (partial(EmployerFactory, with_company=True), True),
+            [partial(LaborInspectorFactory, membership=True), False],
+        ],
+        ids=[
+            "job_seeker",
+            "authorized_prescriber",
+            "prescriber_with_org",
+            "prescriber_no_org",
+            "employer",
+            "labor_inspector",
+        ],
+    )
+    def test_permissions(self, client, factory, access):
+        user = factory()
+        client.force_login(user)
+        response = client.get(self.URL)
+        if access:
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 403
+
+    def test_view(self, client, snapshot):
+        user = EmployerFactory(with_company=True)
+
+        client.force_login(user)
+        response = client.get(self.URL)
+        assert str(parse_response_to_soup(response, selector="#main")) == snapshot(name="get")
+
+        # unknown NIR :
+        dummy_job_seeker = JobSeekerFactory.build(for_snapshot=True)
+        response = client.post(self.URL, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "preview": "1"})
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        next_url = reverse(
+            "job_seekers_views:search_by_email_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        expected_job_seeker_session = {
+            "config": {
+                "tunnel": "gps",
+                "from_url": reverse("gps:join_group_from_nir"),
+                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
+            },
+            "profile": {
+                "nir": dummy_job_seeker.jobseeker_profile.nir,
+            },
+        }
+        assertRedirects(response, next_url)
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        # existing nit
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "preview": "1"})
+        assert str(parse_response_to_soup(response, selector="#nir-confirmation-modal")) == snapshot(name="modal")
+
+        # if we cancel: back to start with the nir we didn't find in the input
+        response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "cancel": "1"})
+        html_detail = parse_response_to_soup(response, selector="#main")
+        del html_detail.find(id="id_nir").attrs["value"]
+        assert str(html_detail) == snapshot(name="get")
+
+        # But if we accept:
+        response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": "1"})
+        assertRedirects(response, reverse("gps:group_list"))
+        assert_new_beneficiary_toast(response, job_seeker)
+
+        # If we were already following the user
+        response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": "1"})
+        assertRedirects(response, reverse("gps:group_list"))
+        assert_already_followed_beneficiary_toast(response, job_seeker)
+
+    def test_unknown_nir_known_email_with_no_nir(self, client, snapshot):
+        user = EmployerFactory(with_company=True)
+        existing_job_seeker_without_nir = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="")
+        nir = "276024719711371"
+
+        client.force_login(user)
+
+        # Step search for NIR in GPS view
+        # ----------------------------------------------------------------------
+        response = client.post(self.URL, data={"nir": nir, "preview": "1"})
+
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        next_url = reverse(
+            "job_seekers_views:search_by_email_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        expected_job_seeker_session = {
+            "config": {
+                "tunnel": "gps",
+                "from_url": reverse("gps:join_group_from_nir"),
+                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
+            },
+            "profile": {
+                "nir": nir,
+            },
+        }
+        assertRedirects(response, next_url)
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        # Step get job seeker e-mail : the user is found
+        # ----------------------------------------------------------------------
+        response = client.get(next_url)
+        assertContains(response, "<h1>Enregistrer un nouveau bénéficiaire</h1>", html=True)
+
+        response = client.post(
+            next_url,
+            data={"email": existing_job_seeker_without_nir.email, "preview": 1},
+        )
+        assert str(parse_response_to_soup(response, "#email-confirmation-modal")) == snapshot
+
+        # The job seeker isn't followed yet
+        assert not FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=existing_job_seeker_without_nir, member=user
+        ).exists()
+
+        response = client.post(
+            next_url,
+            data={"email": existing_job_seeker_without_nir.email, "confirm": 1},
+        )
+        assertRedirects(response, reverse("gps:group_list"))
+        assert_new_beneficiary_toast(response, existing_job_seeker_without_nir)
+
+        existing_job_seeker_without_nir.refresh_from_db()
+        assert existing_job_seeker_without_nir.jobseeker_profile.nir == nir
+
+        assert FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=existing_job_seeker_without_nir, member=user
+        ).exists()
+
+    def test_unknown_nir_known_email_with_another_nir(self, client, snapshot):
+        user = EmployerFactory(with_company=True)
+        existing_job_seeker_with_nir = JobSeekerFactory(for_snapshot=True)
+        job_seeker_nir = existing_job_seeker_with_nir.jobseeker_profile.nir
+        nir = "276024719711371"
+
+        client.force_login(user)
+
+        # Step search for NIR in GPS view
+        # ----------------------------------------------------------------------
+        response = client.post(self.URL, data={"nir": nir, "preview": "1"})
+
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        next_url = reverse(
+            "job_seekers_views:search_by_email_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        expected_job_seeker_session = {
+            "config": {
+                "tunnel": "gps",
+                "from_url": reverse("gps:join_group_from_nir"),
+                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
+            },
+            "profile": {
+                "nir": nir,
+            },
+        }
+        assertRedirects(response, next_url)
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        # Step get job seeker e-mail : the user is found
+        # ----------------------------------------------------------------------
+        response = client.post(
+            next_url,
+            data={"email": existing_job_seeker_with_nir.email, "preview": 1},
+        )
+        assert str(parse_response_to_soup(response, "#email-confirmation-modal")) == snapshot
+
+        # The job seeker isn't followed yet
+        assert not FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=existing_job_seeker_with_nir, member=user
+        ).exists()
+
+        response = client.post(
+            next_url,
+            data={"email": existing_job_seeker_with_nir.email, "confirm": 1},
+        )
+        assertRedirects(response, reverse("gps:group_list"))
+        assert_new_beneficiary_toast(response, existing_job_seeker_with_nir)
+
+        existing_job_seeker_with_nir.refresh_from_db()
+        assert existing_job_seeker_with_nir.jobseeker_profile.nir == job_seeker_nir
+
+        assert FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=existing_job_seeker_with_nir, member=user
+        ).exists()
+
+    def test_unknown_nir_and_unknown_email(self, client, settings, mocker):
+        user = EmployerFactory(with_company=True)
+        dummy_job_seeker = JobSeekerFactory.build(
+            jobseeker_profile__with_hexa_address=True,
+            jobseeker_profile__with_education_level=True,
+            with_ban_geoloc_address=True,
+        )
+
+        client.force_login(user)
+
+        # Step search for NIR in GPS view
+        # ----------------------------------------------------------------------
+        response = client.post(self.URL, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "preview": "1"})
+
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        next_url = reverse(
+            "job_seekers_views:search_by_email_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        expected_job_seeker_session = {
+            "config": {
+                "tunnel": "gps",
+                "from_url": reverse("gps:join_group_from_nir"),
+                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
+            },
+            "profile": {
+                "nir": dummy_job_seeker.jobseeker_profile.nir,
+            },
+        }
+        assertRedirects(response, next_url)
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        # Step get job seeker e-mail : no user is found
+        # ----------------------------------------------------------------------
+        response = client.post(next_url, data={"email": dummy_job_seeker.email, "preview": 1})
+
+        expected_job_seeker_session |= {
+            "user": {
+                "email": dummy_job_seeker.email,
+            },
+        }
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "job_seekers_views:create_job_seeker_step_1_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        assertRedirects(response, next_url)
+
+        # Step create a job seeker.
+        # ----------------------------------------------------------------------
+        response = client.get(next_url)
+        # The NIR is prefilled
+        assertContains(response, dummy_job_seeker.jobseeker_profile.nir)
+
+        geispolsheim = create_city_geispolsheim()
+        birthdate = dummy_job_seeker.jobseeker_profile.birthdate
+
+        post_data = {
+            "title": dummy_job_seeker.title,
+            "first_name": dummy_job_seeker.first_name,
+            "last_name": dummy_job_seeker.last_name,
+            "birthdate": birthdate,
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
+            "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+            "birth_country": Country.france_id,
+        }
+        response = client.post(next_url, data=post_data)
+        expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
+        expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
+        expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
+        expected_job_seeker_session["profile"]["birth_country"] = post_data.pop("birth_country")
+        expected_job_seeker_session["user"] |= post_data
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "job_seekers_views:create_job_seeker_step_2_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        assertRedirects(response, next_url)
+
+        response = client.get(next_url)
+        assert response.status_code == 200
+
+        post_data = {
+            "ban_api_resolved_address": dummy_job_seeker.geocoding_address,
+            "address_line_1": dummy_job_seeker.address_line_1,
+            "post_code": geispolsheim.post_codes[0],
+            "insee_code": geispolsheim.code_insee,
+            "city": geispolsheim.name,
+            "phone": dummy_job_seeker.phone,
+            "fill_mode": "ban_api",
+        }
+
+        settings.API_BAN_BASE_URL = "http://ban-api"
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+        )
+
+        response = client.post(next_url, data=post_data)
+
+        expected_job_seeker_session["user"] |= post_data | {"address_line_2": "", "address_for_autocomplete": None}
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "job_seekers_views:create_job_seeker_step_3_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        assertRedirects(response, next_url)
+
+        response = client.get(next_url)
+        assert response.status_code == 200
+
+        post_data = {
+            "education_level": dummy_job_seeker.jobseeker_profile.education_level,
+        }
+        response = client.post(next_url, data=post_data)
+        expected_job_seeker_session["profile"] |= post_data | {
+            "pole_emploi_id": "",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED.value,
+            "resourceless": False,
+            "rqth_employee": False,
+            "oeth_employee": False,
+            "pole_emploi": False,
+            "pole_emploi_id_forgotten": "",
+            "pole_emploi_since": "",
+            "unemployed": False,
+            "unemployed_since": "",
+            "rsa_allocation": False,
+            "has_rsa_allocation": RSAAllocation.NO.value,
+            "rsa_allocation_since": "",
+            "ass_allocation": False,
+            "ass_allocation_since": "",
+            "aah_allocation": False,
+            "aah_allocation_since": "",
+        }
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "job_seekers_views:create_job_seeker_step_end_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        assertRedirects(response, next_url)
+
+        response = client.get(next_url)
+        assertContains(response, "Créer et suivre le bénéficiaire")
+
+        response = client.post(next_url)
+        assert job_seeker_session_name not in client.session
+        new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
+        assert_new_beneficiary_toast(response, new_job_seeker)
+        assert FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=new_job_seeker, member=user
+        ).exists()

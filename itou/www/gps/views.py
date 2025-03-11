@@ -14,6 +14,7 @@ from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.pagination import pager
+from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.gps.enums import Channel
 from itou.www.gps.forms import (
@@ -23,6 +24,8 @@ from itou.www.gps.forms import (
     MembershipsFiltersForm,
 )
 from itou.www.gps.utils import add_beneficiary, get_all_coworkers
+from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
+from itou.www.job_seekers_views.forms import CheckJobSeekerNirForm
 
 
 def is_allowed_to_use_gps(user):
@@ -237,7 +240,7 @@ def display_contact_info(request, group_id, target_participant_public_id, mode):
 def join_group(request, template_name="gps/join_group.html"):
     urls = {
         Channel.FROM_COWORKER: reverse("gps:join_group_from_coworker"),
-        Channel.FROM_NIR: "",  # FIXME
+        Channel.FROM_NIR: reverse("gps:join_group_from_nir"),
         Channel.FROM_NAME_EMAIL: "",  # FIXME
     }
     if request.current_organization is None:
@@ -270,6 +273,51 @@ def join_group_from_coworker(request, template_name="gps/join_group_from_coworke
         "form": form,
         "reset_url": get_safe_url(request, "back_url", fallback_url=reverse("gps:join_group")),
     }
+
+    return render(request, template_name, context)
+
+
+@check_user(is_allowed_to_use_gps_advanced_features)
+def join_group_from_nir(request, template_name="gps/join_group_from_nir.html"):
+    form = CheckJobSeekerNirForm(data=request.POST or None, is_gps=True)
+    context = {
+        "form": form,
+        "reset_url": get_safe_url(request, "back_url", fallback_url=reverse("gps:join_group")),
+        "job_seeker": None,
+        "preview_mode": False,
+    }
+
+    if request.method == "POST" and form.is_valid():
+        job_seeker = form.get_job_seeker()
+
+        if job_seeker is None:
+            # Maybe plug into GetOrCreateJobSeekerStartView
+            data = {
+                "config": {
+                    "tunnel": "gps",
+                    "from_url": request.get_full_path(),
+                    "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
+                },
+                "profile": {"nir": form.cleaned_data["nir"]},
+            }
+            job_seeker_session = SessionNamespace.create_uuid_namespace(request.session, data)
+            return HttpResponseRedirect(
+                reverse(
+                    "job_seekers_views:search_by_email_for_sender",
+                    kwargs={"session_uuid": job_seeker_session.name},
+                )
+            )
+
+        if form.data.get("confirm"):
+            add_beneficiary(request, job_seeker)
+            return HttpResponseRedirect(reverse("gps:group_list"))
+
+        context |= {
+            # Ask the sender to confirm the NIR we found is associated to the correct user
+            "preview_mode": job_seeker and bool(form.data.get("preview")),
+            "job_seeker": job_seeker,
+            "nir_not_found": job_seeker is None,
+        }
 
     return render(request, template_name, context)
 
