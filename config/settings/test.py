@@ -62,3 +62,5 @@ if os.getenv("DEBUG_SQL_SNAPSHOT"):
     TEMPLATES[0]["OPTIONS"]["debug"] = True  # noqa: F405
 
 FORCE_PROCONNECT_LOGIN = True  # default behaviour in tests
+
+REQUIRE_OTP_FOR_STAFF = False

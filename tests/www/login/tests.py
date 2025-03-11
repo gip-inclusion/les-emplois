@@ -9,6 +9,8 @@ from django.test import override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.html import escape
+from django_otp.oath import TOTP
+from django_otp.plugins.otp_totp.models import TOTPDevice
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.openid_connect.france_connect import constants as fc_constants
@@ -458,31 +460,96 @@ class TestItouStaffLogin:
         assertContains(response, "Adresse e-mail")
         assertContains(response, "Mot de passe")
 
-    def test_login(self, client):
-        user = ItouStaffFactory()
-        url = reverse("login:itou_staff")
-        response = client.get(url)
-        assert response.status_code == 200
-
-        form_data = {
-            "login": user.email,
-            "password": DEFAULT_PASSWORD,
-        }
-        response = client.post(url, data=form_data)
-        assertRedirects(response, reverse("account_email_verification_sent"))
-
-    def test_admin_login(self, client):
+    def test_login(self, client, settings):
         user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
         login_url = reverse("login:itou_staff")
         admin_url = reverse("admin:users_user_change", args=(user.pk,))
+        verify_otp_url = reverse("login:verify_otp")
+        setup_otp_url = reverse("itou_staff_views:otp_devices")
+        settings.REQUIRE_OTP_FOR_STAFF = True
 
         response = client.get(admin_url)
-        expected_url = add_url_params(login_url, {"next": admin_url})
-        assertRedirects(response, expected_url)
+        next_url = add_url_params(login_url, {"next": admin_url})
+        assertRedirects(response, next_url)
 
+        # Without a device, the user is redirected to the otp setup page
         form_data = {
             "login": user.email,
             "password": DEFAULT_PASSWORD,
         }
-        response = client.post(expected_url, data=form_data)
+        response = client.post(next_url, data=form_data, follow=True)
+        assertRedirects(response, setup_otp_url)
+
+        # Same with an unconfirmed device
+        device = TOTPDevice.objects.create(user=user, confirmed=False)
+        response = client.post(next_url, data=form_data, follow=True)
+        assertRedirects(response, setup_otp_url)
+
+        # With a confirmed device the user is redirected to the OTP code form
+        device.confirmed = True
+        device.save()
+        response = client.post(next_url, data=form_data, follow=True)
+        next_url = add_url_params(verify_otp_url, {"next": admin_url})
+        assertRedirects(response, next_url)
+
+        # The user should not be able to access the setup otp pages
+        response = client.get(setup_otp_url)
+        assertRedirects(response, add_url_params(verify_otp_url, {"next": setup_otp_url}))
+        other_device = TOTPDevice.objects.create(user=user, confirmed=False)
+        setup_otp_confirm_device_url = reverse("itou_staff_views:otp_confirm_device", args=(other_device.pk,))
+        response = client.get(setup_otp_confirm_device_url)
+        assertRedirects(response, add_url_params(verify_otp_url, {"next": setup_otp_confirm_device_url}))
+
+        # Give a bad token
+        totp = TOTP(device.bin_key, drift=100)
+        post_data = {
+            "name": "Mon appareil",
+            "otp_token": totp.token(),  # a token from a long time ago
+        }
+        response = client.post(next_url, data=post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {"otp_token": ["code invalide"]}
+
+        # there's throttling
+        totp = TOTP(device.bin_key)
+        post_data["otp_token"] = totp.token()
+        response = client.post(next_url, data=post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {"otp_token": ["code invalide"]}
+
+        # When resetting the failure count it works
+        device.throttling_failure_timestamp = None
+        device.throttling_failure_count = 0
+        device.save()
+        response = client.post(next_url, data=post_data)
         assertRedirects(response, admin_url)
+
+    def test_login_otp_not_required(self, client):
+        user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
+        login_url = reverse("login:itou_staff")
+        admin_url = reverse("admin:users_user_change", args=(user.pk,))
+        verify_otp_url = reverse("login:verify_otp")
+
+        response = client.get(admin_url)
+        next_url = add_url_params(login_url, {"next": admin_url})
+        assertRedirects(response, next_url)
+
+        # Without a device, the user is logged and redirected to the next_url
+        form_data = {
+            "login": user.email,
+            "password": DEFAULT_PASSWORD,
+        }
+        response = client.post(next_url, data=form_data, follow=True)
+        assertRedirects(response, admin_url)
+
+        # Same with an unconfirmed device
+        device = TOTPDevice.objects.create(user=user, confirmed=False)
+        response = client.post(next_url, data=form_data, follow=True)
+        assertRedirects(response, admin_url)
+
+        # With a confirmed device the user is redirected to the OTP code form
+        device.confirmed = True
+        device.save()
+        response = client.post(next_url, data=form_data, follow=True)
+        next_url = add_url_params(verify_otp_url, {"next": admin_url})
+        assertRedirects(response, next_url)

@@ -339,4 +339,6 @@ def test_can_view_stats_staff():
         assert request.user.is_authenticated
         assert not utils.can_view_stats_staff(request)
 
-    assert utils.can_view_stats_staff(get_request(ItouStaffFactory()))
+    user = ItouStaffFactory()
+    user.is_verified = lambda: True  # Fake django_otp.middleware.OTPMiddleware
+    assert utils.can_view_stats_staff(get_request(user))

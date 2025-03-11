@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic.edit import FormView
+from django_otp import login as otp_login
 
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, MATOMO_ACCOUNT_TYPE, IdentityProvider, UserKind
@@ -14,7 +15,7 @@ from itou.users.models import User
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.urls import add_url_params, get_safe_url, get_url_param_value
 from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
-from itou.www.login.forms import FindExistingUserViaEmailForm, ItouLoginForm
+from itou.www.login.forms import FindExistingUserViaEmailForm, ItouLoginForm, VerifyOTPForm
 
 
 class UserKindLoginMixin:
@@ -181,3 +182,18 @@ class ItouStaffLoginView(ItouLoginView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context | {"uses_pro_connect": False}
+
+
+class VerifyOTPView(FormView):
+    template_name = "account/verify_otp.html"
+    form_class = VerifyOTPForm
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"user": self.request.user}
+
+    def form_valid(self, form):
+        otp_login(self.request, self.request.user.otp_device)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return get_safe_url(self.request, REDIRECT_FIELD_NAME, reverse("dashboard:index"))

@@ -659,10 +659,16 @@ class TestOTP:
         device = TOTPDevice.objects.get()  # Still only one
         assertRedirects(response, reverse("itou_staff_views:otp_confirm_device", args=(device.pk,)))
 
-        # When the user already confirmed a device, the page is different
+        # When the user already confirmed a device he must first confirm the otp token
         device.name = "Mon appareil"
         device.confirmed = True
         device.save()
+        post_data = {
+            "name": "Mon appareil",
+            "otp_token": TOTP(device.bin_key).token(),
+        }
+        response = client.post(reverse("login:verify_otp"), data=post_data)
+        # The devices page is different
         response = client.get(url)
         assert str(
             parse_response_to_soup(
