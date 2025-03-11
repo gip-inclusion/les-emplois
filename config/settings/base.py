@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     "itou.openid_connect.france_connect",
     "itou.openid_connect.pe_connect",
     "itou.openid_connect.pro_connect",
+    "itou.otp",
     "itou.invitations",
     "itou.external_data",
     "itou.metabase",
