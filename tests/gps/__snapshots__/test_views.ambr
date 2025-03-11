@@ -2638,3 +2638,77 @@
           </main>
   '''
 # ---
+# name: TestJoinGroupFromCoworker.test_view
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+                              <h1>Ajouter un bénéficiaire</h1>
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section" id="join_group">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="col-8">
+                      <div class="c-form">
+                          <form class="js-prevent-multiple-submit" id="join_group_form" method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              
+                              <div class="form-group form-group-required"><label class="form-label" for="js-search-user-input">Nom et prénom du bénéficiaire</label><select class="form-select django-select2" data-ajax--url="/gps/beneficiaries-autocomplete" data-allow-clear="false" data-minimum-input-length="2" data-theme="bootstrap-5" id="js-search-user-input" lang="fr" name="user" required="">
+  </select></div>
+                              
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/gps/groups/join">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button class="btn btn-block btn-primary disabled" type="button">
+                          <span>Ajouter le bénéficiaire</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---

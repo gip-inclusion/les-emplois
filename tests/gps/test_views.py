@@ -3,12 +3,14 @@ from functools import partial
 
 import freezegun
 import pytest
+from django.contrib import messages
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
-from itou.gps.models import FollowUpGroup
+from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.prescribers.models import PrescriberOrganization
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
@@ -19,6 +21,34 @@ from tests.users.factories import (
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
+
+
+def assert_new_beneficiary_toast(response, job_seeker):
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                messages.SUCCESS,
+                "Bénéficiaire ajouté||"
+                f"{job_seeker.get_full_name()} fait maintenant partie de la liste de vos bénéficiaires.",
+                extra_tags="toast",
+            ),
+        ],
+    )
+
+
+def assert_already_followed_beneficiary_toast(response, job_seeker):
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                messages.INFO,
+                "Bénéficiaire déjà dans la liste||"
+                f"{job_seeker.get_full_name()} fait déjà partie de la liste de vos bénéficiaires.",
+                extra_tags="toast",
+            ),
+        ],
+    )
 
 
 class TestGroupLists:
@@ -730,7 +760,7 @@ class TestJoinGroup:
 
         # All redirection work : the join_group_from_* view will check if the user is allowed
         response = client.post(url, data={"channel": "from_coworker"})
-        assertRedirects(response, url)  # FIXME
+        assertRedirects(response, reverse("gps:join_group_from_coworker"), fetch_redirect_response=False)
 
         response = client.post(url, data={"channel": "from_nir"})
         assertRedirects(response, url)  # FIXME
@@ -808,3 +838,70 @@ class TestBeneficiariesAutocomplete:
         # with "martin gps" Martin is the only match
         results = get_autocomplete_results(prescriber, term="martin gps")
         assert results == [second_beneficiary.pk]
+
+    def test_XSS(self):
+        # The javascript code return a jquery object that will not be escaped, we need to escape the user name
+        # to prevent xss
+        with open("itou/static/js/gps.js") as f:
+            script_content = f.read()
+            assert "${select2Utils.escapeMarkup(data.name)}" in script_content
+            assert "${select2Utils.escapeMarkup(data.title)}" in script_content
+
+
+class TestJoinGroupFromCoworker:
+    URL = reverse("gps:join_group_from_coworker")
+
+    @pytest.mark.parametrize(
+        "factory,access",
+        [
+            [partial(JobSeekerFactory, for_snapshot=True), False],
+            (partial(PrescriberFactory, membership__organization__authorized=True), True),
+            (partial(PrescriberFactory, membership__organization__authorized=False), True),
+            (PrescriberFactory, False),
+            (partial(EmployerFactory, with_company=True), True),
+            [partial(LaborInspectorFactory, membership=True), False],
+        ],
+        ids=[
+            "job_seeker",
+            "authorized_prescriber",
+            "prescriber_with_org",
+            "prescriber_no_org",
+            "employer",
+            "labor_inspector",
+        ],
+    )
+    def test_permissions(self, client, factory, access):
+        user = factory()
+        client.force_login(user)
+        response = client.get(self.URL)
+        if access:
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 403
+
+    def test_view(self, client, snapshot):
+        company = CompanyFactory(with_membership=True)
+        user = company.members.get()
+        coworker = CompanyMembershipFactory(company=company).user
+
+        client.force_login(user)
+        response = client.get(self.URL)
+        assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+
+        followed_job_seeker = JobSeekerFactory()
+        FollowUpGroupFactory(beneficiary=followed_job_seeker, memberships=1, memberships__member=user)
+        response = client.post(self.URL, data={"user": followed_job_seeker.pk})
+        assertRedirects(response, reverse("gps:group_list"))
+        assert_already_followed_beneficiary_toast(response, followed_job_seeker)
+
+        coworker_job_seeker = JobSeekerFactory()
+        group = FollowUpGroupFactory(beneficiary=coworker_job_seeker, memberships=1, memberships__member=coworker)
+        response = client.post(self.URL, data={"user": coworker_job_seeker.pk})
+        assertRedirects(response, reverse("gps:group_list"))
+        assert_new_beneficiary_toast(response, coworker_job_seeker)
+        assert FollowUpGroupMembership.objects.filter(follow_up_group=group, member=user).exists()
+
+        another_job_seeker = JobSeekerFactory()
+        response = client.post(self.URL, data={"user": another_job_seeker.pk})
+        assert response.status_code == 200
+        assert response.context["form"].errors == {"user": ["Ce candidat ne peut être suivi."]}
