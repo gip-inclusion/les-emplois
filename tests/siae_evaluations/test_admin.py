@@ -91,6 +91,7 @@ class TestEvaluationCampaignAdmin:
             BASE_NUM_QUERIES
             + 1  # Load Django session
             + 1  # Load user
+            + 1  # Check if user is verified
             + 1  # Count the filtered results (paginator)
             + 1  # Count the full results
             + 1  # Fetch evaluated siae and related evaludation_campaign, siae, convention
@@ -208,6 +209,7 @@ class TestEvaluationCampaignAdmin:
             BASE_NUM_QUERIES
             + 1  # Load Django session
             + 1  # Load user
+            + 1  # Check if user is verified
             + 1  # Count the filtered results (paginator)
             + 1  # Count the full results
             + 1  # Fetch selected evaluation_campaigns

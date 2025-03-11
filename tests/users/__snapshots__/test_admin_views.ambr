@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_num_queries
   dict({
-    'num_queries': 26,
+    'num_queries': 27,
     'queries': list([
       dict({
         'origin': list([
@@ -58,6 +58,32 @@
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "otp_totp_totpdevice"."id",
+                 "otp_totp_totpdevice"."user_id",
+                 "otp_totp_totpdevice"."name",
+                 "otp_totp_totpdevice"."confirmed",
+                 "otp_totp_totpdevice"."throttling_failure_timestamp",
+                 "otp_totp_totpdevice"."throttling_failure_count",
+                 "otp_totp_totpdevice"."created_at",
+                 "otp_totp_totpdevice"."last_used_at",
+                 "otp_totp_totpdevice"."key",
+                 "otp_totp_totpdevice"."step",
+                 "otp_totp_totpdevice"."t0",
+                 "otp_totp_totpdevice"."digits",
+                 "otp_totp_totpdevice"."tolerance",
+                 "otp_totp_totpdevice"."drift",
+                 "otp_totp_totpdevice"."last_t"
+          FROM "otp_totp_totpdevice"
+          WHERE ("otp_totp_totpdevice"."user_id" = %s
+                 AND "otp_totp_totpdevice"."confirmed")
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
