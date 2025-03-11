@@ -1,0 +1,89 @@
+{% extends "layout/base.html" %}
+{% load format_filters %}
+{% load django_bootstrap5 %}
+{% load buttons_form %}
+{% load static %}
+
+{% block title_content %}<h1>Ajouter un bénéficiaire</h1>{% endblock %}
+
+{% block content %}
+    <section class="s-section" id="join_group">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="col-8">
+                    <div class="c-form">
+                        <form method="post" class="js-prevent-multiple-submit js-format-nir">
+                            {% csrf_token %}
+                            {% bootstrap_form form %}
+                            {# Reload this page and show a modal containing more information about the job seeker. #}
+                            {% itou_buttons_form primary_label="Ajouter le bénéficiaire" primary_name="preview" primary_value="1" reset_url=reset_url %}
+                            {% if preview_mode %}
+                                <!-- Modal -->
+                                <div class="modal" id="email-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="email-confirmation-label" aria-modal="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h3 class="modal-title" id="emal-confirmation-label">
+                                                    {% if email_only_match %}
+                                                        Un bénéficiaire avec cette adresse e-mail a été trouvé
+                                                    {% else %}
+                                                        Un bénéficiaire avec ces informations a été trouvé
+                                                    {% endif %}
+                                                </h3>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {% if email_only_match and can_use_gps_advanced_features %}
+                                                    <p>
+                                                        Cette adresse e-mail est associée à <strong>{{ job_seeker.get_full_name }}</strong>, dont la date de naissance est le <strong>{{ job_seeker.jobseeker_profile.birthdate|date:"d/m/Y" }}</strong>.
+                                                    </p>
+                                                {% else %}
+                                                    <p>
+                                                        Un bénéficiaire avec ce nom et cette adresse e-mail, dont la date de naissance est le <strong>{{ job_seeker.jobseeker_profile.birthdate|date:"d/m/Y" }}</strong>, a été trouvé.
+                                                    </p>
+                                                    {% if not can_use_gps_advanced_features %}
+                                                        <p>
+                                                            Vous serez ajouté à la liste des intervenants quand le bénéficiaire ou le référent de parcours accepteront votre demande d’accès.
+                                                        </p>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+                                            <div class="modal-footer">
+                                                {% if can_use_gps_advanced_features %}
+                                                    {# Reload this page with a new form. #}
+                                                    {% bootstrap_button "Ce n'est pas le bénéficiaire que je cherche" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                                                    {# Go to the next step. #}
+                                                    {% bootstrap_button "Ajouter le bénéficiaire" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
+                                                {% else %}
+                                                    {# Reload this page with a new form. #}
+                                                    {% bootstrap_button "Annuler" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                                                    {# Go to the next step. #}
+                                                    {% bootstrap_button "Demander à être ajouté" button_type="submit" button_class="btn btn-sm btn-primary" name="ask" value="1" %}
+                                                {% endif %}
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/split_nir.js' %}"></script>
+    {% if preview_mode %}
+        {# Show the confirmation modal after submitting the form. #}
+        <script nonce="{{ CSP_NONCE }}">
+            // Adding the "show" CSS class is not enough and not documented.
+            // A JS initialization is recommended.
+            const nirConfirmationModal = new bootstrap.Modal("#user-confirmation-modal");
+            nirConfirmationModal.show();
+        </script>
+    {% endif %}
+{% endblock script %}
