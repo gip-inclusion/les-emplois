@@ -6,6 +6,7 @@ from itou.communications.dispatch import (
     PrescriberNotification,
     PrescriberOrEmployerNotification,
 )
+from itou.job_applications.enums import RefusalReason
 
 
 @notifications_registry.register
@@ -108,6 +109,11 @@ class JobApplicationRefusedForProxyNotification(PrescriberOrEmployerNotification
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/refuse_subject.txt"
     body_template = "apply/email/refuse_body_for_proxy.txt"
+
+    def is_applicable(self):
+        if job_application := self.context.get("job_application"):
+            return super().is_applicable() and job_application.refusal_reason != RefusalReason.AUTO
+        return super().is_applicable()
 
 
 @notifications_registry.register
