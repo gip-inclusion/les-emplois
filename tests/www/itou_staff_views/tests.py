@@ -1,13 +1,17 @@
 import datetime
 import io
+from functools import partial
 
 import openpyxl
 import pytest
+from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.utils import timezone
+from django_otp.oath import TOTP
+from django_otp.plugins.otp_totp.models import TOTPDevice
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 from rest_framework.authtoken.models import Token
 
 from itou.companies.models import CompanyMembership
@@ -611,3 +615,108 @@ class TestMergeUsers:
             f"Fusion utilisateurs {employer_1.pk} ← {employer_2.pk} — Done !",
             "HTTP 302 Found",
         ]
+
+
+class TestOTP:
+    @pytest.mark.parametrize(
+        "factory,expected_status",
+        [
+            (JobSeekerFactory, 403),
+            (partial(EmployerFactory, with_company=True), 403),
+            (PrescriberFactory, 403),
+            (partial(LaborInspectorFactory, membership=True), 403),
+            (ItouStaffFactory, 200),
+        ],
+    )
+    def test_permissions(self, client, factory, expected_status):
+        user = factory()
+        client.force_login(user)
+        response = client.get(reverse("itou_staff_views:otp_devices"))
+        assert response.status_code == expected_status
+
+        device = TOTPDevice.objects.create(user=user, confirmed=False)
+        response = client.get(reverse("itou_staff_views:otp_confirm_device", args=(device.pk,)))
+        assert response.status_code == expected_status
+
+    @freeze_time("2025-03-11 05:18:56")
+    def test_devices(self, client, snapshot):
+        staff_user = ItouStaffFactory()
+        client.force_login(staff_user)
+        url = reverse("itou_staff_views:otp_devices")
+
+        response = client.get(url)
+        assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="no_device")
+
+        response = client.post(url)
+        device = TOTPDevice.objects.get()
+        assertRedirects(response, reverse("itou_staff_views:otp_confirm_device", args=(device.pk,)))
+
+        # As long as the device isn't confirmed it isn't shown, and we don't create a new one.
+        response = client.get(url)
+        assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="no_device")
+
+        response = client.post(url)
+        device = TOTPDevice.objects.get()  # Still only one
+        assertRedirects(response, reverse("itou_staff_views:otp_confirm_device", args=(device.pk,)))
+
+        # When the user already confirmed a device, the page is different
+        device.name = "Mon appareil"
+        device.confirmed = True
+        device.save()
+        response = client.get(url)
+        assert str(
+            parse_response_to_soup(
+                response,
+                ".s-section",
+                replace_in_attr=[
+                    ("href", f"user={staff_user.pk}", "user=[PK of User]"),
+                ],
+            )
+        ) == snapshot(name="with_device")
+
+        response = client.post(url)
+        device = TOTPDevice.objects.exclude(pk=device.pk).get()
+        assertRedirects(response, reverse("itou_staff_views:otp_confirm_device", args=(device.pk,)))
+
+    def test_confirm(self, client):
+        staff_user = ItouStaffFactory()
+        client.force_login(staff_user)
+
+        device = TOTPDevice.objects.create(
+            user=staff_user, confirmed=False, key="8fe0a9983c7dddb4acb0146c5507553371e9f211"
+        )
+        url = reverse("itou_staff_views:otp_confirm_device", args=(device.pk,))
+        response = client.get(url)
+        assertContains(response, "R7QKTGB4PXO3JLFQCRWFKB2VGNY6T4QR")  # the otp secret matching the hex key
+
+        totp = TOTP(device.bin_key, drift=100)
+        post_data = {
+            "name": "Mon appareil",
+            "otp_token": totp.token(),  # a token from a long time ago
+        }
+        response = client.post(url, data=post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {"otp_token": ["Mauvais code OTP"]}
+        device.refresh_from_db()
+        assert device.confirmed is False
+
+        # there's throttling
+        totp = TOTP(device.bin_key)
+        post_data["otp_token"] = totp.token()
+        response = client.post(url, data=post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {"otp_token": ["Mauvais code OTP"]}
+        device.refresh_from_db()
+        assert device.confirmed is False
+
+        # When resetting the failure count
+        device.throttling_failure_timestamp = None
+        device.throttling_failure_count = 0
+        device.save()
+        response = client.post(url, data=post_data)
+        assertMessages(
+            response, [messages.Message(messages.SUCCESS, "Votre nouvel appareil est confirmé", extra_tags="toast")]
+        )
+        assertRedirects(response, reverse("itou_staff_views:otp_devices"))
+        device.refresh_from_db()
+        assert device.confirmed is True

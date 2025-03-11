@@ -1,0 +1,50 @@
+{% extends "layout/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}Configuration 2FA {{ block.super }}{% endblock %}
+
+{% block title_content %}<h1>Configuration 2FA</h1>{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-8">
+                    <div class="c-box">
+                        <form method="post" class="js-prevent-multiple-submit">
+                            {% csrf_token %}
+                            <div class="row align-items-center">
+                                <div class="col col-5">Choisissez un nom pour votre appareil :</div>
+                                <div class="col col">{% bootstrap_field form.name layout='inline' %}</div>
+                            </div>
+
+                            <div class="row align-items-center">
+                                <div class="col col-5">Scannez ce QR Code avec votre logiciel de génération de mots de passe à usage unique.</div>
+                                <div class="col col">
+                                    <img src="{{ qrcode }}" width="250" alt="QR code pour la configuration de l’authentification à deux facteurs">
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-4">
+                                <div class="col col-5">Ou bien copiez le code suivant dans ce même logiciel :</div>
+                                <div class="col col">
+                                    <strong>{{ otp_secret }}</strong>
+                                    {% include "includes/copy_to_clipboard.html" with content=otp_secret css_classes="btn-ico btn-link btn-sm ms-2 py-0" placement="right" %}
+
+                                </div>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col col-5">Puis générez le code OTP et entrez-le ici :</div>
+                                <div class="col col-2">{% bootstrap_field form.otp_token layout='inline' %}</div>
+                                <div class="col col-auto">
+                                    <button type="submit" class="btn btn-block btn-primary">
+                                        <span>Vérifier le code OTP</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}

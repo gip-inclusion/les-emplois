@@ -1,7 +1,9 @@
 import csv
 import datetime
 import io
+from base64 import b32encode
 
+import segno
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.db.models import Q
@@ -11,6 +13,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.http import content_disposition_header
+from django_otp import devices_for_user, login as otp_login
+from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from itou.approvals.models import Approval
 from itou.companies.models import CompanyMembership
@@ -28,7 +32,12 @@ from itou.www.itou_staff_views.export_utils import (
     get_export_ts,
     job_app_export_spec,
 )
-from itou.www.itou_staff_views.forms import ItouStaffExportJobApplicationForm, MergeUserConfirmForm, MergeUserForm
+from itou.www.itou_staff_views.forms import (
+    ConfirmTOTPDeviceForm,
+    ItouStaffExportJobApplicationForm,
+    MergeUserConfirmForm,
+    MergeUserForm,
+)
 
 
 class Echo:
@@ -285,5 +294,39 @@ def merge_users_confirm(
         "merge_allowed": merge_allowed,
         "transfer_data": transfer_data,
         "form": form,
+    }
+    return render(request, template_name, context)
+
+
+@check_user(lambda user: user.is_staff)
+def otp_devices(request, template_name="itou_staff_views/otp_devices.html"):
+    if request.method == "POST":
+        device, _ = TOTPDevice.objects.get_or_create(user=request.user, confirmed=False)
+        return HttpResponseRedirect(reverse("itou_staff_views:otp_confirm_device", kwargs={"device_id": device.pk}))
+
+    context = {"devices": list(devices_for_user(request.user))}
+    return render(request, template_name, context)
+
+
+@check_user(lambda user: user.is_staff)
+def otp_confirm_device(request, device_id, template_name="itou_staff_views/otp_confirm_device.html"):
+    device = get_object_or_404(TOTPDevice.objects.filter(user=request.user, confirmed=False), pk=device_id)
+
+    form = ConfirmTOTPDeviceForm(data=request.POST or None, device=device)
+    if request.method == "POST" and form.is_valid():
+        device.confirmed = True
+        device.name = form.cleaned_data["name"]
+        device.save(update_fields=["name", "confirmed"])
+        messages.success(request, "Votre nouvel appareil est confirmé", extra_tags="toast")
+        # Mark the user as verified
+        otp_login(request, device)
+        return HttpResponseRedirect(reverse("itou_staff_views:otp_devices"))
+
+    context = {
+        "form": form,
+        "otp_secret": b32encode(device.bin_key).decode(),
+        # Generate svg data uri qrcode
+        "qrcode": segno.make(device.config_url).svg_data_uri(),
+        "otp_verified": False,
     }
     return render(request, template_name, context)
