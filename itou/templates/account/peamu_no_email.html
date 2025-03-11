@@ -13,7 +13,13 @@
 
 {% block title %}Votre compte France Travail doit être validé {{ block.super }}{% endblock %}
 
-{% block title_content %}<h1>Votre compte France Travail doit être validé</h1>{% endblock %}
+{% block title_content %}
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1>Votre compte France Travail doit être validé</h1>
+        {% endfill %}
+    {% endcomponent %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">

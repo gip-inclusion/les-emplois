@@ -5,7 +5,11 @@
 {% block title %}Modifier la suspension de PASS IAE {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1>Modifier la suspension de PASS IAE de {{ suspension.approval.user.get_full_name }}</h1>
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1>Modifier la suspension de PASS IAE de {{ suspension.approval.user.get_full_name }}</h1>
+        {% endfill %}
+    {% endcomponent %}
 {% endblock %}
 
 {% block content %}

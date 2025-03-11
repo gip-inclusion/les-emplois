@@ -4,7 +4,11 @@
 {% block title %}Invitation {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1>Bienvenue {{ invitation.first_name|title }} {{ invitation.last_name|upper }} !</h1>
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1>Bienvenue {{ invitation.first_name|title }} {{ invitation.last_name|upper }} !</h1>
+        {% endfill %}
+    {% endcomponent %}
 {% endblock %}
 
 {% block content %}

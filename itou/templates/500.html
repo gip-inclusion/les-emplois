@@ -3,12 +3,22 @@
 {% block title %}Erreur 500 {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1>Erreur 500</h1>
-    <h2>Une erreur technique s'est produite.</h2>
-    <p>Notre équipe technique a été informée du problème et s'en occupera le plus rapidement possible.</p>
-    <p>
-        Toutefois, nous vous invitons à contacter
-        <a href="{{ ITOU_HELP_CENTER_URL }}">l'assistance de la Plateforme de l'inclusion</a>
-        afin que nous disposions de toutes les informations nécessaires à la résolution du problème.
-    </p>
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1>Erreur 500</h1>
+        {% endfill %}
+        {% fill "c_title__secondary" %}
+            <h2>Une erreur technique s'est produite.</h2>
+            <p>Notre équipe technique a été informée du problème et s'en occupera le plus rapidement possible.</p>
+            <p>
+                Toutefois, nous vous invitons à contacter
+                <a href="{{ ITOU_HELP_CENTER_URL }}"
+                   rel="noopener"
+                   target="_blank"
+                   class="has-external-link"
+                   aria-label="Vous rendre sur le site de l'assistance de la Plateforme de l'inclusion (ouverture dans un nouvel onglet)">l'assistance de la Plateforme de l'inclusion</a>
+                afin que nous disposions de toutes les informations nécessaires à la résolution du problème.
+            </p>
+        {% endfill %}
+    {% endcomponent %}
 {% endblock %}

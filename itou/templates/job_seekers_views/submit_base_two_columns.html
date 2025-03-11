@@ -4,7 +4,11 @@
 {% block title %}Postuler {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1>{% include 'apply/includes/_submit_title.html' %}</h1>
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1>{% include 'apply/includes/_submit_title.html' %}</h1>
+        {% endfill %}
+    {% endcomponent %}
 {% endblock %}
 
 {% block content %}

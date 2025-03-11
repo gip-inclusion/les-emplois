@@ -8,7 +8,11 @@
 {% endblock %}
 
 {% block title_content %}
-    <h1>Refuser la demande de prolongation pour {{ prolongation_request.approval.user.get_full_name }}</h1>
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1>Refuser la demande de prolongation pour {{ prolongation_request.approval.user.get_full_name }}</h1>
+        {% endfill %}
+    {% endcomponent %}
 {% endblock %}
 
 {% block content %}

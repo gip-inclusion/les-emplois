@@ -10,4 +10,10 @@
     </div>
 {% endblock %}
 
-{% block title_content %}<h1>Compte inactif</h1>{% endblock %}
+{% block title_content %}
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1>Compte inactif</h1>
+        {% endfill %}
+    {% endcomponent %}
+{% endblock %}

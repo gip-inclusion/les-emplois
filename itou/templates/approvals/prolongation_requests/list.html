@@ -9,7 +9,13 @@
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block title_content %}<h1>Gérer les prolongations de PASS IAE</h1>{% endblock %}
+{% block title_content %}
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1>Gérer les prolongations de PASS IA</h1>
+        {% endfill %}
+    {% endcomponent %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section" hx-select=".s-section" hx-target=".s-section" hx-swap="outerHTML show:window:top">

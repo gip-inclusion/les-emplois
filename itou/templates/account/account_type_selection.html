@@ -4,7 +4,13 @@
 
 {% block title %}Connexion {{ block.super }}{% endblock %}
 
-{% block title_content %}<h1>Connexion</h1>{% endblock %}
+{% block title_content %}
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1>Connexion</h1>
+        {% endfill %}
+    {% endcomponent %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">

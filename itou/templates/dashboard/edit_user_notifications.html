@@ -6,7 +6,13 @@
 
 {% block title %}Mes notifications {{ block.super }}{% endblock %}
 
-{% block title_content %}<h1>Mes notifications</h1>{% endblock %}
+{% block title_content %}
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1>Mes notifications</h1>
+        {% endfill %}
+    {% endcomponent %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">

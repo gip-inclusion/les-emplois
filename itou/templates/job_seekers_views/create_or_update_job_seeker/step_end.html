@@ -4,7 +4,6 @@
 {% load buttons_form %}
 
 {% block title %}
-
     {% if is_gps|default:False %}
         Création du bénéficiaire
     {% else %}
@@ -19,18 +18,22 @@
 {% endblock %}
 
 {% block title_content %}
-    <h1 class="my-5">
-        {% if is_gps|default:False %}
-            Création du bénéficiaire
-        {% else %}
-            {% if update_job_seeker %}
-                Modification
-            {% else %}
-                Création
-            {% endif %}
-            du compte candidat
-        {% endif %}
-    </h1>
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1>
+                {% if is_gps|default:False %}
+                    Création du bénéficiaire
+                {% else %}
+                    {% if update_job_seeker %}
+                        Modification
+                    {% else %}
+                        Création
+                    {% endif %}
+                    du compte candidat
+                {% endif %}
+            </h1>
+        {% endfill %}
+    {% endcomponent %}
 {% endblock %}
 
 {% block content %}

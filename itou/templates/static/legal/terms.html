@@ -4,10 +4,16 @@
 {% block title %}Conditions d’utilisation des emplois de l’inclusion {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1 id="conditions-générales-dutilisation">Conditions Générales d&#39;Utilisation</h1>
-    <h2 class="h3">
-        Les présentes conditions générales d’utilisation (dites « CGU ») définissent les conditions d’accès et d’utilisation des Services par l’Utilisateur.
-    </h2>
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1 id="conditions-générales-dutilisation">Conditions Générales d&#39;Utilisation</h1>
+        {% endfill %}
+        {% fill "c_title__secondary" %}
+            <h2 class="h3">
+                Les présentes conditions générales d’utilisation (dites « CGU ») définissent les conditions d’accès et d’utilisation des Services par l’Utilisateur.
+            </h2>
+        {% endfill %}
+    {% endcomponent %}
 {% endblock %}
 
 {% block content %}

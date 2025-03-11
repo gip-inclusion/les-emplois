@@ -15,15 +15,19 @@
 {% endblock %}
 
 {% block title_content %}
-    <h1>
-        {% if update_job_seeker %}
-            Modification
-        {% else %}
-            Création
-        {% endif %}
-        du compte
-        {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
-    </h1>
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1>
+                {% if update_job_seeker %}
+                    Modification
+                {% else %}
+                    Création
+                {% endif %}
+                du compte
+                {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
+            </h1>
+        {% endfill %}
+    {% endcomponent %}
 {% endblock %}
 
 {% block content %}

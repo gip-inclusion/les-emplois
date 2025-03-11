@@ -4,7 +4,13 @@
 
 {% block title %}Déconnexion {{ block.super }}{% endblock %}
 
-{% block title_content %}<h1>Déconnexion</h1>{% endblock %}
+{% block title_content %}
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1>Déconnexion</h1>
+        {% endfill %}
+    {% endcomponent %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section pt-lg-3">

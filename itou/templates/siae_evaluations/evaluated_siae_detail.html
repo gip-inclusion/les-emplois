@@ -42,13 +42,17 @@
 {% endblock %}
 
 {% block title_content %}
-    <h1 class="h1">
-        {% if evaluated_siae.evaluation_is_final %}
-            Pièces justificatives
-        {% else %}
-            Contrôler les pièces justificatives
-        {% endif %}
-    </h1>
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1>
+                {% if evaluated_siae.evaluation_is_final %}
+                    Pièces justificatives
+                {% else %}
+                    Contrôler les pièces justificatives
+                {% endif %}
+            </h1>
+        {% endfill %}
+    {% endcomponent %}
 {% endblock %}
 
 {% block content %}
@@ -60,9 +64,7 @@
                     <p>
                         Numéro de téléphone à utiliser au besoin :
                         {% if evaluated_siae.siae.phone %}
-                            <a aria-label="Contact téléphonique" href="tel:{{ evaluated_siae.siae.phone|cut:" " }}">
-                                {{ evaluated_siae.siae.phone|format_phone }}
-                            </a>
+                            <a aria-label="Contact téléphonique" href="tel:{{ evaluated_siae.siae.phone|cut:" " }}">{{ evaluated_siae.siae.phone|format_phone }}</a>
                         {% else %}
                             <span>Non renseigné</span>
                         {% endif %}
@@ -93,18 +95,14 @@
                                     <hr class="m-0">
                                     <div class="c-box--results__footer">
                                         <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                                            <a href="{% url 'siae_evaluations_views:evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
-                                                Contrôler cette auto-prescription
-                                            </a>
+                                            <a href="{% url 'siae_evaluations_views:evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-block w-100 w-md-auto">Contrôler cette auto-prescription</a>
                                         </div>
                                     </div>
                                 {% elif evaluated_job_application_state != "PENDING" and evaluated_job_application_state != "PROCESSING" %}
                                     <hr class="m-0">
                                     <div class="c-box--results__footer">
                                         <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                                            <a href="{% url 'siae_evaluations_views:evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
-                                                Revoir ses justificatifs
-                                            </a>
+                                            <a href="{% url 'siae_evaluations_views:evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-block w-100 w-md-auto">Revoir ses justificatifs</a>
                                         </div>
                                     </div>
                                 {% endif %}

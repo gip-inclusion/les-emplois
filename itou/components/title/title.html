@@ -1,0 +1,17 @@
+{% comment %}
+    This component should only be used in the .s-title-02 section.
+    The c_title__main slot is required and could only contain a <h1> heading, a .badge and a sub-heading in a paragraph.
+    The c_title__cta and c_title__secondary slots are optional.
+    The c_title__cta slot should only contain one or two buttons or links.
+    The c_title__ secondary slot should only contain more headings (<h2>/<h3>) or some paragraphs (<p>).
+{% endcomment %}
+
+<div class="c-title">
+    <div class="c-title__main">{% slot "c_title__main" required %}{% endslot %}</div>
+    {% if component_vars.is_filled.c_title__cta %}
+        <div class="c-title__cta">{% slot "c_title__cta" %}{% endslot %}</div>
+    {% endif %}
+    {% if component_vars.is_filled.c_title__secondary %}
+        <div class="c-title__secondary">{% slot "c_title__secondary" %}{% endslot %}</div>
+    {% endif %}
+</div>

@@ -15,9 +15,7 @@ from itou.utils.urls import add_url_params
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import (
-    JobSeekerFactory,
-)
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import KNOWN_SESSION_KEYS
 
 
@@ -266,7 +264,7 @@ def test_create_job_seeker(_mock, client):
     assertRedirects(response, next_url)
 
     response = client.get(next_url)
-    assertContains(response, '<h1 class="my-5">Création du bénéficiaire</h1>', html=True)
+    assertContains(response, "<h1>Création du bénéficiaire</h1>", html=True)
     assertContains(response, "Créer et suivre le bénéficiaire")
 
     response = client.post(next_url)

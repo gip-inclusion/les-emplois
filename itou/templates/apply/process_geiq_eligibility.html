@@ -5,7 +5,11 @@
 {% block title %}Embauche - Eligibilité GEIQ {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1>Candidature de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</h1>
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1>Candidature de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</h1>
+        {% endfill %}
+    {% endcomponent %}
 {% endblock %}
 
 {% block content %}
