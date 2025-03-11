@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "hijack",
     "hijack.contrib.admin",
     "pgtrigger",
+    "django_components",
     # Register adapters before to load allauth apps.
     "itou.allauth_adapters",
     "allauth",
@@ -157,8 +158,20 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [os.path.join(APPS_DIR, "templates")],
-        "APP_DIRS": True,
         "OPTIONS": {
+            "loaders": [
+                (
+                    "django.template.loaders.cached.Loader",
+                    [
+                        # Default Django loader
+                        "django.template.loaders.filesystem.Loader",
+                        # Including this is the same as APP_DIRS=True
+                        "django.template.loaders.app_directories.Loader",
+                        # Components loader
+                        "django_components.template_loader.Loader",
+                    ],
+                )
+            ],
             "context_processors": [
                 "django.contrib.auth.context_processors.auth",
                 "django.template.context_processors.debug",
@@ -175,7 +188,10 @@ TEMPLATES = [
                 "itou.utils.context_processors.expose_enums",
                 "itou.utils.context_processors.matomo",
                 "itou.utils.context_processors.active_announcement_campaign",
-            ]
+            ],
+            "builtins": [
+                "django_components.templatetags.component_tags",
+            ],
         },
     }
 ]
@@ -761,11 +777,16 @@ BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 
 # Pilotage
 # ------------------------------------------------------------------------------
-
 PILOTAGE_SHOW_STATS_WEBINAR = os.getenv("PILOTAGE_SHOW_STATS_WEBINAR", True) in [True, "True", "true"]
 
 # Github
 API_GITHUB_BASE_URL = "https://api.github.com"
+
+# Django-components
+BASE_DIR = ROOT_DIR
+COMPONENTS = {
+    "dirs": [os.path.abspath(os.path.join(BASE_DIR, "itou/components"))],
+}
 
 # Territorial experimentation
 # ------------------------------------------------------------------------------
