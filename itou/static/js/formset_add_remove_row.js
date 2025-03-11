@@ -36,7 +36,7 @@ function updateElementIndex(el, prefix, ndx) {
 function addRemoveButton(selector, col_selector, prefix) {
   let total = $(`#id_${prefix}-TOTAL_FORMS`).val();
   if (total > 1) {
-    const deletebutton = `<div class="inline-col col-md-auto remove-form-row">
+    const deletebutton = `<div class="inline-col col-md-auto remove-form-row mb-2 mt-auto">
       <button type="button" class="btn btn-ico-only btn-danger" aria-label="Supprimer cette invitation"><i class="ri-close-line ri-lg fw-normal"></i></button>
       </div>`;
     $(selector).find(`${col_selector}:last`).after(deletebutton);
@@ -62,7 +62,7 @@ function cloneMore(selector, prefix) {
   });
   // Add a delete button if it does not exist.
   if (newElement.find('.remove-form-row').length == 0) {
-    const deletebutton = `<div class="inline-col col-md-auto remove-form-row">
+    const deletebutton = `<div class="inline-col col-md-auto remove-form-row mb-2 mt-auto">
       <button type="button" class="btn btn-ico-only btn-danger" aria-label="Supprimer cette invitation"><i class="ri-close-line ri-lg fw-normal"></i></button>
     </div>`;
     $(selector).find('.inline-col').last().after(deletebutton);
