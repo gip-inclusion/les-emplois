@@ -1,0 +1,53 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load static %}
+
+{% block title %}GPS - Ajouter un bénéficiaire {{ block.super }}{% endblock %}
+
+{% block title_content %}<h1>Ajouter un bénéficiaire</h1>{% endblock %}
+
+{% block title_prevstep %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="c-form">
+                        <h2>Sélectionnez votre situation *</h2>
+
+                        <form method="post">
+                            {% csrf_token %}
+
+                            <div class="form-group">
+                                {% if request.current_organization %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="channel" value="{{ Channel.FROM_COWORKER }}" id="from_coworker_id">
+                                        <label class="form-check-label" for="from_coworker_id">
+                                            Le bénéficiaire est suivi par une personne de ma structure.
+                                        </label>
+                                    </div>
+                                {% endif %}
+                                {% if can_use_gps_advanced_features %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="channel" value="{{ Channel.FROM_NIR }}" id="from_nir_id">
+                                        <label class="form-check-label" for="from_nir_id">Je connais le numéro de sécurité sociale du bénéficiaire.</label>
+                                    </div>
+                                {% endif %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="channel" value="{{ Channel.FROM_NAME_EMAIL }}" id="from_name_email_id">
+                                    <label class="form-check-label" for="from_name_email_id">Je connais le nom et l’adresse e-mail du bénéficiaire.</label>
+                                </div>
+                            </div>
+
+                            {% itou_buttons_form primary_label="Suivant" reset_url=None %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

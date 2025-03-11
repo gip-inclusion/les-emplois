@@ -21,6 +21,7 @@ urlpatterns = [
         views.display_contact_info,
         name="display_contact_info",
     ),
+    path("groups/join", views.join_group, name="join_group"),
     # Backward compatibility - used in bizdev mailing
     path("", RedirectView.as_view(url=reverse_lazy("gps:group_list"), permanent=True)),
     path("groups", RedirectView.as_view(url=reverse_lazy("gps:group_list"), permanent=True)),
