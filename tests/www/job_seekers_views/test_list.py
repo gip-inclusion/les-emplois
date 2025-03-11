@@ -1,6 +1,8 @@
 import datetime
 import uuid
+from functools import partial
 
+import factory
 import pytest
 from django.urls import reverse
 from django.utils import timezone
@@ -94,14 +96,43 @@ def test_raise_404_on_organization_tab_for_prescriber_without_org(client):
     assert response.status_code == 404
 
 
-@pytest.mark.parametrize("with_membership, assertion", [(False, assertNotContains), (True, assertContains)])
-def test_displayed_tabs(client, with_membership, assertion):
-    user = PrescriberFactory(membership=with_membership)
-    client.force_login(user)
+@pytest.mark.parametrize(
+    "user_factory,assertion",
+    [
+        pytest.param(PrescriberFactory, assertNotContains, id="PrescriberWithoutOrganization"),
+        pytest.param(
+            partial(PrescriberFactory, membership__organization__authorized=False),
+            assertNotContains,
+            id="PrescriberAloneInOrganization",
+        ),
+        pytest.param(
+            lambda: PrescriberFactory.create_batch(
+                2, membership__organization=PrescriberOrganizationWithMembershipFactory(), membership__is_active=True
+            )[0],
+            assertContains,
+            id="PrescriberWithActiveMember",
+        ),
+        pytest.param(
+            lambda: PrescriberFactory.create_batch(
+                2,
+                membership__organization=PrescriberOrganizationWithMembershipFactory(),
+                membership__is_active=factory.Iterator([True, False]),
+            )[0],
+            assertContains,
+            id="PrescriberWithOldMember",
+        ),
+    ],
+)
+def test_displayed_tabs(client, user_factory, assertion):
+    client.force_login(user_factory())
     response = client.get(reverse("job_seekers_views:list"))
 
-    assertContains(response, "Mes candidats")
-    assertion(response, "Tous les candidats de la structure")
+    assertion(
+        response,
+        f"""<a class="nav-link" href="{reverse("job_seekers_views:list_organization")}">
+        Tous les candidats de la structure</a>""",
+        html=True,
+    )
 
 
 @pytest.mark.parametrize(
@@ -112,7 +143,7 @@ def test_displayed_tabs(client, with_membership, assertion):
     ],
 )
 def test_displayed_filters(client, url, assertion):
-    user = PrescriberFactory(membership=True)
+    user = PrescriberOrganizationWith2MembershipFactory().members.first()
     client.force_login(user)
     response = client.get(url)
 
@@ -482,8 +513,8 @@ def test_job_seeker_created_by_prescriber_without_org(client):
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_htmx_job_seeker_filter(client, url):
-    job_app = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
-    prescriber = job_app.sender
+    prescriber = PrescriberOrganizationWith2MembershipFactory(authorized=True).members.first()
+    job_app = JobApplicationFactory(sender=prescriber)
     other_app = JobApplicationFactory(sender=prescriber)
     client.force_login(prescriber)
     response = client.get(url)
@@ -511,7 +542,7 @@ def test_htmx_job_seeker_filter(client, url):
 
 
 def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
-    prescriber = PrescriberFactory()
+    prescriber = PrescriberOrganizationWith2MembershipFactory().members.first()
     a_b_job_seeker = JobApplicationFactory(
         sender=prescriber, job_seeker__first_name="A_something", job_seeker__last_name="B_something"
     ).job_seeker
@@ -553,7 +584,7 @@ def test_filtered_by_eligibility_state(client, url):
     Éligibilité "IAE valide": show job seekers with valid diagnosis OR with valid approval.
     Éligibilité "IAE à valider": show job seekers without valid diagnosis AND without valid approval.
     """
-    prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
+    prescriber = PrescriberOrganizationWith2MembershipFactory().members.first()
     client.force_login(prescriber)
     # Eligibility validated
     job_seeker_valid_eligibility_no_approval = IAEEligibilityDiagnosisFactory(
@@ -613,7 +644,7 @@ def test_filtered_by_eligibility_state(client, url):
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_filtered_by_approval_state(client, url):
-    prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
+    prescriber = PrescriberOrganizationWith2MembershipFactory().members.first()
     client.force_login(prescriber)
 
     job_seeker_expired_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
@@ -743,7 +774,7 @@ def test_filtered_by_organization_members(client):
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_htmx_filters(client, url):
-    prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
+    prescriber = PrescriberOrganizationWith2MembershipFactory().members.first()
     client.force_login(prescriber)
 
     IAEEligibilityDiagnosisFactory(
@@ -768,7 +799,7 @@ def test_htmx_filters(client, url):
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_job_seekers_order(client, url, subtests):
-    prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
+    prescriber = PrescriberOrganizationWith2MembershipFactory().members.first()
     c_d_job_seeker = JobApplicationFactory(
         sender=prescriber,
         job_seeker__created_by=prescriber,
@@ -817,8 +848,8 @@ def test_job_seekers_order(client, url, subtests):
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_htmx_order(client, url):
-    job_app = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
-    prescriber = job_app.sender
+    prescriber = PrescriberOrganizationWith2MembershipFactory(authorized=True).members.first()
+    job_app = JobApplicationFactory(sender=prescriber)
     other_app = JobApplicationFactory(sender=prescriber)
     client.force_login(prescriber)
     response = client.get(url)

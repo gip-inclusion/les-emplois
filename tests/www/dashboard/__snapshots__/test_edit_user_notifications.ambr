@@ -1598,7 +1598,7 @@
 # ---
 # name: test_prescriber_allowed[view queries]
   dict({
-    'num_queries': 10,
+    'num_queries': 11,
     'queries': list([
       dict({
         'origin': list([
@@ -1732,6 +1732,21 @@
                  AND "communications_notificationsettings"."structure_type_id" = %s)
           ORDER BY "communications_notificationsettings"."id" ASC
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[dashboard/edit_user_notifications.html]',
+          'edit_user_notifications[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
         ''',
       }),
       dict({

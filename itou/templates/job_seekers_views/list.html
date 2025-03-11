@@ -36,7 +36,7 @@
 {% endblock title_messages %}
 
 {% block title_extra %}
-    {% if request.current_organization %}
+    {% if request.current_organization and request.current_organization.memberships.count > 1 %}
         <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
             <li class="nav-item">
                 <a class="nav-link{% if not list_organization %} active{% endif %}" href="{% url 'job_seekers_views:list' %}">

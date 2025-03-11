@@ -353,7 +353,7 @@
 # ---
 # name: TestEditJobSeekerInfo.test_edit_by_prescriber[view queries]
   dict({
-    'num_queries': 15,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -627,6 +627,21 @@
                  AND "account_emailaddress"."email" = %s
                  AND "account_emailaddress"."verified")
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[dashboard/edit_job_seeker_info.html]',
+          'edit_job_seeker_info[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
         ''',
       }),
       dict({

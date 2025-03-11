@@ -3045,7 +3045,7 @@
 # ---
 # name: test_queries[SQL queries in list mode]
   dict({
-    'num_queries': 22,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -4094,6 +4094,22 @@
                                                                                             %s)
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."name" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[apply/list_prescriptions.html]',
+          'list_prescriptions[www/apply/views/list_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
         ''',
       }),
       dict({
@@ -4231,7 +4247,7 @@
 # ---
 # name: test_queries[SQL queries in table mode]
   dict({
-    'num_queries': 19,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -5280,6 +5296,22 @@
                                                                                             %s)
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."name" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[apply/list_prescriptions.html]',
+          'list_prescriptions[www/apply/views/list_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."organization_id" = %s
         ''',
       }),
       dict({
