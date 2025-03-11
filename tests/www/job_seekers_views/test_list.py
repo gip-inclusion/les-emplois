@@ -9,7 +9,12 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 
 from itou.users.models import User, UserKind
 from itou.utils.templatetags.str_filters import mask_unless
+from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
+from tests.eligibility.factories import (
+    GEIQEligibilityDiagnosisFactory,
+    IAEEligibilityDiagnosisFactory,
+)
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
@@ -520,6 +525,142 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
         (c_d_job_seeker.pk, "C… D…"),
         (created_job_seeker.pk, "Zorro MARTIN"),
     ]
+
+
+@pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
+def test_filtered_by_eligibility_state(client, url):
+    """
+    Éligibilité "IAE valide": show job seekers with valid diagnosis OR with valid approval.
+    Éligibilité "IAE à valider": show job seekers without valid diagnosis AND without valid approval.
+    """
+    prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
+    client.force_login(prescriber)
+    # Eligibility validated
+    job_seeker_valid_eligibility_no_approval = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        job_seeker__created_by=prescriber,
+        job_seeker__first_name="valid eligibility, no approval",
+    ).job_seeker
+    job_seeker_valid_geiq_eligibility_no_approval = GEIQEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        job_seeker__created_by=prescriber,
+        job_seeker__first_name="valid geiq eligibility, no approval",
+    ).job_seeker
+    job_seeker_expired_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        job_seeker__created_by=prescriber,
+        expired=True,
+        job_seeker__first_name="expired eligibility, valid approval",
+    ).job_seeker
+    ApprovalFactory(user=job_seeker_expired_eligibility_valid_approval)
+    job_seeker_valid_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        job_seeker__created_by=prescriber,
+        job_seeker__first_name="valid eligibility, valid approval",
+    ).job_seeker
+    ApprovalFactory(user=job_seeker_valid_eligibility_valid_approval)
+
+    # Eligibility to validate
+    job_seeker_expired_eligibility_no_approval = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        job_seeker__created_by=prescriber,
+        expired=True,
+        job_seeker__first_name="expired eligibility, no approval",
+    ).job_seeker
+
+    response = client.get(url, {"eligibility_validated": "on"})
+    assert response.context["page_obj"].object_list == [
+        job_seeker_expired_eligibility_valid_approval,
+        job_seeker_valid_eligibility_no_approval,
+        job_seeker_valid_eligibility_valid_approval,
+    ]
+
+    response = client.get(url, {"eligibility_pending": "on"})
+    assert response.context["page_obj"].object_list == [
+        job_seeker_expired_eligibility_no_approval,
+        job_seeker_valid_geiq_eligibility_no_approval,
+    ]
+
+    response = client.get(url, {"eligibility_validated": "on", "eligibility_pending": "on"})
+    assert response.context["page_obj"].object_list == [
+        job_seeker_expired_eligibility_no_approval,
+        job_seeker_expired_eligibility_valid_approval,
+        job_seeker_valid_eligibility_no_approval,
+        job_seeker_valid_eligibility_valid_approval,
+        job_seeker_valid_geiq_eligibility_no_approval,
+    ]
+
+
+@pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
+def test_filtered_by_approval_state(client, url):
+    prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
+    client.force_login(prescriber)
+
+    job_seeker_expired_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        job_seeker__created_by=prescriber,
+        expired=True,
+        job_seeker__first_name="expired eligibility, valid approval",
+    ).job_seeker
+    ApprovalFactory(user=job_seeker_expired_eligibility_valid_approval)
+
+    job_seeker_expired_eligibility_expired_approval = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        job_seeker__created_by=prescriber,
+        expired=True,
+        job_seeker__first_name="expired eligibility, expired approval",
+    ).job_seeker
+    ApprovalFactory(user=job_seeker_expired_eligibility_expired_approval, expired=True)
+
+    job_seeker_valid_eligibility_no_approval = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        job_seeker__created_by=prescriber,
+        job_seeker__first_name="valid eligibility, no approval",
+    ).job_seeker
+
+    response = client.get(url, {"pass_iae_active": "on"})
+    assert response.context["page_obj"].object_list == [job_seeker_expired_eligibility_valid_approval]
+
+    response = client.get(url, {"pass_iae_expired": "on"})
+    assert response.context["page_obj"].object_list == [job_seeker_expired_eligibility_expired_approval]
+
+    response = client.get(url, {"no_pass_iae": "on"})
+    assert response.context["page_obj"].object_list == [job_seeker_valid_eligibility_no_approval]
+
+    response = client.get(url, {"pass_iae_expired": "on", "no_pass_iae": "on"})
+    assert response.context["page_obj"].object_list == [
+        job_seeker_expired_eligibility_expired_approval,
+        job_seeker_valid_eligibility_no_approval,
+    ]
+
+    response = client.get(url, {"pass_iae_active": "on", "pass_iae_expired": "on", "no_pass_iae": "on"})
+    assert response.context["page_obj"].object_list == [
+        job_seeker_expired_eligibility_expired_approval,
+        job_seeker_expired_eligibility_valid_approval,
+        job_seeker_valid_eligibility_no_approval,
+    ]
+
+
+@pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
+def test_htmx_filters(client, url):
+    prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
+    client.force_login(prescriber)
+
+    IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
+        job_seeker__created_by=prescriber,
+    )
+    response = client.get(url)
+    page = parse_response_to_soup(response, selector="#main")
+    eligibility_validated_checkbox = page.find("input", attrs={"name": "eligibility_validated"})
+    eligibility_validated_checkbox["checked"] = ""
+
+    response = client.get(url, {"eligibility_validated": "on"}, headers={"HX-Request": "true"})
+    update_page_with_htmx(page, f"form[hx-get='{url}']", response)
+
+    response = client.get(url, {"eligibility_validated": "on"})
+    fresh_page = parse_response_to_soup(response, selector="#main")
+    assertSoupEqual(page, fresh_page)
 
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])

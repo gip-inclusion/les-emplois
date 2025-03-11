@@ -60,26 +60,71 @@
               
       <section class="s-section">
           <div class="s-section__container container">
+              
+                  
+              
+              <form hx-get="/job-seekers/list-organization" hx-include="#id_job_seeker" hx-indicator="#job-seekers-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-seekers-section" hx-trigger="change from:#id_order, change delay:.5s, change from:#id_job_seeker delay:.5s">
+                  
+  
+  <div class="s-section__row row selection-indicator" data-emplois-elements-visibility-on-selection="hidden">
+      <div class="col-12">
+          <div></div>
+          <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+              
+  
+  <div class="dropdown">
+      <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
+          Situation IAE
+      </button>
+      <ul class="dropdown-menu">
+          <li>
+              <strong class="dropdown-header">Éligibilité IAE</strong>
+          </li>
+          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Valide</label></div></div></li>
+          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_eligibility_pending" name="eligibility_pending" type="checkbox"/><label class="form-check-label" for="id_eligibility_pending">À valider</label></div></div></li>
+          <li>
+              <hr class="dropdown-divider"/>
+          </li>
+          <li>
+              <strong class="dropdown-header">PASS IAE</strong>
+          </li>
+          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Valide</label></div></div></li>
+          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/><label class="form-check-label" for="id_pass_iae_expired">Expiré</label></div></div></li>
+          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_no_pass_iae" name="no_pass_iae" type="checkbox"/><label class="form-check-label" for="id_no_pass_iae">Aucun</label></div></div></li>
+      </ul>
+  </div>
+  
+              
+  
+  
+      
+  
+  <div class="ms-md-auto" id="job-seekers-list-filter-counter">
+      
+  </div>
+  
+          </div>
+      </div>
+  </div>
+  
+                  <input id="id_order" name="order" type="hidden" value="full_name"/>
+              </form>
               <div class="s-section__row row">
                   <div class="col-12">
-                      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                          
+                      <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                          <div class="flex-md-grow-1">
+                              
   
   <p class="mb-0" id="job-seekers-list-count">
       0 résultat
   </p>
   
+                          </div>
                           <div class="flex-column flex-md-row mt-3 mt-md-0">
-                              
-                                  
-                              
-                              <form hx-get="/job-seekers/list-organization" hx-indicator="#job-seekers-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-seekers-section" hx-trigger="change from:#id_order, change delay:.5s">
-                                  <div class="w-lg-400px"><label class="visually-hidden" for="id_job_seeker">Nom</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du candidat" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
+                              <div class="w-lg-400px"><label class="visually-hidden" for="id_job_seeker">Nom</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du candidat" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
     <option selected="" value=""></option>
   
   </select></div>
-                                  <input id="id_order" name="order" type="hidden" value="full_name"/>
-                              </form>
                           </div>
                       </div>
                       
@@ -169,26 +214,71 @@
               
       <section class="s-section">
           <div class="s-section__container container">
+              
+                  
+              
+              <form hx-get="/job-seekers/list" hx-include="#id_job_seeker" hx-indicator="#job-seekers-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-seekers-section" hx-trigger="change from:#id_order, change delay:.5s, change from:#id_job_seeker delay:.5s">
+                  
+  
+  <div class="s-section__row row selection-indicator" data-emplois-elements-visibility-on-selection="hidden">
+      <div class="col-12">
+          <div></div>
+          <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+              
+  
+  <div class="dropdown">
+      <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
+          Situation IAE
+      </button>
+      <ul class="dropdown-menu">
+          <li>
+              <strong class="dropdown-header">Éligibilité IAE</strong>
+          </li>
+          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Valide</label></div></div></li>
+          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_eligibility_pending" name="eligibility_pending" type="checkbox"/><label class="form-check-label" for="id_eligibility_pending">À valider</label></div></div></li>
+          <li>
+              <hr class="dropdown-divider"/>
+          </li>
+          <li>
+              <strong class="dropdown-header">PASS IAE</strong>
+          </li>
+          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Valide</label></div></div></li>
+          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/><label class="form-check-label" for="id_pass_iae_expired">Expiré</label></div></div></li>
+          <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_no_pass_iae" name="no_pass_iae" type="checkbox"/><label class="form-check-label" for="id_no_pass_iae">Aucun</label></div></div></li>
+      </ul>
+  </div>
+  
+              
+  
+  
+      
+  
+  <div class="ms-md-auto" id="job-seekers-list-filter-counter">
+      
+  </div>
+  
+          </div>
+      </div>
+  </div>
+  
+                  <input id="id_order" name="order" type="hidden" value="full_name"/>
+              </form>
               <div class="s-section__row row">
                   <div class="col-12">
-                      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                          
+                      <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                          <div class="flex-md-grow-1">
+                              
   
   <p class="mb-0" id="job-seekers-list-count">
       0 résultat
   </p>
   
+                          </div>
                           <div class="flex-column flex-md-row mt-3 mt-md-0">
-                              
-                                  
-                              
-                              <form hx-get="/job-seekers/list" hx-indicator="#job-seekers-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-seekers-section" hx-trigger="change from:#id_order, change delay:.5s">
-                                  <div class="w-lg-400px"><label class="visually-hidden" for="id_job_seeker">Nom</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du candidat" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
+                              <div class="w-lg-400px"><label class="visually-hidden" for="id_job_seeker">Nom</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du candidat" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
     <option selected="" value=""></option>
   
   </select></div>
-                                  <input id="id_order" name="order" type="hidden" value="full_name"/>
-                              </form>
                           </div>
                       </div>
                       
@@ -625,7 +715,7 @@
       </button>
   </th>
   
-                          <th scope="col">Statut du PASS IAE</th>
+                          <th scope="col">Situation IAE</th>
                           <th aria-sort="none" scope="col">
       <button data-emplois-setter-target="#id_order" data-emplois-setter-value="job_applications_nb" type="button">
           Nombre de candidatures

@@ -157,8 +157,10 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         )
     )
 
-    if form.is_valid() and (job_seeker_pk := form.cleaned_data["job_seeker"]):
-        queryset = queryset.filter(pk=job_seeker_pk)
+    filters_counter = 0
+    if form.is_valid():
+        queryset = form.filter(queryset)
+        filters_counter = form.get_filters_counter()
 
     try:
         order = JobSeekerOrder(request.GET.get("order"))
@@ -174,6 +176,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         "back_url": get_safe_url(request, "back_url"),
         "list_organization": list_organization,
         "filters_form": form,
+        "filters_counter": filters_counter,
         "order": order,
         "page_obj": page_obj,
         "mon_recap_banner_departments": settings.MON_RECAP_BANNER_DEPARTMENTS,
