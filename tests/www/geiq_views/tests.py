@@ -193,15 +193,18 @@ def test_geiq_list_assessment_visibility(client):
         company__department=29,
         company__name="GEIQ du Finistère",
     )
+    geiq_29_2023_assessment.institutions.add(ddets, dreets)
     geiq_29_2024_assessment = ImplementationAssessmentFactory(
         campaign=campaign_2024,
         company=geiq_29_2023_assessment.company,
     )
+    geiq_29_2024_assessment.institutions.add(ddets, dreets)
     geiq_56_2023_assessment = ImplementationAssessmentFactory(
         campaign=campaign_2023,
         company__department=56,
         company__name="GEIQ du Morbihan",
     )
+    geiq_56_2023_assessment.institutions.add(dreets)
 
     def _get_assessment_url(assessment):
         return reverse("geiq:assessment_info", kwargs={"assessment_pk": assessment.pk})
@@ -227,12 +230,12 @@ def test_geiq_list_assessment_visibility(client):
 
 
 def test_geiq_list_snapshots(client, snapshot):
-    membership = InstitutionMembershipFactory(
+    dreets_membership = InstitutionMembershipFactory(
         institution__kind=InstitutionKind.DREETS_GEIQ,
         institution__department=29,
     )
-    url = reverse("geiq:geiq_list", kwargs={"institution_pk": membership.institution.pk})
-    client.force_login(membership.user)
+    url = reverse("geiq:geiq_list", kwargs={"institution_pk": dreets_membership.institution.pk})
+    client.force_login(dreets_membership.user)
 
     response = client.get(url)
     assert str(parse_response_to_soup(response, selector="#main .s-section")) == snapshot(name="empty list")
@@ -256,6 +259,8 @@ def test_geiq_list_snapshots(client, snapshot):
             activity_report_file=FileFactory(for_snapshot=True),
         ),
     ]
+    assessments[0].institutions.add(dreets_membership.institution)
+    assessments[1].institutions.add(dreets_membership.institution)
     EmployeeFactory(assessment=assessments[0], allowance_amount=1400)
     EmployeeFactory(assessment=assessments[1], allowance_amount=0)
     for i, review_state in enumerate(ReviewState, start=1):
@@ -270,10 +275,11 @@ def test_geiq_list_snapshots(client, snapshot):
                 activity_report_file=FileFactory(key=f"report for {review_state}"),
                 review_comment="Un commentaire",
                 reviewed_at=datetime.datetime(2024, 8, 1, 0, 0, 0, tzinfo=datetime.UTC),
-                review_institution=membership.institution,
+                review_institution=dreets_membership.institution,
                 review_state=review_state,
             )
         )
+        assessments[-1].institutions.add(dreets_membership.institution)
         EmployeeFactory.create_batch(i, assessment=assessments[-1], allowance_amount=1400)
 
     response = client.get(url)
@@ -341,6 +347,7 @@ def test_state_snapshot(client, snapshot):
         institution__name="DDETS 75",
     )
     ddets = institution_membership.institution
+    assessment.institutions.add(ddets)
     ddets_user = institution_membership.user
     assessment_info_url = reverse("geiq:assessment_info", kwargs={"assessment_pk": assessment.pk})
 
@@ -455,6 +462,7 @@ def test_review(client):
     )
     ddets_user = membership.user
     ddets = membership.institution
+    assessment.institutions.add(ddets)
     client.force_login(ddets_user)
     info_url = reverse("geiq:assessment_info", kwargs={"assessment_pk": assessment.pk})
     report_url = reverse("geiq:assessment_report", kwargs={"assessment_pk": assessment.pk})
@@ -546,6 +554,7 @@ def test_employee_list_and_details(client, snapshot):
         institution__department=assessment.company.department,
     )
     dreets_user = dreets_membership.user
+    assessment.institutions.add(dreets_membership.institution)
 
     employee_list_urls = {
         info_type: reverse("geiq:employee_list", kwargs={"assessment_pk": assessment.pk, "info_type": info_type})
