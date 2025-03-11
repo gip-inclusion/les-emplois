@@ -1,10 +1,12 @@
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Exists, OuterRef, Prefetch
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
+from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView, UpdateView
 
@@ -19,6 +21,7 @@ from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.gps.enums import Channel
 from itou.www.gps.forms import (
     FollowUpGroupMembershipForm,
+    JobSeekerSearchByNameEmailForm,
     JobSeekersFollowedByCoworkerSearchForm,
     JoinGroupChannelForm,
     MembershipsFiltersForm,
@@ -241,7 +244,7 @@ def join_group(request, template_name="gps/join_group.html"):
     urls = {
         Channel.FROM_COWORKER: reverse("gps:join_group_from_coworker"),
         Channel.FROM_NIR: reverse("gps:join_group_from_nir"),
-        Channel.FROM_NAME_EMAIL: "",  # FIXME
+        Channel.FROM_NAME_EMAIL: reverse("gps:join_group_from_name_and_email"),
     }
     if request.current_organization is None:
         return HttpResponseRedirect(urls[Channel.FROM_NAME_EMAIL])
@@ -317,6 +320,91 @@ def join_group_from_nir(request, template_name="gps/join_group_from_nir.html"):
             "preview_mode": job_seeker and bool(form.data.get("preview")),
             "job_seeker": job_seeker,
             "nir_not_found": job_seeker is None,
+        }
+
+    return render(request, template_name, context)
+
+
+@check_user(is_allowed_to_use_gps)
+def join_group_from_name_and_email(request, template_name="gps/join_group_from_name_and_email.html"):
+    form = JobSeekerSearchByNameEmailForm(data=request.POST or None)
+    context = {
+        "form": form,
+        "reset_url": get_safe_url(request, "back_url", fallback_url=reverse("gps:join_group")),
+        "job_seeker": None,
+        "email_only_match": False,
+        "preview_mode": False,
+    }
+
+    if request.method == "POST" and form.is_valid():
+        job_seeker = (
+            User.objects.filter(
+                kind=UserKind.JOB_SEEKER,
+                first_name__iexact=form.cleaned_data["first_name"],
+                last_name__iexact=form.cleaned_data["last_name"],
+                email=form.cleaned_data["email"],
+            )
+            .select_related("jobseeker_profile")
+            .first()
+        )
+
+        if job_seeker is None:
+            job_seeker_email_match = User.objects.filter(
+                kind=UserKind.JOB_SEEKER, email=form.cleaned_data["email"]
+            ).first()
+            if job_seeker_email_match:
+                context["email_only_match"] = True
+                if is_allowed_to_use_gps_advanced_features(request.user):
+                    # slight change in modal wording
+                    job_seeker = job_seeker_email_match
+                else:
+                    form.add_error(
+                        "__all__",
+                        mark_safe(
+                            "<strong>Veuillez vérifier le nom ou l’e-mail.</strong><br>"
+                            "Un compte bénéficiaire avec un nom différent existe déjà pour cette adresse e-mail."
+                        ),
+                    )
+
+            else:
+                # Maybe plug into GetOrCreateJobSeekerStartView
+                data = {
+                    "config": {
+                        "tunnel": "gps",
+                        "from_url": request.get_full_path(),
+                        "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
+                    },
+                    "user": form.cleaned_data,
+                }
+                job_seeker_session = SessionNamespace.create_uuid_namespace(request.session, data)
+                return HttpResponseRedirect(
+                    reverse(
+                        "job_seekers_views:create_job_seeker_step_1_for_sender",
+                        kwargs={"session_uuid": job_seeker_session.name},
+                    )
+                )
+
+        # For authorized prescribers + employers
+        if form.data.get("confirm") and is_allowed_to_use_gps_advanced_features(request.user):
+            add_beneficiary(request, job_seeker)
+            return HttpResponseRedirect(reverse("gps:group_list"))
+
+        # For non authorized prescribers
+        if form.data.get("ask"):
+            # FIXME add Slack notification
+            messages.info(
+                request,
+                "Demande d’ajout envoyée||"
+                f"Votre demande d’ajout pour {job_seeker.get_full_name()} a bien été transmise pour validation.",
+                extra_tags="toast",
+            )
+            return HttpResponseRedirect(reverse("gps:group_list"))
+
+        context |= {
+            # Ask the sender to confirm the found user is correct
+            "preview_mode": job_seeker and bool(form.data.get("preview")),
+            "job_seeker": job_seeker,
+            "can_use_gps_advanced_features": is_allowed_to_use_gps_advanced_features(request.user),
         }
 
     return render(request, template_name, context)

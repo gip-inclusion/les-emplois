@@ -57,6 +57,20 @@ def assert_already_followed_beneficiary_toast(response, job_seeker):
     )
 
 
+def assert_ask_to_follow_beneficiary_toast(response, job_seeker):
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                messages.INFO,
+                "Demande d’ajout envoyée||"
+                f"Votre demande d’ajout pour {job_seeker.get_full_name()} a bien été transmise pour validation.",
+                extra_tags="toast",
+            ),
+        ],
+    )
+
+
 class TestGroupLists:
     @pytest.mark.parametrize(
         "factory,status_code",
@@ -772,14 +786,14 @@ class TestJoinGroup:
         assertRedirects(response, reverse("gps:join_group_from_nir"), fetch_redirect_response=False)
 
         response = client.post(url, data={"channel": "from_name_email"})
-        assertRedirects(response, url)  # FIXME
+        assertRedirects(response, reverse("gps:join_group_from_name_and_email"), fetch_redirect_response=False)
 
     def test_view_without_org(self, client):
         url = reverse("gps:join_group")
         user = PrescriberFactory()
         client.force_login(user)
         response = client.get(url)
-        assertRedirects(response, url, fetch_redirect_response=False)  # FIXME
+        assertRedirects(response, reverse("gps:join_group_from_name_and_email"), fetch_redirect_response=False)
 
 
 class TestBeneficiariesAutocomplete:
@@ -1264,4 +1278,325 @@ class TestJoinGroupFromNir:
         assert_new_beneficiary_toast(response, new_job_seeker)
         assert FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
+        ).exists()
+
+
+class TestJoinGroupFromNameAndEmail:
+    URL = reverse("gps:join_group_from_name_and_email")
+
+    @pytest.mark.parametrize(
+        "factory,access",
+        [
+            [partial(JobSeekerFactory, for_snapshot=True), False],
+            (partial(PrescriberFactory, membership__organization__authorized=True), True),
+            (partial(PrescriberFactory, membership__organization__authorized=False), True),
+            (PrescriberFactory, True),
+            (partial(EmployerFactory, with_company=True), True),
+            [partial(LaborInspectorFactory, membership=True), False],
+        ],
+        ids=[
+            "job_seeker",
+            "authorized_prescriber",
+            "prescriber_with_org",
+            "prescriber_no_org",
+            "employer",
+            "labor_inspector",
+        ],
+    )
+    def test_permissions(self, client, factory, access):
+        user = factory()
+        client.force_login(user)
+        response = client.get(self.URL)
+        if access:
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 403
+
+    @pytest.mark.parametrize("known_name", [True, False])
+    def test_unknown_email(self, client, settings, mocker, known_name):
+        # This process is the same with or without gps advanced features
+
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        dummy_job_seeker = JobSeekerFactory.build(
+            jobseeker_profile__with_hexa_address=True,
+            jobseeker_profile__with_education_level=True,
+            with_ban_geoloc_address=True,
+        )
+
+        response = client.get(self.URL)
+
+        # Unknown email -> redirect to job seeker creation flow
+        # ----------------------------------------------------------------------
+        job_seeker = JobSeekerFactory()
+        first_name = job_seeker.first_name if known_name else "John"
+        last_name = job_seeker.last_name if known_name else "Snow"
+        post_data = {
+            "email": dummy_job_seeker.email,
+            "first_name": first_name,
+            "last_name": last_name,
+            "preview": "1",
+        }
+        response = client.post(self.URL, data=post_data)
+        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        next_url = reverse(
+            "job_seekers_views:create_job_seeker_step_1_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        expected_job_seeker_session = {
+            "config": {
+                "tunnel": "gps",
+                "from_url": reverse("gps:join_group_from_name_and_email"),
+                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
+            },
+            "user": {
+                "email": dummy_job_seeker.email,
+                "first_name": first_name,
+                "last_name": last_name,
+            },
+        }
+        assertRedirects(response, next_url)
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        # Step create a job seeker.
+        # ----------------------------------------------------------------------
+        response = client.get(next_url)
+        # The name is prefilled
+        assertContains(response, first_name)
+        assertContains(response, last_name)
+
+        geispolsheim = create_city_geispolsheim()
+        birthdate = dummy_job_seeker.jobseeker_profile.birthdate
+
+        # If we use an existing NIR
+        existing_nir = JobSeekerFactory().jobseeker_profile.nir
+        post_data = {
+            "title": dummy_job_seeker.title,
+            "first_name": first_name,
+            "last_name": last_name,
+            "birthdate": birthdate,
+            "nir": existing_nir,
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
+            "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+            "birth_country": Country.france_id,
+        }
+        response = client.post(next_url, data=post_data)
+        assert response.status_code == 200
+        assertContains(response, "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.")
+
+        # With a other NIR
+        post_data["nir"] = dummy_job_seeker.jobseeker_profile.nir
+        response = client.post(next_url, data=post_data)
+        expected_job_seeker_session["profile"] = {}
+        for key in ["nir", "birthdate", "lack_of_nir_reason", "birth_place", "birth_country"]:
+            expected_job_seeker_session["profile"][key] = post_data.pop(key)
+        expected_job_seeker_session["user"] |= post_data
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "job_seekers_views:create_job_seeker_step_2_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        assertRedirects(response, next_url)
+
+        response = client.get(next_url)
+        assert response.status_code == 200
+
+        post_data = {
+            "ban_api_resolved_address": dummy_job_seeker.geocoding_address,
+            "address_line_1": dummy_job_seeker.address_line_1,
+            "post_code": geispolsheim.post_codes[0],
+            "insee_code": geispolsheim.code_insee,
+            "city": geispolsheim.name,
+            "phone": dummy_job_seeker.phone,
+            "fill_mode": "ban_api",
+        }
+
+        settings.API_BAN_BASE_URL = "http://ban-api"
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+        )
+
+        response = client.post(next_url, data=post_data)
+
+        expected_job_seeker_session["user"] |= post_data | {"address_line_2": "", "address_for_autocomplete": None}
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "job_seekers_views:create_job_seeker_step_3_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        assertRedirects(response, next_url)
+
+        response = client.get(next_url)
+        assert response.status_code == 200
+
+        post_data = {"education_level": dummy_job_seeker.jobseeker_profile.education_level}
+        response = client.post(next_url, data=post_data)
+        next_url = reverse(
+            "job_seekers_views:create_job_seeker_step_end_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        assertRedirects(response, next_url)
+
+        expected_job_seeker_session["profile"] |= post_data | {
+            "pole_emploi_id": "",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED.value,
+            "resourceless": False,
+            "rqth_employee": False,
+            "oeth_employee": False,
+            "pole_emploi": False,
+            "pole_emploi_id_forgotten": "",
+            "pole_emploi_since": "",
+            "unemployed": False,
+            "unemployed_since": "",
+            "rsa_allocation": False,
+            "has_rsa_allocation": RSAAllocation.NO.value,
+            "rsa_allocation_since": "",
+            "ass_allocation": False,
+            "ass_allocation_since": "",
+            "aah_allocation": False,
+            "aah_allocation_since": "",
+        }
+        assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        response = client.get(next_url)
+        assertContains(response, "Créer et suivre le bénéficiaire")
+
+        response = client.post(next_url)
+        assert job_seeker_session_name not in client.session
+        new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
+        assert_new_beneficiary_toast(response, new_job_seeker)
+        assert FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=new_job_seeker, member=user
+        ).exists()
+
+        # FIXME assert slack notification if known_name
+
+    def test_full_match_with_advanced_features(self, client, snapshot):
+        user = PrescriberFactory(membership__organization__authorized=True)
+        client.force_login(user)
+
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        post_data = {
+            "email": job_seeker.email,
+            "first_name": job_seeker.first_name,
+            "last_name": job_seeker.last_name,
+            "preview": "1",
+        }
+        response = client.post(self.URL, data=post_data)
+        assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+
+        post_data = {
+            "email": job_seeker.email,
+            "first_name": job_seeker.first_name,
+            "last_name": job_seeker.last_name,
+            "confirm": "1",
+        }
+        response = client.post(self.URL, data=post_data)
+        assertRedirects(response, reverse("gps:group_list"))
+        assert_new_beneficiary_toast(response, job_seeker)
+        assert FollowUpGroupMembership.objects.filter(follow_up_group__beneficiary=job_seeker, member=user).exists()
+
+    def test_full_match_without_advanced_features(self, client, snapshot):
+        user = PrescriberFactory(membership__organization__authorized=False)
+        client.force_login(user)
+
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        post_data = {
+            "email": job_seeker.email,
+            "first_name": job_seeker.first_name,
+            "last_name": job_seeker.last_name,
+            "preview": "1",
+        }
+        response = client.post(self.URL, data=post_data)
+        assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+
+        # Cannot confirm
+        post_data = {
+            "email": job_seeker.email,
+            "first_name": job_seeker.first_name,
+            "last_name": job_seeker.last_name,
+            "confirm": "1",
+        }
+        response = client.post(self.URL, data=post_data)
+        assert response.status_code == 200
+        assert not FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=job_seeker, member=user
+        ).exists()
+
+        # When asking
+        post_data = {
+            "email": job_seeker.email,
+            "first_name": job_seeker.first_name,
+            "last_name": job_seeker.last_name,
+            "ask": "1",
+        }
+        response = client.post(self.URL, data=post_data)
+        assertRedirects(response, reverse("gps:group_list"))
+
+        assert_ask_to_follow_beneficiary_toast(response, job_seeker)
+        assert not FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=job_seeker, member=user
+        ).exists()
+
+        # FIXME assert slack notification
+
+    def test_partial_match_with_advanced_features(self, client, snapshot):
+        user = PrescriberFactory(membership__organization__authorized=True)
+        client.force_login(user)
+
+        response = client.get(self.URL)
+
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        post_data = {
+            "email": job_seeker.email,
+            "first_name": "John",
+            "last_name": "Snow",
+            "preview": "1",
+        }
+        response = client.post(self.URL, data=post_data)
+        assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+
+        post_data = {
+            "email": job_seeker.email,
+            "first_name": "John",
+            "last_name": "Snow",
+            "confirm": "1",
+        }
+        response = client.post(self.URL, data=post_data)
+        assertRedirects(response, reverse("gps:group_list"))
+        assert_new_beneficiary_toast(response, job_seeker)
+        assert FollowUpGroupMembership.objects.filter(follow_up_group__beneficiary=job_seeker, member=user).exists()
+
+    def test_partial_match_without_advanced_features(self, client, snapshot):
+        user = PrescriberFactory(membership__organization__authorized=False)
+        client.force_login(user)
+
+        response = client.get(self.URL)
+
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        post_data = {
+            "email": job_seeker.email,
+            "first_name": "John",
+            "last_name": "Snow",
+            "preview": "1",
+        }
+        response = client.post(self.URL, data=post_data)
+        assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+
+        # Cannot confirm
+        post_data = {
+            "email": job_seeker.email,
+            "first_name": "John",
+            "last_name": "Snow",
+            "confirm": "1",
+        }
+        response = client.post(self.URL, data=post_data)
+        assert response.status_code == 200
+        assert not FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=job_seeker, member=user
         ).exists()
