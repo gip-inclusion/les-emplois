@@ -1,0 +1,64 @@
+{% extends "layout/base.html" %}
+{% load format_filters %}
+{% load django_bootstrap5 %}
+{% load buttons_form %}
+{% load static %}
+
+{% block title_content %}<h1>Ajouter un bénéficiaire</h1>{% endblock %}
+
+{% block content %}
+    <section class="s-section" id="join_group">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="col-8">
+                    <div class="c-form">
+                        <form method="post" class="js-prevent-multiple-submit js-format-nir">
+                            {% csrf_token %}
+                            {% bootstrap_form form %}
+                            {# Reload this page and show a modal containing more information about the job seeker. #}
+                            {% itou_buttons_form primary_label="Ajouter le bénéficiaire" primary_name="preview" primary_value="1" reset_url=reset_url %}
+                            {% if preview_mode %}
+                                <!-- Modal -->
+                                <div class="modal" id="nir-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="nir-confirmation-label" aria-modal="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h3 class="modal-title" id="nir-confirmation-label">Un bénéficiaire avec ce numéro a été trouvé</h3>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>
+                                                    Ce numéro de sécurité sociale est associé au compte de <b>{{ job_seeker.get_full_name }}</b>.
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                {# Reload this page with a new form. #}
+                                                {% bootstrap_button "Ce n'est pas le bénéficiaire que je cherche" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                                                {# Go to the next step. #}
+                                                {% bootstrap_button "Ajouter le bénéficiaire" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/split_nir.js' %}"></script>
+    {% if preview_mode %}
+        {# Show the confirmation modal after submitting the form. #}
+        <script nonce="{{ CSP_NONCE }}">
+            // Adding the "show" CSS class is not enough and not documented.
+            // A JS initialization is recommended.
+            const nirConfirmationModal = new bootstrap.Modal("#nir-confirmation-modal");
+            nirConfirmationModal.show();
+        </script>
+    {% endif %}
+{% endblock script %}
