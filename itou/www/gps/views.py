@@ -18,10 +18,11 @@ from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.gps.enums import Channel
 from itou.www.gps.forms import (
     FollowUpGroupMembershipForm,
+    JobSeekersFollowedByCoworkerSearchForm,
     JoinGroupChannelForm,
     MembershipsFiltersForm,
 )
-from itou.www.gps.utils import get_all_coworkers
+from itou.www.gps.utils import add_beneficiary, get_all_coworkers
 
 
 def is_allowed_to_use_gps(user):
@@ -235,7 +236,7 @@ def display_contact_info(request, group_id, target_participant_public_id, mode):
 @check_user(is_allowed_to_use_gps)
 def join_group(request, template_name="gps/join_group.html"):
     urls = {
-        Channel.FROM_COWORKER: "",  # FIXME
+        Channel.FROM_COWORKER: reverse("gps:join_group_from_coworker"),
         Channel.FROM_NIR: "",  # FIXME
         Channel.FROM_NAME_EMAIL: "",  # FIXME
     }
@@ -251,6 +252,25 @@ def join_group(request, template_name="gps/join_group.html"):
         "can_use_gps_advanced_features": is_allowed_to_use_gps_advanced_features(request.user),
         "Channel": Channel,
     }
+    return render(request, template_name, context)
+
+
+@check_user(is_allowed_to_use_gps)
+def join_group_from_coworker(request, template_name="gps/join_group_from_coworker.html"):
+    if request.current_organization is None:
+        raise PermissionDenied("Il faut une organisation ou une structure pour accéder à cette page")
+
+    form = JobSeekersFollowedByCoworkerSearchForm(data=request.POST or None, organizations=request.organizations)
+
+    if request.method == "POST" and form.is_valid():
+        add_beneficiary(request, form.job_seeker)
+        return HttpResponseRedirect(reverse("gps:group_list"))
+
+    context = {
+        "form": form,
+        "reset_url": get_safe_url(request, "back_url", fallback_url=reverse("gps:join_group")),
+    }
+
     return render(request, template_name, context)
 
 

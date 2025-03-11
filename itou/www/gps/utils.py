@@ -1,4 +1,25 @@
+from django.contrib import messages
+
 from itou.common_apps.organizations.models import MembershipQuerySet
+from itou.gps.models import FollowUpGroup
+
+
+def add_beneficiary(request, beneficiary):
+    added = FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=request.user)
+    if added:
+        messages.success(
+            request,
+            "Bénéficiaire ajouté||"
+            f"{beneficiary.get_full_name()} fait maintenant partie de la liste de vos bénéficiaires.",
+            extra_tags="toast",
+        )
+    else:
+        messages.info(
+            request,
+            "Bénéficiaire déjà dans la liste||"
+            f"{beneficiary.get_full_name()} fait déjà partie de la liste de vos bénéficiaires.",
+            extra_tags="toast",
+        )
 
 
 def get_all_coworkers(organizations):
