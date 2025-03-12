@@ -3,12 +3,18 @@
 {% block title %}Erreur 403 {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1>Vous ne pouvez pas continuer</h1>
-    {% if exception %}
-        <div class="alert alert-warning" role="status">
-            <p class="mb-0">{{ exception }}</p>
-        </div>
-    {% else %}
-        <h2>Accès refusé</h2>
-    {% endif %}
+    {% component "title" %}
+        {% fill "c_title__main" %}
+            <h1>Vous ne pouvez pas continuer</h1>
+        {% endfill %}
+        {% fill "c_title__secondary" %}
+            {% if exception %}
+                <div class="alert alert-warning" role="status">
+                    <p class="mb-0">{{ exception }}</p>
+                </div>
+            {% else %}
+                <h2>Accès refusé</h2>
+            {% endif %}
+        {% endfill %}
+    {% endcomponent %}
 {% endblock %}
