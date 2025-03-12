@@ -11,40 +11,85 @@
                 <div class="col-6">
                     <div class="c-box">
                         <h2>Mes appareils</h2>
-                        {% if devices %}
-                            <p>Voici la liste de vos appareils configurés :</p>
-                            <table class="table table-sm">
-                                <caption class="visually-hidden">Liste de vos appareils configurés</caption>
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Nom</th>
-                                        <th scope="col">Créé le</th>
-                                        <th scope="col">Dernière utilisation</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for device in devices %}
-                                        <tr>
-                                            <td>{{ device.name }}</td>
-                                            <td>{{ device.created_at }}</td>
-                                            <td>
-                                                {{ device.last_used_at|default:'<i class="text-disabled">jamais</i>' }}
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                            <p class="text-disabled">Si vous souhaitez en supprimer, demandez à Supportix</p>
-                        {% else %}
-                            <p>Vous n'avez pas configuré d'appareil OTP.</p>
-                        {% endif %}
                         <form method="post">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-block btn-primary">
+                            {% if devices %}
+                                <p>Voici la liste de vos appareils configurés :</p>
+                                <table class="table table-sm">
+                                    <caption class="visually-hidden">Liste de vos appareils configurés</caption>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col"></th>
+                                            <th scope="col">Nom</th>
+                                            <th scope="col">Créé le</th>
+                                            <th scope="col">Dernière utilisation</th>
+                                            <th scope="col">Supprimer</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for device in devices %}
+                                            <tr>
+                                                <td>
+                                                    {% if user.otp_device == device %}
+                                                        <i class="ri-verified-badge-line text-success" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Vous avez utilisé cet appareil pour vous connecter."></i>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ device.name }}</td>
+                                                <td>{{ device.created_at }}</td>
+                                                <td>
+                                                    {{ device.last_used_at|default:'<i class="text-disabled">jamais</i>' }}
+                                                </td>
+                                                <td>
+
+                                                    <button class="btn btn-sm btn-link {% if user.otp_device == device %}disabled{% else %}text-danger{% endif %}"
+                                                            type="button"
+                                                            {% if user.otp_device == device %} data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." {% endif %}
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#delete_{{ device.pk }}_modal"
+                                                            aria-label="Supprimer l’appareil {{ device.name }}">
+                                                        <i class="ri-delete-bin-line fw-normal" aria-hidden="true"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <p>Vous n'avez pas configuré d'appareil OTP.</p>
+                            {% endif %}
+                            <button type="submit" class="btn btn-block btn-primary" name="action" value="new">
                                 Configurer un
                                 {% if devices %}nouvel{% endif %}
                                 appareil
                             </button>
+
+                            {# modals to confirm device deletion #}
+                            {% for device in devices %}
+                                <div id="delete_{{ device.pk }}_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h3 class="modal-title">Êtes-vous sûr de vouloir supprimer l'appareil {{ device.name }} ?</h3>
+                                            </div>
+                                            <div class="modal-body">
+                                                {% if user.otp_device == device and devices|length > 1 %}
+                                                    <p>Cet appareil est celui que vous avez utilisé pour vous connecter.</p>
+                                                    <p>
+                                                        Si vous le supprimez, vous devrez immédiatement confirmer votre identité avec un des autres appareils que vous avez enregistré.
+                                                    </p>
+                                                {% endif %}
+                                                <p>Cette action est irréversible.</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                                                <button class="btn btn-sm btn-danger" aria-label="Supprimer l’appareil {{ device.name }}" name="delete-device" value="{{ device.pk }}">
+                                                    Confirmer la suppression
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
                         </form>
                     </div>
                 </div>

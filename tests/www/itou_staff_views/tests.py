@@ -11,7 +11,13 @@ from django.utils import timezone
 from django_otp.oath import TOTP
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
+from pytest_django.asserts import (
+    assertContains,
+    assertMessages,
+    assertNotContains,
+    assertQuerySetEqual,
+    assertRedirects,
+)
 from rest_framework.authtoken.models import Token
 
 from itou.companies.models import CompanyMembership
@@ -647,7 +653,7 @@ class TestOTP:
         response = client.get(url)
         assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="no_device")
 
-        response = client.post(url)
+        response = client.post(url, data={"action": "new"})
         device = TOTPDevice.objects.get()
         assertRedirects(response, reverse("itou_staff_views:otp_confirm_device", args=(device.pk,)))
 
@@ -655,7 +661,7 @@ class TestOTP:
         response = client.get(url)
         assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="no_device")
 
-        response = client.post(url)
+        response = client.post(url, data={"action": "new"})
         device = TOTPDevice.objects.get()  # Still only one
         assertRedirects(response, reverse("itou_staff_views:otp_confirm_device", args=(device.pk,)))
 
@@ -675,12 +681,14 @@ class TestOTP:
                 response,
                 ".s-section",
                 replace_in_attr=[
-                    ("href", f"user={staff_user.pk}", "user=[PK of User]"),
+                    ("value", f"{device.pk}", "[PK of device]"),
+                    ("id", f"delete_{device.pk}_modal", "delete_[PK of device]_modal"),
+                    ("data-bs-target", f"#delete_{device.pk}_modal", "#delete_[PK of device]_modal"),
                 ],
             )
         ) == snapshot(name="with_device")
 
-        response = client.post(url)
+        response = client.post(url, data={"action": "new"})
         device = TOTPDevice.objects.exclude(pk=device.pk).get()
         assertRedirects(response, reverse("itou_staff_views:otp_confirm_device", args=(device.pk,)))
 
@@ -726,3 +734,62 @@ class TestOTP:
         assertRedirects(response, reverse("itou_staff_views:otp_devices"))
         device.refresh_from_db()
         assert device.confirmed is True
+
+    def test_delete_devices(self, client, snapshot, settings):
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        staff_user = ItouStaffFactory()
+        url = reverse("itou_staff_views:otp_devices")
+
+        with freeze_time("2025-03-11 05:18:56") as frozen_time:
+            client.force_login(staff_user)
+
+            device_1 = TOTPDevice.objects.create(user=staff_user, confirmed=True, name="bitwarden")
+            frozen_time.tick(60)
+
+            device_2 = TOTPDevice.objects.create(user=staff_user, confirmed=True, name="authenticator")
+            frozen_time.tick(60)
+
+            # Verify user
+            post_data = {
+                "name": "Mon appareil",
+                "otp_token": TOTP(device_1.bin_key).token(),
+            }
+            client.post(reverse("login:verify_otp"), data=post_data)
+
+            # List devices
+            response = client.get(url)
+            assertContains(response, device_1.name)
+            assertContains(response, device_2.name)
+            assert str(
+                parse_response_to_soup(
+                    response,
+                    ".s-section",
+                    replace_in_attr=[
+                        ("value", f"{device_1.pk}", "[PK of device_1]"),
+                        ("id", f"delete_{device_1.pk}_modal", "delete_[PK of device_1]_modal"),
+                        ("data-bs-target", f"#delete_{device_1.pk}_modal", "#delete_[PK of device_1]_modal"),
+                        ("value", f"{device_2.pk}", "[PK of device_2]"),
+                        ("id", f"delete_{device_2.pk}_modal", "delete_[PK of device_2]_modal"),
+                        ("data-bs-target", f"#delete_{device_2.pk}_modal", "#delete_[PK of device_2]_modal"),
+                    ],
+                )
+            ) == snapshot(name="with_device")
+
+            # We cannot remove the used device
+            response = client.post(url, data={"delete-device": str(device_1.pk)}, follow=True)
+            assertQuerySetEqual(TOTPDevice.objects.all(), [device_1, device_2], ordered=False)
+            assertMessages(
+                response,
+                [
+                    messages.Message(
+                        messages.ERROR, "Impossible de supprimer l’appareil qui a été utilisé pour se connecter."
+                    )
+                ],
+            )
+
+            # The user removes his other device
+            response = client.post(url, data={"delete-device": str(device_2.pk)})
+            assertQuerySetEqual(TOTPDevice.objects.all(), [device_1])
+            assertContains(response, device_1.name)
+            assertNotContains(response, device_2.name)
+            assertMessages(response, [messages.Message(messages.SUCCESS, "L’appareil a été supprimé.")])
