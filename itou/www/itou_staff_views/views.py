@@ -301,10 +301,20 @@ def merge_users_confirm(
 @check_user(lambda user: user.is_staff)
 def otp_devices(request, template_name="itou_staff_views/otp_devices.html"):
     if request.method == "POST":
-        device, _ = TOTPDevice.objects.get_or_create(user=request.user, confirmed=False)
-        return HttpResponseRedirect(reverse("itou_staff_views:otp_confirm_device", kwargs={"device_id": device.pk}))
+        if request.POST.get("action") == "new":
+            device, _ = TOTPDevice.objects.get_or_create(user=request.user, confirmed=False)
+            return HttpResponseRedirect(
+                reverse("itou_staff_views:otp_confirm_device", kwargs={"device_id": device.pk})
+            )
+        if device_id := request.POST.get("delete-device"):
+            device = get_object_or_404(TOTPDevice.objects.filter(user=request.user), pk=device_id)
+            if device != request.user.otp_device:
+                messages.success(request, "L’appareil a été supprimé.")
+                device.delete()
+            else:
+                messages.error(request, "Impossible de supprimer l’appareil qui a été utilisé pour se connecter.")
 
-    context = {"devices": list(devices_for_user(request.user))}
+    context = {"devices": sorted(devices_for_user(request.user), key=lambda device: device.created_at)}
     return render(request, template_name, context)
 
 
