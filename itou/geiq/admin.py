@@ -1,7 +1,9 @@
 import logging
+from pprint import pformat
 
 from django.contrib import admin, messages
 from django.core.exceptions import ImproperlyConfigured
+from django.utils import timezone
 from django.utils.html import format_html
 
 from itou.geiq import models, sync
@@ -60,7 +62,26 @@ class ImplementationAssessmentCampaignAdmin(ItouModelAdmin):
                     s = "s" if nb_delete > 1 else ""
                     messages.warning(request, f"{nb_delete} bilan{s} sont liés à des GEIQ n’existant plus dans LABEL.")
 
-    actions = [sync_assessments]
+    @admin.action(description="Récupérer & stocker la liste des GEIQ avec leurs antennes")
+    def get_geiq_label_infos(self, request, queryset):
+        for campaign in queryset:
+            if campaign.geiq_label_infos:
+                messages.error(request, f"Les informations LABEL de la campagne {campaign} ont déjà été récupérées.")
+                continue
+            try:
+                campaign.geiq_label_infos = sync.get_geiq_label_infos()
+                campaign.geiq_label_infos_synced_at = timezone.now()
+                campaign.save(update_fields=("geiq_label_infos", "geiq_label_infos_synced_at"))
+            except ImproperlyConfigured:
+                messages.error(request, "Synchronisation impossible avec Label: configuration incomplète")
+                return
+            except geiq_label.LabelAPIError:
+                logger.warning("Error while syncing GEIQ campaign %s with Label", campaign)
+                messages.error(request, f"Erreur lors de la synchronisation de la campagne {campaign} avec Label")
+            else:
+                messages.success(request, f"Les informations LABEL de la campagne {campaign} ont été récupérées.")
+
+    actions = [sync_assessments, get_geiq_label_infos]
     list_display = (
         "pk",
         "year",
@@ -71,11 +92,33 @@ class ImplementationAssessmentCampaignAdmin(ItouModelAdmin):
         ImplementationAssessmentInline,
         PkSupportRemarkInline,
     ]
+    readonly_fields = ("pretty_geiq_label_infos", "geiq_label_infos_synced_at")
+    fieldsets = (
+        (
+            "Date",
+            {
+                "fields": ("year", "submission_deadline", "review_deadline"),
+            },
+        ),
+        (
+            "LABEL",
+            {
+                "fields": ("geiq_label_infos_synced_at", "pretty_geiq_label_infos"),
+                "classes": ["collapse"],
+            },
+        ),
+    )
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
             return self.readonly_fields + ("year",)
         return self.readonly_fields
+
+    @admin.display(description="Données LABEL")
+    def pretty_geiq_label_infos(self, obj):
+        if obj.geiq_label_infos:
+            return format_html("<pre><code>{}</code></pre>", pformat(obj.geiq_label_infos, width=200))
+        return "-"
 
 
 @admin.register(models.ImplementationAssessment)

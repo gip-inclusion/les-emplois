@@ -13,6 +13,10 @@ class ImplementationAssessmentCampaign(models.Model):
     year = models.IntegerField(verbose_name="année", unique=True)
     submission_deadline = models.DateField(verbose_name="date limite de transmission du bilan d’exécution")
     review_deadline = models.DateField(verbose_name="date limite de contrôle du bilan d’exécution")
+    geiq_label_infos = models.JSONField(verbose_name="données LABEL", null=True)
+    geiq_label_infos_synced_at = models.DateTimeField(
+        verbose_name="données LABEL récupérées le", blank=True, null=True
+    )
 
     class Meta:
         verbose_name = "campagne de bilan d’exécution"
