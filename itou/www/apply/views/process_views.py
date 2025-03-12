@@ -285,21 +285,39 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     """
     job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
 
-    queryset = job_applications.select_related(
-        "job_seeker",
-        "eligibility_diagnosis",
-        "sender",
-        "sender_company",
-        "sender_prescriber_organization",
-        "to_company",
-        "approval",
-        "archived_by",
-    ).prefetch_related(
-        "selected_jobs__appellation",
-        "eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
-        "geiq_eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
+    queryset = (
+        job_applications.select_related(
+            "job_seeker",
+            "eligibility_diagnosis",
+            "sender",
+            "sender_company",
+            "sender_prescriber_organization",
+            "to_company",
+            "approval",
+            "archived_by",
+        )
+        .prefetch_related(
+            "selected_jobs__appellation",
+            "eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
+            "geiq_eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
+        )
+        .annotate(
+            upcoming_participations_count=Count(
+                "job_seeker__rdvi_participations",
+                filter=Q(
+                    job_seeker__rdvi_participations__appointment__company=F("to_company"),
+                    job_seeker__rdvi_participations__status=Participation.Status.UNKNOWN,
+                    job_seeker__rdvi_participations__appointment__start_at__gt=timezone.now(),
+                ),
+            ),
+        )
     )
     job_application = get_object_or_404(queryset, id=job_application_id)
+    participations = (
+        job_application.job_seeker.rdvi_participations.filter(appointment__company=job_application.to_company)
+        .select_related("appointment", "appointment__location")
+        .order_by("-appointment__start_at")
+    )
 
     transition_logs = job_application.logs.select_related("user").all()
 
@@ -344,7 +362,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "expired_eligibility_diagnosis": None,  # XXX: should we search for an expired diagnosis here ?
         "job_application": job_application,
-        "participations": [],
+        "participations": participations,
         "transition_logs": transition_logs,
         "back_url": back_url,
         "matomo_custom_title": "Candidature",

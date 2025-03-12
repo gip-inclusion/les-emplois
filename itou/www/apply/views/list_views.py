@@ -219,6 +219,11 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         title = annotate_title(title, filters_form.cleaned_data["archived"])
 
     try:
+        display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
+    except ValueError:
+        display_kind = JobApplicationsDisplayKind.LIST
+
+    try:
         order = JobApplicationOrder(request.GET.get("order"))
     except ValueError:
         order = JobApplicationOrder.CREATED_AT_DESC
@@ -227,15 +232,34 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         job_seeker_full_name=Concat(Lower("job_seeker__first_name"), Value(" "), Lower("job_seeker__last_name"))
     ).order_by(*order.order_by)
 
+    if display_kind == JobApplicationsDisplayKind.LIST:
+        job_applications = job_applications.annotate(
+            next_appointment_start_at=Subquery(
+                Participation.objects.filter(
+                    appointment__company=OuterRef("to_company"),
+                    job_seeker=OuterRef("job_seeker"),
+                    status=Participation.Status.UNKNOWN,
+                    appointment__start_at__gt=timezone.now(),
+                )
+                .order_by("appointment__start_at")
+                .values("appointment__start_at")[:1],
+                output_field=models.DateTimeField(),
+            ),
+            other_appointments_count=Count(
+                "job_seeker__rdvi_participations",
+                filter=Q(
+                    job_seeker__rdvi_participations__appointment__company=F("to_company"),
+                    job_seeker__rdvi_participations__status=Participation.Status.UNKNOWN,
+                    job_seeker__rdvi_participations__appointment__start_at__gt=timezone.now(),
+                ),
+            )
+            - 1,  # Exclude the next appointment
+        )
+
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=20)
     _add_pending_for_weeks(job_applications_page)
     _add_user_can_view_personal_information(job_applications_page, request.user.can_view_personal_information)
     _add_administrative_criteria(job_applications_page)
-
-    try:
-        display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
-    except ValueError:
-        display_kind = JobApplicationsDisplayKind.LIST
 
     context = {
         "title": title,

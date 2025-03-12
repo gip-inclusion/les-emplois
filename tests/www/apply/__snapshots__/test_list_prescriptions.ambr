@@ -584,10 +584,22 @@
                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                 ORDER BY U0."created_at" DESC
                 LIMIT 1) AS "jobseeker_valid_eligibility_diagnosis",
-                    GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change"
+                    GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
+          
+               (SELECT U1."start_at"
+                FROM "rdv_insertion_participation" U0
+                INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+                WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                       AND U1."start_at" > %s
+                       AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                       AND U0."status" = %s)
+                ORDER BY U1."start_at" ASC
+                LIMIT 1) AS "next_appointment_start_at"
              FROM "job_applications_jobapplication"
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
              INNER JOIN "users_user" T5 ON ("job_applications_jobapplication"."job_seeker_id" = T5."id")
+             LEFT OUTER JOIN "rdv_insertion_participation" ON (T5."id" = "rdv_insertion_participation"."job_seeker_id")
+             LEFT OUTER JOIN "rdv_insertion_appointment" ON ("rdv_insertion_participation"."appointment_id" = "rdv_insertion_appointment"."id")
              WHERE ("job_applications_jobapplication"."sender_id" = %s
                     AND "job_applications_jobapplication"."archived_at" IS NULL)
              GROUP BY "job_applications_jobapplication"."id",
@@ -668,6 +680,20 @@
                              ORDER BY U0."created_at" DESC
                              LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
                  (COALESCE(LOWER(T5."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T5."last_name"), %s)), %s)) AS "job_seeker_full_name",
+          
+            (SELECT U1."start_at"
+             FROM "rdv_insertion_participation" U0
+             INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+             WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                    AND U1."start_at" > %s
+                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                    AND U0."status" = %s)
+             ORDER BY U1."start_at" ASC
+             LIMIT 1) AS "next_appointment_start_at",
+                 (COUNT("rdv_insertion_participation"."id") FILTER (
+                                                                    WHERE ("rdv_insertion_appointment"."company_id" = ("job_applications_jobapplication"."to_company_id")
+                                                                           AND "rdv_insertion_appointment"."start_at" > %s
+                                                                           AND "rdv_insertion_participation"."status" = %s)) - %s) AS "other_appointments_count",
                  T5."id",
                  T5."password",
                  T5."last_login",
@@ -771,43 +797,43 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 T8."id",
-                 T8."address_line_1",
-                 T8."address_line_2",
-                 T8."post_code",
-                 T8."city",
-                 T8."department",
-                 T8."coords",
-                 T8."geocoding_score",
-                 T8."geocoding_updated_at",
-                 T8."ban_api_resolved_address",
-                 T8."insee_city_id",
-                 T8."name",
-                 T8."created_at",
-                 T8."updated_at",
-                 T8."uid",
-                 T8."active_members_email_reminder_last_sent_at",
-                 T8."automatic_geocoding_update",
-                 T8."siret",
-                 T8."naf",
-                 T8."kind",
-                 T8."brand",
-                 T8."phone",
-                 T8."email",
-                 T8."auth_email",
-                 T8."website",
-                 T8."description",
-                 T8."provided_support",
-                 T8."source",
-                 T8."created_by_id",
-                 T8."block_job_applications",
-                 T8."job_applications_blocked_at",
-                 T8."spontaneous_applications_open_since",
-                 T8."convention_id",
-                 T8."job_app_score",
-                 T8."is_searchable",
-                 T8."rdv_solidarites_id",
-                 T8."fields_history",
+                 T11."id",
+                 T11."address_line_1",
+                 T11."address_line_2",
+                 T11."post_code",
+                 T11."city",
+                 T11."department",
+                 T11."coords",
+                 T11."geocoding_score",
+                 T11."geocoding_updated_at",
+                 T11."ban_api_resolved_address",
+                 T11."insee_city_id",
+                 T11."name",
+                 T11."created_at",
+                 T11."updated_at",
+                 T11."uid",
+                 T11."active_members_email_reminder_last_sent_at",
+                 T11."automatic_geocoding_update",
+                 T11."siret",
+                 T11."naf",
+                 T11."kind",
+                 T11."brand",
+                 T11."phone",
+                 T11."email",
+                 T11."auth_email",
+                 T11."website",
+                 T11."description",
+                 T11."provided_support",
+                 T11."source",
+                 T11."created_by_id",
+                 T11."block_job_applications",
+                 T11."job_applications_blocked_at",
+                 T11."spontaneous_applications_open_since",
+                 T11."convention_id",
+                 T11."job_app_score",
+                 T11."is_searchable",
+                 T11."rdv_solidarites_id",
+                 T11."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -910,8 +936,10 @@
           LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
           INNER JOIN "users_user" T5 ON ("job_applications_jobapplication"."job_seeker_id" = T5."id")
+          LEFT OUTER JOIN "rdv_insertion_participation" ON (T5."id" = "rdv_insertion_participation"."job_seeker_id")
+          LEFT OUTER JOIN "rdv_insertion_appointment" ON ("rdv_insertion_participation"."appointment_id" = "rdv_insertion_appointment"."id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON (T5."id" = "users_jobseekerprofile"."user_id")
-          LEFT OUTER JOIN "companies_company" T8 ON ("job_applications_jobapplication"."sender_company_id" = T8."id")
+          LEFT OUTER JOIN "companies_company" T11 ON ("job_applications_jobapplication"."sender_company_id" = T11."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
@@ -923,7 +951,7 @@
                    T5."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
-                   T8."id",
+                   T11."id",
                    "prescribers_prescriberorganization"."id",
                    "companies_company"."id",
                    "companies_siaeconvention"."id",
@@ -3630,10 +3658,22 @@
                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                 ORDER BY U0."created_at" DESC
                 LIMIT 1) AS "jobseeker_valid_eligibility_diagnosis",
-                    GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change"
+                    GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
+          
+               (SELECT U1."start_at"
+                FROM "rdv_insertion_participation" U0
+                INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+                WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                       AND U1."start_at" > %s
+                       AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                       AND U0."status" = %s)
+                ORDER BY U1."start_at" ASC
+                LIMIT 1) AS "next_appointment_start_at"
              FROM "job_applications_jobapplication"
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
              INNER JOIN "users_user" T6 ON ("job_applications_jobapplication"."job_seeker_id" = T6."id")
+             LEFT OUTER JOIN "rdv_insertion_participation" ON (T6."id" = "rdv_insertion_participation"."job_seeker_id")
+             LEFT OUTER JOIN "rdv_insertion_appointment" ON ("rdv_insertion_participation"."appointment_id" = "rdv_insertion_appointment"."id")
              WHERE ((("job_applications_jobapplication"."sender_id" = %s
                       AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
                      OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
@@ -3716,6 +3756,20 @@
                              ORDER BY U0."created_at" DESC
                              LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
                  (COALESCE(LOWER(T6."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."last_name"), %s)), %s)) AS "job_seeker_full_name",
+          
+            (SELECT U1."start_at"
+             FROM "rdv_insertion_participation" U0
+             INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+             WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                    AND U1."start_at" > %s
+                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                    AND U0."status" = %s)
+             ORDER BY U1."start_at" ASC
+             LIMIT 1) AS "next_appointment_start_at",
+                 (COUNT("rdv_insertion_participation"."id") FILTER (
+                                                                    WHERE ("rdv_insertion_appointment"."company_id" = ("job_applications_jobapplication"."to_company_id")
+                                                                           AND "rdv_insertion_appointment"."start_at" > %s
+                                                                           AND "rdv_insertion_participation"."status" = %s)) - %s) AS "other_appointments_count",
                  T6."id",
                  T6."password",
                  T6."last_login",
@@ -3819,43 +3873,43 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 T9."id",
-                 T9."address_line_1",
-                 T9."address_line_2",
-                 T9."post_code",
-                 T9."city",
-                 T9."department",
-                 T9."coords",
-                 T9."geocoding_score",
-                 T9."geocoding_updated_at",
-                 T9."ban_api_resolved_address",
-                 T9."insee_city_id",
-                 T9."name",
-                 T9."created_at",
-                 T9."updated_at",
-                 T9."uid",
-                 T9."active_members_email_reminder_last_sent_at",
-                 T9."automatic_geocoding_update",
-                 T9."siret",
-                 T9."naf",
-                 T9."kind",
-                 T9."brand",
-                 T9."phone",
-                 T9."email",
-                 T9."auth_email",
-                 T9."website",
-                 T9."description",
-                 T9."provided_support",
-                 T9."source",
-                 T9."created_by_id",
-                 T9."block_job_applications",
-                 T9."job_applications_blocked_at",
-                 T9."spontaneous_applications_open_since",
-                 T9."convention_id",
-                 T9."job_app_score",
-                 T9."is_searchable",
-                 T9."rdv_solidarites_id",
-                 T9."fields_history",
+                 T12."id",
+                 T12."address_line_1",
+                 T12."address_line_2",
+                 T12."post_code",
+                 T12."city",
+                 T12."department",
+                 T12."coords",
+                 T12."geocoding_score",
+                 T12."geocoding_updated_at",
+                 T12."ban_api_resolved_address",
+                 T12."insee_city_id",
+                 T12."name",
+                 T12."created_at",
+                 T12."updated_at",
+                 T12."uid",
+                 T12."active_members_email_reminder_last_sent_at",
+                 T12."automatic_geocoding_update",
+                 T12."siret",
+                 T12."naf",
+                 T12."kind",
+                 T12."brand",
+                 T12."phone",
+                 T12."email",
+                 T12."auth_email",
+                 T12."website",
+                 T12."description",
+                 T12."provided_support",
+                 T12."source",
+                 T12."created_by_id",
+                 T12."block_job_applications",
+                 T12."job_applications_blocked_at",
+                 T12."spontaneous_applications_open_since",
+                 T12."convention_id",
+                 T12."job_app_score",
+                 T12."is_searchable",
+                 T12."rdv_solidarites_id",
+                 T12."fields_history",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -3959,8 +4013,10 @@
           LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
           INNER JOIN "users_user" T6 ON ("job_applications_jobapplication"."job_seeker_id" = T6."id")
+          LEFT OUTER JOIN "rdv_insertion_participation" ON (T6."id" = "rdv_insertion_participation"."job_seeker_id")
+          LEFT OUTER JOIN "rdv_insertion_appointment" ON ("rdv_insertion_participation"."appointment_id" = "rdv_insertion_appointment"."id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON (T6."id" = "users_jobseekerprofile"."user_id")
-          LEFT OUTER JOIN "companies_company" T9 ON ("job_applications_jobapplication"."sender_company_id" = T9."id")
+          LEFT OUTER JOIN "companies_company" T12 ON ("job_applications_jobapplication"."sender_company_id" = T12."id")
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           WHERE ((("job_applications_jobapplication"."sender_id" = %s
@@ -3973,7 +4029,7 @@
                    T6."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
-                   T9."id",
+                   T12."id",
                    "prescribers_prescriberorganization"."id",
                    "companies_company"."id",
                    "companies_siaeconvention"."id",
