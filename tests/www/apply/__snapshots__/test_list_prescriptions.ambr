@@ -563,7 +563,35 @@
                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                 ORDER BY U0."created_at" DESC
                 LIMIT 1) AS "jobseeker_valid_eligibility_diagnosis",
-                    GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change"
+                    GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
+          
+               (SELECT U1."start_at"
+                FROM "rdv_insertion_participation" U0
+                INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+                WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                       AND U1."start_at" > %s
+                       AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                       AND U0."status" = %s)
+                ORDER BY U1."start_at" ASC
+                LIMIT 1) AS "next_appointment_start_at",
+                    (
+                       (SELECT COUNT(U0."id") AS "count"
+                        FROM "rdv_insertion_participation" U0
+                        INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+                        WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                               AND U1."start_at" > %s
+                               AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                               AND U0."status" = %s)
+                        ORDER BY RANDOM() ASC) - %s) AS "other_participations_count",
+          
+               (SELECT COUNT(U0."id") AS "count"
+                FROM "rdv_insertion_participation" U0
+                INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+                WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                       AND U1."start_at" > %s
+                       AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                       AND U0."status" = %s)
+                ORDER BY RANDOM() ASC) AS "upcoming_participations_count"
              FROM "job_applications_jobapplication"
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
              INNER JOIN "users_user" T5 ON ("job_applications_jobapplication"."job_seeker_id" = T5."id")
@@ -571,7 +599,8 @@
                     AND "job_applications_jobapplication"."archived_at" IS NULL)
              GROUP BY "job_applications_jobapplication"."id",
                       1,
-                      2) subquery
+                      2,
+                      6) subquery
         ''',
       }),
       dict({
@@ -647,6 +676,34 @@
                              ORDER BY U0."created_at" DESC
                              LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
                  (COALESCE(LOWER(T5."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T5."last_name"), %s)), %s)) AS "job_seeker_full_name",
+          
+            (SELECT U1."start_at"
+             FROM "rdv_insertion_participation" U0
+             INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+             WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                    AND U1."start_at" > %s
+                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                    AND U0."status" = %s)
+             ORDER BY U1."start_at" ASC
+             LIMIT 1) AS "next_appointment_start_at",
+          
+            (SELECT COUNT(U0."id") AS "count"
+             FROM "rdv_insertion_participation" U0
+             INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+             WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                    AND U1."start_at" > %s
+                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                    AND U0."status" = %s)
+             ORDER BY RANDOM() ASC) AS "upcoming_participations_count",
+                 (
+                    (SELECT COUNT(U0."id") AS "count"
+                     FROM "rdv_insertion_participation" U0
+                     INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+                     WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                            AND U1."start_at" > %s
+                            AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                            AND U0."status" = %s)
+                     ORDER BY RANDOM() ASC) - %s) AS "other_participations_count",
                  T5."id",
                  T5."password",
                  T5."last_login",
@@ -902,6 +959,7 @@
           GROUP BY "job_applications_jobapplication"."id",
                    49,
                    50,
+                   53,
                    T5."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
@@ -3579,7 +3637,35 @@
                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                 ORDER BY U0."created_at" DESC
                 LIMIT 1) AS "jobseeker_valid_eligibility_diagnosis",
-                    GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change"
+                    GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
+          
+               (SELECT U1."start_at"
+                FROM "rdv_insertion_participation" U0
+                INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+                WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                       AND U1."start_at" > %s
+                       AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                       AND U0."status" = %s)
+                ORDER BY U1."start_at" ASC
+                LIMIT 1) AS "next_appointment_start_at",
+                    (
+                       (SELECT COUNT(U0."id") AS "count"
+                        FROM "rdv_insertion_participation" U0
+                        INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+                        WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                               AND U1."start_at" > %s
+                               AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                               AND U0."status" = %s)
+                        ORDER BY RANDOM() ASC) - %s) AS "other_participations_count",
+          
+               (SELECT COUNT(U0."id") AS "count"
+                FROM "rdv_insertion_participation" U0
+                INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+                WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                       AND U1."start_at" > %s
+                       AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                       AND U0."status" = %s)
+                ORDER BY RANDOM() ASC) AS "upcoming_participations_count"
              FROM "job_applications_jobapplication"
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
              INNER JOIN "users_user" T6 ON ("job_applications_jobapplication"."job_seeker_id" = T6."id")
@@ -3589,7 +3675,8 @@
                     AND "job_applications_jobapplication"."archived_at" IS NULL)
              GROUP BY "job_applications_jobapplication"."id",
                       1,
-                      2) subquery
+                      2,
+                      6) subquery
         ''',
       }),
       dict({
@@ -3665,6 +3752,34 @@
                              ORDER BY U0."created_at" DESC
                              LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
                  (COALESCE(LOWER(T6."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."last_name"), %s)), %s)) AS "job_seeker_full_name",
+          
+            (SELECT U1."start_at"
+             FROM "rdv_insertion_participation" U0
+             INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+             WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                    AND U1."start_at" > %s
+                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                    AND U0."status" = %s)
+             ORDER BY U1."start_at" ASC
+             LIMIT 1) AS "next_appointment_start_at",
+          
+            (SELECT COUNT(U0."id") AS "count"
+             FROM "rdv_insertion_participation" U0
+             INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+             WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                    AND U1."start_at" > %s
+                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                    AND U0."status" = %s)
+             ORDER BY RANDOM() ASC) AS "upcoming_participations_count",
+                 (
+                    (SELECT COUNT(U0."id") AS "count"
+                     FROM "rdv_insertion_participation" U0
+                     INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+                     WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                            AND U1."start_at" > %s
+                            AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                            AND U0."status" = %s)
+                     ORDER BY RANDOM() ASC) - %s) AS "other_participations_count",
                  T6."id",
                  T6."password",
                  T6."last_login",
@@ -3922,6 +4037,7 @@
           GROUP BY "job_applications_jobapplication"."id",
                    49,
                    50,
+                   53,
                    T6."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
