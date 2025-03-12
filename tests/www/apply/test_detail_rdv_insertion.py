@@ -14,7 +14,6 @@ from itou.utils.mocks.rdv_insertion import (
     RDV_INSERTION_CREATE_AND_INVITE_SUCCESS_BODY,
 )
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.rdv_insertion.factories import InvitationRequestFactory, ParticipationFactory
 from tests.utils.test import parse_response_to_soup
 
@@ -49,16 +48,13 @@ class TestRdvInsertionAppointmentsList:
     APPOINTMENTS_TABLE_ID = '<table id="rdvi-appointments"'
 
     def setup_method(self, freeze, **kwargs):
-        organization = PrescriberOrganizationWithMembershipFactory(
-            membership__user__first_name="Max", membership__user__last_name="Throughput"
-        )
         self.job_application = JobApplicationFactory(
             to_company__name="Hit Pit",
             to_company__with_membership=True,
             to_company__rdv_solidarites_id=1234,
             job_seeker__first_name="Jacques",
             job_seeker__last_name="Henry",
-            sender=organization.active_members.get(),
+            sent_by_authorized_prescriber_organisation=True,
             for_snapshot=True,
         )
         self.participation = ParticipationFactory(
@@ -72,6 +68,7 @@ class TestRdvInsertionAppointmentsList:
         "profile,view_name,template_name",
         [
             ("employer", "apply:details_for_company", "process_details_company"),
+            ("prescriber", "apply:details_for_prescriber", "process_details"),
             ("job_seeker", "apply:details_for_jobseeker", "process_details"),
         ],
     )
@@ -91,6 +88,7 @@ class TestRdvInsertionAppointmentsList:
         "profile,view_name,template_name",
         [
             ("employer", "apply:details_for_company", "process_details_company"),
+            ("prescriber", "apply:details_for_prescriber", "process_details"),
             ("job_seeker", "apply:details_for_jobseeker", "process_details"),
         ],
     )
@@ -109,6 +107,7 @@ class TestRdvInsertionAppointmentsList:
         "profile,view_name,template_name,contains_tab",
         [
             ("employer", "apply:details_for_company", "process_details_company", True),
+            ("prescriber", "apply:details_for_prescriber", "process_details", False),
             ("job_seeker", "apply:details_for_jobseeker", "process_details", False),
         ],
     )
@@ -129,6 +128,7 @@ class TestRdvInsertionAppointmentsList:
         "profile,view_name,template_name",
         [
             ("employer", "apply:details_for_company", "process_details_company"),
+            ("prescriber", "apply:details_for_prescriber", "process_details"),
             ("job_seeker", "apply:details_for_jobseeker", "process_details"),
         ],
     )
@@ -144,6 +144,7 @@ class TestRdvInsertionAppointmentsList:
         "profile,view_name",
         [
             ("employer", "apply:details_for_company"),
+            ("prescriber", "apply:details_for_prescriber"),
             ("job_seeker", "apply:details_for_jobseeker"),
         ],
     )
@@ -160,6 +161,7 @@ class TestRdvInsertionAppointmentsList:
         "profile,view_name",
         [
             ("employer", "apply:details_for_company"),
+            ("prescriber", "apply:details_for_prescriber"),
             ("job_seeker", "apply:details_for_jobseeker"),
         ],
     )
@@ -174,6 +176,7 @@ class TestRdvInsertionAppointmentsList:
         "profile,view_name",
         [
             ("employer", "apply:details_for_company"),
+            ("prescriber", "apply:details_for_prescriber"),
             ("job_seeker", "apply:details_for_jobseeker"),
         ],
     )
@@ -211,6 +214,7 @@ class TestRdvInsertionAppointmentsList:
         "profile,view_name",
         [
             ("employer", "apply:details_for_company"),
+            ("prescriber", "apply:details_for_prescriber"),
             ("job_seeker", "apply:details_for_jobseeker"),
         ],
     )
@@ -224,6 +228,7 @@ class TestRdvInsertionAppointmentsList:
         "profile,view_name",
         [
             ("employer", "apply:details_for_company"),
+            ("prescriber", "apply:details_for_prescriber"),
             ("job_seeker", "apply:details_for_jobseeker"),
         ],
     )
@@ -252,6 +257,7 @@ class TestRdvInsertionAppointmentsList:
         "profile,view_name",
         [
             ("employer", "apply:details_for_company"),
+            ("prescriber", "apply:details_for_prescriber"),
             ("job_seeker", "apply:details_for_jobseeker"),
         ],
     )
@@ -315,6 +321,7 @@ class TestRdvInsertionAppointmentsList:
         "profile,view_name",
         [
             ("employer", "apply:details_for_company"),
+            ("prescriber", "apply:details_for_prescriber"),
             ("job_seeker", "apply:details_for_jobseeker"),
         ],
     )
@@ -332,16 +339,13 @@ class TestRdvInsertionAppointmentsList:
 class TestRdvInsertionInvitationRequestsList:
     @freeze_time("2024-07-01")
     def setup_method(self, freeze, **kwargs):
-        organization = PrescriberOrganizationWithMembershipFactory(
-            membership__user__first_name="Max", membership__user__last_name="Throughput"
-        )
         self.job_application = JobApplicationFactory(
             to_company__name="Hit Pit",
             to_company__with_membership=True,
             to_company__rdv_solidarites_id=1234,
             job_seeker__first_name="Jacques",
             job_seeker__last_name="Henry",
-            sender=organization.active_members.get(),
+            sent_by_authorized_prescriber_organisation=True,
             for_snapshot=True,
         )
         self.invitation_request = InvitationRequestFactory(
@@ -355,6 +359,7 @@ class TestRdvInsertionInvitationRequestsList:
         "profile,view_name,invitations_presence",
         [
             ("employer", "apply:details_for_company", True),
+            ("prescriber", "apply:details_for_prescriber", False),
             ("job_seeker", "apply:details_for_jobseeker", False),
         ],
     )
@@ -376,6 +381,7 @@ class TestRdvInsertionInvitationRequestsList:
         "profile,view_name,contains_invite_button",
         [
             ("employer", "apply:details_for_company", True),
+            ("prescriber", "apply:details_for_prescriber", False),
             ("job_seeker", "apply:details_for_jobseeker", False),
         ],
     )
@@ -415,12 +421,13 @@ class TestRdvInsertionInvitationRequestsList:
         assert str(invitation_requests_table) == snapshot(name="updated_invitation_requests")
 
     @respx.mock
-    def test_invite_fails_for_job_seeker(self, client, snapshot, mocker):
+    @pytest.mark.parametrize("profile", ["prescriber", "job_seeker"])
+    def test_invite_fails_for_non_employers(self, profile_login, client, profile, mocker):
         mocker.patch(
             "itou.www.apply.views.process_views.get_api_credentials", return_value=RDV_INSERTION_AUTH_SUCCESS_HEADERS
         )
         assert InvitationRequest.objects.count() == 1
-        client.force_login(self.job_application.job_seeker)
+        profile_login(profile, self.job_application)
 
         # Call the invite endpoint
         response = client.post(

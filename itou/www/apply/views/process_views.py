@@ -294,6 +294,11 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         )
     )
     job_application = get_object_or_404(queryset, id=job_application_id)
+    participations = (
+        job_application.job_seeker.rdvi_participations.filter(appointment__company=job_application.to_company)
+        .select_related("appointment", "appointment__location")
+        .order_by("-appointment__start_at")
+    )
 
     transition_logs = job_application.logs.select_related("user").all()
 
@@ -338,7 +343,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "expired_eligibility_diagnosis": None,  # XXX: should we search for an expired diagnosis here ?
         "job_application": job_application,
-        "participations": [],
+        "participations": participations,
         "transition_logs": transition_logs,
         "back_url": back_url,
         "matomo_custom_title": "Candidature",
