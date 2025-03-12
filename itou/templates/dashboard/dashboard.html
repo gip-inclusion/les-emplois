@@ -5,6 +5,10 @@
 
 {% block title %}Tableau de bord {{ block.super }}{% endblock %}
 
+{% block title_content %}
+    {% include 'dashboard/includes/dashboard_title_content.html' %}
+{% endblock %}
+
 {% block title_messages %}
     {{ block.super }}
 
@@ -23,7 +27,7 @@
             <p>Les candidatures de prescripteur sans organisation ont 2 fois moins de chances d’être acceptées !</p>
             <ul>
                 <li>
-                    Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser <a href="https://tally.so/r/npPpNq">ce formulaire d’aide</a>.
+                    Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser <a href="https://tally.so/r/npPpNq" class="has-external-link" target="_blank">ce formulaire d’aide</a>.
                 </li>
                 <li>
                     Si vous souhaitez rejoindre le tableau de bord d’une organisation présente sur les Emplois de l’inclusion, vous pouvez demander à un de vos collègues de vous inviter.
@@ -138,10 +142,6 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
     {% endif %}
-{% endblock %}
-
-{% block title_content %}
-    {% include 'dashboard/includes/dashboard_title_content.html' %}
 {% endblock %}
 
 {% block title_extra %}

@@ -1,18 +1,18 @@
 {% load format_filters %}
 {% load matomo %}
 
-<div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-    <div>
+{% component "title" %}
+    {% fill "c_title__main" %}
         {% if not request.organizations %}
-            {% if user.get_full_name %}<h1 class="mb-0">{{ user.get_full_name }}</h1>{% endif %}
+            {% if user.get_full_name %}<h1>{{ user.get_full_name }}</h1>{% endif %}
             {% if user.is_prescriber %}
-                <p class="mb-0">Orienteur seul</p>
+                <p>Orienteur seul</p>
             {% elif user.is_job_seeker %}
-                <p class="mb-0">Candidat</p>
+                <p>Candidat</p>
             {% endif %}
         {% else %}
-            <h1 class="mb-0">{{ request.current_organization.display_name }}</h1>
-            <p class="mb-0">
+            <h1>{{ request.current_organization.display_name }}</h1>
+            <p>
                 {% if user.is_prescriber %}
                     {% if request.current_organization.code_safir_pole_emploi %}
                         {% if request.current_organization.is_authorized %}Prescripteur habilité -{% endif %}
@@ -30,33 +30,35 @@
                 {% endif %}
             </p>
         {% endif %}
-    </div>
+    {% endfill %}
     {% if user.is_employer %}
-        {% if request.current_organization.is_subject_to_eligibility_rules or request.current_organization.kind == CompanyKind.GEIQ %}
-            {% comment %}
-            NOTE(vperron):
-            We currently do not allow OPCS users to apply for an offer.
-            We will have to discuss this matter further with AVE, but it has been
-            decided that it probably did not make much sense initially.
-            {% endcomment %}
-            <div>
-                {% if siae_suspension_text_with_dates %}
-                    <button type="button"
-                            class="btn btn-lg btn-primary btn-ico disabled"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
-                            data-bs-title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ siae_suspension_text_with_dates }}"
-                            aria-label="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ siae_suspension_text_with_dates }}">
-                        <i class="ri-user-follow-line fw-medium" aria-hidden="true"></i>
-                        <span>Déclarer une embauche</span>
-                    </button>
-                {% else %}
-                    <a href="{% url 'apply:start_hire' company_pk=request.current_organization.pk %}" class="btn btn-lg btn-primary btn-ico" {% matomo_event "employeurs" "clic" "declarer-embauche" %}>
-                        <i class="ri-user-follow-line fw-medium" aria-hidden="true"></i>
-                        <span>Déclarer une embauche</span>
-                    </a>
-                {% endif %}
-            </div>
-        {% endif %}
+        {% fill "c_title__cta" %}
+            {% if request.current_organization.is_subject_to_eligibility_rules or request.current_organization.kind == CompanyKind.GEIQ %}
+                {% comment %}
+                NOTE(vperron):
+                We currently do not allow OPCS users to apply for an offer.
+                We will have to discuss this matter further with AVE, but it has been
+                decided that it probably did not make much sense initially.
+                {% endcomment %}
+                <div>
+                    {% if siae_suspension_text_with_dates %}
+                        <button type="button"
+                                class="btn btn-lg btn-ico btn-primary disabled"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                data-bs-title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ siae_suspension_text_with_dates }}"
+                                aria-label="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ siae_suspension_text_with_dates }}">
+                            <i class="ri-user-follow-line fw-medium" aria-hidden="true"></i>
+                            <span>Déclarer une embauche</span>
+                        </button>
+                    {% else %}
+                        <a href="{% url 'apply:start_hire' company_pk=request.current_organization.pk %}" class="btn btn-lg btn-ico btn-primary" {% matomo_event "employeurs" "clic" "declarer-embauche" %}>
+                            <i class="ri-user-follow-line fw-medium" aria-hidden="true"></i>
+                            <span>Déclarer une embauche</span>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfill %}
     {% endif %}
-</div>
+{% endcomponent %}
