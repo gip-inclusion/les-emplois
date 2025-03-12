@@ -112,11 +112,20 @@ class JoinGroupChannelForm(forms.Form):
     channel = forms.ChoiceField(widget=forms.RadioSelect, choices=Channel)
 
 
+class GPSRemoteAutocompleteSelect2Widget(RemoteAutocompleteSelect2Widget):
+    def invalid_choice(self, obj):
+        return "Choix invalide"
+
+    def __init__(self, *args, **kwargs):
+        # Since we only use this when a user posts a invalid user pk, we don't want to display the user name.
+        super().__init__(*args, label_from_instance=self.invalid_choice, **kwargs)
+
+
 class JobSeekersFollowedByCoworkerSearchForm(forms.Form):
     user = forms.ModelChoiceField(
         queryset=User.objects.filter(kind=UserKind.JOB_SEEKER),
         label="Nom et prénom du bénéficiaire",
-        widget=RemoteAutocompleteSelect2Widget(
+        widget=GPSRemoteAutocompleteSelect2Widget(
             attrs={
                 "data-ajax--url": reverse_lazy("gps:beneficiaries_autocomplete"),
                 "data-minimum-input-length": 2,
