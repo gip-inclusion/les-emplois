@@ -21,6 +21,7 @@ from itou.geiq.models import (
     ImplementationAssessment,
     ReviewState,
 )
+from itou.companies.enums import CompanyKind
 from itou.geiq.sync import sync_employee_and_contracts
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
@@ -47,6 +48,15 @@ class InfoType(enum.StrEnum):
 
     # Otherwise Django will detect InfoType as callable and access to individual values does not work
     do_not_call_in_templates = enum.nonmember(True)
+
+
+@check_user(lambda user: user.is_employer)
+def assessments_list_for_employer(request, template_name="geiq/assessments_list_for_employer.html")
+    if request.current_organization.kind != CompanyKind.GEIQ:
+        raise Http404
+    context = {"assessment": request.current_organization.implementation_assessments.all().order_by("-campaign__year")}
+    return render(request, template_name, context)
+
 
 
 def _get_assessments_for_labor_inspector(request):
