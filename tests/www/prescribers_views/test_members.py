@@ -1,10 +1,7 @@
 import pytest
-from django.core.exceptions import BadRequest
-from django.test import RequestFactory
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from itou.www.prescribers_views.views import deactivate_member
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
 from tests.prescribers.factories import (
     PrescriberFactory,
@@ -151,30 +148,6 @@ class TestUserMembershipDeactivation:
         assert sent_invitation.has_expired is True
         sent_invitation_to_other.refresh_from_db()
         assert sent_invitation_to_other.has_expired is False
-
-    # To be removed when the old URL is no longer used
-    def test_deactivate_user_with_user_id(self, client):
-        organization = PrescriberOrganizationWith2MembershipFactory(name="Mission locale", email="ml@mailinator.com")
-        admin = organization.members.filter(prescribermembership__is_admin=True).first()
-        guest = organization.members.filter(prescribermembership__is_admin=False).first()
-
-        memberships = guest.prescribermembership_set.all()
-        membership = memberships.first()
-
-        client.force_login(admin)
-        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
-        response = client.post(url)
-        assert response.status_code == 302
-
-        # User should be deactivated now
-        membership.refresh_from_db()
-        assert not membership.is_active
-
-    def test_deactivate_member_wo_public_id_nor_user_id(self):
-        request = RequestFactory().get("/")
-        request.user = PrescriberFactory()
-        with pytest.raises(BadRequest, match="Missing user ID"):
-            deactivate_member(request, None, None, None)
 
     def test_deactivate_user_from_another_organisation(self, client, mailoutbox):
         my_organization = PrescriberOrganizationFactory()
