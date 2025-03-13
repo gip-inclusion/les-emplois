@@ -6,7 +6,7 @@ import sentry_sdk
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.conf import settings
-from django.db.models import Q, TextChoices
+from django.db.models import Exists, OuterRef, Q, TextChoices
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse
 from django.utils import timezone
@@ -22,7 +22,7 @@ from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, PriorAction
 from itou.users.forms import JobSeekerProfileModelForm
-from itou.users.models import JobSeekerProfile
+from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.templatetags.str_filters import mask_unless, pluralizefr
 from itou.utils.types import InclusiveDateRange
@@ -850,9 +850,21 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         # If both or none of eligibility_validated and eligibility_pending are checked, no need to filter anything
         match (self.cleaned_data.get("eligibility_validated"), self.cleaned_data.get("eligibility_pending")):
             case (True, False):
-                queryset = queryset.eligibility_validated()
+                queryset = queryset.filter(
+                    Exists(
+                        User.objects.eligibility_validated(siae=OuterRef(OuterRef("to_company"))).filter(
+                            pk=OuterRef(OuterRef("job_seeker"))
+                        )
+                    )
+                )
             case (False, True):
-                queryset = queryset.eligibility_pending()
+                queryset = queryset.filter(
+                    Exists(
+                        User.objects.eligibility_pending(siae=OuterRef(OuterRef("to_company"))).filter(
+                            pk=OuterRef(OuterRef("job_seeker"))
+                        )
+                    )
+                )
 
         if senders := self.cleaned_data.get("senders"):
             queryset = queryset.filter(sender__id__in=senders)
