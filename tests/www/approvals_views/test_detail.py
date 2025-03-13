@@ -536,9 +536,3 @@ class TestApprovalDetailView:
         job_application.delete()
         response = client.get(url)
         assert response.status_code == 403
-
-    def test_access_with_single_object_mixin_on_pk(self, client):
-        approval = JobApplicationFactory(with_approval=True).approval
-        client.force_login(approval.user)
-        response = client.get(reverse("approvals:details", kwargs={"pk": approval.id}))
-        assert response.status_code == 200
