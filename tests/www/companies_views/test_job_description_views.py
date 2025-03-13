@@ -248,6 +248,26 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
         other_company_job_description.refresh_from_db()
         assert not other_company_job_description.is_active
 
+    def test_toggle_job_description_active_updating_last_modified(self, client):
+        # Closing recruitment does not modify the last modified time, but opening it does.
+        self._login(client, self.user)
+
+        job_description = self.company.job_description_through.first()
+        job_creation_time = job_description.updated_at
+        assert job_description.is_active
+
+        post_data = {"job_description_id": job_description.pk, "action": "toggle_active"}
+        client.post(self.url, data=post_data)
+        job_description.refresh_from_db()
+        assert not job_description.is_active
+        assert job_description.updated_at == job_creation_time
+
+        post_data["job_description_is_active"] = "on"
+        client.post(self.url, data=post_data)
+        job_description.refresh_from_db()
+        assert job_description.is_active
+        assert job_description.updated_at > job_creation_time
+
     def test_delete_job_descriptions(self, client):
         response = self._login(client, self.user)
 
