@@ -579,9 +579,7 @@ class User(AbstractUser, AddressMixin):
 
     @property
     def is_handled_by_proxy(self):
-        if self.is_job_seeker and self.created_by_id and not self.last_login:
-            return True
-        return False
+        return bool(self.is_job_seeker and self.created_by_id and not self.last_login)
 
     @cached_property
     def is_prescriber_with_authorized_org(self):
