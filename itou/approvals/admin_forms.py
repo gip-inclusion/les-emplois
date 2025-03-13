@@ -32,19 +32,13 @@ class ApprovalFormMixin:
         return number
 
 
-class ApprovalAdminForm(ApprovalFormMixin, forms.ModelForm):
+class ApprovalAdminForm(forms.ModelForm):
     class Meta:
         model = Approval
-        fields = ["start_at", "end_at", "user", "number", "created_by", "origin", "eligibility_diagnosis"]
-        widgets = {"created_by": forms.HiddenInput(), "origin": forms.HiddenInput()}
+        fields = ["start_at", "end_at", "user", "eligibility_diagnosis"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # ex nihilo with arbitrary numbers because we have noticed holes in
-        # the approvals transmitted by PE and we have complaints from users.
-        if "number" in self.fields:
-            self.fields["number"].required = False
-            self.fields["number"].help_text += self.ADDITIONAL_HELP_TEXT_NUMBER
 
         if self.instance.pk and (self.instance.suspension_set.exists() or self.instance.prolongation_set.exists()):
             obnoxious_warning = (
@@ -56,24 +50,8 @@ class ApprovalAdminForm(ApprovalFormMixin, forms.ModelForm):
             if "end_at" in self.fields:
                 self.fields["end_at"].help_text = obnoxious_warning
 
-    def get_origin(self):
-        if self.instance.pk:
-            return self.instance.origin
-        return self.cleaned_data["origin"]
-
-    def set_origin(self):
-        number = self.cleaned_data.get("number")
-        # Only set to PE approval if there's a number and it's not from ITOU
-        if number and not number.startswith(Approval.ASP_ITOU_PREFIX):
-            self.cleaned_data["origin"] = Origin.PE_APPROVAL
-        else:
-            self.cleaned_data["origin"] = Origin.ADMIN
-
     def clean(self):
         super().clean()
-
-        if "origin" in self.cleaned_data:
-            self.set_origin()
 
         eligibility_diagnosis = self.cleaned_data.get("eligibility_diagnosis")
         if eligibility_diagnosis and eligibility_diagnosis.job_seeker != self.cleaned_data["user"]:

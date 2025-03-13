@@ -211,6 +211,8 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
         "created_at",
         "created_by",
         "updated_at",
+        "number",
+        "origin",
         "pe_notification_status",
         "pe_notification_time",
         "pe_notification_endpoint",
@@ -295,11 +297,6 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
     def _get_queryset_with_relations(self, request):
         queryset = super()._get_queryset_with_relations(request)
         return queryset.with_assigned_company()
-
-    def get_readonly_fields(self, request, obj=None):
-        if obj:
-            return ("origin",) + self.readonly_fields
-        return self.readonly_fields
 
     def get_search_fields(self, request):
         search_fields = []
