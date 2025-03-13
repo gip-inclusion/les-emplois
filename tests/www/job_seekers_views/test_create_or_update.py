@@ -7,7 +7,7 @@ from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertMessages, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune, Country, RSAAllocation
 from itou.users.enums import LackOfPoleEmploiId, Title
@@ -25,6 +25,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
+from tests.users import constants as users_test_constants
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.test import KNOWN_SESSION_KEYS, parse_response_to_soup
 from tests.www.apply.test_submit import CONFIRM_RESET_MARKUP, LINK_RESET_MARKUP
@@ -993,12 +994,12 @@ class TestUpdateForSender:
         client.get(start_url)
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
 
+        url = reverse("job_seekers_views:update_job_seeker_step_1", kwargs={"session_uuid": job_seeker_session_name})
+        response = client.get(url)
+        assertNotContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True)
         birthdate = datetime.date(1911, 11, 1)
         response = client.post(
-            reverse(
-                "job_seekers_views:update_job_seeker_step_1",
-                kwargs={"session_uuid": job_seeker_session_name},
-            ),
+            url,
             {
                 "title": Title.M,
                 "first_name": "Manuel",
@@ -1133,11 +1134,14 @@ class TestUpdateForSender:
         client.get(reverse("job_seekers_views:update_job_seeker_start"), params)
         [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
         new_birth_date = datetime.date(1978, 12, 1)
+        url = reverse(
+            "job_seekers_views:update_job_seeker_step_1",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
+        response = client.get(url)
+        assertContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True, count=1)
         response = client.post(
-            reverse(
-                "job_seekers_views:update_job_seeker_step_1",
-                kwargs={"session_uuid": job_seeker_session_name},
-            ),
+            url,
             {
                 "title": Title.M,
                 "first_name": "Bob",

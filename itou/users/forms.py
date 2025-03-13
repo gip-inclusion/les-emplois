@@ -81,6 +81,7 @@ class JobSeekerProfileModelForm(JobSeekerProfileFieldsMixin, BirthPlaceWithBirth
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.job_seeker_identity_certified = self.instance.pk and self.instance.identity_certified()
         birthdate = self.fields["birthdate"]
         birthdate.widget = DuetDatePickerWidget(
             attrs={
@@ -95,7 +96,7 @@ class JobSeekerProfileModelForm(JobSeekerProfileFieldsMixin, BirthPlaceWithBirth
             except KeyError:
                 pass
 
-        if self.instance.pk and self.instance.identity_certified():
+        if self.job_seeker_identity_certified:
             jobseeker_profile = self.instance.jobseeker_profile
             for fieldname, field in self.fields.items():
                 if (
