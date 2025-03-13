@@ -8,13 +8,6 @@ app_name = "approvals"
 
 urlpatterns = [
     # PASS IAE
-    # redirections to be removed in few weeks
-    path(
-        "display/<int:approval_id>",
-        views.redirect_to_display_printable_approval,
-        name="redirect_to_display_printable_approval",
-    ),
-    path("details/<int:pk>", views.ApprovalDetailView.as_view(), name="details"),
     path("details/<uuid:public_id>", views.ApprovalDetailView.as_view(), name="details"),
     path("display/<uuid:public_id>", views.ApprovalPrintableDisplay.as_view(), name="display_printable_approval"),
     path("list", views.ApprovalListView.as_view(), name="list"),
