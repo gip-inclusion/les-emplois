@@ -337,12 +337,12 @@ class JobApplicationQuerySet(models.QuerySet):
             )
         )
 
-    def with_next_appointments_count(self):
+    def with_upcoming_participations_count(self):
         """
         Gives the total count of pending RDVI appointments for this job seeker and this SIAE
         """
         return self.annotate(
-            next_appointments_count=Subquery(
+            upcoming_participations_count=Subquery(
                 Participation.objects.filter(
                     appointment__company=OuterRef("to_company"),
                     job_seeker=OuterRef("job_seeker"),
