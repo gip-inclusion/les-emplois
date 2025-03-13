@@ -128,9 +128,9 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     if display_kind == JobApplicationsDisplayKind.LIST:
         job_applications = (
             job_applications.with_next_appointment_start_at()
-            .with_next_appointments_count()
+            .with_upcoming_participations_count()
             .annotate(
-                other_appointments_count=F("next_appointments_count") - 1,  # Exclude the next appointment
+                other_participations_count=F("upcoming_participations_count") - 1,  # Exclude the next appointment
             )
         )
 
@@ -219,9 +219,9 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     if display_kind == JobApplicationsDisplayKind.LIST:
         job_applications = (
             job_applications.with_next_appointment_start_at()
-            .with_next_appointments_count()
+            .with_upcoming_participations_count()
             .annotate(
-                other_appointments_count=F("next_appointments_count") - 1,  # Exclude the next appointment
+                other_participations_count=F("upcoming_participations_count") - 1,  # Exclude the next appointment
             )
         )
 
@@ -317,7 +317,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     if display_kind == JobApplicationsDisplayKind.LIST:
         job_applications = (
             job_applications.with_next_appointment_start_at()
-            .with_next_appointments_count()
+            .with_upcoming_participations_count()
             .annotate(
                 has_pending_rdv_insertion_invitation_request=Exists(
                     InvitationRequest.objects.filter(
@@ -326,7 +326,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
                         created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
                     )
                 ),
-                other_appointments_count=F("next_appointments_count") - 1,  # Exclude the next appointment
+                other_participations_count=F("upcoming_participations_count") - 1,  # Exclude the next appointment
             )
         )
 
