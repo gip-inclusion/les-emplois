@@ -3733,20 +3733,25 @@
                                                                                ORDER BY U0."created_at" DESC
                                                                                LIMIT 1))))
                        LIMIT 1)
-                    AND (EXISTS
-                           (SELECT %s AS "a"
-                            FROM "approvals_approval" U0
-                            WHERE (U0."user_id" = ("job_applications_jobapplication"."job_seeker_id")
-                                   AND U0."end_at" >= %s)
-                            LIMIT 1)
-                         OR EXISTS
-                           (SELECT %s AS "a"
-                            FROM "eligibility_eligibilitydiagnosis" U0
-                            WHERE ((U0."author_kind" = %s
-                                    OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
-                                   AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
-                                   AND U0."expires_at" > %s)
-                            LIMIT 1))
+                    AND EXISTS
+                      (SELECT %s AS "a"
+                       FROM "users_user" V0
+                       WHERE ((EXISTS
+                                 (SELECT %s AS "a"
+                                  FROM "approvals_approval" U0
+                                  WHERE (U0."user_id" = (V0."id")
+                                         AND U0."end_at" >= %s)
+                                  LIMIT 1)
+                               OR EXISTS
+                                 (SELECT %s AS "a"
+                                  FROM "eligibility_eligibilitydiagnosis" U0
+                                  WHERE ((U0."author_kind" = %s
+                                          OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
+                                         AND U0."job_seeker_id" = (V0."id")
+                                         AND U0."expires_at" > %s)
+                                  LIMIT 1))
+                              AND V0."id" = ("job_applications_jobapplication"."job_seeker_id"))
+                       LIMIT 1)
                     AND "job_applications_jobapplication"."sender_id" IN (%s)
                     AND "job_applications_jobapplication"."job_seeker_id" = %s
                     AND "job_applications_jobapplication"."archived_at" IS NULL

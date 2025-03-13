@@ -14,7 +14,7 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, MinLengthValidator, RegexValidator
 from django.db import models
-from django.db.models import Count, Q
+from django.db.models import Count, Exists, OuterRef, Q
 from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils import timezone
@@ -46,7 +46,30 @@ from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_birth_location, validate_birthdate, validate_nir, validate_pole_emploi_id
 
 
-class ItouUserManager(UserManager):
+class UserQuerySet(models.QuerySet):
+    def get_eligibility_validated_lookup(self, siae=None):
+        from itou.approvals.models import Approval
+        from itou.eligibility.models import EligibilityDiagnosis
+
+        return Exists(
+            Approval.objects.filter(
+                user=OuterRef("pk"),
+            ).valid()
+        ) | Exists(
+            EligibilityDiagnosis.objects.for_job_seeker_and_siae(
+                OuterRef("pk"),
+                siae=siae,
+            ).valid()
+        )
+
+    def eligibility_validated(self, siae=None):
+        return self.filter(self.get_eligibility_validated_lookup(siae=siae))
+
+    def eligibility_pending(self, siae=None):
+        return self.exclude(self.get_eligibility_validated_lookup(siae=siae))
+
+
+class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
     def get_duplicated_pole_emploi_ids(self):
         """
         Returns an array of `pole_emploi_id` used more than once:
