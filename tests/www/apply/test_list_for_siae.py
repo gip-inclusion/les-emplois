@@ -440,10 +440,17 @@ class TestProcessListSiae:
 
         # Authorized prescriber diagnosis
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_app.job_seeker)
+        # Test all four possible combinations of the two filters.
+        response = client.get(reverse("apply:list_for_siae"))
+        assert set(response.context["job_applications_page"].object_list) == set([job_app, _another_job_app])
         response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
         assert response.context["job_applications_page"].object_list == [job_app]
         response = client.get(reverse("apply:list_for_siae"), {"eligibility_pending": True})
         assert response.context["job_applications_page"].object_list == [_another_job_app]
+        response = client.get(
+            reverse("apply:list_for_siae"), {"eligibility_validated": True, "eligibility_pending": True}
+        )
+        assert set(response.context["job_applications_page"].object_list) == set([job_app, _another_job_app])
 
         # Make sure the diagnostic expired - it should be ignored
         diagnosis.expires_at = timezone.localdate() - datetime.timedelta(
