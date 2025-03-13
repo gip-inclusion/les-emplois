@@ -84,7 +84,7 @@
                                             <th scope="col">Nbre de postes</th>
                                             <th scope="col">Statut</th>
                                             <th scope="col">Mise à jour</th>
-                                            <th scope="col" class="text-end w-50px"></th>
+                                            <th scope="col" class="text-end w-100px"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -96,24 +96,14 @@
                                             <td>-</td>
                                             <td>-</td>
                                             <td>
-                                                {# Change status for accepting spontaneous applications #}
-                                                <form method="post" hx-boost="true" hx-trigger="change" id="toggle_job_description_form_spontaneous_applications" class="js-prevent-multiple-submit">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="action" value="toggle_spontaneous_applications" />
-                                                    <div class="form-check form-switch has-state-label">
-                                                        <input type="checkbox"
-                                                               class="form-check-input"
-                                                               name="spontaneous_applications_is_active"
-                                                               id="spontaneous_applications_is_active"
-                                                               {% if siae.spontaneous_applications_open_since %}checked{% endif %}
-                                                               {% if siae.block_job_applications %}disabled{% endif %} />
-                                                        <label class="form-check-label" for="spontaneous_applications_is_active" data-it-state-label-off="Fermé" data-it-state-label-on="Ouvert">
-                                                        </label>
-                                                    </div>
-                                                </form>
+                                                {% include "companies/includes/buttons/spontaneous_applications_toggle.html" with csrf_token=csrf_token company=siae hx_swap_oob=False only %}
                                             </td>
-                                            <td>{{ siae.spontaneous_applications_open_since|default_if_none:"-"|naturaldate|capfirst }}</td>
-                                            <td></td>
+                                            <td>
+                                                <span id="spontaneous_applications_open_since_cell">{{ siae.spontaneous_applications_open_since|default_if_none:"-"|naturaldate|capfirst }}</span>
+                                            </td>
+                                            <td class="w-100px">
+                                                {% include "companies/includes/buttons/spontaneous_applications_refresh.html" with csrf_token=csrf_token request=request company=siae only %}
+                                            </td>
                                         </tr>
                                         {% for job_description in job_pager %}
                                             <tr>
@@ -151,8 +141,11 @@
                                                         </div>
                                                     </form>
                                                 </td>
-                                                <td>{{ job_description.last_employer_update_at|default_if_none:"-"|naturaldate|capfirst }}</td>
-                                                <td class="text-end w-50px">
+                                                <td>
+                                                    <span id="job_description_{{ job_description.pk }}_list_cell_last_employer_update_at">{{ job_description.last_employer_update_at|default_if_none:"-"|naturaldate|capfirst }}</span>
+                                                </td>
+                                                <td class="w-100px">
+                                                    {% include "companies/includes/buttons/job_description_refresh.html" with for_detail=False job_description=job_description csrf_token=csrf_token request=request only %}
                                                     <button class="btn btn-sm btn-link btn-ico-only" type="button" data-bs-toggle="modal" data-bs-target="#_delete_modal_{{ job_description.id }}">
                                                         <i class="ri-delete-bin-line" data-bs-toggle="tooltip" data-bs-title="Supprimer" aria-label="Supprimer ce métier"></i>
                                                     </button>
@@ -206,4 +199,5 @@
 {% block script %}
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js'%}"></script>
+    <script src='{% static "js/htmx_compat.js" %}'></script>
 {% endblock %}

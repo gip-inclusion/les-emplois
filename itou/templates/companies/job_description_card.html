@@ -20,7 +20,11 @@
 
 {% block title_navinfo %}
     {% component_navinfo c_navinfo__back_url=back_url c_navinfo__info=c_navinfo__info %}
-        {% if job.last_employer_update_at %}
+        {% if job.company == request.current_organization %}
+            {% fragment as c_navinfo__info %}
+                {% include "companies/includes/buttons/job_description_refresh.html" with for_detail=True job_description=job csrf_token=csrf_token request=request only %}
+            {% endfragment %}
+        {% elif job.last_employer_update_at %}
             {% fragment as c_navinfo__info %}
                 Mise à jour le {{ job.last_employer_update_at|date:"d/m/Y" }}
             {% endfragment %}
@@ -168,4 +172,5 @@
 {% block script %}
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js'%}"></script>
+    <script src='{% static "js/htmx_compat.js" %}'></script>
 {% endblock %}
