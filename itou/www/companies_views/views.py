@@ -657,13 +657,8 @@ def members(request, template_name="companies/members.html"):
 
 
 @check_user(lambda user: user.is_employer)
-def deactivate_member(request, public_id=None, user_id=None, template_name="companies/deactivate_member.html"):
-    if public_id:
-        user = get_object_or_404(User, public_id=public_id)
-    elif user_id:
-        user = get_object_or_404(User, pk=user_id)
-    else:
-        raise BadRequest("Missing user ID")
+def deactivate_member(request, public_id, template_name="companies/deactivate_member.html"):
+    user = get_object_or_404(User, public_id=public_id)
     return deactivate_org_member(
         request,
         user.id,
