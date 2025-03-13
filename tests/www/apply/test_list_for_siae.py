@@ -566,6 +566,39 @@ class TestProcessListSiae:
         response = client.get(reverse("apply:list_for_siae"), {"selected_jobs": [appellation1.pk]})
         assert response.context["job_applications_page"].object_list == [job_app]
 
+    @freeze_time("2025-03-13")
+    def test_list_for_siae_filters_query(self, client, snapshot):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+
+        job_app = JobApplicationFactory(
+            to_company=company,
+            created_at=timezone.now() - timezone.timedelta(days=1),
+            sent_by_authorized_prescriber_organisation=True,
+            job_seeker__post_code="37000",
+        )
+        date_format = DuetDatePickerWidget.INPUT_DATE_FORMAT
+
+        level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
+
+        client.force_login(employer)
+        with assertSnapshotQueries(snapshot(name="SQL queries filters")):
+            client.get(
+                reverse("apply:list_for_siae"),
+                {
+                    "states": [JobApplicationState.ACCEPTED],
+                    "start_date": timezone.localdate(job_app.created_at).strftime(date_format),
+                    "end_date": timezone.localdate(job_app.created_at).strftime(date_format),
+                    "sender_prescriber_organizations": [job_app.sender_prescriber_organization.id],
+                    "senders": [job_app.sender.id],
+                    "job_seeker": job_app.job_seeker.pk,
+                    "pass_iae_active": True,
+                    "eligibility_validated": True,
+                    "criteria": [level1_criterion.pk],
+                    "departments": ["37"],
+                },
+            )
+
     def test_prescriptions(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
