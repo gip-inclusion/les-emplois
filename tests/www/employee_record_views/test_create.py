@@ -21,6 +21,7 @@ from tests.companies.factories import CompanyWithMembershipAndJobsFactory, SiaeF
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
+from tests.users import constants as users_test_constants
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import parse_response_to_soup
 
@@ -187,7 +188,8 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         # Job seeker / employee must have a title
 
         client.force_login(self.user)
-        client.get(self.url)
+        response = client.get(self.url)
+        assertNotContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True)
 
         data = _get_user_form_data(self.job_seeker)
         data.pop("title")
@@ -282,6 +284,8 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
     def test_accept_personal_data_readonly_with_certified_criteria(self, client):
         IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=self.job_seeker, certified=True)
         client.force_login(self.user)
+        response = client.get(self.url)
+        assertContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True, count=1)
         response = client.post(
             self.url,
             data={

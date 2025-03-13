@@ -69,6 +69,7 @@ from tests.job_applications.factories import (
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
+from tests.users import constants as users_test_constants
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import KNOWN_SESSION_KEYS, assert_previous_step, assertSnapshotQueries, parse_response_to_soup
@@ -2058,6 +2059,7 @@ class TestProcessAcceptViews:
 
         # test how hiring_end_date is displayed
         response = client.get(next_url)
+        assertNotContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True)
         # test case hiring_end_at
         if hiring_end_at:
             assertContains(
@@ -3035,6 +3037,9 @@ class TestProcessAcceptViews:
         )
         client.force_login(self.company.members.get())
 
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url_accept)
+        assertContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True, count=1)
         post_data = {
             "title": Title.M if job_seeker.title is Title.MME else Title.MME,
             "first_name": "Léon",
