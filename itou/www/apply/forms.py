@@ -858,11 +858,11 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         if job_seeker := self.cleaned_data.get("job_seeker"):
             queryset = queryset.filter(job_seeker__id=job_seeker)
 
-        archived = self.cleaned_data["archived"]
-        if archived == ArchivedChoices.ACTIVE:
-            queryset = queryset.filter(archived_at=None)
-        elif archived == ArchivedChoices.ARCHIVED:
-            queryset = queryset.exclude(archived_at=None)
+        match self.cleaned_data["archived"]:
+            case ArchivedChoices.ACTIVE:
+                queryset = queryset.filter(archived_at=None)
+            case ArchivedChoices.ARCHIVED:
+                queryset = queryset.exclude(archived_at=None)
 
         return queryset
 
