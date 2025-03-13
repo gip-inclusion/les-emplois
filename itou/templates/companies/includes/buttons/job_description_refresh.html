@@ -1,0 +1,46 @@
+{% load datetime_filters %}
+
+{% if for_detail %}
+    {% url 'companies_views:job_description_refresh_for_detail' job_description.pk as hx_post_url %}
+{% else %}
+    {% url 'companies_views:job_description_refresh' job_description.pk as hx_post_url %}
+{% endif %}
+
+<form hx-post="{{ hx_post_url }}" hx-swap="{{ for_detail|yesno:'outerHTML,none' }}" class="{{ for_detail|yesno:',d-inline' }}">
+    {% csrf_token %}
+
+    <button type="submit" class="btn btn-sm btn-link p-0">
+        <div class="stable-text">
+            <i class="ri-refresh-line fw-normal"
+               data-bs-toggle="tooltip"
+               data-bs-title="Actualiser la date de mise à jour"
+               data-bs-placement="{{ for_detail|yesno:'left,top' }}"
+               aria-label="Indiquer que la fiche de poste est à jour"></i>
+            {% if for_detail %}
+                <span class="fs-sm text-muted fw-normal">
+                    {% if job_description.last_employer_update_at %}
+                        Mise à jour le {{ job_description.last_employer_update_at|date:"d/m/Y" }}
+                    {% else %}
+                        Actualiser la date de mise à jour
+                    {% endif %}
+                </span>
+            {% endif %}
+        </div>
+        <div class="loading-text">
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            {% if for_detail %}
+                <span class="fs-sm text-muted fw-normal">
+                    {% if job_description.last_employer_update_at %}
+                        Mise à jour le {{ job_description.last_employer_update_at|date:"d/m/Y" }}
+                    {% else %}
+                        Actualiser la date de mise à jour
+                    {% endif %}
+                </span>
+            {% endif %}
+        </div>
+    </button>
+</form>
+
+{% if request.htmx and not for_detail %}
+    <span id="job_description_{{ job_description.pk }}_list_cell_last_employer_update_at" hx-swap-oob="true">{{ job_description.last_employer_update_at|default_if_none:"-"|naturaldate|capfirst }}</span>
+{% endif %}
