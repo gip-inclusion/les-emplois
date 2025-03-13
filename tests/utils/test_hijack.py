@@ -1,6 +1,8 @@
 import pytest
 from django.contrib.auth.models import Permission
 from django.urls import reverse
+from django_otp.oath import TOTP
+from django_otp.plugins.otp_totp.models import TOTPDevice
 from pytest_django.asserts import assertRedirects
 
 from itou.users.enums import IdentityProvider
@@ -95,3 +97,25 @@ class TestUserHijack:
 
         response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk})
         assertRedirects(response, initial_url, fetch_redirect_response=False)
+
+    def test_keep_otp_after_hijack(self, client, settings):
+        settings.REQUIRE_OTP_FOR_STAFF = True
+        hijacked = JobSeekerFactory()
+        hijacker = ItouStaffFactory(is_superuser=True)
+        client.force_login(hijacker)
+
+        device = TOTPDevice.objects.create(user=hijacker, confirmed=True, name="my device")
+        post_data = {
+            "name": "Mon appareil",
+            "otp_token": TOTP(device.bin_key).token(),
+        }
+        client.post(reverse("login:verify_otp"), data=post_data)
+
+        response = client.get(reverse("dashboard:index"))
+        assert response.status_code == 200
+
+        response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk})
+        assertRedirects(response, reverse("dashboard:index"), fetch_redirect_response=False)
+
+        response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk}, follow=True)
+        assertRedirects(response, reverse("dashboard:index"))
