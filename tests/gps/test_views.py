@@ -15,6 +15,7 @@ from itou.users.enums import LackOfPoleEmploiId, Title
 from itou.users.models import User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.templatetags.str_filters import mask_unless
+from itou.utils.urls import get_absolute_url
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
@@ -1535,12 +1536,12 @@ class TestJoinGroupFromNameAndEmail:
 
         expected_mock_calls = []
         if known_name:
-            new_job_seeker_admin_url = reverse("admin:users_user_change", args=(new_job_seeker.pk,))
+            new_job_seeker_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(new_job_seeker.pk,)))
             expected_mock_calls = [
                 (
                     (
                         ":black_square_for_stop: Création d’un nouveau bénéficiaire : "
-                        f'<a href="{new_job_seeker_admin_url}">{new_job_seeker.get_full_name()}</a>.',
+                        f"<{new_job_seeker_admin_url}|{mask_unless(new_job_seeker.get_full_name(), False)}>.",
                     ),
                 )
             ]
@@ -1614,13 +1615,13 @@ class TestJoinGroupFromNameAndEmail:
             follow_up_group__beneficiary=job_seeker, member=user
         ).exists()
 
-        job_seeker_admin_url = reverse("admin:users_user_change", args=(job_seeker.pk,))
-        user_admin_url = reverse("admin:users_user_change", args=(user.pk,))
+        job_seeker_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(job_seeker.pk,)))
+        user_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(user.pk,)))
         assert slack_mock.mock_calls == [
             (
                 (
-                    f':gemini: Demande d’ajout <a href="{user_admin_url}">{user.get_full_name()}</a> '
-                    f'veut suivre <a href="{job_seeker_admin_url}">{job_seeker.get_full_name()}</a>.',
+                    f":gemini: Demande d’ajout <{user_admin_url}|{user.get_full_name()}> "
+                    f"veut suivre <{job_seeker_admin_url}|{mask_unless(job_seeker.get_full_name(), False)}>.",
                 ),
             )
         ]
