@@ -862,7 +862,7 @@ class TestPoleEmploiApprovalManager:
 
 
 class TestAutomaticApprovalAdminViews:
-    def test_create_approval_with_a_wrong_number(self, client):
+    def test_create_is_forbidden(self, client):
         """
         We cannot create an approval starting with ASP_ITOu_PREFIX
         """
@@ -885,12 +885,7 @@ class TestAutomaticApprovalAdminViews:
             "number": "XXXXX1234567",
         }
         response = client.post(url, data=post_data)
-        assert response.status_code == 200
-        assertFormError(
-            response.context["adminform"],
-            "number",
-            [ApprovalAdminForm.ERROR_NUMBER],
-        )
+        assert response.status_code == 403
 
     def test_edit_approval_with_a_wrong_number(self, client):
         """
@@ -960,67 +955,6 @@ class TestAutomaticApprovalAdminViews:
             f'(<a href="/admin/employee_record/employeerecord/{employee_record.pk}/change/">{employee_record.pk}</a>) '
             f"pour la modification de ce PASS IAE ({approval.number})." == str(list(response.context["messages"])[0])
         )
-
-    def test_create_approval(self, client):
-        user = ItouStaffFactory()
-        content_type = ContentType.objects.get_for_model(Approval)
-        permission = Permission.objects.get(content_type=content_type, codename="add_approval")
-        user.user_permissions.add(permission)
-        client.force_login(user)
-
-        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
-        other_job_seeker = JobSeekerFactory()
-        url = reverse("admin:approvals_approval_add")
-
-        post_data = {
-            "start_at": "01/01/2100",
-            "end_at": "31/12/2102",
-            "user": other_job_seeker.pk,
-            "eligibility_diagnosis": diagnosis.pk,
-            "origin": Origin.DEFAULT,  # Will be overriden
-        }
-        response = client.post(url, data=post_data)
-        assert response.status_code == 200
-        assertFormError(
-            response.context["adminform"],
-            "eligibility_diagnosis",
-            ["Le diagnostic doit appartenir au même utilisateur que le PASS"],
-        )
-        assert not Approval.objects.exists()
-
-        post_data = {
-            "start_at": "01/01/2100",
-            "end_at": "31/12/2102",
-            "user": diagnosis.job_seeker_id,
-            "eligibility_diagnosis": diagnosis.pk,
-            "origin": Origin.DEFAULT,  # Will be overriden
-        }
-        response = client.post(url, data=post_data)
-        assert Approval.objects.count() == 1
-        approval = Approval.objects.get()
-        assert approval.eligibility_diagnosis == diagnosis
-        assert approval.origin == Origin.ADMIN
-
-    def test_create_pe_approval_manually(self, client):
-        user = ItouStaffFactory()
-        content_type = ContentType.objects.get_for_model(Approval)
-        permission = Permission.objects.get(content_type=content_type, codename="add_approval")
-        user.user_permissions.add(permission)
-        client.force_login(user)
-
-        other_job_seeker = JobSeekerFactory()
-        url = reverse("admin:approvals_approval_add")
-
-        post_data = {
-            "start_at": "01/01/2100",
-            "end_at": "31/12/2102",
-            "user": other_job_seeker.pk,
-            "number": "123456789123",
-            "origin": Origin.DEFAULT,  # Will be overriden
-        }
-        client.post(url, data=post_data)
-        approval = Approval.objects.get()
-        assert approval.origin == Origin.PE_APPROVAL
 
 
 class TestCustomApprovalAdminViews:
