@@ -15,7 +15,7 @@ class BulkCreatedAtQuerysetProxy:
 
 
 class FollowUpGroupManager(models.Manager):
-    def follow_beneficiary(self, beneficiary, user, is_referent=None):
+    def follow_beneficiary(self, beneficiary, user, is_referent=None, is_active=True):
         now = timezone.now()
         with transaction.atomic():
             group, _ = FollowUpGroup.objects.get_or_create(beneficiary=beneficiary)
@@ -23,7 +23,7 @@ class FollowUpGroupManager(models.Manager):
             update_args = {
                 "ended_at": None,
                 "last_contact_at": now,
-                "is_active": True,
+                "is_active": is_active,
             }
             if is_referent is not None:
                 update_args["is_referent"] = is_referent
