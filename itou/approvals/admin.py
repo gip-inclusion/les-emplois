@@ -20,17 +20,17 @@ from itou.utils.admin import (
     ItouStackedInline,
     ItouTabularInline,
     PkSupportRemarkInline,
+    ReadonlyMixin,
     get_admin_view_link,
     get_structure_view_link,
 )
 from itou.utils.templatetags.str_filters import pluralizefr
 
 
-class JobApplicationInline(ItouStackedInline):
+class JobApplicationInline(ItouStackedInline, ReadonlyMixin):
     model = JobApplication
     extra = 0
     show_change_link = True
-    can_delete = False
     fields = (
         "job_seeker",
         "to_company_link",
@@ -52,12 +52,6 @@ class JobApplicationInline(ItouStackedInline):
 
     # Mandatory for "custom" inline fields
     readonly_fields = ("employee_record_status", "to_company_link")
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
 
     @admin.display(description="Entreprise destinataire")
     def to_company_link(self, obj):
@@ -105,40 +99,26 @@ class JobApplicationInline(ItouStackedInline):
         return self.get_empty_value_display()
 
 
-class SuspensionInline(ItouTabularInline):
+class SuspensionInline(ItouTabularInline, ReadonlyMixin):
     model = models.Suspension
     extra = 0
     show_change_link = True
-    can_delete = False
     fields = ("start_at", "end_at", "duration", "reason", "created_by", "siae")
     raw_id_fields = ("approval", "siae", "created_by", "updated_by")
     readonly_fields = ("duration",)
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
 
     @admin.display(description="Durée")
     def duration(self, obj):
         return f"{obj.duration.days} jour{pluralizefr(obj.duration.days)}"
 
 
-class ProlongationInline(ItouTabularInline):
+class ProlongationInline(ItouTabularInline, ReadonlyMixin):
     model = models.Prolongation
     extra = 0
     show_change_link = True
-    can_delete = False
     fields = ("start_at", "end_at", "duration", "reason", "declared_by", "validated_by")
     raw_id_fields = ("declared_by", "validated_by")
     readonly_fields = ("duration",)
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
 
     @admin.display(description="Durée")
     def duration(self, obj):
@@ -609,7 +589,7 @@ class ProlongationAdmin(ProlongationCommonAdmin):
 
 
 @admin.register(models.PoleEmploiApproval)
-class PoleEmploiApprovalAdmin(ItouModelAdmin):
+class PoleEmploiApprovalAdmin(ItouModelAdmin, ReadonlyMixin):
     list_display = (
         "pk",
         "pole_emploi_id",
@@ -643,7 +623,7 @@ class PoleEmploiApprovalAdmin(ItouModelAdmin):
 
 
 @admin.register(models.CancelledApproval)
-class CancelledApprovalAdmin(ItouModelAdmin):
+class CancelledApprovalAdmin(ItouModelAdmin, ReadonlyMixin):
     list_display = (
         "number",
         "start_at",
@@ -664,15 +644,6 @@ class CancelledApprovalAdmin(ItouModelAdmin):
     list_filter = ("origin_siae_kind", "origin_sender_kind", "origin_prescriber_organization_kind")
     change_list_template = "admin/approvals/change_list_with_stats.html"
     stats_url = reverse_lazy("admin:approvals_cancelledapproval_sent_to_pe_stats")
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
 
     def get_urls(self):
         additional_urls = [

@@ -38,6 +38,7 @@ from itou.utils.admin import (
     ItouModelAdmin,
     ItouTabularInline,
     PkSupportRemarkInline,
+    ReadonlyMixin,
     add_support_remark_to_obj,
     get_admin_view_link,
     get_structure_view_link,
@@ -45,18 +46,11 @@ from itou.utils.admin import (
 from itou.utils.urls import add_url_params
 
 
-class EmailAddressInline(ItouTabularInline):
+class EmailAddressInline(ItouTabularInline, ReadonlyMixin):
     model = EmailAddress
     extra = 0
-    can_delete = False
     fields = ("pk_link", "verified", "primary")
     readonly_fields = fields
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
 
     @admin.display(description="PK")
     def pk_link(self, obj):
@@ -83,7 +77,7 @@ class DisabledNotificationsMixin:
         return "Aucune"
 
 
-class CompanyMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
+class CompanyMembershipInline(DisabledNotificationsMixin, ItouTabularInline, ReadonlyMixin):
     model = CompanyMembership
     extra = 0
     readonly_fields = (
@@ -97,22 +91,15 @@ class CompanyMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
         "updated_by",
     )
     fields = readonly_fields
-    can_delete = False
     show_change_link = True
     fk_name = "user"
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
 
     @admin.display(description="Entreprise")
     def company_siret_link(self, obj):
         return get_structure_view_link(obj.company)
 
 
-class PrescriberMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
+class PrescriberMembershipInline(DisabledNotificationsMixin, ItouTabularInline, ReadonlyMixin):
     model = PrescriberMembership
     extra = 0
     readonly_fields = (
@@ -126,20 +113,13 @@ class PrescriberMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
         "updated_by",
     )
     fields = readonly_fields
-    can_delete = False
     fk_name = "user"
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
 
     def organization_id_link(self, obj):
         return get_structure_view_link(obj.organization)
 
 
-class InstitutionMembershipInline(ItouTabularInline):
+class InstitutionMembershipInline(ItouTabularInline, ReadonlyMixin):
     model = InstitutionMembership
     extra = 0
     readonly_fields = (
@@ -152,33 +132,19 @@ class InstitutionMembershipInline(ItouTabularInline):
         "updated_by",
     )
     fields = readonly_fields
-    can_delete = False
     fk_name = "user"
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
 
     def institution_id_link(self, obj):
         return get_structure_view_link(obj.institution)
 
 
-class JobApplicationInline(ItouTabularInline):
+class JobApplicationInline(ItouTabularInline, ReadonlyMixin):
     model = JobApplication
     fk_name = "job_seeker"
     extra = 0
-    can_delete = False
     fields = ("pk_link", "created_at", "sender_kind", "to_company_link", "state")
     readonly_fields = fields
     list_select_related = ("to_company", "job_seeker")
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
 
     @admin.display(description="PK")
     def pk_link(self, obj):
@@ -205,11 +171,10 @@ class SentJobApplicationInline(JobApplicationInline):
         return get_admin_view_link(obj.job_seeker, content=obj.job_seeker.get_full_name())
 
 
-class EligibilityDiagnosisInline(ItouTabularInline):
+class EligibilityDiagnosisInline(ItouTabularInline, ReadonlyMixin):
     model = EligibilityDiagnosis
     fk_name = "job_seeker"
     extra = 0
-    can_delete = False
     fields = (
         "pk_link",
         "author",
@@ -218,30 +183,25 @@ class EligibilityDiagnosisInline(ItouTabularInline):
     )
     readonly_fields = fields
 
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
-
     @admin.display(description="PK")
     def pk_link(self, obj):
         return get_admin_view_link(obj)
 
     @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):
-        return obj.is_valid
+        if obj.pk:
+            return obj.is_valid
+        return None
 
 
 class GEIQEligibilityDiagnosisInline(EligibilityDiagnosisInline):
     model = GEIQEligibilityDiagnosis
 
 
-class ApprovalInline(ItouTabularInline):
+class ApprovalInline(ItouTabularInline, ReadonlyMixin):
     model = Approval
     fk_name = "user"
     extra = 0
-    can_delete = False
     fields = (
         "pk_link",
         "start_at",
@@ -249,12 +209,6 @@ class ApprovalInline(ItouTabularInline):
         "is_valid",
     )
     readonly_fields = fields
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
 
     @admin.display(description="numéro")
     def pk_link(self, obj):

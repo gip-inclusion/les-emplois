@@ -12,6 +12,7 @@ from django.utils.html import format_html
 from django.utils.text import Truncator
 
 from itou.emails.models import Email
+from itou.utils.admin import ReadonlyMixin
 
 
 class EmailStatusFilter(admin.SimpleListFilter):
@@ -34,7 +35,7 @@ class EmailStatusFilter(admin.SimpleListFilter):
 
 
 @admin.register(Email)
-class EmailAdmin(admin.ModelAdmin):
+class EmailAdmin(admin.ModelAdmin, ReadonlyMixin):
     class Media:
         css = {"all": ("css/itou-admin.css",)}
 
