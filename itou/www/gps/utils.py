@@ -6,6 +6,7 @@ from itou.common_apps.organizations.models import MembershipQuerySet
 from itou.gps.models import FollowUpGroup
 from itou.utils import slack
 from itou.utils.templatetags.str_filters import mask_unless
+from itou.utils.urls import get_absolute_url
 
 
 def add_beneficiary(request, beneficiary, notify_duplicate=False):
@@ -24,10 +25,10 @@ def add_beneficiary(request, beneficiary, notify_duplicate=False):
             extra_tags="toast",
         )
     if notify_duplicate:
-        job_seeker_admin_url = reverse("admin:users_user_change", args=(beneficiary.pk,))
+        job_seeker_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(beneficiary.pk,)))
         send_slack_message_for_gps(
             ":black_square_for_stop: Création d’un nouveau bénéficiaire : "
-            f'<a href="{job_seeker_admin_url}">{beneficiary.get_full_name()}</a>.'
+            f"<{job_seeker_admin_url}|{mask_unless(beneficiary.get_full_name(), False)}>."
         )
 
 

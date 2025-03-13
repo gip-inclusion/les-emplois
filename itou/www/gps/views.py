@@ -18,7 +18,7 @@ from itou.utils.auth import check_user
 from itou.utils.pagination import pager
 from itou.utils.session import SessionNamespace
 from itou.utils.templatetags.str_filters import mask_unless
-from itou.utils.urls import add_url_params, get_safe_url
+from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
 from itou.www.gps.enums import Channel
 from itou.www.gps.forms import (
     FollowUpGroupMembershipForm,
@@ -392,11 +392,11 @@ def join_group_from_name_and_email(request, template_name="gps/join_group_from_n
 
         # For non authorized prescribers
         if form.data.get("ask"):
-            job_seeker_admin_url = reverse("admin:users_user_change", args=(job_seeker.pk,))
-            user_admin_url = reverse("admin:users_user_change", args=(request.user.pk,))
+            job_seeker_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(job_seeker.pk,)))
+            user_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(request.user.pk,)))
             send_slack_message_for_gps(
-                f':gemini: Demande d’ajout <a href="{user_admin_url}">{request.user.get_full_name()}</a> '
-                f'veut suivre <a href="{job_seeker_admin_url}">{job_seeker.get_full_name()}</a>.'
+                f":gemini: Demande d’ajout <{user_admin_url}|{request.user.get_full_name()}> "
+                f"veut suivre <{job_seeker_admin_url}|{mask_unless(job_seeker.get_full_name(), False)}>."
             )
             masked_name = mask_unless(job_seeker.get_full_name(), False)
             messages.info(
