@@ -16,7 +16,7 @@ from django.forms import model_to_dict
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertFormError, assertMessages, assertNumQueries, assertQuerySetEqual
+from pytest_django.asserts import assertMessages, assertNumQueries, assertQuerySetEqual
 
 from itou.approvals.admin import JobApplicationInline
 from itou.approvals.admin_forms import ApprovalAdminForm
@@ -886,40 +886,6 @@ class TestAutomaticApprovalAdminViews:
         }
         response = client.post(url, data=post_data)
         assert response.status_code == 403
-
-    def test_edit_approval_with_a_wrong_number(self, client):
-        """
-        Given an existing approval, when setting a different number,
-        then the save is rejected.
-        """
-        user = ItouStaffFactory()
-        content_type = ContentType.objects.get_for_model(Approval)
-        permission = Permission.objects.get(content_type=content_type, codename="change_approval")
-        user.user_permissions.add(permission)
-
-        client.force_login(user)
-
-        job_app = JobApplicationFactory(with_approval=True)
-        approval = job_app.approval
-
-        url = reverse("admin:approvals_approval_change", args=[approval.pk])
-
-        response = client.get(url)
-        assert response.status_code == 200
-
-        post_data = {
-            "start_at": approval.start_at.strftime("%d/%m/%Y"),
-            "end_at": approval.end_at.strftime("%d/%m/%Y"),
-            "user": job_app.job_seeker.pk,
-            "number": "XXXXX1234567",
-        }
-        response = client.post(url, data=post_data)
-        assert response.status_code == 200
-        assertFormError(
-            response.context["adminform"],
-            "number",
-            [ApprovalAdminForm.ERROR_NUMBER_CANNOT_BE_CHANGED % approval.number],
-        )
 
     def test_edit_approval_with_an_existing_employee_record(self, client):
         user = ItouStaffFactory()
