@@ -30,6 +30,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape
 from faker import Faker as fk
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNumQueries, assertRedirects
 
 import itou.utils.json
@@ -52,7 +53,7 @@ from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.utils.sync import DiffItem, DiffItemKind, yield_sync_diff
 from itou.utils.templatetags import badges, dict_filters, format_filters, job_seekers
-from itou.utils.templatetags.datetime_filters import duration
+from itou.utils.templatetags.datetime_filters import duration, naturaldate
 from itou.utils.tokens import COMPANY_SIGNUP_MAGIC_LINK_TIMEOUT, CompanySignupTokenGenerator
 from itou.utils.urls import (
     add_url_params,
@@ -1840,3 +1841,61 @@ def test_create_fake_postcode():
 )
 def test_duration(timedelta, expected):
     assert duration(timedelta) == expected
+
+
+@pytest.mark.parametrize(
+    "date_or_datetime,expected",
+    [
+        (datetime.datetime.fromisoformat("2025-03-13T11:36:36+01:00"), "aujourd’hui"),
+        (datetime.datetime.fromisoformat("2025-03-13T00:00:00+01:00"), "aujourd’hui"),
+        (datetime.datetime.fromisoformat("2025-03-13T00:00:00"), "aujourd’hui"),
+        (datetime.datetime.fromisoformat("2025-03-13T23:59:59.999999+01:00"), "aujourd’hui"),
+        (datetime.datetime.fromisoformat("2025-03-13T23:59:59.999999"), "aujourd’hui"),
+        (datetime.date.fromisoformat("2025-03-13"), "aujourd’hui"),
+        (datetime.datetime.fromisoformat("2025-03-12T00:00:00+01:00"), "hier"),
+        (datetime.datetime.fromisoformat("2025-03-12T23:59:59.999999+01:00"), "hier"),
+        (datetime.date.fromisoformat("2025-03-12"), "hier"),
+        (datetime.datetime.fromisoformat("2025-03-14T00:00:00+01:00"), "demain"),
+        (datetime.datetime.fromisoformat("2025-03-14T23:59:59.999999+01:00"), "demain"),
+        (datetime.date.fromisoformat("2025-03-14"), "demain"),
+        (datetime.datetime.fromisoformat("2025-03-11T00:00:00+01:00"), "il y a 2 jours"),
+        (datetime.datetime.fromisoformat("2025-03-11T23:59:59.999999+01:00"), "il y a 2 jours"),
+        (datetime.date.fromisoformat("2025-03-11"), "il y a 2 jours"),
+        (datetime.datetime.fromisoformat("2025-03-15T00:00:00+01:00"), "dans 2 jours"),
+        (datetime.datetime.fromisoformat("2025-03-15T23:59:59.999999+01:00"), "dans 2 jours"),
+        (datetime.date.fromisoformat("2025-03-15"), "dans 2 jours"),
+        (datetime.datetime.fromisoformat("2025-02-12T00:00:00+01:00"), "il y a 29 jours"),
+        (datetime.datetime.fromisoformat("2025-02-12T23:59:59.999999+01:00"), "il y a 29 jours"),
+        (datetime.date.fromisoformat("2025-02-12"), "il y a 29 jours"),
+        (datetime.datetime.fromisoformat("2025-04-11T00:00:00+01:00"), "dans 29 jours"),
+        (datetime.datetime.fromisoformat("2025-04-11T23:59:59.999999+01:00"), "dans 29 jours"),
+        (datetime.date.fromisoformat("2025-04-11"), "dans 29 jours"),
+        (datetime.datetime.fromisoformat("2025-02-11T00:00:00+01:00"), "il y a 1 mois"),
+        (datetime.datetime.fromisoformat("2025-02-11T23:59:59.999999+01:00"), "il y a 1 mois"),
+        (datetime.date.fromisoformat("2025-02-11"), "il y a 1 mois"),
+        (datetime.datetime.fromisoformat("2025-04-12T00:00:00+01:00"), "dans 1 mois"),
+        (datetime.datetime.fromisoformat("2025-04-12T23:59:59.999999+01:00"), "dans 1 mois"),
+        (datetime.date.fromisoformat("2025-04-12"), "dans 1 mois"),
+        (datetime.datetime.fromisoformat("2024-03-14T00:00:00+01:00"), "il y a 12 mois"),
+        (datetime.datetime.fromisoformat("2024-03-14T23:59:59.999999+01:00"), "il y a 12 mois"),
+        (datetime.date.fromisoformat("2024-03-14"), "il y a 12 mois"),
+        (datetime.datetime.fromisoformat("2026-03-12T00:00:00+01:00"), "dans 12 mois"),
+        (datetime.datetime.fromisoformat("2026-03-12T23:59:59.999999+01:00"), "dans 12 mois"),
+        (datetime.date.fromisoformat("2026-03-12"), "dans 12 mois"),
+        (datetime.datetime.fromisoformat("2024-03-13T00:00:00+01:00"), "il y a 1 an"),
+        (datetime.datetime.fromisoformat("2024-03-13T23:59:59.999999+01:00"), "il y a 1 an"),
+        (datetime.date.fromisoformat("2024-03-13"), "il y a 1 an"),
+        (datetime.datetime.fromisoformat("2026-03-13T00:00:00+01:00"), "dans 1 an"),
+        (datetime.datetime.fromisoformat("2026-03-13T23:59:59.999999+01:00"), "dans 1 an"),
+        (datetime.date.fromisoformat("2026-03-13"), "dans 1 an"),
+        (datetime.datetime.fromisoformat("2022-03-13T00:00:00+01:00"), "il y a 3 ans"),
+        (datetime.datetime.fromisoformat("2022-03-13T23:59:59.999999+01:00"), "il y a 3 ans"),
+        (datetime.date.fromisoformat("2022-03-13"), "il y a 3 ans"),
+        (datetime.datetime.fromisoformat("2028-03-13T00:00:00+01:00"), "dans 3 ans"),
+        (datetime.datetime.fromisoformat("2028-03-13T23:59:59.999999+01:00"), "dans 3 ans"),
+        (datetime.date.fromisoformat("2028-03-13"), "dans 3 ans"),
+    ],
+)
+@freeze_time("2025-03-13T11:36:36+01:00")
+def test_naturaldate(date_or_datetime, expected):
+    assert naturaldate(date_or_datetime) == expected
