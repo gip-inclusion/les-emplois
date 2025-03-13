@@ -1,10 +1,7 @@
 import pytest
-from django.core.exceptions import BadRequest
-from django.test import RequestFactory
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from itou.www.companies_views.views import deactivate_member
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.companies.factories import (
     CompanyFactory,
@@ -146,31 +143,6 @@ class TestUserMembershipDeactivation:
         assert sent_invitation.has_expired is True
         sent_invitation_to_other.refresh_from_db()
         assert sent_invitation_to_other.has_expired is False
-
-    # To be removed when the old URL is no longer used
-    def test_deactivate_user_with_user_id(self, client):
-        company = CompanyWith2MembershipsFactory(name="Les petits paniers", email="petitspaniers@mailinator.com")
-        admin = company.members.filter(companymembership__is_admin=True).first()
-        guest = company.members.filter(companymembership__is_admin=False).first()
-
-        membership = guest.companymembership_set.first()
-        assert guest not in company.active_admin_members
-        assert admin in company.active_admin_members
-
-        client.force_login(admin)
-        url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
-        response = client.post(url)
-        assert response.status_code == 302
-
-        # User should be deactivated now
-        membership.refresh_from_db()
-        assert not membership.is_active
-
-    def test_deactivate_member_wo_public_id_nor_user_id(self):
-        request = RequestFactory().get("/")
-        request.user = EmployerFactory()
-        with pytest.raises(BadRequest, match="Missing user ID"):
-            deactivate_member(request, None, None, None)
 
     def test_deactivate_with_no_perms(self, client):
         """

@@ -29,8 +29,6 @@ urlpatterns = [
     path("edit-company-preview", views.edit_company_step_preview, name="edit_company_step_preview"),
     path("colleagues", views.members, name="members"),
     path("deactivate_member/<uuid:public_id>", views.deactivate_member, name="deactivate_member"),
-    # to be removed when old url is not used anymore
-    path("deactivate_member/<int:user_id>", views.deactivate_member, name="deactivate_member"),
     path("admin_role/<str:action>/<uuid:public_id>", views.update_admin_role, name="update_admin_role"),
     path("dora-services/<str:code_insee>", views.hx_dora_services, name="hx_dora_services"),
     path(
