@@ -33,37 +33,26 @@ def get_permissions_dict():
     import itou.siae_evaluations.models as siae_evaluations_models
     import itou.users.models as users_models
 
-    always_read_only_models = {
-        analytics_models.Datum,
-        analytics_models.StatsDashboardVisit,
-        approvals_models.CancelledApproval,
-        approvals_models.PoleEmploiApproval,
-        asp_models.Commune,
-        asp_models.Country,
-        asp_models.Department,
-        cities_models.City,
-        companies_models.SiaeFinancialAnnex,
-        eligibility_models.AdministrativeCriteria,
-        job_applications_models.JobApplicationTransitionLog,
-        jobs_models.Appellation,
-        jobs_models.Rome,
-        siae_evaluations_models.Calendar,
-        siae_evaluations_models.EvaluationCampaign,
-        siae_evaluations_models.EvaluatedSiae,
-        siae_evaluations_models.EvaluatedJobApplication,
-        siae_evaluations_models.EvaluatedAdministrativeCriteria,
-        siae_evaluations_models.Sanctions,
-    }
     group_itou_admin_permissions = {
         account_models.EmailAddress: PERMS_ADD,
+        analytics_models.Datum: PERMS_READ,
+        analytics_models.StatsDashboardVisit: PERMS_READ,
         approvals_models.Approval: PERMS_ALL,
+        approvals_models.CancelledApproval: PERMS_READ,
+        approvals_models.PoleEmploiApproval: PERMS_READ,
         approvals_models.Prolongation: PERMS_ALL,
         approvals_models.Suspension: PERMS_ALL,
+        asp_models.Commune: PERMS_READ,
+        asp_models.Country: PERMS_READ,
+        asp_models.Department: PERMS_READ,
+        cities_models.City: PERMS_READ,
         companies_models.Company: PERMS_ADD,
         companies_models.SiaeConvention: PERMS_EDIT,
         companies_models.JobDescription: PERMS_ALL,
         companies_models.CompanyMembership: PERMS_ALL,
+        companies_models.SiaeFinancialAnnex: PERMS_READ,
         employee_record_models.EmployeeRecord: PERMS_DELETE,
+        eligibility_models.AdministrativeCriteria: PERMS_READ,
         eligibility_models.EligibilityDiagnosis: PERMS_ADD,
         eligibility_models.SelectedAdministrativeCriteria: PERMS_ALL,
         institution_models.Institution: PERMS_ADD,
@@ -72,8 +61,17 @@ def get_permissions_dict():
         invitation_models.PrescriberWithOrgInvitation: PERMS_DELETE,
         invitation_models.EmployerInvitation: PERMS_DELETE,
         job_applications_models.JobApplication: PERMS_DELETE,
+        job_applications_models.JobApplicationTransitionLog: PERMS_READ,
+        jobs_models.Appellation: PERMS_READ,
+        jobs_models.Rome: PERMS_READ,
         prescribers_models.PrescriberMembership: PERMS_ALL,
         prescribers_models.PrescriberOrganization: PERMS_ADD,
+        siae_evaluations_models.Calendar: PERMS_READ,
+        siae_evaluations_models.EvaluationCampaign: PERMS_READ,
+        siae_evaluations_models.EvaluatedSiae: PERMS_READ,
+        siae_evaluations_models.EvaluatedJobApplication: PERMS_READ,
+        siae_evaluations_models.EvaluatedAdministrativeCriteria: PERMS_READ,
+        siae_evaluations_models.Sanctions: PERMS_READ,
         users_models.User: PERMS_ADD,
         users_models.JobSeekerProfile: PERMS_EDIT,
     }
@@ -106,30 +104,12 @@ def get_permissions_dict():
     }
 
     return {
-        "itou-admin": {
-            **group_itou_admin_permissions,
-            **{model: PERMS_READ for model in always_read_only_models},
-        },
-        "itou-admin-readonly": {
-            **{model: PERMS_READ for model in group_itou_admin_permissions},
-            **{model: PERMS_READ for model in always_read_only_models},
-        },
-        "gps-admin": {
-            **group_gps_admin_permissions,
-            **{model: PERMS_READ for model in always_read_only_models if model in group_gps_admin_permissions},
-        },
-        "gps-admin-readonly": {
-            **{model: PERMS_READ for model in group_gps_admin_permissions},
-            **{model: PERMS_READ for model in always_read_only_models if model in group_gps_admin_permissions},
-        },
-        "pilotage-admin": {
-            **group_pilotage_admin_permissions,
-            **{model: PERMS_READ for model in always_read_only_models if model in group_pilotage_admin_permissions},
-        },
-        "pilotage-admin-readonly": {
-            **{model: PERMS_READ for model in group_pilotage_admin_permissions},
-            **{model: PERMS_READ for model in always_read_only_models if model in group_pilotage_admin_permissions},
-        },
+        "itou-admin": {**group_itou_admin_permissions},
+        "itou-admin-readonly": {**{model: PERMS_READ for model in group_itou_admin_permissions}},
+        "gps-admin": {**group_gps_admin_permissions},
+        "gps-admin-readonly": {**{model: PERMS_READ for model in group_gps_admin_permissions}},
+        "pilotage-admin": {**group_pilotage_admin_permissions},
+        "pilotage-admin-readonly": {**{model: PERMS_READ for model in group_pilotage_admin_permissions}},
     }
 
 
