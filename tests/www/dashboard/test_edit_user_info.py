@@ -14,6 +14,7 @@ from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploi
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
+from tests.users import constants as users_test_constants
 from tests.users.factories import (
     JobSeekerFactory,
     PrescriberFactory,
@@ -76,6 +77,7 @@ class TestEditUserInfoView:
         url = reverse("dashboard:edit_user_info")
         with assertSnapshotQueries(snapshot):
             response = client.get(url)
+        assertNotContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True)
         # There's a specific view to edit the email so we don't show it here
         assertNotContains(response, self.EMAIL_LABEL)
         # Check that the NIR field is disabled
@@ -572,9 +574,12 @@ class TestEditUserInfoView:
             certified=True,
         )
         client.force_login(job_seeker)
+        url = reverse("dashboard:edit_user_info")
+        response = client.get(url)
+        assertContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True, count=1)
         birthdate = date(1978, 12, 1)
         response = client.post(
-            reverse("dashboard:edit_user_info"),
+            url,
             {
                 "email": "bob@saintclar.net",
                 "title": "M",

@@ -9,6 +9,7 @@
                 {% csrf_token %}
                 <fieldset>
                     <legend>Etat civil du salarié</legend>
+                    {% include "includes/job_seekers/readonly_form.html" with form=form ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
                     {% bootstrap_form_errors form type="all" %}
 
                     {% bootstrap_field form.title %}
