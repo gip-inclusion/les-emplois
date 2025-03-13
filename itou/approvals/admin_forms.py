@@ -57,7 +57,7 @@ class ApprovalAdminForm(forms.ModelForm):
         if eligibility_diagnosis and eligibility_diagnosis.job_seeker != self.cleaned_data["user"]:
             # Could we filter available eligibility diagnosis ?
             self.add_error("eligibility_diagnosis", "Le diagnostic doit appartenir au même utilisateur que le PASS")
-        elif not eligibility_diagnosis and self.get_origin() in [Origin.ADMIN, Origin.DEFAULT]:
+        elif not eligibility_diagnosis and self.instance.origin in [Origin.ADMIN, Origin.DEFAULT]:
             self.add_error("eligibility_diagnosis", "Ce champ est obligatoire")
 
 
