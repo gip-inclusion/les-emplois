@@ -724,23 +724,25 @@ class FilterJobApplicationsForm(forms.Form):
         if states := data.get("states"):
             filters.append(Q(state__in=states))
 
-        if data.get("pass_iae_active") or data.get("pass_iae_suspended"):
-            queryset = queryset.with_has_suspended_approval()
+        pass_iae_key_to_filter = {
+            # Simplification of CommonApprovalQuerySet.valid_lookup()
+            # The date is not enough to know if an approval is valid or not
+            "pass_iae_active": Q(approval__end_at__gte=timezone.localdate(), has_suspended_approval=False),
+            # This is NOT what we want but how things work currently:
+            # if you check pass_iae_active, the value of pass_iae_suspended is ignored
+            # Filter on the `has_suspended_approval` annotation, which is set in `with_list_related_data()`.
+            "pass_iae_suspended": Q(has_suspended_approval=True),
+            "pass_iae_expired": Q(approval__end_at__lt=timezone.localdate()),
+        }
+
+        if any([data.get(key) for key in pass_iae_key_to_filter.keys()]):
+            if data.get("pass_iae_active") or data.get("pass_iae_suspended"):
+                queryset = queryset.with_has_suspended_approval()
             pass_status_filter = Q()
-            if data.get("pass_iae_active"):
-                # Simplification of CommonApprovalQuerySet.valid_lookup()
-                # The date is not enough to know if an approval is valid or not
-                pass_status_filter |= Q(approval__end_at__gte=timezone.localdate(), has_suspended_approval=False)
-
-            if data.get("pass_iae_suspended"):
-                # This is NOT what we want but how things work currently:
-                # if you check pass_iae_active, the value of pass_iae_suspended is ignored
-                # Filter on the `has_suspended_approval` annotation, which is set in `with_list_related_data()`.
-                pass_status_filter |= Q(has_suspended_approval=True)
+            for key, filter in pass_iae_key_to_filter.items():
+                if data.get(key):
+                    pass_status_filter |= filter
             filters.append(pass_status_filter)
-
-        if data.get("pass_iae_expired"):
-            filters.append(Q(approval__end_at__lt=timezone.localdate()))
 
         if start_date := data.get("start_date"):
             filters.append(Q(created_at__gte=start_date))
