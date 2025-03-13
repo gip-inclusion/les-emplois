@@ -39,14 +39,8 @@ def member_list(request, template_name="institutions/members.html"):
 
 
 @check_user(lambda user: user.is_labor_inspector)
-def deactivate_member(request, public_id=None, user_id=None, template_name="institutions/deactivate_member.html"):
-    if public_id:
-        user = get_object_or_404(User, public_id=public_id)
-    elif user_id:
-        user = get_object_or_404(User, id=user_id)
-    else:
-        raise BadRequest("Missing user ID")
-
+def deactivate_member(request, public_id, template_name="institutions/deactivate_member.html"):
+    user = get_object_or_404(User, public_id=public_id)
     return deactivate_org_member(
         request,
         user.id,
