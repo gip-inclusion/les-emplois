@@ -21,9 +21,12 @@ def get_permissions_dict():
     import itou.approvals.models as approvals_models
     import itou.asp.models as asp_models
     import itou.cities.models as cities_models
+    import itou.communications.models as communications_models
     import itou.companies.models as companies_models
     import itou.eligibility.models as eligibility_models
+    import itou.emails.models as emails_models
     import itou.employee_record.models as employee_record_models
+    import itou.geiq.models as geiq_models
     import itou.gps.models as gps_models
     import itou.institutions.models as institution_models
     import itou.invitations.models as invitation_models
@@ -34,45 +37,57 @@ def get_permissions_dict():
     import itou.users.models as users_models
 
     group_itou_admin_permissions = {
-        account_models.EmailAddress: PERMS_ADD,
-        analytics_models.Datum: PERMS_READ,
-        analytics_models.StatsDashboardVisit: PERMS_READ,
-        approvals_models.Approval: PERMS_ALL,
+        account_models.EmailAddress: PERMS_ALL,
+        # There's a special form that does not uses the ADD permission
+        approvals_models.Approval: PERMS_DELETE,
         approvals_models.CancelledApproval: PERMS_READ,
         approvals_models.PoleEmploiApproval: PERMS_READ,
         approvals_models.Prolongation: PERMS_ALL,
+        approvals_models.ProlongationRequest: PERMS_EDIT,
         approvals_models.Suspension: PERMS_ALL,
         asp_models.Commune: PERMS_READ,
         asp_models.Country: PERMS_READ,
         asp_models.Department: PERMS_READ,
         cities_models.City: PERMS_READ,
-        companies_models.Company: PERMS_ADD,
-        companies_models.SiaeConvention: PERMS_EDIT,
-        companies_models.JobDescription: PERMS_ALL,
-        companies_models.CompanyMembership: PERMS_ALL,
+        communications_models.AnnouncementCampaign: PERMS_ALL,
         companies_models.SiaeFinancialAnnex: PERMS_READ,
-        employee_record_models.EmployeeRecord: PERMS_DELETE,
+        companies_models.Company: PERMS_ALL,
+        companies_models.SiaeConvention: PERMS_EDIT,
+        companies_models.JobDescription: PERMS_READ,
+        companies_models.CompanyMembership: PERMS_ADD,
         eligibility_models.AdministrativeCriteria: PERMS_READ,
-        eligibility_models.EligibilityDiagnosis: PERMS_ADD,
+        eligibility_models.EligibilityDiagnosis: PERMS_ALL,
+        eligibility_models.GEIQAdministrativeCriteria: PERMS_READ,
+        eligibility_models.GEIQEligibilityDiagnosis: PERMS_ALL,
+        eligibility_models.GEIQSelectedAdministrativeCriteria: PERMS_ALL,
         eligibility_models.SelectedAdministrativeCriteria: PERMS_ALL,
+        emails_models.Email: PERMS_READ,
+        employee_record_models.EmployeeRecord: PERMS_EDIT,
+        employee_record_models.EmployeeRecordUpdateNotification: PERMS_READ,
+        employee_record_models.EmployeeRecordTransitionLog: PERMS_READ,
+        geiq_models.ImplementationAssessment: PERMS_READ,
+        geiq_models.ImplementationAssessmentCampaign: PERMS_ADD,
+        geiq_models.Employee: PERMS_READ,
+        geiq_models.EmployeeContract: PERMS_READ,
+        geiq_models.EmployeePrequalification: PERMS_READ,
         institution_models.Institution: PERMS_ADD,
-        institution_models.InstitutionMembership: PERMS_ALL,
+        institution_models.InstitutionMembership: PERMS_ADD,
+        invitation_models.EmployerInvitation: PERMS_DELETE,
         invitation_models.LaborInspectorInvitation: PERMS_DELETE,
         invitation_models.PrescriberWithOrgInvitation: PERMS_DELETE,
-        invitation_models.EmployerInvitation: PERMS_DELETE,
-        job_applications_models.JobApplication: PERMS_DELETE,
+        job_applications_models.JobApplication: PERMS_ALL,
         job_applications_models.JobApplicationTransitionLog: PERMS_READ,
         jobs_models.Appellation: PERMS_READ,
         jobs_models.Rome: PERMS_READ,
-        prescribers_models.PrescriberMembership: PERMS_ALL,
-        prescribers_models.PrescriberOrganization: PERMS_ADD,
+        prescribers_models.PrescriberMembership: PERMS_ADD,
+        prescribers_models.PrescriberOrganization: PERMS_ALL,
         siae_evaluations_models.Calendar: PERMS_READ,
         siae_evaluations_models.EvaluationCampaign: PERMS_READ,
         siae_evaluations_models.EvaluatedSiae: PERMS_READ,
         siae_evaluations_models.EvaluatedJobApplication: PERMS_READ,
         siae_evaluations_models.EvaluatedAdministrativeCriteria: PERMS_READ,
         siae_evaluations_models.Sanctions: PERMS_READ,
-        users_models.User: PERMS_ADD,
+        users_models.User: PERMS_ALL | PERMS_HIJACK,
         users_models.JobSeekerProfile: PERMS_EDIT,
     }
     group_gps_admin_permissions = {
