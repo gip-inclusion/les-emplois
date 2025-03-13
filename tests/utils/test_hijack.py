@@ -1,6 +1,7 @@
 import pytest
 from django.contrib.auth.models import Permission
 from django.urls import reverse
+from pytest_django.asserts import assertRedirects
 
 from itou.users.enums import IdentityProvider
 from tests.users.factories import (
@@ -23,14 +24,12 @@ class TestUserHijack:
         client.force_login(hijacker)
 
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
-        assert response.status_code == 302
-        assert response["Location"] == "/foo/"
+        assertRedirects(response, "/foo/", fetch_redirect_response=False)
         assert caplog.records[0].message == f"admin={hijacker} has started impersonation of user={hijacked}"
         caplog.clear()
 
         response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk, "next": "/bar/"})
-        assert response.status_code == 302
-        assert response["Location"] == "/bar/"
+        assertRedirects(response, "/bar/", fetch_redirect_response=False)
         assert caplog.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
 
     def test_disallowed_hijackers(self, client):
@@ -39,8 +38,7 @@ class TestUserHijack:
         hijacker = PrescriberFactory(is_active=False)  # Not staff nor active
         client.force_login(hijacker)
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
-        assert response.status_code == 302
-        assert response["Location"] == "/accounts/login/?next=/hijack/acquire/"
+        assertRedirects(response, "/accounts/login/?next=/hijack/acquire/", fetch_redirect_response=False)
 
         hijacker = PrescriberFactory()  # active but not staff or superuser
         client.force_login(hijacker)
@@ -63,14 +61,12 @@ class TestUserHijack:
         client.force_login(hijacker)
 
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
-        assert response.status_code == 302
-        assert response["Location"] == "/foo/"
+        assertRedirects(response, "/foo/", fetch_redirect_response=False)
         assert caplog.records[0].message == f"admin={hijacker} has started impersonation of user={hijacked}"
         caplog.clear()
 
         response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk, "next": "/bar/"})
-        assert response.status_code == 302
-        assert response["Location"] == "/bar/"
+        assertRedirects(response, "/bar/", fetch_redirect_response=False)
         assert caplog.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
 
     def test_allowed_django_prescriber(self, client, caplog, settings):
@@ -79,14 +75,12 @@ class TestUserHijack:
         client.force_login(hijacker)
 
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
-        assert response.status_code == 302
-        assert response["Location"] == "/foo/"
+        assertRedirects(response, "/foo/", fetch_redirect_response=False)
         assert caplog.records[0].message == f"admin={hijacker} has started impersonation of user={hijacked}"
         caplog.clear()
 
         response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk, "next": "/bar/"})
-        assert response.status_code == 302
-        assert response["Location"] == "/bar/"
+        assertRedirects(response, "/bar/", fetch_redirect_response=False)
         assert caplog.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
 
     def test_release_redirects_to_admin(self, client):
@@ -97,9 +91,7 @@ class TestUserHijack:
         initial_url = reverse("admin:users_user_changelist")
 
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk}, HTTP_REFERER=initial_url)
-        assert response.status_code == 302
-        assert response["Location"] == "/dashboard/"
+        assertRedirects(response, reverse("dashboard:index"), fetch_redirect_response=False)
 
         response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk})
-        assert response.status_code == 302
-        assert response["Location"] == "/admin/users/user/"
+        assertRedirects(response, initial_url, fetch_redirect_response=False)
