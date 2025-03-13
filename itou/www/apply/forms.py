@@ -844,11 +844,13 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
 
     def filter(self, queryset):
         queryset = super().filter(queryset)
-        if self.cleaned_data.get("eligibility_validated"):
-            queryset = queryset.eligibility_validated()
 
-        if self.cleaned_data.get("eligibility_pending"):
-            queryset = queryset.eligibility_pending()
+        # If both or none of eligibility_validated and eligibility_pending are checked, no need to filter anything
+        match (self.cleaned_data.get("eligibility_validated"), self.cleaned_data.get("eligibility_pending")):
+            case (True, False):
+                queryset = queryset.eligibility_validated()
+            case (False, True):
+                queryset = queryset.eligibility_pending()
 
         if senders := self.cleaned_data.get("senders"):
             queryset = queryset.filter(sender__id__in=senders)
