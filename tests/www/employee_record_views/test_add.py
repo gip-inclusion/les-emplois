@@ -83,8 +83,8 @@ def test_wizard(snapshot, client):
         response,
         selector="#main .s-section",
         replace_in_attr=[
-            ("value", str(approval.pk), "[PK of Approval]"),
             ("value", wizard_session_name, "[UUID of session]"),
+            ("value", str(approval.pk), "[PK of Approval]"),
         ],
     )
     assert str(soup) == snapshot(name="choose-approval")
