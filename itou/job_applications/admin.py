@@ -18,32 +18,25 @@ from itou.utils.admin import (
     ItouModelAdmin,
     ItouStackedInline,
     ItouTabularInline,
+    ReadonlyMixin,
     UUIDSupportRemarkInline,
     get_admin_view_link,
 )
 from itou.utils.templatetags.str_filters import pluralizefr
 
 
-class TransitionLogInline(ItouTabularInline):
+class TransitionLogInline(ItouTabularInline, ReadonlyMixin):
     model = models.JobApplicationTransitionLog
     extra = 0
     raw_id_fields = ("user",)
-    can_delete = False
     readonly_fields = ("transition", "from_state", "to_state", "user", "timestamp", "target_company")
 
-    def has_add_permission(self, request, obj=None):
-        return False
 
-
-class PriorActionInline(ItouTabularInline):
+class PriorActionInline(ItouTabularInline, ReadonlyMixin):
     model = models.PriorAction
     extra = 0
-    can_delete = False
     readonly_fields = ("action", "dates")
     verbose_name_plural = "actions préalable à l'embauche"
-
-    def has_add_permission(self, request, obj=None):
-        return False
 
 
 class JobsInline(ItouTabularInline):
@@ -67,10 +60,9 @@ class ManualApprovalDeliveryRequiredFilter(admin.SimpleListFilter):
         return queryset
 
 
-class EmployeeRecordInline(ItouStackedInline):
+class EmployeeRecordInline(ItouStackedInline, ReadonlyMixin):
     model = employee_record_models.EmployeeRecord
     extra = 0
-    can_delete = False
     fields = ("link",)
     readonly_fields = ("link",)
 
@@ -80,12 +72,6 @@ class EmployeeRecordInline(ItouStackedInline):
             obj,
             content=mark_safe(f"<b>{obj.get_status_display()} (ID: {obj.pk})</b>"),
         )
-
-    def has_add_permission(self, request, obj=None):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
 
 
 @admin.register(models.JobApplication)
@@ -350,7 +336,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
 
 
 @admin.register(models.JobApplicationTransitionLog)
-class JobApplicationTransitionLogAdmin(ItouModelAdmin):
+class JobApplicationTransitionLogAdmin(ItouModelAdmin, ReadonlyMixin):
     actions = None
     date_hierarchy = "timestamp"
     list_display = ("job_application", "transition", "from_state", "to_state", "user", "timestamp")

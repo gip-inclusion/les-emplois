@@ -1,13 +1,12 @@
 from django.contrib import admin
 
 import itou.gps.models as models
-from itou.utils.admin import ItouModelAdmin
+from itou.utils.admin import ItouModelAdmin, ReadonlyMixin
 
 
-class MemberInline(admin.TabularInline):
+class MemberInline(admin.TabularInline, ReadonlyMixin):
     model = models.FollowUpGroup.members.through
     extra = 0
-    can_delete = False
     readonly_fields = [
         "is_active",
         "is_referent",
@@ -21,12 +20,6 @@ class MemberInline(admin.TabularInline):
     ]
 
     show_change_link = True
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
 
 
 @admin.register(models.FollowUpGroupMembership)

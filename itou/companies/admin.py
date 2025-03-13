@@ -20,6 +20,7 @@ from itou.utils.admin import (
     ItouModelAdmin,
     ItouTabularInline,
     PkSupportRemarkInline,
+    ReadonlyMixin,
     add_support_remark_to_obj,
     get_admin_view_link,
 )
@@ -58,11 +59,10 @@ class JobsInline(ItouTabularInline):
         return get_admin_view_link(obj, content=format_html("<strong>Fiche de poste ID: {}</strong>", obj.id))
 
 
-class FinancialAnnexesInline(ItouTabularInline):
+class FinancialAnnexesInline(ItouTabularInline, ReadonlyMixin):
     model = models.SiaeFinancialAnnex
     fields = ("number", "is_active", "state", "start_at", "end_at", "created_at")
     readonly_fields = ("number", "is_active", "state", "start_at", "end_at", "created_at")
-    can_delete = False
 
     ordering = (
         "-end_at",
@@ -74,24 +74,11 @@ class FinancialAnnexesInline(ItouTabularInline):
     def is_active(self, obj):
         return obj.is_active
 
-    def has_change_permission(self, request, obj=None):
-        return False
 
-    def has_add_permission(self, request, obj=None):
-        return False
-
-
-class CompaniesInline(ItouTabularInline):
+class CompaniesInline(ItouTabularInline, ReadonlyMixin):
     model = models.Company
     fields = ("company_id_link", "kind", "siret", "source", "name", "brand")
     readonly_fields = ("company_id_link", "kind", "siret", "source", "name", "brand")
-    can_delete = False
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
 
     def company_id_link(self, obj):
         return get_admin_view_link(obj)
@@ -537,7 +524,7 @@ class SiaeConventionAdmin(ItouModelAdmin):
 
 
 @admin.register(models.SiaeFinancialAnnex)
-class SiaeFinancialAnnexAdmin(ItouModelAdmin):
+class SiaeFinancialAnnexAdmin(ItouModelAdmin, ReadonlyMixin):
     list_display = ("number", "state", "start_at", "end_at")
     list_filter = ("state",)
     raw_id_fields = ("convention",)
@@ -580,12 +567,3 @@ class SiaeFinancialAnnexAdmin(ItouModelAdmin):
         ),
     )
     search_fields = ("pk", "number")
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False

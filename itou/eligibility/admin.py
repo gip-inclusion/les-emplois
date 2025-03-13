@@ -9,7 +9,13 @@ from itou.eligibility import models
 from itou.eligibility.admin_form import GEIQEligibilityDiagnosisAdminForm, IAEEligibilityDiagnosisAdminForm
 from itou.eligibility.models.common import AbstractSelectedAdministrativeCriteria
 from itou.job_applications import models as job_applications_models
-from itou.utils.admin import ItouModelAdmin, ItouTabularInline, PkSupportRemarkInline, get_admin_view_link
+from itou.utils.admin import (
+    ItouModelAdmin,
+    ItouTabularInline,
+    PkSupportRemarkInline,
+    ReadonlyMixin,
+    get_admin_view_link,
+)
 
 
 class AbstractSelectedAdministrativeCriteriaInlineFormSet(BaseInlineFormSet):
@@ -58,10 +64,9 @@ class SelectedGEIQAdministrativeCriteriaInline(AbstractSelectedAdministrativeCri
     model = models.GEIQEligibilityDiagnosis.administrative_criteria.through
 
 
-class ApprovalInline(ItouTabularInline):
+class ApprovalInline(ItouTabularInline, ReadonlyMixin):
     model = approvals_models.Approval
     extra = 0
-    can_delete = False
     show_change_link = True
     fields = (
         "start_at",
@@ -70,21 +75,14 @@ class ApprovalInline(ItouTabularInline):
     )
     readonly_fields = fields
 
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
-
     @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):
         return obj.is_valid()
 
 
-class JobApplicationInline(ItouTabularInline):
+class JobApplicationInline(ItouTabularInline, ReadonlyMixin):
     model = job_applications_models.JobApplication
     extra = 0
-    can_delete = False
     show_change_link = True
     fields = (
         "job_seeker",
@@ -95,12 +93,6 @@ class JobApplicationInline(ItouTabularInline):
     )
     readonly_fields = fields
     list_select_related = ("to_company",)
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
 
     @admin.display(description="Entreprise destinataire")
     def to_company_link(self, obj):
@@ -241,23 +233,13 @@ class GEIQEligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
         return f"{obj.allowance_amount} EUR"
 
 
-class AbstractAdministrativeCriteriaAdmin(ItouModelAdmin):
+class AbstractAdministrativeCriteriaAdmin(ItouModelAdmin, ReadonlyMixin):
+    # Administrative criteria are updated via fixtures
     list_display_links = ("pk", "name")
     list_filter = ("level",)
     raw_id_fields = ("created_by",)
     readonly_fields = ("created_at",)
     search_fields = ("name", "desc")
-
-    # Administrative criteria are updated via fixtures
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
 
 
 @admin.register(models.AdministrativeCriteria)
