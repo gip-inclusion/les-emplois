@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
+from django.views.decorators.http import require_POST
 from django.views.generic.base import TemplateView
 
 from itou.cities.models import City
@@ -293,6 +294,34 @@ def job_description_list(request, template_name="companies/job_description_list.
         "back_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
+
+
+@require_POST
+@check_user(lambda user: user.is_employer)
+def refresh_spontaneous_applications(request):
+    company = get_current_company_or_404(request)
+    if company.spontaneous_applications_open_since:
+        company.spontaneous_applications_open_since = timezone.now()
+        company.save(update_fields=["spontaneous_applications_open_since", "updated_at"])
+    return render(
+        request,
+        "companies/includes/buttons/spontaneous_applications_refresh.html",
+        {"company": company, "request": request},
+    )
+
+
+@require_POST
+@check_user(lambda user: user.is_employer)
+def refresh_job_description(request, job_description_id, for_detail=False):
+    company = get_current_company_or_404(request)
+    job_description = get_object_or_404(company.job_description_through.all(), pk=job_description_id)
+    job_description.last_employer_update_at = timezone.now()
+    job_description.save(update_fields=["last_employer_update_at", "updated_at"])
+    return render(
+        request,
+        "companies/includes/buttons/job_description_refresh.html",
+        {"job_description": job_description, "for_detail": for_detail, "request": request},
+    )
 
 
 JOB_DESCRIPTION_EDIT_SESSION_KIND = "job_description_edit"

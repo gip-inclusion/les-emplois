@@ -1,0 +1,24 @@
+{% load datetime_filters %}
+
+{% if company.spontaneous_applications_open_since %}
+    <form hx-post="{% url 'companies_views:spontaneous_applications_refresh' %}" hx-swap="outerHTML" id="refresh_spontaneous_applications_opening">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm btn-link p-0">
+            <div class="stable-text">
+                <i class="ri-refresh-line fw-normal"
+                   data-bs-toggle="tooltip"
+                   data-bs-title="Actualiser la date de mise à jour"
+                   data-bs-placement="top"
+                   aria-label="Indiquer que les candidatures spontanées sont toujours ouvertes à ce jour"></i>
+            </div>
+            <div class="loading-text">
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            </div>
+        </button>
+    </form>
+{% endif %}
+
+{% if request.htmx and request.htmx.target == "refresh_spontaneous_applications_opening" %}
+    {% include "companies/includes/buttons/spontaneous_applications_toggle.html" with csrf_token=csrf_token company=company hx_swap_oob=True only %}
+    <span id="spontaneous_applications_open_since_cell" hx-swap-oob="true">{{ company.spontaneous_applications_open_since|default_if_none:"-"|naturaldate|capfirst }}</span>
+{% endif %}

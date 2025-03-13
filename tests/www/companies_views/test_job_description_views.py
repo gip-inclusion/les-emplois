@@ -20,6 +20,7 @@ from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
+from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
@@ -312,6 +313,73 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
             assert job_description.is_active is True
             assert job_description.updated_at == timezone.now()
             assert job_description.last_employer_update_at == timezone.now()
+
+    @pytest.mark.parametrize(
+        "is_closed,expected",
+        [
+            (True, lambda: None),
+            (False, lambda: timezone.now()),
+        ],
+        ids=["closed", "open"],
+    )
+    def test_spontaneous_applications_refresh_updates_spontaneous_applications_open_since(
+        self, is_closed, expected, client
+    ):
+        with freeze_time("2025-04-09 15:16:17.18") as frozen_time:
+            self.company.spontaneous_applications_open_since = timezone.now()
+            self.company.save(update_fields=["spontaneous_applications_open_since", "updated_at"])
+
+            frozen_time.move_to("2025-04-11 15:16:17.18")
+
+            client.force_login(self.user)
+
+            list_url = reverse("companies_views:job_description_list")
+            refresh_url = reverse("companies_views:spontaneous_applications_refresh")
+            response = client.get(list_url)
+            page = parse_response_to_soup(response, selector="div.table-responsive > table")
+
+            if is_closed:
+                # Close spontaneous applications
+                self.company.spontaneous_applications_open_since = None
+                self.company.save(update_fields=["spontaneous_applications_open_since", "updated_at"])
+
+            response = client.post(
+                refresh_url, headers={"hx-request": "true", "hx-target": "refresh_spontaneous_applications_opening"}
+            )
+            update_page_with_htmx(page, f"form[hx-post='{refresh_url}']", response)
+
+            self.company.refresh_from_db()
+            assert self.company.spontaneous_applications_open_since == expected()
+
+            response = client.get(list_url)
+            fresh_page = parse_response_to_soup(response, selector="div.table-responsive > table")
+            assertSoupEqual(page, fresh_page)
+
+    @pytest.mark.parametrize("is_active", [True, False])
+    def test_job_description_refresh_updates_last_employer_update_at(self, is_active, client):
+        with freeze_time("2025-04-09 15:16:17.18") as frozen_time:
+            client.force_login(self.user)
+
+            job_description = JobDescriptionFactory(
+                company=self.company, is_active=is_active, last_employer_update_at=timezone.now()
+            )
+
+            frozen_time.move_to("2025-04-11 15:16:17.18")
+
+            list_url = reverse("companies_views:job_description_list")
+            refresh_url = reverse("companies_views:job_description_refresh", args=(job_description.pk,))
+            response = client.get(list_url)
+            page = parse_response_to_soup(response, selector="div.table-responsive > table")
+
+            response = client.post(refresh_url, headers={"hx-request": "true"})
+            update_page_with_htmx(page, f"form[hx-post='{refresh_url}']", response)
+
+            job_description.refresh_from_db()
+            assert job_description.last_employer_update_at == timezone.now()
+
+            response = client.get(list_url)
+            fresh_page = parse_response_to_soup(response, selector="div.table-responsive > table")
+            assertSoupEqual(page, fresh_page)
 
     def test_delete_job_descriptions(self, client):
         client.force_login(self.user)
@@ -737,3 +805,32 @@ class TestJobDescriptionCard(JobDescriptionAbstract):
         assertContains(response, "a job description")
         assertContains(response, "a profile description")
         assertNotContains(response, PLACE_HOLDER)
+
+    @pytest.mark.parametrize("is_active", [True, False])
+    @freeze_time("2025-05-07")
+    def test_job_description_refresh_updates_last_employer_update_at(self, is_active, client):
+        refresh_url = reverse("companies_views:job_description_refresh_for_detail", args=(self.job_description.pk,))
+        client.force_login(self.user)
+
+        self.job_description.is_active = is_active
+        self.job_description.last_employer_update_at = None
+        self.job_description.save()
+
+        response = client.get(self.url)
+        page = parse_response_to_soup(response, selector=".c-navinfo__info")
+        assertContains(
+            response, '<span class="fs-sm text-muted fw-normal">Actualiser la date de mise à jour</span>', html=True
+        )
+
+        response = client.post(refresh_url, headers={"hx-request": "true"})
+        update_page_with_htmx(page, f"form[hx-post='{refresh_url}']", response)
+        assertContains(
+            response, '<span class="fs-sm text-muted fw-normal">Mise à jour le 07/05/2025</span>', html=True
+        )
+
+        self.job_description.refresh_from_db()
+        assert self.job_description.last_employer_update_at == timezone.now()
+
+        response = client.get(self.url)
+        fresh_page = parse_response_to_soup(response, selector=".c-navinfo__info")
+        assertSoupEqual(page, fresh_page)
