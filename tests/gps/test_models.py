@@ -119,6 +119,10 @@ class TestFollowBeneficiary:
         membership.refresh_from_db()
         assert membership.is_active is True
 
+        FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber, is_active=False)
+        membership.refresh_from_db()
+        assert membership.is_active is False
+
 
 @pytest.mark.parametrize(
     "UserFactory,MembershipFactory,relation_name",
