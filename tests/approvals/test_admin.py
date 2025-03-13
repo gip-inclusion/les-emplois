@@ -5,9 +5,9 @@ from django.contrib import messages
 from django.contrib.admin import helpers
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertMessages, assertNotContains
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
-from itou.approvals.enums import ProlongationReason
+from itou.approvals.enums import Origin, ProlongationReason
 from itou.files.models import File
 from itou.job_applications.enums import JobApplicationState
 from itou.utils.admin import get_admin_view_link
@@ -170,6 +170,63 @@ def test_check_inconsistency_check(admin_client):
             )
         ],
     )
+
+
+@pytest.mark.parametrize(
+    "origin,diag_required",
+    [
+        (Origin.ADMIN, True),
+        (Origin.DEFAULT, True),
+        (Origin.AI_STOCK, False),
+        (Origin.PE_APPROVAL, False),
+    ],
+)
+def test_approval_eligibility_diagnosis(admin_client, origin, diag_required):
+    kwargs = {"origin": origin}
+    if not diag_required:
+        kwargs["eligibility_diagnosis"] = None
+    approval = ApprovalFactory(**kwargs)
+    post_data = {
+        "start_at": str(approval.start_at),
+        "initial-start_at": str(approval.start_at),
+        "end_at": str(approval.end_at),
+        "initial-end_at": str(approval.end_at),
+        "user": str(approval.user.pk),
+        "eligibility_diagnosis": "",
+        "suspension_set-TOTAL_FORMS": "0",
+        "suspension_set-INITIAL_FORMS": "0",
+        "suspension_set-MIN_NUM_FORMS": "0",
+        "suspension_set-MAX_NUM_FORMS": "0",
+        "prolongation_set-TOTAL_FORMS": "0",
+        "prolongation_set-INITIAL_FORMS": "0",
+        "prolongation_set-MIN_NUM_FORMS": "0",
+        "prolongation_set-MAX_NUM_FORMS": "0",
+        "prolongationrequest_set-TOTAL_FORMS": "0",
+        "prolongationrequest_set-INITIAL_FORMS": "0",
+        "prolongationrequest_set-MIN_NUM_FORMS": "0",
+        "prolongationrequest_set-MAX_NUM_FORMS": "0",
+        "jobapplication_set-TOTAL_FORMS": "0",
+        "jobapplication_set-INITIAL_FORMS": "0",
+        "jobapplication_set-MIN_NUM_FORMS": "0",
+        "jobapplication_set-MAX_NUM_FORMS": "0",
+        "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+        "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
+        "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": "0",
+        "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": "1",
+        "utils-pksupportremark-content_type-object_id-0-remark": "",
+        "utils-pksupportremark-content_type-object_id-0-id": "",
+        "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
+        "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
+    }
+    response = admin_client.post(
+        reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}),
+        data=post_data,
+    )
+    if diag_required:
+        assert response.status_code == 200
+        assert response.context["errors"] == [["Ce champ est obligatoire"]]
+    else:
+        assertRedirects(response, reverse("admin:approvals_approval_changelist"))
 
 
 def test_search_fields(admin_client):
