@@ -44,7 +44,7 @@ def get_permissions_dict():
         approvals_models.CancelledApproval: PERMS_READ,
         approvals_models.PoleEmploiApproval: PERMS_READ,
         approvals_models.Prolongation: PERMS_ALL,
-        approvals_models.ProlongationRequest: PERMS_EDIT,
+        approvals_models.ProlongationRequest: PERMS_DELETE,
         approvals_models.Suspension: PERMS_ALL,
         asp_models.Commune: PERMS_READ,
         asp_models.Country: PERMS_READ,
