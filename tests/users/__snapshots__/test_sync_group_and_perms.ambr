@@ -106,6 +106,7 @@
     'delete_prolongation',
     'view_prolongation',
     'change_prolongationrequest',
+    'delete_prolongationrequest',
     'view_prolongationrequest',
     'add_suspension',
     'change_suspension',
