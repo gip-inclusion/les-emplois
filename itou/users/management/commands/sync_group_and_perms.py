@@ -40,7 +40,7 @@ def get_permissions_dict():
     group_itou_admin_permissions = {
         account_models.EmailAddress: PERMS_ALL,
         # There's a special form that does not uses the ADD permission
-        approvals_models.Approval: PERMS_DELETE,
+        approvals_models.Approval: PERMS_DELETE | {"export_ft_api_rejections"},
         approvals_models.CancelledApproval: PERMS_READ,
         approvals_models.PoleEmploiApproval: PERMS_READ,
         approvals_models.Prolongation: PERMS_ALL,
@@ -76,7 +76,7 @@ def get_permissions_dict():
         invitation_models.EmployerInvitation: PERMS_DELETE,
         invitation_models.LaborInspectorInvitation: PERMS_DELETE,
         invitation_models.PrescriberWithOrgInvitation: PERMS_DELETE,
-        job_applications_models.JobApplication: PERMS_ALL,
+        job_applications_models.JobApplication: PERMS_ALL | {"export_job_applications_unknown_to_ft"},
         job_applications_models.JobApplicationTransitionLog: PERMS_READ,
         jobs_models.Appellation: PERMS_READ,
         jobs_models.Rome: PERMS_READ,
@@ -88,7 +88,7 @@ def get_permissions_dict():
         siae_evaluations_models.EvaluatedJobApplication: PERMS_READ,
         siae_evaluations_models.EvaluatedAdministrativeCriteria: PERMS_READ,
         siae_evaluations_models.Sanctions: PERMS_READ,
-        users_models.User: PERMS_ALL | PERMS_HIJACK,
+        users_models.User: PERMS_ALL | PERMS_HIJACK | {"export_cta", "merge_users"},
         users_models.JobSeekerProfile: PERMS_EDIT,
         utils_models.PkSupportRemark: PERMS_ADD,
         utils_models.UUIDSupportRemark: PERMS_ADD,
@@ -132,7 +132,11 @@ def get_permissions_dict():
 
 
 def to_perm_codenames(model, perms_set):
-    return [f"{perm}_{model._meta.model_name}" for perm in perms_set]
+    return [
+        # FIXME: Migrate hijack permission from "users.hijack_user" to "users.hijack"?
+        f"{perm}_{model._meta.model_name}" if perm in PERMS_ALL | PERMS_HIJACK else perm
+        for perm in perms_set
+    ]
 
 
 class Command(BaseCommand):

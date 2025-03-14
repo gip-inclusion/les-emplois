@@ -1,27 +1,35 @@
-<div class="col mb-3 mb-md-5">
-    <div class="c-box p-0 h-100">
-        <div class="p-3 p-lg-4">
-            <span class="h4 m-0">Exports de données</span>
-        </div>
-        <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-            <p class="mb-3 mb-lg-5">
-                <a href="{% url 'itou_staff_views:export_job_applications_unknown_to_ft' %}" class="btn-link btn-ico">
-                    <i class="ri-key-2-line ri-lg fw-normal" aria-hidden="true"></i>
-                    <span>Candidatures inconnues de France Travail</span>
-                </a>
-            </p>
-            <p class="mb-3 mb-lg-5">
-                <a href="{% url 'itou_staff_views:export_ft_api_rejections' %}" class="btn-link btn-ico">
-                    <i class="ri-download-line ri-lg fw-normal" aria-hidden="true"></i>
-                    <span>Rejets de l'API FranceTravail</span>
-                </a>
-            </p>
-            <p class="mb-3 mb-lg-5">
-                <a href="{% url 'itou_staff_views:export_cta' %}" class="btn-link btn-ico">
-                    <i class="ri-download-line ri-lg fw-normal" aria-hidden="true"></i>
-                    <span>Export des prescripteurs et employeurs</span>
-                </a>
-            </p>
+{% if perms.job_applications.export_job_applications_unknown_to_ft or perms.approvals.export_ft_api_rejections or perms.users.export_cta %}
+    <div class="col mb-3 mb-md-5">
+        <div class="c-box p-0 h-100">
+            <div class="p-3 p-lg-4">
+                <span class="h4 m-0">Exports de données</span>
+            </div>
+            <div class="px-3 px-lg-4 pt-3 pt-lg-4">
+                {% if perms.job_applications.export_job_applications_unknown_to_ft %}
+                    <p class="mb-3 mb-lg-5">
+                        <a href="{% url 'itou_staff_views:export_job_applications_unknown_to_ft' %}" class="btn-link btn-ico">
+                            <i class="ri-key-2-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>Candidatures inconnues de France Travail</span>
+                        </a>
+                    </p>
+                {% endif %}
+                {% if perms.approvals.export_ft_api_rejections %}
+                    <p class="mb-3 mb-lg-5">
+                        <a href="{% url 'itou_staff_views:export_ft_api_rejections' %}" class="btn-link btn-ico">
+                            <i class="ri-download-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>Rejets de l'API FranceTravail</span>
+                        </a>
+                    </p>
+                {% endif %}
+                {% if perms.users.export_cta %}
+                    <p class="mb-3 mb-lg-5">
+                        <a href="{% url 'itou_staff_views:export_cta' %}" class="btn-link btn-ico">
+                            <i class="ri-download-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>Export des prescripteurs et employeurs</span>
+                        </a>
+                    </p>
+                {% endif %}
+            </div>
         </div>
     </div>
-</div>
+{% endif %}
