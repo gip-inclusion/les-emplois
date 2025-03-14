@@ -18,7 +18,20 @@
 {% block nb_columns %}8{% endblock %}
 
 {% block title_prevstep %}
-    {% include "layout/previous_step.html" with back_url=back_url only %}
+    <div class="d-flex justify-content-between align-items-center">
+        {# Wrap previous_step in a div to ensure that second div is justified right #}
+        <div>{% include "layout/previous_step.html" with back_url=back_url only %}</div>
+        <div>
+            {% if job.company == request.current_organization %}
+                <button type="button">
+                    <i class="ri-refresh-line fw-normal" aria-hidden="true"></i>
+                    <span>Mise à jour le {{ job.updated_at|date:"d/m/Y" }}</span>
+                </button>
+            {% else %}
+                <p>Mise à jour le {{ job.updated_at|date:"d/m/Y" }}</p>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
 
 {% block title_content %}
