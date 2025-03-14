@@ -34,7 +34,7 @@ class TestFollowBeneficiary:
         with freeze_time() as frozen_time:
             created_at = timezone.now()
             started_at = timezone.localdate()
-            created = FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber)
+            _, created = FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber)
             assert created is True
             group = FollowUpGroup.objects.get()
             membership = group.memberships.get()
@@ -49,7 +49,7 @@ class TestFollowBeneficiary:
             frozen_time.tick()
             updated_at = timezone.now()
 
-            created = FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber)
+            _, created = FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber)
             assert created is False
             membership.refresh_from_db()
             assert membership.created_at == created_at
