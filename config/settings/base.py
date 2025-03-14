@@ -10,6 +10,7 @@ import warnings
 
 from dotenv import load_dotenv
 
+from config.components import patch_the_components_monkey
 from config.sentry import sentry_init
 from itou.utils.enums import ItouEnvironment
 from itou.utils.urls import markdown_url_set_protocol, markdown_url_set_target_blank
@@ -787,6 +788,7 @@ BASE_DIR = ROOT_DIR
 COMPONENTS = {
     "dirs": [os.path.abspath(os.path.join(BASE_DIR, "itou/components"))],
 }
+patch_the_components_monkey()
 
 # Territorial experimentation
 # ------------------------------------------------------------------------------
