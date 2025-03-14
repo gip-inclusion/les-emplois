@@ -4,6 +4,8 @@ from functools import partial
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.contrib.auth.models import Group
+from django.core.management import call_command
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -42,7 +44,7 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
@@ -915,6 +917,24 @@ class TestDashboardView:
                 "geiq:employee_list", kwargs={"assessment_pk": new_assessment.pk, "info_type": "personal-information"}
             ),
         )
+
+    def test_staff_users(self, client, snapshot):
+        # Not superuser, not in itou-admin
+        staff_user = ItouStaffFactory()
+        client.force_login(staff_user)
+        response = client.get(reverse("dashboard:index"))
+        assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="partial")
+
+        call_command("sync_group_and_perms")
+        staff_user.groups.add(Group.objects.get(name="itou-admin"))
+        response = client.get(reverse("dashboard:index"))
+        assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="full")
+
+        staff_user.is_superuser = True
+        staff_user.save()
+        staff_user.groups.clear()
+        response = client.get(reverse("dashboard:index"))
+        assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="full")
 
 
 @pytest.mark.parametrize(
