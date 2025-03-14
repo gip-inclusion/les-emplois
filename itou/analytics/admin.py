@@ -5,7 +5,7 @@ from itou.utils.admin import ItouModelAdmin, ReadonlyMixin
 
 
 @admin.register(Datum)
-class DatumAdmin(ItouModelAdmin, ReadonlyMixin):
+class DatumAdmin(ReadonlyMixin, ItouModelAdmin):
     list_display = ["pk", "code", "bucket", "get_value_display", "measured_at"]
     list_filter = ["code"]
     fields = ["code", "bucket", "get_value_display", "measured_at"]
@@ -18,7 +18,7 @@ class DatumAdmin(ItouModelAdmin, ReadonlyMixin):
 
 
 @admin.register(StatsDashboardVisit)
-class StatsDashboardVisitAdmin(ItouModelAdmin, ReadonlyMixin):
+class StatsDashboardVisitAdmin(ReadonlyMixin, ItouModelAdmin):
     list_display = [
         "measured_at",
         "dashboard_id",

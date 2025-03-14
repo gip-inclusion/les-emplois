@@ -4,7 +4,7 @@ import itou.gps.models as models
 from itou.utils.admin import ItouModelAdmin, ReadonlyMixin
 
 
-class MemberInline(admin.TabularInline, ReadonlyMixin):
+class MemberInline(ReadonlyMixin, admin.TabularInline):
     model = models.FollowUpGroup.members.through
     extra = 0
     readonly_fields = [
