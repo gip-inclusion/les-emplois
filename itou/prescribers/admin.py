@@ -203,7 +203,7 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
         """
         if "_authorization_action_refuse" in request.POST:
             # Same checks in change_form template to display the button
-            if request.user.is_superuser or obj.has_pending_authorization():
+            if request.user.is_itou_admin or obj.has_pending_authorization():
                 if (
                     self.get_queryset(request)
                     .filter(siret=obj.siret, kind=PrescriberOrganizationKind.OTHER)
@@ -228,7 +228,7 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
 
         if "_authorization_action_validate" in request.POST:
             # Same checks as change_form template to display the button
-            if request.user.is_superuser or obj.has_pending_authorization() or obj.has_refused_authorization():
+            if request.user.is_itou_admin or obj.has_pending_authorization() or obj.has_refused_authorization():
                 # Organizations typed as "Other" cannot be marked valid
                 if obj.kind == PrescriberOrganizationKind.OTHER:
                     msg = "Pour habiliter cette organisation, vous devez sélectionner un type différent de “Autre”."
