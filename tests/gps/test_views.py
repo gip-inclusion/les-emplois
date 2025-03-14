@@ -1611,17 +1611,18 @@ class TestJoinGroupFromNameAndEmail:
         assertRedirects(response, reverse("gps:group_list"))
 
         assert_ask_to_follow_beneficiary_toast(response, job_seeker)
-        assert not FollowUpGroupMembership.objects.filter(
-            follow_up_group__beneficiary=job_seeker, member=user
-        ).exists()
+        relation = FollowUpGroupMembership.objects.get(follow_up_group__beneficiary=job_seeker, member=user)
+        assert relation.is_active is False
 
         job_seeker_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(job_seeker.pk,)))
         user_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(user.pk,)))
+        membership_url = get_absolute_url(reverse("admin:gps_followupgroupmembership_change", args=(relation.pk,)))
         assert slack_mock.mock_calls == [
             (
                 (
                     f":gemini: Demande d’ajout <{user_admin_url}|{user.get_full_name()}> "
-                    f"veut suivre <{job_seeker_admin_url}|{mask_unless(job_seeker.get_full_name(), False)}>.",
+                    f"veut suivre <{job_seeker_admin_url}|{mask_unless(job_seeker.get_full_name(), False)}> "
+                    f"(<{membership_url}|relation>).",
                 ),
             )
         ]

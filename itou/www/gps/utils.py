@@ -9,10 +9,18 @@ from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_absolute_url
 
 
-def add_beneficiary(request, beneficiary, notify_duplicate=False):
-    _, added = FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=request.user)
+def add_beneficiary(request, beneficiary, notify_duplicate=False, is_active=True):
+    membership, added = FollowUpGroup.objects.follow_beneficiary(
+        beneficiary=beneficiary, user=request.user, is_active=is_active
+    )
     name = mask_unless(beneficiary.get_full_name(), predicate=request.user.can_view_personal_information(beneficiary))
-    if added:
+    if is_active is False:
+        messages.info(
+            request,
+            f"Demande d’ajout envoyée||Votre demande d’ajout pour {name} a bien été transmise pour validation.",
+            extra_tags="toast",
+        )
+    elif added:
         messages.success(
             request,
             f"Bénéficiaire ajouté||{name} fait maintenant partie de la liste de vos bénéficiaires.",
@@ -30,6 +38,7 @@ def add_beneficiary(request, beneficiary, notify_duplicate=False):
             ":black_square_for_stop: Création d’un nouveau bénéficiaire : "
             f"<{job_seeker_admin_url}|{mask_unless(beneficiary.get_full_name(), False)}>."
         )
+    return membership
 
 
 def get_all_coworkers(organizations):
