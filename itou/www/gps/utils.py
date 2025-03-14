@@ -10,7 +10,7 @@ from itou.utils.urls import get_absolute_url
 
 
 def add_beneficiary(request, beneficiary, notify_duplicate=False):
-    added = FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=request.user)
+    _, added = FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=request.user)
     name = mask_unless(beneficiary.get_full_name(), predicate=request.user.can_view_personal_information(beneficiary))
     if added:
         messages.success(

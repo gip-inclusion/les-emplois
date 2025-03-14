@@ -34,13 +34,13 @@ class FollowUpGroupManager(models.Manager):
                 "started_at": timezone.localdate(),
             }
 
-            _, created = FollowUpGroupMembership.objects.update_or_create(
+            membership, created = FollowUpGroupMembership.objects.update_or_create(
                 follow_up_group=group,
                 member=user,
                 defaults=update_args,
                 create_defaults=create_args,
             )
-            return created
+            return membership, created
 
 
 class FollowUpGroupQueryset(BulkCreatedAtQuerysetProxy, models.QuerySet):
