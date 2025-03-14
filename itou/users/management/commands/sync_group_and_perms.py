@@ -35,6 +35,7 @@ def get_permissions_dict():
     import itou.prescribers.models as prescribers_models
     import itou.siae_evaluations.models as siae_evaluations_models
     import itou.users.models as users_models
+    import itou.utils.models as utils_models
 
     group_itou_admin_permissions = {
         account_models.EmailAddress: PERMS_ALL,
@@ -89,6 +90,8 @@ def get_permissions_dict():
         siae_evaluations_models.Sanctions: PERMS_READ,
         users_models.User: PERMS_ALL | PERMS_HIJACK,
         users_models.JobSeekerProfile: PERMS_EDIT,
+        utils_models.PkSupportRemark: PERMS_ADD,
+        utils_models.UUIDSupportRemark: PERMS_ADD,
     }
     group_gps_admin_permissions = {
         companies_models.Company: PERMS_READ,

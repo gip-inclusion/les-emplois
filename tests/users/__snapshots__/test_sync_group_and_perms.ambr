@@ -86,6 +86,8 @@
     'view_sanctions',
     'view_jobseekerprofile',
     'view_user',
+    'view_pksupportremark',
+    'view_uuidsupportremark',
   ])
 # ---
 # name: test_command[itou-admin]
@@ -200,6 +202,12 @@
     'delete_user',
     'hijack_user',
     'view_user',
+    'add_pksupportremark',
+    'change_pksupportremark',
+    'view_pksupportremark',
+    'add_uuidsupportremark',
+    'change_uuidsupportremark',
+    'view_uuidsupportremark',
   ])
 # ---
 # name: test_command[logs]
