@@ -1,8 +1,10 @@
 from django.core.exceptions import ValidationError
+from django.forms import widgets
 
 from itou.asp.forms import BirthPlaceWithBirthdateModelForm
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
+from itou.utils.apis import api_particulier
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -79,6 +81,7 @@ class JobSeekerProfileModelForm(JobSeekerProfileFieldsMixin, BirthPlaceWithBirth
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.job_seeker_identity_certified = self.instance.pk and self.instance.identity_certified()
         birthdate = self.fields["birthdate"]
         birthdate.widget = DuetDatePickerWidget(
             attrs={
@@ -92,3 +95,20 @@ class JobSeekerProfileModelForm(JobSeekerProfileFieldsMixin, BirthPlaceWithBirth
                 self.fields[fieldname].required = True
             except KeyError:
                 pass
+
+        if self.job_seeker_identity_certified:
+            jobseeker_profile = self.instance.jobseeker_profile
+            for fieldname, field in self.fields.items():
+                if (
+                    fieldname
+                    in api_particulier.USER_REQUIRED_FIELDS + api_particulier.JOBSEEKER_PROFILE_REQUIRED_FIELDS
+                ):
+                    field.disabled = True
+                    if fieldname in ["birth_place", "birth_country"]:
+                        # No need to load a select2, if we’re only going to disable it.
+                        field.widget = widgets.Select()
+                        # Avoid constructing the choices.
+                        modelfield = jobseeker_profile._meta.get_field(fieldname)
+                        accessor = modelfield.attname
+                        value = getattr(jobseeker_profile, accessor)
+                        field.queryset = field.queryset.filter(pk=value)
