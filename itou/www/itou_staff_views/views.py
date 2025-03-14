@@ -6,6 +6,7 @@ from base64 import b32encode
 import segno
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
+from django.contrib.auth.decorators import permission_required
 from django.db.models import Q
 from django.http import FileResponse, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
@@ -40,17 +41,13 @@ from itou.www.itou_staff_views.forms import (
 )
 
 
-def is_itou_admin(user):
-    return user.is_superuser or user.is_staff and user.groups.filter(name="itou-admin").exists()
-
-
 class Echo:
     # https://docs.djangoproject.com/en/5.0/howto/outputting-csv/
     def write(self, value):
         return value
 
 
-@check_user(is_itou_admin)
+@permission_required("job_applications.export_job_applications_unknown_to_ft")
 def export_job_applications_unknown_to_ft(
     request,
     *args,
@@ -122,7 +119,7 @@ def export_job_applications_unknown_to_ft(
     return render(request, template_name, {"form": form})
 
 
-@check_user(is_itou_admin)
+@permission_required("approvals.export_ft_api_rejections")
 def export_ft_api_rejections(request):
     first_day_of_month = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     rejected_approvals = (
@@ -184,7 +181,7 @@ def export_ft_api_rejections(request):
     )
 
 
-@check_user(is_itou_admin)
+@permission_required("users.export_cta")
 def export_cta(request):
     employees_qs = CompanyMembership.objects.active().select_related("company", "user")
     prescribers_qs = PrescriberMembership.objects.active().select_related("organization", "user")
@@ -209,7 +206,7 @@ def export_cta(request):
     )
 
 
-@check_user(is_itou_admin)
+@permission_required("users.merge_users")
 def merge_users(request, template_name="itou_staff_views/merge_users.html"):
     form = MergeUserForm(data=request.POST or None)
 
@@ -224,7 +221,7 @@ def merge_users(request, template_name="itou_staff_views/merge_users.html"):
     return render(request, template_name, {"form": form})
 
 
-@check_user(is_itou_admin)
+@permission_required("users.merge_users")
 def merge_users_confirm(
     request, user_1_public_id, user_2_public_id, template_name="itou_staff_views/merge_users_confirm.html"
 ):

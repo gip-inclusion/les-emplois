@@ -39,7 +39,6 @@ from itou.www.dashboard.forms import (
     EditUserNotificationForm,
 )
 from itou.www.gps.views import is_allowed_to_use_gps, show_gps_as_a_nav_entry
-from itou.www.itou_staff_views.views import is_itou_admin
 from itou.www.search.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
 from itou.www.stats.utils import get_stats_for_institution
@@ -123,7 +122,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "evaluated_siae_notifications": EvaluatedSiae.objects.none(),
         "siae_suspension_text_with_dates": None,
         "siae_search_form": SiaeSearchForm(),
-        "is_itou_admin": is_itou_admin(request.user),
     }
 
     if request.user.is_employer:

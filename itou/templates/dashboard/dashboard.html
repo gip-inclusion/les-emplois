@@ -176,10 +176,8 @@
                             <div class="row {% if not user.is_job_seeker %}row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxxl-4{% endif %} mt-3 mt-md-5">
                                 {% if user.is_staff %}
                                     {% include "dashboard/includes/admin_card.html" %}
-                                    {% if is_itou_admin %}
-                                        {% include "dashboard/includes/staff_export_card.html" %}
-                                        {% include "dashboard/includes/staff_actions_card.html" %}
-                                    {% endif %}
+                                    {% include "dashboard/includes/staff_export_card.html" %}
+                                    {% include "dashboard/includes/staff_actions_card.html" %}
                                     {% include "dashboard/includes/staff_stats_card.html" %}
                                 {% endif %}
 

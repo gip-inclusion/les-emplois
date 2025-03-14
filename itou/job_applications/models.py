@@ -718,6 +718,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 condition=~models.Q(archived_at=None, archived_by__isnull=False),
             ),
         ]
+        permissions = [
+            ("export_job_applications_unknown_to_ft", "Can export job applications of job seekers unknown to FT")
+        ]
 
     def __str__(self):
         return str(self.id)
