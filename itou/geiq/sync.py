@@ -74,6 +74,20 @@ def sync_to_db(api_data, db_queryset, *, model, mapping, data_to_django_obj, wit
     return obj_to_create, obj_to_update, obj_to_delete
 
 
+def get_geiq_infos():
+    FIELDS = ("id", "nom", "siret", "ville", "cp")
+    client = geiq_label.get_client()
+
+    geiq_infos = []
+    for geiq in client.get_all_geiq():
+        geiq_info = {k: v for k, v in geiq.items() if k in FIELDS}
+        geiq_info["antennes"] = []
+        for antenne in geiq["antennes"]:
+            geiq_info["antennes"].append({k: v for k, v in antenne.items() if k in FIELDS})
+        geiq_infos.append(geiq_info)
+    return geiq_infos
+
+
 def sync_assessments(campaign):
     siret_to_company = {
         company.siret: company for company in Company.objects.filter(kind=CompanyKind.GEIQ).exclude(siret="")
