@@ -6,7 +6,7 @@ from itou.utils.admin import ItouGISMixin, ItouModelAdmin, ReadonlyMixin
 
 
 @admin.register(models.City)
-class CityAdmin(ItouGISMixin, ItouModelAdmin, ReadonlyMixin):
+class CityAdmin(ReadonlyMixin, ItouGISMixin, ItouModelAdmin):
     list_display = ("name", "department", "post_codes", "code_insee")
 
     list_filter = ("department",)

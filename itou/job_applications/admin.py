@@ -25,14 +25,14 @@ from itou.utils.admin import (
 from itou.utils.templatetags.str_filters import pluralizefr
 
 
-class TransitionLogInline(ItouTabularInline, ReadonlyMixin):
+class TransitionLogInline(ReadonlyMixin, ItouTabularInline):
     model = models.JobApplicationTransitionLog
     extra = 0
     raw_id_fields = ("user",)
     readonly_fields = ("transition", "from_state", "to_state", "user", "timestamp", "target_company")
 
 
-class PriorActionInline(ItouTabularInline, ReadonlyMixin):
+class PriorActionInline(ReadonlyMixin, ItouTabularInline):
     model = models.PriorAction
     extra = 0
     readonly_fields = ("action", "dates")
@@ -60,7 +60,7 @@ class ManualApprovalDeliveryRequiredFilter(admin.SimpleListFilter):
         return queryset
 
 
-class EmployeeRecordInline(ItouStackedInline, ReadonlyMixin):
+class EmployeeRecordInline(ReadonlyMixin, ItouStackedInline):
     model = employee_record_models.EmployeeRecord
     extra = 0
     fields = ("link",)
@@ -336,7 +336,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
 
 
 @admin.register(models.JobApplicationTransitionLog)
-class JobApplicationTransitionLogAdmin(ItouModelAdmin, ReadonlyMixin):
+class JobApplicationTransitionLogAdmin(ReadonlyMixin, ItouModelAdmin):
     actions = None
     date_hierarchy = "timestamp"
     list_display = ("job_application", "transition", "from_state", "to_state", "user", "timestamp")

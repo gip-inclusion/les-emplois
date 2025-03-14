@@ -46,7 +46,7 @@ from itou.utils.admin import (
 from itou.utils.urls import add_url_params
 
 
-class EmailAddressInline(ItouTabularInline, ReadonlyMixin):
+class EmailAddressInline(ReadonlyMixin, ItouTabularInline):
     model = EmailAddress
     extra = 0
     fields = ("pk_link", "verified", "primary")
@@ -77,7 +77,7 @@ class DisabledNotificationsMixin:
         return "Aucune"
 
 
-class CompanyMembershipInline(DisabledNotificationsMixin, ItouTabularInline, ReadonlyMixin):
+class CompanyMembershipInline(ReadonlyMixin, DisabledNotificationsMixin, ItouTabularInline):
     model = CompanyMembership
     extra = 0
     readonly_fields = (
@@ -99,7 +99,7 @@ class CompanyMembershipInline(DisabledNotificationsMixin, ItouTabularInline, Rea
         return get_structure_view_link(obj.company)
 
 
-class PrescriberMembershipInline(DisabledNotificationsMixin, ItouTabularInline, ReadonlyMixin):
+class PrescriberMembershipInline(ReadonlyMixin, DisabledNotificationsMixin, ItouTabularInline):
     model = PrescriberMembership
     extra = 0
     readonly_fields = (
@@ -119,7 +119,7 @@ class PrescriberMembershipInline(DisabledNotificationsMixin, ItouTabularInline, 
         return get_structure_view_link(obj.organization)
 
 
-class InstitutionMembershipInline(ItouTabularInline, ReadonlyMixin):
+class InstitutionMembershipInline(ReadonlyMixin, ItouTabularInline):
     model = InstitutionMembership
     extra = 0
     readonly_fields = (
@@ -138,7 +138,7 @@ class InstitutionMembershipInline(ItouTabularInline, ReadonlyMixin):
         return get_structure_view_link(obj.institution)
 
 
-class JobApplicationInline(ItouTabularInline, ReadonlyMixin):
+class JobApplicationInline(ReadonlyMixin, ItouTabularInline):
     model = JobApplication
     fk_name = "job_seeker"
     extra = 0
@@ -171,7 +171,7 @@ class SentJobApplicationInline(JobApplicationInline):
         return get_admin_view_link(obj.job_seeker, content=obj.job_seeker.get_full_name())
 
 
-class EligibilityDiagnosisInline(ItouTabularInline, ReadonlyMixin):
+class EligibilityDiagnosisInline(ReadonlyMixin, ItouTabularInline):
     model = EligibilityDiagnosis
     fk_name = "job_seeker"
     extra = 0
@@ -198,7 +198,7 @@ class GEIQEligibilityDiagnosisInline(EligibilityDiagnosisInline):
     model = GEIQEligibilityDiagnosis
 
 
-class ApprovalInline(ItouTabularInline, ReadonlyMixin):
+class ApprovalInline(ReadonlyMixin, ItouTabularInline):
     model = Approval
     fk_name = "user"
     extra = 0

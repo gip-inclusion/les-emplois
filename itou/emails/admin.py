@@ -35,7 +35,7 @@ class EmailStatusFilter(admin.SimpleListFilter):
 
 
 @admin.register(Email)
-class EmailAdmin(admin.ModelAdmin, ReadonlyMixin):
+class EmailAdmin(ReadonlyMixin, admin.ModelAdmin):
     class Media:
         css = {"all": ("css/itou-admin.css",)}
 
