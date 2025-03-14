@@ -59,7 +59,7 @@ class JobsInline(ItouTabularInline):
         return get_admin_view_link(obj, content=format_html("<strong>Fiche de poste ID: {}</strong>", obj.id))
 
 
-class FinancialAnnexesInline(ItouTabularInline, ReadonlyMixin):
+class FinancialAnnexesInline(ReadonlyMixin, ItouTabularInline):
     model = models.SiaeFinancialAnnex
     fields = ("number", "is_active", "state", "start_at", "end_at", "created_at")
     readonly_fields = ("number", "is_active", "state", "start_at", "end_at", "created_at")
@@ -75,7 +75,7 @@ class FinancialAnnexesInline(ItouTabularInline, ReadonlyMixin):
         return obj.is_active
 
 
-class CompaniesInline(ItouTabularInline, ReadonlyMixin):
+class CompaniesInline(ReadonlyMixin, ItouTabularInline):
     model = models.Company
     fields = ("company_id_link", "kind", "siret", "source", "name", "brand")
     readonly_fields = ("company_id_link", "kind", "siret", "source", "name", "brand")
@@ -524,7 +524,7 @@ class SiaeConventionAdmin(ItouModelAdmin):
 
 
 @admin.register(models.SiaeFinancialAnnex)
-class SiaeFinancialAnnexAdmin(ItouModelAdmin, ReadonlyMixin):
+class SiaeFinancialAnnexAdmin(ReadonlyMixin, ItouModelAdmin):
     list_display = ("number", "state", "start_at", "end_at")
     list_filter = ("state",)
     raw_id_fields = ("convention",)

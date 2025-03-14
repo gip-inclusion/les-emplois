@@ -64,7 +64,7 @@ class SelectedGEIQAdministrativeCriteriaInline(AbstractSelectedAdministrativeCri
     model = models.GEIQEligibilityDiagnosis.administrative_criteria.through
 
 
-class ApprovalInline(ItouTabularInline, ReadonlyMixin):
+class ApprovalInline(ReadonlyMixin, ItouTabularInline):
     model = approvals_models.Approval
     extra = 0
     show_change_link = True
@@ -80,7 +80,7 @@ class ApprovalInline(ItouTabularInline, ReadonlyMixin):
         return obj.is_valid()
 
 
-class JobApplicationInline(ItouTabularInline, ReadonlyMixin):
+class JobApplicationInline(ReadonlyMixin, ItouTabularInline):
     model = job_applications_models.JobApplication
     extra = 0
     show_change_link = True
@@ -233,7 +233,7 @@ class GEIQEligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
         return f"{obj.allowance_amount} EUR"
 
 
-class AbstractAdministrativeCriteriaAdmin(ItouModelAdmin, ReadonlyMixin):
+class AbstractAdministrativeCriteriaAdmin(ReadonlyMixin, ItouModelAdmin):
     # Administrative criteria are updated via fixtures
     list_display_links = ("pk", "name")
     list_filter = ("level",)

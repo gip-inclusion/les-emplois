@@ -113,7 +113,7 @@ def _evaluated_siae_serializer(queryset):
 
 
 @admin.register(models.EvaluationCampaign)
-class EvaluationCampaignAdmin(ItouModelAdmin, ReadonlyMixin):
+class EvaluationCampaignAdmin(ReadonlyMixin, ItouModelAdmin):
     @admin.action(description="Exporter les SIAE des campagnes sélectionnées")
     def export_siaes(self, request, queryset):
         export_qs = (
@@ -218,7 +218,7 @@ class EvaluationCampaignAdmin(ItouModelAdmin, ReadonlyMixin):
 
 
 @admin.register(models.EvaluatedSiae)
-class EvaluatedSiaeAdmin(ItouModelAdmin, ReadonlyMixin):
+class EvaluatedSiaeAdmin(ReadonlyMixin, ItouModelAdmin):
     list_display = ["evaluation_campaign", "siae", "state", "reviewed_at"]
     list_display_links = ("siae",)
     readonly_fields = (
@@ -257,7 +257,7 @@ class EvaluatedSiaeAdmin(ItouModelAdmin, ReadonlyMixin):
 
 
 @admin.register(models.EvaluatedJobApplication)
-class EvaluatedJobApplicationAdmin(ItouModelAdmin, ReadonlyMixin):
+class EvaluatedJobApplicationAdmin(ReadonlyMixin, ItouModelAdmin):
     list_display = ("evaluated_siae", "job_application", "approval", "job_seeker")
     list_display_links = ("job_application",)
     list_select_related = ("evaluated_siae__siae", "job_application__approval", "job_application__job_seeker")
@@ -284,7 +284,7 @@ class EvaluatedJobApplicationAdmin(ItouModelAdmin, ReadonlyMixin):
 
 
 @admin.register(models.EvaluatedAdministrativeCriteria)
-class EvaluatedAdministrativeCriteriaAdmin(ItouModelAdmin, ReadonlyMixin):
+class EvaluatedAdministrativeCriteriaAdmin(ReadonlyMixin, ItouModelAdmin):
     list_display = ("evaluated_job_application", "administrative_criteria", "submitted_at", "review_state")
     list_display_links = ("administrative_criteria",)
     readonly_fields = (
@@ -309,7 +309,7 @@ class EvaluatedAdministrativeCriteriaAdmin(ItouModelAdmin, ReadonlyMixin):
 
 
 @admin.register(models.Sanctions)
-class SanctionsAdmin(ItouModelAdmin, ReadonlyMixin):
+class SanctionsAdmin(ReadonlyMixin, ItouModelAdmin):
     list_display = [
         "evaluated_siae",
         "evaluation_campaign",

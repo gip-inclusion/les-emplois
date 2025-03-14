@@ -27,7 +27,7 @@ from itou.utils.admin import (
 from itou.utils.templatetags.str_filters import pluralizefr
 
 
-class JobApplicationInline(ItouStackedInline, ReadonlyMixin):
+class JobApplicationInline(ReadonlyMixin, ItouStackedInline):
     model = JobApplication
     extra = 0
     show_change_link = True
@@ -99,7 +99,7 @@ class JobApplicationInline(ItouStackedInline, ReadonlyMixin):
         return self.get_empty_value_display()
 
 
-class SuspensionInline(ItouTabularInline, ReadonlyMixin):
+class SuspensionInline(ReadonlyMixin, ItouTabularInline):
     model = models.Suspension
     extra = 0
     show_change_link = True
@@ -112,7 +112,7 @@ class SuspensionInline(ItouTabularInline, ReadonlyMixin):
         return f"{obj.duration.days} jour{pluralizefr(obj.duration.days)}"
 
 
-class ProlongationInline(ItouTabularInline, ReadonlyMixin):
+class ProlongationInline(ReadonlyMixin, ItouTabularInline):
     model = models.Prolongation
     extra = 0
     show_change_link = True
@@ -589,7 +589,7 @@ class ProlongationAdmin(ProlongationCommonAdmin):
 
 
 @admin.register(models.PoleEmploiApproval)
-class PoleEmploiApprovalAdmin(ItouModelAdmin, ReadonlyMixin):
+class PoleEmploiApprovalAdmin(ReadonlyMixin, ItouModelAdmin):
     list_display = (
         "pk",
         "pole_emploi_id",
@@ -623,7 +623,7 @@ class PoleEmploiApprovalAdmin(ItouModelAdmin, ReadonlyMixin):
 
 
 @admin.register(models.CancelledApproval)
-class CancelledApprovalAdmin(ItouModelAdmin, ReadonlyMixin):
+class CancelledApprovalAdmin(ReadonlyMixin, ItouModelAdmin):
     list_display = (
         "number",
         "start_at",

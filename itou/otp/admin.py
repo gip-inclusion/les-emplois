@@ -5,7 +5,7 @@ from django_otp.plugins.otp_totp.models import TOTPDevice
 from itou.utils.admin import ReadonlyMixin
 
 
-class TOTPDeviceAdmin(django_otp_admin.TOTPDeviceAdmin, ReadonlyMixin):
+class TOTPDeviceAdmin(ReadonlyMixin, django_otp_admin.TOTPDeviceAdmin):
     pass
 
 
