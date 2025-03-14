@@ -12,7 +12,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST, require_safe
 
-from itou.common_apps.address.departments import REGIONS
 from itou.files.models import File
 from itou.geiq.emails import GIEQImplementationAssessmentFactory
 from itou.geiq.models import (
@@ -51,16 +50,7 @@ class InfoType(enum.StrEnum):
 
 
 def _get_assessments_for_labor_inspector(request):
-    reviewable_departments = []
-    for institution in request.organizations:
-        if institution.kind in (InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ):
-            if institution.kind == InstitutionKind.DDETS_GEIQ:
-                reviewable_departments.append(institution.department)
-            else:
-                reviewable_departments.extend(REGIONS[institution.region])
-    return ImplementationAssessment.objects.filter(company__department__in=reviewable_departments).select_related(
-        "campaign", "company"
-    )
+    return request.current_organization.implementation_assessments.select_related("campaign", "company")
 
 
 @check_user(lambda user: user.is_active and (user.is_employer or user.is_labor_inspector))
@@ -299,10 +289,6 @@ def geiq_list(request, institution_pk, year=None, template_name="geiq/geiq_list.
         ),
         pk=institution_pk,
     )
-    if institution.kind == InstitutionKind.DDETS_GEIQ:
-        reviewable_departments = [institution.department]
-    else:
-        reviewable_departments = REGIONS[institution.region]
 
     max_year_subquery = (
         ImplementationAssessment.objects.filter(company_id=OuterRef("company_id"))
@@ -310,8 +296,7 @@ def geiq_list(request, institution_pk, year=None, template_name="geiq/geiq_list.
         .values("campaign__year")[:1]
     )
     assessments = (
-        ImplementationAssessment.objects.filter(company__department__in=reviewable_departments)
-        .annotate(max_year=Subquery(max_year_subquery))
+        institution.implementation_assessments.annotate(max_year=Subquery(max_year_subquery))
         .filter(campaign__year=F("max_year"))
         .select_related("company", "campaign")
         .annotate(eligible_employees_nb=Count("employees", filter=Q(employees__allowance_amount__gt=0)))
