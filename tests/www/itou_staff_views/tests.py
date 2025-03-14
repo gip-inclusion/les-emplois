@@ -5,6 +5,7 @@ from functools import partial
 import openpyxl
 import pytest
 from django.contrib import messages
+from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.utils import timezone
@@ -57,7 +58,7 @@ class TestExportJobApplications:
             (EmployerFactory, {"with_company": True}, 403),
             (PrescriberFactory, {}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
-            (ItouStaffFactory, {}, 403),
+            (ItouStaffFactory, {}, 302),
             (ItouStaffFactory, {"is_superuser": True}, 200),
         ],
     )
@@ -66,6 +67,18 @@ class TestExportJobApplications:
         client.force_login(user)
         response = client.get(reverse("itou_staff_views:export_job_applications_unknown_to_ft"))
         assert response.status_code == expected_status
+
+    def test_requires_permission(self, settings, client):
+        user = ItouStaffFactory()
+        client.force_login(user)
+
+        url = reverse("itou_staff_views:export_job_applications_unknown_to_ft")
+        response = client.get(url)
+        assertRedirects(response, f"{settings.LOGIN_URL}?next={url}", fetch_redirect_response=False)
+
+        user.user_permissions.add(Permission.objects.get(codename="export_job_applications_unknown_to_ft"))
+        response = client.get(reverse("itou_staff_views:export_job_applications_unknown_to_ft"))
+        assert response.status_code == 200
 
     @pytest.mark.parametrize(
         "start,end",
@@ -154,7 +167,7 @@ class TestExportPEApiRejections:
             (EmployerFactory, {"with_company": True}, 403),
             (PrescriberFactory, {}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
-            (ItouStaffFactory, {}, 403),
+            (ItouStaffFactory, {}, 302),
             (ItouStaffFactory, {"is_superuser": True}, 302),  # redirects to dashboard if no file
         ],
     )
@@ -163,6 +176,18 @@ class TestExportPEApiRejections:
         client.force_login(user)
         response = client.get(reverse("itou_staff_views:export_ft_api_rejections"))
         assert response.status_code == expected_status
+
+    def test_requires_permission(self, settings, client):
+        user = ItouStaffFactory()
+        client.force_login(user)
+
+        url = reverse("itou_staff_views:export_ft_api_rejections")
+        response = client.get(url)
+        assertRedirects(response, f"{settings.LOGIN_URL}?next={url}", fetch_redirect_response=False)
+
+        user.user_permissions.add(Permission.objects.get(codename="export_ft_api_rejections"))
+        response = client.get(reverse("itou_staff_views:export_ft_api_rejections"))
+        assertRedirects(response, reverse("dashboard:index"))
 
     @freeze_time("2022-09-13T11:11:11+02:00")
     def test_export(self, client, snapshot):
@@ -206,7 +231,7 @@ class TestExportCTA:
             (EmployerFactory, {"with_company": True}, 403),
             (PrescriberFactory, {}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
-            (ItouStaffFactory, {}, 403),
+            (ItouStaffFactory, {}, 302),
             (ItouStaffFactory, {"is_superuser": True}, 200),
         ],
     )
@@ -215,6 +240,18 @@ class TestExportCTA:
         client.force_login(user)
         response = client.get(reverse("itou_staff_views:export_cta"))
         assert response.status_code == expected_status
+
+    def test_requires_permission(self, settings, client):
+        user = ItouStaffFactory()
+        client.force_login(user)
+
+        url = reverse("itou_staff_views:export_cta")
+        response = client.get(url)
+        assertRedirects(response, f"{settings.LOGIN_URL}?next={url}", fetch_redirect_response=False)
+
+        user.user_permissions.add(Permission.objects.get(codename="export_cta"))
+        response = client.get(reverse("itou_staff_views:export_cta"))
+        assert response.status_code == 200
 
     @freeze_time("2024-05-17T11:11:11+02:00")
     def test_export(self, client, snapshot):
@@ -240,7 +277,7 @@ class TestMergeUsers:
             (EmployerFactory, {"with_company": True}, 403),
             (PrescriberFactory, {}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
-            (ItouStaffFactory, {}, 403),
+            (ItouStaffFactory, {}, 302),
             (ItouStaffFactory, {"is_superuser": True}, 200),
         ],
     )
@@ -251,6 +288,18 @@ class TestMergeUsers:
         assert response.status_code == expected_status
         response = client.get(reverse("itou_staff_views:merge_users_confirm", args=(user.public_id, user.public_id)))
         assert response.status_code == expected_status
+
+    def test_requires_permission(self, settings, client):
+        user = ItouStaffFactory()
+        client.force_login(user)
+
+        url = reverse("itou_staff_views:merge_users")
+        response = client.get(url)
+        assertRedirects(response, f"{settings.LOGIN_URL}?next={url}", fetch_redirect_response=False)
+
+        user.user_permissions.add(Permission.objects.get(codename="merge_users"))
+        response = client.get(reverse("itou_staff_views:merge_users"))
+        assert response.status_code == 200
 
     def test_merge_users(self, client):
         client.force_login(ItouStaffFactory(is_superuser=True))
