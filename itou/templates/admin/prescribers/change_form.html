@@ -3,14 +3,14 @@
 {% block submit_buttons_bottom %}
 
     {# Whatever the state, the super user has access to refuse and validate actions #}
-    {% if perms.prescribers.change_prescriberorganization and original.has_pending_authorization or user.is_superuser %}
+    {% if perms.prescribers.change_prescriberorganization and original.has_pending_authorization or user.is_itou_admin %}
 
         <div class="submit-row">
             <input class="danger with-confirm" type="submit" value="Refuser l'habilitation" name="_authorization_action_refuse">
             <input class="default with-confirm" type="submit" value="Valider l'habilitation" name="_authorization_action_validate">
         </div>
 
-    {% elif perms.prescribers.change_prescriberorganization and original.has_refused_authorization and not user.is_superuser %}
+    {% elif perms.prescribers.change_prescriberorganization and original.has_refused_authorization and not user.is_itou_admin %}
         {# Allow to validate an authorization after an error in a refusal. #}
 
         <div class="submit-row">
