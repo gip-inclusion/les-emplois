@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Exists, OuterRef, Prefetch
@@ -394,16 +393,14 @@ def join_group_from_name_and_email(request, template_name="gps/join_group_from_n
         if form.data.get("ask"):
             job_seeker_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(job_seeker.pk,)))
             user_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(request.user.pk,)))
+            membership = add_beneficiary(request, job_seeker, is_active=False)
+            membership_url = get_absolute_url(
+                reverse("admin:gps_followupgroupmembership_change", args=(membership.pk,))
+            )
             send_slack_message_for_gps(
                 f":gemini: Demande d’ajout <{user_admin_url}|{request.user.get_full_name()}> "
-                f"veut suivre <{job_seeker_admin_url}|{mask_unless(job_seeker.get_full_name(), False)}>."
-            )
-            masked_name = mask_unless(job_seeker.get_full_name(), False)
-            messages.info(
-                request,
-                "Demande d’ajout envoyée||"
-                f"Votre demande d’ajout pour {masked_name} a bien été transmise pour validation.",
-                extra_tags="toast",
+                f"veut suivre <{job_seeker_admin_url}|{mask_unless(job_seeker.get_full_name(), False)}> "
+                f"(<{membership_url}|relation>)."
             )
             return HttpResponseRedirect(reverse("gps:group_list"))
 
