@@ -45,7 +45,7 @@
                                           
                                       </div>
                                       <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                                          <a class="btn btn-primary btn-ico" href="/employee_record/add/">
+                                          <a class="btn btn-primary btn-ico" href="/employee_record/add/?reset_url=/employee_record/list%3Fstatus%3DNEW%26status%3DREJECTED%26order%3D">
                                               <i aria-hidden="true" class="ri-user-add-line ri-lg"></i>
                                               <span>Créer une fiche salarié</span>
                                           </a>
@@ -67,7 +67,7 @@
                                           
                                       </div>
                                       <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                                          <a class="btn btn-primary btn-ico" href="/employee_record/add/">
+                                          <a class="btn btn-primary btn-ico" href="/employee_record/add/?reset_url=/employee_record/list%3Fstatus%3DNEW%26status%3DREJECTED%26order%3D">
                                               <i aria-hidden="true" class="ri-user-add-line ri-lg"></i>
                                               <span>Créer une fiche salarié</span>
                                           </a>

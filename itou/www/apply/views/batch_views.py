@@ -1,6 +1,5 @@
 import enum
 import logging
-from collections import namedtuple
 
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -8,10 +7,8 @@ from django.core.exceptions import ValidationError
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template import loader
-from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-from django.views.generic import TemplateView
 from django_xworkflows import models as xwf_models
 
 from itou.companies.models import Company
@@ -20,7 +17,6 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.utils.auth import check_user
 from itou.utils.perms.company import get_current_company_or_404
-from itou.utils.session import SessionNamespace
 from itou.utils.templatetags.str_filters import pluralizefr
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
@@ -30,6 +26,7 @@ from itou.www.apply.forms import (
     JobApplicationRefusalReasonForm,
     _get_orienter_and_prescriber_nb,
 )
+from itou.www.utils.wizard import WizardView
 
 
 logger = logging.getLogger(__name__)
@@ -165,9 +162,6 @@ def postpone(request):
     return HttpResponseRedirect(next_url)
 
 
-BATCH_REFUSE_SESSION_KIND = "job-applications-batch-refuse"
-
-
 class RefuseViewStep(enum.StrEnum):
     REASON = "reason"
     JOB_SEEKER_ANSWER = "job-seeker-answer"
@@ -206,21 +200,16 @@ def _start_refuse_wizard(request, *, application_ids, next_url, from_detail_view
 
     if not application_ids:
         return HttpResponseRedirect(next_url)
-    refuse_session = SessionNamespace.create_uuid_namespace(
-        request.session,
-        data={
+
+    return RefuseWizardView.initiliaze_session_and_start(
+        request,
+        reset_url=next_url,
+        extra_session_data={
             "config": {
-                "session_kind": BATCH_REFUSE_SESSION_KIND,
-                "reset_url": next_url,
                 "tunnel": RefuseTunnel.SINGLE if from_detail_view else RefuseTunnel.BATCH,
             },
             "application_ids": application_ids,
         },
-    )
-    return HttpResponseRedirect(
-        reverse(
-            "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session.name, "step": RefuseViewStep.REASON}
-        )
     )
 
 
@@ -232,14 +221,15 @@ def refuse(request):
     )
 
 
-class RefuseWizardView(UserPassesTestMixin, TemplateView):
-    url_name = None  # Set by `RefuseWizardView.as_view` call in urls.py
-    expected_session_kind = BATCH_REFUSE_SESSION_KIND
-    STEPS = [
-        RefuseViewStep.REASON,
-        RefuseViewStep.JOB_SEEKER_ANSWER,
-        RefuseViewStep.PRESCRIBER_ANSWER,
-    ]
+class RefuseWizardView(UserPassesTestMixin, WizardView):
+    url_name = "apply:batch_refuse_steps"
+    expected_session_kind = "job-applications-batch-refuse"
+
+    steps_config = {
+        RefuseViewStep.REASON: JobApplicationRefusalReasonForm,
+        RefuseViewStep.JOB_SEEKER_ANSWER: JobApplicationRefusalJobSeekerAnswerForm,
+        RefuseViewStep.PRESCRIBER_ANSWER: JobApplicationRefusalPrescriberAnswerForm,
+    }
 
     template_name = "apply/process_refuse.html"
 
@@ -247,26 +237,14 @@ class RefuseWizardView(UserPassesTestMixin, TemplateView):
         return self.request.user.is_authenticated and self.request.user.is_employer
 
     def load_session(self, session_uuid):
-        wizard_session = SessionNamespace(self.request.session, session_uuid)
-        if not wizard_session.exists():
-            raise Http404
-        if (session_kind := wizard_session.get("config", {}).get("session_kind")) != self.expected_session_kind:
-            logger.warning(f"Trying to reuse invalid session with kind={session_kind}")
-            raise Http404
-        self.wizard_session = wizard_session
-        self.reset_url = wizard_session.get("config", {}).get("reset_url")
-        self.tunnel = wizard_session.get("config", {}).get("tunnel", RefuseTunnel.BATCH)
-        if self.reset_url is None:
-            # Session should have been initialized with a reset_url and this RefuseWizardView expects one
-            raise Http404
+        super().load_session(session_uuid)
+        self.tunnel = self.wizard_session.get("config", {}).get("tunnel", RefuseTunnel.BATCH)
 
-    def setup(self, request, *args, session_uuid, step, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.load_session(session_uuid)
-
+    def setup_wizard(self):
+        super().setup_wizard()
         # Batch refuse specific logic
         self.applications = _get_and_lock_received_applications(
-            request,
+            self.request,
             self.wizard_session.get("application_ids", []),
             lock=False,
         )
@@ -276,48 +254,19 @@ class RefuseWizardView(UserPassesTestMixin, TemplateView):
             # Update the list
             self.wizard_session.set("application_ids", [application.pk for application in self.applications])
 
-        # Check step consistency
-        self.steps = self.get_steps()
-        try:
-            step = RefuseViewStep(step)
-        except ValueError:
-            raise Http404
-        if step not in self.steps:
-            raise Http404
-
-        self.step = step
-        self.next_step = self.get_next_step()
-
-        self.form = self.get_form(self.step, data=self.request.POST if self.request.method == "POST" else None)
-
     def get_steps(self):
         if any(
             job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER
             for job_application in self.applications
         ):
-            return self.STEPS
+            return super().get_steps()
         return [
             RefuseViewStep.REASON,
             RefuseViewStep.JOB_SEEKER_ANSWER,
         ]
 
-    def get_next_step(self):
-        next_step_index = self.steps.index(self.step) + 1
-        if next_step_index >= len(self.steps):
-            return None
-        return self.steps[next_step_index]
-
-    def get_previous_step(self):
-        prev_step_index = self.steps.index(self.step) - 1
-        if prev_step_index < 0:
-            return None
-        return self.steps[prev_step_index]
-
-    def get_step_url(self, step):
-        return reverse(self.url_name, kwargs={"session_uuid": self.wizard_session.name, "step": step})
-
     def get_form_initial(self, step):
-        initial_data = self.wizard_session.get(step, {})
+        initial_data = super().get_form_initial(step)
         # XXX: check if we want to override job_seeker_answer even if one is present ?
         if step == RefuseViewStep.JOB_SEEKER_ANSWER and not initial_data.get("job_seeker_answer"):
             refusal_reason = self.wizard_session.get(RefuseViewStep.REASON, {}).get("refusal_reason")
@@ -334,18 +283,8 @@ class RefuseWizardView(UserPassesTestMixin, TemplateView):
                 )
         return initial_data
 
-    def get_form_kwargs(self):
-        return {"job_applications": self.applications}
-
-    def get_form_class(self, step):
-        return {
-            RefuseViewStep.REASON: JobApplicationRefusalReasonForm,
-            RefuseViewStep.JOB_SEEKER_ANSWER: JobApplicationRefusalJobSeekerAnswerForm,
-            RefuseViewStep.PRESCRIBER_ANSWER: JobApplicationRefusalPrescriberAnswerForm,
-        }[step]
-
-    def get_form(self, step, data):
-        return self.get_form_class(step)(initial=self.get_form_initial(step), data=data, **self.get_form_kwargs())
+    def get_form_kwargs(self, step):
+        return super().get_form_kwargs(step) | {"job_applications": self.applications}
 
     def get_context_data(self, **kwargs):
         orienter_nb, prescriber_nb = _get_orienter_and_prescriber_nb(self.applications)
@@ -360,8 +299,6 @@ class RefuseWizardView(UserPassesTestMixin, TemplateView):
             to_prescriber = "aux prescripteurs/orienteurs"
             the_prescriber = "les prescripteurs/orienteurs"
 
-        # Compatible with formtools wizard.steps object to share stepper_progress implementation
-        Steps = namedtuple("Steps", ["current", "step1", "count", "next", "prev"])
         if self.tunnel == RefuseTunnel.BATCH:
             matomo_custom_title = "Candidatures refusées"
             matomo_event_name = f"batch-refuse-applications-{self.step}-submit"
@@ -373,15 +310,6 @@ class RefuseWizardView(UserPassesTestMixin, TemplateView):
             "can_view_personal_information": True,  # SIAE members have access to personal info
             "matomo_custom_title": matomo_custom_title,
             "matomo_event_name": matomo_event_name,
-            "wizard_steps": Steps(
-                current=self.step,
-                step1=self.steps.index(self.step) + 1,
-                count=len(self.steps),
-                next=self.next_step,
-                prev=self.get_step_url(self.get_previous_step()) if self.get_previous_step() is not None else None,
-            ),
-            "form": self.form,
-            "reset_url": self.reset_url,
             "RefuseViewStep": RefuseViewStep,
             "to_prescriber": to_prescriber,
             "the_prescriber": the_prescriber,
@@ -398,37 +326,6 @@ class RefuseWizardView(UserPassesTestMixin, TemplateView):
             context["refusal_reason_shared_with_job_seeker"] = reason_data.get("refusal_reason_shared_with_job_seeker")
 
         return context
-
-    def find_step_with_invalid_data_until_step(self, step):
-        """Return the step with invalid data or None if everything is fine"""
-        for previous_step in self.steps:
-            if previous_step == step:
-                return None
-            if self.wizard_session.get(previous_step) is self.wizard_session.NOT_SET:
-                return previous_step
-            form = self.get_form(previous_step, data=self.wizard_session.get(previous_step, {}))
-            if not form.is_valid():
-                return previous_step
-        return None
-
-    def get(self, request, *args, **kwargs):
-        if invalid_step := self.find_step_with_invalid_data_until_step(self.step):
-            return HttpResponseRedirect(self.get_step_url(invalid_step))
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        if self.form.is_valid():
-            self.wizard_session.set(self.step, self.form.cleaned_data)
-            if self.next_step:
-                return HttpResponseRedirect(self.get_step_url(self.next_step))
-            else:
-                if invalid_step := self.find_step_with_invalid_data_until_step(self.step):
-                    messages.warning(request, "Certaines informations sont absentes ou invalides")
-                    return HttpResponseRedirect(self.get_step_url(invalid_step))
-                self.done()
-                return HttpResponseRedirect(self.reset_url)
-        context = self.get_context_data(**kwargs)
-        return self.render_to_response(context)
 
     def done(self):
         refuse_session_data = self.wizard_session.as_dict()
@@ -477,7 +374,8 @@ class RefuseWizardView(UserPassesTestMixin, TemplateView):
             refused_nb,
             ",".join(str(app_uid) for app_uid in refused_ids),
         )
-        self.wizard_session.delete()
+
+        return self.reset_url
 
 
 @check_user(lambda user: user.is_employer)

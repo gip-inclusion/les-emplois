@@ -111,7 +111,7 @@ urlpatterns = [
     path("company/batch/refuse", batch_views.refuse, name="batch_refuse"),
     path(
         "company/batch/refuse/<uuid:session_uuid>/<slug:step>",
-        batch_views.RefuseWizardView.as_view(url_name="apply:batch_refuse_steps"),
+        batch_views.RefuseWizardView.as_view(),
         name="batch_refuse_steps",
     ),
     path("company/batch/transfer", batch_views.transfer, name="batch_transfer"),
