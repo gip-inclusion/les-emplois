@@ -1,0 +1,33 @@
+{% extends "layout/base.html" %}
+{% load format_filters %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% load buttons_form %}
+
+{% block title %}Créer un bilan d’exécution {{ block.super }}{% endblock %}
+
+{% block title_content %}<h1>Créer un bilan d’exécution</h1>{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    {% if not current_campaign %}La campagne actuelle n'est pas encore ouvert.{% endif %}
+                    {% for assessment in assessments %}
+                        {{ assessment }}
+                    {% empty %}
+
+                    {% endfor %}
+                    <h2>Mes bilans</h2>
+                    <p>
+                        Cet espace vous permet de créer et de suivre vos bilans d’exécution.
+                        <br>
+                        Vous devez créer un bilan par convention.
+                    </p>
+                    <a class="btn btn-primary" href="">Créer un bilan d’exécution</a>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
