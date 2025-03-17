@@ -218,6 +218,17 @@
       </div>
   
   
+              <div class="dropdown">
+                  <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
+                      Candidat sans solution
+                  </button>
+                  <ul class="dropdown-menu">
+                      <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_stalled" name="stalled" type="checkbox"/><label class="form-check-label" for="id_stalled">N’afficher que les candidats sans solution</label></div></div></li>
+                      <li>
+                          <a class="btn btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/33573455767441--Qu-est-ce-qu-un-candidat-sans-solution-sur-les-Emplois-de-l-inclusion" rel="noopener" target="_blank">Qu’est-ce qu’un candidat sans solution ?</a>
+                      </li>
+                  </ul>
+              </div>
               
               
   
@@ -473,6 +484,39 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 (EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."created_at" <= %s)
+                     LIMIT 1)
+                  AND EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."created_at" >= %s)
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "approvals_approval" U0
+                     WHERE U0."user_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "eligibility_eligibilitydiagnosis" U0
+                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "eligibility_geiqeligibilitydiagnosis" U0
+                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."state" = %s)
+                     LIMIT 1)) AS "stalled",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -508,8 +552,29 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   34,
-                   35
+                   NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "approvals_approval" U0
+             WHERE U0."user_id" = ("users_user"."id")
+             LIMIT 1),
+                       NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE U0."job_seeker_id" = ("users_user"."id")
+             LIMIT 1),
+                           NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "eligibility_geiqeligibilitydiagnosis" U0
+             WHERE U0."job_seeker_id" = ("users_user"."id")
+             LIMIT 1),
+                               NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "job_applications_jobapplication" U0
+             WHERE (U0."job_seeker_id" = ("users_user"."id")
+                    AND U0."state" = %s)
+             LIMIT 1),
+                                   35,
+                                   36
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
         ''',
@@ -612,6 +677,39 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 (EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."created_at" <= %s)
+                     LIMIT 1)
+                  AND EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."created_at" >= %s)
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "approvals_approval" U0
+                     WHERE U0."user_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "eligibility_eligibilitydiagnosis" U0
+                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "eligibility_geiqeligibilitydiagnosis" U0
+                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."state" = %s)
+                     LIMIT 1)) AS "stalled",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -647,8 +745,29 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   34,
-                   35
+                   NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "approvals_approval" U0
+             WHERE U0."user_id" = ("users_user"."id")
+             LIMIT 1),
+                       NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE U0."job_seeker_id" = ("users_user"."id")
+             LIMIT 1),
+                           NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "eligibility_geiqeligibilitydiagnosis" U0
+             WHERE U0."job_seeker_id" = ("users_user"."id")
+             LIMIT 1),
+                               NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "job_applications_jobapplication" U0
+             WHERE (U0."job_seeker_id" = ("users_user"."id")
+                    AND U0."state" = %s)
+             LIMIT 1),
+                                   35,
+                                   36
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -762,6 +881,39 @@
                         OR U0."sender_prescriber_organization_id" = %s)
                        AND U0."job_seeker_id" = ("users_user"."id"))
                 GROUP BY U0."job_seeker_id") AS "last_updated_at",
+                    (EXISTS
+                       (SELECT %s AS "a"
+                        FROM "job_applications_jobapplication" U0
+                        WHERE (U0."job_seeker_id" = ("users_user"."id")
+                               AND U0."created_at" <= %s)
+                        LIMIT 1)
+                     AND EXISTS
+                       (SELECT %s AS "a"
+                        FROM "job_applications_jobapplication" U0
+                        WHERE (U0."job_seeker_id" = ("users_user"."id")
+                               AND U0."created_at" >= %s)
+                        LIMIT 1)
+                     AND NOT EXISTS
+                       (SELECT %s AS "a"
+                        FROM "approvals_approval" U0
+                        WHERE U0."user_id" = ("users_user"."id")
+                        LIMIT 1)
+                     AND NOT EXISTS
+                       (SELECT %s AS "a"
+                        FROM "eligibility_eligibilitydiagnosis" U0
+                        WHERE U0."job_seeker_id" = ("users_user"."id")
+                        LIMIT 1)
+                     AND NOT EXISTS
+                       (SELECT %s AS "a"
+                        FROM "eligibility_geiqeligibilitydiagnosis" U0
+                        WHERE U0."job_seeker_id" = ("users_user"."id")
+                        LIMIT 1)
+                     AND NOT EXISTS
+                       (SELECT %s AS "a"
+                        FROM "job_applications_jobapplication" U0
+                        WHERE (U0."job_seeker_id" = ("users_user"."id")
+                               AND U0."state" = %s)
+                        LIMIT 1)) AS "stalled",
           
                (SELECT U0."id"
                 FROM "eligibility_eligibilitydiagnosis" U0
@@ -779,7 +931,28 @@
                                               %s))
              GROUP BY "users_user"."id",
                       1,
-                      2) subquery
+                      2,
+                      NOT EXISTS
+               (SELECT %s AS "a"
+                FROM "approvals_approval" U0
+                WHERE U0."user_id" = ("users_user"."id")
+                LIMIT 1),
+                          NOT EXISTS
+               (SELECT %s AS "a"
+                FROM "eligibility_eligibilitydiagnosis" U0
+                WHERE U0."job_seeker_id" = ("users_user"."id")
+                LIMIT 1),
+                              NOT EXISTS
+               (SELECT %s AS "a"
+                FROM "eligibility_geiqeligibilitydiagnosis" U0
+                WHERE U0."job_seeker_id" = ("users_user"."id")
+                LIMIT 1),
+                                  NOT EXISTS
+               (SELECT %s AS "a"
+                FROM "job_applications_jobapplication" U0
+                WHERE (U0."job_seeker_id" = ("users_user"."id")
+                       AND U0."state" = %s)
+                LIMIT 1)) subquery
         ''',
       }),
       dict({
@@ -821,6 +994,39 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 (EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."created_at" <= %s)
+                     LIMIT 1)
+                  AND EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."created_at" >= %s)
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "approvals_approval" U0
+                     WHERE U0."user_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "eligibility_eligibilitydiagnosis" U0
+                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "eligibility_geiqeligibilitydiagnosis" U0
+                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."state" = %s)
+                     LIMIT 1)) AS "stalled",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -856,9 +1062,30 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   34,
-                   35
-          ORDER BY 34 ASC,
+                   NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "approvals_approval" U0
+             WHERE U0."user_id" = ("users_user"."id")
+             LIMIT 1),
+                       NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE U0."job_seeker_id" = ("users_user"."id")
+             LIMIT 1),
+                           NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "eligibility_geiqeligibilitydiagnosis" U0
+             WHERE U0."job_seeker_id" = ("users_user"."id")
+             LIMIT 1),
+                               NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "job_applications_jobapplication" U0
+             WHERE (U0."job_seeker_id" = ("users_user"."id")
+                    AND U0."state" = %s)
+             LIMIT 1),
+                                   35,
+                                   36
+          ORDER BY 35 ASC,
                    "users_user"."id" ASC
           LIMIT 4
         ''',
@@ -1024,6 +1251,7 @@
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list">Alain ZORRO</a>
+                                  
                               </td>
                               <td>
                                   
@@ -1069,6 +1297,7 @@
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list">Bernard YGREC</a>
+                                  
                               </td>
                               <td>
                                   
@@ -1114,6 +1343,7 @@
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list">Charlotte XERUS</a>
+                                  
                               </td>
                               <td>
                                   
@@ -1151,6 +1381,7 @@
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list">David WATERFORD</a>
+                                  
                               </td>
                               <td>
                                   
@@ -1398,6 +1629,39 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 (EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."created_at" <= %s)
+                     LIMIT 1)
+                  AND EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."created_at" >= %s)
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "approvals_approval" U0
+                     WHERE U0."user_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "eligibility_eligibilitydiagnosis" U0
+                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "eligibility_geiqeligibilitydiagnosis" U0
+                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."state" = %s)
+                     LIMIT 1)) AS "stalled",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -1432,8 +1696,29 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   34,
-                   35
+                   NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "approvals_approval" U0
+             WHERE U0."user_id" = ("users_user"."id")
+             LIMIT 1),
+                       NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE U0."job_seeker_id" = ("users_user"."id")
+             LIMIT 1),
+                           NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "eligibility_geiqeligibilitydiagnosis" U0
+             WHERE U0."job_seeker_id" = ("users_user"."id")
+             LIMIT 1),
+                               NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "job_applications_jobapplication" U0
+             WHERE (U0."job_seeker_id" = ("users_user"."id")
+                    AND U0."state" = %s)
+             LIMIT 1),
+                                   35,
+                                   36
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
         ''',
@@ -1535,6 +1820,39 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 (EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."created_at" <= %s)
+                     LIMIT 1)
+                  AND EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."created_at" >= %s)
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "approvals_approval" U0
+                     WHERE U0."user_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "eligibility_eligibilitydiagnosis" U0
+                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "eligibility_geiqeligibilitydiagnosis" U0
+                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."state" = %s)
+                     LIMIT 1)) AS "stalled",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -1569,8 +1887,29 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   34,
-                   35
+                   NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "approvals_approval" U0
+             WHERE U0."user_id" = ("users_user"."id")
+             LIMIT 1),
+                       NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE U0."job_seeker_id" = ("users_user"."id")
+             LIMIT 1),
+                           NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "eligibility_geiqeligibilitydiagnosis" U0
+             WHERE U0."job_seeker_id" = ("users_user"."id")
+             LIMIT 1),
+                               NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "job_applications_jobapplication" U0
+             WHERE (U0."job_seeker_id" = ("users_user"."id")
+                    AND U0."state" = %s)
+             LIMIT 1),
+                                   35,
+                                   36
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -1685,6 +2024,39 @@
                         OR U0."sender_prescriber_organization_id" = %s)
                        AND U0."job_seeker_id" = ("users_user"."id"))
                 GROUP BY U0."job_seeker_id") AS "last_updated_at",
+                    (EXISTS
+                       (SELECT %s AS "a"
+                        FROM "job_applications_jobapplication" U0
+                        WHERE (U0."job_seeker_id" = ("users_user"."id")
+                               AND U0."created_at" <= %s)
+                        LIMIT 1)
+                     AND EXISTS
+                       (SELECT %s AS "a"
+                        FROM "job_applications_jobapplication" U0
+                        WHERE (U0."job_seeker_id" = ("users_user"."id")
+                               AND U0."created_at" >= %s)
+                        LIMIT 1)
+                     AND NOT EXISTS
+                       (SELECT %s AS "a"
+                        FROM "approvals_approval" U0
+                        WHERE U0."user_id" = ("users_user"."id")
+                        LIMIT 1)
+                     AND NOT EXISTS
+                       (SELECT %s AS "a"
+                        FROM "eligibility_eligibilitydiagnosis" U0
+                        WHERE U0."job_seeker_id" = ("users_user"."id")
+                        LIMIT 1)
+                     AND NOT EXISTS
+                       (SELECT %s AS "a"
+                        FROM "eligibility_geiqeligibilitydiagnosis" U0
+                        WHERE U0."job_seeker_id" = ("users_user"."id")
+                        LIMIT 1)
+                     AND NOT EXISTS
+                       (SELECT %s AS "a"
+                        FROM "job_applications_jobapplication" U0
+                        WHERE (U0."job_seeker_id" = ("users_user"."id")
+                               AND U0."state" = %s)
+                        LIMIT 1)) AS "stalled",
           
                (SELECT U0."id"
                 FROM "eligibility_eligibilitydiagnosis" U0
@@ -1701,7 +2073,28 @@
                                               %s))
              GROUP BY "users_user"."id",
                       1,
-                      2) subquery
+                      2,
+                      NOT EXISTS
+               (SELECT %s AS "a"
+                FROM "approvals_approval" U0
+                WHERE U0."user_id" = ("users_user"."id")
+                LIMIT 1),
+                          NOT EXISTS
+               (SELECT %s AS "a"
+                FROM "eligibility_eligibilitydiagnosis" U0
+                WHERE U0."job_seeker_id" = ("users_user"."id")
+                LIMIT 1),
+                              NOT EXISTS
+               (SELECT %s AS "a"
+                FROM "eligibility_geiqeligibilitydiagnosis" U0
+                WHERE U0."job_seeker_id" = ("users_user"."id")
+                LIMIT 1),
+                                  NOT EXISTS
+               (SELECT %s AS "a"
+                FROM "job_applications_jobapplication" U0
+                WHERE (U0."job_seeker_id" = ("users_user"."id")
+                       AND U0."state" = %s)
+                LIMIT 1)) subquery
         ''',
       }),
       dict({
@@ -1743,6 +2136,39 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 (EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."created_at" <= %s)
+                     LIMIT 1)
+                  AND EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."created_at" >= %s)
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "approvals_approval" U0
+                     WHERE U0."user_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "eligibility_eligibilitydiagnosis" U0
+                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "eligibility_geiqeligibilitydiagnosis" U0
+                     WHERE U0."job_seeker_id" = ("users_user"."id")
+                     LIMIT 1)
+                  AND NOT EXISTS
+                    (SELECT %s AS "a"
+                     FROM "job_applications_jobapplication" U0
+                     WHERE (U0."job_seeker_id" = ("users_user"."id")
+                            AND U0."state" = %s)
+                     LIMIT 1)) AS "stalled",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -1777,9 +2203,30 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   34,
-                   35
-          ORDER BY 34 ASC,
+                   NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "approvals_approval" U0
+             WHERE U0."user_id" = ("users_user"."id")
+             LIMIT 1),
+                       NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE U0."job_seeker_id" = ("users_user"."id")
+             LIMIT 1),
+                           NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "eligibility_geiqeligibilitydiagnosis" U0
+             WHERE U0."job_seeker_id" = ("users_user"."id")
+             LIMIT 1),
+                               NOT EXISTS
+            (SELECT %s AS "a"
+             FROM "job_applications_jobapplication" U0
+             WHERE (U0."job_seeker_id" = ("users_user"."id")
+                    AND U0."state" = %s)
+             LIMIT 1),
+                                   35,
+                                   36
+          ORDER BY 35 ASC,
                    "users_user"."id" ASC
           LIMIT 3
         ''',
@@ -1888,6 +2335,7 @@
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list-organization">Alain ZORRO</a>
+                                  
                               </td>
                               <td>
                                   
@@ -1933,6 +2381,7 @@
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list-organization">Bernard YGREC</a>
+                                  
                               </td>
                               <td>
                                   
@@ -1978,6 +2427,7 @@
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list-organization">Charlotte XERUS</a>
+                                  
                               </td>
                               <td>
                                   

@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from collections import Counter
 from functools import partial
 
 import factory
@@ -9,6 +10,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.job_applications.enums import JobApplicationState
 from itou.users.models import User, UserKind
 from itou.utils.templatetags.str_filters import mask_unless
 from tests.approvals.factories import ApprovalFactory
@@ -719,6 +721,88 @@ def test_filtered_by_approval_state(client, url):
         job_seeker_expired_eligibility_valid_approval,
         job_seeker_valid_eligibility_no_approval,
     ]
+
+
+def test_filtered_by_stalled_all_cases(client):
+    # TODO(rsebille):
+    # When stalled job seekers come from Pilotage, we won’t need to validate
+    # stalled() computation and this test should be deleted.
+    prescriber = PrescriberMembershipFactory().user
+    client.force_login(prescriber)
+    valid_stalled_created_at = timezone.now() - datetime.timedelta(days=90)
+    stalled = JobApplicationFactory(
+        created_at=valid_stalled_created_at,
+        eligibility_diagnosis=None,
+        sender=prescriber,
+    )
+    billy = JobSeekerFactory(
+        first_name="Billy",
+        last_name="Boo",
+        email="billy.boo@mailinator.com",
+    )
+    JobApplicationFactory(
+        job_seeker=billy,
+        # More than six months ago, excluded by <6 months, matches >1 month.
+        created_at=timezone.now() - datetime.timedelta(days=183),
+        eligibility_diagnosis=None,
+        sender=prescriber,
+    )
+    JobApplicationFactory(
+        job_seeker=billy,
+        # Less than 6 months ago.
+        created_at=timezone.now() - datetime.timedelta(days=181),
+        eligibility_diagnosis=None,
+        sender=prescriber,
+    )
+    # The following job seekers are not stalled.
+    # Too recent.
+    JobApplicationFactory(sender=prescriber, eligibility_diagnosis=None)
+    # Too old.
+    JobApplicationFactory(
+        created_at=timezone.now() - datetime.timedelta(days=185),
+        sender=prescriber,
+        eligibility_diagnosis=None,
+    )
+    # Accepted
+    JobApplicationFactory(
+        created_at=valid_stalled_created_at,
+        state=JobApplicationState.ACCEPTED,
+        sender=prescriber,
+        eligibility_diagnosis=None,
+    )
+    # Has diagnosis.
+    iae_job_seeker = JobSeekerFactory(first_name="iae_diag", last_name="iae_diag", with_verified_email=True)
+    JobApplicationFactory(job_seeker=iae_job_seeker, sender=prescriber)
+    JobApplicationFactory(job_seeker=iae_job_seeker, sender=prescriber, created_at=valid_stalled_created_at)
+    geiq_job_seeker = JobSeekerFactory(first_name="geiq_diag", last_name="geiq_diag", with_verified_email=True)
+    JobApplicationFactory(job_seeker=geiq_job_seeker, sender=prescriber)
+    JobApplicationFactory(job_seeker=geiq_job_seeker, sender=prescriber, created_at=valid_stalled_created_at)
+    # Has approval.
+    approval_job_seeker = JobSeekerFactory(first_name="approval", last_name="approval", with_verified_email=True)
+    approval = ApprovalFactory(user=approval_job_seeker)
+    JobApplicationFactory(
+        job_seeker=approval_job_seeker,
+        sender=prescriber,
+        approval=approval,
+        eligibility_diagnosis=None,
+    )
+    response = client.get(reverse("job_seekers_views:list"), {"stalled": "on"})
+    assert Counter(response.context["page_obj"].object_list) == Counter([stalled.job_seeker, billy])
+
+
+def test_filtered_by_stalled(client):
+    prescriber = PrescriberMembershipFactory().user
+    client.force_login(prescriber)
+    stalled = JobApplicationFactory(
+        created_at=timezone.now() - datetime.timedelta(days=90),
+        eligibility_diagnosis=None,
+        sender=prescriber,
+    )
+    other = JobApplicationFactory(sender=prescriber)
+    response = client.get(reverse("job_seekers_views:list"))
+    assert Counter(response.context["page_obj"].object_list) == Counter([stalled.job_seeker, other.job_seeker])
+    response = client.get(reverse("job_seekers_views:list"), {"stalled": "on"})
+    assert response.context["page_obj"].object_list == [stalled.job_seeker]
 
 
 def test_filtered_by_organization_members(client):
