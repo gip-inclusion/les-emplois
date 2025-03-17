@@ -47,14 +47,40 @@ class Assessment(models.Model):
     companies = models.ManyToManyField(
         Company,
         verbose_name="entreprises",
-        related_name="implementation_assessments",
+        related_name="assessments",
         limit_choices_to={"kind": CompanyKind.GEIQ},
     )
     institutions = models.ManyToManyField(
         Institution,
         verbose_name="institutions",
         related_name="implementation_assessments",
+        through="AssessmentInstitutionLink",
+        through_fields=("assessment", "institution"),
         limit_choices_to={
             "kind__in": [InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ],
         },
-    ) => TODO: utiliser un Through
+    )
+    name_for_institution = models.CharField(verbose_name="nom du bilan pour les institutions")
+    label_geiq_id = models.IntegerField(verbose_name="identifiant label du GEIQ principal")
+    label_antennas = models.JSONField(verbose_name="antennes LABEL concernées par le bilan")
+
+
+class AssessmentInstitutionLink(models.Model):
+    assessment = models.ForeignKey(
+        Assessment, verbose_name="bilan lié", related_name="institution_links", on_delete=models.CASCADE
+    )
+    institution = models.ForeignKey(
+        Institution,
+        verbose_name="institution liée",
+        related_name="assessment_links",
+        limit_choices_to={
+            "kind__in": [InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ],
+        },
+        on_delete=models.PROTECT,
+    )
+    with_convention = models.BooleanField(verbose_name="avec un convention", default=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["assessment", "institution"], name="assessment_institution_unique"),
+        ]
