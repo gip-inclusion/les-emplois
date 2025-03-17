@@ -441,6 +441,22 @@ class JobDescriptionAdmin(ItouModelAdmin):
     def display_name(self, obj):
         return obj.custom_name if obj.custom_name else obj.appellation
 
+    def save_model(self, request, obj, form, change):
+        # Closing recruitment as an action isn't considered as modifying the job description,
+        # with respect to the timestamp.
+        if change:
+            old_obj = models.JobDescription.objects.get(id=obj.id)
+            changed_fields = [
+                field.name
+                for field in models.JobDescription._meta.fields
+                if getattr(old_obj, field.name) != getattr(obj, field.name)
+            ]
+            if changed_fields == ["is_active"] and not obj.is_active:
+                obj.save(update_fields=["is_active"])
+                return
+        # Otherwise save as normal.
+        return super().save_model(request, obj, form, change)
+
 
 @admin.register(models.SiaeConvention)
 class SiaeConventionAdmin(ItouModelAdmin):
