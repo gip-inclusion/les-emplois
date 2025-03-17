@@ -32,6 +32,9 @@
                         <tr>
                             <td>
                                 <a href="{% url "job_seekers_views:details" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link">{{ job_seeker.get_full_name|mask_unless:job_seeker.user_can_view_personal_information }}</a>
+                                {% if job_seeker.jobseeker_profile.is_stalled %}
+                                    <span class="badge badge-base badge-xs rounded-pill bg-warning-lighter text-warning" aria-label="Candidat sans solution"><i class="ri-user-forbid-line" aria-hidden="true" data-bs-title="Candidat sans solution" data-bs-toggle="tooltip"></i></span>
+                                {% endif %}
                             </td>
                             <td>
                                 {% include "apply/includes/eligibility_badge.html" with job_seeker=job_seeker is_subject_to_eligibility_rules=True eligibility_diagnosis=job_seeker.valid_eligibility_diagnosis force_valid=False badge_size="badge-xs" only %}
