@@ -96,7 +96,7 @@ class TestProcessListSiae:
             <div class="form-check">
             <input id="id_selected_jobs_0-top"
                    class="form-check-input"
-                   data-sync-with="id_selected_jobs_0"
+                   data-emplois-sync-with="id_selected_jobs_0"
                    name="{self.SELECTED_JOBS}"
                    type="checkbox"
                    value="{job1.appellation.code}">
@@ -107,7 +107,7 @@ class TestProcessListSiae:
             <div class="form-check">
                 <input id="id_selected_jobs_1-top"
                        class="form-check-input"
-                       data-sync-with="id_selected_jobs_1"
+                       data-emplois-sync-with="id_selected_jobs_1"
                        name="{self.SELECTED_JOBS}"
                        type="checkbox"
                        value="{job2.appellation.code}">
@@ -749,7 +749,7 @@ def test_list_for_siae_htmx_filters(client):
     url = reverse("apply:list_for_siae")
     response = client.get(url)
     page = parse_response_to_soup(response, selector="#main")
-    # Simulate the data-sync-with and check both checkboxes.
+    # Simulate the data-emplois-sync-with and check both checkboxes.
     refused_checkboxes = page.find_all(
         "input",
         attrs={"name": "states", "value": "refused"},
