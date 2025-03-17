@@ -9,13 +9,9 @@ from itou.metabase.tables.utils import (
 )
 
 
-def get_field(name):
-    return ProlongationRequest._meta.get_field(name)
-
-
 TABLE = MetabaseTable(name="demandes_de_prolongation")
 TABLE.add_columns(
-    get_common_prolongation_columns(get_field_fn=get_field)
+    get_common_prolongation_columns(model=ProlongationRequest)
     + [
         {
             "name": "id_prolongation",
