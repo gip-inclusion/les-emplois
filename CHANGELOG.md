@@ -1,5 +1,35 @@
 # Journal des modifications
 
+## 2025-03-17
+
+### Ajouté
+
+- [Candidatures: Décliner toutes les candidatures sans réponse (nouvelle + à l’étude) depuis plus de 2 mois](https://github.com/gip-inclusion/les-emplois/pull/5728) 🖼
+- [Employeur: Paramètre pour fermer les candidatures spontanées](https://github.com/gip-inclusion/les-emplois/pull/5698)
+- [Pilotage : Chiffres clés dynamiques dans le tableau de bord](https://github.com/gip-inclusion/les-emplois/pull/4589) 🖼
+- [Prescripteur : ajout de filtres dans l'espace Mes candidats](https://github.com/gip-inclusion/les-emplois/pull/5670)
+
+### Modifié
+
+- [Admin: Correction de la page des PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/5763)
+- [Admin: Correction du tableau de bord pour les non super utilisteurs](https://github.com/gip-inclusion/les-emplois/pull/5770)
+- [Admin: Corrections diverses pour l'équipe support](https://github.com/gip-inclusion/les-emplois/pull/5772)
+- [Admin: Limiter les modifications de PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/5759)
+- [Admin: Mise à jour des permissions du groupe itou-admin](https://github.com/gip-inclusion/les-emplois/pull/5757)
+- [Candidature : Modification des filtres Eligibilité IAE et PASS IAE dans la liste de candidatures](https://github.com/gip-inclusion/les-emplois/pull/5746)
+- [GPS: Correction de l'ajout de bénéficiare](https://github.com/gip-inclusion/les-emplois/pull/5764)
+- [GPS: Ne pas afficher les informations personnelles aux orienteurs quand le candidat n'a pas repris le contrôle de son compte](https://github.com/gip-inclusion/les-emplois/pull/5729)
+- [GPS: Permettre l'ajout de bénéficiaire](https://github.com/gip-inclusion/les-emplois/pull/5709)
+- [Inscription: Refonte de l’étape “situation” du parcours d’inscription du candidat en autonomie](https://github.com/gip-inclusion/les-emplois/pull/5738)
+- [PASS IAE: La date de début du contrat doit être avant la date de fin du PASS](https://github.com/gip-inclusion/les-emplois/pull/5248)
+- [Profil salarié : afficher l’encart Immersion Facilitée de la page de tous les salariés](https://github.com/gip-inclusion/les-emplois/pull/5638) 🖼
+- [Sécurité: Mise en place du 2FA pour l'accès des comptes staff](https://github.com/gip-inclusion/les-emplois/pull/5706) 🖼
+- [UX/UI: Modifications des urls d'annulation et de retour dans les formulaires d'inscription](https://github.com/gip-inclusion/les-emplois/pull/5747)
+
+### Supprimé
+
+- [IDOR: suppression des redirections temporaires](https://github.com/gip-inclusion/les-emplois/pull/5761)
+
 ## 2025-03-10
 
 ### Modifié
