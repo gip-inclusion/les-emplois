@@ -235,9 +235,6 @@ def assertSnapshotQueries(snapshot, func=None, *args, using=DEFAULT_DB_ALIAS, **
         func(*args, **kwargs)
 
 
-origin_debug_sql = CursorDebugWrapper.debug_sql
-
-
 # List of functions that help identify the query origin
 OTHER_PACKAGES_ALLOWLIST = {
     "count": "django/core/paginator.py",
@@ -336,6 +333,9 @@ def _detect_origin(debug=False):
                     f"  Line: {frame_info.lineno} - " + linecache.getline(frame_filename, frame_info.lineno).strip()
                 )
     return parts
+
+
+origin_debug_sql = CursorDebugWrapper.debug_sql
 
 
 @contextmanager
