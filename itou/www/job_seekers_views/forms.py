@@ -37,6 +37,8 @@ class FilterForm(forms.Form):
     pass_iae_expired = forms.BooleanField(label="Expiré", required=False)
     no_pass_iae = forms.BooleanField(label="Aucun", required=False)
 
+    stalled = forms.BooleanField(label="N’afficher que les candidats sans solution", required=False)
+
     organization_members = forms.MultipleChoiceField(
         label="Nom de la personne", required=False, widget=Select2MultipleWidget
     )
@@ -113,6 +115,9 @@ class FilterForm(forms.Form):
             if self.cleaned_data.get("no_pass_iae"):
                 pass_status_filter |= Q(last_approval_end_at__isnull=True)
             filters.append(pass_status_filter)
+
+        if self.cleaned_data.get("stalled"):
+            queryset = queryset.filter(stalled=True)
 
         # Organization members
         if organization_members := self.cleaned_data.get("organization_members"):
