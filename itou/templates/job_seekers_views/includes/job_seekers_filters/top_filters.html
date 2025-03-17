@@ -5,6 +5,20 @@
         <div>{% bootstrap_form_errors filters_form %}</div>
         <div class="btn-dropdown-filter-group mb-3 mb-md-4">
             {% include "job_seekers_views/includes/job_seekers_filters/approval_state.html" with filters_form=filters_form btn_dropdown_filter=True only %}
+            <div class="dropdown">
+                <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                    Candidat sans solution
+                </button>
+                <ul class="dropdown-menu">
+                    <li>{% bootstrap_field filters_form.is_stalled wrapper_class="dropdown-item" %}</li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <a href="{{ ITOU_HELP_CENTER_URL }}/articles/33573455767441--Qu-est-ce-qu-un-candidat-sans-solution-sur-les-Emplois-de-l-inclusion" class="btn btn-link has-external-link" target="_blank" rel="noopener">Qu’est-ce qu’un candidat sans solution ?</a>
+                    </li>
+                </ul>
+            </div>
             {% if list_organization %}
                 <button type="button" class="btn btn-ico btn-dropdown-filter" data-bs-toggle="offcanvas" data-bs-target="#offcanvasApplyFilters" aria-controls="offcanvasApplyFilters">
                     <i class="ri-sound-module-fill fw-medium" aria-hidden="true"></i>
