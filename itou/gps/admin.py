@@ -24,7 +24,7 @@ class MemberInline(ReadonlyMixin, admin.TabularInline):
 
 @admin.register(models.FollowUpGroupMembership)
 class FollowUpGroupMembershipAdmin(ItouModelAdmin):
-    list_display = ("created_at", "updated_at", "member", "follow_up_group", "is_referent")
+    list_display = ("created_at", "updated_at", "member", "follow_up_group", "reason_truncated", "is_referent")
     list_filter = (
         "is_referent",
         "created_in_bulk",
@@ -60,6 +60,10 @@ class FollowUpGroupMembershipAdmin(ItouModelAdmin):
         if lookup in ["follow_up_group__beneficiary"]:
             return True
         return super().lookup_allowed(lookup, value)
+
+    @admin.display(description="motif de suivi")
+    def reason_truncated(self, obj):
+        return obj.reason[:60]
 
     def save_model(self, request, obj, form, change):
         if not change:
