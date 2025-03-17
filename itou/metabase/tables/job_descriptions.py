@@ -1,9 +1,4 @@
-from itou.companies.models import JobDescription
 from itou.metabase.tables.utils import MetabaseTable, get_department_and_region_columns
-
-
-def get_field(name):
-    return JobDescription._meta.get_field(name)
 
 
 TABLE = MetabaseTable(name="fiches_de_poste")
