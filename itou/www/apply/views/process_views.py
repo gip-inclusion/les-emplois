@@ -553,6 +553,7 @@ def transfer(request, job_application_id):
     return HttpResponseRedirect(back_url)
 
 
+# We need LoginRequiredMixin because EmployerSearchView inherits from LoginNotRequiredMixin
 class JobApplicationExternalTransferStep1View(LoginRequiredMixin, EmployerSearchView):
     job_application = None
 
@@ -588,7 +589,7 @@ class JobApplicationExternalTransferStep1View(LoginRequiredMixin, EmployerSearch
         ]
 
 
-class JobApplicationExternalTransferStep1CompanyCardView(LoginRequiredMixin, CompanyCardView):
+class JobApplicationExternalTransferStep1CompanyCardView(CompanyCardView):
     def setup(self, request, job_application_id, company_pk, *args, **kwargs):
         super().setup(request, company_pk, *args, **kwargs)
 
@@ -606,7 +607,7 @@ class JobApplicationExternalTransferStep1CompanyCardView(LoginRequiredMixin, Com
         }
 
 
-class JobApplicationExternalTransferStep1JobDescriptionCardView(LoginRequiredMixin, JobDescriptionCardView):
+class JobApplicationExternalTransferStep1JobDescriptionCardView(JobDescriptionCardView):
     def setup(self, request, job_application_id, job_description_id, *args, **kwargs):
         super().setup(request, job_description_id, *args, **kwargs)
 

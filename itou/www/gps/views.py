@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Exists, OuterRef, Prefetch
 from django.http import HttpResponseRedirect, JsonResponse
@@ -88,7 +87,7 @@ def group_list(request, current, template_name="gps/group_list.html"):
     return render(request, "gps/includes/memberships_results.html" if request.htmx else template_name, context)
 
 
-class GroupDetailsMixin(LoginRequiredMixin):
+class GroupDetailsMixin:
     # Don't use UserPassesTestMixin because we need the kwargs
     def setup(self, request, *args, **kwargs):
         if request.user.is_authenticated:
