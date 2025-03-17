@@ -7,13 +7,9 @@ from itou.metabase.tables.utils import (
 )
 
 
-def get_field(name):
-    return Prolongation._meta.get_field(name)
-
-
 TABLE = MetabaseTable(name="prolongations")
 TABLE.add_columns(
-    get_common_prolongation_columns(get_field_fn=get_field)
+    get_common_prolongation_columns(model=Prolongation)
     + [
         {
             "name": "date_de_création",
