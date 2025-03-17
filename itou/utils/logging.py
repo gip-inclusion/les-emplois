@@ -3,6 +3,7 @@ import logging
 from django_datadog_logger.formatters import datadog
 
 from itou.utils.command import get_current_command_info
+from itou.utils.timer.infos import get_current_timing_info
 
 
 logger = logging.getLogger(__name__)
@@ -41,4 +42,6 @@ class ItouDataDogJSONFormatter(datadog.DataDogJSONFormatter):
         if (command_info := get_current_command_info()) is not None:
             log_entry_dict["command.run_uid"] = command_info.run_uid
             log_entry_dict["command.name"] = command_info.name
+        if (sql_timing := get_current_timing_info()) is not None:
+            log_entry_dict["timing.sql_duration"] = sql_timing
         return log_entry_dict

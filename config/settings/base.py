@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 
 from config.sentry import sentry_init
 from itou.utils.enums import ItouEnvironment
+from itou.utils.timer import monkeypatch
 from itou.utils.urls import markdown_url_set_protocol, markdown_url_set_target_blank
 
 
@@ -127,6 +128,7 @@ FORMS_URLFIELD_ASSUME_HTTPS = True
 MIDDLEWARE = [
     # Generate request Id
     "django_datadog_logger.middleware.request_id.RequestIdMiddleware",
+    "itou.utils.timer.middleware.RequestTimerMiddleware",
     # Itou health check for Clever Cloud, don’t require requests to match ALLOWED_HOSTS
     "itou.www.middleware.public_health_check",
     # Django stack
@@ -790,3 +792,5 @@ SERIALIZATION_MODULES = {
 OTP_TOTP_ISSUER = f"Les Emplois de l'inclusion ({ITOU_ENVIRONMENT})"
 OTP_ADMIN_HIDE_SENSITIVE_DATA = True
 REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "True") == "True"
+
+monkeypatch.install_sql_timing()
