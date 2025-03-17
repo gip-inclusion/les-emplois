@@ -1,6 +1,11 @@
 from django.db import models
 from django.utils import timezone
 
+from itou.companies.enums import CompanyKind
+from itou.companies.models import Company
+from itou.institutions.enums import InstitutionKind
+from itou.institutions.models import Institution
+
 
 class AssessmentCampaign(models.Model):
     year = models.IntegerField(verbose_name="année", unique=True)
@@ -35,3 +40,21 @@ class LABELInfos(models.Model):
 
     def __str__(self):
         return f"Liste récupérée le {timezone.localdate(self.synced_at).isoformat()}"
+
+
+class Assessment(models.Model):
+    campaign = models.ForeignKey(AssessmentCampaign, related_name="assessments", on_delete=models.PROTECT)
+    companies = models.ManyToManyField(
+        Company,
+        verbose_name="entreprises",
+        related_name="implementation_assessments",
+        limit_choices_to={"kind": CompanyKind.GEIQ},
+    )
+    institutions = models.ManyToManyField(
+        Institution,
+        verbose_name="institutions",
+        related_name="implementation_assessments",
+        limit_choices_to={
+            "kind__in": [InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ],
+        },
+    ) => TODO: utiliser un Through
