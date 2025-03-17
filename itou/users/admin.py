@@ -19,7 +19,7 @@ from itou.communications.models import NotificationSettings
 from itou.companies.models import CompanyMembership
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.geo.models import QPV
-from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
+from itou.gps.models import FollowUpGroupMembership, FranceTravailContact
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
@@ -385,15 +385,14 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
         if obj.pk is None:
             return self.get_empty_value_display()
         if obj.is_job_seeker:
-            url = add_url_params(
-                reverse("admin:gps_followupgroupmembership_changelist"), {"follow_up_group__beneficiary": obj.id}
-            )
-            count = FollowUpGroupMembership.objects.filter(follow_up_group__beneficiary=obj).count()
-            return format_html('<a href="{}">Liste des professionnels suivant ce bénéficiaire ({})</a>', url, count)
+            if memberships := FollowUpGroupMembership.objects.filter(follow_up_group__beneficiary=obj):
+                url = reverse("admin:gps_followupgroup_change", args=(memberships[0].follow_up_group_id,))
+                return format_html('<a href="{}">Groupe de suivi de ce bénéficiaire</a>', url, len(memberships))
+            return "Pas de groupe de suivi"
         if obj.is_prescriber or obj.is_employer:
-            url = add_url_params(reverse("admin:gps_followupgroup_changelist"), {"memberships__member": obj.id})
-            count = FollowUpGroup.objects.filter(memberships__member=obj).count()
-            return format_html('<a href="{}">Liste des groupes de suivi de cet utilisateur ({}) </a>', url, count)
+            url = add_url_params(reverse("admin:gps_followupgroupmembership_changelist"), {"member": obj.id})
+            count = FollowUpGroupMembership.objects.filter(member=obj).count()
+            return format_html('<a href="{}">Liste des relations de cet utilisateur ({}) </a>', url, count)
         return ""
 
     @admin.action(description="Désactiver le compte IC / PC pour changement prescripteur <-> employeur")

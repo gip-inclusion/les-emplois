@@ -713,8 +713,7 @@
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
-          FROM "gps_followupgroup"
-          INNER JOIN "gps_followupgroupmembership" ON ("gps_followupgroup"."id" = "gps_followupgroupmembership"."follow_up_group_id")
+          FROM "gps_followupgroupmembership"
           WHERE "gps_followupgroupmembership"."member_id" = %s
         ''',
       }),
