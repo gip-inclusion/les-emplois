@@ -5,6 +5,7 @@ from itou.metabase.tables.utils import (
     get_choice,
     get_column_from_field,
     get_common_prolongation_columns,
+    get_model_field,
 )
 
 
@@ -44,8 +45,8 @@ TABLE.add_columns(
             "comment": "Date de la demande",
             "fn": lambda o: o.created_at.date(),
         },
-        get_column_from_field(get_field("processed_at"), name="date_traitement"),
-        get_column_from_field(get_field("processed_by"), name="id_utilisateur_traitant"),
-        get_column_from_field(get_field("reminder_sent_at"), name="date_envoi_rappel"),
+        get_column_from_field(get_model_field(ProlongationRequest, "processed_at"), name="date_traitement"),
+        get_column_from_field(get_model_field(ProlongationRequest, "processed_by"), name="id_utilisateur_traitant"),
+        get_column_from_field(get_model_field(ProlongationRequest, "reminder_sent_at"), name="date_envoi_rappel"),
     ]
 )

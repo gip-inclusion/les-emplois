@@ -10,11 +10,8 @@ from itou.metabase.tables.utils import (
     get_establishment_is_active_column,
     get_establishment_last_login_date_column,
     get_first_membership_join_date,
+    get_model_field,
 )
-
-
-def get_field(name):
-    return Company._meta.get_field(name)
 
 
 TABLE = MetabaseTable(name="structures_v0")
@@ -53,9 +50,9 @@ TABLE.add_columns(
             "comment": "Source des données de la structure",
             "fn": lambda o: get_choice(choices=Company.SOURCE_CHOICES, key=o.source),
         },
-        get_column_from_field(get_field("naf"), name="code_naf"),
-        get_column_from_field(get_field("email"), name="email_public"),
-        get_column_from_field(get_field("auth_email"), name="email_authentification"),
+        get_column_from_field(get_model_field(Company, "naf"), name="code_naf"),
+        get_column_from_field(get_model_field(Company, "email"), name="email_public"),
+        get_column_from_field(get_model_field(Company, "auth_email"), name="email_authentification"),
         {
             "name": "convergence_france",
             "type": "boolean",

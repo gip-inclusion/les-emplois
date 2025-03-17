@@ -44,6 +44,10 @@ class MetabaseTable:
         return fn(input)
 
 
+def get_model_field(model, name):
+    return model._meta.get_field(name)
+
+
 def get_field_type_from_field(field):
     if isinstance(field, CharField):
         return "varchar"

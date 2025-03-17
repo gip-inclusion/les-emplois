@@ -1,19 +1,15 @@
 from itou.companies.models import CompanyMembership
 from itou.institutions.models import InstitutionMembership
-from itou.metabase.tables.utils import MetabaseTable, get_column_from_field
+from itou.metabase.tables.utils import MetabaseTable, get_column_from_field, get_model_field
 from itou.prescribers.models import PrescriberMembership
-
-
-def get_field(name):
-    return InstitutionMembership._meta.get_field(name)
 
 
 TABLE = MetabaseTable(name="collaborations")
 TABLE.add_columns(
     [
         # Do not add an `id` field as it would *not* be unique among various kinds of memberships.
-        get_column_from_field(get_field("user"), name="id_utilisateur"),
-        get_column_from_field(get_field("is_admin"), name="administrateur"),
+        get_column_from_field(get_model_field(InstitutionMembership, "user"), name="id_utilisateur"),
+        get_column_from_field(get_model_field(InstitutionMembership, "is_admin"), name="administrateur"),
         {
             "name": "id_structure",
             "type": "integer",
