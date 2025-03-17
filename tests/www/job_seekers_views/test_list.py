@@ -783,7 +783,7 @@ def test_htmx_filters(client, url):
     )
     response = client.get(url)
     page = parse_response_to_soup(response, selector="#main")
-    # Simulate the data-sync-with and check both checkboxes.
+    # Simulate the data-emplois-sync-with and check both checkboxes.
     eligibility_validated_checkboxes = page.find_all("input", attrs={"name": "eligibility_validated"})
     assert len(eligibility_validated_checkboxes) == 2
     for checkbox in eligibility_validated_checkboxes:

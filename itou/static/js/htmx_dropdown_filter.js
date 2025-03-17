@@ -57,7 +57,7 @@
   }
 
   function syncInputs(target) {
-    target.querySelectorAll("input[data-sync-with]").forEach((syncedInputOrigin) => {
+    target.querySelectorAll("input[data-emplois-sync-with]").forEach((syncedInputOrigin) => {
       const syncedInputTarget = document.getElementById(syncedInputOrigin.dataset.syncWith);
       syncedInputOrigin.addEventListener("change", function(event) {
         syncedInputTarget.checked = event.target.checked;

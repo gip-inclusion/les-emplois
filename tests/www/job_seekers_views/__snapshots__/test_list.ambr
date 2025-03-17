@@ -99,7 +99,7 @@
                       
   <div class="dropdown-item">
       <div class="form-check">
-          <input class="form-check-input" data-sync-with="id_eligibility_validated" id="id_eligibility_validated-offcanvas" name="eligibility_validated" type="checkbox"/>
+          <input class="form-check-input" data-emplois-sync-with="id_eligibility_validated" id="id_eligibility_validated-offcanvas" name="eligibility_validated" type="checkbox"/>
           <label class="form-check-label" for="id_eligibility_validated-offcanvas">Valide</label>
       </div>
   </div>
@@ -109,7 +109,7 @@
                       
   <div class="dropdown-item">
       <div class="form-check">
-          <input class="form-check-input" data-sync-with="id_eligibility_pending" id="id_eligibility_pending-offcanvas" name="eligibility_pending" type="checkbox"/>
+          <input class="form-check-input" data-emplois-sync-with="id_eligibility_pending" id="id_eligibility_pending-offcanvas" name="eligibility_pending" type="checkbox"/>
           <label class="form-check-label" for="id_eligibility_pending-offcanvas">À valider</label>
       </div>
   </div>
@@ -131,7 +131,7 @@
                       
   <div class="dropdown-item">
       <div class="form-check">
-          <input class="form-check-input" data-sync-with="id_pass_iae_active" id="id_pass_iae_active-offcanvas" name="pass_iae_active" type="checkbox"/>
+          <input class="form-check-input" data-emplois-sync-with="id_pass_iae_active" id="id_pass_iae_active-offcanvas" name="pass_iae_active" type="checkbox"/>
           <label class="form-check-label" for="id_pass_iae_active-offcanvas">Valide</label>
       </div>
   </div>
@@ -141,7 +141,7 @@
                       
   <div class="dropdown-item">
       <div class="form-check">
-          <input class="form-check-input" data-sync-with="id_pass_iae_expired" id="id_pass_iae_expired-offcanvas" name="pass_iae_expired" type="checkbox"/>
+          <input class="form-check-input" data-emplois-sync-with="id_pass_iae_expired" id="id_pass_iae_expired-offcanvas" name="pass_iae_expired" type="checkbox"/>
           <label class="form-check-label" for="id_pass_iae_expired-offcanvas">Expiré</label>
       </div>
   </div>
@@ -151,7 +151,7 @@
                       
   <div class="dropdown-item">
       <div class="form-check">
-          <input class="form-check-input" data-sync-with="id_no_pass_iae" id="id_no_pass_iae-offcanvas" name="no_pass_iae" type="checkbox"/>
+          <input class="form-check-input" data-emplois-sync-with="id_no_pass_iae" id="id_no_pass_iae-offcanvas" name="no_pass_iae" type="checkbox"/>
           <label class="form-check-label" for="id_no_pass_iae-offcanvas">Aucun</label>
       </div>
   </div>

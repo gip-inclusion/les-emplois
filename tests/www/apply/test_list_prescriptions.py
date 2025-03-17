@@ -322,7 +322,7 @@ def test_htmx_filters(client):
     url = reverse("apply:list_prescriptions")
     response = client.get(url)
     page = parse_response_to_soup(response, selector="#main")
-    # Simulate the data-sync-with and check both checkboxes.
+    # Simulate the data-emplois-sync-with and check both checkboxes.
     refused_checkboxes = page.find_all(
         "input",
         attrs={"name": "states", "value": "refused"},
