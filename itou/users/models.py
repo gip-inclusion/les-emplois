@@ -1,3 +1,4 @@
+import datetime
 import time
 import uuid
 from collections import Counter
@@ -67,6 +68,32 @@ class UserQuerySet(models.QuerySet):
 
     def eligibility_pending(self, siae=None):
         return self.exclude(self.get_eligibility_validated_lookup(siae=siae))
+
+    def with_stalled(self, job_apps_subquery=None):
+        from itou.approvals.models import Approval
+        from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
+        from itou.job_applications.enums import JobApplicationState
+        from itou.job_applications.models import JobApplication
+
+        midnight_today = datetime.datetime.combine(
+            timezone.localdate(),
+            datetime.time.min,
+            tzinfo=timezone.get_current_timezone(),
+        )
+        a_month_ago = midnight_today - datetime.timedelta(days=30)
+        six_months_ago = midnight_today - datetime.timedelta(days=182)
+        if job_apps_subquery is None:
+            job_apps_subquery = JobApplication.objects.filter(job_seeker=OuterRef("pk"))
+        return self.annotate(
+            stalled=(
+                Exists(job_apps_subquery.filter(created_at__lte=a_month_ago))
+                & Exists(job_apps_subquery.filter(created_at__gte=six_months_ago))
+                & ~Exists(Approval.objects.filter(user=OuterRef("pk")))
+                & ~Exists(EligibilityDiagnosis.objects.filter(job_seeker=OuterRef("pk")))
+                & ~Exists(GEIQEligibilityDiagnosis.objects.filter(job_seeker=OuterRef("pk")))
+                & ~Exists(job_apps_subquery.filter(state=JobApplicationState.ACCEPTED))
+            )
+        )
 
 
 class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
