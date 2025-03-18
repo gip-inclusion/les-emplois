@@ -247,13 +247,22 @@ class TestGroupLists:
     def test_mask_names(self, client):
         prescriber = PrescriberFactory(membership__organization__authorized=False)
         job_seeker = JobSeekerFactory(for_snapshot=True)
-        FollowUpGroupFactory(memberships=1, memberships__member=prescriber, beneficiary=job_seeker)
+        group = FollowUpGroupFactory(memberships=1, memberships__member=prescriber, beneficiary=job_seeker)
+        masked_name = "J… D…"
+        full_name = "Jane DOE"
 
         client.force_login(prescriber)
         my_groups_url = reverse("gps:group_list")
         response = client.get(my_groups_url)
-        assertNotContains(response, "Jane DOE")
-        assertContains(response, "J… D…")
+        assertNotContains(response, full_name)
+        assertContains(response, masked_name)
+
+        # If the membership allows to view personal information
+        group.memberships.update(can_view_personal_information=True)
+        my_groups_url = reverse("gps:group_list")
+        response = client.get(my_groups_url)
+        assertContains(response, full_name)
+        assertNotContains(response, masked_name)
 
 
 def test_backward_compat_urls(client):
@@ -503,9 +512,24 @@ class TestGroupDetailsBeneficiaryTab:
                 ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
             ],
         )
+        assert str(html_details) == snapshot(name="no_diagnostic_can_edit")
+
+        # Same if the membership allow it
+        beneficiary.created_by = None
+        beneficiary.save()
+        group.memberships.update(can_view_personal_information=True)
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+                ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
+            ],
+        )
         assert str(html_details) == snapshot(name="no_diagnostic")
 
-        # When he is
+        # When he is in an authorized organization
         PrescriberOrganization.objects.update(is_authorized=True)
         response = client.get(url)
         html_details = parse_response_to_soup(
@@ -531,7 +555,7 @@ class TestGroupDetailsBeneficiaryTab:
                 ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
             ],
         )
-        assert str(html_details) == snapshot(name="with_beneficiary_edition")
+        assert str(html_details) == snapshot(name="with_diagnostic_can_edit")
 
 
 class TestGroupDetailsContributionTab:
@@ -828,15 +852,15 @@ class TestBeneficiariesAutocomplete:
         else:
             assert response.status_code == 403
 
-    @pytest.mark.parametrize("can_view_personal_info", [True, False])
+    @pytest.mark.parametrize("can_view_personal_info", ["authorized", "membership", False])
     def test_autocomplete(self, client, can_view_personal_info):
         prescriber = PrescriberFactory(first_name="gps member Vince")
         organization_1 = PrescriberMembershipFactory(
-            user=prescriber, organization__authorized=can_view_personal_info
+            user=prescriber, organization__authorized=can_view_personal_info == "authorized"
         ).organization
         coworker_1 = PrescriberMembershipFactory(organization=organization_1).user
         organization_2 = PrescriberMembershipFactory(
-            user=prescriber, organization__authorized=can_view_personal_info
+            user=prescriber, organization__authorized=can_view_personal_info == "authorized"
         ).organization
         coworker_2 = PrescriberMembershipFactory(organization=organization_2).user
 
@@ -857,7 +881,15 @@ class TestBeneficiariesAutocomplete:
         JobSeekerFactory(first_name="gps other beneficiary Joe", last_name="Dalton")
 
         FollowUpGroupFactory(beneficiary=first_beneficiary, memberships=4, memberships__member=prescriber)
-        FollowUpGroupFactory(beneficiary=second_beneficiary, memberships=2, memberships__member=coworker_1)
+        second_group = FollowUpGroupFactory(
+            beneficiary=second_beneficiary,
+            memberships=2,
+            memberships__member=coworker_1,
+        )
+        if can_view_personal_info == "membership":
+            FollowUpGroupMembership.objects.filter(follow_up_group=second_group, member=coworker_1).update(
+                can_view_personal_information=True
+            )
         FollowUpGroupFactory(beneficiary=third_beneficiary, memberships=3, memberships__member=coworker_2)
 
         def get_autocomplete_results(user, term="gps"):
