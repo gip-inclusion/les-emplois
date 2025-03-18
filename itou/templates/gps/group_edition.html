@@ -1,8 +1,9 @@
 {% extends "gps/group_details_base.html" %}
 {% load django_bootstrap5 %}
+{% load str_filters %}
 
 {% block title_content %}
-    <h1 class="m-3">{{ group.beneficiary.get_full_name }}</h1>
+    <h1 class="m-3">{{ group.beneficiary.get_full_name|mask_unless:can_view_personal_information }}</h1>
     <div class="c-box c-box--action">
         <h2 class="visually-hidden">Actions rapides</h2>
         <div class="form-row align-items-center gx-3">
