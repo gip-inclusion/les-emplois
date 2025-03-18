@@ -121,6 +121,10 @@ class FollowUpGroupMembership(models.Model):
     ended_at = models.DateField(verbose_name="date de fin de suivi", null=True, blank=True)
 
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
+    # For user without proper access, this field allow to see personal informations in gps views
+    can_view_personal_information = models.BooleanField(
+        verbose_name="accès aux données du bénéficiaire", default=False
+    )
 
     follow_up_group = models.ForeignKey(
         FollowUpGroup,
