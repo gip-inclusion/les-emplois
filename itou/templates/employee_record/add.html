@@ -57,7 +57,7 @@
                                     {% endif %}
                                 </span>
                                 <p class="c-info__detail mb-0">
-                                    <a href="{% url 'employee_record_views:missing_employee' %}">Cliquez-ici</a> pour faire une recherche avancée parmi l’ensemble des candidats ou salariés de votre structure.
+                                    <a href="{% url 'employee_record_views:missing_employee' %}?back_url={{ request.get_full_path|urlencode }}">Cliquez-ici</a> pour faire une recherche avancée parmi l’ensemble des candidats ou salariés de votre structure.
                                 </p>
                             </div>
                             <hr>

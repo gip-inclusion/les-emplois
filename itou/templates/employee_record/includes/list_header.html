@@ -1,0 +1,37 @@
+<div id="employee-records-list-header"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    {% if num_recently_missing_employee_records %}
+        <h2>Fiches salarié ASP</h2>
+        <div class="alert alert-info" role="status" id="id_missing_employee_records_alert">
+            <div class="row align-items-center">
+                <div class="col-auto pe-0">
+                    <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
+                </div>
+                <div class="col">
+                    {% if num_recently_missing_employee_records == 1 %}
+                        <p class="mb-0">1 nouveau salarié, embauché il y a moins de 4 mois, n’a pas encore de fiche salarié.</p>
+                    {% else %}
+                        <p class="mb-0">
+                            {{ num_recently_missing_employee_records }} nouveaux salariés, embauchés il y a moins de 4 mois, n’ont pas encore de fiches salarié.
+                        </p>
+                    {% endif %}
+                </div>
+                <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                    <a class="btn btn-primary btn-ico" href="{% url "employee_record_views:add" %}?reset_url={{ request.get_full_path|urlencode }}">
+                        <i class="ri-user-add-line ri-lg" aria-hidden="true"></i>
+                        <span>Créer une fiche salarié</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
+            <h2 class="mb-0">Fiches salarié ASP</h2>
+            <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les collaborateurs">
+                <a class="btn btn-primary btn-ico" href="{% url "employee_record_views:add" %}?reset_url={{ request.get_full_path|urlencode }}">
+                    <i class="ri-user-add-line ri-lg" aria-hidden="true"></i>
+                    <span>Créer une fiche salarié</span>
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>

@@ -24,7 +24,7 @@ from itou.utils.auth import check_user
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
-from itou.utils.urls import get_safe_url
+from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.employee_record_views.enums import EmployeeRecordOrder, MissingEmployeeCase
 from itou.www.employee_record_views.forms import (
     AddEmployeeRecordChooseApprovalForm,
@@ -134,7 +134,10 @@ class AddView(UserPassesTestMixin, WizardView):
 @check_user(lambda user: user.is_employer)
 def missing_employee(request, template_name="employee_record/missing_employee.html"):
     siae = get_current_company_or_404(request)
-    back_url = reverse("employee_record_views:add")
+    back_url = add_url_params(
+        reverse("employee_record_views:add"),
+        {"reset_url": get_safe_url(request, "back_url", fallback_url=reverse("employee_record_views:list"))},
+    )
 
     if not siae.can_use_employee_record:
         raise PermissionDenied
