@@ -35,13 +35,18 @@ class MembershipsFiltersForm(forms.Form):
         return queryset
 
     def _get_beneficiary_choices(self, request_user):
-        beneficiaries_ids = self.queryset.values_list("follow_up_group__beneficiary_id", flat=True)
-        beneficiaries = User.objects.filter(id__in=beneficiaries_ids)
+        beneficiaries_data = dict(
+            self.queryset.values_list("follow_up_group__beneficiary_id", "can_view_personal_information")
+        )
+        beneficiaries = User.objects.filter(id__in=beneficiaries_data)
         beneficiaries = [
             (
                 beneficiary.id,
                 mask_unless(
-                    beneficiary.get_full_name(), predicate=request_user.can_view_personal_information(beneficiary)
+                    beneficiary.get_full_name(),
+                    predicate=(
+                        beneficiaries_data[beneficiary.pk] or request_user.can_view_personal_information(beneficiary)
+                    ),
                 ),
             )
             for beneficiary in beneficiaries.order_by("first_name", "last_name")

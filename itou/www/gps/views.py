@@ -74,8 +74,9 @@ def group_list(request, current, template_name="gps/group_list.html"):
 
     memberships_page = pager(memberships, request.GET.get("page"), items_per_page=50)
     for membership in memberships_page:
-        membership.user_can_view_personal_information = request.user.can_view_personal_information(
-            membership.follow_up_group.beneficiary
+        membership.user_can_view_personal_information = (
+            membership.can_view_personal_information
+            or request.user.can_view_personal_information(membership.follow_up_group.beneficiary)
         )
 
     context = {
@@ -105,7 +106,10 @@ class GroupDetailsMixin:
         return context | {
             "back_url": back_url,
             "group": self.group,
-            "can_view_personal_information": self.request.user.can_view_personal_information(self.group.beneficiary),
+            "can_view_personal_information": (
+                self.membership.can_view_personal_information
+                or self.request.user.can_view_personal_information(self.group.beneficiary)
+            ),
         }
 
 
@@ -425,24 +429,43 @@ def beneficiaries_autocomplete(request):
                     )
                 )
             )
+            .annotate(
+                membership_can_view_personal_information=Exists(
+                    FollowUpGroupMembership.objects.filter(
+                        follow_up_group__beneficiary_id=OuterRef("pk"),
+                        member=request.user,
+                        can_view_personal_information=True,
+                    )
+                )
+            )
         )
 
         def format_data(user):
             data = {
                 "id": user.pk,
                 "title": "",
-                "name": mask_unless(user.get_full_name(), predicate=request.user.can_view_personal_information(user)),
+                "name": mask_unless(
+                    user.get_full_name(),
+                    predicate=(
+                        user.membership_can_view_personal_information
+                        or request.user.can_view_personal_information(user)
+                    ),
+                ),
                 "birthdate": "",
             }
             if user.title:
                 # only add a . after M, not Mme
                 data["title"] = (
-                    f"{user.title.capitalize()}."[:3] if request.user.can_view_personal_information(user) else ""
+                    f"{user.title.capitalize()}."[:3]
+                    if user.membership_can_view_personal_information
+                    or request.user.can_view_personal_information(user)
+                    else ""
                 )
             if getattr(user.jobseeker_profile, "birthdate", None):
                 data["birthdate"] = (
                     user.jobseeker_profile.birthdate.strftime("%d/%m/%Y")
-                    if request.user.can_view_personal_information(user)
+                    if user.membership_can_view_personal_information
+                    or request.user.can_view_personal_information(user)
                     else ""
                 )
             return data

@@ -247,13 +247,30 @@ class TestGroupLists:
     def test_mask_names(self, client):
         prescriber = PrescriberFactory(membership__organization__authorized=False)
         job_seeker = JobSeekerFactory(for_snapshot=True)
-        FollowUpGroupFactory(memberships=1, memberships__member=prescriber, beneficiary=job_seeker)
+        group = FollowUpGroupFactory(memberships=1, memberships__member=prescriber, beneficiary=job_seeker)
+        masked_name = "J… D…"
+        full_name = "Jane DOE"
 
         client.force_login(prescriber)
         my_groups_url = reverse("gps:group_list")
         response = client.get(my_groups_url)
-        assertNotContains(response, "Jane DOE")
-        assertContains(response, "J… D…")
+        assertNotContains(response, full_name)
+        assertContains(response, masked_name)
+
+        # If the membership allows to view personal information
+        group.memberships.update(can_view_personal_information=True)
+        my_groups_url = reverse("gps:group_list")
+        response = client.get(my_groups_url)
+        assertContains(response, full_name)
+        assertNotContains(response, masked_name)
+
+        # If the organization is authorized
+        group.memberships.update(can_view_personal_information=False)
+        PrescriberOrganization.objects.all().update(is_authorized=True)
+        my_groups_url = reverse("gps:group_list")
+        response = client.get(my_groups_url)
+        assertContains(response, full_name)
+        assertNotContains(response, masked_name)
 
 
 def test_backward_compat_urls(client):
@@ -503,9 +520,24 @@ class TestGroupDetailsBeneficiaryTab:
                 ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
             ],
         )
+        assert str(html_details) == snapshot(name="no_diagnostic_can_edit")
+
+        # Same if the membership allow it
+        beneficiary.created_by = None
+        beneficiary.save()
+        group.memberships.update(can_view_personal_information=True)
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+                ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
+            ],
+        )
         assert str(html_details) == snapshot(name="no_diagnostic")
 
-        # When he is
+        # When he is in an authorized organization
         PrescriberOrganization.objects.update(is_authorized=True)
         response = client.get(url)
         html_details = parse_response_to_soup(
@@ -531,7 +563,7 @@ class TestGroupDetailsBeneficiaryTab:
                 ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
             ],
         )
-        assert str(html_details) == snapshot(name="with_beneficiary_edition")
+        assert str(html_details) == snapshot(name="with_diagnostic_can_edit")
 
 
 class TestGroupDetailsContributionTab:
@@ -828,18 +860,19 @@ class TestBeneficiariesAutocomplete:
         else:
             assert response.status_code == 403
 
-    @pytest.mark.parametrize("can_view_personal_info", [True, False])
+    @pytest.mark.parametrize("can_view_personal_info", ["authorized", "membership", False])
     def test_autocomplete(self, client, can_view_personal_info):
         prescriber = PrescriberFactory(first_name="gps member Vince")
         organization_1 = PrescriberMembershipFactory(
-            user=prescriber, organization__authorized=can_view_personal_info
+            user=prescriber, organization__authorized=can_view_personal_info == "authorized"
         ).organization
         coworker_1 = PrescriberMembershipFactory(organization=organization_1).user
         organization_2 = PrescriberMembershipFactory(
-            user=prescriber, organization__authorized=can_view_personal_info
+            user=prescriber, organization__authorized=can_view_personal_info == "authorized"
         ).organization
         coworker_2 = PrescriberMembershipFactory(organization=organization_2).user
 
+        # created and followed by prescriber : he will always see the personal informations
         first_beneficiary = JobSeekerFactory(
             first_name="gps beneficiary Bob",
             last_name="Le Brico",
@@ -847,18 +880,35 @@ class TestBeneficiariesAutocomplete:
             jobseeker_profile__birthdate=date(1980, 1, 1),
             title=Title.M,
         )
+        FollowUpGroupFactory(beneficiary=first_beneficiary, memberships=1, memberships__member=prescriber)
+
+        # followed by prescriber : he will only see personal info if he's authorized or if the memberships allows it
         second_beneficiary = JobSeekerFactory(
             first_name="gps second beneficiary Martin",
             last_name="Pêcheur",
             jobseeker_profile__birthdate=date(1990, 1, 1),
             title=Title.MME,
         )
-        third_beneficiary = JobSeekerFactory(first_name="gps third beneficiary Foo", last_name="Bar")
+        FollowUpGroupFactory(beneficiary=second_beneficiary, memberships=1, memberships__member=prescriber)
+
+        # follow by coworker_1: the prescriber will only see personal info if he's authorized
+        third_beneficiary = JobSeekerFactory(
+            first_name="gps third beneficiary Jeanne",
+            last_name="Bonneau",
+            jobseeker_profile__birthdate=date(2000, 1, 1),
+            title=Title.MME,
+        )
+        FollowUpGroupFactory(beneficiary=third_beneficiary, memberships=1, memberships__member=coworker_1)
+
+        # Followed by coworker_2: not the active organization, but the prescriber will still see it
+        fourth_beneficiary = JobSeekerFactory(first_name="gps fourth beneficiary Foo", last_name="Bar")
+        FollowUpGroupFactory(beneficiary=fourth_beneficiary, memberships=1, memberships__member=coworker_2)
+
+        # No link to the prescriber : don't display him
         JobSeekerFactory(first_name="gps other beneficiary Joe", last_name="Dalton")
 
-        FollowUpGroupFactory(beneficiary=first_beneficiary, memberships=4, memberships__member=prescriber)
-        FollowUpGroupFactory(beneficiary=second_beneficiary, memberships=2, memberships__member=coworker_1)
-        FollowUpGroupFactory(beneficiary=third_beneficiary, memberships=3, memberships__member=coworker_2)
+        if can_view_personal_info == "membership":
+            FollowUpGroupMembership.objects.filter(member=prescriber).update(can_view_personal_information=True)
 
         def get_autocomplete_results(user, term="gps"):
             client.force_login(user)
@@ -875,7 +925,7 @@ class TestBeneficiariesAutocomplete:
             "title": "M.",
             "name": first_beneficiary.get_full_name(),
         }
-        if can_view_personal_info:
+        if can_view_personal_info in ["authorized", "membership"]:
             second_beneficiary_data = {
                 "birthdate": "01/01/1990",
                 "id": second_beneficiary.pk,
@@ -890,10 +940,30 @@ class TestBeneficiariesAutocomplete:
                 "name": mask_unless(second_beneficiary.get_full_name(), False),
             }
         assert data[second_beneficiary.pk] == second_beneficiary_data
+        if can_view_personal_info == "authorized":
+            third_beneficiary_data = {
+                "birthdate": "01/01/2000",
+                "id": third_beneficiary.pk,
+                "title": "Mme",
+                "name": third_beneficiary.get_full_name(),
+            }
+        else:
+            third_beneficiary_data = {
+                "birthdate": "",
+                "id": third_beneficiary.pk,
+                "title": "",
+                "name": mask_unless(third_beneficiary.get_full_name(), False),
+            }
+        assert data[third_beneficiary.pk] == third_beneficiary_data
 
-        # The prescriber should see the 3 job seekers followed by members of his organizations, but no the other one
+        # The prescriber should see the 4 job seekers followed by members of his organizations, but no the other one
         results = get_autocomplete_results(prescriber)
-        assert set(results) == {first_beneficiary.pk, second_beneficiary.pk, third_beneficiary.pk}
+        assert set(results) == {
+            first_beneficiary.pk,
+            second_beneficiary.pk,
+            third_beneficiary.pk,
+            fourth_beneficiary.pk,
+        }
 
         # a random other user won't see anyone
         results = get_autocomplete_results(EmployerFactory(with_company=True))
