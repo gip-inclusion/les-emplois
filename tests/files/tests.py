@@ -1,7 +1,10 @@
 import io
+import os
 import uuid
 
 import httpx
+import pytest
+from botocore.config import Config
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.management import call_command
@@ -109,3 +112,11 @@ def test_sync_files_check_existing(temporary_bucket, caplog):
     assert caplog.messages[-1].startswith(
         "Management command itou.files.management.commands.sync_s3_files succeeded in"
     )
+
+
+@pytest.mark.skipif(os.getenv("CI") != "true", reason="Not using to Cellar")
+@pytest.mark.xfail
+def test_cellar_does_not_support_checksum_validation():
+    client = s3_client()
+    client.config = Config()
+    client.put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Body=b"", Key="file")
