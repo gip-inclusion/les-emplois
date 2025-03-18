@@ -401,7 +401,7 @@ def test_step_3_no_previous_CV(client, mocker, pdf_file):
     assert new_job_application.job_seeker == job_application.job_seeker
     assert new_job_application.sender == employer
     assert new_job_application.resume_link == (
-        f"{settings.AWS_S3_ENDPOINT_URL}tests/{storages['public'].location}"
+        f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
         f"/resume/11111111-1111-1111-1111-111111111111.pdf"
     )
     assert new_job_application.state == JobApplicationState.NEW
@@ -489,7 +489,7 @@ def test_step_3_replace_previous_CV(client, mocker, pdf_file):
     assert new_job_application.job_seeker == job_application.job_seeker
     assert new_job_application.sender == employer
     assert new_job_application.resume_link == (
-        f"{settings.AWS_S3_ENDPOINT_URL}tests/{storages['public'].location}"
+        f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
         f"/resume/11111111-1111-1111-1111-111111111111.pdf"
     )
     assert new_job_application.state == JobApplicationState.NEW
