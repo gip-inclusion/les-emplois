@@ -34,10 +34,18 @@ DATABASES["default"]["PASSWORD"] = os.getenv("PGPASSWORD", "password")  # noqa: 
 
 HUEY["immediate"] = True  # noqa: F405
 
-AWS_S3_ENDPOINT_URL = f"http://{os.getenv('CELLAR_ADDON_HOST', 'localhost:9000')}/"
-AWS_S3_ACCESS_KEY_ID = "minioadmin"
-AWS_S3_SECRET_ACCESS_KEY = "minioadmin"
-AWS_STORAGE_BUCKET_NAME = "tests"
+cellar_addon_host = os.getenv("CELLAR_ADDON_HOST_TEST")
+AWS_S3_ENDPOINT_URL = (
+    f"https://{cellar_addon_host}/"
+    if cellar_addon_host
+    else f"http://{os.getenv('CELLAR_ADDON_HOST', 'localhost:9000')}/"
+)
+AWS_S3_ACCESS_KEY_ID = os.getenv("CELLAR_ADDON_KEY_ID_TEST", "minioadmin")
+AWS_S3_SECRET_ACCESS_KEY = os.getenv("CELLAR_ADDON_SECRET_KEY_TEST", "minioadmin")
+# S3 bucket names must be globally unique. CI uses Cellar, so the storage
+# bucket name must not exist on all of Cellar.
+# https://www.clever-cloud.com/developers/doc/addons/cellar/#name-your-bucket
+AWS_STORAGE_BUCKET_NAME = "c1-tests"
 
 PILOTAGE_DATASTORE_S3_ENDPOINT_URL = AWS_S3_ENDPOINT_URL
 PILOTAGE_DATASTORE_S3_ACCESS_KEY = AWS_S3_ACCESS_KEY_ID

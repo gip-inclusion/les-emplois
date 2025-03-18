@@ -50,7 +50,7 @@ def test_bucket_policy_for_anonymous_user():
 
     # Anything under the resume prefix is public.
     filename = f"{uuid.uuid4()}.pdf"
-    root_url = f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/"
+    root_url = f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}"
     s3_client().put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Body=b"", Key=f"resume/{filename}")
     response = httpx.head(f"{root_url}/resume/{filename}")
     assert response.status_code == 200
