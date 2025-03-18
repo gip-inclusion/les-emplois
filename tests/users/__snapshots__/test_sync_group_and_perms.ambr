@@ -96,6 +96,7 @@
     'change_emailaddress',
     'delete_emailaddress',
     'view_emailaddress',
+    'add_approval',
     'change_approval',
     'delete_approval',
     'view_approval',
