@@ -223,10 +223,12 @@
                       Candidat sans solution
                   </button>
                   <ul class="dropdown-menu">
-                      <div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_stalled" name="stalled" type="checkbox"/><label class="form-check-label" for="id_stalled">N’afficher que les candidats sans solution</label></div></div>
+                      <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_stalled" name="stalled" type="checkbox"/><label class="form-check-label" for="id_stalled">N’afficher que les candidats sans solution</label></div></div></li>
+                      <li>
+                          <a class="btn btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/33573455767441--Qu-est-ce-qu-un-candidat-sans-solution-sur-les-Emplois-de-l-inclusion" rel="noopener" target="_blank">Qu’est-ce qu’un candidat sans solution ?</a>
+                      </li>
                   </ul>
               </div>
-              <a class="btn btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" rel="noopener" target="_blank">Qu’est-ce qu’un candidat sans solution ?</a>
               
               
   
