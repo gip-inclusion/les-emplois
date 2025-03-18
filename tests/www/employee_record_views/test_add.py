@@ -61,6 +61,7 @@ def test_wizard(snapshot, client):
                     "company_[PK of Company]_add_employee_record-current_step",
                 ),
                 ("value", str(job_application.job_seeker.pk), "[PK of job seeker]"),
+                ("href", wizard_session_name, "[UUID of session]"),
             ],
         )
     ) == snapshot(name="choose-employee")
@@ -85,6 +86,7 @@ def test_wizard(snapshot, client):
         replace_in_attr=[
             ("value", wizard_session_name, "[UUID of session]"),
             ("value", str(approval.pk), "[PK of Approval]"),
+            ("href", wizard_session_name, "[UUID of session]"),
         ],
     )
     assert str(soup) == snapshot(name="choose-approval")

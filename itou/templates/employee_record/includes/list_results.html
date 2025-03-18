@@ -17,6 +17,7 @@
 </div>
 
 {% if request.htmx %}
+    {% include 'employee_record/includes/list_header.html' %}
     {% include "employee_record/includes/list_order.html" %}
     {% include "employee_record/includes/list_counter.html" %}
     {% include "employee_record/includes/employee_record_filters/status.html" %}
