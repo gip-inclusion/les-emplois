@@ -592,7 +592,7 @@ class TestApplyAsJobSeeker:
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
         assert job_application.resume_link == (
-            f"{settings.AWS_S3_ENDPOINT_URL}tests/{storages['public'].location}"
+            f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
 
@@ -1241,7 +1241,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert job_application.selected_jobs.get() == selected_job
         assert (
             job_application.resume_link == f"{settings.AWS_S3_ENDPOINT_URL}"
-            f"tests/{storages['public'].location}/resume/11111111-1111-1111-1111-111111111111.pdf"
+            f"{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
 
         assert f"job_application-{company.pk}" not in client.session
@@ -1556,7 +1556,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
         assert job_application.resume_link == (
-            f"{settings.AWS_S3_ENDPOINT_URL}tests/{storages['public'].location}"
+            f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
 
@@ -2044,7 +2044,7 @@ class TestApplyAsPrescriber:
         assert job_application.selected_jobs.get() == selected_job
 
         assert job_application.resume_link == (
-            f"{settings.AWS_S3_ENDPOINT_URL}tests/{storages['public'].location}"
+            f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
 
@@ -2627,7 +2627,7 @@ class TestApplyAsCompany:
         assert job_application.selected_jobs.get() == selected_job
 
         assert job_application.resume_link == (
-            f"{settings.AWS_S3_ENDPOINT_URL}tests/{storages['public'].location}"
+            f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
 
