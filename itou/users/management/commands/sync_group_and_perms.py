@@ -39,8 +39,7 @@ def get_permissions_dict():
 
     group_itou_admin_permissions = {
         account_models.EmailAddress: PERMS_ALL,
-        # There's a special form that does not uses the ADD permission
-        approvals_models.Approval: PERMS_DELETE,
+        approvals_models.Approval: PERMS_ALL,
         approvals_models.CancelledApproval: PERMS_READ,
         approvals_models.PoleEmploiApproval: PERMS_READ,
         approvals_models.Prolongation: PERMS_ALL,
