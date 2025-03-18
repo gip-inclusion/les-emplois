@@ -8,6 +8,7 @@ import json
 import os
 import warnings
 
+from botocore.config import Config
 from dotenv import load_dotenv
 
 from config.sentry import sentry_init
@@ -617,6 +618,13 @@ ASP_EA2_UNZIP_PASSWORD = os.getenv("ASP_EA2_UNZIP_PASSWORD")
 AWS_S3_ACCESS_KEY_ID = os.getenv("CELLAR_ADDON_KEY_ID")
 AWS_S3_SECRET_ACCESS_KEY = os.getenv("CELLAR_ADDON_KEY_SECRET")
 AWS_STORAGE_BUCKET_NAME = os.getenv("S3_STORAGE_BUCKET_NAME")
+# CleverCloud S3 implementation does not support recent data integrity features from AWS.
+# https://github.com/boto/boto3/issues/4392
+# https://github.com/boto/boto3/issues/4398#issuecomment-2619946229
+AWS_S3_CLIENT_CONFIG = Config(
+    request_checksum_calculation="when_required",
+    response_checksum_validation="when_required",
+)
 
 # S3 store for communicating with the Pilotage.
 PILOTAGE_DATASTORE_S3_ENDPOINT_URL = os.getenv("PILOTAGE_DATASTORE_S3_ENDPOINT_URL")
