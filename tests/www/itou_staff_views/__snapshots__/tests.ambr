@@ -2747,7 +2747,7 @@
                                               <tr>
                                                   <td>
                                                       
-                                                          <i class="ri-verified-badge-line text-success" data-bs-placement="top" data-bs-title="Vous avez utilisé cet appareil pour vous connecter." data-bs-toggle="tooltip"></i>
+                                                          <i class="ri-verified-badge-fill text-success" data-bs-placement="top" data-bs-title="Vous avez utilisé cet appareil pour vous connecter." data-bs-toggle="tooltip"></i>
                                                       
                                                   </td>
                                                   <td>bitwarden</td>
@@ -2901,7 +2901,7 @@
                                               <tr>
                                                   <td>
                                                       
-                                                          <i class="ri-verified-badge-line text-success" data-bs-placement="top" data-bs-title="Vous avez utilisé cet appareil pour vous connecter." data-bs-toggle="tooltip"></i>
+                                                          <i class="ri-verified-badge-fill text-success" data-bs-placement="top" data-bs-title="Vous avez utilisé cet appareil pour vous connecter." data-bs-toggle="tooltip"></i>
                                                       
                                                   </td>
                                                   <td>Mon appareil</td>
