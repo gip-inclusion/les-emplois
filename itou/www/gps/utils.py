@@ -13,7 +13,10 @@ def add_beneficiary(request, beneficiary, notify_duplicate=False, is_active=True
     membership, added = FollowUpGroup.objects.follow_beneficiary(
         beneficiary=beneficiary, user=request.user, is_active=is_active
     )
-    name = mask_unless(beneficiary.get_full_name(), predicate=request.user.can_view_personal_information(beneficiary))
+    name = mask_unless(
+        beneficiary.get_full_name(),
+        predicate=membership.can_view_personal_information or request.user.can_view_personal_information(beneficiary),
+    )
     if is_active is False:
         messages.info(
             request,
