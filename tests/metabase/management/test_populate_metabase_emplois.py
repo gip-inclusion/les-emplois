@@ -15,7 +15,7 @@ from itou.companies.models import JobDescription
 from itou.eligibility.models import AdministrativeCriteria
 from itou.geo.utils import coords_to_geometry
 from itou.job_applications.enums import JobApplicationState
-from itou.metabase.tables import gps
+from itou.metabase.tables import gps, suspensions
 from itou.metabase.tables.utils import hash_content
 from itou.users.enums import IdentityProvider, UserKind
 from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
@@ -24,6 +24,7 @@ from tests.approvals.factories import (
     PoleEmploiApprovalFactory,
     ProlongationFactory,
     ProlongationRequestDenyInformationFactory,
+    SuspensionFactory,
 )
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
@@ -683,6 +684,42 @@ def test_populate_prolongation_requests():
             prolongation_request.reminder_sent_at,
             datetime.date(2023, 2, 1),
         )
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_suspensions():
+    num_queries = 1  # Count Suspensions
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
+    num_queries += 1  # Select pks
+    num_queries += 1  # Select one chunk
+    num_queries += 1  # Select queryset with annotations
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    # NOTE: Freeze time before comparison to avoid issues comparing database type (datetime) with FakeDate.
+    with freeze_time("2023-02-02"):
+        suspension = SuspensionFactory()
+        with assertNumQueries(num_queries):
+            management.call_command("populate_metabase_emplois", mode="suspensions")
+
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM {suspensions.TABLE.name} ORDER BY id")
+        rows = cursor.fetchall()
+        assert rows == [
+            (
+                suspension.id,
+                suspension.start_at,
+                suspension.end_at,
+                suspension.created_at,
+                suspension.reason.value,
+                hash_content(suspension.approval.number),
+                int(suspension.is_in_progress),
+                datetime.date(2023, 2, 1),
+            )
+        ]
 
 
 @freeze_time("2023-02-02")
