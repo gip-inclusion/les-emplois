@@ -26,7 +26,7 @@ from django.db.models import Count, F, Max, Prefetch, Q
 from django.utils import timezone
 
 from itou.analytics.models import Datum, StatsDashboardVisit
-from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, ProlongationRequest
+from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, ProlongationRequest, Suspension
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.companies.enums import ContractType
@@ -61,6 +61,7 @@ from itou.metabase.tables import (
     prolongations,
     rome_codes,
     selected_jobs,
+    suspensions,
     users,
 )
 from itou.metabase.tables.utils import get_active_companies_pks
@@ -99,6 +100,7 @@ class Command(BaseCommand):
             "approvals": self.populate_approvals,
             "prolongations": self.populate_prolongations,
             "prolongation_requests": self.populate_prolongation_requests,
+            "suspensions": self.populate_suspensions,
             "institutions": self.populate_institutions,
             "evaluation_campaigns": self.populate_evaluation_campaigns,
             "evaluated_siaes": self.populate_evaluated_siaes,
@@ -416,6 +418,10 @@ class Command(BaseCommand):
         ).all()
         populate_table(prolongation_requests.TABLE, batch_size=1000, querysets=[queryset])
 
+    def populate_suspensions(self):
+        queryset = Suspension.objects.all()
+        populate_table(suspensions.TABLE, batch_size=1000, querysets=[queryset])
+
     def populate_institutions(self):
         queryset = Institution.objects.all()
         populate_table(institutions.TABLE, batch_size=1000, querysets=[queryset])
@@ -490,6 +496,7 @@ class Command(BaseCommand):
             ContractType: "c1_ref_type_contrat",
             PrescriberOrganizationKind: "c1_ref_type_prescripteur",
             RefusalReason: "c1_ref_motif_de_refus",
+            Suspension.Reason: "c1_ref_motif_suspension",
         }
         for enum, table_name in enum_to_table.items():
             self.logger.info("Preparing content for %s table...", table_name)

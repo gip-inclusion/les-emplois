@@ -31,6 +31,7 @@ if [[ "$1" == "--daily" ]]; then
     django-admin populate_metabase_emplois --mode=approvals |& tee -a "$OUTPUT_LOG"
     django-admin populate_metabase_emplois --mode=prolongations |& tee -a "$OUTPUT_LOG"
     django-admin populate_metabase_emplois --mode=prolongation_requests |& tee -a "$OUTPUT_LOG"
+    django-admin populate_metabase_emplois --mode=suspensions |& tee -a "$OUTPUT_LOG"
     django-admin populate_metabase_emplois --mode=institutions |& tee -a "$OUTPUT_LOG"
     django-admin populate_metabase_emplois --mode=evaluation_campaigns |& tee -a "$OUTPUT_LOG"
     django-admin populate_metabase_emplois --mode=evaluated_siaes |& tee -a "$OUTPUT_LOG"

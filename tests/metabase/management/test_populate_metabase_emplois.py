@@ -28,6 +28,7 @@ from tests.approvals.factories import (
     PoleEmploiApprovalFactory,
     ProlongationFactory,
     ProlongationRequestDenyInformationFactory,
+    SuspensionFactory,
 )
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
@@ -731,6 +732,42 @@ def test_populate_prolongation_requests():
         )
 
 
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_suspensions():
+    suspension = SuspensionFactory()
+
+    num_queries = 1  # Count Suspensions
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
+    num_queries += 1  # Select pks
+    num_queries += 1  # Select one chunk
+    num_queries += 1  # Select queryset with annotations
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="suspensions")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM suspensions_v0 ORDER BY id")
+        rows = dictfetchall(cursor)
+
+    assert rows == [
+        {
+            "id": suspension.id,
+            "id_pass_agrément": suspension.approval_id,
+            "date_début": suspension.start_at,
+            "date_fin": suspension.end_at,
+            "motif": suspension.reason.value,
+            "en_cours": int(suspension.is_in_progress),
+            "date_de_création": suspension.created_at,
+            "date_mise_à_jour_metabase": timezone.localdate() - datetime.timedelta(days=1),
+        }
+    ]
+
+
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
@@ -1040,7 +1077,7 @@ def test_populate_enums():
     num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
     num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
     num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries *= 4  # We inject thus many enums so far.
+    num_queries *= 5  # We inject thus many enums so far.
     with assertNumQueries(num_queries):
         management.call_command("populate_metabase_emplois", mode="enums")
 
@@ -1068,6 +1105,14 @@ def test_populate_enums():
         cursor.execute("SELECT * FROM c1_ref_motif_de_refus ORDER BY code")
         rows = cursor.fetchall()
         assert rows[0] == ("approval_expiration_too_close", "La date de fin du PASS IAE / agrément est trop proche")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM c1_ref_motif_suspension ORDER BY code")
+        rows = cursor.fetchall()
+        assert rows[0] == (
+            "APPROVAL_BETWEEN_CTA_MEMBERS",
+            "Situation faisant l'objet d'un accord entre les acteurs membres du CTA (Comité technique d'animation)",
+        )
 
 
 def test_data_inconsistencies(caplog):
