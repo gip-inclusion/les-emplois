@@ -8,10 +8,12 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
+from itou.jobs.models import Appellation
 from itou.utils.models import PkSupportRemark
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, ItouStaffFactory
 from tests.utils.test import (
     BASE_NUM_QUERIES,
@@ -346,3 +348,41 @@ class TestTransferCompanyData:
         assert "Candidatures reçues" in remark
         assert f"Désactivation entreprise:\n  * companies.Company[{from_company.pk}]" in remark
         assert "Peut apparaître dans la recherche:\n  * is_searchable: False remplacé par True" in remark
+
+
+@freeze_time("2023-08-31 12:34:56")
+def test_toggle_job_description_active_updating_last_modified(admin_client):
+    # Closing recruitment does not modify the last modified time, but opening it does.
+    company = CompanyFactory()
+    create_test_romes_and_appellations(["N1101"])
+    appellation = Appellation.objects.first()
+    company.jobs.add(appellation)
+    job_description = appellation.jobdescription_set.first()
+    original_job_updated_at = job_description.updated_at
+    assert job_description.is_active
+
+    url = reverse("admin:companies_jobdescription_change", kwargs={"object_id": job_description.pk})
+    # POST the required fields with only is_active changed.
+    post_data = {
+        "appellation": appellation.pk,
+        "company": company.pk,
+        "created_at_0": job_description.created_at.strftime("%d/%m/%Y"),
+        "created_at_1": job_description.created_at.strftime("%H:%M:%S"),
+        "creation_source": job_description.creation_source,
+        "ui_rank": job_description.ui_rank,
+        "is_active": False,
+    }
+    response = admin_client.post(url, data=post_data)
+    change_url = reverse("admin:companies_jobdescription_changelist")
+    assertRedirects(response, change_url, fetch_redirect_response=False)
+    response = admin_client.get(change_url)
+    job_description.refresh_from_db()
+    assert not job_description.is_active
+    assert job_description.updated_at == original_job_updated_at
+
+    with freeze_time("2023-09-01 12:34:56"):
+        post_data["is_active"] = True
+        admin_client.post(url, data=post_data)
+        job_description.refresh_from_db()
+        assert job_description.is_active
+        assert job_description.updated_at > original_job_updated_at
