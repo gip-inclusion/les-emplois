@@ -267,19 +267,26 @@ class TestApply:
         )
 
     @pytest.mark.parametrize(
-        "job_description_id,expected_session",
+        "job_description_id,back_url,expected_session",
         [
-            pytest.param("", {}, id="empty"),
-            pytest.param(1, {"selected_jobs": [1]}, id="with_selected_jobs"),
+            pytest.param("", "", {}, id="empty"),
+            pytest.param(1, "", {"selected_jobs": [1]}, id="with_selected_jobs"),
+            pytest.param(
+                1,
+                "/une/url/quelconque",
+                {"selected_jobs": [1], "reset_url": "/une/url/quelconque"},
+                id="with_selected_jobs_and_reset_url",
+            ),
+            pytest.param("", "/une/url/quelconque", {"reset_url": "/une/url/quelconque"}, id="with_reset_url"),
         ],
     )
-    def test_start_view_initializes_session(self, client, job_description_id, expected_session):
+    def test_start_view_initializes_session(self, client, job_description_id, back_url, expected_session):
         company = CompanyFactory(with_jobs=True, with_membership=True)
         if job_description_id:
             JobDescriptionFactory(pk=job_description_id, company=company)
         client.force_login(PrescriberFactory())
         url = reverse("apply:start", kwargs={"company_pk": company.pk})
-        client.get(url, {"job_description_id": job_description_id})
+        client.get(url, {"job_description_id": job_description_id, "back_url": back_url})
 
         assert client.session[f"job_application-{company.pk}"] == expected_session
 
@@ -374,13 +381,20 @@ class TestHire:
             response = client.get(url)
             assertContains(response, "Le candidat a terminé un parcours il y a moins de deux ans", status_code=403)
 
-    def test_start_view_initializes_session(self, client):
+    @pytest.mark.parametrize(
+        "back_url,expected_session",
+        [
+            pytest.param("/une/url/quelconque", {"reset_url": "/une/url/quelconque"}, id="with_back_url"),
+            pytest.param("", {}, id="empty"),
+        ],
+    )
+    def test_start_view_initializes_session(self, client, back_url, expected_session):
         company = CompanyFactory(with_jobs=True, with_membership=True)
         client.force_login(company.members.first())
-        url = reverse("apply:start_hire", kwargs={"company_pk": company.pk})
-        client.get(url)
+        url = reverse("apply:start", kwargs={"company_pk": company.pk})
+        client.get(url, {"back_url": back_url})
 
-        assert client.session[f"job_application-{company.pk}"] == {}
+        assert client.session[f"job_application-{company.pk}"] == expected_session
 
 
 def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
@@ -458,7 +472,10 @@ class TestApplyAsJobSeeker:
         # Entry point.
         # ----------------------------------------------------------------------
 
-        response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
+        response = client.get(
+            reverse("apply:start", kwargs={"company_pk": company.pk}),
+            {"back_url": reset_url_company},
+        )
 
         [job_seeker_session_name] = [
             k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
@@ -527,12 +544,12 @@ class TestApplyAsJobSeeker:
         assertContains(response, LINK_RESET_MARKUP % reset_url_company)
 
         selected_job = company.job_description_through.first()
-        reset_url_job_description = reverse(
-            "companies_views:job_description_card", kwargs={"job_description_id": selected_job.pk}
-        )
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
 
-        assert client.session[f"job_application-{company.pk}"] == {"selected_jobs": [selected_job.pk]}
+        assert client.session[f"job_application-{company.pk}"] == {
+            "selected_jobs": [selected_job.pk],
+            "reset_url": reset_url_company,
+        }
 
         next_url = reverse(
             "apply:application_eligibility", kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id}
@@ -552,7 +569,7 @@ class TestApplyAsJobSeeker:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assertContains(response, "Envoyer la candidature")
-        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_job_description)
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         with mock.patch(
             "itou.www.apply.views.submit_views.uuid.uuid4",
@@ -662,7 +679,7 @@ class TestApplyAsJobSeeker:
         # Follow the application process.
         response = client.get(
             reverse("apply:start", kwargs={"company_pk": company.pk}),
-            {"job_description_id": job_description.pk},
+            {"job_description_id": job_description.pk, "back_url": reset_url_job_description},
         )
         [job_seeker_session_name] = [
             k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
@@ -849,6 +866,11 @@ class TestApplyAsJobSeeker:
             "contacter plus facilement.</p>"
         )
         client.force_login(application.job_seeker)
+        session = client.session
+        session[f"job_application-{application.to_company.pk}"] = {
+            "reset_url": reverse("companies_views:card", kwargs={"siae_id": application.to_company.pk})
+        }
+        session.save()
         response = client.get(
             reverse(
                 "apply:application_end",
@@ -869,6 +891,11 @@ class TestApplyAsJobSeeker:
             "la prise de contact avec le candidat.</p>"
         )
         client.force_login(application.to_company.members.first())
+        session = client.session
+        session[f"job_application-{application.to_company.pk}"] = {
+            "reset_url": reverse("companies_views:card", kwargs={"siae_id": application.to_company.pk})
+        }
+        session.save()
         response = client.get(
             reverse(
                 "apply:application_end",
@@ -891,6 +918,11 @@ class TestApplyAsJobSeeker:
             "la prise de contact avec le candidat.</p>"
         )
         client.force_login(application.sender_prescriber_organization.members.first())
+        session = client.session
+        session[f"job_application-{application.to_company.pk}"] = {
+            "reset_url": reverse("companies_views:card", kwargs={"siae_id": application.to_company.pk})
+        }
+        session.save()
         response = client.get(
             reverse(
                 "apply:application_end",
@@ -934,7 +966,7 @@ class TestApplyAsAuthorizedPrescriber:
         # Entry point.
         # ----------------------------------------------------------------------
 
-        response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
+        response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), {"back_url": from_url})
 
         next_url = reverse(
             "apply:pending_authorization_for_sender",
@@ -1161,7 +1193,10 @@ class TestApplyAsAuthorizedPrescriber:
         selected_job = company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
 
-        assert client.session[f"job_application-{company.pk}"] == {"selected_jobs": [selected_job.pk]}
+        assert client.session[f"job_application-{company.pk}"] == {
+            "selected_jobs": [selected_job.pk],
+            "reset_url": from_url,
+        }
 
         next_url = reverse(
             "apply:application_eligibility",
@@ -1244,7 +1279,10 @@ class TestApplyAsAuthorizedPrescriber:
         # Entry point.
         # ----------------------------------------------------------------------
 
-        response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
+        response = client.get(
+            reverse("apply:start", kwargs={"company_pk": company.pk}),
+            {"back_url": reset_url_company},
+        )
 
         params = {
             "tunnel": "sender",
@@ -1453,12 +1491,12 @@ class TestApplyAsAuthorizedPrescriber:
         assertContains(response, LINK_RESET_MARKUP % reset_url_company)
 
         selected_job = company.job_description_through.first()
-        reset_url_job_description = reverse(
-            "companies_views:job_description_card", kwargs={"job_description_id": selected_job.pk}
-        )
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
 
-        assert client.session[f"job_application-{company.pk}"] == {"selected_jobs": [selected_job.pk]}
+        assert client.session[f"job_application-{company.pk}"] == {
+            "selected_jobs": [selected_job.pk],
+            "reset_url": reset_url_company,
+        }
 
         next_url = reverse(
             "apply:application_eligibility",
@@ -1476,7 +1514,7 @@ class TestApplyAsAuthorizedPrescriber:
             return_value=True,
         ):
             response = client.get(next_url)
-            assertContains(response, CONFIRM_RESET_MARKUP % reset_url_job_description)
+            assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
             assert not EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=company)
             assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
 
@@ -1495,7 +1533,7 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assertContains(response, "Postuler")
-        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_job_description)
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         with mock.patch(
             "itou.www.apply.views.submit_views.uuid.uuid4",
@@ -1605,9 +1643,12 @@ class TestApplyAsAuthorizedPrescriber:
         company = CompanyWithMembershipAndJobsFactory(romes=["N1101"])
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         user = prescriber_organization.members.get()
+        reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         client.force_login(user)
 
-        response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
+        response = client.get(
+            reverse("apply:start", kwargs={"company_pk": company.pk}), {"back_url": reset_url_company}
+        )
 
         params = {
             "tunnel": "sender",
@@ -1703,7 +1744,9 @@ class TestApplyAsPrescriber:
         # Entry point.
         # ----------------------------------------------------------------------
 
-        response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
+        response = client.get(
+            reverse("apply:start", kwargs={"company_pk": company.pk}), {"back_url": reset_url_company}
+        )
         params = {
             "tunnel": "sender",
             "company": company.pk,
@@ -1950,12 +1993,12 @@ class TestApplyAsPrescriber:
         assertContains(response, LINK_RESET_MARKUP % reset_url_company)
 
         selected_job = company.job_description_through.first()
-        reset_url_job_description = reverse(
-            "companies_views:job_description_card", kwargs={"job_description_id": selected_job.pk}
-        )
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
 
-        assert client.session[f"job_application-{company.pk}"] == {"selected_jobs": [selected_job.pk]}
+        assert client.session[f"job_application-{company.pk}"] == {
+            "selected_jobs": [selected_job.pk],
+            "reset_url": reset_url_company,
+        }
 
         next_url = reverse(
             "apply:application_eligibility",
@@ -1977,7 +2020,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assertContains(response, "Postuler")
-        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_job_description)
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         with mock.patch(
             "itou.www.apply.views.submit_views.uuid.uuid4",
@@ -2091,10 +2134,13 @@ class TestApplyAsPrescriberNirExceptions:
             pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
         )
         company, user = self.create_test_data()
+        reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         client.force_login(user)
 
         # Follow all redirections…
-        response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
+        response = client.get(
+            reverse("apply:start", kwargs={"company_pk": company.pk}), {"back_url": reset_url_company}, follow=True
+        )
 
         # …until a job seeker has to be determined.
         assert response.status_code == 200
@@ -2180,10 +2226,13 @@ class TestApplyAsPrescriberNirExceptions:
             pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
         )
         siae, user = self.create_test_data()
+        reset_url_company = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
         client.force_login(user)
 
         # Follow all redirections…
-        response = client.get(reverse("apply:start", kwargs={"company_pk": siae.pk}), follow=True)
+        response = client.get(
+            reverse("apply:start", kwargs={"company_pk": siae.pk}), {"back_url": reset_url_company}, follow=True
+        )
         [job_seeker_session_name] = [
             k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
         ]
@@ -2303,7 +2352,7 @@ class TestApplyAsCompany:
         # Entry point.
         # ----------------------------------------------------------------------
 
-        response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
+        response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), {"back_url": reset_url})
 
         params = {
             "tunnel": "sender",
@@ -2527,16 +2576,12 @@ class TestApplyAsCompany:
         assertContains(response, LINK_RESET_MARKUP % reset_url)
 
         selected_job = company.job_description_through.first()
-        # Autoprescription: after job selection, reset button sends to dashboard,
-        # otherwise sends to job description card
-        reset_url = (
-            reverse("dashboard:index")
-            if company in user.company_set.all()
-            else reverse("companies_views:job_description_card", kwargs={"job_description_id": selected_job.pk})
-        )
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
 
-        assert client.session[f"job_application-{company.pk}"] == {"selected_jobs": [selected_job.pk]}
+        assert client.session[f"job_application-{company.pk}"] == {
+            "selected_jobs": [selected_job.pk],
+            "reset_url": reset_url,
+        }
 
         next_url = reverse(
             "apply:application_eligibility",
@@ -4318,6 +4363,7 @@ class TestUpdateJobSeekerStep3View:
 @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
 def test_detect_existing_job_seeker(client):
     company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+    reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
     prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
     user = prescriber_organization.members.first()
@@ -4334,7 +4380,7 @@ def test_detect_existing_job_seeker(client):
     # Entry point.
     # ----------------------------------------------------------------------
 
-    response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
+    response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), {"back_url": reset_url_company})
 
     params = {
         "tunnel": "sender",
@@ -4791,9 +4837,7 @@ class TestCheckPreviousApplicationsView:
         client.force_login(user)
         apply_session = SessionNamespace(client.session, f"job_application-{self.company.pk}")
         apply_session.init(
-            {
-                "selected_jobs": [],
-            }
+            {"selected_jobs": [], "reset_url": reverse("companies_views:card", kwargs={"siae_id": self.company.pk})}
         )
         apply_session.save()
 

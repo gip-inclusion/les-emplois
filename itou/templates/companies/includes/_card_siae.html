@@ -80,7 +80,7 @@
                     <p class="mb-3 mb-md-0">Cette structure vous intéresse ?</p>
                     {% url 'apply:start' company_pk=siae.pk as apply_url %}
                     <a class="btn btn-ico btn-primary"
-                       href="{% url_add_query apply_url job_seeker=job_seeker.public_id|default:'' %}"
+                       href="{% url_add_query apply_url job_seeker=job_seeker.public_id|default:'' back_url=request.get_full_path %}"
                        {% matomo_event "candidature" "clic" "start_application" %}
                        aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
                         <i class="ri ri-draft-line" aria-hidden="true"></i>
@@ -163,7 +163,7 @@
                     <p class="mb-3 mb-md-0">Cette structure vous intéresse ?</p>
                     {% url 'apply:start' company_pk=siae.pk as apply_url %}
                     <a class="btn btn-ico btn-primary"
-                       href="{% url_add_query apply_url job_seeker=job_seeker.public_id|default:'' %}"
+                       href="{% url_add_query apply_url job_seeker=job_seeker.public_id|default:'' back_url=request.get_full_path %}"
                        {% matomo_event "candidature" "clic" "start_application" %}
                        aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
                         <i class="ri ri-draft-line" aria-hidden="true"></i>

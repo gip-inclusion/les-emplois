@@ -1,5 +1,6 @@
 {% load format_filters %}
 {% load matomo %}
+{% load url_add_query %}
 
 <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
     <div>
@@ -51,7 +52,8 @@
                         <span>Déclarer une embauche</span>
                     </button>
                 {% else %}
-                    <a href="{% url 'apply:start_hire' company_pk=request.current_organization.pk %}" class="btn btn-lg btn-primary btn-ico" {% matomo_event "employeurs" "clic" "declarer-embauche" %}>
+                    {% url "apply:start_hire" company_pk=request.current_organization.pk as hire_url %}
+                    <a href="{% url_add_query hire_url back_url=request.get_full_path %}" class="btn btn-lg btn-primary btn-ico" {% matomo_event "employeurs" "clic" "declarer-embauche" %}>
                         <i class="ri-user-follow-line fw-medium" aria-hidden="true"></i>
                         <span>Déclarer une embauche</span>
                     </a>

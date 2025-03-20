@@ -23,7 +23,7 @@ from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.session import SessionNamespace
-from itou.utils.urls import add_url_params
+from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.apply.forms import ApplicationJobsForm, SubmitJobApplicationForm
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
@@ -120,20 +120,9 @@ class ApplyStepBaseView(TemplateView):
         return None
 
     def get_reset_url(self):
-        if self.hire_process or self.auto_prescription_process:
-            # The employer can come either by creating an application or hiring somebody.
-            # In both cases, the reset_url adds no value compared to going back to the dashboard.
-            return reverse("dashboard:index")
-
-        try:
-            selected_jobs = self.apply_session.get("selected_jobs", [])
-            [job_description] = selected_jobs
-        except (
-            KeyError,  # No apply_session
-            ValueError,  # No job description, or multiple job descriptions.
-        ):
-            return reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
-        return reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description})
+        if self.apply_session.exists():
+            return self.apply_session.get("reset_url", reverse("dashboard:index"))
+        return reverse("dashboard:index")
 
     def init_job_seeker_session(self, request):
         job_seeker_session = SessionNamespace.create_uuid_namespace(
@@ -255,6 +244,8 @@ class StartView(ApplyStepBaseView):
             raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
 
         self.apply_session.init({})
+        if back_url := get_safe_url(request, "back_url"):
+            self.apply_session.set("reset_url", back_url)
 
         # Store away the selected job in the session to avoid passing it
         # along the many views before ApplicationJobsView.
