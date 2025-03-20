@@ -3,6 +3,7 @@
 {% load django_bootstrap5 %}
 {% load str_filters %}
 {% load matomo %}
+{% load datetime_filters %}
 
 {% block title %}Métiers et recrutements {{ block.super }}{% endblock %}
 
@@ -75,6 +76,7 @@
                                             <th scope="col">Localisation</th>
                                             <th scope="col">Nbre de postes</th>
                                             <th scope="col">Statut</th>
+                                            <th scope="col">Mise à jour</th>
                                             <th scope="col" class="text-end w-50px"></th>
                                         </tr>
                                     </thead>
@@ -103,6 +105,7 @@
                                                     </div>
                                                 </form>
                                             </td>
+                                            <td>-</td>
                                             <td></td>
                                         </tr>
                                         {% for job_description in job_pager %}
@@ -141,6 +144,7 @@
                                                         </div>
                                                     </form>
                                                 </td>
+                                                <td>{{ job_description.updated_at|naturaldate|capfirst }}</td>
                                                 <td class="text-end w-50px">
                                                     <button class="btn btn-sm btn-link btn-ico-only" type="button" data-bs-toggle="modal" data-bs-target="#_delete_modal_{{ job_description.id }}">
                                                         <i class="ri-delete-bin-line" data-bs-toggle="tooltip" data-bs-title="Supprimer" aria-label="Supprimer ce métier"></i>
