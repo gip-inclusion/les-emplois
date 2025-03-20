@@ -340,11 +340,10 @@ ACCOUNT_ADAPTER = "itou.users.adapter.UserAdapter"
 
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_EMAIL_SUBJECT_PREFIX = ""
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
-ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_DISPLAY = "itou.users.models.get_allauth_account_user_display"
 
 BOOTSTRAP5 = {
