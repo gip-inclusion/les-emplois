@@ -90,3 +90,7 @@ API_PARTICULIER_BASE_URL = "https://staging.particulier.api.gouv.fr/api/"
 
 FORCE_PROCONNECT_LOGIN = os.getenv("FORCE_PROCONNECT_LOGIN", "True") == "True"
 REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "False") == "True"
+
+SHELL_PLUS_IMPORTS = [
+    "import datetime",
+]
