@@ -23,7 +23,7 @@ from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.session import SessionNamespace
-from itou.utils.urls import add_url_params
+from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.apply.forms import ApplicationJobsForm, SubmitJobApplicationForm
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
@@ -120,6 +120,8 @@ class ApplyStepBaseView(TemplateView):
         return None
 
     def get_reset_url(self):
+        if reset_url := self.apply_session.get("reset_url"):
+            return reset_url
         if self.hire_process or self.auto_prescription_process:
             # The employer can come either by creating an application or hiring somebody.
             # In both cases, the reset_url adds no value compared to going back to the dashboard.
@@ -254,6 +256,10 @@ class StartView(ApplyStepBaseView):
         if self.company.block_job_applications and not self.company.has_member(request.user):
             raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
 
+        self.apply_session.init({})
+        if back_url := get_safe_url(request, "back_url"):
+            self.apply_session.set("reset_url", back_url)
+
         # Store away the selected job in the session to avoid passing it
         # along the many views before ApplicationJobsView.
         if job_description_id := request.GET.get("job_description_id"):
@@ -262,7 +268,7 @@ class StartView(ApplyStepBaseView):
             except (JobDescription.DoesNotExist, ValueError):
                 pass
             else:
-                self.apply_session.init({"selected_jobs": [job_description.pk]})
+                self.apply_session.set("selected_jobs", [job_description.pk])
 
         # Go directly to step ApplicationJobsView if we're carrying the job seeker public id with us.
         if tunnel == "sender" and (job_seeker := _get_job_seeker_to_apply_for(self.request)):
