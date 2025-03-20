@@ -5,6 +5,7 @@ from itou.institutions.models import Institution
 
 
 class CreateForm(forms.Form):
+    ANTENNA_PREFIX = "antenna"
     main_geiq = forms.BooleanField()
 
     convention_with_ddets = forms.BooleanField()
@@ -16,9 +17,10 @@ class CreateForm(forms.Form):
         queryset=Institution.objects.filter(kind=InstitutionKind.DREETS_GEIQ), required=False
     )
 
-    def __init__(self, geiq_name, antennas):
+    def __init__(self, *args, geiq_name, antennas, **kwargs):
+        super().__init__(*args, **kwargs)
         self.fields["main_geiq"].label = geiq_name
 
         for antenna in antennas:
             if antenna_id := antenna["id"]:  # Ignore main geiq with id 0
-                self.fields[f"antenna_{antenna_id}"] = forms.BooleanField(label=antenna["name"])
+                self.fields[f"{self.ANTENNA_PREFIX}_{antenna_id}"] = forms.BooleanField(label=antenna["nom"])
