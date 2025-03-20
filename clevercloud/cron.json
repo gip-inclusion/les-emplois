@@ -18,6 +18,8 @@
 
   "0 1,13,20 * * * $ROOT/clevercloud/run_management_command.sh sync_s3_files",
 
+  "0 12 * * MON-FRI $ROOT/clevercloud/import-iae.sh",
+
   "1 0 * * * $ROOT/clevercloud/run_management_command.sh update_prescriber_organization_with_api_entreprise",
   "30 0 * * * $ROOT/clevercloud/run_management_command.sh collect_analytics_data --save",
   "45 0 * * * $ROOT/clevercloud/run_management_command.sh import_advisor_information shared_bucket/imports-gps/export_gps.xlsx --wet-run",
