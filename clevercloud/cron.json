@@ -32,6 +32,7 @@
   "20 23 * * * $ROOT/clevercloud/run_management_command.sh archive_job_applications",
   "40 23 * * * $ROOT/clevercloud/run_management_command.sh archive_old_gps_memberships",
 
+  "0 12 * * 1-4 $ROOT/clevercloud/import-iae.sh",
   "0 9-12 * * 1 $ROOT/clevercloud/run_management_command.sh upload_data_to_pilotage asp_riae_shared_bucket/ --wet-run",
   "0 0 * * 1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
   "0 2 * * 1 $ROOT/clevercloud/crons/populate_metabase_matomo.sh",
