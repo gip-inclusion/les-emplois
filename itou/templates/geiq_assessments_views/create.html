@@ -13,19 +13,13 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    {% if not current_campaign %}La campagne actuelle n'est pas encore ouvert.{% endif %}
-                    {% for assessment in assessments %}
-                        {{ assessment }}
-                    {% empty %}
-
-                    {% endfor %}
-                    <h2>Mes bilans</h2>
-                    <p>
-                        Cet espace vous permet de créer et de suivre vos bilans d’exécution.
-                        <br>
-                        Vous devez créer un bilan par convention.
-                    </p>
-                    <a class="btn btn-primary" href="">Créer un bilan d’exécution</a>
+                    {% if not campaign_label_infos %}
+                        La campagne actuelle n'est pas encore ouverte ou les données LABEL ne sont pas encore disponibles.
+                    {% elif not geiq_infos %}
+                        Le SIRET ({{ siret }}) de votre entreprise actuelle ne semble pas connu de LABEL: impossible de créer un bilan.
+                    {% endif %}
+                    <h2>Créer un bilan</h2>
+                    {{ create_form }}
                 </div>
             </div>
         </div>
