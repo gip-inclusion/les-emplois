@@ -294,6 +294,7 @@ class Command(BaseCommand):
                             "author_prescriber_organization",
                             "author_siae",
                         )
+                        .prefetch_related("selected_administrative_criteria")
                         .annotate(
                             level_1_count=Count(
                                 "administrative_criteria",

@@ -117,6 +117,22 @@ def get_latest_diagnosis_criteria(job_seeker, criteria_id):
     return None
 
 
+def get_latest_diagnosis_selected_criteria(job_seeker, criteria_id):
+    latest_diagnosis = get_latest_diagnosis(job_seeker)
+    if latest_diagnosis:
+        for selected_criteria in latest_diagnosis.selected_administrative_criteria.all():
+            if selected_criteria.administrative_criteria_id == criteria_id:
+                return selected_criteria
+
+
+def get_latest_diagnosis_selected_criteria_attribute(job_seeker, criteria_id, attribute_name):
+    return getattr(
+        get_latest_diagnosis_selected_criteria(job_seeker=job_seeker, criteria_id=criteria_id),
+        attribute_name,
+        None,
+    )
+
+
 def _format_criteria_name_as_column_comment(criteria):
     column_comment = (
         criteria.name.replace("'", " ")
@@ -375,7 +391,7 @@ def get_table():
         ]
     )
 
-    # Add one column for each of the 15 criteria.
+    # Add one column, four if certifiable, for each of the 15 criteria.
     for criteria in AdministrativeCriteria.objects.order_by("id").all():
         column_comment = _format_criteria_name_as_column_comment(criteria)
         column_name = format_criteria_name_as_column_name(criteria)
@@ -390,6 +406,42 @@ def get_table():
                 }
             ]
         )
+        if criteria.is_certifiable:
+            certification_comment = f"Certification du critère {column_comment} (niveau {criteria.level})"
+            job_seekers_table.add_columns(
+                [
+                    {
+                        "name": f"{column_name}_certifié",
+                        "type": "boolean",
+                        "comment": certification_comment,
+                        "fn": partial(
+                            get_latest_diagnosis_selected_criteria_attribute,
+                            criteria_id=criteria.id,
+                            attribute_name="certified",
+                        ),
+                    },
+                    {
+                        "name": f"{column_name}_date_certification",
+                        "type": "timestamp with time zone",
+                        "comment": f"Date de la dernière {certification_comment}",
+                        "fn": partial(
+                            get_latest_diagnosis_selected_criteria_attribute,
+                            criteria_id=criteria.id,
+                            attribute_name="certified_at",
+                        ),
+                    },
+                    {
+                        "name": f"{column_name}_période_certification",
+                        "type": "daterange",
+                        "comment": f"Période de {certification_comment}",
+                        "fn": partial(
+                            get_latest_diagnosis_selected_criteria_attribute,
+                            criteria_id=criteria.id,
+                            attribute_name="certification_period",
+                        ),
+                    },
+                ]
+            )
 
     job_seekers_table.add_columns(
         [
