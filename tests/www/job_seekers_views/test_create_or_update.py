@@ -135,7 +135,9 @@ class TestGetOrCreateForJobSeeker:
         # Init session
         start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
         client.get(start_url)
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [job_seeker_session_name] = [
+            k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
+        ]
 
         response = client.get(
             reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name})
@@ -163,7 +165,9 @@ class TestGetOrCreateForJobSeeker:
         # Init session
         start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
         client.get(start_url)
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [job_seeker_session_name] = [
+            k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
+        ]
 
         response = client.get(
             reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name})
@@ -303,7 +307,9 @@ class TestGetOrCreateForSender:
         # Init session
         start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
         client.get(start_url, follow=True)
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [job_seeker_session_name] = [
+            k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
+        ]
 
         response = client.get(
             reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
@@ -320,7 +326,9 @@ class TestGetOrCreateForSender:
 
         # Init session
         client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [job_seeker_session_name] = [
+            k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
+        ]
 
         birthdate = datetime.date(1911, 11, 1)
         response = client.post(
@@ -358,7 +366,9 @@ class TestGetOrCreateForSender:
 
         # Init session
         client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [job_seeker_session_name] = [
+            k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
+        ]
 
         birthdate = datetime.date(1911, 11, 1)
         response = client.post(
@@ -392,7 +402,9 @@ class TestGetOrCreateForSender:
 
         # Init session
         client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [job_seeker_session_name] = [
+            k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
+        ]
 
         response = client.post(
             reverse(
