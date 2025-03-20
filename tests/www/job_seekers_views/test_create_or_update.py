@@ -134,7 +134,7 @@ class TestGetOrCreateForJobSeeker:
 
         # Init session
         start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
-        client.get(start_url)
+        client.get(start_url, {"back_url": reset_url})
         [job_seeker_session_name] = [
             k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
         ]
