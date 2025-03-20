@@ -19,7 +19,17 @@
                         Le SIRET ({{ siret }}) de votre entreprise actuelle ne semble pas connu de LABEL: impossible de créer un bilan.
                     {% endif %}
                     <h2>Créer un bilan</h2>
-                    {{ create_form }}
+                    <div class="c-form">
+                        {% bootstrap_form create_form alert_error_type="all" %}
+                        <fieldset>
+                            <legend class="h3">Antennes</legend>
+                            {% for field in create_form %}
+                                {% if create_form.ANTENNA_PREFIX in field.name %}
+                                    {% bootstrap_field field %}
+                                {% endif %}
+                            {% endfor %}
+                        </fieldset>
+                    </div>
                 </div>
             </div>
         </div>
