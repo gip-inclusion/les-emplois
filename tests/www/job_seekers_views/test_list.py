@@ -288,7 +288,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         updated_at=timezone.now() - datetime.timedelta(days=1),
     )
 
-    # Job seeker created by the prescriber but for another organization; will be shown
+    # Job seeker created by the prescriber but for another organization; will not be shown
     other_organization = PrescriberOrganizationFactory()
     david = JobSeekerFactory(
         first_name="David",
@@ -318,25 +318,28 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         assert str(soup) == snapshot(name="job seekers list tbody")
 
         # Job seekers are displayed for the prescriber
-        for job_seeker in [alain, bernard, charlotte, david]:
+        for job_seeker in [alain, bernard, charlotte]:
             assert_contains_job_seeker(response, job_seeker, back_url=url_organization, with_personal_information=True)
             assert_contains_button_apply_for(response, job_seeker, with_city=True)
 
         # Job seeker not displayed for the prescriber
-        assertNotContains(response, edouard.get_full_name())
-        assertNotContains(response, reverse("job_seekers_views:details", kwargs={"public_id": edouard.public_id}))
+        for job_seeker in [david, edouard]:
+            assertNotContains(response, job_seeker.get_full_name())
+            assertNotContains(
+                response, reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+            )
 
     # The job seekers created by the other member of the organization are not shown in the
     # "Mes candidats" tab
     response = client.get(url_user)
 
     # Job seekers are displayed for the prescriber
-    for job_seeker in [alain, david]:
+    for job_seeker in [alain]:
         assert_contains_job_seeker(response, job_seeker, back_url=url_user, with_personal_information=True)
         assert_contains_button_apply_for(response, job_seeker, with_city=True)
 
     # Job seeker not displayed for the prescriber
-    for job_seeker in [bernard, charlotte, edouard]:
+    for job_seeker in [bernard, charlotte, david, edouard]:
         assertNotContains(response, job_seeker.get_full_name())
         assertNotContains(response, reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
 
@@ -488,7 +491,7 @@ def test_job_seeker_created_by_prescriber_without_org(client):
         created_by=prescriber,
     )
     # Job seeker created by this prescriber when he was in an organization.
-    # He is not member of it anymore, but the job seeker is still displayed.
+    # He is not member of it anymore, it won't be shown anymore
     charlotte = JobSeekerFactory(
         first_name="Charlotte",
         last_name="Xerus",
@@ -507,15 +510,16 @@ def test_job_seeker_created_by_prescriber_without_org(client):
     assert_contains_job_seeker(response, bernard, with_personal_information=True)
     assert_contains_button_apply_for(response, bernard, with_city=True)
 
-    assert_contains_job_seeker(response, charlotte, with_personal_information=True)
-    assert_contains_button_apply_for(response, charlotte, with_city=True)
+    assertNotContains(response, charlotte.get_full_name())
+    assertNotContains(response, reverse("job_seekers_views:details", kwargs={"public_id": charlotte.public_id}))
 
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_htmx_job_seeker_filter(client, url):
-    prescriber = PrescriberOrganizationWith2MembershipFactory(authorized=True).members.first()
-    job_app = JobApplicationFactory(sender=prescriber)
-    other_app = JobApplicationFactory(sender=prescriber)
+    organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
+    prescriber = organization.members.first()
+    job_app = JobApplicationFactory(sender=prescriber, sender_prescriber_organization=organization)
+    other_app = JobApplicationFactory(sender=prescriber, sender_prescriber_organization=organization)
     client.force_login(prescriber)
     response = client.get(url)
 
@@ -584,22 +588,26 @@ def test_filtered_by_eligibility_state(client, url):
     Éligibilité "IAE valide": show job seekers with valid diagnosis OR with valid approval.
     Éligibilité "IAE à valider": show job seekers without valid diagnosis AND without valid approval.
     """
-    prescriber = PrescriberOrganizationWith2MembershipFactory().members.first()
+    organization = PrescriberOrganizationWith2MembershipFactory()
+    prescriber = organization.members.first()
     client.force_login(prescriber)
     # Eligibility validated
     job_seeker_valid_eligibility_no_approval = IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
         job_seeker__created_by=prescriber,
+        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         job_seeker__first_name="valid eligibility, no approval",
     ).job_seeker
     job_seeker_valid_geiq_eligibility_no_approval = GEIQEligibilityDiagnosisFactory(
         from_prescriber=True,
         job_seeker__created_by=prescriber,
+        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         job_seeker__first_name="valid geiq eligibility, no approval",
     ).job_seeker
     job_seeker_expired_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
         job_seeker__created_by=prescriber,
+        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         expired=True,
         job_seeker__first_name="expired eligibility, valid approval",
     ).job_seeker
@@ -607,6 +615,7 @@ def test_filtered_by_eligibility_state(client, url):
     job_seeker_valid_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
         job_seeker__created_by=prescriber,
+        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         job_seeker__first_name="valid eligibility, valid approval",
     ).job_seeker
     ApprovalFactory(user=job_seeker_valid_eligibility_valid_approval)
@@ -615,6 +624,7 @@ def test_filtered_by_eligibility_state(client, url):
     job_seeker_expired_eligibility_no_approval = IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
         job_seeker__created_by=prescriber,
+        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         expired=True,
         job_seeker__first_name="expired eligibility, no approval",
     ).job_seeker
@@ -644,12 +654,14 @@ def test_filtered_by_eligibility_state(client, url):
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_filtered_by_approval_state(client, url):
-    prescriber = PrescriberOrganizationWith2MembershipFactory().members.first()
+    organization = PrescriberOrganizationWith2MembershipFactory()
+    prescriber = organization.members.first()
     client.force_login(prescriber)
 
     job_seeker_expired_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
         job_seeker__created_by=prescriber,
+        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         expired=True,
         job_seeker__first_name="expired eligibility, valid approval",
     ).job_seeker
@@ -658,6 +670,7 @@ def test_filtered_by_approval_state(client, url):
     job_seeker_expired_eligibility_expired_approval = IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
         job_seeker__created_by=prescriber,
+        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         expired=True,
         job_seeker__first_name="expired eligibility, expired approval",
     ).job_seeker
@@ -666,6 +679,7 @@ def test_filtered_by_approval_state(client, url):
     job_seeker_valid_eligibility_no_approval = IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
         job_seeker__created_by=prescriber,
+        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         job_seeker__first_name="valid eligibility, no approval",
     ).job_seeker
 
@@ -739,6 +753,7 @@ def test_filtered_by_organization_members(client):
     ).job_seeker
     job_seeker_applied_by_user_created_by_user_not_in_orga = JobApplicationFactory(
         sender=prescriber,
+        sender_prescriber_organization=organization,
         job_seeker__first_name="applied_by_user_created_by_other_user_not_in_orga",
         job_seeker__last_name="Zorro",
         job_seeker__created_by=other_prescriber_not_in_orga,
@@ -799,26 +814,33 @@ def test_htmx_filters(client, url):
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_job_seekers_order(client, url, subtests):
-    prescriber = PrescriberOrganizationWith2MembershipFactory().members.first()
+    organization = PrescriberOrganizationWith2MembershipFactory()
+    prescriber = organization.members.first()
     c_d_job_seeker = JobApplicationFactory(
         sender=prescriber,
         job_seeker__created_by=prescriber,
+        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         job_seeker__first_name="Charles",
         job_seeker__last_name="Deux candidatures",
     ).job_seeker
     JobApplicationFactory(sender=prescriber, job_seeker=c_d_job_seeker)
     created_job_seeker = JobSeekerFactory(
         created_by=prescriber,
+        jobseeker_profile__created_by_prescriber_organization=organization,
         first_name="Zorro",
         last_name="Martin",
     )
     second_created_job_seeker = JobSeekerFactory(
         created_by=prescriber,
+        jobseeker_profile__created_by_prescriber_organization=organization,
         first_name="Zorro",
         last_name="Martin",
     )
     a_b_job_seeker = JobApplicationFactory(
-        sender=prescriber, job_seeker__first_name="Alice", job_seeker__last_name="Berger"
+        sender=prescriber,
+        job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
+        job_seeker__first_name="Alice",
+        job_seeker__last_name="Berger",
     ).job_seeker
 
     client.force_login(prescriber)
@@ -848,9 +870,10 @@ def test_job_seekers_order(client, url, subtests):
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_htmx_order(client, url):
-    prescriber = PrescriberOrganizationWith2MembershipFactory(authorized=True).members.first()
-    job_app = JobApplicationFactory(sender=prescriber)
-    other_app = JobApplicationFactory(sender=prescriber)
+    organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
+    prescriber = organization.members.first()
+    job_app = JobApplicationFactory(sender=prescriber, sender_prescriber_organization=organization)
+    other_app = JobApplicationFactory(sender=prescriber, sender_prescriber_organization=organization)
     client.force_login(prescriber)
     response = client.get(url)
 

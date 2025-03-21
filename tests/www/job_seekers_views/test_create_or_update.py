@@ -445,9 +445,7 @@ class TestStandaloneCreateAsPrescriber:
 
         match case:
             case "in_list_user":
-                # Job seeker in user's list even if it was for another orga
                 existing_job_seeker.created_by = user
-                existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = other_organization
                 next_url = add_url_params(
                     reverse(
                         "search:employers_results",
@@ -525,9 +523,7 @@ class TestStandaloneCreateAsPrescriber:
 
         match case:
             case "in_list_user":
-                # Job seeker in user's list even if it was for another orga
                 existing_job_seeker.created_by = user
-                existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = other_organization
                 next_url = add_url_params(
                     reverse(
                         "search:employers_results",
