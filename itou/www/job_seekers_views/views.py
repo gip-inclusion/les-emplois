@@ -118,9 +118,11 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     if list_organization:
         if not request.current_organization or not request.current_organization.memberships.count() > 1:
             raise Http404
-        job_seekers_ids = list(User.objects.linked_job_seeker_ids(request.user, request.current_organization))
+        job_seekers_ids = list(
+            User.objects.linked_job_seeker_ids(request.user, request.current_organization, from_all_coworkers=True)
+        )
     else:
-        job_seekers_ids = list(User.objects.linked_job_seeker_ids(request.user, None))
+        job_seekers_ids = list(User.objects.linked_job_seeker_ids(request.user, request.current_organization))
 
     user_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization).filter(
         job_seeker=OuterRef("pk")
@@ -343,7 +345,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             return False
 
         return job_seeker.pk in User.objects.linked_job_seeker_ids(
-            self.request.user, self.request.current_organization
+            self.request.user, self.request.current_organization, from_all_coworkers=True
         )
 
 
