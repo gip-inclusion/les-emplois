@@ -128,6 +128,7 @@ class TestManager:
         job_seeker_with_sent_job_app_no_organization = JobApplicationFactory(
             sender=prescriber, eligibility_diagnosis=None
         ).job_seeker
+        # It's not possible to make a eligibility diagnosis with no organization
 
         # From the prescriber as a member of the organization
         job_seeker_created_by_user_in_organization = JobSeekerFactory(
@@ -138,6 +139,11 @@ class TestManager:
             sender=prescriber,
             sender_prescriber_organization=organization,
             eligibility_diagnosis=None,
+        ).job_seeker
+        job_seeker_with_authored_diagnosis_in_organization = IAEEligibilityDiagnosisFactory(
+            author=prescriber,
+            author_prescriber_organization=organization,
+            from_prescriber=True,
         ).job_seeker
 
         # From the prescriber as a member of another organization. We won't display those
@@ -150,6 +156,11 @@ class TestManager:
             sender_prescriber_organization=other_organization,
             eligibility_diagnosis=None,
         )
+        IAEEligibilityDiagnosisFactory(
+            author=prescriber,
+            author_prescriber_organization=other_organization,
+            from_prescriber=True,
+        )
 
         job_seeker_created_by_organization_coworker = JobSeekerFactory(
             jobseeker_profile__created_by_prescriber_organization=organization
@@ -157,6 +168,11 @@ class TestManager:
         job_seeker_with_job_app_sent_by_organization_coworker = JobApplicationFactory(
             sender_prescriber_organization=organization,
             eligibility_diagnosis=None,
+        ).job_seeker
+        job_seeker_with_diagnosis_authored_by_organization_coworker = IAEEligibilityDiagnosisFactory(
+            author_prescriber_organization=organization,
+            author=PrescriberMembershipFactory(organization=organization).user,
+            from_prescriber=True,
         ).job_seeker
 
         assertQuerySetEqual(
@@ -185,6 +201,7 @@ class TestManager:
                 job_seeker_with_sent_job_app_no_organization.pk,
                 job_seeker_created_by_user_in_organization.pk,
                 job_seeker_with_sent_job_app_in_organization.pk,
+                job_seeker_with_authored_diagnosis_in_organization.pk,
             ],
             ordered=False,
         )
@@ -196,8 +213,10 @@ class TestManager:
                 job_seeker_with_sent_job_app_no_organization.pk,
                 job_seeker_created_by_user_in_organization.pk,
                 job_seeker_with_sent_job_app_in_organization.pk,
+                job_seeker_with_authored_diagnosis_in_organization.pk,
                 job_seeker_created_by_organization_coworker.pk,
                 job_seeker_with_job_app_sent_by_organization_coworker.pk,
+                job_seeker_with_diagnosis_authored_by_organization_coworker.pk,
             ],
             ordered=False,
         )
