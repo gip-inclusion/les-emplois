@@ -168,12 +168,17 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
         - job seekers created by the user as a member of no organization
         - job seekers for whom the user applied as a member of organization
         - job seekers for whom the user applied as a member of no organization
+        - job seekers for whom the current user made a EligibilityDiagnosis as a member of organization
+        - job seekers for whom the current user made a EligibilityDiagnosis as a member of no organization
 
         With from_all_coworkers=True:
         - all the previous
         - job seekers created by a member of the organization
         - job seekers for whom a member of the organization applied
+        - job seekers for whom e member of the organization made a EligibilityDiagnosis
         """
+        from itou.eligibility.models import EligibilityDiagnosis
+
         job_application_model = apps.get_model("job_applications", "JobApplication")
 
         # First the links for the user as a member of no organisation
@@ -181,24 +186,30 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
             Q(created_by=user, jobseeker_profile__created_by_prescriber_organization=None),
         ]
         job_applications_filter = [Q(sender=user, sender_prescriber_organization=None)]
+        eligibility_diagnosis_filters = [Q(author=user, author_prescriber_organization=None)]
 
         # then the links for the organization either only for the user, or for all members
         if organization:
             if from_all_coworkers:
                 job_seeker_filters.append(Q(jobseeker_profile__created_by_prescriber_organization=organization))
                 job_applications_filter.append(Q(sender_prescriber_organization=organization))
+                eligibility_diagnosis_filters.append(Q(author_prescriber_organization=organization))
             else:
                 job_seeker_filters.append(
                     Q(created_by=user, jobseeker_profile__created_by_prescriber_organization=organization)
                 )
                 job_applications_filter.append(Q(sender=user, sender_prescriber_organization=organization))
+                eligibility_diagnosis_filters.append(Q(author=user, author_prescriber_organization=organization))
 
         created_job_seekers = self.filter(or_queries(job_seeker_filters)).values_list("id", flat=True)
         job_seekers_applications = job_application_model.objects.filter(
             or_queries(job_applications_filter)
         ).values_list("job_seeker_id", flat=True)
+        job_seekers_eligibility_diagnosis = EligibilityDiagnosis.objects.filter(
+            or_queries(eligibility_diagnosis_filters)
+        ).values_list("job_seeker_id", flat=True)
 
-        return created_job_seekers.union(job_seekers_applications)
+        return created_job_seekers.union(job_seekers_applications, job_seekers_eligibility_diagnosis)
 
     def search_by_full_name(self, name):
         """

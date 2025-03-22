@@ -422,6 +422,14 @@
                     OR ("job_applications_jobapplication"."sender_id" = %s
                         AND "job_applications_jobapplication"."sender_prescriber_organization_id" = %s))
              ORDER BY "job_applications_jobapplication"."created_at" DESC)
+          UNION
+            (SELECT "eligibility_eligibilitydiagnosis"."job_seeker_id" AS "col1"
+             FROM "eligibility_eligibilitydiagnosis"
+             WHERE (("eligibility_eligibilitydiagnosis"."author_id" = %s
+                     AND "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" IS NULL)
+                    OR ("eligibility_eligibilitydiagnosis"."author_id" = %s
+                        AND "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = %s))
+             ORDER BY "eligibility_eligibilitydiagnosis"."created_at" DESC)
         ''',
       }),
       dict({
@@ -1348,6 +1356,13 @@
                      AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
                     OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
              ORDER BY "job_applications_jobapplication"."created_at" DESC)
+          UNION
+            (SELECT "eligibility_eligibilitydiagnosis"."job_seeker_id" AS "col1"
+             FROM "eligibility_eligibilitydiagnosis"
+             WHERE (("eligibility_eligibilitydiagnosis"."author_id" = %s
+                     AND "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" IS NULL)
+                    OR "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = %s)
+             ORDER BY "eligibility_eligibilitydiagnosis"."created_at" DESC)
         ''',
       }),
       dict({
