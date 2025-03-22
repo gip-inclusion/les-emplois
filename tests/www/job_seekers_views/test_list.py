@@ -69,6 +69,12 @@ def assert_contains_job_seeker(
     )
 
 
+def assert_update_eligibility(response, can_update):
+    assert_function = assertContains if can_update else assertNotContains
+    assert_function(response, "Mettre à jour son éligibilité IAE")
+    assert_function(response, "Valider son éligibilité IAE")
+
+
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_anonymous_user(client, url):
     response = client.get(url)
@@ -230,6 +236,9 @@ def test_multiple(client, snapshot):
 
         # Job seeker does not have an address, so it is not in the URL
         assert_contains_button_apply_for(response, job_app4.job_seeker, with_city=False)
+
+    # The links to the eligibility update view are shown
+    assert_update_eligibility(response, can_update=True)
 
     # Current user cannot view personal information, so the city is not in the URL
     client.force_login(unauthorized_prescriber)
@@ -462,6 +471,9 @@ def test_multiple_with_job_seekers_created_by_unauthorized_organization(client):
     assert_contains_job_seeker(response, bernard, back_url=url_organization, with_personal_information=False)
     assert_contains_button_apply_for(response, bernard, with_city=False)
 
+    # There's no link to the eligibility update view
+    assert_update_eligibility(response, can_update=False)
+
 
 def test_job_seeker_created_by_prescriber_without_org(client):
     """
@@ -512,6 +524,9 @@ def test_job_seeker_created_by_prescriber_without_org(client):
 
     assertNotContains(response, charlotte.get_full_name())
     assertNotContains(response, reverse("job_seekers_views:details", kwargs={"public_id": charlotte.public_id}))
+
+    # There's no link to the eligibility update view
+    assert_update_eligibility(response, can_update=False)
 
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])

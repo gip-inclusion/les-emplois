@@ -4,7 +4,7 @@ import uuid
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
 from tests.approvals.factories import ApprovalFactory
@@ -12,7 +12,7 @@ from tests.companies.factories import CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import JobSeekerFactory, LaborInspectorFactory
+from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
@@ -51,11 +51,15 @@ def test_single_iae_diag_from_prescriber(client, snapshot):
 
     iae_employer = CompanyMembershipFactory(company__subject_to_eligibility=True).user
 
-    for user in [iae_employer, prescriber_membership.user]:
-        client.force_login(user)
-        response = client.get(url)
-        soup = parse_response_to_soup(response, selector="#main")
-        assert str(soup) == snapshot(name="snapshot with diag")
+    client.force_login(prescriber_membership.user)
+    response = client.get(url)
+    soup = parse_response_to_soup(response, selector="#main")
+    assert str(soup) == snapshot(name="snapshot with diag_and_update_eligibility")
+
+    client.force_login(iae_employer)
+    response = client.get(url)
+    soup = parse_response_to_soup(response, selector="#main")
+    assert str(soup) == snapshot(name="snapshot with diag")
 
     non_iae_employer = CompanyMembershipFactory(company__not_subject_to_eligibility=True).user
 
@@ -314,3 +318,48 @@ def test_apply_for_button_as_unauthorized_prescriber(client):
         ),
         html=True,
     )
+
+
+def test_update_iae_eligibility_buttons(client):
+    update_eligibility_str = "Mettre à jour son éligibilité IAE"
+    validate_eligibility_str = "Valider son éligibilité IAE"
+
+    authorized_prescriber = PrescriberFactory(membership__organization__authorized=True)
+    unauthorized_prescriber = PrescriberFactory(membership__organization__authorized=False)
+
+    job_seeker = JobSeekerFactory()
+    url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+
+    # A unauthorized prescriber doesn't see the button
+    client.force_login(unauthorized_prescriber)
+    response = client.get(url)
+    assertNotContains(response, update_eligibility_str)
+    assertNotContains(response, validate_eligibility_str)
+
+    # A authorized prescriber will the see the validate button as the jobseeker has no diagnostic
+    client.force_login(authorized_prescriber)
+    response = client.get(url)
+    assertNotContains(response, update_eligibility_str)
+    assertContains(response, validate_eligibility_str)
+
+    # Same if the jobseeker has an old approval and diagnostic :
+    ApprovalFactory(
+        user=job_seeker,
+        start_at=datetime.date(2021, 1, 1),
+        eligibility_diagnosis__expired=True,
+    )
+    response = client.get(url)
+    assertNotContains(response, update_eligibility_str)
+    assertContains(response, validate_eligibility_str)
+
+    # With a valid diagnostic, we see the update button
+    IAEEligibilityDiagnosisFactory(job_seeker=job_seeker, from_prescriber=True)
+    response = client.get(url)
+    assertContains(response, update_eligibility_str)
+    assertNotContains(response, validate_eligibility_str)
+
+    # With a valid Approval, no link
+    ApprovalFactory(user=job_seeker)
+    response = client.get(url)
+    assertNotContains(response, update_eligibility_str)
+    assertNotContains(response, validate_eligibility_str)
