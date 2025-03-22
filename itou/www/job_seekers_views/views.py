@@ -73,6 +73,7 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
 
         approval = None
         iae_eligibility_diagnosis = None
+        can_edit_iae_eligibility = False
         if self.request.user.is_prescriber or (
             self.request.user.is_employer and self.request.current_organization.is_subject_to_eligibility_rules
         ):
@@ -82,6 +83,8 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
                 for_siae=self.request.current_organization if self.request.user.is_employer else None,
                 prefetch=["selected_administrative_criteria__administrative_criteria"],
             )
+        if self.request.user.is_prescriber_with_authorized_org and approval is None:
+            can_edit_iae_eligibility = True
 
         if geiq_eligibility_diagnosis:
             geiq_eligibility_diagnosis.criteria_display = geiq_eligibility_diagnosis.get_criteria_display_qs()
@@ -92,6 +95,7 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
         return super().get_context_data(**kwargs) | {
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
+            "can_edit_iae_eligibility": can_edit_iae_eligibility,
             "matomo_custom_title": "Détail candidat",
             "approval": approval,
             "back_url": get_safe_url(self.request, "back_url"),

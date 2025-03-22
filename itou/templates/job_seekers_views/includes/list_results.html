@@ -24,6 +24,7 @@
                         {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.JOB_APPLICATIONS_NB_ASC name="Nombre de candidatures" only %}
                         {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.LAST_UPDATED_AT_ASC name="Dernière mise à jour de candidature" only %}
                         <th scope="col" class="text-end w-50px"></th>
+                        {% if request.current_organization.is_authorized %}<th scope="col" class="text-end w-50px"></th>{% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -48,6 +49,31 @@
                                     <i class="ri-draft-line" aria-label="Postuler pour ce candidat"></i>
                                 </a>
                             </td>
+                            {% if request.current_organization.is_authorized %}
+                                <td class="text-end w-50px">
+                                    <button id="dropdown_{{ forloop.counter }}_action_menu"
+                                            class="btn btn-sm btn-link btn-ico-only"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-haspopup="true"
+                                            aria-expanded="false"
+                                            aria-label="Plus d'actions"
+                                            {% if job_seeker.has_valid_approval %}disabled{% endif %}>
+                                        <i class="ri-more-2-fill" aria-hidden="true"></i>
+                                    </button>
+                                    {% if not job_seeker.has_valid_approval %}
+                                        <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
+                                            <a href=" {% url 'eligibility_views:update' public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="dropdown-item">
+                                                {% if job_seeker.valid_eligibility_diagnosis %}
+                                                    Mettre à jour son éligibilité IAE
+                                                {% else %}
+                                                    Valider son éligibilité IAE
+                                                {% endif %}
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                 </tbody>
