@@ -268,7 +268,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         super().__init__()
         self.company = None
         self.hire_process = None
-        self.prescription_proces = None
+        self.prescription_process = None
         self.auto_prescription_process = None
         self.standalone_creation = None
         self.is_gps = False
