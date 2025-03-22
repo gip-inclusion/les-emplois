@@ -1,0 +1,105 @@
+{% extends "layout/base.html" %}
+{% load django_bootstrap5 %}
+{% load buttons_form %}
+{% load url_add_query %}
+
+{% block title %}Éligibilité IAE - {{ job_seeker.get_full_name }}{{ block.super }}{% endblock %}
+{% block title_content %}
+    <h1>
+        {% if eligibility_diagnosis %}
+            Mettre à jour
+        {% else %}
+            Valider
+        {% endif %}
+        l'éligibilité de {{ job_seeker.get_full_name }}
+    </h1>
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="c-form">
+
+                        {# FIXME: almost the same as itou/template/apply/submit/application/eligibility.html form_content block #}
+                        {% if eligibility_diagnosis %}
+                            <div class="mb-5">
+                                <p>L’éligibilité à l'IAE du candidat a été validée par :</p>
+                                <p class="text-tertiary fw-bold">{{ eligibility_diagnosis.author_organization.display_name }}</p>
+                            </div>
+
+                            <div class="alert alert-info mb-5" role="status">
+                                <div class="row">
+                                    <div class="col-auto pe-0">
+                                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
+                                    </div>
+                                    <div class="col">
+                                        <p class="mb-2">
+                                            <strong>Date de fin de validité du diagnostic : {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
+                                        </p>
+                                        <p>
+                                            Tant que l’éligibilité IAE est valide, vous n’avez rien à faire. Si vous souhaitez la mettre à jour, sa validité sera prolongée jusqu'au {{ new_expires_at_if_updated|date:"d/m/Y" }}.
+                                        </p>
+                                        <button class="btn btn-link text-start p-0" data-shroud-clear>Mettre à jour l’éligibilité</button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if job_seeker.address_in_qpv or job_seeker.zrr_city_name %}
+                            {% include "apply/includes/known_criteria.html" %}
+                        {% endif %}
+
+                        <div class="c-info mb-3">
+                            <button class="c-info__summary">
+                                <span>Pour valider l'éligibilité IAE du candidat</span>
+                            </button>
+                            <div class="c-info__detail">
+                                <ul>
+                                    <li>
+                                        Veuillez vous assurer d’avoir réalisé un diagnostic socio-professionnel dans le cadre d'un entretien individuel.
+                                        Vous pouvez vous appuyer sur le document
+                                        <a class="has-external-link"
+                                           href="{% autologin_proconnect 'https://communaute.inclusion.gouv.fr/surveys/dsp/create/' user %}"
+                                           target="_blank"
+                                           rel="noreferrer noopener"
+                                           aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+                                    </li>
+                                    <li>Il est recommandé de sélectionner le(s) critères(s) administratifs d’éligibilité correspondants.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <form method="post">
+                            {% csrf_token %}
+
+                            <div class="{% if eligibility_diagnosis and not form.is_bound %}js-shroud{% endif %}">
+                                <fieldset>
+                                    <legend class="h3">Critères administratifs de niveau 1</legend>
+                                    {% for field in form %}
+                                        {% if form.LEVEL_1_PREFIX in field.name %}
+                                            {% bootstrap_field field %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </fieldset>
+
+                                <fieldset>
+                                    <legend class="h3">Critères administratifs de niveau 2</legend>
+                                    {% for field in form %}
+                                        {% if form.LEVEL_2_PREFIX in field.name %}
+                                            {% bootstrap_field field %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </fieldset>
+                                <input type="hidden" name="shrouded" value="1" data-shroud-input>
+                            </div>
+
+                            {% itou_buttons_form primary_label="Valider" reset_url=back_url %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
