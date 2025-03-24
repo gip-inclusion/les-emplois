@@ -408,12 +408,19 @@
           
             (SELECT "users_user"."id" AS "col1"
              FROM "users_user"
-             WHERE "users_user"."created_by_id" = %s
+             LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+             WHERE (("users_user"."created_by_id" = %s
+                     AND "users_jobseekerprofile"."created_by_prescriber_organization_id" IS NULL)
+                    OR ("users_user"."created_by_id" = %s
+                        AND "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s))
              ORDER BY RANDOM() ASC)
           UNION
             (SELECT "job_applications_jobapplication"."job_seeker_id" AS "col1"
              FROM "job_applications_jobapplication"
-             WHERE "job_applications_jobapplication"."sender_id" = %s
+             WHERE (("job_applications_jobapplication"."sender_id" = %s
+                     AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
+                    OR ("job_applications_jobapplication"."sender_id" = %s
+                        AND "job_applications_jobapplication"."sender_prescriber_organization_id" = %s))
              ORDER BY "job_applications_jobapplication"."created_at" DESC)
         ''',
       }),
@@ -1272,12 +1279,10 @@
           
             (SELECT "users_user"."id" AS "col1"
              FROM "users_user"
-             WHERE "users_user"."created_by_id" = %s
-             ORDER BY RANDOM() ASC)
-          UNION
-            (SELECT "users_jobseekerprofile"."user_id" AS "col1"
-             FROM "users_jobseekerprofile"
-             WHERE "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s
+             LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+             WHERE (("users_user"."created_by_id" = %s
+                     AND "users_jobseekerprofile"."created_by_prescriber_organization_id" IS NULL)
+                    OR "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s)
              ORDER BY RANDOM() ASC)
           UNION
             (SELECT "job_applications_jobapplication"."job_seeker_id" AS "col1"
@@ -1361,7 +1366,6 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
-                                           %s,
                                            %s))
           GROUP BY "users_user"."id",
                    34,
@@ -1399,7 +1403,6 @@
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" IN (%s,
-                                                   %s,
                                                    %s,
                                                    %s)
           ORDER BY "approvals_approval"."created_at" DESC
@@ -1500,7 +1503,6 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
-                                           %s,
                                            %s))
           GROUP BY "users_user"."id",
                    34,
@@ -1537,7 +1539,6 @@
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" IN (%s,
-                                                   %s,
                                                    %s,
                                                    %s)
           ORDER BY "approvals_approval"."created_at" DESC
@@ -1633,7 +1634,6 @@
              WHERE ("users_user"."kind" = %s
                     AND "users_user"."id" IN (%s,
                                               %s,
-                                              %s,
                                               %s))
              GROUP BY "users_user"."id",
                       1,
@@ -1711,14 +1711,13 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
-                                           %s,
                                            %s))
           GROUP BY "users_user"."id",
                    34,
                    35
           ORDER BY 34 ASC,
                    "users_user"."id" ASC
-          LIMIT 4
+          LIMIT 3
         ''',
       }),
       dict({
@@ -1748,7 +1747,6 @@
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" IN (%s,
-                                                   %s,
                                                    %s,
                                                    %s)
           ORDER BY "approvals_approval"."created_at" DESC
@@ -1911,37 +1909,6 @@
                                       
                                   
                                   <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=33333333-3333-3333-3333-333333333333&amp;city=brest-29">
-                                      <i aria-label="Postuler pour ce candidat" class="ri-draft-line"></i>
-                                  </a>
-                              </td>
-                          </tr>
-                      
-                          <tr>
-                              <td>
-                                  <a class="btn-link" href="/job-seekers/details/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list-organization">David WATERFORD</a>
-                              </td>
-                              <td>
-                                  
-  
-      
-          
-                      <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
-              <i aria-hidden="true" class="ri-error-warning-line"></i>
-              Éligibilité IAE à valider
-          </span>
-          
-      
-  
-  
-                              </td>
-                              <td>0</td>
-                              <td></td>
-                              <td class="text-end w-50px">
-                                  
-                                  
-                                      
-                                  
-                                  <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=44444444-4444-4444-4444-444444444444&amp;city=brest-29">
                                       <i aria-label="Postuler pour ce candidat" class="ri-draft-line"></i>
                                   </a>
                               </td>
