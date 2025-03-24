@@ -112,6 +112,8 @@
     {% endif %}
 
     {% if tally_popup_form_id %}
+        {{ tally_hidden_fields|json_script:'tally-hidden-fields' }}
+
         {# `defer` ensures the script runs *after* embed.js above has been loaded. #}
         <script defer nonce="{{ CSP_NONCE }}">
             // Any given Tally popup will not be shown more than once every `minDaysBetweenDisplays` days.
@@ -120,6 +122,7 @@
             const formId = '{{ tally_popup_form_id }}';
             const key = 'statsTallyPopupLastShown-' + formId;
             const todaysDate = new Date();
+            const hiddenFields = JSON.parse(document.getElementById('tally-hidden-fields').textContent);
 
             function supportsLocalStorage() {
                 try {
@@ -139,6 +142,7 @@
                         text: "👋",
                         animation: "wave"
                     },
+                    hiddenFields: hiddenFields,
                     onClose: () => {
                         stopShowingPopupForAWhile();
                     },
