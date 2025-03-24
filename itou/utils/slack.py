@@ -10,10 +10,16 @@ import json
 import httpx
 from django.conf import settings
 
+from itou.utils.enums import ItouEnvironment
+
 
 def send_slack_message(text="Hello world :wave:", url=None):
     url = url or settings.SLACK_CRON_WEBHOOK_URL
     if not url:
+        if settings.ITOU_ENVIRONMENT == ItouEnvironment.DEV:
+            print("=============================\nSlack message :")
+            print(text)
+            print("=============================")
         return
     response = httpx.post(
         url=url,
