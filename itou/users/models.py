@@ -1109,6 +1109,18 @@ class JobSeekerProfile(models.Model):
         blank=True,
     )
 
+    is_stalled = models.BooleanField(
+        verbose_name="candidat sans solution",
+        default=False,
+        editable=False,
+        help_text=(
+            "Un candidat est dans la file active de l'IAE depuis plus de 30 jours "
+            "s'il a émis une candidature dans les 6 derniers mois, "
+            "n'a pas de candidature acceptée, "
+            "et a émis sa première candidature il y a plus de 30 jours."
+        ),
+    )
+
     class Meta:
         verbose_name = "profil demandeur d'emploi"
         verbose_name_plural = "profils demandeur d'emploi"
@@ -1130,6 +1142,9 @@ class JobSeekerProfile(models.Model):
                 validation_error_code="unique_nir_if_not_empty",
                 violation_error_message="Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.",
             ),
+        ]
+        indexes = [
+            models.Index(fields=["is_stalled"], name="users_jobseeker_stalled_idx", condition=Q(is_stalled=True)),
         ]
 
     def __str__(self):
