@@ -23,8 +23,8 @@
                         <th scope="col">Situation IAE</th>
                         {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.JOB_APPLICATIONS_NB_ASC name="Nombre de candidatures" only %}
                         {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.LAST_UPDATED_AT_ASC name="Dernière mise à jour de candidature" only %}
-                        <th scope="col" class="text-end w-50px"></th>
-                        {% if request.current_organization.is_authorized %}<th scope="col" class="text-end w-50px"></th>{% endif %}
+                        <th scope="col" class="text-end {% if request.current_organization.is_authorized %}w-100px{% else %}w-50px{% endif %}">
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -38,7 +38,7 @@
                             </td>
                             <td>{{ job_seeker.job_applications_nb }}</td>
                             <td>{{ job_seeker.last_updated_at|date:"d/m/Y" }}</td>
-                            <td class="text-end w-50px">
+                            <td class="text-end {% if request.current_organization.is_authorized %}w-100px{% else %}w-50px{% endif %}">
                                 {% url "search:employers_results" as search_url %}
                                 {% if job_seeker.user_can_view_personal_information %}
                                     {% url_add_query search_url job_seeker=job_seeker.public_id city=job_seeker.city_slug as url_query %}
@@ -48,9 +48,7 @@
                                 <a class="btn btn-sm btn-link btn-ico-only" href="{{ url_query }}" data-bs-toggle="tooltip" data-bs-title="Postuler pour ce candidat" {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %}>
                                     <i class="ri-draft-line" aria-label="Postuler pour ce candidat"></i>
                                 </a>
-                            </td>
-                            {% if request.current_organization.is_authorized %}
-                                <td class="text-end w-50px">
+                                {% if request.current_organization.is_authorized %}
                                     <button id="dropdown_{{ forloop.counter }}_action_menu"
                                             class="btn btn-sm btn-link btn-ico-only"
                                             type="button"
@@ -72,8 +70,8 @@
                                             </a>
                                         </div>
                                     {% endif %}
-                                </td>
-                            {% endif %}
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

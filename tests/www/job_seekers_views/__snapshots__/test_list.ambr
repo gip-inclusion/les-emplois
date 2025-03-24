@@ -1015,8 +1015,8 @@
       </button>
   </th>
   
-                          <th class="text-end w-50px" scope="col"></th>
-                          <th class="text-end w-50px" scope="col"></th>
+                          <th class="text-end w-100px" scope="col">
+                          </th>
                       </tr>
                   </thead>
                   <tbody>
@@ -1041,7 +1041,7 @@
                               </td>
                               <td>2</td>
                               <td>29/08/2024</td>
-                              <td class="text-end w-50px">
+                              <td class="text-end w-100px">
                                   
                                   
                                       
@@ -1049,9 +1049,7 @@
                                   <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=11111111-1111-1111-1111-111111111111&amp;city=brest-29">
                                       <i aria-label="Postuler pour ce candidat" class="ri-draft-line"></i>
                                   </a>
-                              </td>
-                              
-                                  <td class="text-end w-50px">
+                                  
                                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="dropdown" id="dropdown_1_action_menu" type="button">
                                           <i aria-hidden="true" class="ri-more-2-fill"></i>
                                       </button>
@@ -1064,8 +1062,8 @@
                                               </a>
                                           </div>
                                       
-                                  </td>
-                              
+                                  
+                              </td>
                           </tr>
                       
                           <tr>
@@ -1088,7 +1086,7 @@
                               </td>
                               <td>1</td>
                               <td>30/08/2024</td>
-                              <td class="text-end w-50px">
+                              <td class="text-end w-100px">
                                   
                                   
                                       
@@ -1096,9 +1094,7 @@
                                   <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=22222222-2222-2222-2222-222222222222&amp;city=brest-29">
                                       <i aria-label="Postuler pour ce candidat" class="ri-draft-line"></i>
                                   </a>
-                              </td>
-                              
-                                  <td class="text-end w-50px">
+                                  
                                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="dropdown" id="dropdown_2_action_menu" type="button">
                                           <i aria-hidden="true" class="ri-more-2-fill"></i>
                                       </button>
@@ -1111,8 +1107,8 @@
                                               </a>
                                           </div>
                                       
-                                  </td>
-                              
+                                  
+                              </td>
                           </tr>
                       
                           <tr>
@@ -1135,7 +1131,7 @@
                               </td>
                               <td>1</td>
                               <td>30/08/2024</td>
-                              <td class="text-end w-50px">
+                              <td class="text-end w-100px">
                                   
                                   
                                       
@@ -1143,15 +1139,13 @@
                                   <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=33333333-3333-3333-3333-333333333333&amp;city=brest-29">
                                       <i aria-label="Postuler pour ce candidat" class="ri-draft-line"></i>
                                   </a>
-                              </td>
-                              
-                                  <td class="text-end w-50px">
+                                  
                                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="dropdown" disabled="" id="dropdown_3_action_menu" type="button">
                                           <i aria-hidden="true" class="ri-more-2-fill"></i>
                                       </button>
                                       
-                                  </td>
-                              
+                                  
+                              </td>
                           </tr>
                       
                           <tr>
@@ -1174,7 +1168,7 @@
                               </td>
                               <td>1</td>
                               <td>30/08/2024</td>
-                              <td class="text-end w-50px">
+                              <td class="text-end w-100px">
                                   
                                   
                                       
@@ -1182,9 +1176,7 @@
                                   <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=44444444-4444-4444-4444-444444444444">
                                       <i aria-label="Postuler pour ce candidat" class="ri-draft-line"></i>
                                   </a>
-                              </td>
-                              
-                                  <td class="text-end w-50px">
+                                  
                                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="dropdown" id="dropdown_4_action_menu" type="button">
                                           <i aria-hidden="true" class="ri-more-2-fill"></i>
                                       </button>
@@ -1197,8 +1189,8 @@
                                               </a>
                                           </div>
                                       
-                                  </td>
-                              
+                                  
+                              </td>
                           </tr>
                       
                   </tbody>
@@ -1913,7 +1905,7 @@
                               </td>
                               <td>0</td>
                               <td></td>
-                              <td class="text-end w-50px">
+                              <td class="text-end w-100px">
                                   
                                   
                                       
@@ -1921,9 +1913,7 @@
                                   <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=11111111-1111-1111-1111-111111111111&amp;city=brest-29">
                                       <i aria-label="Postuler pour ce candidat" class="ri-draft-line"></i>
                                   </a>
-                              </td>
-                              
-                                  <td class="text-end w-50px">
+                                  
                                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="dropdown" id="dropdown_1_action_menu" type="button">
                                           <i aria-hidden="true" class="ri-more-2-fill"></i>
                                       </button>
@@ -1936,8 +1926,8 @@
                                               </a>
                                           </div>
                                       
-                                  </td>
-                              
+                                  
+                              </td>
                           </tr>
                       
                           <tr>
@@ -1960,7 +1950,7 @@
                               </td>
                               <td>0</td>
                               <td></td>
-                              <td class="text-end w-50px">
+                              <td class="text-end w-100px">
                                   
                                   
                                       
@@ -1968,9 +1958,7 @@
                                   <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=22222222-2222-2222-2222-222222222222&amp;city=brest-29">
                                       <i aria-label="Postuler pour ce candidat" class="ri-draft-line"></i>
                                   </a>
-                              </td>
-                              
-                                  <td class="text-end w-50px">
+                                  
                                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="dropdown" id="dropdown_2_action_menu" type="button">
                                           <i aria-hidden="true" class="ri-more-2-fill"></i>
                                       </button>
@@ -1983,8 +1971,8 @@
                                               </a>
                                           </div>
                                       
-                                  </td>
-                              
+                                  
+                              </td>
                           </tr>
                       
                           <tr>
@@ -2007,7 +1995,7 @@
                               </td>
                               <td>0</td>
                               <td></td>
-                              <td class="text-end w-50px">
+                              <td class="text-end w-100px">
                                   
                                   
                                       
@@ -2015,9 +2003,7 @@
                                   <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Postuler pour ce candidat" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=33333333-3333-3333-3333-333333333333&amp;city=brest-29">
                                       <i aria-label="Postuler pour ce candidat" class="ri-draft-line"></i>
                                   </a>
-                              </td>
-                              
-                                  <td class="text-end w-50px">
+                                  
                                       <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="dropdown" id="dropdown_3_action_menu" type="button">
                                           <i aria-hidden="true" class="ri-more-2-fill"></i>
                                       </button>
@@ -2030,8 +2016,8 @@
                                               </a>
                                           </div>
                                       
-                                  </td>
-                              
+                                  
+                              </td>
                           </tr>
                       
                   </tbody>
