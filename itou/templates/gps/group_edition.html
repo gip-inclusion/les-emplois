@@ -30,17 +30,16 @@
                 <div class="col-12 col-lg-8">
                     <form method="post" id="id-membership-form">
                         {% csrf_token %}
-
                         <h2>Mon intervention</h2>
                         <div class="c-box mb-4">
-                            <h2>Période de l’accompagnement</h2>
+                            <h3>Période de l’accompagnement</h3>
                             {% bootstrap_field form.started_at %}
                             {% bootstrap_field form.is_ongoing %}
                             {% bootstrap_field form.ended_at show_label=False %}
                             <small class="d-inline-block mb-3">* champs obligatoires</small>
                         </div>
                         <div class="c-box mb-4">
-                            <h2>Motif de l’intervention</h2>
+                            <h3>Motif de l’intervention</h3>
                             <div class="c-info mb-1">
                                 <span class="c-info__summary">Cette information sera visible aux autres intervenants. N’inscrivez aucune information confidentielle dans ce champ.</span>
                             </div>

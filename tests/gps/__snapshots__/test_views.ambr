@@ -66,7 +66,7 @@
                   
               </div>
               <div class="c-box mb-5">
-                  <h2>Informations de contact</h2>
+                  <h3>Informations de contact</h3>
                   <div class="row">
                       <div class="col-12 col-md-6 mb-3 mb-md-0">
                           <ul class="list-data">
@@ -166,7 +166,7 @@
                   
               </div>
               <div class="c-box mb-5">
-                  <h2>Informations de contact</h2>
+                  <h3>Informations de contact</h3>
                   <div class="row">
                       <div class="col-12 col-md-6 mb-3 mb-md-0">
                           <ul class="list-data">
@@ -314,7 +314,7 @@
                   
               </div>
               <div class="c-box mb-5">
-                  <h2>Informations de contact</h2>
+                  <h3>Informations de contact</h3>
                   <div class="row">
                       <div class="col-12 col-md-6 mb-3 mb-md-0">
                           <ul class="list-data">
@@ -383,7 +383,7 @@
               </div>
               
                   <div class="c-box">
-                      <h2>Diagnostic</h2>
+                      <h3>Diagnostic</h3>
                       <ul class="list-data list-data__two-column-lg">
                           <li>
                               <small>Niveau de formation</small>
@@ -489,7 +489,7 @@
                   
               </div>
               <div class="c-box mb-5">
-                  <h2>Informations de contact</h2>
+                  <h3>Informations de contact</h3>
                   <div class="row">
                       <div class="col-12 col-md-6 mb-3 mb-md-0">
                           <ul class="list-data">
@@ -558,7 +558,7 @@
               </div>
               
                   <div class="c-box">
-                      <h2>Diagnostic</h2>
+                      <h3>Diagnostic</h3>
                       <ul class="list-data list-data__two-column-lg">
                           <li>
                               <small>Niveau de formation</small>
@@ -659,7 +659,7 @@
               </div>
               <div class="c-box mb-4">
                   <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
-                      <h2 class="mb-0">Période de l’accompagnement</h2>
+                      <h3 class="mb-0">Période de l’accompagnement</h3>
                       
                           <div><span class="badge badge-sm rounded-pill bg-emploi-light text-primary">
       <i aria-hidden="true" class="ri-eye-close-line"></i>
@@ -683,7 +683,7 @@
               </div>
               <div class="c-box mb-4">
                   <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
-                      <h2 class="mb-0">Motif de l’intervention</h2>
+                      <h3 class="mb-0">Motif de l’intervention</h3>
                       
                           <div><span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
       <i aria-hidden="true" class="ri-map-pin-user-line"></i>
@@ -772,7 +772,7 @@
               </div>
               <div class="c-box mb-4">
                   <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
-                      <h2 class="mb-0">Période de l’accompagnement</h2>
+                      <h3 class="mb-0">Période de l’accompagnement</h3>
                       
                           <div><span class="badge badge-sm rounded-pill bg-success-lighter text-success">
       <i aria-hidden="true" class="ri-eye-line"></i>
@@ -796,7 +796,7 @@
               </div>
               <div class="c-box mb-4">
                   <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
-                      <h2 class="mb-0">Motif de l’intervention</h2>
+                      <h3 class="mb-0">Motif de l’intervention</h3>
                       
                           <div><span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
       <i aria-hidden="true" class="ri-map-pin-user-line"></i>
@@ -881,10 +881,9 @@
                   <div class="col-12 col-lg-8">
                       <form id="id-membership-form" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-  
                           <h2>Mon intervention</h2>
                           <div class="c-box mb-4">
-                              <h2>Période de l’accompagnement</h2>
+                              <h3>Période de l’accompagnement</h3>
                               <div class="form-group form-group-required"><label class="form-label" for="id_started_at">Date de début</label><duet-date-picker class="" identifier="id_started_at" max="2024-06-21" name="started_at" required="" value="2024-06-21"></duet-date-picker></div>
                               <div class="form-group form-group-required"><label class="form-label">Date de fin</label><div class="" data-disable-target="duet-date-picker[identifier=id_ended_at]" id="id_is_ongoing" required="">
       
@@ -909,7 +908,7 @@
                               <small class="d-inline-block mb-3">* champs obligatoires</small>
                           </div>
                           <div class="c-box mb-4">
-                              <h2>Motif de l’intervention</h2>
+                              <h3>Motif de l’intervention</h3>
                               <div class="c-info mb-1">
                                   <span class="c-info__summary">Cette information sera visible aux autres intervenants. N’inscrivez aucune information confidentielle dans ce champ.</span>
                               </div>
@@ -938,30 +937,34 @@
   '''
   <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card'[Public ID of target_participant]">
                                   <div class="c-box--results__header">
-                                      <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 align-items-start mb-3">
-                                          <p class="fs-sm mb-0 flex-grow-1">
-                                              <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
+                                      <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                                          <div class="c-box--results__summary flex-grow-1">
                                               
-                                                  Accompagnateur depuis le 20/01/2025
+                                                  <i aria-hidden="true" class="ri-user-line"></i>
                                               
-                                          </p>
-                                          
-                                          
-                                      </div>
-                                      <div class="c-box--results__summary">
-                                          
-                                              <i aria-hidden="true" class="ri-user-line"></i>
-                                          
-                                          <div>
-                                              <div class="d-flex gap-3 align-items-center">
-                                                  <h3>Jean DUPONT</h3>
-                                                  
-                                              </div>
-                                              <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                                                  Prescripteur
-                                                  
+                                              <div>
+                                                  <div class="d-flex align-items-center gap-2">
+                                                      <h3>Jean DUPONT</h3>
+                                                      
+                                                  </div>
+                                                  <span>
+                                                      Prescripteur
+                                                      
+                                                  </span>
                                               </div>
                                           </div>
+                                          
+                                      </div>
+                                      <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
+                                          <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                              <li>
+                                                  <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
+                                                  
+                                                      Accompagnateur depuis le 20/01/2025
+                                                  
+                                              </li>
+                                          </ul>
+                                          
                                       </div>
                                   </div>
                                   <hr class="m-0"/>
@@ -1080,13 +1083,24 @@
                           
                               <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-[Public ID of prescriber]">
                                   <div class="c-box--results__header">
-                                      <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 align-items-start mb-3">
-                                          <p class="fs-sm mb-0 flex-grow-1">
-                                              <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
+                                      <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                                          <div class="c-box--results__summary flex-grow-1">
                                               
-                                                  Accompagnateur du 01/01/2024 au 20/06/2024
+                                                  <i aria-hidden="true" class="ri-home-smile-line"></i>
                                               
-                                          </p>
+                                              <div>
+                                                  <div class="d-flex align-items-center gap-2">
+                                                      <h3>Pierre DUPONT</h3>
+                                                      
+                                                          <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">c’est vous</span>
+                                                      
+                                                  </div>
+                                                  <span>
+                                                      Prescripteur
+                                                      pour Les Olivades
+                                                  </span>
+                                              </div>
+                                          </div>
                                           
                                               <div><span class="badge badge-sm rounded-pill bg-emploi-light text-primary">
       <i aria-hidden="true" class="ri-eye-close-line"></i>
@@ -1094,29 +1108,24 @@
   </span>
   </div>
                                           
-                                          
-                                              <a class="btn btn-sm btn-ico btn-secondary" href="/gps/groups/[PK of FollowUpGroup]/edition">
-                                                  <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
-                                                  <span>Modifier mon intervention</span>
-                                              </a>
-                                          
                                       </div>
-                                      <div class="c-box--results__summary">
-                                          
-                                              <i aria-hidden="true" class="ri-home-smile-line"></i>
-                                          
-                                          <div>
-                                              <div class="d-flex gap-3 align-items-center">
-                                                  <h3>Pierre DUPONT</h3>
+                                      <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
+                                          <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                              <li>
+                                                  <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
                                                   
-                                                      <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">c’est vous</span>
+                                                      Accompagnateur du 01/01/2024 au 20/06/2024
                                                   
+                                              </li>
+                                          </ul>
+                                          
+                                              <div>
+                                                  <a class="btn btn-outline-primary btn-ico btn-block w-100 w-md-auto white-space-nowrap" href="/gps/groups/[PK of FollowUpGroup]/edition">
+                                                      <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
+                                                      <span>Modifier mon intervention</span>
+                                                  </a>
                                               </div>
-                                              <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                                                  Prescripteur
-                                                  pour Les Olivades
-                                              </div>
-                                          </div>
+                                          
                                       </div>
                                   </div>
                                   <hr class="m-0"/>
@@ -1162,30 +1171,34 @@
                           
                               <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-[Public ID of participant]">
                                   <div class="c-box--results__header">
-                                      <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 align-items-start mb-3">
-                                          <p class="fs-sm mb-0 flex-grow-1">
-                                              <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
+                                      <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                                          <div class="c-box--results__summary flex-grow-1">
                                               
-                                                  Accompagnateur depuis le 21/06/2024
+                                                  <i aria-hidden="true" class="ri-user-line"></i>
                                               
-                                          </p>
-                                          
-                                          
-                                      </div>
-                                      <div class="c-box--results__summary">
-                                          
-                                              <i aria-hidden="true" class="ri-user-line"></i>
-                                          
-                                          <div>
-                                              <div class="d-flex gap-3 align-items-center">
-                                                  <h3>François LE FRANÇAIS</h3>
-                                                  
-                                              </div>
-                                              <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                                                  Prescripteur
-                                                  
+                                              <div>
+                                                  <div class="d-flex align-items-center gap-2">
+                                                      <h3>François LE FRANÇAIS</h3>
+                                                      
+                                                  </div>
+                                                  <span>
+                                                      Prescripteur
+                                                      
+                                                  </span>
                                               </div>
                                           </div>
+                                          
+                                      </div>
+                                      <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
+                                          <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                              <li>
+                                                  <i aria-hidden="true" class="ri-calendar-line fw-normal me-1"></i>
+                                                  
+                                                      Accompagnateur depuis le 21/06/2024
+                                                  
+                                              </li>
+                                          </ul>
+                                          
                                       </div>
                                   </div>
                                   <hr class="m-0"/>
