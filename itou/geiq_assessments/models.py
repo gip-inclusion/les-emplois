@@ -64,6 +64,14 @@ class Assessment(models.Model):
     label_geiq_id = models.IntegerField(verbose_name="identifiant label du GEIQ principal")
     label_antennas = models.JSONField(verbose_name="antennes LABEL concernées par le bilan")
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["campaign", "label_geiq_id", "label_antennas"],
+                name="unique_assessment_per_antenna_group",
+            )
+        ]
+
 
 class AssessmentInstitutionLink(models.Model):
     assessment = models.ForeignKey(
