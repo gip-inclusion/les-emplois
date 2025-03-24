@@ -72,6 +72,9 @@ markdown  # https://github.com/Python-Markdown/markdown
 # Easy JS
 django-htmx  # https://github.com/adamchainz/django-htmx
 
+# Easy Componants
+slippers # https://mitchel.me/slippers
+
 # Data management
 # ------------------------------------------------------------------------------
 
