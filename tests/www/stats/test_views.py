@@ -15,7 +15,7 @@ from itou.companies.models import Company
 from itou.institutions.enums import InstitutionKind
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.apis.metabase import METABASE_DASHBOARDS
-from itou.www.stats import urls as stats_urls
+from itou.www.stats import urls as stats_urls, utils as stats_utils
 from itou.www.stats.views import get_params_aci_asp_ids_for_department
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
@@ -497,3 +497,26 @@ def test_stats_ph_state_main_for_prescriber_without_organization(client):
 
     response = client.get(reverse("stats:stats_ph_state_main"))
     assert response.status_code == 403
+
+
+@freeze_time("2023-03-10")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@pytest.mark.parametrize(
+    "organization_kind",
+    stats_utils.STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST
+    + [
+        PrescriberOrganizationKind.CHRS,
+        PrescriberOrganizationKind.CHU,
+        PrescriberOrganizationKind.OIL,
+        PrescriberOrganizationKind.RS_FJT,
+    ],  # Partial access by region (configured in can_view_stats_ph utility)
+)
+def test_stats_ph_state_main_tally_form_overrides(client, organization_kind):
+    organization = PrescriberOrganizationWithMembershipFactory(
+        kind=organization_kind, department="75", authorized=True
+    )
+    client.force_login(organization.members.get())
+
+    response = client.get(reverse("stats:stats_ph_state_main"))
+    assert response.status_code == 200
+    assert response.context["tally_hidden_fields"] == {"type_prescripteur": organization_kind}
