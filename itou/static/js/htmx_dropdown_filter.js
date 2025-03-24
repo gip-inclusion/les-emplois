@@ -58,7 +58,7 @@
 
   function syncInputs(target) {
     target.querySelectorAll("input[data-emplois-sync-with]").forEach((syncedInputOrigin) => {
-      const syncedInputTarget = document.getElementById(syncedInputOrigin.dataset.syncWith);
+      const syncedInputTarget = document.getElementById(syncedInputOrigin.dataset.emploisSyncWith);
       syncedInputOrigin.addEventListener("change", function(event) {
         syncedInputTarget.checked = event.target.checked;
         // Trigger HTMX form submission.
