@@ -1,8 +1,6 @@
-import operator
 import time
 import uuid
 from collections import Counter
-from functools import reduce
 
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str
@@ -42,6 +40,7 @@ from itou.companies.enums import CompanyKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 from itou.users.notifications import JobSeekerCreatedByProxyNotification
+from itou.utils.db import or_queries
 from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_absolute_url
@@ -194,9 +193,9 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
                 )
                 job_applications_filter.append(Q(sender=user, sender_prescriber_organization=organization))
 
-        created_job_seekers = self.filter(reduce(operator.or_, job_seeker_filters)).values_list("id", flat=True)
+        created_job_seekers = self.filter(or_queries(job_seeker_filters)).values_list("id", flat=True)
         job_seekers_applications = job_application_model.objects.filter(
-            reduce(operator.or_, job_applications_filter)
+            or_queries(job_applications_filter)
         ).values_list("job_seeker_id", flat=True)
 
         return created_job_seekers.union(job_seekers_applications)
