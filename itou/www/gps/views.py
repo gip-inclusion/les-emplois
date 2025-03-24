@@ -110,6 +110,7 @@ class GroupDetailsMixin:
                 self.membership.can_view_personal_information
                 or self.request.user.can_view_personal_information(self.group.beneficiary)
             ),
+            "can_print_page": True,
         }
 
 
@@ -205,6 +206,7 @@ class GroupEditionView(GroupDetailsMixin, UpdateView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "matomo_custom_title": "Profil GPS - mon intervention",
+            "can_print_page": False,
         }
 
     def get_success_url(self):

@@ -27,12 +27,25 @@
   
   
                               
-      <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">J… D…</h1>
-          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
-              <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
-          </button>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">J… D…</h1>
+                  
+                      <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+                      </button>
+                  
+              </div>
+          </div>
       </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
@@ -45,12 +58,6 @@
           </li>
       </ul>
   
-                              
-                                  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
@@ -120,12 +127,25 @@
   
   
                               
-      <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">Jane DOE</h1>
-          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
-              <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
-          </button>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">Jane DOE</h1>
+                  
+                      <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+                      </button>
+                  
+              </div>
+          </div>
       </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
@@ -138,12 +158,6 @@
           </li>
       </ul>
   
-                              
-                                  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
@@ -261,12 +275,25 @@
   
   
                               
-      <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">Jane DOE</h1>
-          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
-              <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
-          </button>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">Jane DOE</h1>
+                  
+                      <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+                      </button>
+                  
+              </div>
+          </div>
       </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
@@ -279,12 +306,6 @@
           </li>
       </ul>
   
-                              
-                                  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
@@ -409,12 +430,25 @@
   
   
                               
-      <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">Jane DOE</h1>
-          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
-              <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
-          </button>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">Jane DOE</h1>
+                  
+                      <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+                      </button>
+                  
+              </div>
+          </div>
       </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
@@ -427,12 +461,6 @@
           </li>
       </ul>
   
-                              
-                                  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
@@ -577,12 +605,25 @@
   
   
                               
-      <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">Jane DOE</h1>
-          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
-              <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
-          </button>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">Jane DOE</h1>
+                  
+                      <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+                      </button>
+                  
+              </div>
+          </div>
       </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
@@ -595,12 +636,6 @@
           </li>
       </ul>
   
-                              
-                                  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
@@ -752,12 +787,25 @@
   
   
                               
-      <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">J… D…</h1>
-          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
-              <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
-          </button>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">J… D…</h1>
+                  
+                      <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+                      </button>
+                  
+              </div>
+          </div>
       </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
@@ -770,12 +818,6 @@
           </li>
       </ul>
   
-                              
-                                  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
@@ -865,12 +907,25 @@
   
   
                               
-      <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">J… D…</h1>
-          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
-              <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
-          </button>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">J… D…</h1>
+                  
+                      <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+                      </button>
+                  
+              </div>
+          </div>
       </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
@@ -883,12 +938,6 @@
           </li>
       </ul>
   
-                              
-                                  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
@@ -978,7 +1027,21 @@
   
   
                               
-      <h1 class="m-3">J… D…</h1>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">J… D…</h1>
+                  
+              </div>
+          </div>
+      </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <div class="c-box c-box--action">
           <h2 class="visually-hidden">Actions rapides</h2>
           <div class="form-row align-items-center gx-3">
@@ -997,12 +1060,6 @@
           </div>
       </div>
   
-                              
-                                  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
@@ -1171,12 +1228,25 @@
   
   
                               
-      <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">Jane DOE</h1>
-          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
-              <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
-          </button>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">Jane DOE</h1>
+                  
+                      <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+                      </button>
+                  
+              </div>
+          </div>
       </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link active" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
@@ -1189,12 +1259,6 @@
           </li>
       </ul>
   
-                              
-                                  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
