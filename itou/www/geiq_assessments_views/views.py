@@ -49,7 +49,7 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
         # TODO: store antenna selection
         assessment = Assessment.objects.create(
             campaign=campaign_label_infos.campaign,
-            name_for_institution=geiq_info["name"],
+            name_for_institution=geiq_info["nom"],
             label_geiq_id=geiq_info["id"],
             # label_antennas= ... computed from create_form.cleaned_data
         )
@@ -79,10 +79,8 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
 
     context = {
         "campaign_label_infos": campaign_label_infos,
-        "siret": current_siret,
         "geiq_info": geiq_info,
-        "main_geiq_name": "",
-        "create_form": create_form,
-        "antennas": [],
+        "siret": current_siret,
+        "form": create_form,
     }
     return render(request, template_name, context)
