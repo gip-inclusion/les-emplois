@@ -1,5 +1,12 @@
 # Journal des modifications
 
+## 2025-03-24
+
+### Modifié
+
+- [Fiches salarié : Correction de l'URL du bouton "Créer une fiche salarié"](https://github.com/gip-inclusion/les-emplois/pull/5798)
+- [UX/UI : Réduire la taille des badges dans le tableau des demandeurs d’emplois des prescripteurs](https://github.com/gip-inclusion/les-emplois/pull/5796) 🖼
+
 ## 2025-03-17
 
 ### Ajouté
