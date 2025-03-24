@@ -14,7 +14,7 @@ from itou.utils.command import BaseCommand
 class Command(BaseCommand):
     CACHE_NAME = "stats"
 
-    DATA_TO_FETCH = {
+    KPI_TO_FETCH = {
         DatumKey.FLUX_IAE_DATA_UPDATED_AT: {
             "card_id": 272,
             "converter": parse_datetime,
@@ -52,16 +52,18 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         super().add_arguments(parser)
+        subparsers = parser.add_subparsers(dest="data", required=True)
 
-        parser.add_argument("action", choices=["fetch", "show"])
-        parser.add_argument("--wet-run", dest="wet_run", action="store_true")
+        kpi = subparsers.add_parser("kpi")
+        kpi.add_argument("action", choices=["fetch", "show"])
+        kpi.add_argument("--wet-run", dest="wet_run", action="store_true")
 
-    def fetch(self, *, wet_run):
+    def fetch_kpi(self, *, wet_run):
         cache = caches[self.CACHE_NAME]
         client = Client(settings.METABASE_SITE_URL)
 
         metabase_data = {DatumKey.DATA_UPDATED_AT: timezone.now()}
-        for datum_key, metabase_informations in self.DATA_TO_FETCH.items():
+        for datum_key, metabase_informations in self.KPI_TO_FETCH.items():
             self.logger.info("Fetching datum_key=%s", datum_key)
             converter = metabase_informations.get("converter", lambda x: x)
             filters = metabase_informations.get("filters")
@@ -88,12 +90,18 @@ class Command(BaseCommand):
         else:
             pprint.pp(metabase_data, sort_dicts=True)
 
-    def show(self, *, wet_run):
+    def show_kpi(self, *, wet_run):
         data = caches[self.CACHE_NAME].get_many(DatumKey)
         for key, value in data.items():
             print(repr(key))
             print(repr(value))
             print()
 
-    def handle(self, action, *, wet_run, **kwargs):
-        getattr(self, action)(wet_run=wet_run)
+    def handle(self, *, data, **options):
+        match data:
+            case "kpi":
+                action_function = {
+                    "fetch": self.fetch_kpi,
+                    "show": self.show_kpi,
+                }[options["action"]]
+                action_function(wet_run=options["wet_run"])
