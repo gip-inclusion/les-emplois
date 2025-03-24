@@ -1,8 +1,8 @@
 {% extends "layout/base.html" %}
-{% load format_filters %}
 {% load django_bootstrap5 %}
+{% load format_filters %}
 {% load static %}
-{% load buttons_form %}
+{% load str_filters %}
 
 {% block title %}Bilan d’exécution {{ block.super }}{% endblock %}
 
@@ -13,18 +13,44 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    {% for assessment in assessments %}
-                        {{ assessment }}
-                    {% empty %}
-
-                    {% endfor %}
-                    <h2>Mes bilans</h2>
-                    <p>
-                        Cet espace vous permet de créer et de suivre vos bilans d’exécution.
-                        <br>
-                        Vous devez créer un bilan par convention.
-                    </p>
-                    <a class="btn btn-primary" href="{% url "geiq_assessments_views:create" %}">Créer un bilan d’exécution</a>
+                    {% if assessments %}
+                        <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
+                            <h2 class="mb-0">Mes bilans</h2>
+                            <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les bilans d’exécution">
+                                <a class="btn btn-primary" href="{% url "geiq_assessments_views:create" %}">Créer un bilan d’exécution</a>
+                            </div>
+                        </div>
+                        <p>{{ assessments|length }} résultat{{ assessments|pluralizefr }}</p>
+                        <div class="table-responsive mt-3 mt-md-4">
+                            <table class="table table-hover">
+                                <caption class="visually-hidden">Liste des bilans d’exécution</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Institution</th>
+                                        <th scope="col">Date d’envoi</th>
+                                        <th scope="col">Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for assessment in assessments %}
+                                        <tr>
+                                            <td>{{ assessment }}</td>
+                                            <td>{{ assessment.submitted_at|date:"d/m/Y"|default:"-" }}</td>
+                                            <td>{{ assessment }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <h2>Mes bilans</h2>
+                        <p>
+                            Cet espace vous permet de créer et de suivre vos bilans d’exécution.
+                            <br>
+                            Vous devez créer un bilan par convention.
+                        </p>
+                        <a class="btn btn-primary" href="{% url "geiq_assessments_views:create" %}">Créer un bilan d’exécution</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
