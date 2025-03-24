@@ -40,7 +40,7 @@ class CreateForm(forms.Form):
         label="Région", queryset=Institution.objects.filter(kind=InstitutionKind.DREETS_GEIQ), required=False
     )
 
-    def __init__(self, *args, geiq_name, antennas, **kwargs):
+    def __init__(self, *args, geiq_name, antenna_names, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["ddets"].form_group_class = "form-group ms-4 collapse ddets_group"
         self.fields["dreets"].form_group_class = "form-group ms-4 collapse dreets_group"
@@ -56,12 +56,15 @@ class CreateForm(forms.Form):
         self.fields["main_geiq"].label = geiq_name
 
         antenna_fields = []
-        for antenna in antennas:
-            if antenna_id := antenna["id"]:  # Ignore main geiq with id 0
-                field_name = f"{self.ANTENNA_PREFIX}_{antenna_id}"
-                self.fields[field_name] = forms.BooleanField(label=antenna["nom"], required=False)
+        for antenna_id, antenna_name in antenna_names.items():
+            if antenna_id:  # Ignore main geiq with id 0
+                field_name = self.get_antenna_field(antenna_id)
+                self.fields[field_name] = forms.BooleanField(label=antenna_name, required=False)
                 antenna_fields.append(field_name)
         self.antenna_fields = antenna_fields
+
+    def get_antenna_field(self, antenna_id):
+        return f"{self.ANTENNA_PREFIX}_{antenna_id}"
 
     def clean(self):
         cleaned_data = super().clean()

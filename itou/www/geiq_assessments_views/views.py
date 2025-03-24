@@ -1,9 +1,11 @@
+import operator
+
 from django.http import Http404
 from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.http import require_safe
 
-from itou.common_apps.address.departments import REGIONS
+from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, REGIONS
 from itou.companies.enums import CompanyKind
 from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, LABELInfos
 from itou.institutions.enums import InstitutionKind
@@ -41,17 +43,25 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
         geiq_info = None
 
     if geiq_info is not None:
-        create_form = CreateForm(antennas=geiq_info["antennes"], geiq_name=geiq_info["nom"], data=request.POST or None)
+        antenna_names = {antenna_info["id"]: antenna_info["nom"] for antenna_info in geiq_info["antennes"]}
+        create_form = CreateForm(antenna_names=antenna_names, geiq_name=geiq_info["nom"], data=request.POST or None)
     else:
         create_form = None
 
     if request.method == "POST" and create_form and create_form.is_valid():
         # TODO: store antenna selection
+        label_antennas = []
+        if create_form.cleaned_data.get("main_geiq"):
+            label_antennas.append({"id": 0, "name": geiq_info["nom"]})
+        for antenna_id, antenna_name in antenna_names.items():
+            if create_form.cleaned_data.get(create_form.get_antenna_field(antenna_id)):
+                label_antennas.append({"id": antenna_id, "name": antenna_name})
+
         assessment = Assessment.objects.create(
             campaign=campaign_label_infos.campaign,
             name_for_institution=geiq_info["nom"],
             label_geiq_id=geiq_info["id"],
-            # label_antennas= ... computed from create_form.cleaned_data
+            label_antennas=sorted(label_antennas, key=operator.itemgetter("id")),  # Stable order to detect duplicates
         )
 
         # TODO: link companies matching the selected SIRET
@@ -61,7 +71,7 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
         ddets = create_form.cleaned_data["ddets"]
         ddets_dreets = (
             Institution.objects.filter(
-                kind=InstitutionKind.DREETS_GEIQ, department__in=REGIONS[ddets.department]
+                kind=InstitutionKind.DREETS_GEIQ, department__in=REGIONS[DEPARTMENT_TO_REGION[ddets.department]]
             ).first()
             if ddets
             else None
