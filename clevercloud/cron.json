@@ -23,6 +23,7 @@
   "45 0 * * * $ROOT/clevercloud/run_management_command.sh import_advisor_information shared_bucket/imports-gps/export_gps.xlsx --wet-run",
   "30 1 * * * $ROOT/clevercloud/run_management_command.sh send_users_to_brevo --wet-run",
   "0 3 * * * $ROOT/clevercloud/run_management_command.sh clearsessions",
+  "0 4 * * * $ROOT/clevercloud/run_management_command.sh metabase_data stalled-job-seekers --wet-run",
   "15 5 * * * $ROOT/clevercloud/run_management_command.sh prolongation_requests_chores email_reminder --wet-run",
   "0 7 * * * $ROOT/clevercloud/run_management_command.sh sync_s3_files --check-existing",
   "0 9 * * * $ROOT/clevercloud/run_management_command.sh send_check_authorized_members_email",
