@@ -12,7 +12,7 @@
   "20 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=prescribers",
   "40 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=job_seekers",
 
-  "30 2-18/4 * * * $ROOT/clevercloud/run_management_command.sh metabase_data fetch --wet-run",
+  "30 2-18/4 * * * $ROOT/clevercloud/run_management_command.sh metabase_data kpi fetch --wet-run",
   "25 8-18/2 * * 1-5 $ROOT/clevercloud/transfer_employee_records.sh --download",
   "55 8-18/2 * * 1-5 $ROOT/clevercloud/transfer_employee_records.sh --upload",
 
