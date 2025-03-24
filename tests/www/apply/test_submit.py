@@ -46,7 +46,12 @@ from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.cities.factories import create_city_geispolsheim, create_city_in_zrr, create_test_cities
-from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWithMembershipAndJobsFactory
+from tests.companies.factories import (
+    CompanyFactory,
+    CompanyMembershipFactory,
+    CompanyWithMembershipAndJobsFactory,
+    JobDescriptionFactory,
+)
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.geo.factories import ZRRFactory
 from tests.gps.test import mock_advisor_list
@@ -260,6 +265,26 @@ class TestApply:
             response,
             reverse("apply:application_end", kwargs={"company_pk": company.pk, "application_pk": job_application.pk}),
         )
+
+    @pytest.mark.parametrize(
+        "job_description_id,expected_session",
+        [
+            pytest.param("", None, id="no_session"),
+            pytest.param(1, {"selected_jobs": [1]}, id="with_selected_jobs"),
+        ],
+    )
+    def test_start_view_initializes_session(self, client, job_description_id, expected_session):
+        company = CompanyFactory(with_jobs=True, with_membership=True)
+        if job_description_id:
+            JobDescriptionFactory(pk=job_description_id, company=company)
+        client.force_login(PrescriberFactory())
+        url = reverse("apply:start", kwargs={"company_pk": company.pk})
+        client.get(url, {"job_description_id": job_description_id})
+
+        if expected_session is None:
+            assert f"job_application-{company.pk}" not in client.session.keys()
+        else:
+            assert client.session[f"job_application-{company.pk}"] == expected_session
 
 
 class TestHire:
