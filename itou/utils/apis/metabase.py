@@ -132,8 +132,8 @@ METABASE_DASHBOARDS = {
     #
     "stats_ph_state_main": {
         "dashboard_id": 488,
-        "tally_popup_form_id": "mRG61J",
-        "tally_embed_form_id": "3qLKad",
+        "tally_popup_form_id": "3XQ5D4",
+        "tally_embed_form_id": "mVNGgv",
     },
     #
     # Institution stats - DDETS IAE - department level.
