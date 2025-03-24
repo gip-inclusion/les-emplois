@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -63,6 +64,16 @@ class Assessment(models.Model):
     name_for_institution = models.CharField(verbose_name="nom du bilan pour les institutions")
     label_geiq_id = models.IntegerField(verbose_name="identifiant label du GEIQ principal")
     label_antennas = models.JSONField(verbose_name="antennes LABEL concernées par le bilan")
+
+    submitted_at = models.DateTimeField("transmis le", blank=True, null=True)
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="transmis par",
+        related_name="submitted_assessments",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,  # For traceability and accountability
+    )
 
     class Meta:
         constraints = [
