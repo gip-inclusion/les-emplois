@@ -1,8 +1,8 @@
 {% extends "layout/base.html" %}
+{% load buttons_form %}
 {% load format_filters %}
 {% load django_bootstrap5 %}
 {% load static %}
-{% load buttons_form %}
 
 {% block title %}Créer un bilan d’exécution {{ block.super }}{% endblock %}
 
@@ -15,21 +15,48 @@
                 <div class="col-12 col-lg-8">
                     {% if not campaign_label_infos %}
                         La campagne actuelle n'est pas encore ouverte ou les données LABEL ne sont pas encore disponibles.
-                    {% elif not geiq_infos %}
+                    {% elif not geiq_info %}
                         Le SIRET ({{ siret }}) de votre entreprise actuelle ne semble pas connu de LABEL: impossible de créer un bilan.
+                    {% else %}
+                        <div class="c-form">
+                            <form method="post">
+                                {% csrf_token %}
+                                {% bootstrap_form_errors form alert_error_type="all" %}
+                                <fieldset>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <legend class="h4">Par quel type d’institution êtes-vous conventionné ?</legend>
+                                            {% bootstrap_field form.convention_with_ddets %}
+                                            {% bootstrap_field form.ddets wrapper_class=form.ddets.field.form_group_class %}
+                                            {% bootstrap_field form.convention_with_dreets %}
+                                            {% bootstrap_field form.dreets wrapper_class=form.dreets.field.form_group_class %}
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <hr>
+                                <fieldset>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <legend class="h4">Quelles sont les structures concernées par cette convention ?</legend>
+                                            <p>GEIQ principal:</p>
+                                            {% bootstrap_field form.main_geiq %}
+                                            <p>Antennes:</p>
+                                            {% for field in form %}
+                                                {% if form.ANTENNA_PREFIX in field.name %}
+                                                    {% bootstrap_field field %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <div class="c-info">
+                                    <span class="c-info__summary">Les données des structures sélectionnées apparaitront dans le bilan</span>
+                                </div>
+                                {% url "geiq_assessments_views:list_for_geiq" as reset_url %}
+                                {% itou_buttons_form primary_label="Créer le bilan" reset_url=reset_url show_mandatory_fields_mention=False %}
+                            </form>
+                        </div>
                     {% endif %}
-                    <h2>Créer un bilan</h2>
-                    <div class="c-form">
-                        {% bootstrap_form create_form alert_error_type="all" %}
-                        <fieldset>
-                            <legend class="h3">Antennes</legend>
-                            {% for field in create_form %}
-                                {% if create_form.ANTENNA_PREFIX in field.name %}
-                                    {% bootstrap_field field %}
-                                {% endif %}
-                            {% endfor %}
-                        </fieldset>
-                    </div>
                 </div>
             </div>
         </div>
