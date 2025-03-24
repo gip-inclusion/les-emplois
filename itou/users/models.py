@@ -1,6 +1,8 @@
+import operator
 import time
 import uuid
 from collections import Counter
+from functools import reduce
 
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str
@@ -158,30 +160,46 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
 
         return result
 
-    def linked_job_seeker_ids(self, user, organization=None):
+    def linked_job_seeker_ids(self, user, organization, from_all_coworkers=False):
         """
-        Ids of job seekers that appear in the user's job seekers list view:
-        - job seekers created by the current user
-        - job seekers created by the current organization
-        - job seekers for whom the current user applied
-        """
-        job_seekers_created_by_user = self.filter(created_by=user).values_list("id", flat=True)
+        Return the ids of job seekers that appear in the user's job seekers list view
 
+        With from_all_coworkers=False :
+        - job seekers created by the user as a member of organization
+        - job seekers created by the user as a member of no organization
+        - job seekers for whom the user applied as a member of organization
+        - job seekers for whom the user applied as a member of no organization
+
+        With from_all_coworkers=True:
+        - all the previous
+        - job seekers created by a member of the organization
+        - job seekers for whom a member of the organization applied
+        """
         job_application_model = apps.get_model("job_applications", "JobApplication")
+
+        # First the links for the user as a member of no organisation
+        job_seeker_filters = [
+            Q(created_by=user, jobseeker_profile__created_by_prescriber_organization=None),
+        ]
+        job_applications_filter = [Q(sender=user, sender_prescriber_organization=None)]
+
+        # then the links for the organization either only for the user, or for all members
         if organization:
-            job_seekers_created_by_orga = JobSeekerProfile.objects.filter(
-                created_by_prescriber_organization=organization,
-            ).values_list("user_id", flat=True)
-            job_seekers_applications = job_application_model.objects.filter(
-                (Q(sender=user) & Q(sender_prescriber_organization__isnull=True))
-                | Q(sender_prescriber_organization=organization),
-            ).values_list("job_seeker_id", flat=True)
-        else:
-            job_seekers_created_by_orga = User.objects.none()
-            job_seekers_applications = job_application_model.objects.filter(sender=user).values_list(
-                "job_seeker_id", flat=True
-            )
-        return job_seekers_created_by_user.union(job_seekers_created_by_orga, job_seekers_applications)
+            if from_all_coworkers:
+                job_seeker_filters.append(Q(jobseeker_profile__created_by_prescriber_organization=organization))
+                job_applications_filter.append(Q(sender_prescriber_organization=organization))
+            else:
+                job_seeker_filters.append(
+                    Q(created_by=user, jobseeker_profile__created_by_prescriber_organization=organization)
+                )
+                job_applications_filter.append(Q(sender=user, sender_prescriber_organization=organization))
+
+        created_job_seekers = self.filter(reduce(operator.or_, job_seeker_filters)).values_list("id", flat=True)
+        job_seekers_applications = job_application_model.objects.filter(
+            reduce(operator.or_, job_applications_filter)
+        ).values_list("job_seeker_id", flat=True)
+
+        return created_job_seekers.union(job_seekers_applications)
 
     def search_by_full_name(self, name):
         """

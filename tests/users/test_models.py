@@ -31,6 +31,7 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import (
     IAEEligibilityDiagnosisFactory,
 )
+from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
@@ -116,6 +117,90 @@ class TestManager:
 
         assert User.objects.search_by_full_name("Jean").count() == 2
         assert User.objects.search_by_full_name("Jean II").get() == user_1
+
+    def test_linked_job_seeker_ids(self):
+        organization = PrescriberOrganizationFactory()
+        other_organization = PrescriberOrganizationFactory()
+        prescriber = PrescriberMembershipFactory(organization=organization).user
+
+        # From the prescriber as a member of no organization
+        job_seeker_created_by_user_no_organization = JobSeekerFactory(created_by=prescriber)
+        job_seeker_with_sent_job_app_no_organization = JobApplicationFactory(
+            sender=prescriber, eligibility_diagnosis=None
+        ).job_seeker
+
+        # From the prescriber as a member of the organization
+        job_seeker_created_by_user_in_organization = JobSeekerFactory(
+            created_by=prescriber,
+            jobseeker_profile__created_by_prescriber_organization=organization,
+        )
+        job_seeker_with_sent_job_app_in_organization = JobApplicationFactory(
+            sender=prescriber,
+            sender_prescriber_organization=organization,
+            eligibility_diagnosis=None,
+        ).job_seeker
+
+        # From the prescriber as a member of another organization. We won't display those
+        JobSeekerFactory(
+            created_by=prescriber,
+            jobseeker_profile__created_by_prescriber_organization=other_organization,
+        )
+        JobApplicationFactory(
+            sender=prescriber,
+            sender_prescriber_organization=other_organization,
+            eligibility_diagnosis=None,
+        )
+
+        job_seeker_created_by_organization_coworker = JobSeekerFactory(
+            jobseeker_profile__created_by_prescriber_organization=organization
+        )
+        job_seeker_with_job_app_sent_by_organization_coworker = JobApplicationFactory(
+            sender_prescriber_organization=organization,
+            eligibility_diagnosis=None,
+        ).job_seeker
+
+        assertQuerySetEqual(
+            User.objects.linked_job_seeker_ids(prescriber, organization=None),
+            [
+                job_seeker_created_by_user_no_organization.pk,
+                job_seeker_with_sent_job_app_no_organization.pk,
+            ],
+            ordered=False,
+        )
+
+        # NB: Nothing changes as there's no organization
+        assertQuerySetEqual(
+            User.objects.linked_job_seeker_ids(prescriber, organization=None, from_all_coworkers=True),
+            [
+                job_seeker_created_by_user_no_organization.pk,
+                job_seeker_with_sent_job_app_no_organization.pk,
+            ],
+            ordered=False,
+        )
+
+        assertQuerySetEqual(
+            User.objects.linked_job_seeker_ids(prescriber, organization=organization),
+            [
+                job_seeker_created_by_user_no_organization.pk,
+                job_seeker_with_sent_job_app_no_organization.pk,
+                job_seeker_created_by_user_in_organization.pk,
+                job_seeker_with_sent_job_app_in_organization.pk,
+            ],
+            ordered=False,
+        )
+
+        assertQuerySetEqual(
+            User.objects.linked_job_seeker_ids(prescriber, organization=organization, from_all_coworkers=True),
+            [
+                job_seeker_created_by_user_no_organization.pk,
+                job_seeker_with_sent_job_app_no_organization.pk,
+                job_seeker_created_by_user_in_organization.pk,
+                job_seeker_with_sent_job_app_in_organization.pk,
+                job_seeker_created_by_organization_coworker.pk,
+                job_seeker_with_job_app_sent_by_organization_coworker.pk,
+            ],
+            ordered=False,
+        )
 
 
 class TestModel:
