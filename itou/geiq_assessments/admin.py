@@ -30,7 +30,7 @@ class AssessmentCampaignAdmin(ItouModelAdmin):
 
             try:
                 data = sync.get_geiq_infos()
-                campaign.label_infos = models.GEIQLabelInfos.objects.create(campaign=campaign, data=data)
+                campaign.label_infos = models.LABELInfos.objects.create(campaign=campaign, data=data)
             except ImproperlyConfigured:
                 messages.error(request, "Synchronisation impossible avec Label: configuration incomplète")
                 return
