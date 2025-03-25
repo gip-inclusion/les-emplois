@@ -16,6 +16,7 @@ from itou.users.models import User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_absolute_url
+from itou.www.gps.enums import EndReason
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
@@ -130,7 +131,7 @@ class TestGroupLists:
         ).follow_up_group
 
         # old membership
-        FollowUpGroupMembershipFactory(ended_at=timezone.localdate(), member=user)
+        FollowUpGroupMembershipFactory(ended_at=timezone.localdate(), end_reason=EndReason.MANUAL, member=user)
 
         # inactive membership
         FollowUpGroupMembershipFactory(is_active=False, member=user)
@@ -168,6 +169,7 @@ class TestGroupLists:
             follow_up_group__beneficiary__last_name="Bon",
             is_referent=False,
             ended_at=timezone.localdate(),
+            end_reason=EndReason.MANUAL,
             member=user,
         )
 
@@ -323,6 +325,7 @@ class TestGroupDetailsMembershipTab:
             member=prescriber,
             started_at=date(2024, 1, 1),
             ended_at=date(2024, 6, 20),
+            end_reason=EndReason.MANUAL,
             reason="iae",  # With a reason
         ).follow_up_group
         participant = FollowUpGroupMembershipFactory(
@@ -654,6 +657,7 @@ class TestGroupDetailsContributionTab:
 
         membership = group.memberships.get()
         membership.ended_at = timezone.localdate()
+        membership.end_reason = EndReason.MANUAL
         membership.reason = "parce que"
         membership.save()
         response = client.get(url)
@@ -730,6 +734,7 @@ class TestGroupDetailsEditionTab:
         membership.refresh_from_db()
         assert membership.started_at == date(2024, 1, 3)
         assert membership.ended_at == date(2024, 6, 21)  # today
+        assert membership.end_reason == EndReason.MANUAL
         assert membership.is_referent is False
 
         # The user just clics on "Accompagnement en cours"
@@ -745,6 +750,7 @@ class TestGroupDetailsEditionTab:
         membership.refresh_from_db()
         assert membership.started_at == date(2024, 1, 3)
         assert membership.ended_at is None
+        assert membership.end_reason is None
         assert membership.is_referent is False
 
         # The user ends again the membership and sets a date
@@ -760,6 +766,7 @@ class TestGroupDetailsEditionTab:
         membership.refresh_from_db()
         assert membership.started_at == date(2024, 1, 3)
         assert membership.ended_at == date(2024, 6, 20)
+        assert membership.end_reason == EndReason.MANUAL
         assert membership.is_referent is False
 
         # The user follows again the beneficiary as referent
@@ -776,6 +783,7 @@ class TestGroupDetailsEditionTab:
         membership.refresh_from_db()
         assert membership.started_at == date(2024, 1, 3)
         assert membership.ended_at is None
+        assert membership.end_reason is None
         assert membership.is_referent is True
 
         # The user sets a reason
