@@ -54,4 +54,12 @@
             </li>
         {% endif %}
     </ul>
+    {% if not form.spontaneous_application and not form.selected_jobs|length %}
+        <p>Cet employeur ne souhaite pas recevoir de candidatures pour le moment.</p>
+    {% endif %}
+{% endblock %}
+
+{% block form_submit_button %}
+    {# Disable the form submission if there are no available jobs #}
+    {% if form.spontaneous_application or form.selected_jobs|length %}{{ block.super }}{% endif %}
 {% endblock %}

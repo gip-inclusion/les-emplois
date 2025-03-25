@@ -71,7 +71,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.users.test_models import user_with_approval_in_waiting_period
-from tests.utils.test import KNOWN_SESSION_KEYS, assertSnapshotQueries
+from tests.utils.test import KNOWN_SESSION_KEYS, assertSnapshotQueries, parse_response_to_soup
 
 
 BACK_BUTTON_ARIA_LABEL = "Retourner à l’étape précédente"
@@ -3446,6 +3446,20 @@ class TestApplicationView:
         )
         assertNotContains(response, self.spontaneous_application_label)
         assert self.spontaneous_application_field not in response.context["form"].fields
+
+    def test_application_jobs_none_available(self, client, snapshot):
+        # No jobs available and spontaneous applications closed.
+        company = CompanyFactory(with_membership=True, spontaneous_applications_open_since=None)
+        client.force_login(company.members.first())
+        job_seeker = JobSeekerFactory()
+
+        response = client.get(
+            reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
+        )
+        assert str(parse_response_to_soup(response, ".c-form > form")) == snapshot
 
     def test_application_start_with_invalid_job_description_id(self, client):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True, with_jobs=True)

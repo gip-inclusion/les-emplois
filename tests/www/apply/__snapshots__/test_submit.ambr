@@ -1,4 +1,26 @@
 # serializer version: 1
+# name: TestApplicationView.test_application_jobs_none_available
+  '''
+  <form method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+  
+                              
+      <ul class="list-group list-group-flush">
+          
+          
+      </ul>
+      
+          <p>Cet employeur ne souhaite pas recevoir de candidatures pour le moment.</p>
+      
+  
+  
+                              
+      
+      
+  
+                          </form>
+  '''
+# ---
 # name: TestHireConfirmation.test_as_company[view queries]
   dict({
     'num_queries': 24,
