@@ -83,6 +83,20 @@ class Assessment(models.Model):
         verbose_name = "bilan d’exécution"
         verbose_name_plural = "bilans d’exécution"
 
+    def name_for_geiq(self):
+        convention_institution_names = []
+        for institution_link in self.institution_links.all():
+            if institution_link.with_convention:
+                institution = institution_link.institution
+                match institution.kind:
+                    case InstitutionKind.DREETS_GEIQ:
+                        convention_institution_names.append(f"DREETS {institution.region}")
+                    case InstitutionKind.DDETS_GEIQ:
+                        convention_institution_names.append(f"DDETS {institution.department}")
+                    case _:
+                        convention_institution_names.append(institution.name)
+        return " / ".join(sorted(convention_institution_names)) if convention_institution_names else str(self.pk)
+
 
 class AssessmentInstitutionLink(models.Model):
     assessment = models.ForeignKey(
