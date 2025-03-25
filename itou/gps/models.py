@@ -106,6 +106,16 @@ class FollowUpGroupMembershipQueryset(BulkCreatedAtQuerysetProxy, models.QuerySe
 class FollowUpGroupMembership(models.Model):
     class Meta:
         verbose_name = "relation"
+        constraints = [
+            models.CheckConstraint(
+                name="end_coherence",
+                violation_error_message="Incohérence du champ motif de fin",
+                condition=(
+                    models.Q(ended_at=None, end_reason=None)
+                    | models.Q(ended_at__isnull=False, end_reason__isnull=False)
+                ),
+            ),
+        ]
 
     is_referent = models.BooleanField(default=False, verbose_name="référent")
 
