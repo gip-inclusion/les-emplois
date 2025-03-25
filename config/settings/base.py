@@ -27,6 +27,10 @@ APPS_DIR = os.path.abspath(os.path.join(ROOT_DIR, "itou"))
 FIXTURE_DIRS = [os.path.abspath(os.path.join(ROOT_DIR, "itou/fixtures/django"))]
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+# Allow secret key fallback to rotate secrets
+SECRET_KEY_FALLBACKS = []
+if secret_key_fallback := os.getenv("DJANGO_SECRET_KEY_FALLBACK"):
+    SECRET_KEY_FALLBACKS.append(secret_key_fallback)
 
 DEBUG = False
 
