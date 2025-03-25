@@ -1,7 +1,8 @@
 import operator
 
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_safe
 
@@ -86,11 +87,25 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
             AssessmentInstitutionLink.objects.create(
                 assessment=assessment, institution=ddets_dreets, with_convention=False
             )
+        return HttpResponseRedirect(reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk}))
 
     context = {
         "campaign_label_infos": campaign_label_infos,
         "geiq_info": geiq_info,
         "siret": current_siret,
         "form": create_form,
+    }
+    return render(request, template_name, context)
+
+
+@check_user(lambda user: user.is_employer)
+def assessment_details(request, pk, template_name="geiq_assessments_views/assessment_details.html"):
+    if request.current_organization.kind != CompanyKind.GEIQ:
+        raise Http404
+    assessment = Assessment.objects.prefetch_related("institutions").get(
+        companies=request.current_organization.pk, pk=pk
+    )
+    context = {
+        "assessment": assessment,
     }
     return render(request, template_name, context)

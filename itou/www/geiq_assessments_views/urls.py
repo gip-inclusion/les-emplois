@@ -8,4 +8,5 @@ app_name = "geiq_assessments_views"
 urlpatterns = [
     path("list", views.list_for_geiq, name="list_for_geiq"),
     path("create", views.create_assessment, name="create"),
+    path("details/<uuid:pk>", views.assessment_details, name="details"),
 ]
