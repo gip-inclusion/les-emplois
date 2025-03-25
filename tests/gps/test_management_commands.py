@@ -1,9 +1,11 @@
+import datetime
 from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
 import pytest
 from django.core import management
+from freezegun import freeze_time
 
 from itou.gps.management.commands import sync_follow_up_groups_and_members
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
@@ -11,6 +13,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile
+from itou.www.gps.enums import EndReason
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
@@ -289,3 +292,30 @@ class TestImportAdvisorManagementCommand:
         profile.refresh_from_db()
         assert profile.advisor_information.name == "Test MacTest"
         assert profile.advisor_information.email == "test.mactest@francetravail.fr"
+
+
+class TestArchiveOldFollowUpMembershipCommand:
+    @freeze_time("2025-03-25")
+    def test_command(self):
+        old_membership = FollowUpGroupMembershipFactory(
+            last_contact_at=datetime.datetime(2023, 3, 24, tzinfo=datetime.UTC)
+        )
+        active_membership = FollowUpGroupMembershipFactory()
+        old_ended_at = datetime.date(2024, 1, 1)
+        ended_membership = FollowUpGroupMembershipFactory(
+            ended_at=old_ended_at,
+            end_reason=EndReason.MANUAL,
+        )
+        management.call_command("archive_old_gps_memberships")
+
+        old_membership.refresh_from_db()
+        assert old_membership.ended_at == datetime.date(2025, 3, 25)
+        assert old_membership.end_reason == EndReason.AUTOMATIC
+
+        active_membership.refresh_from_db()
+        assert active_membership.ended_at is None
+        assert active_membership.end_reason is None
+
+        ended_membership.refresh_from_db()
+        assert ended_membership.ended_at == old_ended_at
+        assert ended_membership.end_reason == EndReason.MANUAL
