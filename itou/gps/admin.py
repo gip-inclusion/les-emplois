@@ -40,6 +40,7 @@ class FollowUpGroupMembershipAdmin(ItouModelAdmin):
         "last_contact_at",
         "started_at",
         "ended_at",
+        "end_reason",
         "reason",
         "creator",
         "created_in_bulk",
