@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -44,6 +46,8 @@ class LABELInfos(models.Model):
 
 
 class Assessment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField("créé le", auto_now_add=True)
     campaign = models.ForeignKey(AssessmentCampaign, related_name="assessments", on_delete=models.PROTECT)
     companies = models.ManyToManyField(
         Company,
@@ -76,12 +80,8 @@ class Assessment(models.Model):
     )
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["campaign", "label_geiq_id", "label_antennas"],
-                name="unique_assessment_per_antenna_group",
-            )
-        ]
+        verbose_name = "bilan d’exécution"
+        verbose_name_plural = "bilans d’exécution"
 
 
 class AssessmentInstitutionLink(models.Model):
