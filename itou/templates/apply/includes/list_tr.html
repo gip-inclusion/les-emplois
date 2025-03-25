@@ -13,15 +13,8 @@
 <tr class="align-top">
     {% if job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
         <th scope="row" class="text-start w-50px">
-            {% if forloop.counter == 1 %}
-                <span id="introjsSwitchView01">
-                    <input class="form-check-input" type="checkbox" name="selected-application" value="{{ job_application.pk }}" id="select-{{ job_application.pk }}">
-                    <label class="visually-hidden" for="select-{{ job_application.pk }}">Sélectionner cette candidature</label>
-                </span>
-            {% else %}
-                <input class="form-check-input" type="checkbox" name="selected-application" value="{{ job_application.pk }}" id="select-{{ job_application.pk }}">
-                <label class="visually-hidden" for="select-{{ job_application.pk }}">Sélectionner cette candidature</label>
-            {% endif %}
+            <input class="form-check-input" type="checkbox" name="selected-application" value="{{ job_application.pk }}" id="select-{{ job_application.pk }}">
+            <label class="visually-hidden" for="select-{{ job_application.pk }}">Sélectionner cette candidature</label>
         </th>
     {% endif %}
     {% if job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %}
