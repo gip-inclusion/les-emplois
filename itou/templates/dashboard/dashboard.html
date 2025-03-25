@@ -258,24 +258,4 @@
 {% block script %}
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js'%}"></script>
-
-    {% if user.is_employer or user.is_prescriber_with_authorized_org %}
-        <script async src="https://tally.so/widgets/embed.js"></script>
-        <script nonce="{{ CSP_NONCE }}">
-            window.TallyConfig = {
-                "formId": "{{ user.is_employer|yesno:'mKvOeK,mZvQpy' }}",
-                "popup": {
-                    "emoji": {
-                        "text": "👋",
-                        "animation": "wave"
-                    },
-                    "autoClose": 0,
-                    "showOnce": true,
-                    "hiddenFields": {
-                        "user_id": "{{ user.pk }}",
-                    },
-                }
-            };
-        </script>
-    {% endif %}
 {% endblock %}
