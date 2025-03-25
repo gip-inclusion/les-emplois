@@ -1,5 +1,6 @@
 import operator
 
+from django.db.models import Prefetch
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -20,7 +21,16 @@ from itou.www.geiq_assessments_views.forms import CreateForm
 def list_for_geiq(request, template_name="geiq_assessments_views/list_for_geiq.html"):
     if request.current_organization.kind != CompanyKind.GEIQ:
         raise Http404
-    assessments = Assessment.objects.filter(companies=request.current_organization).select_related("campaign")
+    assessments = (
+        Assessment.objects.filter(companies=request.current_organization)
+        .select_related("campaign")
+        .prefetch_related(
+            Prefetch(
+                lookup="institution_links",
+                queryset=AssessmentInstitutionLink.objects.select_related("institution"),
+            )
+        )
+    )
     context = {
         "assessments": assessments,
     }
@@ -102,10 +112,14 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
 def assessment_details(request, pk, template_name="geiq_assessments_views/assessment_details.html"):
     if request.current_organization.kind != CompanyKind.GEIQ:
         raise Http404
-    assessment = Assessment.objects.prefetch_related("institutions").get(
-        companies=request.current_organization.pk, pk=pk
-    )
+    assessment = Assessment.objects.prefetch_related(
+        Prefetch(
+            lookup="institution_links",
+            queryset=AssessmentInstitutionLink.objects.select_related("institution"),
+        )
+    ).get(companies=request.current_organization.pk, pk=pk)
     context = {
         "assessment": assessment,
+        "back_url": reverse("geiq_assessments_views:list_for_geiq"),
     }
     return render(request, template_name, context)
