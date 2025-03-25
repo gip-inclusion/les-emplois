@@ -78,8 +78,10 @@ class TestSyncGroupsManagementCommand:
         )
 
         # non authorized prescriber sent job application are ignored
-        JobApplicationFactory(
+        non_authorized_prescriber = PrescriberFactory()
+        job_app_3 = JobApplicationFactory(
             job_seeker=beneficiary,
+            sender=non_authorized_prescriber,
             eligibility_diagnosis=None,
         )
 
@@ -107,6 +109,7 @@ class TestSyncGroupsManagementCommand:
                         iae_diag_2.created_at,
                     ]
                 ),
+                non_authorized_prescriber.pk: [job_app_3.created_at],
             },
         }
 
@@ -136,13 +139,11 @@ class TestSyncGroupsManagementCommand:
             sender=follower_1,
             job_seeker=beneficiary_1,
             eligibility_diagnosis=None,
-            sent_by_authorized_prescriber_organisation=True,
         )
         JobApplicationFactory(
             sender=follower_1,
             job_seeker=beneficiary_1,
             eligibility_diagnosis=None,
-            sent_by_authorized_prescriber_organisation=True,
         )
         JobApplicationFactory(
             sender=follower_1,
@@ -169,7 +170,12 @@ class TestSyncGroupsManagementCommand:
             sent_by_authorized_prescriber_organisation=True,
         )
 
-        contacts_data = sync_follow_up_groups_and_members.get_users_contacts([beneficiary_1.pk, beneficiary_2.pk])
+        # simple contact with created job seeker
+        beneficiary_3 = JobSeekerFactory(created_by=follower_1)
+
+        contacts_data = sync_follow_up_groups_and_members.get_users_contacts(
+            [beneficiary_1.pk, beneficiary_2.pk, beneficiary_3.pk]
+        )
         management.call_command("sync_follow_up_groups_and_members", wet_run=True)
 
         # New group and membership for beneficiary_1
@@ -199,6 +205,17 @@ class TestSyncGroupsManagementCommand:
         assert membership_2_2.creator == batch_group_creator
         assert membership_2_2.last_contact_at == contacts_data[beneficiary_2.pk][follower_2.pk][1]
         assert membership_2_2.created_at == contacts_data[beneficiary_2.pk][follower_2.pk][0]
+
+        # New group and membership for beneficiary_3
+        group_3 = FollowUpGroup.objects.get(beneficiary=beneficiary_3)
+        assert group_3.created_in_bulk
+        membership_3_1 = FollowUpGroupMembership.objects.get(follow_up_group=group_3)
+        assert membership_3_1.member == follower_1
+        assert not membership_3_1.is_referent
+        assert membership_3_1.created_in_bulk
+        assert membership_3_1.creator == batch_group_creator
+        assert membership_3_1.last_contact_at == beneficiary_3.date_joined
+        assert membership_3_1.created_at == beneficiary_3.date_joined
 
 
 class TestImportAdvisorManagementCommand:
