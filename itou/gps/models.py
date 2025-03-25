@@ -4,6 +4,7 @@ from django.utils import timezone
 
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.templatetags.str_filters import pluralizefr
+from itou.www.gps.enums import EndReason
 
 
 class BulkCreatedAtQuerysetProxy:
@@ -149,6 +150,13 @@ class FollowUpGroupMembership(models.Model):
     )
 
     reason = models.TextField(blank=True, verbose_name="motif de suivi")
+    end_reason = models.CharField(
+        verbose_name="motif de fin",
+        max_length=30,
+        null=True,
+        blank=True,
+        choices=EndReason.choices,
+    )
 
     objects = FollowUpGroupMembershipQueryset.as_manager()
 
