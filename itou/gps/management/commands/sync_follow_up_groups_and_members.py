@@ -6,7 +6,7 @@ from math import ceil
 from django.conf import settings
 from django.contrib.postgres.expressions import ArraySubquery
 from django.db import transaction
-from django.db.models import OuterRef, Q
+from django.db.models import OuterRef
 from django.db.models.functions import JSONObject
 
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
@@ -26,10 +26,9 @@ def get_users_contacts(ids):
         User.objects.filter(pk__in=ids)
         .annotate(
             job_apps_senders=ArraySubquery(
-                # only look for employer or prescriber_with_authorized_org
+                # only look for employer or prescriber
                 JobApplication.objects.filter(job_seeker=OuterRef("pk"))
-                .filter(Q(sender_prescriber_organization__is_authorized=True) | Q(sender_company__isnull=False))
-                .exclude(sender=None)
+                .filter(sender__kind__in=[UserKind.EMPLOYER, UserKind.PRESCRIBER])
                 .values(json=JSONObject(user_id="sender_id", timestamp="created_at"))
             )
         )
@@ -61,7 +60,7 @@ def get_users_contacts(ids):
     users_contacts = {}
     for beneficiary in beneficiaries_qs:
         contacts = defaultdict(list)
-        for user_id, timestamp in sorted(
+        for user_id, timestamp in [
             (a["user_id"], datetime.datetime.fromisoformat(a["timestamp"]))
             for a in (
                 beneficiary.job_apps_senders
@@ -69,8 +68,10 @@ def get_users_contacts(ids):
                 + beneficiary.iae_diagnosis_authors
                 + beneficiary.job_app_accepted_by
             )
-        ):
+        ]:
             contacts[user_id].append(timestamp)
+        if beneficiary.created_by_id:
+            contacts[beneficiary.created_by_id].append(beneficiary.date_joined)
         users_contacts[beneficiary.pk] = contacts
     return users_contacts
 
@@ -117,8 +118,10 @@ class Command(BaseCommand):
                         memberships = {membership.member_id: membership for membership in group.memberships.all()}
                         for participant_id, timestamps in contacts.items():
                             if membership := memberships.get(participant_id):
-                                membership.last_contact_at = contacts[membership.member_id][-1]
-                                memberships_to_update.append(membership)
+                                last_contact_at = contacts[membership.member_id][-1]
+                                if last_contact_at > membership.last_contact_at:
+                                    membership.last_contact_at = last_contact_at
+                                    memberships_to_update.append(membership)
                             else:
                                 memberships_to_create.append(
                                     FollowUpGroupMembership(
