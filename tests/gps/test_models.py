@@ -6,6 +6,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.www.gps.enums import EndReason
 from tests.companies.factories import CompanyMembershipFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
@@ -43,10 +44,12 @@ class TestFollowBeneficiary:
             assert membership.created_at == created_at
             assert membership.started_at == started_at
             assert membership.ended_at is None
+            assert membership.end_reason is None
             assert membership.last_contact_at == created_at
             assert membership.creator == prescriber
 
             membership.ended_at = started_at
+            membership.end_reason = EndReason.MANUAL
             membership.save()
             frozen_time.tick()
             updated_at = timezone.now()
@@ -57,6 +60,7 @@ class TestFollowBeneficiary:
             assert membership.created_at == created_at
             assert membership.started_at == started_at
             assert membership.ended_at is None
+            assert membership.end_reason is None
             assert membership.last_contact_at == updated_at
 
     def test_is_referent(self):
