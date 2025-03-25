@@ -10,6 +10,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
 from itou.asp.models import Commune, Country, RSAAllocation
+from itou.gps.models import FollowUpGroupMembership
 from itou.users.enums import LackOfPoleEmploiId, Title
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
@@ -819,6 +820,10 @@ class TestStandaloneCreateAsPrescriber:
                 )
             ],
         )
+
+        assert FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=new_job_seeker, member=user
+        ).exists()
 
 
 class TestUpdateAsOther:
