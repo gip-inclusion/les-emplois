@@ -9,7 +9,7 @@ from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Widget
-from itou.www.gps.enums import Channel
+from itou.www.gps.enums import Channel, EndReason
 from itou.www.gps.utils import get_all_coworkers
 from itou.www.signup.forms import FullnameFormMixin
 
@@ -65,7 +65,7 @@ class FollowUpGroupMembershipForm(forms.ModelForm):
 
     class Meta:
         model = FollowUpGroupMembership
-        fields = ["started_at", "ended_at", "is_referent", "reason"]
+        fields = ["started_at", "ended_at", "end_reason", "is_referent", "reason"]
         labels = {
             "is_referent": mark_safe("<strong>Me signaler comme référent</strong>"),
             "started_at": "Date de début",
@@ -105,8 +105,11 @@ class FollowUpGroupMembershipForm(forms.ModelForm):
         # Drop ended_at value if "ongoing" is selected
         if cleaned_data["is_ongoing"] == "True":
             cleaned_data["ended_at"] = None
+            cleaned_data["end_reason"] = None
         else:
             cleaned_data["is_referent"] = False
+            # Keep existing end_reason if there is one
+            cleaned_data["end_reason"] = self.instance.end_reason or EndReason.MANUAL
             if cleaned_data["ended_at"] is None:
                 cleaned_data["ended_at"] = timezone.localdate()
             elif cleaned_data["ended_at"] < cleaned_data["started_at"]:

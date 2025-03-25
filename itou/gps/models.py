@@ -24,6 +24,7 @@ class FollowUpGroupManager(models.Manager):
 
             update_args = {
                 "ended_at": None,
+                "end_reason": None,
                 "last_contact_at": now,
                 "is_active": is_active,
             }
