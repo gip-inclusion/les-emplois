@@ -4,6 +4,7 @@ from django.db import models
 from itou.companies.models import Company
 from itou.files.models import File
 from itou.geiq.enums import ReviewState
+from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.users.enums import Title
 
@@ -33,6 +34,14 @@ class ImplementationAssessmentCampaign(models.Model):
 class ImplementationAssessment(models.Model):
     campaign = models.ForeignKey(
         ImplementationAssessmentCampaign, related_name="implementation_assessments", on_delete=models.PROTECT
+    )
+    institutions = models.ManyToManyField(
+        Institution,
+        verbose_name="institutions",
+        related_name="implementation_assessments",
+        limit_choices_to={
+            "kind__in": [InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ],
+        },
     )
     label_id = models.IntegerField(verbose_name="ID LABEL")
     company = models.ForeignKey(
