@@ -11,7 +11,9 @@ from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFac
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
+    ItouStaffFactory,
     JobSeekerFactory,
+    LaborInspectorFactory,
     PrescriberFactory,
 )
 
@@ -122,6 +124,14 @@ class TestFollowBeneficiary:
         FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber, is_active=False)
         membership.refresh_from_db()
         assert membership.is_active is False
+
+    @pytest.mark.parametrize("factory", [PrescriberFactory, EmployerFactory, LaborInspectorFactory, ItouStaffFactory])
+    def test_is_job_seeker(self, factory):
+        not_a_beneficiary = factory()
+        prescriber = PrescriberFactory()
+
+        with pytest.raises(AssertionError):
+            FollowUpGroup.objects.follow_beneficiary(not_a_beneficiary, prescriber)
 
 
 @pytest.mark.parametrize(
