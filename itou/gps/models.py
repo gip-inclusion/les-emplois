@@ -16,6 +16,7 @@ class BulkCreatedAtQuerysetProxy:
 
 class FollowUpGroupManager(models.Manager):
     def follow_beneficiary(self, beneficiary, user, is_referent=None, is_active=True):
+        assert beneficiary.is_job_seeker
         now = timezone.now()
         with transaction.atomic():
             group, _ = FollowUpGroup.objects.get_or_create(beneficiary=beneficiary)
