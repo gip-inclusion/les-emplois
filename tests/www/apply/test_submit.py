@@ -1484,6 +1484,12 @@ class TestApplyAsAuthorizedPrescriber:
         )
         assertRedirects(response, next_url)
 
+        # Check GPS group
+        membership = FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=new_job_seeker, member=user
+        ).get()
+        membership.delete()  # delete it to check it is created again when applying
+
         # Step application's jobs.
         # ----------------------------------------------------------------------
 
@@ -1572,13 +1578,10 @@ class TestApplyAsAuthorizedPrescriber:
         response = client.get(next_url)
         assert response.status_code == 200
 
-        # Check GPS group
-        # ----------------------------------------------------------------------
-        group = FollowUpGroup.objects.get()
-        assert group.beneficiary == new_job_seeker
-        membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
-        assert membership.member == user
-        assert membership.creator == user
+        # Check GPS group again
+        assert FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=new_job_seeker, member=user
+        ).exists()
 
     def test_cannot_create_job_seeker_with_pole_emploi_email(self, client):
         company = CompanyMembershipFactory().company
@@ -1986,6 +1989,12 @@ class TestApplyAsPrescriber:
         )
         assertRedirects(response, next_url)
 
+        # Check GPS group
+        membership = FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=new_job_seeker, member=user
+        ).get()
+        membership.delete()  # delete it to check it is created again when applying
+
         # Step application's jobs.
         # ----------------------------------------------------------------------
 
@@ -2060,9 +2069,10 @@ class TestApplyAsPrescriber:
         response = client.get(next_url)
         assert response.status_code == 200
 
-        # GPS : no following for not authorized prescribers
-        # ----------------------------------------------------------------------
-        assert not FollowUpGroup.objects.exists()
+        # Check GPS group again
+        assert FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=new_job_seeker, member=user
+        ).exists()
 
     def test_check_info_as_prescriber_for_job_seeker_with_incomplete_info(self, client):
         company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
@@ -2569,6 +2579,12 @@ class TestApplyAsCompany:
         )
         assertRedirects(response, next_url)
 
+        # Check GPS group
+        membership = FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=new_job_seeker, member=user
+        ).get()
+        membership.delete()  # delete it to check it is created again when applying
+
         # Step application's jobs.
         # ----------------------------------------------------------------------
 
@@ -2643,13 +2659,10 @@ class TestApplyAsCompany:
         response = client.get(next_url)
         assert response.status_code == 200
 
-        # Check GPS group
-        # ----------------------------------------------------------------------
-        group = FollowUpGroup.objects.get()
-        assert group.beneficiary == new_job_seeker
-        membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
-        assert membership.member == user
-        assert membership.creator == user
+        # Check GPS group again
+        assert FollowUpGroupMembership.objects.filter(
+            follow_up_group__beneficiary=new_job_seeker, member=user
+        ).exists()
 
     @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
     def test_apply_as_employer(self, client, pdf_file):

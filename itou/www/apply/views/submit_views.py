@@ -657,7 +657,7 @@ class ApplicationResumeView(RequireApplySessionMixin, ApplicationBaseView):
         # The job application is now saved in DB, delete the session early to avoid any problems
         self.apply_session.delete()
 
-        if self.request.user.is_employer or self.request.user.is_prescriber_with_authorized_org:
+        if self.request.user.is_employer or self.request.user.is_prescriber:
             # New job application -> sync GPS groups if the sender is not a jobseeker
             FollowUpGroup.objects.follow_beneficiary(self.job_seeker, self.request.user)
 

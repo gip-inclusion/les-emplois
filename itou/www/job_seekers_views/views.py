@@ -21,6 +21,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
+from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
@@ -847,6 +848,8 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                     .exists()
                 )
                 gps_utils.add_beneficiary(request, user, notify_duplicate)
+            else:
+                FollowUpGroup.objects.follow_beneficiary(beneficiary=user, user=request.user)
 
         return HttpResponseRedirect(url)
 
