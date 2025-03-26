@@ -95,7 +95,11 @@
                                 <input type="hidden" name="shrouded" value="1" data-shroud-input>
                             </div>
 
-                            {% itou_buttons_form primary_label="Valider" reset_url=back_url %}
+                            {% if standalone %}
+                                {% itou_buttons_form primary_label="Valider" reset_url=back_url %}
+                            {% else %}
+                                {% itou_buttons_form primary_label="Suivant" secondary_url=back_url reset_url=reset_url %}
+                            {% endif %}
                         </form>
                     </div>
                 </div>
