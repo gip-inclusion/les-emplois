@@ -443,12 +443,23 @@ class RequireValidApplySessionMixin:
             if self.company.block_job_applications:
                 messages.error(request, apply_view_constants.ERROR_EMPLOYER_BLOCKING_APPLICATIONS)
                 return HttpResponseRedirect(self.get_redirect_url())
+
+            # Spontaneous application blocked
             if (
                 not len(self.apply_session.get("selected_jobs", []))
                 and not self.company.is_open_to_spontaneous_applications
             ):
                 messages.error(request, apply_view_constants.ERROR_EMPLOYER_BLOCKING_SPONTANEOUS_APPLICATIONS)
                 return HttpResponseRedirect(self.get_redirect_url())
+
+            # One of the selected jobs is now inactive
+            if self.company.job_description_through.filter(
+                is_active=False,
+                pk__in=self.apply_session.get("selected_jobs", []),
+            ).exists():
+                messages.error(request, apply_view_constants.ERROR_EMPLOYER_BLOCKING_APPLICATIONS)
+                return HttpResponseRedirect(self.get_redirect_url())
+
         return super().dispatch(request, *args, **kwargs)
 
 

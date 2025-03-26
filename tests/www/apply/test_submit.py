@@ -304,6 +304,41 @@ class TestApply:
             [messages.Message(messages.ERROR, apply_view_constants.ERROR_EMPLOYER_BLOCKING_SPONTANEOUS_APPLICATIONS)],
         )
 
+    def test_recruitment_closed_on_position(self, client):
+        # No block is active, but one of the selected jobs is no longer active.
+        company = CompanyFactory(with_jobs=True, with_membership=True)
+        job_seeker = JobSeekerFactory()
+        client.force_login(job_seeker)
+        session = client.session
+
+        jobs = company.job_description_through.all()
+        inactive_job = jobs[0]
+        inactive_job.is_active = False
+        inactive_job.save(update_fields=["is_active"])
+
+        session[f"job_application-{company.pk}"] = {"selected_jobs": [jobs[0].pk, jobs[1].pk]}
+        session.save()
+
+        response = client.post(
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+            {"message": "Hire me?"},
+        )
+        assert JobApplication.objects.exists() is False
+        assertRedirects(
+            response,
+            reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+        )
+        assertMessages(
+            response,
+            [messages.Message(messages.ERROR, apply_view_constants.ERROR_EMPLOYER_BLOCKING_APPLICATIONS)],
+        )
+
     def test_application_block_ineffective_against_company_member(self, client):
         # A member of the SIAE can bypass the block.
         company = CompanyFactory(with_jobs=True, with_membership=True, block_job_applications=True)
