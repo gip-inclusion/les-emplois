@@ -856,7 +856,6 @@
                                   </div>
                               </div>
                           </div>
-                          <hr/>
                           <form class="js-prevent-multiple-submit" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                               <input name="confirm" type="hidden" value="true"/>

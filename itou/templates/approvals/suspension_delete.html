@@ -20,7 +20,6 @@
                             <strong>Étape 2/2</strong> : Confirmation
                         </p>
                     </div>
-
                     <div class="c-form">
                         <p>
                             <strong>Action choisie</strong> : Confirmer la <strong class="text-danger">suppression définitive</strong> de cette suspension.
@@ -40,7 +39,6 @@
                                 </div>
                             </div>
                         </div>
-                        <hr>
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
                             <input type="hidden" name="confirm" value="true">
