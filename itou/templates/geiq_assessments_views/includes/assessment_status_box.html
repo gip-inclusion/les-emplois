@@ -1,0 +1,14 @@
+<div id="assessment-status-box" {% if request.htmx %}hx-swap-oob="true"{% endif %} class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
+    <h4>Votre dossier n’est pas encore complet</h4>
+    <p class="mb-0">Actions restantes :</p>
+    <ul>
+        {% for action in assessment.missing_actions_to_submit %}
+            <li>
+                <strong>{{ action }}</strong>
+            </li>
+        {% endfor %}
+    </ul>
+    <button type="submit" class="btn btn-primary btn-block" disabled>
+        <span>Envoyer le bilan d’exécution</span>
+    </button>
+</div>

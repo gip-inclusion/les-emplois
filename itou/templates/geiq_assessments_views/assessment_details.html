@@ -28,15 +28,7 @@
                 <div class="col-12 col-lg-8 order-2 order-lg-1">
                     <h2>Mon dossier</h2>
                     <div class="c-box">
-                        <div class="d-flex flex-column justify-content-between mb-3">
-                            <div class="d-flex justify-content-between flex-row mb-3">
-                                <h3 class="mb-0">Document de synthèse généré par Label</h3>
-                                <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
-                            </div>
-                            <div>
-                                <a href="" class="btn btn-primary">Récupérer de Label</a>
-                            </div>
-                        </div>
+                        {% include "geiq_assessments_views/includes/summary_document_section.html" with assessment=assessment only %}
                         <hr>
                         <div class="d-flex flex-column justify-content-between mb-3">
                             <div class="d-flex justify-content-between flex-row mb-3">
@@ -51,7 +43,7 @@
                         <div class="d-flex flex-column justify-content-between mb-3">
                             <div class="d-flex justify-content-between flex-row mb-3">
                                 <h3 class="mb-0">Bilan financier de l’action</h3>
-                                <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+                                {% include "geiq_assessments_views/includes/badge_to_complete.html" only %}
                             </div>
                             <div>
                                 <a href="" class="btn btn-primary">Compléter</a>
@@ -80,18 +72,7 @@
                     </div>
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2">
-                    <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
-                        <h4>Votre dossier n’est pas encore complet</h4>
-                        <p class="mb-0">Actions restantes :</p>
-                        <ul>
-                            <li>
-                                <strong>Détail et sélection des contrats à présenter</strong>
-                            </li>
-                        </ul>
-                        <button type="submit" class="btn btn-primary btn-block" disabled>
-                            <span>Envoyer le bilan d’exécution</span>
-                        </button>
-                    </div>
+                    {% include "geiq_assessments_views/includes/assessment_status_box.html" with assessment=assessment request=request only %}
                     <div class="c-box mb-3 mb-md-4">
                         <h4>Informations générales</h4>
                         <h5>Structures concernées par la convention</h5>
@@ -104,5 +85,8 @@
                 </div>
             </div>
         </div>
+        <form id="file-sync-form">
+            {% csrf_token %}
+        </form>
     </section>
 {% endblock %}
