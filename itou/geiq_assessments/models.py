@@ -111,6 +111,22 @@ class Assessment(models.Model):
         verbose_name = "bilan d’exécution"
         verbose_name_plural = "bilans d’exécution"
 
+    def missing_actions_to_submit(self):
+        actions = []
+        if not self.summary_document_file:
+            actions.append("Récupérer le document de synthèse de label")
+        if not self.structure_financial_assessment_file:
+            actions.append("Récupérer le bilan financier de la structure de label")
+        if not self.action_financial_assessment_file:
+            actions.append("Transmettre le bilan financier de l’action")
+        if True:
+            actions.append("Détail et sélection des contrats à présenter")
+        if not self.geiq_comment:
+            actions.append("Commentaire")
+        if not self.submitted_at:
+            actions.append("Envoi du bilan d’exécution")
+        return actions
+
 
 class AssessmentInstitutionLink(models.Model):
     assessment = models.ForeignKey(
