@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import Case, Count, Exists, F, Max, OuterRef, Prefetch, Q, Subquery, When
+from django.db.models import Case, Count, Exists, F, Func, Max, OuterRef, Prefetch, Q, Subquery, When
 from django.db.models.functions import Coalesce, Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
@@ -35,6 +35,7 @@ from itou.job_applications.enums import (
     RefusalReason,
     SenderKind,
 )
+from itou.rdv_insertion.models import Participation
 from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.utils.emails import get_email_message
 from itou.utils.models import InclusiveDateRangeField
@@ -316,6 +317,43 @@ class JobApplicationQuerySet(models.QuerySet):
             .annotate(c=Count("id"))
             .values("month", "c")
             .order_by("-month")
+        )
+
+    def _get_participations_subquery(self):
+        """
+        Returns a RDVI participations subquery related to outer job applications
+        """
+        return Participation.objects.filter(
+            appointment__company=OuterRef("to_company"),
+            job_seeker=OuterRef("job_seeker"),
+            status=Participation.Status.UNKNOWN,
+            appointment__start_at__gt=timezone.now(),
+        )
+
+    def with_next_appointment_start_at(self):
+        """
+        Gives the next pending RDVI appointment datetime for this job seeker and this SIAE
+        """
+        return self.annotate(
+            next_appointment_start_at=Subquery(
+                self._get_participations_subquery()
+                .order_by("appointment__start_at")
+                .values("appointment__start_at")[:1],
+                output_field=models.DateTimeField(),
+            )
+        )
+
+    def with_upcoming_participations_count(self):
+        """
+        Gives the total count of pending RDVI appointments for this job seeker and this SIAE
+        """
+        return self.annotate(
+            upcoming_participations_count=Subquery(
+                self._get_participations_subquery()
+                .annotate(count=Func(F("pk"), function="COUNT"))  # Count() adds an undesired GROUP BY
+                .values("count"),
+                output_field=models.IntegerField(),
+            )
         )
 
     # Employee record querysets
