@@ -1,16 +1,24 @@
+import io
 import operator
+import uuid
 
+import sentry_sdk
+from django.core.exceptions import ImproperlyConfigured
+from django.core.files.storage import default_storage
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
-from django.views.decorators.http import require_safe
+from django.utils.http import content_disposition_header
+from django.views.decorators.http import require_POST, require_safe
 
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, REGIONS
 from itou.companies.enums import CompanyKind
+from itou.files.models import File
 from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, LabelInfos
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
+from itou.utils.apis import geiq_label
 from itou.utils.auth import check_user
 from itou.www.geiq_assessments_views.forms import CreateForm
 
@@ -115,3 +123,62 @@ def assessment_details(request, pk, template_name="geiq_assessments_views/assess
         "back_url": reverse("geiq_assessments_views:list_for_geiq"),
     }
     return render(request, template_name, context)
+
+
+@check_user(lambda user: user.is_employer)
+def assessment_get_file(request, pk, *, file_field):
+    assessments = Assessment.objects.filter(companies=request.current_organization).select_related("campaign")
+    assessment = get_object_or_404(assessments, pk=pk)
+    filename_prefix = {
+        "summary_document_file": "Synthèse",
+        "structure_financial_assessment_file": "Bilan financier structure",
+        "action_financial_assessment_file": "Bilan financier action",
+    }[file_field]
+    return HttpResponseRedirect(
+        default_storage.url(
+            getattr(assessment, Assessment._meta.get_field(file_field).attname),
+            parameters={
+                "ResponseContentDisposition": content_disposition_header(
+                    "inline", f"{filename_prefix} {assessment.campaign.year}.pdf"
+                ),
+            },
+        )
+    )
+
+
+@require_POST
+@check_user(lambda user: user.is_employer)
+def sync_summary_document(request, pk):
+    assessments = Assessment.objects.filter(companies=request.current_organization)
+    assessment = get_object_or_404(assessments, pk=pk)
+
+    context = {"assessment": assessment}
+    try:
+        client = geiq_label.get_client()
+        synthese_pdf_content = client.get_synthese_pdf(geiq_id=assessment.label_geiq_id)
+        key = default_storage.save(f"{uuid.uuid4()}.pdf", io.BytesIO(synthese_pdf_content))
+        assessment.summary_document_file = File.objects.create(key=key)
+        assessment.save(update_fields=("summary_document_file",))
+    except (ImproperlyConfigured, geiq_label.LabelAPIError) as e:
+        sentry_sdk.capture_exception(e)
+        context["error_msg"] = "Impossible de récupérer le document: réessayez plus tard"
+    return render(request, "geiq_assessments_views/includes/summary_document_section.html", context)
+
+
+@require_POST
+@check_user(lambda user: user.is_employer)
+def sync_structure_financial_assessment(request, pk):
+    assessments = Assessment.objects.filter(companies=request.current_organization)
+    assessment = get_object_or_404(assessments, pk=pk)
+
+    context = {"assessment": assessment}
+    try:
+        client = geiq_label.get_client()
+        compte_pdf_content = client.get_compte_pdf(geiq_id=assessment.label_geiq_id)
+        key = default_storage.save(f"{uuid.uuid4()}.pdf", io.BytesIO(compte_pdf_content))
+        assessment.structure_financial_assessment = File.objects.create(key=key)
+        assessment.save(update_fields=("summary_document_file",))
+    except (ImproperlyConfigured, geiq_label.LabelAPIError) as e:
+        sentry_sdk.capture_exception(e)
+        context["error_msg"] = "Impossible de récupérer le document: réessayez plus tard"
+    return render(request, "geiq_assessments_views/includes/summary_document_section.html", context)
