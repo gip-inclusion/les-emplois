@@ -319,18 +319,24 @@ class JobApplicationQuerySet(models.QuerySet):
             .order_by("-month")
         )
 
+    def _get_participations_subquery(self):
+        """
+        Returns a RDVI participations subquery related to outer job applications
+        """
+        return Participation.objects.filter(
+            appointment__company=OuterRef("to_company"),
+            job_seeker=OuterRef("job_seeker"),
+            status=Participation.Status.UNKNOWN,
+            appointment__start_at__gt=timezone.now(),
+        )
+
     def with_next_appointment_start_at(self):
         """
         Gives the next pending RDVI appointment datetime for this job seeker and this SIAE
         """
         return self.annotate(
             next_appointment_start_at=Subquery(
-                Participation.objects.filter(
-                    appointment__company=OuterRef("to_company"),
-                    job_seeker=OuterRef("job_seeker"),
-                    status=Participation.Status.UNKNOWN,
-                    appointment__start_at__gt=timezone.now(),
-                )
+                self._get_participations_subquery()
                 .order_by("appointment__start_at")
                 .values("appointment__start_at")[:1],
                 output_field=models.DateTimeField(),
@@ -343,12 +349,7 @@ class JobApplicationQuerySet(models.QuerySet):
         """
         return self.annotate(
             upcoming_participations_count=Subquery(
-                Participation.objects.filter(
-                    appointment__company=OuterRef("to_company"),
-                    job_seeker=OuterRef("job_seeker"),
-                    status=Participation.Status.UNKNOWN,
-                    appointment__start_at__gt=timezone.now(),
-                )
+                self._get_participations_subquery()
                 .annotate(count=Func(F("pk"), function="COUNT"))  # Count() adds an undesired GROUP BY
                 .values("count"),
                 output_field=models.IntegerField(),
