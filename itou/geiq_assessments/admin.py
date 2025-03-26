@@ -25,23 +25,23 @@ class AssessmentCampaignAdmin(ItouModelAdmin):
     def download_label_infos(self, request, queryset):
         for campaign in queryset.select_related("label_infos"):
             if hasattr(campaign, "label_infos"):
-                messages.error(request, f"Les informations LABEL de la campagne {campaign} ont déjà été récupérées.")
+                messages.error(request, f"Les informations label de la campagne {campaign} ont déjà été récupérées.")
                 continue
 
             try:
                 data = sync.get_geiq_infos()
-                campaign.label_infos = models.LABELInfos.objects.create(campaign=campaign, data=data)
+                campaign.label_infos = models.LabelInfos.objects.create(campaign=campaign, data=data)
             except ImproperlyConfigured:
-                messages.error(request, "Synchronisation impossible avec Label: configuration incomplète")
+                messages.error(request, "Synchronisation impossible avec label: configuration incomplète")
                 return
 
             except geiq_label.LabelAPIError:
-                logger.warning("Error while syncing GEIQ campaign %s with Label", campaign)
+                logger.warning("Error while syncing GEIQ campaign %s with label", campaign)
 
-                messages.error(request, f"Erreur lors de la synchronisation de la campagne {campaign} avec Label")
+                messages.error(request, f"Erreur lors de la synchronisation de la campagne {campaign} avec label")
 
             else:
-                messages.success(request, f"Les informations LABEL de la campagne {campaign} ont été récupérées.")
+                messages.success(request, f"Les informations label de la campagne {campaign} ont été récupérées.")
 
     actions = [download_label_infos]
     fields = [
@@ -66,7 +66,7 @@ class AssessmentCampaignAdmin(ItouModelAdmin):
             return self.readonly_fields + ("year",)
         return self.readonly_fields
 
-    @admin.display(description="données LABEL")
+    @admin.display(description="données label")
     def label_infos_link(self, obj):
         return (
             get_admin_view_link(obj.label_infos, content=obj.label_infos.synced_at.isoformat())
@@ -75,11 +75,11 @@ class AssessmentCampaignAdmin(ItouModelAdmin):
         )
 
 
-@admin.register(models.LABELInfos)
+@admin.register(models.LabelInfos)
 class LABELInfosAdmin(ReadonlyMixin, ItouModelAdmin):
     fields = ["campaign", "synced_at", "pretty_data"]
 
-    @admin.display(description="Données LABEL")
+    @admin.display(description="Données label")
     def pretty_data(self, obj):
         if obj.data:
             return format_html("<pre><code>{}</code></pre>", pformat(obj.data, width=200))
