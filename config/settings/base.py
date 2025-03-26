@@ -335,6 +335,8 @@ AUTHENTICATION_BACKENDS = (
     "allauth.account.auth_backends.AuthenticationBackend",
 )
 
+SILENCED_SYSTEM_CHECKS = ["slippers.E001"]  # We register the components differently
+
 # User authentication callbacks such as redirections after login.
 # Replaces LOGIN_REDIRECT_URL, which is static, by ACCOUNT_ADAPTER which is dynamic.
 # https://django-allauth.readthedocs.io/en/latest/advanced.html#custom-redirects
