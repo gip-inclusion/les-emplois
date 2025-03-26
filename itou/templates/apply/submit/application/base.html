@@ -28,6 +28,8 @@
     {% endif %}
 {% endblock %}
 
+{% block title_prevstep %}{% endblock %}
+
 {% block title_content %}
     {% if not job_app_to_transfer|default:False %}
         <div class="d-xl-flex align-items-xl-center">
