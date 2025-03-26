@@ -14,17 +14,21 @@
                 <span>Synthèse {{ assessment.campaign.year }}.pdf</span>
                 <i class="ri-download-line fw-medium" aria-hidden="true"></i>
             </a>
-        {% elif error_msg|default:"" %}
-            <button class="btn btn-primary" disabled>{{ error_msg }}</button>
         {% else %}
+            {% if error|default:False %}
+                <p>
+                    <i class="ri-xl ri-alert-line text-danger" aria-hidden="true"></i>Le document n’a pas été importé, merci de réessayer
+                </p>
+            {% endif %}
             <button type="button"
-                    class="btn btn-primary"
+                    class="btn btn-ico btn-primary"
                     hx-post="{% url "geiq_assessments_views:sync_summary_document" pk=assessment.pk %}"
                     hx-swap="outerHTML"
-                    hx-trigger="load"
+                    hx-trigger="{{ error|yesno:"click,load" }}"
                     hx-include="#file-sync-form"
                     hx-target="#summary-document-section">
-                <span class="stable-text">Récupérer de Label</span>
+                <i class="ri-refresh-line" aria-hidden="true"></i>
+                <span class="stable-text">{{ error|yesno:"Réessayer,Récupérer de Label" }}</span>
                 <span class="loading-text">Récupération en cours</span>
             </button>
         {% endif %}
