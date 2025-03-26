@@ -51,7 +51,7 @@ class TestRdvInsertionDisplay:
     ONGOING_INVITE_LABEL = "Envoi en cours"
     INVITE_SENT_LABEL = "Invitation envoyée"
     NEXT_APPOINTMENT_LABEL = "Prochain rdv le 01/09/2024"
-    OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL = "1 autre rendez-vous prévu, consultez-le dans le détail de candidature"
+    OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL = "Un autre rendez-vous prévu, consultez-le dans le détail de candidature"
     OTHER_APPOINTMENTS_TWO_TOOLTIP_LABEL = "2 autres rendez-vous prévus, consultez-les dans le détail de candidature"
 
     def setup_method(self):

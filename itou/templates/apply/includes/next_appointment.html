@@ -1,6 +1,6 @@
 {% load i18n %}
 {% if job_application.next_appointment_start_at %}
-    <button type="button" {% if job_application.other_participations_count %} data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{% blocktrans count other_participations_count=job_application.other_participations_count %}{{ other_participations_count }} autre rendez-vous prévu, consultez-le dans le détail de candidature"{% plural %}{{ other_participations_count }} autres rendez-vous prévus, consultez-les dans le détail de candidature{% endblocktrans%}"{% endif %}>
+    <button type="button" {% if job_application.other_participations_count %} data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{% blocktrans count other_participations_count=job_application.other_participations_count %}Un autre rendez-vous prévu, consultez-le dans le détail de candidature"{% plural %}{{ other_participations_count }} autres rendez-vous prévus, consultez-les dans le détail de candidature{% endblocktrans%}"{% endif %}>
         <i class="ri-calendar-line fw-normal me-1" aria-hidden="true"></i>
         Prochain rdv le {{ job_application.next_appointment_start_at|date:"d/m/Y" }}
     </button>
