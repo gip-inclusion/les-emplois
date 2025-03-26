@@ -6,6 +6,7 @@ from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
+from itou.files.models import File
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 
@@ -32,14 +33,14 @@ class AssessmentCampaign(models.Model):
         return f"Campagne des bilans d’exécution GEIQ de {self.year}"
 
 
-class LABELInfos(models.Model):
+class LabelInfos(models.Model):
     campaign = models.OneToOneField(AssessmentCampaign, on_delete=models.CASCADE, related_name="label_infos")
-    data = models.JSONField(verbose_name="données LABEL")
-    synced_at = models.DateTimeField(verbose_name="données LABEL récupérées le", auto_now=True)
+    data = models.JSONField(verbose_name="données label")
+    synced_at = models.DateTimeField(verbose_name="données label récupérées le", auto_now=True)
 
     class Meta:
-        verbose_name = "liste des GEIQ récupérée de LABEL"
-        verbose_name_plural = "listes des GEIQ récupérées de LABEL"
+        verbose_name = "liste des GEIQ récupérée de label"
+        verbose_name_plural = "listes des GEIQ récupérées de label"
 
     def __str__(self):
         return f"Liste récupérée le {timezone.localdate(self.synced_at).isoformat()}"
@@ -65,9 +66,36 @@ class Assessment(models.Model):
             "kind__in": [InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ],
         },
     )
+    name_for_geiq = models.CharField(verbose_name="nom du bilan pour les GEIQ")
     name_for_institution = models.CharField(verbose_name="nom du bilan pour les institutions")
     label_geiq_id = models.IntegerField(verbose_name="identifiant label du GEIQ principal")
-    label_antennas = models.JSONField(verbose_name="antennes LABEL concernées par le bilan")
+    label_antennas = models.JSONField(verbose_name="antennes label concernées par le bilan")
+
+    summary_document_file = models.OneToOneField(
+        File,
+        verbose_name="document de synthèse généré par label",
+        related_name="+",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+    )
+    structure_financial_assessment_file = models.OneToOneField(
+        File,
+        verbose_name="bilan financier de la structure",
+        related_name="+",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+    )
+    action_financial_assessment_file = models.OneToOneField(
+        File,
+        verbose_name="bilan financier de l’action",
+        related_name="+",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+    )
+    geiq_comment = models.TextField("commentaire général du GEIQ", blank=True)
 
     submitted_at = models.DateTimeField("transmis le", blank=True, null=True)
     submitted_by = models.ForeignKey(
@@ -82,20 +110,6 @@ class Assessment(models.Model):
     class Meta:
         verbose_name = "bilan d’exécution"
         verbose_name_plural = "bilans d’exécution"
-
-    def name_for_geiq(self):
-        convention_institution_names = []
-        for institution_link in self.institution_links.all():
-            if institution_link.with_convention:
-                institution = institution_link.institution
-                match institution.kind:
-                    case InstitutionKind.DREETS_GEIQ:
-                        convention_institution_names.append(f"DREETS {institution.region}")
-                    case InstitutionKind.DDETS_GEIQ:
-                        convention_institution_names.append(f"DDETS {institution.department}")
-                    case _:
-                        convention_institution_names.append(institution.name)
-        return " / ".join(sorted(convention_institution_names)) if convention_institution_names else str(self.pk)
 
 
 class AssessmentInstitutionLink(models.Model):
