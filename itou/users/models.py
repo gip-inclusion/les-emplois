@@ -159,7 +159,7 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
 
         return result
 
-    def linked_job_seeker_ids(self, user, organization, from_all_coworkers=False):
+    def linked_job_seeker_ids(self, user, organization, from_all_coworkers=False, stalled=None):
         """
         Return the ids of job seekers that appear in the user's job seekers list view
 
@@ -201,15 +201,26 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
                 job_applications_filter.append(Q(sender=user, sender_prescriber_organization=organization))
                 eligibility_diagnosis_filters.append(Q(author=user, author_prescriber_organization=organization))
 
-        created_job_seekers = self.filter(or_queries(job_seeker_filters)).values_list("id", flat=True)
-        job_seekers_applications = job_application_model.objects.filter(
-            or_queries(job_applications_filter)
-        ).values_list("job_seeker_id", flat=True)
+        created_job_seekers = self.filter(or_queries(job_seeker_filters))
+        job_seekers_applications = job_application_model.objects.filter(or_queries(job_applications_filter))
         job_seekers_eligibility_diagnosis = EligibilityDiagnosis.objects.filter(
             or_queries(eligibility_diagnosis_filters)
-        ).values_list("job_seeker_id", flat=True)
+        )
 
-        return created_job_seekers.union(job_seekers_applications, job_seekers_eligibility_diagnosis)
+        if stalled is not None:
+            created_job_seekers = created_job_seekers.filter(jobseeker_profile__is_stalled=stalled)
+            job_seekers_applications = job_seekers_applications.filter(
+                job_seeker__jobseeker_profile__is_stalled=stalled
+            )
+            job_seekers_eligibility_diagnosis = job_seekers_eligibility_diagnosis.filter(
+                job_seeker__jobseeker_profile__is_stalled=stalled
+            )
+
+        return self.none().union(
+            created_job_seekers.values_list("id", flat=True),
+            job_seekers_applications.values_list("job_seeker_id", flat=True),
+            job_seekers_eligibility_diagnosis.values_list("job_seeker_id", flat=True),
+        )
 
     def search_by_full_name(self, name):
         """

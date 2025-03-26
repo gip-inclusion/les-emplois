@@ -1,3 +1,5 @@
+{% load str_filters %}
+
 <div class="col mb-3 mb-md-5">
     <div class="c-box p-0 h-100">
         <div class="p-3 p-lg-4 d-flex">
@@ -27,6 +29,28 @@
                     </li>
                 {% endif %}
             </ul>
+            {% if stalled_job_seekers %}
+                <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning" role="status">
+                    <div class="row">
+                        <div class="col-auto pe-0">
+                            <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                                <i class="ri-user-forbid-line ri-lg" aria-hidden="true"></i>
+                            </span>
+                        </div>
+                        <div class="col d-flex align-items-center">
+                            <p class="mb-0">
+                                <b>{{ stalled_job_seekers }}</b>&nbsp;Candidat{{ stalled_job_seekers|pluralizefr }} sans solution
+                            </p>
+                        </div>
+                        <div class="col-12 col-md-auto d-flex align-items-center justify-content-center">
+                            <a href="{% url "job_seekers_views:list" %}?is_stalled=on" class="btn-link btn-ico">
+                                <span>Voir</span>
+                                <i class="ri-arrow-right-s-line ri-lg" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
