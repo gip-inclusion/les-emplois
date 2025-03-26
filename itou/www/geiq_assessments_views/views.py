@@ -161,7 +161,7 @@ def sync_summary_document(request, pk):
         assessment.save(update_fields=("summary_document_file",))
     except (ImproperlyConfigured, geiq_label.LabelAPIError) as e:
         sentry_sdk.capture_exception(e)
-        context["error_msg"] = "Impossible de récupérer le document: réessayez plus tard"
+        context["error"] = True
     return render(request, "geiq_assessments_views/includes/summary_document_section.html", context)
 
 
