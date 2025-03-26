@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from collections import Counter
 from functools import partial
 
 import factory
@@ -719,6 +720,22 @@ def test_filtered_by_approval_state(client, url):
         job_seeker_expired_eligibility_valid_approval,
         job_seeker_valid_eligibility_no_approval,
     ]
+
+
+def test_filtered_by_is_stalled(client):
+    prescriber = PrescriberMembershipFactory().user
+    client.force_login(prescriber)
+    stalled = JobApplicationFactory(
+        created_at=timezone.now() - datetime.timedelta(days=90),
+        eligibility_diagnosis=None,
+        sender=prescriber,
+        job_seeker__jobseeker_profile__is_stalled=True,
+    )
+    other = JobApplicationFactory(sender=prescriber)
+    response = client.get(reverse("job_seekers_views:list"))
+    assert Counter(response.context["page_obj"].object_list) == Counter([stalled.job_seeker, other.job_seeker])
+    response = client.get(reverse("job_seekers_views:list"), {"is_stalled": "on"})
+    assert response.context["page_obj"].object_list == [stalled.job_seeker]
 
 
 def test_filtered_by_organization_members(client):
