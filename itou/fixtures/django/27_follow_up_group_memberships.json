@@ -8,6 +8,7 @@
       "follow_up_group": 1,
       "is_active": true,
       "is_referent": true,
+      "is_referent_certified": false,
       "last_contact_at": "2024-06-12T00:00:00Z",
       "member": 4,
       "started_at": "2024-06-12"
@@ -24,6 +25,7 @@
       "follow_up_group": 2,
       "is_active": true,
       "is_referent": false,
+      "is_referent_certified": false,
       "last_contact_at": "2024-06-12T00:00:00Z",
       "member": 10,
       "started_at": "2024-06-12"
@@ -40,6 +42,7 @@
       "follow_up_group": 3,
       "is_active": true,
       "is_referent": false,
+      "is_referent_certified": false,
       "last_contact_at": "2024-06-12T00:00:00Z",
       "member": 3,
       "started_at": "2024-06-12"
@@ -56,6 +59,7 @@
       "follow_up_group": 3,
       "is_active": true,
       "is_referent": false,
+      "is_referent_certified": false,
       "last_contact_at": "2024-06-12T00:00:00Z",
       "member": 4,
       "started_at": "2024-06-12"
@@ -72,6 +76,7 @@
       "follow_up_group": 4,
       "is_active": true,
       "is_referent": false,
+      "is_referent_certified": false,
       "last_contact_at": "2024-06-12T00:00:00Z",
       "member": 3,
       "started_at": "2024-06-12"
@@ -88,6 +93,7 @@
       "follow_up_group": 5,
       "is_active": true,
       "is_referent": false,
+      "is_referent_certified": false,
       "last_contact_at": "2024-06-12T00:00:00Z",
       "member": 3,
       "started_at": "2024-06-12"
@@ -104,6 +110,7 @@
       "follow_up_group": 6,
       "is_active": true,
       "is_referent": false,
+      "is_referent_certified": false,
       "last_contact_at": "2024-06-12T00:00:00Z",
       "member": 3,
       "started_at": "2024-06-12"
@@ -120,6 +127,7 @@
       "follow_up_group": 6,
       "is_active": true,
       "is_referent": false,
+      "is_referent_certified": false,
       "last_contact_at": "2024-06-12T00:00:00Z",
       "member": 6,
       "started_at": "2024-06-12"
@@ -136,6 +144,7 @@
       "follow_up_group": 7,
       "is_active": true,
       "is_referent": false,
+      "is_referent_certified": true,
       "last_contact_at": "2024-06-12T00:00:00Z",
       "member": 3,
       "started_at": "2024-06-12"
@@ -152,6 +161,7 @@
       "follow_up_group": 7,
       "is_active": true,
       "is_referent": false,
+      "is_referent_certified": false,
       "last_contact_at": "2024-06-12T00:00:00Z",
       "member": 6,
       "started_at": "2024-06-12"
