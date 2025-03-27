@@ -1,4 +1,10 @@
 # Journal des changements techniques majeurs
+
+## 2025-03-27
+
+- [`uv`](https://docs.astral.sh/uv/) est maintenant requis pour développer sur
+  la plateforme, il doit être installé sur la machine des développeurs.
+
 ## 2025-02-04
 
 - Mise à jour vers Python 3.13:
