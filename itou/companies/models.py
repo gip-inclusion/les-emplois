@@ -625,6 +625,15 @@ class JobDescription(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="job_description_through")
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, db_index=True)
+    updated_at_by_company = models.DateTimeField(
+        verbose_name="date de modification par l'entreprise",
+        db_index=True,
+        default=timezone.now,
+        help_text=(
+            "la dernière modification effectuée, à l'exclusion de celles effectuées "
+            "par le personnel support et les processus automatiques"
+        )
+    )
     is_active = models.BooleanField(verbose_name="recrutement ouvert", default=True)
     custom_name = models.CharField(verbose_name="nom personnalisé", blank=True, max_length=255)
     description = models.TextField(verbose_name="description", blank=True)

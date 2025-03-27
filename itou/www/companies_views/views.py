@@ -203,8 +203,9 @@ def job_description_list(request, template_name="companies/job_description_list.
                     company_id=company.pk, pk=job_description_id
                 ).first():
                     job_description.is_active = is_active
+                    job_description.updated_at_by_company = timezone.now()
                     # Opening recruitment updates the "last modified" date.
-                    job_description.save(update_fields=["is_active", "updated_at"])
+                    job_description.save(update_fields=["is_active", "updated_at", "updated_at_by_company"])
                     if is_active:
                         messages.success(
                             request,

@@ -280,8 +280,15 @@ class JobAppellationAndLocationMixin(forms.Form):
         }
 
 
+class JobDescriptionFormMixin(forms.ModelForm):
+    def save(self, commit=False):
+        if self.instance is not None:
+            self.instance.updated_at_by_company = timezone.now()
+        return super().save(commit)
+
+
 # Job descriptions forms (2 steps and session based)
-class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
+class EditJobDescriptionForm(JobAppellationAndLocationMixin, JobDescriptionFormMixin):
     def __init__(self, current_company: Company, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -338,7 +345,7 @@ class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
         return open_positions
 
 
-class EditJobDescriptionDetailsForm(forms.ModelForm):
+class EditJobDescriptionDetailsForm(JobDescriptionFormMixin):
     class Meta:
         model = JobDescription
         fields = [

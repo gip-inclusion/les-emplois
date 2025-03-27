@@ -1,6 +1,9 @@
 import pytest
+from django.utils import timezone
+from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind, ContractType
+from itou.jobs.models import Appellation
 from itou.www.companies_views.forms import EditJobDescriptionDetailsForm, EditJobDescriptionForm
 from tests.cities.factories import create_city_guerande
 from tests.companies.factories import CompanyFactory
@@ -222,6 +225,27 @@ class TestEditJobDescriptionForm:
         assert not cleaned_data.get("is_resume_mandatory")
         assert not cleaned_data.get("is_qpv_mandatory")
 
+    def test_save_updated_by_company(self):
+        company = CompanyFactory()
+        create_test_romes_and_appellations(["N1101"])
+        appellation = Appellation.objects.first()
+        company.jobs.add(appellation)
+        instance = appellation.jobdescription_set.first()
+
+        with freeze_time("2025-03-01"):
+            form = EditJobDescriptionForm(
+                current_company=company,
+                instance=instance,
+                data={
+                    "appellation": instance.appellation.pk,
+                    "contract_type": ContractType.OTHER.value,
+                    "other_contract_type": "other_contract_type",
+                    "open_positions": 5,
+                },
+            )
+            instance = form.save()
+            assert instance.updated_at_by_company == timezone.now()
+
 
 class TestEditJobDescriptionDetailsForm:
     def test_company_fields(self):
@@ -287,3 +311,15 @@ class TestEditJobDescriptionDetailsForm:
         cleaned_data = form.cleaned_data
         assert not cleaned_data.get("is_resume_mandatory")
         assert not cleaned_data.get("is_qpv_mandatory")
+
+    def test_save_updated_by_company(self):
+        company = CompanyFactory()
+        create_test_romes_and_appellations(["N1101"])
+        appellation = Appellation.objects.first()
+        company.jobs.add(appellation)
+        instance = appellation.jobdescription_set.first()
+
+        with freeze_time("2025-03-01"):
+            form = EditJobDescriptionDetailsForm(current_company=company, instance=instance, data={})
+            instance = form.save()
+            assert instance.updated_at_by_company == timezone.now()
