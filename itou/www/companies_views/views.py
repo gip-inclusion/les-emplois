@@ -110,12 +110,11 @@ def report_tally_url(user, company, job_description=None):
 ### Main company view
 
 
+@check_user(lambda user: user.is_employer)
 def overview(request, template_name="companies/overview.html"):
-    company = get_current_company_or_404(request)
-
     context = {
-        "company": company,
-        "can_show_financial_annexes": company.convention_can_be_accessed_by(request.user),
+        "company": request.current_organization,
+        "can_show_financial_annexes": request.current_organization.convention_can_be_accessed_by(request.user),
     }
     return render(request, template_name, context)
 
@@ -287,13 +286,13 @@ def _get_job_description(session_data):
     return None
 
 
+@check_user(lambda user: user.is_employer)
 def edit_job_description(request, template_name="companies/edit_job_description.html"):
-    company = get_current_company_or_404(request)
     session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY) or {}
     job_description = _get_job_description(session_data)
 
     form = companies_forms.EditJobDescriptionForm(
-        company, instance=job_description, data=request.POST or None, initial=session_data
+        request.current_organization, instance=job_description, data=request.POST or None, initial=session_data
     )
 
     if request.method == "POST" and form.is_valid():
@@ -303,8 +302,8 @@ def edit_job_description(request, template_name="companies/edit_job_description.
     return render(request, template_name, {"form": form})
 
 
+@check_user(lambda user: user.is_employer)
 def edit_job_description_details(request, template_name="companies/edit_job_description_details.html"):
-    company = get_current_company_or_404(request)
     session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
 
     if not session_data:
@@ -315,7 +314,7 @@ def edit_job_description_details(request, template_name="companies/edit_job_desc
     rome = get_object_or_404(Appellation.objects.select_related("rome"), pk=session_data.get("appellation")).rome.code
 
     form = companies_forms.EditJobDescriptionDetailsForm(
-        company, instance=job_description, data=request.POST or None, initial=session_data
+        request.current_organization, instance=job_description, data=request.POST or None, initial=session_data
     )
 
     if request.method == "POST" and form.is_valid():
@@ -329,14 +328,14 @@ def edit_job_description_details(request, template_name="companies/edit_job_desc
     context = {
         "form": form,
         "rome": rome,
-        "is_opcs": company.is_opcs,
+        "is_opcs": request.current_organization.is_opcs,
     }
 
     return render(request, template_name, context)
 
 
+@check_user(lambda user: user.is_employer)
 def edit_job_description_preview(request, template_name="companies/edit_job_description_preview.html"):
-    company = get_current_company_or_404(request)
     session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
 
     if not session_data:
@@ -353,7 +352,7 @@ def edit_job_description_preview(request, template_name="companies/edit_job_desc
 
     appellation = Appellation.objects.get(pk=session_data.get("appellation"))
     job_description.appellation = appellation
-    job_description.company = company
+    job_description.company = request.current_organization
 
     if request.method == "POST":
         job_description.save()
@@ -362,7 +361,7 @@ def edit_job_description_preview(request, template_name="companies/edit_job_desc
         return HttpResponseRedirect(reverse("companies_views:job_description_list"))
 
     context = {
-        "siae": company,
+        "siae": request.current_organization,
         "job": job_description,
     }
 
