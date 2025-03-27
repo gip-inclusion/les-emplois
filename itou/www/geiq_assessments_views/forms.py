@@ -1,8 +1,10 @@
 from django import forms
 from django.forms import widgets
 
+from itou.files.forms import ItouFileField
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
+from itou.utils.constants import MB
 
 
 class CreateForm(forms.Form):
@@ -93,3 +95,7 @@ class CreateForm(forms.Form):
                 None,
                 "Vous devez choisir au moins une structure concernée par cette convention.",
             )
+
+
+class ActionFinancialAssessmentForm(forms.Form):
+    assessment_file = ItouFileField(content_type="application/pdf", max_upload_size=5 * MB, label="Bilan")
