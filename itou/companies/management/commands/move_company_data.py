@@ -86,7 +86,7 @@ class Command(BaseCommand):
         **options,
     ):
         if from_id == to_id:
-            self.stderr.write(f"Unable to use the same company as source and destination (ID {from_id})\n")
+            self.logger.warning("Unable to use the same company as source and destination", extra={"company": from_id})
             return
 
         from_company_qs = companies_models.Company.objects.filter(pk=from_id)
@@ -120,14 +120,14 @@ class Command(BaseCommand):
         else:
             fields_to_transfer = list(transfer.TransferField)
 
-        self.stdout.write(
-            "MOVE {} OF company.id={} - {} {} - {}\n".format(
-                "DATA" if move_all_data else "JOB APPLICATIONS",
-                from_company.pk,
-                from_company.kind,
-                from_company.siret,
-                from_company.display_name,
-            )
+        self.logger.info(
+            "Move company DATA" if move_all_data else "Move company JOB APPLICATIONS",
+            extra={
+                "company": from_company.pk,
+                "kind": from_company.kind,
+                "siret": from_company.siret,
+                "display_name": from_company.display_name,
+            },
         )
         for field_to_transfer in fields_to_transfer:
             spec = transfer.TRANSFER_SPECS[field_to_transfer]
@@ -136,19 +136,31 @@ class Command(BaseCommand):
             all_items_count = transfer.get_transfer_queryset(from_company, None, spec).count()
             to_transfer_count = transfer.get_transfer_queryset(from_company, to_company, spec).count()
             suffix = f" (dont {to_transfer_count} à transférer)" if to_transfer_count != all_items_count else ""
-            self.stdout.write(f"| {field_to_transfer.label}: {all_items_count}{suffix}\n")
+            self.logger.info(
+                "field to transfer",
+                extra={"label": field_to_transfer.label, "count": all_items_count, "suffix": suffix},
+            )
 
-        self.stdout.write(
-            f"INTO company.id={to_company.pk} - {to_company.kind} {to_company.siret} - {to_company.display_name}\n"
+        self.logger.info(
+            "Into company",
+            extra={
+                "company": to_company.pk,
+                "kind": to_company.kind,
+                "siret": to_company.siret,
+                "display_name": to_company.display_name,
+            },
         )
         for field_to_transfer in fields_to_transfer:
             spec = transfer.TRANSFER_SPECS[field_to_transfer]
             if "model_field" in spec:
                 continue
             all_items_count = transfer.get_transfer_queryset(to_company, None, spec).count()
-            self.stdout.write(f"| {field_to_transfer.label}: {all_items_count}\n")
+            self.logger.info(
+                "field to transfer",
+                extra={"label": field_to_transfer.label, "count": all_items_count},
+            )
 
-        self.stdout.write("Rapport du transfert:\n")
+        self.logger.info("Rapport du transfert")
         disable_from_company = not only_job_applications
         try:
             with transaction.atomic():
@@ -161,20 +173,26 @@ class Command(BaseCommand):
                 )
                 for section, section_changes in reporter.changes.items():
                     if transfer.TRANSFER_SPECS.get(section, {}).get("model_field"):
-                        self.stdout.write(
-                            f"| {section.label}: {section_changes[0] if section_changes else 'Pas de changement'}"
+                        self.logger.info(
+                            "changement de la section",
+                            extra={
+                                "section": section.label,
+                                "changements": section_changes[0] if section_changes else "Pas de changement",
+                            },
                         )
                     else:
-                        self.stdout.write(f"| {section.label}: {len(section_changes)}")
+                        self.logger.info(
+                            "changement de la section", extra={"section": section.label, "count": len(section_changes)}
+                        )
                         if wet_run:
                             # Print more info to help a possible rollback
                             for section_change in section_changes:
-                                self.stdout.write(f"| - {section_change}")
+                                self.logger.info("changement", extra={"section_change": section_change})
 
                 if not wet_run:
                     raise DryRunException("Rollback!")
         except transfer.TransferError as e:
-            self.stderr.write(e.args[0])
+            self.logger.warning("TransferError", extra={"detail": e.args[0]})
         except DryRunException:
-            self.stdout.write("Transfer rolled back in dry run mode.\n")
+            self.logger.info("Transfer rolled back in dry run mode")
             return

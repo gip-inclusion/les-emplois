@@ -5,6 +5,7 @@ SiaeConvention object logic used by the import_siae.py script is gathered here.
 """
 
 import datetime
+import logging
 
 from django.db import transaction
 from django.utils import timezone
@@ -12,6 +13,8 @@ from django.utils import timezone
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, SiaeConvention
 
+
+logger = logging.getLogger(__name__)
 
 CONVENTION_DEACTIVATION_THRESHOLD = 200
 
@@ -49,9 +52,8 @@ def update_existing_conventions(siret_to_siae_row, conventions_by_siae_key):
         # Ideally this should never happen because the asp_id is supposed to be an immutable id of the structure
         # in ASP data, but one can only hope.
         if convention.asp_id != row.asp_id:
-            print(
-                f"convention.id={convention.id} has changed asp_id from "
-                f"{convention.asp_id} to {row.asp_id} (will be updated)"
+            logger.info(
+                "convention has changed asp_id. will be updated", extra={"from": convention.id, "to": row.asp_id}
             )
             assert not SiaeConvention.objects.filter(asp_id=row.asp_id, kind=siae.kind).exists()
             convention.asp_id = row.asp_id
@@ -61,9 +63,9 @@ def update_existing_conventions(siret_to_siae_row, conventions_by_siae_key):
         # Siret_signature can change from one export to the next!
         # e.g. asp_id=4948 has changed from 81051848000027 to 81051848000019
         if convention.siret_signature != row.siret_signature:
-            print(
-                f"convention.id={convention.id} has changed siret_signature from "
-                f"{convention.siret_signature} to {row.siret_signature} (will be updated)"
+            logger.info(
+                "convention has changed siret_signature. will be updated",
+                extra={"convention": convention.id, "from": convention.siret_signature, "to": row.siret_signature},
             )
             convention.siret_signature = row.siret_signature
             updated_fields.add("siret_signature")
@@ -89,16 +91,15 @@ def update_existing_conventions(siret_to_siae_row, conventions_by_siae_key):
 
         if updated_fields:
             convention.save(update_fields=updated_fields)
-
-    print(f"{reactivations} conventions have been reactivated")
+    logger.info("conventions have been reactivated", extra={"count": reactivations})
 
     if len(conventions_to_deactivate) >= CONVENTION_DEACTIVATION_THRESHOLD and timezone.localdate().month <= 6:
         # Early each year, all or most AF for the new year are missing in ASP AF data.
         # Instead of brutally deactivating all SIAE, we patiently wait until enough AF data is present.
         # While we wait, no SIAE is deactivated whatsoever.
-        print(
-            f"ERROR: too many conventions would be deactivated ({len(conventions_to_deactivate)} is above"
-            f" threshold {CONVENTION_DEACTIVATION_THRESHOLD}) thus none will actually be!"
+        logger.warning(
+            "too many conventions would be deactivated, none will actually be!",
+            extra={"count": len(conventions_to_deactivate), "threshold": CONVENTION_DEACTIVATION_THRESHOLD},
         )
         return
 
@@ -108,7 +109,7 @@ def update_existing_conventions(siret_to_siae_row, conventions_by_siae_key):
         convention.deactivated_at = timezone.now()
     SiaeConvention.objects.bulk_update(conventions_to_deactivate, ["is_active", "deactivated_at"], batch_size=200)
 
-    print(f"{len(conventions_to_deactivate)} conventions have been deactivated")
+    logger.info("conventions have been reactivated", extra={"count": len(conventions_to_deactivate)})
 
 
 def get_creatable_conventions(siret_to_siae_row, conventions_by_siae_key):
@@ -183,7 +184,7 @@ def check_convention_data_consistency():
 
 def create_conventions(siret_to_siae_row, conventions_by_siae_key):
     creatable_conventions = get_creatable_conventions(siret_to_siae_row, conventions_by_siae_key)
-    print(f"will create {len(creatable_conventions)} conventions")
+    logger.info("will create conventions", extra={"count": len(creatable_conventions)})
 
     for convention, siae in creatable_conventions:
         assert not SiaeConvention.objects.filter(asp_id=convention.asp_id, kind=convention.kind).exists()
@@ -197,7 +198,7 @@ def create_conventions(siret_to_siae_row, conventions_by_siae_key):
 @transaction.atomic()
 def delete_conventions():
     deletable_conventions = SiaeConvention.objects.filter(siaes__isnull=True)
-    print(f"will delete {len(deletable_conventions)} conventions")
+    logger.info("will delete conventions", extra={"count": len(deletable_conventions)})
     for convention in deletable_conventions:
         # This will delete the related financial annexes as well.
         convention.delete()

@@ -4,7 +4,12 @@ SiaeFinancialAnnex object logic used by the import_siae.py script is gathered he
 
 """
 
+import logging
+
 from itou.companies.models import SiaeConvention, SiaeFinancialAnnex
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_creatable_and_deletable_afs(af_number_to_row):
@@ -84,10 +89,10 @@ def build_financial_annex_from_number(row):
 def manage_financial_annexes(af_number_to_row):
     creatable_afs, deletable_afs = get_creatable_and_deletable_afs(af_number_to_row)
 
-    print(f"will create {len(creatable_afs)} financial annexes")
+    logger.info("will create financial annexes", extra={"count": len(creatable_afs)})
     for af in creatable_afs:
         af.save()
 
-    print(f"will delete {len(deletable_afs)} financial annexes")
+    logger.info("will delete financial annexes", extra={"count": len(deletable_afs)})
     for af in deletable_afs:
         af.delete()

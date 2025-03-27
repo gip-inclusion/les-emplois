@@ -131,24 +131,25 @@ class Command(BaseCommand):
         )
 
         # Display some "stats" about the dataset
-        self.stdout.write("-" * 80)
-        self.stdout.write(f"Rows in file: {info_stats['rows_in_file']}")
-        self.stdout.write(f"Rows with a SIRET: {info_stats['rows_with_a_siret']}")
-        self.stdout.write(f"Rows with an empty email: {info_stats['rows_with_empty_email']}")
-        self.stdout.write(f"Rows used: {len(geiq_df)}")
-        self.stdout.write(f" > Creatable: {info_stats['creatable_sirets']}")
-        self.stdout.write(f" >> Created: {info_stats['structures_created']}")
-        self.stdout.write(
-            f" >> Not created because of missing email: {info_stats['not_created_because_of_missing_email']}"
+        self.logger.info("-" * 80)
+        self.logger.info("Rows in file", extra={"count": info_stats["rows_in_file"]})
+        self.logger.info("Rows with a SIRET", extra={"count": info_stats["rows_with_a_siret"]})
+        self.logger.info("Rows with an empty email", extra={"count": info_stats["rows_with_empty_email"]})
+        self.logger.info("Rows used", extra={"count": len(geiq_df)})
+        self.logger.info(" > Creatable", extra={"count": info_stats["creatable_sirets"]})
+        self.logger.info(" >> Created", extra={"count": info_stats["structures_created"]})
+        self.logger.info(
+            " >> Not created because of missing email",
+            extra={"count": info_stats["not_created_because_of_missing_email"]},
         )
-        self.stdout.write(f" > Updatable: {info_stats['updatable_sirets']}")
-        self.stdout.write(f" >> Updated: {info_stats['structures_updated']}")
-        self.stdout.write(f" > Deletable: {info_stats['deletable_sirets']}")
-        self.stdout.write(f" >> Deleted: {info_stats['structures_deleted']}")
-        self.stdout.write(f" >> Undeletable: {info_stats['structures_undeletable']}")
-        self.stdout.write(f" >> Skipped: {info_stats['structures_deletable_skipped']}")
-        self.stdout.write("-" * 80)
-        self.stdout.write("Done.")
+        self.logger.info(" > Updatable", extra={"count": info_stats["updatable_sirets"]})
+        self.logger.info(" >> Updated", extra={"count": info_stats["structures_updated"]})
+        self.logger.info(" > Deletable", extra={"count": info_stats["deletable_sirets"]})
+        self.logger.info(" >> Deleted", extra={"count": info_stats["structures_deleted"]})
+        self.logger.info(" >> Undeletable", extra={"count": info_stats["structures_undeletable"]})
+        self.logger.info(" >> Skipped", extra={"count": info_stats["structures_deletable_skipped"]})
+        self.logger.info("-" * 80)
+        self.logger.info("Done.")
 
         warning_messages = []
         if info_stats["rows_with_empty_email"] > 20:

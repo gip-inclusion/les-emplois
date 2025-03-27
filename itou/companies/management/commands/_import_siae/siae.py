@@ -6,6 +6,8 @@ All these helpers are specific to SIAE logic (not GEIQ, EA, EATT).
 
 """
 
+import logging
+
 from django.utils import timezone
 
 from itou.common_apps.address.departments import department_from_postcode
@@ -13,6 +15,9 @@ from itou.companies.enums import CompanyKind
 from itou.companies.management.commands._import_siae.utils import could_siae_be_deleted, geocode_siae
 from itou.companies.models import Company, SiaeConvention
 from itou.utils.emails import send_email_messages
+
+
+logger = logging.getLogger(__name__)
 
 
 def build_siae(row, kind, *, is_active):
@@ -101,22 +106,28 @@ def update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row):
                         return f"{msg} convention=None"
                     return f"{msg} convention.id={siae.convention.id} asp_id={siae.convention.asp_id}"
 
-                print(
-                    f"ERROR: siae.id={siae.id} ({fmt(siae)}) has changed siret from "
-                    f"{siae.siret} to {row.siret} but new siret is already used by "
-                    f"siae.id={existing_siae.id} ({fmt(existing_siae)}) "
+                logger.warning(
+                    "siae has changed siret, but new siret already exists",
+                    extra={
+                        "siae": fmt(siae),
+                        "to_siret": row.siret,
+                        "existing_siae": fmt(existing_siae),
+                    },
                 )
                 errors += 1
                 continue
 
-            print(f"siae.id={siae.id} has changed siret from {siae.siret} to {row.siret} (will be updated)")
+            logger.info(
+                "siae has changed siret (will be updated)",
+                extra={"siae": siae, "from_siret": siae.siret, "to_siret": row.siret},
+            )
             siae.siret = row.siret
             updated_fields.add("siret")
 
         if updated_fields:
             siae.save(update_fields=updated_fields)
 
-    print(f"{auth_email_updates} siae.auth_email fields have been updated")
+    logger.info("siae.auth_email fields have been updated", extra={"count": auth_email_updates})
     return errors
 
 
@@ -143,9 +154,9 @@ def create_new_siaes(siret_to_siae_row, conventions_by_siae_key):
         except Company.DoesNotExist:
             if SiaeConvention.objects.filter(asp_id=asp_id, kind=kind).exists():
                 # Shouldn't happen, if it does it's probably because we messed up at some point
-                print(
-                    f"WARNING: Trying to create a new SIAE {row.siret=} {kind=} "
-                    f"but the convention {asp_id=} {kind=} already exists"
+                logger.warning(
+                    "Trying to create a new SIAE but the convention already exists",
+                    extra={"siret": row.siret, "kind": kind, "asp_id": asp_id},
                 )
                 continue
             if not convention.is_active:
@@ -165,26 +176,27 @@ def create_new_siaes(siret_to_siae_row, conventions_by_siae_key):
             # Siae with this siret+kind already exists but with the wrong source.
             assert existing_siae.source in [Company.SOURCE_USER_CREATED, Company.SOURCE_STAFF_CREATED]
             assert existing_siae.should_have_convention
-            print(
-                f"siae.id={existing_siae.id} already exists "
-                f"with wrong source={existing_siae.source} "
-                f"(source will be fixed to ASP)"
+            logger.info(
+                "siae already exists with wrong source (source will be fixed to ASP)",
+                extra={"siae": existing_siae.id, "source": existing_siae.source},
             )
+
             existing_siae.source = Company.SOURCE_ASP
             existing_siae.convention = None
             existing_siae.save(update_fields={"source", "convention"})
 
-    print("--- beginning of CSV output of all creatable_siaes ---")
-    print("siret;kind;department;name;address")
+    # vincentporte TODO : voulons-nous vraiment continuer à generer un csv dans les logs ?
+    # print("--- beginning of CSV output of all creatable_siaes ---")
+    # print("siret;kind;department;name;address")
     for siae in creatable_siaes:
-        print(f"{siae.siret};{siae.kind};{siae.department};{siae.name};{siae.address_on_one_line}")
+        #    print(f"{siae.siret};{siae.kind};{siae.department};{siae.name};{siae.address_on_one_line}")
         siae.save()
-    print("--- end of CSV output of all creatable_siaes ---")
+    # print("--- end of CSV output of all creatable_siaes ---")
 
     send_email_messages(siae.activate_your_account_email() for siae in creatable_siaes)
 
-    print(f"{len(creatable_siaes)} structures have been created")
-    print(f"{len([s for s in creatable_siaes if s.coords])} structures will have geolocation")
+    logger.info("structures have been created", extra={"count": len(creatable_siaes)})
+    logger.info("structures will have geolocation", extra={"count": len([s for s in creatable_siaes if s.coords])})
 
 
 def cleanup_siaes_after_grace_period():
@@ -200,8 +212,8 @@ def cleanup_siaes_after_grace_period():
         else:
             blocked_deletions += 1
 
-    print(f"{deletions} siaes past their grace period has been deleted")
-    print(f"{blocked_deletions} siaes past their grace period cannot be deleted")
+    logger.info("siaes past after grace period have been deleted", extra={"count": deletions})
+    logger.info("siaes past after grace period cannot be deleted", extra={"count": blocked_deletions})
 
 
 def delete_user_created_siaes_without_members():
@@ -218,12 +230,12 @@ def delete_user_created_siaes_without_members():
     ):
         if not siae.has_members:
             if could_siae_be_deleted(siae):
-                print(f"siae.id={siae.id} is user created and has no member thus will be deleted")
+                logger.info("siae created by user without members has been deleted", extra={"siae": siae.id})
                 siae.delete()
             else:
-                print(
-                    f"ERROR: siae.id={siae.id} is user created and "
-                    f"has no member but has job applications thus cannot be deleted"
+                logger.warning(
+                    "siae created by user without members but has job applications cannot be deleted",
+                    extra={"siae": siae.id},
                 )
                 errors += 1
 
@@ -249,27 +261,29 @@ def manage_staff_created_siaes():
     # Sometimes our staff creates a siae then later attaches it manually to the correct convention. In that
     # case it should be converted to a regular user created siae so that the usual convention logic applies.
     for siae in staff_created_siaes.filter(convention__isnull=False):
-        print(f"converted staff created siae.id={siae.id} to user created siae as it has a convention")
+        logger.info(
+            "converted staff created siae to user created siae as it has a convention", extra={"siae": siae.id}
+        )
         siae.source = Company.SOURCE_USER_CREATED
         siae.save(update_fields={"source"})
 
     recent_unconfirmed_siaes = staff_created_siaes.filter(created_at__gte=three_months_ago)
-    print(
-        f"{recent_unconfirmed_siaes.count()} siaes created recently by staff"
-        " (still waiting for ASP data to be confirmed)"
-    )
+    logger.info("siaes created recently by staff", extra={"count": recent_unconfirmed_siaes.count()})
 
     old_unconfirmed_siaes = staff_created_siaes.filter(created_at__lt=three_months_ago)
-    print(f"{len(old_unconfirmed_siaes)} siaes created by staff should be deleted as they are unconfirmed")
+    logger.info(
+        "siaes created by staff should be deleted as they are unconfirmed", extra={"count": len(old_unconfirmed_siaes)}
+    )
     errors = 0
     for siae in old_unconfirmed_siaes:
         if could_siae_be_deleted(siae):
-            print(f"deleted unconfirmed siae.id={siae.id} created by staff a while ago")
+            logger.info("deleted unconfirmed siae created by staff a while ago", extra={"siae": siae.id})
             siae.delete()
         else:
-            print(
-                f"ERROR: Please fix unconfirmed staff created siae.id={siae.id}"
-                f" by either deleting it or attaching it to the correct convention"
+            logger.warning(
+                "please fix unconfirmed staff created siae by either deleting it or attaching it "
+                "to the correct convention",
+                extra={"siae": siae.id},
             )
             errors += 1
 
@@ -281,10 +295,17 @@ def check_whether_signup_is_possible_for_all_siaes():
 
     no_signup_siaes = Company.objects.filter(auth_email="").exclude(companymembership__is_active=True).distinct()
     for siae in no_signup_siaes:
-        print(
-            f"ERROR: signup is impossible for siae.id={siae.id} siret={siae.siret} "
-            f"kind={siae.kind} dpt={siae.department} source={siae.source} "
-            f"created_by={siae.created_by} siae.email={siae.email}"
+        logger.warning(
+            "signup is impossible for siae",
+            extra={
+                "siae": siae.id,
+                "siret": siae.siret,
+                "kind": siae.kind,
+                "dpt": siae.department,
+                "source": siae.source,
+                "created_by": siae.created_by,
+                "email": siae.email,
+            },
         )
         errors += 1
 

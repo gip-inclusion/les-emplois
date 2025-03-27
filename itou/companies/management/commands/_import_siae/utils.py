@@ -4,6 +4,7 @@ Various helpers shared by the import_siae, import_geiq and import_ea_eatt script
 """
 
 import csv
+import logging
 import os
 import shutil
 import tempfile
@@ -18,6 +19,9 @@ from itou.companies.models import Company
 from itou.metabase.tables.utils import hash_content
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.apis.geocoding import get_geocoding_data
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_filename(filename_prefix, filename_extension, description=None):
@@ -45,7 +49,7 @@ def get_filename(filename_prefix, filename_extension, description=None):
     assert len(filenames) == 1
 
     filename = filenames[0]
-    print(f"Selected file {filename} for {description}.")
+    logger.info("Selected file", extra={"file.name": filename, "description": description})
     return os.path.join(settings.ASP_FLUX_IAE_DIR, filename)
 
 
@@ -138,33 +142,33 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
     - kinds: possible kinds of the structures
     - build_structure: a method building a structure from a dataframe row
     """
-    print(f"Loaded {len(df)} {source} from export.")
+    logger.info("SIAE loaded from export", extra={"count": len(df), "source": source})
 
     db_sirets = {siae.siret for siae in Company.objects.filter(kind__in=kinds)}
     df_sirets = set(df.siret.tolist())
 
     creatable_sirets = df_sirets - db_sirets
-    print(f"{len(creatable_sirets)} {source} will be created.")
+    logger.info("SIAE will be created", extra={"count": len(creatable_sirets), "source": source})
     updatable_sirets = db_sirets.intersection(df_sirets)
-    print(f"{len(updatable_sirets)} {source} will be updated when needed.")
+    logger.info("SIAE will be updated when needed", extra={"count": len(updatable_sirets), "source": source})
     deletable_sirets = db_sirets - df_sirets
-    print(f"{len(deletable_sirets)} {source} will be deleted when possible.")
+    logger.info("SIAE will be deleted when possible", extra={"count": len(deletable_sirets), "source": source})
 
     not_created_because_of_missing_email = 0
     structures_created = 0
     # Create structures which do not exist in database yet.
     for _, row in df[df.siret.isin(creatable_sirets)].iterrows():
         if not row.auth_email:
-            print(f"{source} siret={row.siret} will not been created as it has no email.")
+            logger.info("SIAE will not been created as it has no email", extra={"source": source, "siret": row.siret})
             not_created_because_of_missing_email += 1
             continue
 
-        print(f"{source} siret={row.siret} will be created.")
+        logger.info("SIAE will be created", extra={"source": source, "siret": row.siret})
         siae = build_structure(row)
         if wet_run:
             siae.save()
             structures_created += 1
-        print(f"{source} siret={row.siret} has been created with siae.id={siae.id}.")
+        logger.info("SIAE has been created", extra={"source": source, "siret": row.siret, "siae": siae.id})
 
     structures_updated = 0
     # Update structures which already exist in database.
@@ -173,7 +177,7 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
         if siae.source != source:
             # If a user/staff created structure already exists in db and its siret is later found in an export,
             # it makes sense to convert it.
-            print(f"siae.id={siae.id} siret={siae.siret} source={siae.source} will be converted to source={source}.")
+            logger.info("SIAE will be converted", extra={"to_source": source, "siret": siae.siret, "siae": siae.id})
             siae.source = source
             if wet_run:
                 siae.save()
@@ -201,7 +205,7 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
             continue
 
         if could_siae_be_deleted(siae):
-            print(f"siae.id={siae.id} siret={siae.siret} will be deleted.")
+            logger.info("SIAE will be deleted", extra={"siae": siae.id, "siret": siae.siret})
             if wet_run:
                 siae.delete()
                 deleted_count += 1
@@ -209,11 +213,14 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
 
         # As of 2021/04/15, 2 GEIQ are undeletable.
         # As of 2021/04/15, 8 EA_EATT are undeletable.
-        print(f"siae.id={siae.id} siret={siae.siret} source={siae.source} cannot be deleted as it has data.")
+        logger.info(
+            "SIAE cannot be deleted as it has data",
+            extra={"siae": siae.id, "siret": siae.siret, "source": siae.source},
+        )
         undeletable_count += 1
 
-    print(f"{deleted_count} {source} can and will be deleted.")
-    print(f"{undeletable_count} {source} cannot be deleted as they have data.")
+    logger.info("SIAE can and will be deleted", extra={"source": source, "count": deleted_count})
+    logger.info("SIAE cannot be deleted as they have data", extra={"source": source, "count": undeletable_count})
 
     return {
         "creatable_sirets": len(creatable_sirets),
@@ -341,7 +348,7 @@ def get_fluxiae_df(
         # Ignore 3 rows: the `DEB*` first row, the headers row, and the `FIN*` last row.
         nrows = len(extracted.read_text().splitlines()) - 3
 
-        print(f"Loading {nrows} rows for {vue_name} ...")
+        logger.info("Loading rows for vue", extra={"count": nrows, "vue_name": vue_name})
 
         if converters:
             kwargs["converters"] = converters
