@@ -163,6 +163,38 @@ def test_get_taux_geiq_batch(respx_mock, label_settings):
     assert client.get_taux_geiq() == expected_data
 
 
+def test_get_compte_pdf(respx_mock, label_settings):
+    expected_data = b"some pdf file"
+    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/DownloadCompte?id=123").respond(
+        200,
+        content=expected_data,
+        headers={
+            "content-length": f"{len(expected_data)}",
+            "content-transfer-encoding": "binary",
+            "content-type": "application/pdf",
+        },
+    )
+
+    client = geiq_label.get_client()
+    assert client.get_compte_pdf(geiq_id=123) == expected_data
+
+
+def test_get_compte_pdf_invalid_content_type(respx_mock, label_settings):
+    client = geiq_label.get_client()
+
+    respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/DownloadCompte?id=123").respond(
+        200,
+        content=b"",
+        headers={
+            "content-length": "0",
+            "content-transfer-encoding": "binary",
+            "content-type": "text/html",
+        },
+    )
+    with pytest.raises(geiq_label.LabelAPIError):
+        assert client.get_compte_pdf(geiq_id=123)
+
+
 def test_get_synthese_pdf(respx_mock, label_settings):
     expected_data = b"some pdf file"
     respx_mock.get(f"{label_settings.API_GEIQ_LABEL_BASE_URL}/rest/SynthesePDF?id=123").respond(
