@@ -285,6 +285,7 @@ def edit_job_description(request, template_name="companies/edit_job_description.
         get_object_or_404(
             JobDescription.objects.select_related("appellation", "location"),
             pk=job_description_id,
+            company=request.current_organization,
         )
         if job_description_id
         else None
@@ -309,7 +310,11 @@ def edit_job_description_details(request, template_name="companies/edit_job_desc
         return HttpResponseRedirect(reverse("companies_views:edit_job_description"))
 
     job_description_id = session_data.get("pk")
-    job_description = get_object_or_404(JobDescription, pk=job_description_id) if job_description_id else None
+    job_description = (
+        get_object_or_404(JobDescription, pk=job_description_id, company=request.current_organization)
+        if job_description_id
+        else None
+    )
 
     rome = get_object_or_404(Appellation.objects.select_related("rome"), pk=session_data.get("appellation")).rome.code
 
@@ -339,7 +344,9 @@ def edit_job_description_preview(request, template_name="companies/edit_job_desc
 
     job_description_id = session_data.get("pk")
     job_description = (
-        get_object_or_404(JobDescription, pk=job_description_id) if job_description_id else JobDescription()
+        get_object_or_404(JobDescription, pk=job_description_id, company=request.current_organization)
+        if job_description_id
+        else JobDescription()
     )
 
     job_description.__dict__.update(**session_data)
