@@ -16,8 +16,38 @@ urlpatterns = [
     ),
     path("job_description_list", views.job_description_list, name="job_description_list"),
     path("edit_job_description", views.edit_job_description, name="edit_job_description"),
+    path("edit_job_description/<uuid:edit_session_id>", views.edit_job_description, name="edit_job_description"),
+    path("edit_job_description/<int:job_description_id>", views.edit_job_description, name="edit_job_description"),
+    path(
+        "edit_job_description/<int:job_description_id>/<uuid:edit_session_id>",
+        views.edit_job_description,
+        name="edit_job_description",
+    ),
+    # TODO (François): Remove URL without parameter after a week.
     path("edit_job_description_details", views.edit_job_description_details, name="edit_job_description_details"),
+    path(
+        "edit_job_description_details/<uuid:edit_session_id>",
+        views.edit_job_description_details,
+        name="edit_job_description_details",
+    ),
+    path(
+        "edit_job_description_details/<int:job_description_id>/<uuid:edit_session_id>",
+        views.edit_job_description_details,
+        name="edit_job_description_details",
+    ),
+    # TODO (François): Remove URL without parameter after a week.
     path("edit_job_description_preview", views.edit_job_description_preview, name="edit_job_description_preview"),
+    path(
+        "edit_job_description_preview/<uuid:edit_session_id>",
+        views.edit_job_description_preview,
+        name="edit_job_description_preview",
+    ),
+    path(
+        "edit_job_description_preview/<int:job_description_id>/<uuid:edit_session_id>",
+        views.edit_job_description_preview,
+        name="edit_job_description_preview",
+    ),
+    # TODO(François): Remove URL after a week.
     path(
         "update_job_description/<int:job_description_id>", views.update_job_description, name="update_job_description"
     ),

@@ -26,12 +26,14 @@ from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.auth import LoginNotRequiredMixin, check_user
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
+from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
 from itou.www.companies_views import forms as companies_forms
 
 
 ITOU_SESSION_EDIT_COMPANY_KEY = "edit_siae_session_key"
+# TODO(François): Drop this key next week.
 ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
 
 DATA_INCLUSION_API_CACHE_PREFIX = "data_inclusion_api_results"
@@ -298,51 +300,112 @@ def job_description_list(request, template_name="companies/job_description_list.
     return render(request, template_name, context)
 
 
+JOB_DESCRIPTION_EDIT_SESSION_KIND = "job_description_edit"
+
+
 @check_user(lambda user: user.is_employer)
-def edit_job_description(request, template_name="companies/edit_job_description.html"):
-    session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY) or {}
-    job_description_id = session_data.get("pk")
-    job_description = (
-        get_object_or_404(
+def edit_job_description(
+    request,
+    edit_session_id=None,
+    job_description_id=None,
+    template_name="companies/edit_job_description.html",
+):
+    if edit_session_id:
+        session_namespace = SessionNamespace(request.session, JOB_DESCRIPTION_EDIT_SESSION_KIND, edit_session_id)
+        if not session_namespace.exists():
+            raise Http404
+        session_data = session_namespace.as_dict()
+    else:
+        session_namespace = None
+        session_data = {}
+
+    # TODO(François): Drop this fallback next week.
+    if job_description_id is None and edit_session_id is None:
+        session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY, {})
+        job_description_id = session_data.get("pk")
+
+    if job_description_id:
+        job_description = get_object_or_404(
             JobDescription.objects.select_related("appellation", "location"),
             pk=job_description_id,
+            company=request.current_organization,
         )
-        if job_description_id
-        else None
-    )
+    else:
+        job_description = None
 
     form = companies_forms.EditJobDescriptionForm(
         request.current_organization, instance=job_description, data=request.POST or None, initial=session_data
     )
 
     if request.method == "POST" and form.is_valid():
-        request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {**session_data, **form.cleaned_data}
-        return HttpResponseRedirect(reverse("companies_views:edit_job_description_details"))
+        session_data.update(form.cleaned_data)
+        if session_namespace is None:
+            session_namespace = SessionNamespace.create_uuid_namespace(
+                request.session, JOB_DESCRIPTION_EDIT_SESSION_KIND, session_data
+            )
+        else:
+            session_namespace.update(session_data)
+        request.session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY, None)
+        view_kwargs = {"edit_session_id": session_namespace.name}
+        if job_description:
+            view_kwargs["job_description_id"] = job_description.pk
+        return HttpResponseRedirect(reverse("companies_views:edit_job_description_details", kwargs=view_kwargs))
 
     return render(request, template_name, {"form": form})
 
 
 @check_user(lambda user: user.is_employer)
-def edit_job_description_details(request, template_name="companies/edit_job_description_details.html"):
-    session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
-
+def edit_job_description_details(
+    request,
+    *,
+    edit_session_id=None,
+    job_description_id=None,
+    template_name="companies/edit_job_description_details.html",
+    **kwargs,
+):
+    session_data = None
+    # TODO(François): Make edit_session_id required next week.
+    if edit_session_id:
+        session_namespace = SessionNamespace(request.session, JOB_DESCRIPTION_EDIT_SESSION_KIND, edit_session_id)
+        if not session_namespace.exists():
+            raise Http404
+        session_data = session_namespace.as_dict()
+    # TODO(François): Drop this fallback next week.
+    elif job_description_id is None:
+        try:
+            session_data = request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY]
+        except KeyError as e:
+            raise Http404 from e
+        job_description_id = session_data.get("pk")
+        session_namespace = SessionNamespace.create_uuid_namespace(
+            request.session, JOB_DESCRIPTION_EDIT_SESSION_KIND, session_data
+        )
     if not session_data:
-        return HttpResponseRedirect(reverse("companies_views:edit_job_description"))
+        raise Http404
 
-    job_description_id = session_data.get("pk")
-    job_description = get_object_or_404(JobDescription, pk=job_description_id) if job_description_id else None
+    view_kwargs = {"edit_session_id": session_namespace.name}
+    if job_description_id:
+        job_description = get_object_or_404(
+            JobDescription,
+            pk=job_description_id,
+            company=request.current_organization,
+        )
+        view_kwargs["job_description_id"] = job_description.pk
+    else:
+        job_description = None
 
     rome = get_object_or_404(Appellation.objects.select_related("rome"), pk=session_data.get("appellation")).rome.code
 
     form = companies_forms.EditJobDescriptionDetailsForm(
         request.current_organization, instance=job_description, data=request.POST or None, initial=session_data
     )
-
     if request.method == "POST" and form.is_valid():
-        request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {**session_data, **form.cleaned_data}
-        return HttpResponseRedirect(reverse("companies_views:edit_job_description_preview"))
+        session_namespace.update(form.cleaned_data)
+        request.session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY, None)
+        return HttpResponseRedirect(reverse("companies_views:edit_job_description_preview", kwargs=view_kwargs))
 
     context = {
+        "back_url": reverse("companies_views:edit_job_description", kwargs=view_kwargs),
         "form": form,
         "rome": rome,
         "is_opcs": request.current_organization.is_opcs,
@@ -352,16 +415,44 @@ def edit_job_description_details(request, template_name="companies/edit_job_desc
 
 
 @check_user(lambda user: user.is_employer)
-def edit_job_description_preview(request, template_name="companies/edit_job_description_preview.html"):
-    session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
-
+def edit_job_description_preview(
+    request,
+    *,
+    edit_session_id=None,
+    job_description_id=None,
+    template_name="companies/edit_job_description_preview.html",
+    **kwargs,
+):
+    session_data = None
+    # TODO(François): Make edit_session_id required next week.
+    if edit_session_id:
+        session_namespace = SessionNamespace(request.session, JOB_DESCRIPTION_EDIT_SESSION_KIND, edit_session_id)
+        if not session_namespace.exists():
+            raise Http404
+        session_data = session_namespace.as_dict()
+    # TODO(François): Drop this fallback next week.
+    elif job_description_id is None:
+        try:
+            session_data = request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY]
+        except KeyError as e:
+            raise Http404 from e
+        job_description_id = session_data.get("pk")
+        session_namespace = SessionNamespace.create_uuid_namespace(
+            request.session, JOB_DESCRIPTION_EDIT_SESSION_KIND, session_data
+        )
     if not session_data:
-        return HttpResponseRedirect(reverse("companies_views:edit_job_description"))
+        raise Http404
 
-    job_description_id = session_data.get("pk")
-    job_description = (
-        get_object_or_404(JobDescription, pk=job_description_id) if job_description_id else JobDescription()
-    )
+    view_kwargs = {"edit_session_id": session_namespace.name}
+    if job_description_id:
+        job_description = get_object_or_404(
+            JobDescription,
+            pk=job_description_id,
+            company=request.current_organization,
+        )
+        view_kwargs["job_description_id"] = job_description.pk
+    else:
+        job_description = JobDescription()
 
     job_description.__dict__.update(**session_data)
 
@@ -379,10 +470,12 @@ def edit_job_description_preview(request, template_name="companies/edit_job_desc
             job_description.last_employer_update_at = timezone.now()
         job_description.save()
         messages.success(request, "Fiche de poste enregistrée", extra_tags="toast")
-        request.session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        session_namespace.delete()
+        request.session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY, None)
         return HttpResponseRedirect(reverse("companies_views:job_description_list"))
 
     context = {
+        "back_url": reverse("companies_views:edit_job_description_details", kwargs=view_kwargs),
         "siae": request.current_organization,
         "job": job_description,
     }
@@ -390,6 +483,7 @@ def edit_job_description_preview(request, template_name="companies/edit_job_desc
     return render(request, template_name, context)
 
 
+# TODO(François): Remove this view next week.
 @check_user(lambda user: user.is_employer)
 def update_job_description(request, job_description_id):
     if not JobDescription.objects.filter(
@@ -398,7 +492,12 @@ def update_job_description(request, job_description_id):
     ).exists():
         raise PermissionDenied
     request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {"pk": job_description_id}
-    return HttpResponseRedirect(reverse("companies_views:edit_job_description"))
+    return HttpResponseRedirect(
+        reverse(
+            "companies_views:edit_job_description",
+            kwargs={"job_description_id": job_description_id},
+        )
+    )
 
 
 ### Financial annexes views
