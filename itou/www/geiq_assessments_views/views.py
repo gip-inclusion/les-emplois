@@ -4,6 +4,7 @@ import operator
 import uuid
 
 from django.core.files.storage import default_storage
+from django.db.models import Prefetch
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -119,7 +120,12 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
 def assessment_details(request, pk, template_name="geiq_assessments_views/assessment_details.html"):
     if request.current_organization.kind != CompanyKind.GEIQ:
         raise Http404
-    assessment = Assessment.objects.get(companies=request.current_organization.pk, pk=pk)
+    assessment = Assessment.objects.prefetch_related(
+        Prefetch(
+            "institution_links",
+            queryset=AssessmentInstitutionLink.objects.select_related("institution").order_by("institution__kind"),
+        )
+    ).get(companies=request.current_organization.pk, pk=pk)
     context = {
         "assessment": assessment,
         "back_url": reverse("geiq_assessments_views:list_for_geiq"),
