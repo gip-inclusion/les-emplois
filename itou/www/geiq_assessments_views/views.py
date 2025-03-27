@@ -129,18 +129,20 @@ def assessment_details(request, pk, template_name="geiq_assessments_views/assess
 def assessment_get_file(request, pk, *, file_field):
     assessments = Assessment.objects.filter(companies=request.current_organization).select_related("campaign")
     assessment = get_object_or_404(assessments, pk=pk)
-    filename_prefix = {
-        "summary_document_file": "Synthèse",
-        "structure_financial_assessment_file": "Bilan financier structure",
-        "action_financial_assessment_file": "Bilan financier action",
-    }[file_field]
+    match file_field:
+        case "summary_document_file":
+            filename = assessment.summary_document_filename()
+        case "structure_financial_assessment_file":
+            filename = assessment.structure_financial_assessment_filename()
+        case "action_financial_assessment_file":
+            filename = assessment.action_financial_assessment_filename()
+        case _:
+            raise Http404
     return HttpResponseRedirect(
         default_storage.url(
             getattr(assessment, Assessment._meta.get_field(file_field).attname),
             parameters={
-                "ResponseContentDisposition": content_disposition_header(
-                    "inline", f"{filename_prefix} {assessment.campaign.year}.pdf"
-                ),
+                "ResponseContentDisposition": content_disposition_header("inline", filename),
             },
         )
     )
