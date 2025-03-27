@@ -17,6 +17,7 @@ class LabelCommand(enum.StrEnum):
     Salarie = "Salarie"
     SalarieContrat = "SalarieContrat"
     SalariePreQualification = "SalariePreQualification"
+    DownloadCompte = "DownloadCompte"
     Geiq = "Geiq"
     GeiqPrestation = "GeiqPrestation"
     SynthesePDF = "SynthesePDF"
@@ -33,8 +34,8 @@ class LabelApiClient:
 
     def _command(self, command, **params):
         command = LabelCommand(command)
-        if command == LabelCommand.SynthesePDF:
-            raise ValueError("SynthesePDF does not return JSON data")
+        if command in (LabelCommand.DownloadCompte, LabelCommand.SynthesePDF):
+            raise ValueError(f"{command} does not return JSON data")
         try:
             response_data = (
                 self.client.get(
@@ -72,6 +73,18 @@ class LabelApiClient:
                     break
                 p += 1
         return data
+
+    def get_compte_pdf(self, *, geiq_id):
+        try:
+            response_data = self.client.get(
+                f"rest/{LabelCommand.DownloadCompte}",
+                params={"id": geiq_id},
+            ).raise_for_status()
+        except httpx.HTTPError as exc:
+            raise LabelAPIError("Error requesting Label API") from exc
+        if response_data.headers["content-type"] != "application/pdf":
+            raise LabelAPIError(f"Unexpected content-type: {response_data.headers.get('content-type')}")
+        return response_data.content
 
     def get_synthese_pdf(self, *, geiq_id):
         try:
