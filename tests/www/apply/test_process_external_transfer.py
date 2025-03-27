@@ -190,7 +190,7 @@ def test_step_1_same_company(client):
     )
     assertNotContains(
         response,
-        reverse("companies_views:update_job_description", kwargs={"job_description_id": job.pk}),
+        reverse("companies_views:edit_job_description", kwargs={"job_description_id": job.pk}),
     )
 
 
