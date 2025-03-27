@@ -375,7 +375,13 @@ def edit_job_description_preview(request, template_name="companies/edit_job_desc
     return render(request, template_name, context)
 
 
+@check_user(lambda user: user.is_employer)
 def update_job_description(request, job_description_id):
+    if not JobDescription.objects.filter(
+        pk=job_description_id,
+        company=request.current_organization,
+    ).exists():
+        raise PermissionDenied
     request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {"pk": job_description_id}
     return HttpResponseRedirect(reverse("companies_views:edit_job_description"))
 

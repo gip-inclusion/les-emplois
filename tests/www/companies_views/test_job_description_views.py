@@ -1,3 +1,5 @@
+from functools import partial
+
 import pytest
 from django.contrib import messages
 from django.contrib.gis.geos import Point
@@ -16,7 +18,7 @@ from itou.www.companies_views.views import ITOU_SESSION_JOB_DESCRIPTION_KEY
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
@@ -525,6 +527,44 @@ class TestUpdateJobDescriptionView(JobDescriptionAbstract):
         assertContains(response, self.job_description.appellation.name)
 
         # At this point, we're redirected to 'edit_job_description'
+
+    def test_update_other_company_job_description(self, client):
+        job_description = JobDescriptionFactory()
+        client.force_login(self.user)
+        response = client.get(
+            reverse(
+                "companies_views:update_job_description",
+                kwargs={"job_description_id": job_description.pk},
+            )
+        )
+        assert response.status_code == 403
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
+
+    def test_update_nonexistent_job_description(self, client):
+        client.force_login(self.user)
+        response = client.get(
+            reverse(
+                "companies_views:update_job_description",
+                kwargs={"job_description_id": 0},
+            )
+        )
+        assert response.status_code == 403
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
+
+    @pytest.mark.parametrize(
+        "UserFactory", [partial(EmployerFactory, with_company=True), PrescriberFactory, JobSeekerFactory]
+    )
+    def test_update_job_description_as_other_user(self, client, UserFactory):
+        job_description = JobDescriptionFactory()
+        client.force_login(UserFactory())
+        response = client.get(
+            reverse(
+                "companies_views:update_job_description",
+                kwargs={"job_description_id": job_description.pk},
+            )
+        )
+        assert response.status_code == 403
+        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
 
     def test_update_job_description_remove_location(self, client, subtests):
         assert self.job_description.location is not None
