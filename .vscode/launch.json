@@ -23,6 +23,14 @@
             ],
             "django": true,
             "justMyCode": false
+        },
+        {"name": "Django Management Command",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "${fileBasenameNoExtension}"
+            ]
         }
     ]
 }
