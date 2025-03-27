@@ -186,3 +186,8 @@ def assessment_sync_file(request, pk, *, file_field):
         )
         context["error"] = True
     return render(request, template_name, context)
+
+
+def upload_action_financial_assessment(request, pk, template_name=""):
+    context = {}
+    return render(request, template_name, context)
