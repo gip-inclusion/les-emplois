@@ -6,7 +6,6 @@
 
 # Global tasks.
 # =============================================================================
-PYTHON_VERSION := python3.13
 LINTER_CHECKED_DIRS := config itou scripts tests
 PGDATABASE ?= itou
 REQUIREMENTS_PATH ?= requirements/dev.txt
@@ -28,9 +27,8 @@ runserver: $(VIRTUAL_ENV)
 	python manage.py runserver $(RUNSERVER_DOMAIN)
 
 $(VIRTUAL_ENV): $(REQUIREMENTS_PATH)
-	$(PYTHON_VERSION) -m venv $@
-	$@/bin/pip install uv
-	$@/bin/uv pip sync --require-hashes $^
+	uv venv
+	uv pip sync --require-hashes $^
 	touch $@
 
 venv: $(VIRTUAL_ENV)

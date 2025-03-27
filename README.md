@@ -53,6 +53,15 @@ fichier `README.md`.
 
 ### Dépendances Python
 
+#### Python
+
+`uv` est utilisé pour installer la bonne version de Python et les dépendances
+du projet.
+
+Pour l’installer, suivre la documentation officielle
+https://docs.astral.sh/uv/getting-started/installation/. Un paquet est
+disponible pour la plupart des distributions Linux.
+
 #### Base de données
 
 L’adaptateur Python pour PostgreSQL, [psycopg](https://www.psycopg.org/), a
@@ -77,7 +86,7 @@ $ apt-get install gdal-bin
 #### Virtualenv
 
 La commande `make` suivante crée un
-[`virtualenv`](https://docs.python.org/3/library/venv.html) et installe les
+[`virtualenv`](https://docs.astral.sh/uv/pip/environments/) et installe les
 dépendances pour le développement. Elle peut être exécutée régulièrement pour
 s’assurer que les dépendances sont bien à jour.
 
