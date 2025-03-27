@@ -1,9 +1,8 @@
 import io
+import logging
 import operator
 import uuid
 
-import sentry_sdk
-from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -21,6 +20,9 @@ from itou.institutions.models import Institution
 from itou.utils.apis import geiq_label
 from itou.utils.auth import check_user
 from itou.www.geiq_assessments_views.forms import CreateForm
+
+
+logger = logging.getLogger(__name__)
 
 
 @require_safe
@@ -150,37 +152,31 @@ def assessment_get_file(request, pk, *, file_field):
 
 @require_POST
 @check_user(lambda user: user.is_employer)
-def sync_summary_document(request, pk):
+def assessment_sync_file(request, pk, *, file_field):
     assessments = Assessment.objects.filter(companies=request.current_organization)
     assessment = get_object_or_404(assessments, pk=pk)
 
     context = {"assessment": assessment}
+    match file_field:
+        case "summary_document_file":
+            api_method = "get_synthese_pdf"
+            template_name = "geiq_assessments_views/includes/summary_document_section.html"
+        case "structure_financial_assessment_file":
+            api_method = "get_compte_pdf"
+            template_name = "geiq_assessments_views/includes/structure_financial_assessment_section.html"
+        case _:
+            raise Http404
     try:
         client = geiq_label.get_client()
-        synthese_pdf_content = client.get_synthese_pdf(geiq_id=assessment.label_geiq_id)
-        key = default_storage.save(f"{uuid.uuid4()}.pdf", io.BytesIO(synthese_pdf_content))
-        assessment.summary_document_file = File.objects.create(key=key)
-        assessment.save(update_fields=("summary_document_file",))
-    except (ImproperlyConfigured, geiq_label.LabelAPIError) as e:
-        sentry_sdk.capture_exception(e)
+        pdf_content = getattr(client, api_method)(geiq_id=assessment.label_geiq_id)
+        key = default_storage.save(f"{uuid.uuid4()}.pdf", io.BytesIO(pdf_content))
+        setattr(assessment, file_field, File.objects.create(key=key))
+        assessment.save(update_fields=(file_field,))
+    except Exception as e:
+        # (ImproperlyConfigured, geiq_label.LabelAPIError) are expected
+        # but letting other exceptions slip break the interface
+        logger.exception(
+            "Exception while trying to retrieve a pdf from label API - field=%s exception=%s", file_field, e
+        )
         context["error"] = True
-    return render(request, "geiq_assessments_views/includes/summary_document_section.html", context)
-
-
-@require_POST
-@check_user(lambda user: user.is_employer)
-def sync_structure_financial_assessment(request, pk):
-    assessments = Assessment.objects.filter(companies=request.current_organization)
-    assessment = get_object_or_404(assessments, pk=pk)
-
-    context = {"assessment": assessment}
-    try:
-        client = geiq_label.get_client()
-        compte_pdf_content = client.get_compte_pdf(geiq_id=assessment.label_geiq_id)
-        key = default_storage.save(f"{uuid.uuid4()}.pdf", io.BytesIO(compte_pdf_content))
-        assessment.structure_financial_assessment = File.objects.create(key=key)
-        assessment.save(update_fields=("summary_document_file",))
-    except (ImproperlyConfigured, geiq_label.LabelAPIError) as e:
-        sentry_sdk.capture_exception(e)
-        context["error_msg"] = "Impossible de récupérer le document: réessayez plus tard"
-    return render(request, "geiq_assessments_views/includes/summary_document_section.html", context)
+    return render(request, template_name, context)

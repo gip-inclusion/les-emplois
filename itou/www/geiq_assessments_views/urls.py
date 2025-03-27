@@ -17,8 +17,9 @@ urlpatterns = [
     ),
     path(
         "details/<uuid:pk>/summary-document/sync",
-        views.sync_summary_document,
+        views.assessment_sync_file,
         name="sync_summary_document",
+        kwargs={"file_field": "summary_document_file"},
     ),
     path(
         "details/<uuid:pk>/structure-financial-asssessment",
@@ -28,8 +29,9 @@ urlpatterns = [
     ),
     path(
         "details/<uuid:pk>/structure-financial-asssessment/sync",
-        views.sync_structure_financial_assessment,
+        views.assessment_sync_file,
         name="sync_structure_financial_assessment",
+        kwargs={"file_field": "structure_financial_assessment_file"},
     ),
     path(
         "details/<uuid:pk>/action-financial-asssessment",
