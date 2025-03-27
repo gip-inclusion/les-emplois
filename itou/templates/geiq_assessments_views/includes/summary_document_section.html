@@ -1,1 +1,3 @@
-{% include "geiq_assessments_views/includes/_document_with_sync_section.html" with assessment=assessment request=request error=error|default:False only %}
+{% url "geiq_assessments_views:summary_document" pk=assessment.pk as download_url %}
+{% url "geiq_assessments_views:sync_summary_document" pk=assessment.pk as sync_url %}
+{% include "geiq_assessments_views/includes/_document_with_sync_section.html" with assessment=assessment document_filename=assessment.summary_document_filename document_present=assessment.summary_document_file download_url=download_url error=error|default:False request=request section_id="summary-document-section" sync_url=sync_url title="Document de synthèse généré par label" only %}
