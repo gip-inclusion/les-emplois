@@ -46,4 +46,4 @@ class Command(BaseCommand):
                 companies_to_save,
                 ["coords", "geocoding_score", "ban_api_resolved_address", "geocoding_updated_at"],
             )
-            self.stdout.write(f"> count={len(companies_to_save)} companies geolocated with a high score.")
+            logger.info("companies geolocated with a high score", extra={"count": len(companies_to_save)})

@@ -39,23 +39,23 @@ class TestMoveCompanyData:
         assert company_2.jobs.count() == 4
         assert company_2.members.count() == 1
 
-    def test_prevent_move_outside_iae(self, capsys):
+    def test_prevent_move_outside_iae(self, caplog):
         company_1 = eligibility_factories.IAEEligibilityDiagnosisFactory(from_employer=True).author_siae
         company_2 = companies_factories.CompanyFactory(kind=CompanyKind.EATT)
         management.call_command("move_company_data", from_id=company_1.pk, to_id=company_2.pk, wet_run=True)
         assert company_1.members.count() == 1
         assert company_2.members.count() == 0
-        _stdout, stderr = capsys.readouterr()
-        assert stderr == "Objets impossibles à transférer hors-IAE: Diagnostics IAE créés\n"
+        warning_log_arg = caplog.records[23].detail
+        assert warning_log_arg == "Objets impossibles à transférer hors-IAE: Diagnostics IAE créés"
 
-    def test_prevent_move_outside_geiq(self, capsys):
+    def test_prevent_move_outside_geiq(self, caplog):
         company_1 = eligibility_factories.GEIQEligibilityDiagnosisFactory(from_geiq=True).author_geiq
         company_2 = companies_factories.CompanyFactory(kind=CompanyKind.EATT)
         management.call_command("move_company_data", from_id=company_1.pk, to_id=company_2.pk, wet_run=True)
         assert company_1.members.count() == 2
         assert company_2.members.count() == 0
-        _stdout, stderr = capsys.readouterr()
-        assert stderr == "Objets impossibles à transférer hors-GEIQ: Diagnostics GEIQ créés\n"
+        warning_log_arg = caplog.records[23].detail
+        assert warning_log_arg == "Objets impossibles à transférer hors-GEIQ: Diagnostics GEIQ créés"
 
     @pytest.mark.parametrize(
         "preserve,predicate",
@@ -97,24 +97,24 @@ class TestMoveCompanyData:
         company_1.refresh_from_db()
         assert company_1.is_searchable is False
 
-    def test_prevent_move_with_siae_evaluations(self, capsys):
+    def test_prevent_move_with_siae_evaluations(self, caplog):
         company1 = EvaluatedSiaeFactory().siae
         company2 = companies_factories.CompanyFactory()
 
         management.call_command("move_company_data", from_id=company1.pk, to_id=company2.pk, wet_run=True)
-        _stdout, stderr = capsys.readouterr()
-        assert stderr == (
+        warning_log_arg = caplog.records[23].detail
+        assert warning_log_arg == (
             f"Impossible de transférer les objets de l'entreprise ID={company1.pk}: "
-            "il y a un contrôle a posteriori lié. Vérifiez avec l'équipe support.\n"
+            "il y a un contrôle a posteriori lié. Vérifiez avec l'équipe support."
         )
 
         management.call_command(
             "move_company_data", from_id=company1.pk, to_id=company2.pk, wet_run=True, ignore_siae_evaluations=True
         )
-        stdout, stderr = capsys.readouterr()
-        assert stderr == ""
-        assert f"MOVE DATA OF company.id={company1.pk}" in stdout
-        assert f"INTO company.id={company2.pk}" in stdout
+        assert caplog.records[25].message == "Move company DATA"
+        assert caplog.records[25].company == company1.pk
+        assert caplog.records[36].message == "Into company"
+        assert caplog.records[36].company == company2.pk
 
 
 def test_update_companies_job_app_score(caplog):
@@ -155,7 +155,7 @@ def test_update_companies_job_app_score(caplog):
 
 
 @freeze_time("2023-05-01")
-def test_update_companies_coords(settings, capsys, respx_mock):
+def test_update_companies_coords(settings, caplog, respx_mock):
     company_1 = companies_factories.CompanyFactory(
         coords="POINT (2.387311 48.917735)", geocoding_score=0.65
     )  # score too low
@@ -177,19 +177,40 @@ def test_update_companies_coords(settings, capsys, respx_mock):
     )
 
     management.call_command("update_companies_coords", wet_run=True, verbosity=2)
-    stdout, stderr = capsys.readouterr()
-    assert stderr == ""
-    assert stdout.splitlines() == [
-        "> about to geolocate count=3 objects without geolocation or with a low score.",
-        "> count=3 of these have an address and a post code.",
-        "API result score=0.77 label='7 rue de Laroche' "
-        f"searched_address='{company_1.address_line_1} {company_1.post_code}' object_pk={company_1.pk}",
-        "API result score=0.32 label='5 rue Bigot' "
-        f"searched_address='{company_2.address_line_1} {company_2.post_code}' object_pk={company_2.pk}",
-        "API result score=0.83 label='9 avenue Delorme 92220 Boulogne' "
-        f"searched_address='{company_3.address_line_1} {company_3.post_code}' object_pk={company_3.pk}",
-        "> count=1 companies geolocated with a high score.",
-    ]
+
+    records_data = {
+        0: {
+            "message": "Geolocating objects, about to geolocate objects without geolocation or with a low score",
+            "count": 3,
+        },
+        1: {"message": "Geolocating objects, about to geolocate objects with an address and a post code", "count": 3},
+        3: {
+            "message": "Geolocating object, API result score",
+            "score": "0.77",
+            "label": "7 rue de Laroche",
+            "searched_address": f"{company_1.address_line_1} {company_1.post_code}",
+            "object": company_1.pk,
+        },
+        4: {
+            "message": "Geolocating object, API result score",
+            "score": "0.32",
+            "label": "5 rue Bigot",
+            "searched_address": f"{company_2.address_line_1} {company_2.post_code}",
+            "object": company_2.pk,
+        },
+        5: {
+            "message": "Geolocating object, API result score",
+            "score": "0.83",
+            "label": "9 avenue Delorme 92220 Boulogne",
+            "searched_address": f"{company_3.address_line_1} {company_3.post_code}",
+            "object": company_3.pk,
+        },
+        6: {"message": "companies geolocated with a high score", "count": 1},
+    }
+    for index, data in records_data.items():
+        record = caplog.records[index]
+        for key, value in data.items():
+            assert getattr(record, key) == value
 
     company_3.refresh_from_db()
     assert company_3.ban_api_resolved_address == "9 avenue Delorme 92220 Boulogne"
