@@ -111,6 +111,15 @@ class Assessment(models.Model):
         verbose_name = "bilan d’exécution"
         verbose_name_plural = "bilans d’exécution"
 
+    def action_financial_assessment_filename(self):
+        return f"Bilan financier action {self.campaign.year}.pdf"
+
+    def structure_financial_assessment_filename(self):
+        return f"Bilan financier structure {self.campaign.year}.pdf"
+
+    def summary_document_filename(self):
+        return f"Synthèse {self.campaign.year}.pdf"
+
     def missing_actions_to_submit(self):
         actions = []
         if not self.summary_document_file:
