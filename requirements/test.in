@@ -1,7 +1,5 @@
 -r base.txt
 
-uv  # https://github.com/astral-sh/uv
-
 # Code quality
 # ------------------------------------------------------------------------------
 djlint  # https://www.djlint.com

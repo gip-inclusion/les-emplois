@@ -1,4 +1,6 @@
 [project]
+name = "les-emplois"
+dynamic = ["version"]
 requires-python = ">=3.13"
 
 [tool.ruff]
