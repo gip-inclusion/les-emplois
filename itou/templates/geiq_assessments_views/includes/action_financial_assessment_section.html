@@ -1,9 +1,20 @@
 <div class="d-flex flex-column justify-content-between mb-3">
     <div class="d-flex justify-content-between flex-row mb-3">
         <h3 class="mb-0">Bilan financier de l’action</h3>
-        {% include "geiq_assessments_views/includes/badge_to_complete.html" only %}
+        {% if assessment.action_financial_assessment_file %}
+            {% include "geiq_assessments_views/includes/badge_completed.html" only %}
+        {% else %}
+            {% include "geiq_assessments_views/includes/badge_to_complete.html" only %}
+        {% endif %}
     </div>
     <div>
-        <a href="{% url "geiq_assessments_views:upload_action_financial_assessment" pk=assessment.pk %}" class="btn btn-primary">Compléter</a>
+        {% if assessment.action_financial_assessment_file %}
+            <a href="{% url "geiq_assessments_views:action_financial_assessment" pk=assessment.pk %}" class="btn btn-ico btn-outline-primary" rel="noopener" target="_blank">
+                <span>{{ assessment.action_financial_assessment_filename }}</span>
+                <i class="ri-download-line fw-medium" aria-hidden="true"></i>
+            </a>
+        {% else %}
+            <a href="{% url "geiq_assessments_views:upload_action_financial_assessment" pk=assessment.pk %}" class="btn btn-primary">Compléter</a>
+        {% endif %}
     </div>
 </div>
