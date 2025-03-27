@@ -35,6 +35,7 @@ class FollowUpGroupMembershipAdmin(ItouModelAdmin):
         "is_active",
         "follow_up_group",
         "member",
+        "can_view_personal_information",
         "created_at",
         "last_contact_at",
         "started_at",

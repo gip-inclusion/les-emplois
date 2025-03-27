@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Exists, OuterRef, Prefetch
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.utils.safestring import mark_safe
@@ -74,8 +74,9 @@ def group_list(request, current, template_name="gps/group_list.html"):
 
     memberships_page = pager(memberships, request.GET.get("page"), items_per_page=50)
     for membership in memberships_page:
-        membership.user_can_view_personal_information = request.user.can_view_personal_information(
-            membership.follow_up_group.beneficiary
+        membership.user_can_view_personal_information = (
+            membership.can_view_personal_information
+            or request.user.can_view_personal_information(membership.follow_up_group.beneficiary)
         )
 
     context = {
@@ -105,7 +106,11 @@ class GroupDetailsMixin:
         return context | {
             "back_url": back_url,
             "group": self.group,
-            "can_view_personal_information": self.request.user.can_view_personal_information(self.group.beneficiary),
+            "can_view_personal_information": (
+                self.membership.can_view_personal_information
+                or self.request.user.can_view_personal_information(self.group.beneficiary)
+            ),
+            "can_print_page": True,
         }
 
 
@@ -201,6 +206,7 @@ class GroupEditionView(GroupDetailsMixin, UpdateView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "matomo_custom_title": "Profil GPS - mon intervention",
+            "can_print_page": False,
         }
 
     def get_success_url(self):
@@ -236,6 +242,34 @@ def display_contact_info(request, group_id, target_participant_public_id, mode):
     )
     log_contact_info_display(request.user, follow_up_group, target_participant, mode)
     return render(request, template_name, {"member": target_participant})
+
+
+@require_POST
+@check_user(is_allowed_to_use_gps)
+def ask_access(request, group_id):
+    follow_up_group = get_object_or_404(
+        FollowUpGroup.objects.filter(members=request.user).select_related("beneficiary"),
+        pk=group_id,
+    )
+    membership = get_object_or_404(
+        follow_up_group.memberships,
+        member=request.user,
+    )
+    if not membership.can_view_personal_information:
+        beneficiary_admin_url = get_absolute_url(
+            reverse("admin:users_user_change", args=(follow_up_group.beneficiary_id,))
+        )
+        user_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(request.user.pk,)))
+        membership_url = get_absolute_url(reverse("admin:gps_followupgroupmembership_change", args=(membership.pk,)))
+        send_slack_message_for_gps(
+            f":mag: *Demande d’accès à la fiche*\n"
+            f"<{user_admin_url}|{request.user.get_full_name()}> veut avoir accès aux informations de "
+            f"<{beneficiary_admin_url}|{mask_unless(follow_up_group.beneficiary.get_full_name(), False)}> "
+            f"(<{membership_url}|relation>)."
+        )
+    return HttpResponse(
+        '<button class="btn btn-sm btn-primary" disabled>Demander l’autorisation d’un administrateur</button>'
+    )
 
 
 @check_user(is_allowed_to_use_gps)
@@ -437,24 +471,43 @@ def beneficiaries_autocomplete(request):
                     )
                 )
             )
+            .annotate(
+                membership_can_view_personal_information=Exists(
+                    FollowUpGroupMembership.objects.filter(
+                        follow_up_group__beneficiary_id=OuterRef("pk"),
+                        member__in=all_coworkers.values("pk"),
+                        can_view_personal_information=True,
+                    )
+                )
+            )
         )
 
         def format_data(user):
             data = {
                 "id": user.pk,
                 "title": "",
-                "name": mask_unless(user.get_full_name(), predicate=request.user.can_view_personal_information(user)),
+                "name": mask_unless(
+                    user.get_full_name(),
+                    predicate=(
+                        user.membership_can_view_personal_information
+                        or request.user.can_view_personal_information(user)
+                    ),
+                ),
                 "birthdate": "",
             }
             if user.title:
                 # only add a . after M, not Mme
                 data["title"] = (
-                    f"{user.title.capitalize()}."[:3] if request.user.can_view_personal_information(user) else ""
+                    f"{user.title.capitalize()}."[:3]
+                    if user.membership_can_view_personal_information
+                    or request.user.can_view_personal_information(user)
+                    else ""
                 )
             if getattr(user.jobseeker_profile, "birthdate", None):
                 data["birthdate"] = (
                     user.jobseeker_profile.birthdate.strftime("%d/%m/%Y")
-                    if request.user.can_view_personal_information(user)
+                    if user.membership_can_view_personal_information
+                    or request.user.can_view_personal_information(user)
                     else ""
                 )
             return data

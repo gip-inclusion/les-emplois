@@ -27,12 +27,33 @@
   
   
                               
-      <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">J… D…</h1>
-          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
-              <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
-          </button>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">J… D…</h1>
+                  
+                      <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+                      </button>
+                  
+              </div>
+          </div>
+          
+              <div aria-label="Actions sur les groupes de suivi" class="c-title__cta" role="group">
+                  <button class="btn btn-lg btn-secondary btn-ico" data-bs-target="#ask_access_modal" data-bs-toggle="modal">
+                      <i aria-hidden="true" class="ri-user-unfollow-line fw-medium"></i>
+                      <span>Demander l’accès complet à la fiche</span>
+                  </button>
+              </div>
+          
       </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
@@ -45,12 +66,6 @@
           </li>
       </ul>
   
-                              
-                                  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
@@ -120,12 +135,26 @@
   
   
                               
-      <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">Jane DOE</h1>
-          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
-              <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
-          </button>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">Jane DOE</h1>
+                  
+                      <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+                      </button>
+                  
+              </div>
+          </div>
+          
       </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
@@ -138,12 +167,155 @@
           </li>
       </ul>
   
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row mb-3">
+                  <div class="col-12 col-sm">
+                      <h2>Informations</h2>
+                  </div>
+                  
+              </div>
+              <div class="c-box mb-5">
+                  <h3>Informations de contact</h3>
+                  <div class="row">
+                      <div class="col-12 col-md-6 mb-3 mb-md-0">
+                          <ul class="list-data">
+                              <li>
+                                  <small>Nom</small>
+                                  <strong>DOE</strong>
+                              </li>
+                              <li>
+                                  <small>Prénom</small>
+                                  <strong>Jane</strong>
+                              </li>
+                              
+                                  <li>
+                                      <small>Date de naissance</small>
+                                      
+                                          <strong>01/01/1990</strong>
+                                      
+                                  </li>
+                              
+                          </ul>
+                      </div>
+                      
+                          <div class="col-12 col-md-6">
+                              <ul class="list-data">
+                                  <li>
+                                      <small>Téléphone</small>
+                                      
+                                          <strong>06 12 34 56 78</strong>
+                                          
+                                          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+                                      
+                                  </li>
+                                  <li>
+                                      <small>Adresse e-mail</small>
+                                      <strong>jane.doe@test.local</strong>
+                                      
+                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+                                  </li>
+                                  <li>
+                                      <small>Adresse</small>
+                                      
+                                          <ul class="list-unstyled mb-0">
+                                              <li>
+                                                  <strong>12 rue Georges Bizet</strong>
+                                              </li>
+                                              
+                                              <li>
+                                                  <strong>35000 Rennes</strong>
+                                              </li>
+                                          </ul>
+                                      
+                                  </li>
+                              </ul>
+                          </div>
+                      
+  
+                  </div>
+              </div>
+              
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
+# name: TestGroupDetailsBeneficiaryTab.test_tab[no_diagnostic_can_edit]
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/gps/groups/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">Jane DOE</h1>
+                  
+                      <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+                      </button>
+                  
+              </div>
+          </div>
+          
+      </div>
+  
                               
                                   
   
   
                               
                               
+      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+          <li class="nav-item">
+              <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link active" href="/gps/groups/[PK of FollowUpGroup]/beneficiary?back_url=/gps/groups/list">Informations</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/contribution?back_url=/gps/groups/list">Mon intervention</a>
+          </li>
+      </ul>
+  
                           </div>
                       </div>
                   </div>
@@ -240,7 +412,7 @@
           </main>
   '''
 # ---
-# name: TestGroupDetailsBeneficiaryTab.test_tab[with_beneficiary_edition]
+# name: TestGroupDetailsBeneficiaryTab.test_tab[with_diagnostic]
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
@@ -268,12 +440,26 @@
   
   
                               
-      <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">Jane DOE</h1>
-          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
-              <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
-          </button>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">Jane DOE</h1>
+                  
+                      <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+                      </button>
+                  
+              </div>
+          </div>
+          
       </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
@@ -286,12 +472,6 @@
           </li>
       </ul>
   
-                              
-                                  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
@@ -304,13 +484,6 @@
                   <div class="col-12 col-sm">
                       <h2>Informations</h2>
                   </div>
-                  
-                      <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                          <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-primary" href="/dashboard/edit_job_seeker_info/[PublicID of Beneficiary]?back_url=/gps/groups/[PK of FollowUpGroup]/beneficiary">
-                              <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
-                              <span>Modifier</span>
-                          </a>
-                      </div>
                   
               </div>
               <div class="c-box mb-5">
@@ -415,7 +588,7 @@
           </main>
   '''
 # ---
-# name: TestGroupDetailsBeneficiaryTab.test_tab[with_diagnostic]
+# name: TestGroupDetailsBeneficiaryTab.test_tab[with_diagnostic_can_edit]
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
@@ -443,12 +616,26 @@
   
   
                               
-      <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">Jane DOE</h1>
-          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
-              <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
-          </button>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">Jane DOE</h1>
+                  
+                      <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+                      </button>
+                  
+              </div>
+          </div>
+          
       </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
@@ -461,12 +648,6 @@
           </li>
       </ul>
   
-                              
-                                  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
@@ -481,7 +662,7 @@
                   </div>
                   
                       <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                          <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-primary" href="/dashboard/edit_job_seeker_info/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/gps/groups/[PK of FollowUpGroup]/beneficiary">
+                          <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-primary" href="/dashboard/edit_job_seeker_info/[PublicID of Beneficiary]?back_url=/gps/groups/[PK of FollowUpGroup]/beneficiary">
                               <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
                               <span>Modifier</span>
                           </a>
@@ -618,12 +799,33 @@
   
   
                               
-      <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">J… D…</h1>
-          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
-              <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
-          </button>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">J… D…</h1>
+                  
+                      <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+                      </button>
+                  
+              </div>
+          </div>
+          
+              <div aria-label="Actions sur les groupes de suivi" class="c-title__cta" role="group">
+                  <button class="btn btn-lg btn-secondary btn-ico" data-bs-target="#ask_access_modal" data-bs-toggle="modal">
+                      <i aria-hidden="true" class="ri-user-unfollow-line fw-medium"></i>
+                      <span>Demander l’accès complet à la fiche</span>
+                  </button>
+              </div>
+          
       </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
@@ -636,12 +838,6 @@
           </li>
       </ul>
   
-                              
-                                  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
@@ -731,12 +927,33 @@
   
   
                               
-      <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">J… D…</h1>
-          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
-              <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
-          </button>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">J… D…</h1>
+                  
+                      <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+                      </button>
+                  
+              </div>
+          </div>
+          
+              <div aria-label="Actions sur les groupes de suivi" class="c-title__cta" role="group">
+                  <button class="btn btn-lg btn-secondary btn-ico" data-bs-target="#ask_access_modal" data-bs-toggle="modal">
+                      <i aria-hidden="true" class="ri-user-unfollow-line fw-medium"></i>
+                      <span>Demander l’accès complet à la fiche</span>
+                  </button>
+              </div>
+          
       </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
@@ -749,12 +966,6 @@
           </li>
       </ul>
   
-                              
-                                  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
@@ -844,7 +1055,29 @@
   
   
                               
-      <h1 class="m-3">J… D…</h1>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">J… D…</h1>
+                  
+              </div>
+          </div>
+          
+              <div aria-label="Actions sur les groupes de suivi" class="c-title__cta" role="group">
+                  <button class="btn btn-lg btn-secondary btn-ico" data-bs-target="#ask_access_modal" data-bs-toggle="modal">
+                      <i aria-hidden="true" class="ri-user-unfollow-line fw-medium"></i>
+                      <span>Demander l’accès complet à la fiche</span>
+                  </button>
+              </div>
+          
+      </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <div class="c-box c-box--action">
           <h2 class="visually-hidden">Actions rapides</h2>
           <div class="form-row align-items-center gx-3">
@@ -863,12 +1096,6 @@
           </div>
       </div>
   
-                              
-                                  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
@@ -931,6 +1158,56 @@
       </section>
   
           </main>
+  '''
+# ---
+# name: TestGroupDetailsMembershipTab.test_ask_access[disabled_button]
+  '''
+  <div aria-hidden="true" aria-labelledby="ask_access" class="modal fade" id="ask_access_modal" tabindex="-1">
+              <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h3 class="modal-title">Votre organisation n’est pas habilitée</h3>
+                          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                      </div>
+                      <div class="modal-body">
+                          <p>Pour consulter les informations de ce bénéficiaire, vous avez besoin de l’autorisation d’un administrateur.</p>
+                      </div>
+                      <div class="modal-footer">
+                          <form>
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              <button class="btn btn-sm btn-link" data-bs-dismiss="modal" type="button">Annuler</button>
+                              <button class="btn btn-sm btn-primary" disabled="">Demander l’autorisation d’un administrateur</button>
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+  '''
+# ---
+# name: TestGroupDetailsMembershipTab.test_ask_access[enabled_button]
+  '''
+  <div aria-hidden="true" aria-labelledby="ask_access" class="modal fade" id="ask_access_modal" tabindex="-1">
+              <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h3 class="modal-title">Votre organisation n’est pas habilitée</h3>
+                          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                      </div>
+                      <div class="modal-body">
+                          <p>Pour consulter les informations de ce bénéficiaire, vous avez besoin de l’autorisation d’un administrateur.</p>
+                      </div>
+                      <div class="modal-footer">
+                          <form>
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              <button class="btn btn-sm btn-link" data-bs-dismiss="modal" type="button">Annuler</button>
+                              <button class="btn btn-sm btn-primary" data-bs-dismiss="modal" hx-post="/gps/groups/[PK of FollowUpGroup]/ask_access" hx-swap="outerHTML">
+                                  Demander l’autorisation d’un administrateur
+                              </button>
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
   '''
 # ---
 # name: TestGroupDetailsMembershipTab.test_display_participant_contact_info
@@ -1037,12 +1314,26 @@
   
   
                               
-      <div class="d-flex flex-row gap-3 align-items-center mb-3">
-          <h1 class="m-0">Jane DOE</h1>
-          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
-              <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
-          </button>
+      <div class="c-title">
+          <div class="c-title__main">
+              <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                  <h1 class="m-0">Jane DOE</h1>
+                  
+                      <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                          <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+                      </button>
+                  
+              </div>
+          </div>
+          
       </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link active" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">Intervenants</a>
@@ -1055,12 +1346,6 @@
           </li>
       </ul>
   
-                              
-                                  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
@@ -1259,7 +1544,7 @@
 # ---
 # name: TestGroupLists.test_group_list
   dict({
-    'num_queries': 14,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -1384,6 +1669,27 @@
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
+          SELECT "gps_followupgroup"."beneficiary_id",
+                 "gps_followupgroupmembership"."can_view_personal_information"
+          FROM "gps_followupgroupmembership"
+          INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
+          LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
+          WHERE ("gps_followupgroupmembership"."is_active"
+                 AND "gps_followupgroupmembership"."member_id" = %s
+                 AND "gps_followupgroupmembership"."ended_at" IS NULL)
+          GROUP BY "gps_followupgroupmembership"."id",
+                   "gps_followupgroup"."beneficiary_id"
+          ORDER BY "gps_followupgroupmembership"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MembershipsFiltersForm._get_beneficiary_choices[www/gps/forms.py]',
+          'MembershipsFiltersForm.__init__[www/gps/forms.py]',
+          'group_list[www/gps/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
           SELECT "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -1418,16 +1724,9 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login"
           FROM "users_user"
-          WHERE "users_user"."id" IN
-              (SELECT U2."beneficiary_id"
-               FROM "gps_followupgroupmembership" U0
-               INNER JOIN "gps_followupgroup" U2 ON (U0."follow_up_group_id" = U2."id")
-               LEFT OUTER JOIN "gps_followupgroupmembership" U3 ON (U2."id" = U3."follow_up_group_id")
-               WHERE (U0."is_active"
-                      AND U0."member_id" = %s
-                      AND U0."ended_at" IS NULL)
-               GROUP BY U0."id",
-                        U2."beneficiary_id")
+          WHERE "users_user"."id" IN (%s,
+                                      %s,
+                                      %s)
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
         ''',
@@ -1489,6 +1788,7 @@
                  "gps_followupgroupmembership"."started_at",
                  "gps_followupgroupmembership"."ended_at",
                  "gps_followupgroupmembership"."updated_at",
+                 "gps_followupgroupmembership"."can_view_personal_information",
                  "gps_followupgroupmembership"."follow_up_group_id",
                  "gps_followupgroupmembership"."member_id",
                  "gps_followupgroupmembership"."creator_id",
@@ -1632,7 +1932,8 @@
                  "col43",
                  "col44",
                  "col45",
-                 "col46"
+                 "col46",
+                 "col47"
           FROM
             (SELECT *
              FROM
@@ -1645,46 +1946,47 @@
                        "gps_followupgroupmembership"."started_at" AS "col7",
                        "gps_followupgroupmembership"."ended_at" AS "col8",
                        "gps_followupgroupmembership"."updated_at" AS "col9",
-                       "gps_followupgroupmembership"."follow_up_group_id" AS "col10",
-                       "gps_followupgroupmembership"."member_id" AS "col11",
-                       "gps_followupgroupmembership"."creator_id" AS "col12",
-                       "gps_followupgroupmembership"."reason" AS "col13",
+                       "gps_followupgroupmembership"."can_view_personal_information" AS "col10",
+                       "gps_followupgroupmembership"."follow_up_group_id" AS "col11",
+                       "gps_followupgroupmembership"."member_id" AS "col12",
+                       "gps_followupgroupmembership"."creator_id" AS "col13",
+                       "gps_followupgroupmembership"."reason" AS "col14",
                        ROW_NUMBER() OVER (PARTITION BY "gps_followupgroupmembership"."follow_up_group_id"
                                           ORDER BY RANDOM() ASC) AS "qual0",
                        RANDOM() AS "qual1",
-                       "users_user"."id" AS "col14",
-                       "users_user"."password" AS "col15",
-                       "users_user"."last_login" AS "col16",
-                       "users_user"."is_superuser" AS "col17",
-                       "users_user"."username" AS "col18",
-                       "users_user"."first_name" AS "col19",
-                       "users_user"."last_name" AS "col20",
-                       "users_user"."is_staff" AS "col21",
-                       "users_user"."is_active" AS "col22",
-                       "users_user"."date_joined" AS "col23",
-                       "users_user"."address_line_1" AS "col24",
-                       "users_user"."address_line_2" AS "col25",
-                       "users_user"."post_code" AS "col26",
-                       "users_user"."city" AS "col27",
-                       "users_user"."department" AS "col28",
-                       "users_user"."coords" AS "col29",
-                       "users_user"."geocoding_score" AS "col30",
-                       "users_user"."geocoding_updated_at" AS "col31",
-                       "users_user"."ban_api_resolved_address" AS "col32",
-                       "users_user"."insee_city_id" AS "col33",
-                       "users_user"."title" AS "col34",
-                       "users_user"."full_name_search_vector" AS "col35",
-                       "users_user"."email" AS "col36",
-                       "users_user"."phone" AS "col37",
-                       "users_user"."kind" AS "col38",
-                       "users_user"."identity_provider" AS "col39",
-                       "users_user"."has_completed_welcoming_tour" AS "col40",
-                       "users_user"."created_by_id" AS "col41",
-                       "users_user"."external_data_source_history" AS "col42",
-                       "users_user"."last_checked_at" AS "col43",
-                       "users_user"."public_id" AS "col44",
-                       "users_user"."address_filled_at" AS "col45",
-                       "users_user"."first_login" AS "col46"
+                       "users_user"."id" AS "col15",
+                       "users_user"."password" AS "col16",
+                       "users_user"."last_login" AS "col17",
+                       "users_user"."is_superuser" AS "col18",
+                       "users_user"."username" AS "col19",
+                       "users_user"."first_name" AS "col20",
+                       "users_user"."last_name" AS "col21",
+                       "users_user"."is_staff" AS "col22",
+                       "users_user"."is_active" AS "col23",
+                       "users_user"."date_joined" AS "col24",
+                       "users_user"."address_line_1" AS "col25",
+                       "users_user"."address_line_2" AS "col26",
+                       "users_user"."post_code" AS "col27",
+                       "users_user"."city" AS "col28",
+                       "users_user"."department" AS "col29",
+                       "users_user"."coords" AS "col30",
+                       "users_user"."geocoding_score" AS "col31",
+                       "users_user"."geocoding_updated_at" AS "col32",
+                       "users_user"."ban_api_resolved_address" AS "col33",
+                       "users_user"."insee_city_id" AS "col34",
+                       "users_user"."title" AS "col35",
+                       "users_user"."full_name_search_vector" AS "col36",
+                       "users_user"."email" AS "col37",
+                       "users_user"."phone" AS "col38",
+                       "users_user"."kind" AS "col39",
+                       "users_user"."identity_provider" AS "col40",
+                       "users_user"."has_completed_welcoming_tour" AS "col41",
+                       "users_user"."created_by_id" AS "col42",
+                       "users_user"."external_data_source_history" AS "col43",
+                       "users_user"."last_checked_at" AS "col44",
+                       "users_user"."public_id" AS "col45",
+                       "users_user"."address_filled_at" AS "col46",
+                       "users_user"."first_login" AS "col47"
                 FROM "gps_followupgroupmembership"
                 INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
                 WHERE ("gps_followupgroupmembership"."is_referent"
@@ -1837,7 +2139,7 @@
 # ---
 # name: TestGroupLists.test_old_group_list
   dict({
-    'num_queries': 14,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -1962,6 +2264,27 @@
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
+          SELECT "gps_followupgroup"."beneficiary_id",
+                 "gps_followupgroupmembership"."can_view_personal_information"
+          FROM "gps_followupgroupmembership"
+          INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
+          LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
+          WHERE ("gps_followupgroupmembership"."is_active"
+                 AND "gps_followupgroupmembership"."member_id" = %s
+                 AND NOT ("gps_followupgroupmembership"."ended_at" IS NULL))
+          GROUP BY "gps_followupgroupmembership"."id",
+                   "gps_followupgroup"."beneficiary_id"
+          ORDER BY "gps_followupgroupmembership"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MembershipsFiltersForm._get_beneficiary_choices[www/gps/forms.py]',
+          'MembershipsFiltersForm.__init__[www/gps/forms.py]',
+          'group_list[www/gps/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
           SELECT "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -1996,16 +2319,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login"
           FROM "users_user"
-          WHERE "users_user"."id" IN
-              (SELECT U2."beneficiary_id"
-               FROM "gps_followupgroupmembership" U0
-               INNER JOIN "gps_followupgroup" U2 ON (U0."follow_up_group_id" = U2."id")
-               LEFT OUTER JOIN "gps_followupgroupmembership" U3 ON (U2."id" = U3."follow_up_group_id")
-               WHERE (U0."is_active"
-                      AND U0."member_id" = %s
-                      AND NOT (U0."ended_at" IS NULL))
-               GROUP BY U0."id",
-                        U2."beneficiary_id")
+          WHERE "users_user"."id" IN (%s)
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
         ''',
@@ -2067,6 +2381,7 @@
                  "gps_followupgroupmembership"."started_at",
                  "gps_followupgroupmembership"."ended_at",
                  "gps_followupgroupmembership"."updated_at",
+                 "gps_followupgroupmembership"."can_view_personal_information",
                  "gps_followupgroupmembership"."follow_up_group_id",
                  "gps_followupgroupmembership"."member_id",
                  "gps_followupgroupmembership"."creator_id",
@@ -2210,7 +2525,8 @@
                  "col43",
                  "col44",
                  "col45",
-                 "col46"
+                 "col46",
+                 "col47"
           FROM
             (SELECT *
              FROM
@@ -2223,46 +2539,47 @@
                        "gps_followupgroupmembership"."started_at" AS "col7",
                        "gps_followupgroupmembership"."ended_at" AS "col8",
                        "gps_followupgroupmembership"."updated_at" AS "col9",
-                       "gps_followupgroupmembership"."follow_up_group_id" AS "col10",
-                       "gps_followupgroupmembership"."member_id" AS "col11",
-                       "gps_followupgroupmembership"."creator_id" AS "col12",
-                       "gps_followupgroupmembership"."reason" AS "col13",
+                       "gps_followupgroupmembership"."can_view_personal_information" AS "col10",
+                       "gps_followupgroupmembership"."follow_up_group_id" AS "col11",
+                       "gps_followupgroupmembership"."member_id" AS "col12",
+                       "gps_followupgroupmembership"."creator_id" AS "col13",
+                       "gps_followupgroupmembership"."reason" AS "col14",
                        ROW_NUMBER() OVER (PARTITION BY "gps_followupgroupmembership"."follow_up_group_id"
                                           ORDER BY RANDOM() ASC) AS "qual0",
                        RANDOM() AS "qual1",
-                       "users_user"."id" AS "col14",
-                       "users_user"."password" AS "col15",
-                       "users_user"."last_login" AS "col16",
-                       "users_user"."is_superuser" AS "col17",
-                       "users_user"."username" AS "col18",
-                       "users_user"."first_name" AS "col19",
-                       "users_user"."last_name" AS "col20",
-                       "users_user"."is_staff" AS "col21",
-                       "users_user"."is_active" AS "col22",
-                       "users_user"."date_joined" AS "col23",
-                       "users_user"."address_line_1" AS "col24",
-                       "users_user"."address_line_2" AS "col25",
-                       "users_user"."post_code" AS "col26",
-                       "users_user"."city" AS "col27",
-                       "users_user"."department" AS "col28",
-                       "users_user"."coords" AS "col29",
-                       "users_user"."geocoding_score" AS "col30",
-                       "users_user"."geocoding_updated_at" AS "col31",
-                       "users_user"."ban_api_resolved_address" AS "col32",
-                       "users_user"."insee_city_id" AS "col33",
-                       "users_user"."title" AS "col34",
-                       "users_user"."full_name_search_vector" AS "col35",
-                       "users_user"."email" AS "col36",
-                       "users_user"."phone" AS "col37",
-                       "users_user"."kind" AS "col38",
-                       "users_user"."identity_provider" AS "col39",
-                       "users_user"."has_completed_welcoming_tour" AS "col40",
-                       "users_user"."created_by_id" AS "col41",
-                       "users_user"."external_data_source_history" AS "col42",
-                       "users_user"."last_checked_at" AS "col43",
-                       "users_user"."public_id" AS "col44",
-                       "users_user"."address_filled_at" AS "col45",
-                       "users_user"."first_login" AS "col46"
+                       "users_user"."id" AS "col15",
+                       "users_user"."password" AS "col16",
+                       "users_user"."last_login" AS "col17",
+                       "users_user"."is_superuser" AS "col18",
+                       "users_user"."username" AS "col19",
+                       "users_user"."first_name" AS "col20",
+                       "users_user"."last_name" AS "col21",
+                       "users_user"."is_staff" AS "col22",
+                       "users_user"."is_active" AS "col23",
+                       "users_user"."date_joined" AS "col24",
+                       "users_user"."address_line_1" AS "col25",
+                       "users_user"."address_line_2" AS "col26",
+                       "users_user"."post_code" AS "col27",
+                       "users_user"."city" AS "col28",
+                       "users_user"."department" AS "col29",
+                       "users_user"."coords" AS "col30",
+                       "users_user"."geocoding_score" AS "col31",
+                       "users_user"."geocoding_updated_at" AS "col32",
+                       "users_user"."ban_api_resolved_address" AS "col33",
+                       "users_user"."insee_city_id" AS "col34",
+                       "users_user"."title" AS "col35",
+                       "users_user"."full_name_search_vector" AS "col36",
+                       "users_user"."email" AS "col37",
+                       "users_user"."phone" AS "col38",
+                       "users_user"."kind" AS "col39",
+                       "users_user"."identity_provider" AS "col40",
+                       "users_user"."has_completed_welcoming_tour" AS "col41",
+                       "users_user"."created_by_id" AS "col42",
+                       "users_user"."external_data_source_history" AS "col43",
+                       "users_user"."last_checked_at" AS "col44",
+                       "users_user"."public_id" AS "col45",
+                       "users_user"."address_filled_at" AS "col46",
+                       "users_user"."first_login" AS "col47"
                 FROM "gps_followupgroupmembership"
                 INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
                 WHERE ("gps_followupgroupmembership"."is_referent"
