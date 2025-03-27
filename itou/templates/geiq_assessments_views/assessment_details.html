@@ -71,8 +71,20 @@
                         <ul>
                             {% for antenna in assessment.label_antennas %}<li>{{ antenna.name }}</li>{% endfor %}
                         </ul>
-                        <h5>Contacts DDETS</h5>
-                        <h5>Contacts DREETS</h5>
+                        {% for institution_link in assessment.institution_links.all %}
+                            {% if institution_link.with_convention %}
+                                {% if institution_link.institution.kind == InstitutionKind.DDETS_GEIQ %}
+                                    <h5>Contacts DDETS</h5>
+                                {% elif institution_link.institution.kind == InstitutionKind.DREETS_GEIQ %}
+                                    <h5>Contacts DREETS</h5>
+                                {% else %}
+                                    <h5>Contacts {{ institution_link.institution.kind }}</h5>
+                                {% endif %}
+                                <ul>
+                                    {% for member in institution_link.institution.members.all %}<li>{{ member.email }}</li>{% endfor %}
+                                </ul>
+                            {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
             </div>
