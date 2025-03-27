@@ -273,23 +273,18 @@ def job_description_list(request, template_name="companies/job_description_list.
     return render(request, template_name, context)
 
 
-def _get_job_description(session_data):
-    if pk := session_data.get("pk"):
-        job_description = get_object_or_404(
-            JobDescription.objects.select_related(
-                "appellation",
-                "location",
-            ),
-            pk=pk,
-        )
-        return job_description
-    return None
-
-
 @check_user(lambda user: user.is_employer)
 def edit_job_description(request, template_name="companies/edit_job_description.html"):
     session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY) or {}
-    job_description = _get_job_description(session_data)
+    job_description_id = session_data.get("pk")
+    job_description = (
+        get_object_or_404(
+            JobDescription.objects.select_related("appellation", "location"),
+            pk=job_description_id,
+        )
+        if job_description_id
+        else None
+    )
 
     form = companies_forms.EditJobDescriptionForm(
         request.current_organization, instance=job_description, data=request.POST or None, initial=session_data
@@ -309,7 +304,8 @@ def edit_job_description_details(request, template_name="companies/edit_job_desc
     if not session_data:
         return HttpResponseRedirect(reverse("companies_views:edit_job_description"))
 
-    job_description = _get_job_description(session_data)
+    job_description_id = session_data.get("pk")
+    job_description = get_object_or_404(JobDescription, pk=job_description_id) if job_description_id else None
 
     rome = get_object_or_404(Appellation.objects.select_related("rome"), pk=session_data.get("appellation")).rome.code
 
@@ -341,7 +337,10 @@ def edit_job_description_preview(request, template_name="companies/edit_job_desc
     if not session_data:
         return HttpResponseRedirect(reverse("companies_views:edit_job_description"))
 
-    job_description = _get_job_description(session_data) or JobDescription()
+    job_description_id = session_data.get("pk")
+    job_description = (
+        get_object_or_404(JobDescription, pk=job_description_id) if job_description_id else JobDescription()
+    )
 
     job_description.__dict__.update(**session_data)
 
