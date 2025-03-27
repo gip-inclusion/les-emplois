@@ -39,4 +39,9 @@ urlpatterns = [
         name="action_financial_assessment",
         kwargs={"file_field": "action_financial_assessment_file"},
     ),
+    path(
+        "details/<uuid:pk>/action-financial-asssessment/upload",
+        views.upload_action_financial_assessment,
+        name="upload_action_financial_assessment",
+    ),
 ]
