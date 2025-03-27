@@ -49,7 +49,7 @@ def get_filename(filename_prefix, filename_extension, description=None):
     assert len(filenames) == 1
 
     filename = filenames[0]
-    logger.info("Selected file", extra={"filename": filename, "description": description})
+    logger.info("Selected file", extra={"file.name": filename, "description": description})
     return os.path.join(settings.ASP_FLUX_IAE_DIR, filename)
 
 
