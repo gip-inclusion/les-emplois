@@ -174,6 +174,15 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
         self.company.refresh_from_db()
         assert self.company.spontaneous_applications_open_since == timezone.now()
 
+    def test_toggle_spontaneous_applications_impacts_company_modification(self, client):
+        self._login(client, self.user)
+
+        with freeze_time("2025-03-25"):
+            post_data = {"action": "toggle_spontaneous_applications"}
+            client.post(self.url, data=post_data)
+            self.company.refresh_from_db()
+            assert self.company.updated_at_by_company == timezone.now()
+
     @freeze_time("2021-06-21 10:10:10.10")
     def test_toggle_job_description_activity(self, client):
         response = self._login(client, self.user)

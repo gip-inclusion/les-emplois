@@ -95,7 +95,14 @@ class CreateCompanyForm(forms.ModelForm):
         return company
 
 
-class EditCompanyForm(forms.ModelForm):
+class EditCompanyMixin(forms.ModelForm):
+    def save(self, commit=False):
+        if self.instance is not None:
+            self.instance.updated_at_by_company = timezone.now()
+        return super().save(commit)
+
+
+class EditCompanyForm(EditCompanyMixin):
     class Meta:
         model = Company
         fields = [
@@ -140,7 +147,7 @@ class EditCompanyForm(forms.ModelForm):
         return department_from_postcode(post_code)
 
 
-class EditSiaeDescriptionForm(forms.ModelForm):
+class EditSiaeDescriptionForm(EditCompanyMixin):
     class Meta:
         model = Company
         fields = [
@@ -167,7 +174,7 @@ class EditSiaeDescriptionForm(forms.ModelForm):
         )
 
 
-class BlockJobApplicationsForm(forms.ModelForm):
+class BlockJobApplicationsForm(EditCompanyMixin):
     """
     Toggle blocking new job applications for this SIAE (used in dashboard settings)
     """

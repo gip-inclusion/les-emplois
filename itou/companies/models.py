@@ -258,6 +258,15 @@ class Company(AddressMixin, OrganizationAbstract):
         blank=True,
         on_delete=models.RESTRICT,  # For traceability and accountability
     )
+    updated_at_by_company = models.DateTimeField(
+        verbose_name="date de modification par l'entreprise",
+        db_index=True,
+        default=timezone.now,
+        help_text=(
+            "la dernière modification effectuée, à l'exclusion de celles effectuées "
+            "par le personnel support et les processus automatiques"
+        ),
+    )
 
     # Ability to block new job applications
     block_job_applications = models.BooleanField(verbose_name="blocage des candidatures", default=False)
@@ -632,7 +641,7 @@ class JobDescription(models.Model):
         help_text=(
             "la dernière modification effectuée, à l'exclusion de celles effectuées "
             "par le personnel support et les processus automatiques"
-        )
+        ),
     )
     is_active = models.BooleanField(verbose_name="recrutement ouvert", default=True)
     custom_name = models.CharField(verbose_name="nom personnalisé", blank=True, max_length=255)

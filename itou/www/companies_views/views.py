@@ -223,7 +223,10 @@ def job_description_list(request, template_name="companies/job_description_list.
             case "toggle_spontaneous_applications":
                 set_active = company.spontaneous_applications_open_since is None
                 company.spontaneous_applications_open_since = timezone.now() if set_active else None
-                company.save(update_fields=["spontaneous_applications_open_since"])
+                company.updated_at_by_company = timezone.now()
+                company.save(
+                    update_fields=["spontaneous_applications_open_since", "updated_at", "updated_at_by_company"]
+                )
                 if company.block_job_applications:
                     messages.warning(
                         request,
