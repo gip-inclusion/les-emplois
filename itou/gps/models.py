@@ -4,6 +4,7 @@ from django.utils import timezone
 
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.templatetags.str_filters import pluralizefr
+from itou.www.gps.enums import EndReason
 
 
 class BulkCreatedAtQuerysetProxy:
@@ -22,6 +23,7 @@ class FollowUpGroupManager(models.Manager):
 
             update_args = {
                 "ended_at": None,
+                "end_reason": None,
                 "last_contact_at": now,
                 "is_active": is_active,
             }
@@ -103,6 +105,16 @@ class FollowUpGroupMembershipQueryset(BulkCreatedAtQuerysetProxy, models.QuerySe
 class FollowUpGroupMembership(models.Model):
     class Meta:
         verbose_name = "relation"
+        constraints = [
+            models.CheckConstraint(
+                name="end_coherence",
+                violation_error_message="Incohérence du champ motif de fin",
+                condition=(
+                    models.Q(ended_at=None, end_reason=None)
+                    | models.Q(ended_at__isnull=False, end_reason__isnull=False)
+                ),
+            ),
+        ]
 
     is_referent = models.BooleanField(default=False, verbose_name="référent")
 
@@ -147,6 +159,13 @@ class FollowUpGroupMembership(models.Model):
     )
 
     reason = models.TextField(blank=True, verbose_name="motif de suivi")
+    end_reason = models.CharField(
+        verbose_name="motif de fin",
+        max_length=30,
+        null=True,
+        blank=True,
+        choices=EndReason.choices,
+    )
 
     objects = FollowUpGroupMembershipQueryset.as_manager()
 
