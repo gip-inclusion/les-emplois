@@ -93,6 +93,6 @@ def manage_financial_annexes(af_number_to_row):
     for af in creatable_afs:
         af.save()
 
-    logger.info("wille delete financial annexes", extra={"count": len(deletable_afs)})
+    logger.info("will delete financial annexes", extra={"count": len(deletable_afs)})
     for af in deletable_afs:
         af.delete()

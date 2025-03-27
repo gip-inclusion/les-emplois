@@ -65,7 +65,7 @@ def update_existing_conventions(siret_to_siae_row, conventions_by_siae_key):
         if convention.siret_signature != row.siret_signature:
             logger.info(
                 "convention has changed siret_signature. will be updated",
-                extra={"conventino": convention.id, "from": convention.siret_signature, "to": row.siret_signature},
+                extra={"convention": convention.id, "from": convention.siret_signature, "to": row.siret_signature},
             )
             convention.siret_signature = row.siret_signature
             updated_fields.add("siret_signature")

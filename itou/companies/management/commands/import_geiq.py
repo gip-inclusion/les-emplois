@@ -153,7 +153,7 @@ class Command(BaseCommand):
 
         warning_messages = []
         if info_stats["rows_with_empty_email"] > 20:
-            warning_messages.append("Too many missing emails: {info_stats['rows_with_empty_email']}")
+            warning_messages.append(f"Too many missing emails: {info_stats['rows_with_empty_email']}")
         if info_stats["not_created_because_of_missing_email"]:
             warning_messages.append(
                 f"Structure(s) not created because of a missing email: "

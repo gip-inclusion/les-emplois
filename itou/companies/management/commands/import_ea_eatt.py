@@ -74,7 +74,7 @@ class Command(BaseCommand):
 
         with asp_utils.get_sftp_connection() as sftp:
             self.logger.info(
-                'Connected SFTP server"',
+                "Connected SFTP server",
                 extra={
                     "host": settings.ASP_SFTP_HOST,
                     "user": settings.ASP_SFTP_USER,

@@ -160,7 +160,7 @@ class Command(BaseCommand):
                 extra={"label": field_to_transfer.label, "count": all_items_count},
             )
 
-        self.logger.info1("Rapport du transfert")
+        self.logger.info("Rapport du transfert")
         disable_from_company = not only_job_applications
         try:
             with transaction.atomic():
