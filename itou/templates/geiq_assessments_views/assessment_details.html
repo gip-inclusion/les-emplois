@@ -44,15 +44,7 @@
                             </div>
                         </div>
                         <hr>
-                        <div class="d-flex flex-column justify-content-between mb-3">
-                            <div class="d-flex justify-content-between flex-row mb-3">
-                                <h3 class="mb-0">Commentaire général</h3>
-                                <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
-                            </div>
-                            <div>
-                                <a href="" class="btn btn-primary">Compléter</a>
-                            </div>
-                        </div>
+                        {% include "geiq_assessments_views/includes/geiq_comment_section.html" with assessment=assessment request=request only %}
                     </div>
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2">
