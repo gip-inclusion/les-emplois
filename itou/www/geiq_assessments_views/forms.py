@@ -2,6 +2,7 @@ from django import forms
 from django.forms import widgets
 
 from itou.files.forms import ItouFileField
+from itou.geiq_assessments.models import Assessment
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.utils.constants import MB
@@ -99,3 +100,12 @@ class CreateForm(forms.Form):
 
 class ActionFinancialAssessmentForm(forms.Form):
     assessment_file = ItouFileField(content_type="application/pdf", max_upload_size=5 * MB, label="Bilan")
+
+
+class GeiqCommentForm(forms.ModelForm):
+    class Meta:
+        model = Assessment
+        fields = ["geiq_comment"]
+        labels = {
+            "geiq_comment": "Renseignez un commentaire",
+        }
