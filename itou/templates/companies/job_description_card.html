@@ -30,10 +30,15 @@
         <div class="d-xl-flex align-items-xl-center">
             <div>
                 <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">{{ job.display_name }}</h1>
-                {% if job.custom_name %}
-                    {# display_name returns the custom_name and we show the appellation bellow #}
-                    <p class="mb-0">{{ job.appellation.name }}</p>
-                {% endif %}
+                <p class="mb-0">
+                    {% if job.custom_name %}
+                        {# display_name above returns the custom_name and we show the appellation name and code bellow #}
+                        {{ job.appellation.name }} ({{ job.appellation.code }})
+                    {% else %}
+                        {# display_name above returns the appellation and we only add the appellation code #}
+                        {{ job.appellation.code }}
+                    {% endif %}
+                </p>
             </div>
             {% if job.is_active %}
                 <span class="badge rounded-pill bg-success">
