@@ -44,4 +44,9 @@ urlpatterns = [
         views.upload_action_financial_assessment,
         name="upload_action_financial_assessment",
     ),
+    path(
+        "details/<uuid:pk>/comment",
+        views.assessment_comment,
+        name="assessment_comment",
+    ),
 ]

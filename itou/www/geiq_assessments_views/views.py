@@ -21,7 +21,7 @@ from itou.institutions.models import Institution
 from itou.utils.apis import geiq_label
 from itou.utils.auth import check_user
 from itou.utils.urls import get_safe_url
-from itou.www.geiq_assessments_views.forms import ActionFinancialAssessmentForm, CreateForm
+from itou.www.geiq_assessments_views.forms import ActionFinancialAssessmentForm, CreateForm, GeiqCommentForm
 
 
 logger = logging.getLogger(__name__)
@@ -200,6 +200,7 @@ def upload_action_financial_assessment(
     )
     form = ActionFinancialAssessmentForm(data=request.POST or None, files=request.FILES or None)
     context = {
+        "assessment": assessment,
         "form": form,
         "back_url": back_url,
     }
@@ -208,5 +209,23 @@ def upload_action_financial_assessment(
         file_key = default_storage.save(str(uuid.uuid4()), assessment_pdf)
         assessment.action_financial_assessment_file = File.objects.create(key=file_key)
         assessment.save(update_fields=("action_financial_assessment_file",))
+        return HttpResponseRedirect(back_url)
+    return render(request, template_name, context)
+
+
+def assessment_comment(request, pk, template_name="geiq_assessments_views/assessment_comment.html"):
+    assessments = Assessment.objects.filter(companies=request.current_organization)
+    assessment = get_object_or_404(assessments, pk=pk)
+    back_url = get_safe_url(
+        request, "back_url", fallback_url=reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk})
+    )
+    form = GeiqCommentForm(instance=assessment, data=request.POST or None)
+    context = {
+        "assessment": assessment,
+        "form": form,
+        "back_url": back_url,
+    }
+    if request.method == "POST" and form.is_valid():
+        form.save()
         return HttpResponseRedirect(back_url)
     return render(request, template_name, context)
