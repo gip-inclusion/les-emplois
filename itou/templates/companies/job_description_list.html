@@ -3,6 +3,7 @@
 {% load django_bootstrap5 %}
 {% load str_filters %}
 {% load matomo %}
+{% load datetime_filters %}
 
 {% block title %}Métiers et recrutements {{ block.super }}{% endblock %}
 
@@ -75,7 +76,8 @@
                                             <th scope="col">Localisation</th>
                                             <th scope="col">Nbre de postes</th>
                                             <th scope="col">Statut</th>
-                                            <th scope="col" class="text-end w-50px"></th>
+                                            <th scope="col">Mise à jour</th>
+                                            <th scope="col" class="text-end w-100px"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -103,6 +105,7 @@
                                                     </div>
                                                 </form>
                                             </td>
+                                            <td>-</td>
                                             <td></td>
                                         </tr>
                                         {% for job_description in job_pager %}
@@ -141,7 +144,13 @@
                                                         </div>
                                                     </form>
                                                 </td>
-                                                <td class="text-end w-50px">
+                                                <td>
+                                                    <span id="job_description_{{ job_description.pk }}_list_cell_updated_at">{{ job_description.updated_at|naturaldate|capfirst }}</span>
+                                                </td>
+                                                <td class="d-flex justify-content-around align-items-center w-100px">
+                                                    <form hx-post="{% url 'companies_views:job_description_refresh' job_description.pk %}" hx-swap="none">
+                                                        {% include "companies/includes/buttons/job_description_refresh.html" with for_detail=False job_description=job_description csrf_token=csrf_token request=request only %}
+                                                    </form>
                                                     <button class="btn btn-sm btn-link btn-ico-only" type="button" data-bs-toggle="modal" data-bs-target="#_delete_modal_{{ job_description.id }}">
                                                         <i class="ri-delete-bin-line" data-bs-toggle="tooltip" data-bs-title="Supprimer" aria-label="Supprimer ce métier"></i>
                                                     </button>
@@ -195,4 +204,5 @@
 {% block script %}
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js'%}"></script>
+    <script src='{% static "js/htmx_compat.js" %}'></script>
 {% endblock %}
