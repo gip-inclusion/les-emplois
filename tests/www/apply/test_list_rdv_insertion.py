@@ -191,6 +191,12 @@ class TestRdvInsertionDisplay:
     def test_list_with_many_upcoming_appointments(self, profile_login, client, profile, view_name):
         profile_login(profile, self.job_application)
 
+        # Force job application transition logs creation
+        # This leads to duplicates on agregated results due to the join with transition logs
+        # Hence a subquery is required while last_change isn't persisted in a job application column
+        self.job_application.process()
+        self.job_application.accept(user=self.job_application.to_company.members.first())
+
         ParticipationFactory(
             job_seeker=self.job_application.job_seeker,
             status=Participation.Status.UNKNOWN,

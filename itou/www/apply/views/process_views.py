@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Count, Exists, F, OuterRef, Q
+from django.db.models import Exists, OuterRef
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
@@ -26,7 +26,7 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
 from itou.rdv_insertion.api import get_api_credentials, get_invitation_status
-from itou.rdv_insertion.models import Invitation, InvitationRequest, Participation
+from itou.rdv_insertion.models import Invitation, InvitationRequest
 from itou.users.enums import Title, UserKind
 from itou.users.models import User
 from itou.utils.auth import check_user
@@ -92,16 +92,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
     Detail of an application for a JOBSEEKER
     """
     job_application = get_object_or_404(
-        JobApplication.objects.annotate(
-            upcoming_participations_count=Count(
-                "job_seeker__rdvi_participations",
-                filter=Q(
-                    job_seeker__rdvi_participations__appointment__company=F("to_company"),
-                    job_seeker__rdvi_participations__status=Participation.Status.UNKNOWN,
-                    job_seeker__rdvi_participations__appointment__start_at__gt=timezone.now(),
-                ),
-            ),
-        )
+        JobApplication.objects.with_upcoming_participations_count()
         .select_related(
             "job_seeker__jobseeker_profile",
             "sender",
@@ -174,6 +165,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
     """
     queryset = (
         JobApplication.objects.is_active_company_member(request.user)
+        .with_upcoming_participations_count()
         .select_related(
             "job_seeker__jobseeker_profile",
             "eligibility_diagnosis__author",
@@ -200,14 +192,6 @@ def details_for_company(request, job_application_id, template_name="apply/proces
                     job_seeker=OuterRef("job_seeker"),
                     created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
                 )
-            ),
-            upcoming_participations_count=Count(
-                "job_seeker__rdvi_participations",
-                filter=Q(
-                    job_seeker__rdvi_participations__appointment__company=request.current_organization,
-                    job_seeker__rdvi_participations__status=Participation.Status.UNKNOWN,
-                    job_seeker__rdvi_participations__appointment__start_at__gt=timezone.now(),
-                ),
             ),
         )
     )
@@ -285,19 +269,23 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     """
     job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
 
-    queryset = job_applications.select_related(
-        "job_seeker",
-        "eligibility_diagnosis",
-        "sender",
-        "sender_company",
-        "sender_prescriber_organization",
-        "to_company",
-        "approval",
-        "archived_by",
-    ).prefetch_related(
-        "selected_jobs__appellation",
-        "eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
-        "geiq_eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
+    queryset = (
+        job_applications.with_upcoming_participations_count()
+        .select_related(
+            "job_seeker",
+            "eligibility_diagnosis",
+            "sender",
+            "sender_company",
+            "sender_prescriber_organization",
+            "to_company",
+            "approval",
+            "archived_by",
+        )
+        .prefetch_related(
+            "selected_jobs__appellation",
+            "eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
+            "geiq_eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
+        )
     )
     job_application = get_object_or_404(queryset, id=job_application_id)
 

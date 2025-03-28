@@ -2,8 +2,7 @@ import enum
 from collections import defaultdict
 
 from django.conf import settings
-from django.db import models
-from django.db.models import Count, Exists, F, OuterRef, Q, Subquery, Value
+from django.db.models import Exists, F, OuterRef, Value
 from django.db.models.functions import Concat, Lower
 from django.http.response import HttpResponse
 from django.shortcuts import render
@@ -15,7 +14,7 @@ from itou.companies.enums import CompanyKind
 from itou.eligibility.models import SelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.rdv_insertion.models import InvitationRequest, Participation
+from itou.rdv_insertion.models import InvitationRequest
 from itou.utils.auth import check_user
 from itou.utils.ordering import OrderEnum
 from itou.utils.pagination import pager
@@ -127,27 +126,12 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
         display_kind = JobApplicationsDisplayKind.LIST
 
     if display_kind == JobApplicationsDisplayKind.LIST:
-        job_applications = job_applications.annotate(
-            next_appointment_start_at=Subquery(
-                Participation.objects.filter(
-                    appointment__company=OuterRef("to_company"),
-                    job_seeker=OuterRef("job_seeker"),
-                    status=Participation.Status.UNKNOWN,
-                    appointment__start_at__gt=timezone.now(),
-                )
-                .order_by("appointment__start_at")
-                .values("appointment__start_at")[:1],
-                output_field=models.DateTimeField(),
-            ),
-            other_appointments_count=Count(
-                "job_seeker__rdvi_participations",
-                filter=Q(
-                    job_seeker__rdvi_participations__appointment__company=F("to_company"),
-                    job_seeker__rdvi_participations__status=Participation.Status.UNKNOWN,
-                    job_seeker__rdvi_participations__appointment__start_at__gt=timezone.now(),
-                ),
+        job_applications = (
+            job_applications.with_next_appointment_start_at()
+            .with_upcoming_participations_count()
+            .annotate(
+                other_participations_count=F("upcoming_participations_count") - 1,  # Exclude the next appointment
             )
-            - 1,  # Exclude the next appointment
         )
 
     filters_counter = 0
@@ -322,34 +306,19 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         display_kind = JobApplicationsDisplayKind.TABLE
 
     if display_kind == JobApplicationsDisplayKind.LIST:
-        job_applications = job_applications.annotate(
-            has_pending_rdv_insertion_invitation_request=Exists(
-                InvitationRequest.objects.filter(
-                    job_seeker=OuterRef("job_seeker"),
-                    company=OuterRef("to_company"),
-                    created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
-                )
-            ),
-            next_appointment_start_at=Subquery(
-                Participation.objects.filter(
-                    appointment__company=OuterRef("to_company"),
-                    job_seeker=OuterRef("job_seeker"),
-                    status=Participation.Status.UNKNOWN,
-                    appointment__start_at__gt=timezone.now(),
-                )
-                .order_by("appointment__start_at")
-                .values("appointment__start_at")[:1],
-                output_field=models.DateTimeField(),
-            ),
-            other_appointments_count=Count(
-                "job_seeker__rdvi_participations",
-                filter=Q(
-                    job_seeker__rdvi_participations__appointment__company=request.current_organization,
-                    job_seeker__rdvi_participations__status=Participation.Status.UNKNOWN,
-                    job_seeker__rdvi_participations__appointment__start_at__gt=timezone.now(),
+        job_applications = (
+            job_applications.with_next_appointment_start_at()
+            .with_upcoming_participations_count()
+            .annotate(
+                has_pending_rdv_insertion_invitation_request=Exists(
+                    InvitationRequest.objects.filter(
+                        job_seeker=OuterRef("job_seeker"),
+                        company=OuterRef("to_company"),
+                        created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
+                    )
                 ),
+                other_participations_count=F("upcoming_participations_count") - 1,  # Exclude the next appointment
             )
-            - 1,  # Exclude the next appointment
         )
 
     try:
