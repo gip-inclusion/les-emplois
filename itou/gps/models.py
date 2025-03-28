@@ -2,7 +2,7 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models, transaction
 from django.utils import timezone
 
-from itou.users.models import JobSeekerProfile, User
+from itou.users.models import User
 from itou.utils.templatetags.str_filters import pluralizefr
 from itou.www.gps.enums import EndReason
 
@@ -197,30 +197,3 @@ class FollowUpGroupMembership(models.Model):
         if months:
             res.append(f"{months} mois")
         return ", ".join(res)
-
-
-class FranceTravailContact(models.Model):
-    """
-    The 'Conseiller' from France Travail who is the point of contact on a group's beneficiary
-
-    NOTE: this is a interim model used to store the data.
-    It's not displayed anymore, but we will soon handle it differently
-    by displaying a fake group membership in the group memberships tab
-    """
-
-    name = models.CharField(max_length=255)
-    email = models.EmailField()
-
-    jobseeker_profile = models.OneToOneField(
-        JobSeekerProfile,
-        verbose_name="profil",
-        on_delete=models.CASCADE,
-        related_name="advisor_information",
-    )
-
-    class Meta:
-        verbose_name = "conseiller France Travail"
-        verbose_name_plural = "conseillers FT"
-
-    def __str__(self):
-        return f"{self.name} ({self.email})"
