@@ -82,7 +82,7 @@
     {% if tally_embed_form_id %}
         <section class="s-section mt-0 pt-0">
             <div class="s-section__container container">
-                <iframe data-tally-src="https://tally.so/embed/{{ tally_embed_form_id }}?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
+                <iframe data-tally-src="https://tally.so/embed/{{ tally_embed_form_id }}?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1{% for key, value in tally_hidden_fields.items %}&{{ key }}={{ value }}{% endfor %}"
                         loading="lazy"
                         width="100%"
                         height="189"
