@@ -190,6 +190,7 @@ def assessment_sync_file(request, pk, *, file_field):
     return render(request, template_name, context)
 
 
+@check_user(lambda user: user.is_employer)
 def upload_action_financial_assessment(
     request, pk, template_name="geiq_assessments_views/action_financial_assessment_upload.html"
 ):
@@ -213,6 +214,7 @@ def upload_action_financial_assessment(
     return render(request, template_name, context)
 
 
+@check_user(lambda user: user.is_employer)
 def assessment_comment(request, pk, template_name="geiq_assessments_views/assessment_comment.html"):
     assessments = Assessment.objects.filter(companies=request.current_organization)
     assessment = get_object_or_404(assessments, pk=pk)
@@ -228,4 +230,30 @@ def assessment_comment(request, pk, template_name="geiq_assessments_views/assess
     if request.method == "POST" and form.is_valid():
         form.save()
         return HttpResponseRedirect(back_url)
+    return render(request, template_name, context)
+
+
+@check_user(lambda user: user.is_employer)
+def assessment_contracts_list(request, pk, template_name=""):
+    context = {}
+    return render(request, template_name, context)
+
+
+@check_user(lambda user: user.is_employer)
+def assessment_contracts_details(request, pk, contract_pk, template_name=""):
+    context = {}
+    return render(request, template_name, context)
+
+
+@require_POST
+@check_user(lambda user: user.is_employer)
+def assessment_contracts_include(request, pk, contract_pk, template_name=""):
+    context = {}
+    return render(request, template_name, context)
+
+
+@require_POST
+@check_user(lambda user: user.is_employer)
+def assessment_contracts_exclude(request, pk, contract_pk, template_name=""):
+    context = {}
     return render(request, template_name, context)

@@ -49,4 +49,24 @@ urlpatterns = [
         views.assessment_comment,
         name="assessment_comment",
     ),
+    path(
+        "details/<uuid:pk>/contracts",
+        views.assessment_contracts_list,
+        name="assessment_contracts_list",
+    ),
+    path(
+        "details/<uuid:pk>/contracts/<uuid:contract_pk>",
+        views.assessment_contracts_details,
+        name="assessment_contracts_detail",
+    ),
+    path(
+        "details/<uuid:pk>/contracts/<uuid:contract_pk>/include",
+        views.assessment_contracts_include,
+        name="assessment_contracts_include",
+    ),
+    path(
+        "details/<uuid:pk>/contracts/<uuid:contract_pk>/exclude",
+        views.assessment_contracts_exclude,
+        name="assessment_contracts_exclude",
+    ),
 ]
