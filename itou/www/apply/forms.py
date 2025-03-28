@@ -734,8 +734,6 @@ class FilterJobApplicationsForm(forms.Form):
             filters.append(Q(created_at__lte=end_date))
         if departments := data.get("departments"):
             filters.append(Q(job_seeker__department__in=departments))
-        if selected_jobs := data.get("selected_jobs"):
-            filters.append(Q(selected_jobs__appellation__code__in=selected_jobs))
         if criteria := data.get("criteria"):
             # Filter on the `eligibility_diagnosis_criterion_{criterion}` annotation,
             # which is set in `with_list_related_data()`.
@@ -821,13 +819,6 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         }
         return sorted(departments, key=lambda dpts: dpts[1])
 
-    def _get_choices_for_jobs(self):
-        jobs = set()
-        for job_application in self.job_applications_qs.prefetch_related("selected_jobs__appellation"):
-            for job in job_application.selected_jobs.all():
-                jobs.add((job.appellation.code, job.appellation.name))
-        return sorted(jobs, key=lambda job: job[1])
-
     def filter(self, queryset):
         queryset = super().filter(queryset)
 
@@ -908,7 +899,16 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
             queryset = queryset.filter(sender_prescriber_organization__id__in=sender_prescriber_organizations)
         if sender_companies := self.cleaned_data.get("sender_companies"):
             queryset = queryset.filter(sender_company__id__in=sender_companies)
+        if selected_jobs := self.cleaned_data.get("selected_jobs"):
+            queryset = queryset.filter(selected_jobs__in=selected_jobs)
         return queryset
+
+    def _get_choices_for_jobs(self):
+        jobs = set()
+        for job_application in self.job_applications_qs.prefetch_related("selected_jobs__appellation"):
+            for job in job_application.selected_jobs.all():
+                jobs.add((job.pk, f"{job.display_name} ({job.appellation.code})"))
+        return sorted(jobs, key=lambda job: job[1])
 
     def _get_choices_for_job_seeker(self, users):
         users = [(user.id, user_full_name) for user in users if (user_full_name := user.get_full_name())]
@@ -954,7 +954,16 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
         queryset = super().filter(queryset)
         if to_companies := self.cleaned_data.get("to_companies"):
             queryset = queryset.filter(to_company__id__in=to_companies)
+        if selected_jobs := self.cleaned_data.get("selected_jobs"):
+            queryset = queryset.filter(selected_jobs__appellation__code__in=selected_jobs)
         return queryset
+
+    def _get_choices_for_jobs(self):
+        jobs = set()
+        for job_application in self.job_applications_qs.prefetch_related("selected_jobs__appellation"):
+            for job in job_application.selected_jobs.all():
+                jobs.add((job.appellation.code, f"{job.appellation.name} ({job.appellation.code})"))
+        return sorted(jobs, key=lambda job: job[1])
 
     def get_to_companies_choices(self):
         to_companies = self.job_applications_qs.get_unique_fk_objects("to_company")
