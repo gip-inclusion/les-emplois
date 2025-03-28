@@ -1,3 +1,3 @@
-<div class="col-md-4 mb-3 mb-md-5">
-    {% include "approvals/includes/box.html" with approval=user.latest_common_approval link_from_current_url=request.get_full_path job_seeker_dashboard_version=True only %}
+<div class="col mb-3 mb-md-5">
+    {% include "approvals/includes/box.html" with approval=user.latest_common_approval link_from_current_url=request.get_full_path job_seeker_dashboard_version=True extra_class="h-100" only %}
 </div>
