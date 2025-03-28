@@ -76,6 +76,7 @@
                  "companies_jobdescription"."company_id",
                  "companies_jobdescription"."created_at",
                  "companies_jobdescription"."updated_at",
+                 "companies_jobdescription"."updated_at_by_company",
                  "companies_jobdescription"."is_active",
                  "companies_jobdescription"."custom_name",
                  "companies_jobdescription"."description",
@@ -147,6 +148,7 @@
                  "companies_company"."provided_support",
                  "companies_company"."source",
                  "companies_company"."created_by_id",
+                 "companies_company"."updated_at_by_company",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."spontaneous_applications_open_since",
@@ -394,6 +396,7 @@
                  "companies_jobdescription"."company_id",
                  "companies_jobdescription"."created_at",
                  "companies_jobdescription"."updated_at",
+                 "companies_jobdescription"."updated_at_by_company",
                  "companies_jobdescription"."is_active",
                  "companies_jobdescription"."custom_name",
                  "companies_jobdescription"."description",
@@ -465,6 +468,7 @@
                  "companies_company"."provided_support",
                  "companies_company"."source",
                  "companies_company"."created_by_id",
+                 "companies_company"."updated_at_by_company",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."spontaneous_applications_open_since",
@@ -700,6 +704,7 @@
                  "companies_company"."provided_support",
                  "companies_company"."source",
                  "companies_company"."created_by_id",
+                 "companies_company"."updated_at_by_company",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."spontaneous_applications_open_since",
@@ -855,6 +860,7 @@
                  "companies_company"."provided_support",
                  "companies_company"."source",
                  "companies_company"."created_by_id",
+                 "companies_company"."updated_at_by_company",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."spontaneous_applications_open_since",
@@ -886,7 +892,7 @@
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable"
                  AND "companies_company"."id" = %s)
-          ORDER BY 38 DESC,
+          ORDER BY 39 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -909,6 +915,7 @@
                  "companies_jobdescription"."company_id",
                  "companies_jobdescription"."created_at",
                  "companies_jobdescription"."updated_at",
+                 "companies_jobdescription"."updated_at_by_company",
                  "companies_jobdescription"."is_active",
                  "companies_jobdescription"."custom_name",
                  "companies_jobdescription"."description",
@@ -971,6 +978,7 @@
                  "companies_company"."provided_support",
                  "companies_company"."source",
                  "companies_company"."created_by_id",
+                 "companies_company"."updated_at_by_company",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."spontaneous_applications_open_since",
@@ -1095,6 +1103,7 @@
                  "companies_company"."provided_support",
                  "companies_company"."source",
                  "companies_company"."created_by_id",
+                 "companies_company"."updated_at_by_company",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."spontaneous_applications_open_since",
@@ -1249,6 +1258,7 @@
                  "companies_company"."provided_support",
                  "companies_company"."source",
                  "companies_company"."created_by_id",
+                 "companies_company"."updated_at_by_company",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."spontaneous_applications_open_since",
@@ -1279,7 +1289,7 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 38 DESC,
+          ORDER BY 39 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -1302,6 +1312,7 @@
                  "companies_jobdescription"."company_id",
                  "companies_jobdescription"."created_at",
                  "companies_jobdescription"."updated_at",
+                 "companies_jobdescription"."updated_at_by_company",
                  "companies_jobdescription"."is_active",
                  "companies_jobdescription"."custom_name",
                  "companies_jobdescription"."description",
@@ -1364,6 +1375,7 @@
                  "companies_company"."provided_support",
                  "companies_company"."source",
                  "companies_company"."created_by_id",
+                 "companies_company"."updated_at_by_company",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."spontaneous_applications_open_since",
@@ -1489,6 +1501,7 @@
                  "companies_company"."provided_support",
                  "companies_company"."source",
                  "companies_company"."created_by_id",
+                 "companies_company"."updated_at_by_company",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."spontaneous_applications_open_since",
@@ -1643,6 +1656,7 @@
                  "companies_company"."provided_support",
                  "companies_company"."source",
                  "companies_company"."created_by_id",
+                 "companies_company"."updated_at_by_company",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."spontaneous_applications_open_since",
@@ -1673,7 +1687,7 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 38 DESC,
+          ORDER BY 39 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -1696,6 +1710,7 @@
                  "companies_jobdescription"."company_id",
                  "companies_jobdescription"."created_at",
                  "companies_jobdescription"."updated_at",
+                 "companies_jobdescription"."updated_at_by_company",
                  "companies_jobdescription"."is_active",
                  "companies_jobdescription"."custom_name",
                  "companies_jobdescription"."description",
@@ -1758,6 +1773,7 @@
                  "companies_company"."provided_support",
                  "companies_company"."source",
                  "companies_company"."created_by_id",
+                 "companies_company"."updated_at_by_company",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."spontaneous_applications_open_since",
@@ -1882,6 +1898,7 @@
                  "companies_company"."provided_support",
                  "companies_company"."source",
                  "companies_company"."created_by_id",
+                 "companies_company"."updated_at_by_company",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."spontaneous_applications_open_since",
@@ -2036,6 +2053,7 @@
                  "companies_company"."provided_support",
                  "companies_company"."source",
                  "companies_company"."created_by_id",
+                 "companies_company"."updated_at_by_company",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."spontaneous_applications_open_since",
@@ -2066,7 +2084,7 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 38 DESC,
+          ORDER BY 39 DESC,
                    "companies_company"."block_job_applications" ASC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
@@ -2089,6 +2107,7 @@
                  "companies_jobdescription"."company_id",
                  "companies_jobdescription"."created_at",
                  "companies_jobdescription"."updated_at",
+                 "companies_jobdescription"."updated_at_by_company",
                  "companies_jobdescription"."is_active",
                  "companies_jobdescription"."custom_name",
                  "companies_jobdescription"."description",
@@ -2151,6 +2170,7 @@
                  "companies_company"."provided_support",
                  "companies_company"."source",
                  "companies_company"."created_by_id",
+                 "companies_company"."updated_at_by_company",
                  "companies_company"."block_job_applications",
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."spontaneous_applications_open_since",

@@ -174,6 +174,15 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
         self.company.refresh_from_db()
         assert self.company.spontaneous_applications_open_since == timezone.now()
 
+    def test_toggle_spontaneous_applications_impacts_company_modification(self, client):
+        self._login(client, self.user)
+
+        with freeze_time("2025-03-25"):
+            post_data = {"action": "toggle_spontaneous_applications"}
+            client.post(self.url, data=post_data)
+            self.company.refresh_from_db()
+            assert self.company.updated_at_by_company == timezone.now()
+
     @freeze_time("2021-06-21 10:10:10.10")
     def test_toggle_job_description_activity(self, client):
         response = self._login(client, self.user)
@@ -249,6 +258,22 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
         )
         other_company_job_description.refresh_from_db()
         assert not other_company_job_description.is_active
+
+    @freeze_time("2025-03-25")
+    def test_toggle_job_description_active_updating_last_modified(self, client):
+        # Closing recruitment does not modify the last modified time, but opening it does.
+        self._login(client, self.user)
+
+        job_description = self.company.job_description_through.first()
+        assert job_description.is_active
+
+        update_time = timezone.now()
+        post_data = {"job_description_id": job_description.pk, "action": "toggle_active"}
+        client.post(self.url, data=post_data)
+        job_description.refresh_from_db()
+        assert not job_description.is_active
+        assert job_description.updated_at == update_time
+        assert job_description.updated_at_by_company == update_time
 
     def test_delete_job_descriptions(self, client):
         response = self._login(client, self.user)

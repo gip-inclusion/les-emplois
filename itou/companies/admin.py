@@ -198,6 +198,7 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
             "created_by",
             "created_at",
             "updated_at",
+            "updated_at_by_company",
             "job_applications_blocked_at",
             "geocoding_score",
             "approvals_list",
@@ -435,6 +436,7 @@ class JobDescriptionAdmin(ItouModelAdmin):
         "source_kind",
         "source_url",
         "field_history",
+        "updated_at_by_company",
     )
 
     @admin.display(description="Intitulé du poste")
