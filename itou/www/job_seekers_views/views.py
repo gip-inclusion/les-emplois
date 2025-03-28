@@ -150,6 +150,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     )
     queryset = (
         User.objects.filter(kind=UserKind.JOB_SEEKER, pk__in=job_seekers_ids)
+        .select_related("jobseeker_profile")
         .prefetch_related("approvals")
         .annotate(
             full_name=Concat(Lower("first_name"), Value(" "), Lower("last_name")),

@@ -218,6 +218,20 @@
       </div>
   
   
+              <div class="dropdown">
+                  <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" type="button">
+                      Candidat sans solution
+                  </button>
+                  <ul class="dropdown-menu">
+                      <li><div class="dropdown-item"><div class="form-check"><input class="form-check-input" id="id_is_stalled" name="is_stalled" type="checkbox"/><label class="form-check-label" for="id_is_stalled">N’afficher que les candidats sans solution</label></div></div></li>
+                      <li>
+                          <hr class="dropdown-divider"/>
+                      </li>
+                      <li>
+                          <a class="btn btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/33573455767441--Qu-est-ce-qu-un-candidat-sans-solution-sur-les-Emplois-de-l-inclusion" rel="noopener" target="_blank">Qu’est-ce qu’un candidat sans solution ?</a>
+                      </li>
+                  </ul>
+              </div>
               
               
   
@@ -499,9 +513,48 @@
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "valid_eligibility_diagnosis",
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
-                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
+                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled"
           FROM "users_user"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
@@ -509,7 +562,8 @@
                                            %s))
           GROUP BY "users_user"."id",
                    34,
-                   35
+                   35,
+                   "users_jobseekerprofile"."user_id"
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
         ''',
@@ -638,9 +692,48 @@
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "valid_eligibility_diagnosis",
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
-                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
+                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled"
           FROM "users_user"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
@@ -648,7 +741,8 @@
                                            %s))
           GROUP BY "users_user"."id",
                    34,
-                   35
+                   35,
+                   "users_jobseekerprofile"."user_id"
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -847,9 +941,48 @@
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "valid_eligibility_diagnosis",
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
-                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
+                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled"
           FROM "users_user"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
@@ -857,7 +990,8 @@
                                            %s))
           GROUP BY "users_user"."id",
                    34,
-                   35
+                   35,
+                   "users_jobseekerprofile"."user_id"
           ORDER BY 34 ASC,
                    "users_user"."id" ASC
           LIMIT 4
@@ -1024,6 +1158,7 @@
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list">Alain ZORRO</a>
+                                  
                               </td>
                               <td>
                                   
@@ -1069,6 +1204,7 @@
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list">Bernard YGREC</a>
+                                  
                               </td>
                               <td>
                                   
@@ -1114,6 +1250,7 @@
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list">Charlotte XERUS</a>
+                                  
                               </td>
                               <td>
                                   
@@ -1151,6 +1288,7 @@
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list">David WATERFORD</a>
+                                  
                               </td>
                               <td>
                                   
@@ -1424,16 +1562,56 @@
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "valid_eligibility_diagnosis",
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
-                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
+                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled"
           FROM "users_user"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
                    34,
-                   35
+                   35,
+                   "users_jobseekerprofile"."user_id"
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
         ''',
@@ -1561,16 +1739,56 @@
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "valid_eligibility_diagnosis",
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
-                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
+                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled"
           FROM "users_user"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
                    34,
-                   35
+                   35,
+                   "users_jobseekerprofile"."user_id"
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -1769,16 +1987,56 @@
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "valid_eligibility_diagnosis",
                  ARRAY_AGG(DISTINCT "job_applications_jobapplication"."sender_id") FILTER (
-                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by"
+                                                                                           WHERE "job_applications_jobapplication"."sender_id" IS NOT NULL) AS "application_sent_by",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled"
           FROM "users_user"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" IN (%s,
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
                    34,
-                   35
+                   35,
+                   "users_jobseekerprofile"."user_id"
           ORDER BY 34 ASC,
                    "users_user"."id" ASC
           LIMIT 3
@@ -1888,6 +2146,7 @@
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list-organization">Alain ZORRO</a>
+                                  
                               </td>
                               <td>
                                   
@@ -1933,6 +2192,7 @@
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list-organization">Bernard YGREC</a>
+                                  
                               </td>
                               <td>
                                   
@@ -1978,6 +2238,7 @@
                           <tr>
                               <td>
                                   <a class="btn-link" href="/job-seekers/details/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list-organization">Charlotte XERUS</a>
+                                  
                               </td>
                               <td>
                                   
