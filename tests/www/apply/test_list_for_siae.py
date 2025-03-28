@@ -100,7 +100,9 @@ class TestProcessListSiae:
                    name="{self.SELECTED_JOBS}"
                    type="checkbox"
                    value="{job1.pk}">
-            <label for="id_selected_jobs_0-top" class="form-check-label">{job1.display_name}</label>
+            <label for="id_selected_jobs_0-top" class="form-check-label">
+                {job1.display_name} ({job1.appellation.code})
+            </label>
             </div>
             </li>
             <li class="dropdown-item">
@@ -111,7 +113,9 @@ class TestProcessListSiae:
                        name="{self.SELECTED_JOBS}"
                        type="checkbox"
                        value="{job2.pk}">
-                <label for="id_selected_jobs_1-top" class="form-check-label">{job2.display_name}</label>
+                <label for="id_selected_jobs_1-top" class="form-check-label">
+                    {job2.display_name} ({job2.appellation.code})
+                </label>
             </div>
             </li>
             </ul>

@@ -907,7 +907,7 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
         jobs = set()
         for job_application in self.job_applications_qs.prefetch_related("selected_jobs__appellation"):
             for job in job_application.selected_jobs.all():
-                jobs.add((job.pk, job.display_name))
+                jobs.add((job.pk, f"{job.display_name} ({job.appellation.code})"))
         return sorted(jobs, key=lambda job: job[1])
 
     def _get_choices_for_job_seeker(self, users):
@@ -962,7 +962,7 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
         jobs = set()
         for job_application in self.job_applications_qs.prefetch_related("selected_jobs__appellation"):
             for job in job_application.selected_jobs.all():
-                jobs.add((job.appellation.code, job.appellation.name))
+                jobs.add((job.appellation.code, f"{job.appellation.name} ({job.appellation.code})"))
         return sorted(jobs, key=lambda job: job[1])
 
     def get_to_companies_choices(self):
