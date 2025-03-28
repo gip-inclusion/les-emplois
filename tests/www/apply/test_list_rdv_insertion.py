@@ -17,7 +17,6 @@ from itou.utils.mocks.rdv_insertion import (
 )
 from itou.www.apply.views.list_views import JobApplicationsDisplayKind
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.rdv_insertion.factories import InvitationRequestFactory, ParticipationFactory
 from tests.utils.test import parse_response_to_soup
 
@@ -51,21 +50,17 @@ class TestRdvInsertionDisplay:
     ONGOING_INVITE_LABEL = "Envoi en cours"
     INVITE_SENT_LABEL = "Invitation envoyée"
     NEXT_APPOINTMENT_LABEL = "Prochain rdv le 01/09/2024"
-    OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL = "1 autre rendez-vous prévu, consultez-le dans le détail de candidature"
+    OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL = "Un autre rendez-vous prévu, consultez-le dans le détail de candidature"
     OTHER_APPOINTMENTS_TWO_TOOLTIP_LABEL = "2 autres rendez-vous prévus, consultez-les dans le détail de candidature"
 
     def setup_method(self):
-        org = PrescriberOrganizationWithMembershipFactory(
-            membership__user__first_name="Max",
-            membership__user__last_name="Throughput",
-        )
         self.job_application = JobApplicationFactory(
             to_company__name="Hit Pit",
             to_company__with_membership=True,
             to_company__rdv_solidarites_id=1234,
             job_seeker__first_name="Jacques",
             job_seeker__last_name="Henry",
-            sender=org.active_members.get(),
+            sent_by_authorized_prescriber_organisation=True,
             for_snapshot=True,
         )
         self.participation = ParticipationFactory(
@@ -79,6 +74,7 @@ class TestRdvInsertionDisplay:
         "profile,view_name,job_application_label",
         [
             ("employer", "apply:list_for_siae", SEE_JOB_APPLICATION_LABEL),
+            ("prescriber", "apply:list_prescriptions", SEE_JOB_APPLICATION_LABEL),
             ("job_seeker", "apply:list_for_job_seeker", SEE_JOB_APPLICATION_LABEL_FOR_JOB_SEEKER),
         ],
     )
@@ -97,6 +93,7 @@ class TestRdvInsertionDisplay:
         "profile,view_name,job_application_label",
         [
             ("employer", "apply:list_for_siae", SEE_JOB_APPLICATION_LABEL),
+            ("prescriber", "apply:list_prescriptions", SEE_JOB_APPLICATION_LABEL),
             ("job_seeker", "apply:list_for_job_seeker", SEE_JOB_APPLICATION_LABEL_FOR_JOB_SEEKER),
         ],
     )
@@ -121,6 +118,7 @@ class TestRdvInsertionDisplay:
         "profile,view_name,job_application_label",
         [
             ("employer", "apply:list_for_siae", SEE_JOB_APPLICATION_LABEL),
+            ("prescriber", "apply:list_prescriptions", SEE_JOB_APPLICATION_LABEL),
             ("job_seeker", "apply:list_for_job_seeker", SEE_JOB_APPLICATION_LABEL_FOR_JOB_SEEKER),
         ],
     )
@@ -150,6 +148,7 @@ class TestRdvInsertionDisplay:
         "profile,view_name",
         [
             ("employer", "apply:list_for_siae"),
+            ("prescriber", "apply:list_prescriptions"),
             ("job_seeker", "apply:list_for_job_seeker"),
         ],
     )
@@ -168,6 +167,7 @@ class TestRdvInsertionDisplay:
         "profile,view_name",
         [
             ("employer", "apply:list_for_siae"),
+            ("prescriber", "apply:list_prescriptions"),
             ("job_seeker", "apply:list_for_job_seeker"),
         ],
     )
@@ -185,11 +185,18 @@ class TestRdvInsertionDisplay:
         "profile,view_name",
         [
             ("employer", "apply:list_for_siae"),
+            ("prescriber", "apply:list_prescriptions"),
             ("job_seeker", "apply:list_for_job_seeker"),
         ],
     )
     def test_list_with_many_upcoming_appointments(self, profile_login, client, profile, view_name):
         profile_login(profile, self.job_application)
+
+        # Force job application transition logs creation
+        # This leads to duplicates on agregated results due to the join with transition logs
+        # Hence a subquery is required while last_change isn't persisted in a job application column
+        self.job_application.process()
+        self.job_application.accept(user=self.job_application.to_company.members.first())
 
         ParticipationFactory(
             job_seeker=self.job_application.job_seeker,
@@ -222,23 +229,20 @@ class TestRdvInsertionDisplay:
 
 class TestRdvInsertionView:
     def setup_method(self):
-        org = PrescriberOrganizationWithMembershipFactory(
-            membership__user__first_name="Max",
-            membership__user__last_name="Throughput",
-        )
         self.job_application = JobApplicationFactory(
             to_company__name="Hit Pit",
             to_company__with_membership=True,
             to_company__rdv_solidarites_id=1234,
             job_seeker__first_name="Jacques",
             job_seeker__last_name="Henry",
-            sender=org.active_members.get(),
+            sent_by_authorized_prescriber_organisation=True,
             for_snapshot=True,
         )
 
     @respx.mock
-    def test_rdv_insertion_invite_not_available_for_job_seeker(self, client):
-        client.force_login(self.job_application.job_seeker)
+    @pytest.mark.parametrize("profile", ["prescriber", "job_seeker"])
+    def test_rdv_insertion_invite_not_available_for_non_employers(self, profile_login, client, profile):
+        profile_login(profile, self.job_application)
         response = client.post(
             reverse("apply:rdv_insertion_invite", kwargs={"job_application_id": self.job_application.pk}),
             follow=True,
