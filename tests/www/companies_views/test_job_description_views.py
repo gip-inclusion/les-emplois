@@ -717,7 +717,7 @@ class TestJobDescriptionCard(JobDescriptionAbstract):
         assertNotContains(response, PLACE_HOLDER)
 
     def test_display_custom_or_appellation_name(self, client):
-        TITLE_MARKUP = '<h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">%s</h1>'
+        TITLE_MARKUP = '<h1 class="mb-1 mb-xl-0 me-xl-3">%s</h1>'
         SUBTITLE_MARKUP = '<p class="mb-0">%s</p>'
 
         # custom_name is missing, show only appellation.name, and bellow appellation.code
