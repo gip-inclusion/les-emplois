@@ -450,13 +450,13 @@ class Client:
             raise Exception(data["error"])
         return data
 
-    def fetch_card_results(self, card, filters=None, group_by=None):
-        if not any([filters, group_by]):
+    def fetch_card_results(self, card, fields=None, filters=None, group_by=None):
+        if not any([fields, filters, group_by]):
             return self._client.post(f"/card/{card}/query/json").raise_for_status().json()
 
         dataset_query = self._client.get(f"/card/{card}").raise_for_status().json()["dataset_query"]
         dataset_query["query"] = self.merge_query(
             dataset_query["query"],
-            self.build_query(where=filters, group_by=group_by),
+            self.build_query(select=fields, where=filters, group_by=group_by),
         )
         return self.fetch_dataset_results(dataset_query)

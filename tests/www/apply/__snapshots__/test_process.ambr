@@ -292,7 +292,8 @@
                  "users_jobseekerprofile"."hexa_commune_id",
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id"
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
@@ -1317,6 +1318,7 @@
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled",
                  "eligibility_eligibilitydiagnosis"."id",
                  "eligibility_eligibilitydiagnosis"."author_id",
                  "eligibility_eligibilitydiagnosis"."author_kind",
@@ -1460,6 +1462,7 @@
                  T12."pe_obfuscated_nir",
                  T12."pe_last_certification_attempt_at",
                  T12."created_by_prescriber_organization_id",
+                 T12."is_stalled",
                  T13."id",
                  T13."address_line_1",
                  T13."address_line_2",
@@ -2484,6 +2487,7 @@
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled",
                  "eligibility_eligibilitydiagnosis"."id",
                  "eligibility_eligibilitydiagnosis"."author_id",
                  "eligibility_eligibilitydiagnosis"."author_kind",
@@ -2627,6 +2631,7 @@
                  T12."pe_obfuscated_nir",
                  T12."pe_last_certification_attempt_at",
                  T12."created_by_prescriber_organization_id",
+                 T12."is_stalled",
                  T13."id",
                  T13."address_line_1",
                  T13."address_line_2",
@@ -3594,6 +3599,7 @@
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled",
                  "eligibility_eligibilitydiagnosis"."id",
                  "eligibility_eligibilitydiagnosis"."author_id",
                  "eligibility_eligibilitydiagnosis"."author_kind",
@@ -3737,6 +3743,7 @@
                  T12."pe_obfuscated_nir",
                  T12."pe_last_certification_attempt_at",
                  T12."created_by_prescriber_organization_id",
+                 T12."is_stalled",
                  T13."id",
                  T13."address_line_1",
                  T13."address_line_2",
