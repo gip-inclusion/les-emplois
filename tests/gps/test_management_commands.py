@@ -1,10 +1,12 @@
 import datetime
 import os
+from tempfile import NamedTemporaryFile
 
 import openpyxl
 import pytest
-from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.core import management
+from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.gps.management.commands import sync_follow_up_groups_and_members
@@ -12,11 +14,15 @@ from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from itou.users.enums import UserKind
+from itou.users.models import User
+from itou.utils.export import generate_excel_sheet
+from itou.utils.models import PkSupportRemark
 from itou.www.gps.enums import EndReason
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -226,6 +232,170 @@ class TestSyncGroupsManagementCommand:
         assert membership_3_1.created_at == beneficiary_3.date_joined
 
 
+@freeze_time()
+def test_import_advisor_information(settings, caplog, mocker):
+    batch_group_creator = ItouStaffFactory()
+    settings.GPS_GROUPS_CREATED_BY_EMAIL = batch_group_creator.email
+
+    job_seeker_with_no_correct_data = JobSeekerFactory()
+    employer = EmployerFactory()
+
+    unknown_safir = "22222"
+    known_safir = "11111"
+    organization = PrescriberOrganizationFactory(code_safir_pole_emploi=known_safir)
+
+    # A job seeker whose advisor is a prescriber that already exists, with no follow up group
+    job_seeker_1 = JobSeekerFactory()
+    prescriber_1 = PrescriberFactory()
+
+    # A job seeker whose advisor is a prescriber that already exists, with a follow up group
+    job_seeker_2 = JobSeekerFactory()
+    prescriber_2 = PrescriberFactory()
+    membership_2 = FollowUpGroupMembershipFactory(
+        follow_up_group__beneficiary=job_seeker_2,
+        member=prescriber_2,
+        ended_at=datetime.date(2000, 1, 1),
+        end_reason="The millennium bug",
+        last_contact_at=datetime.datetime(2000, 1, 1, tzinfo=datetime.UTC),
+        is_active=False,
+    )
+
+    # A job seeker whose advisor is a prescriber that does not exist, with a safir that exists
+    job_seeker_3 = JobSeekerFactory()
+    # previous certified referent
+    previous_membership_3 = FollowUpGroupMembershipFactory(
+        follow_up_group__beneficiary=job_seeker_3, is_referent_certified=True
+    )
+
+    # A job seeker whose advisor is a prescriber that does not exist, with a safir that does not exist
+    job_seeker_4 = JobSeekerFactory()
+
+    # An old membership that had is_referent_certified=True
+    old_certified_referent_membership = FollowUpGroupMembershipFactory(is_referent_certified=True)
+
+    with NamedTemporaryFile() as file:
+        # write imported file add a column to ignore to ensure the code does'nt crash
+        headers = ["ID", "prenom_cdde", "nom_cdde", "code_safir_agence", "mail_cdde", "some random column"]
+        data = [
+            # missing prenom_cdde
+            [job_seeker_with_no_correct_data.pk, "", "Test", "Test", "Test", "random value"],
+            # missing nom_cdde
+            [job_seeker_with_no_correct_data.pk, "Test", "", "Test", "Test", "random value"],
+            # missing code_safir_agence
+            [job_seeker_with_no_correct_data.pk, "test", "Test", "", "Test", "random value"],
+            # missing mail_cdde
+            [job_seeker_with_no_correct_data.pk, "test", "Test", "Test", "", "random value"],
+            # mail_cdde is used by an employer
+            [job_seeker_with_no_correct_data.pk, "Test", "Test", "Test", employer.email, "random value"],
+            # Not a job seeker
+            [prescriber_1.pk, "Test", "Test", "Test", "Test", "random value"],
+            # correct data
+            [
+                job_seeker_1.pk,
+                "prescriber_1_first_name",  # This value isn't used
+                "prescriber_1_last_name",  # This value isn't used
+                known_safir,  # This will be ignored as the prescriber already exists
+                prescriber_1.email,
+                "random value",
+            ],
+            [
+                job_seeker_2.pk,
+                "prescriber_2_first_name",  # This value isn't used
+                "prescriber_2_last_name",  # This value isn't used
+                unknown_safir,  # This will be ignored as the prescriber already exists
+                prescriber_2.email,
+                "random value",
+            ],
+            [
+                job_seeker_3.pk,
+                "Alphonse",
+                "Armani",
+                known_safir,
+                "alphonse.armani@mailinator.com",
+                "random value",
+            ],
+            [
+                job_seeker_4.pk,
+                "Beatrice",
+                "Balladur",
+                unknown_safir,
+                "beatrice.balladur@mailinator.com",
+                "random value",
+            ],
+        ]
+        generate_excel_sheet(headers, data).save(file)
+        file.seek(0)
+        management.call_command("import_advisor_information", file.name, wet_run=True)
+
+    # The old membership is not certified anymore
+    old_certified_referent_membership.refresh_from_db()
+    assert old_certified_referent_membership.is_referent_certified is False
+
+    # job seeker 1 to 4 groups and the one from old_certified_referent_membership
+    assert FollowUpGroup.objects.count() == 5
+    # each group only has one membership except for job_seeker_3's group
+    assert FollowUpGroupMembership.objects.count() == 6
+
+    # Job seeker 1:
+    membership_1 = FollowUpGroupMembership.objects.get(follow_up_group__beneficiary=job_seeker_1)
+    assert membership_1.is_referent_certified is True
+    assert membership_1.member == prescriber_1
+    # We don't attach an existing prescriber to an organisation
+    assert not prescriber_1.prescribermembership_set.exists()
+
+    # Job seeker 2:
+    membership_2.refresh_from_db()
+    assert membership_2.is_referent_certified is True
+    assert membership_2.member == prescriber_2
+    assert membership_2.ended_at is None
+    assert membership_2.end_reason is None
+    assert membership_2.last_contact_at == timezone.now()
+    assert membership_2.is_active is True
+
+    # Job seeker 3:
+    membership_3 = (
+        FollowUpGroupMembership.objects.filter(follow_up_group__beneficiary=job_seeker_3)
+        .exclude(pk=previous_membership_3.pk)
+        .get()
+    )
+    assert membership_3.is_referent_certified is True
+    previous_membership_3.refresh_from_db()
+    assert previous_membership_3.is_referent_certified is False
+    # created prescriber
+    prescriber_3 = membership_3.member
+    assert prescriber_3.email == "alphonse.armani@mailinator.com"
+    assert prescriber_3.first_name == "Alphonse"
+    assert prescriber_3.last_name == "Armani"
+    assert prescriber_3.is_prescriber
+    assert prescriber_3.prescribermembership_set.get().organization == organization
+    user_content_type = ContentType.objects.get_for_model(User)
+    user_remark = PkSupportRemark.objects.filter(content_type=user_content_type, object_id=prescriber_3.pk).get()
+    assert user_remark.remark == "Créé par l'import des référents FT pour GPS"
+
+    # Job seeker 4:
+    membership_4 = FollowUpGroupMembership.objects.get(follow_up_group__beneficiary=job_seeker_4)
+    assert membership_4.is_referent_certified is True
+    # created prescriber
+    prescriber_4 = membership_4.member
+    assert prescriber_4.email == "beatrice.balladur@mailinator.com"
+    assert prescriber_4.first_name == "Beatrice"
+    assert prescriber_4.last_name == "Balladur"
+    assert prescriber_4.is_prescriber
+    assert not prescriber_4.prescribermembership_set.exists()
+    user_remark = PkSupportRemark.objects.filter(content_type=user_content_type, object_id=prescriber_4.pk).get()
+    assert user_remark.remark == "Créé par l'import des référents FT pour GPS"
+
+    assert caplog.messages[:-1] == [
+        "Found 6 rows from GPS export.",  # 10 minus the 4 with missing data
+        f"Some job seekers ids where not found: [{prescriber_1.pk}].",
+        f"Some advisor email are attached to non prescriber accounts: ['{employer.email}'].",
+        "Matched 4 users in the database",
+        "100.00%",
+        "--------------------------------------------------------------------------------",
+        "Import complete. 2 prescribers were created and 4 certified referent were set.",
+    ]
+
+
 class TestArchiveOldFollowUpMembershipCommand:
     @freeze_time("2025-03-25")
     def test_command(self):
@@ -254,7 +424,8 @@ class TestArchiveOldFollowUpMembershipCommand:
 
 
 @freeze_time("2025-04-03 09:44")
-def test_export_beneficiaries_for_advisor_command(capsys):
+def test_export_beneficiaries_for_advisor_command(tmp_path, settings):
+    settings.EXPORT_DIR = tmp_path
     # Not a job seeker
     PrescriberFactory(post_code="30000")
 
