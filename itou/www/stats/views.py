@@ -130,6 +130,7 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
         "tally_embed_form_id": tally_embed_form_id,
         "PILOTAGE_HELP_CENTER_URL": global_constants.PILOTAGE_HELP_CENTER_URL,
         "tally_suspension_form": tally_suspension_form,
+        "tally_hidden_fields": {},
     }
 
     # Key value pairs in context override preexisting pairs in base_context.
@@ -514,6 +515,10 @@ def stats_ph_state_main(request):
             ).values_list("pk", flat=True)
         )
 
+    # Override the default tally form by prescriber type.
+    hidden_fields = {"type_prescripteur": request.current_organization.kind}
+    extra_context = {"tally_hidden_fields": hidden_fields}
+
     return render_stats_ph(
         request=request,
         page_title="Etat des candidatures orientées",
@@ -521,6 +526,7 @@ def stats_ph_state_main(request):
             mb.PRESCRIBER_FILTER_KEY: PrescriberOrganizationKind(request.current_organization.kind).label,
             mb.C1_PRESCRIBER_ORG_FILTER_KEY: allowed_org_pks,
         },
+        extra_context=extra_context,
     )
 
 
