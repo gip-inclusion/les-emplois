@@ -1,6 +1,9 @@
 import datetime
+import os
 
+import openpyxl
 import pytest
+from django.conf import settings
 from django.core import management
 from freezegun import freeze_time
 
@@ -248,3 +251,51 @@ class TestArchiveOldFollowUpMembershipCommand:
         ended_membership.refresh_from_db()
         assert ended_membership.ended_at == old_ended_at
         assert ended_membership.end_reason == EndReason.MANUAL
+
+
+@freeze_time("2025-04-03 09:44")
+def test_export_beneficiaries_for_advisor_command(capsys):
+    # Not a job seeker
+    PrescriberFactory(post_code="30000")
+
+    # Not in the correct department
+    JobSeekerFactory(post_code="40000")
+
+    job_seeker_1 = JobSeekerFactory(
+        post_code="30000",
+        jobseeker_profile__birthdate=datetime.date(2000, 12, 31),
+        jobseeker_profile__nir="",
+    )
+    job_seeker_2 = JobSeekerFactory(
+        post_code="30000",
+        jobseeker_profile__birthdate=None,
+    )
+
+    management.call_command("export_beneficiaries_for_advisor", "30")
+
+    path = os.path.join(settings.EXPORT_DIR, "gps_dpt_30_2025-04-03_11:44.xlsx")
+    workbook = openpyxl.load_workbook(path)
+    worksheet = workbook.active
+    assert [[cell.value or "" for cell in row] for row in worksheet.rows] == [
+        [
+            "ID",
+            "prénom",
+            "nom",
+            "nir",
+            "date_de_naissance",
+        ],
+        [
+            str(job_seeker_1.pk),
+            job_seeker_1.first_name,
+            job_seeker_1.last_name.upper(),
+            "",
+            "31/12/2000",
+        ],
+        [
+            str(job_seeker_2.pk),
+            job_seeker_2.first_name,
+            job_seeker_2.last_name.upper(),
+            job_seeker_2.jobseeker_profile.nir,
+            "",
+        ],
+    ]
