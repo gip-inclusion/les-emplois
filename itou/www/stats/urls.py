@@ -24,7 +24,6 @@ urlpatterns = [
     path("cd/orga_etp", views.stats_cd_orga_etp, name="stats_cd_orga_etp"),
     # Prescriber stats - FT.
     # Legacy `pe` term is used in URLs for retroactivity in Matomo stats but in fact it means `ft`.
-    path("pe/delay/main", views.stats_ft_delay_main, name="stats_ft_delay_main"),
     path("pe/delay/raw", views.stats_ft_delay_raw, name="stats_ft_delay_raw"),
     path("pe/conversion/main", views.stats_ft_conversion_main, name="stats_ft_conversion_main"),
     path("pe/conversion/raw", views.stats_ft_conversion_raw, name="stats_ft_conversion_raw"),

@@ -88,11 +88,6 @@ METABASE_DASHBOARDS = {
     #
     # Prescriber stats - FT.
     #
-    "stats_ft_delay_main": {
-        "dashboard_id": 168,
-        "tally_popup_form_id": "3lb9XW",
-        "tally_embed_form_id": "meM7DE",
-    },
     "stats_ft_delay_raw": {
         "dashboard_id": 180,
     },
@@ -292,7 +287,7 @@ METABASE_DASHBOARDS = {
 }
 
 
-SUSPENDED_DASHBOARD_IDS = [357, 298, 168]
+SUSPENDED_DASHBOARD_IDS = [357, 298]
 
 
 # Metabase private / signed URLs
