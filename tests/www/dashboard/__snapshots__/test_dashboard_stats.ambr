@@ -3283,9 +3283,6 @@
                               </p>
                               <p>C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.</p>
                           </div>
-                          <div>
-                              <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/tension" rel="noopener" target="_blank">Consulter ces données</a>
-                          </div>
                       </div>
                       
                       <div class="d-flex flex-column w-100">
@@ -3351,12 +3348,6 @@
                                   </a>
                               </li>
                           -->
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/ddets/tension">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Fiches de poste en tension des structures de mon département</span>
-                              </a>
-                          </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets/hiring">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -3463,9 +3454,6 @@
                               </p>
                               <p>C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.</p>
                           </div>
-                          <div>
-                              <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/tension" rel="noopener" target="_blank">Consulter ces données</a>
-                          </div>
                       </div>
                       
                       <div class="d-flex flex-column w-100">
@@ -3531,12 +3519,6 @@
                                   </a>
                               </li>
                           -->
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/ddets/tension">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Fiches de poste en tension des structures de mon département</span>
-                              </a>
-                          </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets/hiring">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -3643,9 +3625,6 @@
                               </p>
                               <p>C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.</p>
                           </div>
-                          <div>
-                              <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/tension" rel="noopener" target="_blank">Consulter ces données</a>
-                          </div>
                       </div>
                       
                       <div class="d-flex flex-column w-100">
@@ -3711,12 +3690,6 @@
                                   </a>
                               </li>
                           -->
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/ddets/tension">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Fiches de poste en tension des structures de mon département</span>
-                              </a>
-                          </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets/hiring">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -4149,9 +4122,6 @@
                               </p>
                               <p>C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.</p>
                           </div>
-                          <div>
-                              <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/tension" rel="noopener" target="_blank">Consulter ces données</a>
-                          </div>
                       </div>
                       
                       <div class="d-flex flex-column w-100">
@@ -4214,12 +4184,6 @@
                               <a class="btn-link btn-ico" href="/stats/dgefp/siae_evaluation">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Voir les données du contrôle a posteriori (version bêta)</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dgefp/tension">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Fiches de poste en tension</span>
                               </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -4323,9 +4287,6 @@
                               </p>
                               <p>C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.</p>
                           </div>
-                          <div>
-                              <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/tension" rel="noopener" target="_blank">Consulter ces données</a>
-                          </div>
                       </div>
                       
                       <div class="d-flex flex-column w-100">
@@ -4388,12 +4349,6 @@
                               <a class="btn-link btn-ico" href="/stats/dgefp/siae_evaluation">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Voir les données du contrôle a posteriori (version bêta)</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dgefp/tension">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Fiches de poste en tension</span>
                               </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -4497,9 +4452,6 @@
                               </p>
                               <p>C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.</p>
                           </div>
-                          <div>
-                              <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/tension" rel="noopener" target="_blank">Consulter ces données</a>
-                          </div>
                       </div>
                       
                       <div class="d-flex flex-column w-100">
@@ -4562,12 +4514,6 @@
                               <a class="btn-link btn-ico" href="/stats/dgefp/siae_evaluation">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Voir les données du contrôle a posteriori (version bêta)</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dgefp/tension">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Fiches de poste en tension</span>
                               </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -5004,9 +4950,6 @@
                               </p>
                               <p>C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.</p>
                           </div>
-                          <div>
-                              <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/tension" rel="noopener" target="_blank">Consulter ces données</a>
-                          </div>
                       </div>
                       
                       <div class="d-flex flex-column w-100">
@@ -5074,12 +5017,6 @@
                                   </a>
                               </li>
                           -->
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dreets/tension">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Fiches de poste en tension des structures de ma région</span>
-                              </a>
-                          </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dreets/hiring">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -5176,9 +5113,6 @@
                               </p>
                               <p>C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.</p>
                           </div>
-                          <div>
-                              <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/tension" rel="noopener" target="_blank">Consulter ces données</a>
-                          </div>
                       </div>
                       
                       <div class="d-flex flex-column w-100">
@@ -5246,12 +5180,6 @@
                                   </a>
                               </li>
                           -->
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dreets/tension">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Fiches de poste en tension des structures de ma région</span>
-                              </a>
-                          </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dreets/hiring">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
@@ -5348,9 +5276,6 @@
                               </p>
                               <p>C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.</p>
                           </div>
-                          <div>
-                              <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/tension" rel="noopener" target="_blank">Consulter ces données</a>
-                          </div>
                       </div>
                       
                       <div class="d-flex flex-column w-100">
@@ -5418,12 +5343,6 @@
                                   </a>
                               </li>
                           -->
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dreets/tension">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Fiches de poste en tension des structures de ma région</span>
-                              </a>
-                          </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dreets/hiring">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>

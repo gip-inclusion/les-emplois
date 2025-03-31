@@ -143,11 +143,6 @@ METABASE_DASHBOARDS = {
         "tally_popup_form_id": "nG0lDp",
         "tally_embed_form_id": "mO0GY7",
     },
-    "stats_ddets_iae_tension": {
-        "dashboard_id": 389,
-        "tally_popup_form_id": "nrEPLl",
-        "tally_embed_form_id": "3jxPWx",
-    },
     "stats_ddets_iae_iae": {
         "dashboard_id": 117,
     },
@@ -200,11 +195,6 @@ METABASE_DASHBOARDS = {
         "tally_popup_form_id": "nG0lDp",
         "tally_embed_form_id": "mO0GY7",
     },
-    "stats_dreets_iae_tension": {
-        "dashboard_id": 389,
-        "tally_popup_form_id": "nrEPLl",
-        "tally_embed_form_id": "3jxPWx",
-    },
     "stats_dreets_iae_iae": {
         "dashboard_id": 117,
     },
@@ -248,11 +238,6 @@ METABASE_DASHBOARDS = {
         "dashboard_id": 517,
         "tally_popup_form_id": "nG0lDp",
         "tally_embed_form_id": "mO0GY7",
-    },
-    "stats_dgefp_iae_tension": {
-        "dashboard_id": 519,
-        "tally_popup_form_id": "nrEPLl",
-        "tally_embed_form_id": "3jxPWx",
     },
     "stats_dgefp_iae_hiring": {
         "dashboard_id": 520,
@@ -312,7 +297,7 @@ METABASE_DASHBOARDS = {
 }
 
 
-SUSPENDED_DASHBOARD_IDS = [357, 389, 162, 298, 168]
+SUSPENDED_DASHBOARD_IDS = [357, 162, 298, 168]
 
 
 # Metabase private / signed URLs
