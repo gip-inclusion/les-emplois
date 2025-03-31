@@ -411,6 +411,9 @@ class TestGroupDetailsMembershipTab:
         beneficiary = JobSeekerFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
         participant = FollowUpGroupMembershipFactory(follow_up_group=group, created_at=timezone.now()).member
+        certified_referent = FollowUpGroupMembershipFactory(
+            follow_up_group=group, created_at=timezone.now(), is_referent_certified=True
+        ).member
 
         client.force_login(prescriber)
         url = reverse("gps:group_memberships", kwargs={"group_id": group.pk})
@@ -419,7 +422,11 @@ class TestGroupDetailsMembershipTab:
         html_details = parse_response_to_soup(response, selector="#gps_intervenants")
         cards = html_details.find_all("div", attrs={"class": "c-box c-box--results has-links-inside mb-3 my-md-4"})
         participant_ids = [card.attrs["id"].split("card-")[1] for card in cards]
-        assert participant_ids == [str(participant.public_id), str(prescriber.public_id)]
+        assert participant_ids == [
+            str(certified_referent.public_id),
+            str(participant.public_id),
+            str(prescriber.public_id),
+        ]
 
     @freezegun.freeze_time("2025-01-20")
     def test_display_participant_contact_info(self, client, mocker, snapshot):
