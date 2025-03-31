@@ -1,21 +1,28 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 
 {% block title %}Créer une nouvelle structure {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1>Créer/rejoindre une nouvelle structure</h1>
-    <p>Vous souhaitez rejoindre une structure :</p>
-    <ul>
-        <li>
-            ayant déjà un ou plusieurs membres, <b>demandez à l’un de ces membres de vous inviter depuis son tableau de bord</b>
-        </li>
-        <li>
-            connue des services des emplois de l'inclusion mais n’ayant pas encore de membre : <a href="{% url 'signup:company_select' %}">utilisez ce formulaire</a>
-        </li>
-    </ul>
-    <p>Dans les autres cas, complétez le formulaire ci-dessous.</p>
+    {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
+        {% fragment as c_title__main %}
+            <h1>Créer/rejoindre une nouvelle structure</h1>
+        {% endfragment %}
+        {% fragment as c_title__secondary %}
+            <p>Vous souhaitez rejoindre une structure :</p>
+            <ul>
+                <li>
+                    ayant déjà un ou plusieurs membres, <b>demandez à l’un de ces membres de vous inviter depuis son tableau de bord</b>
+                </li>
+                <li>
+                    connue des services des emplois de l'inclusion mais n’ayant pas encore de membre : <a href="{% url 'signup:company_select' %}">utilisez ce formulaire</a>
+                </li>
+            </ul>
+            <p>Dans les autres cas, complétez le formulaire ci-dessous.</p>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}

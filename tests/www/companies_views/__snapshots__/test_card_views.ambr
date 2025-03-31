@@ -275,8 +275,24 @@
   
                               
       
-      <h1>Acme inc.</h1>
-      <h2>Entreprise d'insertion</h2>
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Acme inc.</h1>
+              <p>Entreprise d'insertion</p>
+          </div>
+      
+      
+  </div>
+  
+  
+                              
+                                  
+  
+  
+  
+                              
+                              
       <div class="c-box c-box--action">
           <h2 class="visually-hidden">Actions rapides</h2>
           <div class="form-row align-items-center gx-3">
@@ -306,13 +322,6 @@
           </div>
       </div>
   
-                              
-                                  
-  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>
