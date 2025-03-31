@@ -207,18 +207,6 @@ class GroupEditionView(GroupDetailsMixin, UpdateView):
         return reverse("gps:group_contribution", args=(self.group.pk,))
 
 
-@check_user(is_allowed_to_use_gps)
-def user_details(request, public_id):
-    membership = get_object_or_404(
-        FollowUpGroupMembership.objects.select_related("follow_up_group"),
-        follow_up_group__beneficiary__public_id=public_id,
-        member=request.user,
-        is_active=True,
-    )
-
-    return HttpResponseRedirect(reverse("gps:group_memberships", args=(membership.follow_up_group.pk,)))
-
-
 @require_POST
 @check_user(is_allowed_to_use_gps)
 def display_contact_info(request, group_id, target_participant_public_id, mode):
