@@ -112,11 +112,6 @@ METABASE_DASHBOARDS = {
     "stats_ft_state_raw": {
         "dashboard_id": 183,
     },
-    "stats_ft_tension": {
-        "dashboard_id": 162,
-        "tally_popup_form_id": "wobaYV",
-        "tally_embed_form_id": "3EKJ5q",
-    },
     #
     # Authorized Prescribers' stats
     #
@@ -297,7 +292,7 @@ METABASE_DASHBOARDS = {
 }
 
 
-SUSPENDED_DASHBOARD_IDS = [357, 162, 298, 168]
+SUSPENDED_DASHBOARD_IDS = [357, 298, 168]
 
 
 # Metabase private / signed URLs
