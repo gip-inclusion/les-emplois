@@ -303,10 +303,7 @@ class TestApplyAsPrescriber:
         # Step application's eligibility
         # ----------------------------------------------------------------------
 
-        # job seeker is getting RSA
-        response = client.post(next_url, {"level_1_1": True})
-
-        assert EligibilityDiagnosis.objects.has_considered_valid(job_seeker, for_siae=guerande_company)
+        response = client.get(next_url)
 
         next_url = reverse(
             "apply:application_resume",
