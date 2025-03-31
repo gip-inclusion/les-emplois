@@ -1,5 +1,28 @@
 # Journal des modifications
 
+## 2025-03-31
+
+### Modifié
+
+- [Candidature : ajouter `back_url` sur les boutons Postuler](https://github.com/gip-inclusion/les-emplois/pull/5804)
+- [Correction de contrôle d’accès aux fiches de poste](https://github.com/gip-inclusion/les-emplois/pull/5841)
+- [GPS: Mise à jour des règles de suivi automatique](https://github.com/gip-inclusion/les-emplois/pull/5834)
+- [Pilotage: Publication nationale de TdB État des candidatures orientées (prescripteurs habilités)](https://github.com/gip-inclusion/les-emplois/pull/5651)
+- [Prescripteur: Améliorer la liste des candidats affichés dans l'onglet  "Tous les candidats de ma structure"](https://github.com/gip-inclusion/les-emplois/pull/5805)
+- [Prescripteur: Pouvoir valider l’éligibilité IAE sans être dans le parcours Postuler](https://github.com/gip-inclusion/les-emplois/pull/5809)
+- [UX/UI: Correction de wording de boutons de formulaires](https://github.com/gip-inclusion/les-emplois/pull/5835)
+- [UX/UI: correction UI des "cards" du dashboard candidats](https://github.com/gip-inclusion/les-emplois/pull/5845) 🖼
+- [UX/UI: Suppression de l’IntroJS du traitement par lot](https://github.com/gip-inclusion/les-emplois/pull/5830)
+- [UX/UI : correction des filtres (synchro entre menu déroulant et panneau latéral)](https://github.com/gip-inclusion/les-emplois/pull/5828)
+
+### Supprimé
+
+- [Tableau de bord: Supprimer les sondages présentés aux employeurs et aux prescripteurs](https://github.com/gip-inclusion/les-emplois/pull/5833)
+
+### Tech
+
+- [Tech: importer les librairies frequemment utilisées dans shell_plus](https://github.com/gip-inclusion/les-emplois/pull/5803)
+
 ## 2025-03-24
 
 ### Modifié
