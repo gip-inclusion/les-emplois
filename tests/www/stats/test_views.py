@@ -479,7 +479,7 @@ def test_get_params_aci_asp_ids_for_department_when_only_the_antenna_is_in_the_d
     }
 
 
-@pytest.mark.parametrize("dashboard_name", ["ph_prescription", "state", "tension"])
+@pytest.mark.parametrize("dashboard_name", ["ph_prescription", "state"])
 @pytest.mark.parametrize(
     "institution_kind", [InstitutionKind.DGEFP_IAE, InstitutionKind.DREETS_IAE, InstitutionKind.DDETS_IAE]
 )
